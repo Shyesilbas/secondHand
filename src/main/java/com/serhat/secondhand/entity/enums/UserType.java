@@ -1,6 +1,7 @@
 package com.serhat.secondhand.entity.enums;
 
-public enum AccountType {
-    INDIVIDUAL,
-    CORPORATE
+public enum UserType {
+    BUYER,
+    SELLER,
+    BOTH
 }

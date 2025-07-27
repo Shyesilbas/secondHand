@@ -1,4 +1,8 @@
 package com.serhat.secondhand.entity.enums;
 
-public class TokenType {
+public enum TokenType {
+    ACCESS_TOKEN,
+    REFRESH_TOKEN,
+    EMAIL_VERIFICATION,
+    PASSWORD_RESET
 }

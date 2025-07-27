@@ -1,4 +1,7 @@
 package com.serhat.secondhand.entity.enums;
 
-public class TokenStatus {
+public enum TokenStatus {
+    EXPIRED,
+    REVOKED,
+    ACTIVE
 }
