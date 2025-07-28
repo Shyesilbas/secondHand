@@ -5,6 +5,7 @@ import com.serhat.secondhand.entity.enums.AccountStatus;
 import com.serhat.secondhand.entity.enums.UserType;
 import com.serhat.secondhand.entity.enums.Gender;
 import jakarta.persistence.*;
+import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
@@ -57,6 +59,12 @@ public class User implements UserDetails {
     @CreatedDate
     @Column(name = "acc_creation_date")
     private LocalDate accountCreationDate;
+
+    @Timestamp
+    @Column(name = "last_login_date")
+    private LocalDateTime lastLoginDate;
+
+    private String LastLoginIp;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_type", nullable = false)
