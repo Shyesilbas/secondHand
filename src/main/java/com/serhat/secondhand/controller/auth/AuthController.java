@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,16 +58,21 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(
         summary = "User logout",
-        description = "Revokes all refresh tokens for the user"
+        description = "Revokes all refresh tokens and the current access token for the user"
     )
     @SecurityRequirement(name = "JWT")
     @ApiResponse(responseCode = "200", description = "Logout successful")
     @ApiResponse(responseCode = "400", description = "User already logged out")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    public ResponseEntity<Map<String, String>> logout(Authentication authentication) {
+    public ResponseEntity<Map<String, String>> logout(
+            Authentication authentication,
+            HttpServletRequest request) {
         
         String username = authentication.getName();
-        String message = authService.logout(username);
+        
+        String accessToken = extractTokenFromHeader(request);
+        
+        String message = authService.logout(username, accessToken);
         
         return ResponseEntity.ok(Map.of(
             "message", message,
@@ -119,5 +125,13 @@ public class AuthController {
             "authorities", authentication.getAuthorities(),
             "message", "Token is valid"
         ));
+    }
+
+    private String extractTokenFromHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 } 

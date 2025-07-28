@@ -50,8 +50,16 @@ public class JwtUtils {
         return buildToken(extraClaims, userDetails, accessTokenExpiration);
     }
 
+    public String generateAccessTokenWithJti(UserDetails userDetails, String jti) {
+        return buildTokenWithJti(new HashMap<>(), userDetails, accessTokenExpiration, jti);
+    }
+
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
+    }
+
+    public String generateRefreshTokenWithJti(UserDetails userDetails, String jti) {
+        return buildTokenWithJti(new HashMap<>(), userDetails, refreshTokenExpiration, jti);
     }
 
     public String generatePasswordResetToken(UserDetails userDetails) {
@@ -65,6 +73,17 @@ public class JwtUtils {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .id(UUID.randomUUID().toString()) // Add JTI for token blacklisting
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey())
+                .compact();
+    }
+
+    private String buildTokenWithJti(Map<String, Object> extraClaims, UserDetails userDetails, long expiration, String jti) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .id(jti) // Add JTI for token blacklisting
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())

@@ -14,17 +14,24 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TokenRepository extends JpaRepository<Token,Long> {
-
-    Optional<Token> findByToken(String token);
-
-    Optional<Token> findByTokenAndTokenStatus(String token, TokenStatus tokenStatus);
+public interface TokenRepository extends JpaRepository<Token, Long> {
 
     List<Token> findByUserAndTokenStatus(User user, TokenStatus tokenStatus);
 
     List<Token> findByUserAndTokenTypeAndTokenStatus(User user, TokenType tokenType, TokenStatus tokenStatus);
 
-    List<Token> findByUserAndTokenType(User user, TokenType tokenType);
+    Optional<Token> findByToken(String token);
+
+    Optional<Token> findByTokenAndTokenStatus(String token, TokenStatus tokenStatus);
+
+    // JTI-based methods
+    Optional<Token> findByJti(String jti);
+
+    Optional<Token> findByJtiAndTokenStatus(String jti, TokenStatus tokenStatus);
+
+    List<Token> findByAccessTokenJtiAndTokenStatus(String accessTokenJti, TokenStatus tokenStatus);
+
+    List<Token> findByRefreshTokenJtiAndTokenStatus(String refreshTokenJti, TokenStatus tokenStatus);
 
     @Query("SELECT t FROM Token t WHERE t.expiresAt < :currentTime AND t.tokenStatus = 'ACTIVE'")
     List<Token> findExpiredTokens(@Param("currentTime") LocalDateTime currentTime);

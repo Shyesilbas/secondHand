@@ -1,5 +1,8 @@
 package com.serhat.secondhand.jwt;
 
+import com.serhat.secondhand.dto.TokenValidationResult;
+import com.serhat.secondhand.entity.enums.TokenStatus;
+import com.serhat.secondhand.service.TokenService;
 import com.serhat.secondhand.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +29,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsService;
+    private final TokenService tokenService;
 
     // Public endpoints that should not be filtered
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
@@ -57,6 +61,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             if (accessToken == null) {
                 log.debug("No access token found in Authorization header for request: {}", request.getRequestURI());
                 filterChain.doFilter(request, response);
+                return;
+            }
+
+            // Check if token is revoked or expired in database
+            String jti = jwtUtils.extractJti(accessToken);
+            TokenValidationResult validationResult = tokenService.validateTokenByJti(jti);
+            
+            if (!validationResult.isValid()) {
+                sendTokenError(response, request, validationResult.getStatus());
                 return;
             }
 
@@ -98,5 +111,43 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
         
         return null;
+    }
+
+    private void sendTokenError(HttpServletResponse response, HttpServletRequest request, TokenStatus tokenStatus) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        
+        String message;
+        String errorCode;
+        
+        if (tokenStatus == TokenStatus.REVOKED) {
+            message = "Session revoked. Log in again";
+            errorCode = "SESSION_REVOKED";
+        } else if (tokenStatus == TokenStatus.EXPIRED) {
+            message = "Session Expired. Login again";
+            errorCode = "SESSION_EXPIRED";
+        } else {
+            message = "Invalid session!.";
+            errorCode = "SESSION_INVALID";
+        }
+        
+        String errorResponse = """
+            {
+                "timestamp": "%s",
+                "status": 401,
+                "error": "Unauthorized",
+                "message": "%s",
+                "path": "%s",
+                "errorCode": "%s"
+            }
+            """.formatted(
+                java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+                message,
+                request.getRequestURI(),
+                errorCode
+            );
+        
+        response.getWriter().write(errorResponse);
+        log.info("Token access blocked - Status: {}, Path: {}", tokenStatus, request.getRequestURI());
     }
 }

@@ -12,7 +12,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tokens")
+@Table(name = "tokens", indexes = {
+    @Index(name = "idx_jti", columnList = "jti"),
+    @Index(name = "idx_access_token_jti", columnList = "accessTokenJti"),
+    @Index(name = "idx_refresh_token_jti", columnList = "refreshTokenJti"),
+    @Index(name = "idx_user_token_type", columnList = "user_id, tokenType, tokenStatus")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,6 +30,15 @@ public class Token {
 
     @Column(nullable = false, unique = true, length = 1000)
     private String token;
+
+    @Column(name = "jti", nullable = false, unique = true, length = 36)
+    private String jti; // JWT ID - unique identifier for this token
+
+    @Column(name = "access_token_jti", length = 36)
+    private String accessTokenJti; // JTI of the related access token (for refresh tokens)
+
+    @Column(name = "refresh_token_jti", length = 36)
+    private String refreshTokenJti; // JTI of the related refresh token (for access tokens)
 
     @Enumerated(EnumType.STRING)
     @Column(name = "token_type", nullable = false)
