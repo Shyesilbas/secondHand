@@ -68,19 +68,29 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             userEmail = jwtUtils.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                boolean isTokenValid = tokenService.isTokenValid(jwt);
+                TokenStatus status = tokenService.getTokenStatus(jwt).orElse(TokenStatus.REVOKED);
 
-                if (jwtUtils.isTokenValid(jwt, userDetailsService.loadUserByUsername(userEmail)) && isTokenValid) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetailsService.loadUserByUsername(userEmail),
-                            null,
-                            userDetailsService.loadUserByUsername(userEmail).getAuthorities()
-                    );
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                // First check JWT expiry
+                if (!jwtUtils.isTokenValid(jwt, userDetailsService.loadUserByUsername(userEmail))) {
+                    sendTokenError(response, request, TokenStatus.EXPIRED);
+                    return;
                 }
+
+                // Then DB status
+                if (status != TokenStatus.ACTIVE) {
+                    sendTokenError(response, request, status);
+                    return;
+                }
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetailsService.loadUserByUsername(userEmail),
+                        null,
+                        userDetailsService.loadUserByUsername(userEmail).getAuthorities()
+                );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
             log.error("Authentication error: ", e);

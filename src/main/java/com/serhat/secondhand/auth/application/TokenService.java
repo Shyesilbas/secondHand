@@ -120,4 +120,8 @@ public class TokenService {
                      token.getUser().getUsername());
         });
     }
+
+    public Optional<TokenStatus> getTokenStatus(String tokenValue) {
+        return tokenRepository.findByToken(tokenValue).map(Token::getTokenStatus);
+    }
 }

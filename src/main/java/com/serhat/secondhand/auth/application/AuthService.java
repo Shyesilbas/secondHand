@@ -96,7 +96,7 @@ public class AuthService {
             log.info("Access token revoked during logout.");
         }
 
-        // Revoke all tokens for the user
+
         tokenService.revokeAllUserTokens(user);
 
         log.info("User logged out successfully: {}", user.getEmail());
@@ -122,13 +122,19 @@ public class AuthService {
         }
 
         String newAccessToken = jwtUtils.generateAccessToken(user);
+        String newRefreshToken = jwtUtils.generateRefreshToken(user);
 
-        // Revoke the old refresh token and save the new access token
+        // Revoke the old refresh token
         tokenService.revokeToken(refreshToken);
-        tokenService.saveToken(newAccessToken, TokenType.ACCESS_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
 
-        log.info("Tokens refreshed successfully for user: {}", username);
-        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, refreshToken);
+        // Persist new tokens
+        tokenService.saveToken(newAccessToken, TokenType.ACCESS_TOKEN, user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
+        tokenService.saveToken(newRefreshToken, TokenType.REFRESH_TOKEN, user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+
+        log.info("Tokens rotated successfully for user: {}", username);
+        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, newRefreshToken);
     }
 
     public LoginResponse getAuthenticatedUser(String username) {
