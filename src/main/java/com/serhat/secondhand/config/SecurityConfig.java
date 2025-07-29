@@ -43,6 +43,8 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
+                                "/api/auth/password/forgot",
+                                "/api/auth/password/reset",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
                                 "/swagger-ui.html",
@@ -58,7 +60,7 @@ public class SecurityConfig {
                         .hasRole("BUYER")
                         
                         // General user endpoints (both buyers and sellers)
-                        .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**")
+                        .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**", "/api/auth/password/change")
                         .hasAnyRole("BUYER", "SELLER")
                         
                         .anyRequest().authenticated()

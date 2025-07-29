@@ -204,4 +204,35 @@ public class TokenService {
         // Default case - treat as not found
         return TokenValidationResult.notFound();
     }
+
+    // Password Reset Token Methods
+    public Token createPasswordResetToken(User user, String tokenValue, LocalDateTime expiresAt) {
+        // Revoke any existing password reset tokens for this user
+        revokeUserTokensByType(user, TokenType.PASSWORD_RESET);
+        
+        return saveToken(tokenValue, TokenType.PASSWORD_RESET, user, expiresAt);
+    }
+
+    public Optional<Token> findPasswordResetToken(String tokenValue) {
+        return tokenRepository.findByTokenAndTokenTypeAndTokenStatus(
+            tokenValue, TokenType.PASSWORD_RESET, TokenStatus.ACTIVE
+        );
+    }
+
+    public boolean isPasswordResetTokenValid(String tokenValue) {
+        return findPasswordResetToken(tokenValue)
+                .map(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
+                .orElse(false);
+    }
+
+    public void revokePasswordResetToken(String tokenValue) {
+        tokenRepository.findByTokenAndTokenTypeAndTokenStatus(
+            tokenValue, TokenType.PASSWORD_RESET, TokenStatus.ACTIVE
+        ).ifPresent(token -> {
+            token.setTokenStatus(TokenStatus.REVOKED);
+            tokenRepository.save(token);
+            log.info("Password reset token revoked - JTI: {}, User: {}", 
+                     token.getJti(), token.getUser().getUsername());
+        });
+    }
 }

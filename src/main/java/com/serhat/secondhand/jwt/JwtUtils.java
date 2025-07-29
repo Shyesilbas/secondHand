@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import com.serhat.secondhand.entity.User;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -66,6 +67,21 @@ public class JwtUtils {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("type", "PASSWORD_RESET");
         return buildToken(extraClaims, userDetails, passwordResetTokenExpiration);
+    }
+
+    public String generatePasswordResetToken(User user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("type", "PASSWORD_RESET");
+        extraClaims.put("userId", user.getId());
+        
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(user.getEmail())
+                .id(UUID.randomUUID().toString())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + passwordResetTokenExpiration))
+                .signWith(getSignInKey())
+                .compact();
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {

@@ -1,10 +1,14 @@
 package com.serhat.secondhand.controller.auth;
 
+import com.serhat.secondhand.dto.request.ChangePasswordRequest;
+import com.serhat.secondhand.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.dto.request.LoginRequest;
 import com.serhat.secondhand.dto.request.RegisterRequest;
+import com.serhat.secondhand.dto.request.ResetPasswordRequest;
 import com.serhat.secondhand.dto.response.LoginResponse;
 import com.serhat.secondhand.dto.response.RegisterResponse;
 import com.serhat.secondhand.service.AuthService;
+import com.serhat.secondhand.service.PasswordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

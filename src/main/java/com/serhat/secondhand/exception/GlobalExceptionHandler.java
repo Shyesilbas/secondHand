@@ -1,5 +1,6 @@
 package com.serhat.secondhand.exception;
 
+import com.serhat.secondhand.exception.auth.AccountNotActiveException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -98,6 +99,22 @@ public class GlobalExceptionHandler {
         
         log.warn("Bad credentials: {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccountNotActiveException.class)
+    public ResponseEntity<ErrorResponse> handleAccountNotActive(
+            AccountNotActiveException ex, 
+            HttpServletRequest request) {
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Account Not Active",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        
+        log.warn("Account not active: {} - Status: {}", ex.getMessage(), ex.getAccountStatus());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

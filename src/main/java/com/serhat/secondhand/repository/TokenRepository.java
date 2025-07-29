@@ -24,6 +24,8 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 
     Optional<Token> findByTokenAndTokenStatus(String token, TokenStatus tokenStatus);
 
+    Optional<Token> findByTokenAndTokenTypeAndTokenStatus(String token, TokenType tokenType, TokenStatus tokenStatus);
+
     // JTI-based methods
     Optional<Token> findByJti(String jti);
 

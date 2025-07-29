@@ -4,9 +4,12 @@ import com.serhat.secondhand.dto.request.LoginRequest;
 import com.serhat.secondhand.dto.request.RegisterRequest;
 import com.serhat.secondhand.dto.response.LoginResponse;
 import com.serhat.secondhand.dto.response.RegisterResponse;
+import com.serhat.secondhand.entity.Token;
 import com.serhat.secondhand.entity.User;
+import com.serhat.secondhand.entity.enums.AccountStatus;
 import com.serhat.secondhand.entity.enums.TokenType;
 import com.serhat.secondhand.exception.User.UserAlreadyLoggedOutException;
+import com.serhat.secondhand.exception.auth.AccountNotActiveException;
 import com.serhat.secondhand.exception.auth.InvalidRefreshTokenException;
 import com.serhat.secondhand.jwt.JwtUtils;
 import com.serhat.secondhand.mapper.UserMapper;
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +56,14 @@ public class AuthService {
         );
 
         User user = userService.findByEmail(request.email());
+
+        if(!request.password().equals(user.getPassword())){
+            throw new BadCredentialsException("Bad Credentials");
+        }
+
+        if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            throw AccountNotActiveException.withStatus(user.getAccountStatus());
+        }
 
         user.setLastLoginDate(LocalDateTime.now());
         userService.update(user);
@@ -145,7 +157,7 @@ public class AuthService {
     private String getAccessTokenJtiFromRefreshToken(String refreshTokenJti) {
         // This method gets the linked access token JTI from the refresh token record
         return tokenService.findByJti(refreshTokenJti)
-                .map(token -> token.getAccessTokenJti())
+                .map(Token::getAccessTokenJti)
                 .orElse(null);
     }
 
