@@ -66,9 +66,17 @@ public class User implements UserDetails {
 
     private String LastLoginIp;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "acc_type", nullable = false)
-    private UserType userType;
+    @Column( nullable = false)
+    private boolean accountVerified;
+
+    @Column( nullable = false)
+    private boolean canSell;
+
+    @Column( nullable = true)
+    private String verificationCode;
+
+    @Column(nullable = true)
+    private Integer verificationAttemptLeft = 3;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)
@@ -76,7 +84,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
@@ -96,22 +104,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
-        switch (userType) {
-            case BUYER:
-                authorities.add(new SimpleGrantedAuthority("ROLE_BUYER"));
-                break;
-            case SELLER:
-                authorities.add(new SimpleGrantedAuthority("ROLE_SELLER"));
-                break;
-            case BOTH:
-                authorities.add(new SimpleGrantedAuthority("ROLE_BUYER"));
-                authorities.add(new SimpleGrantedAuthority("ROLE_SELLER"));
-                break;
-        }
-
-        return authorities;
+        List<SimpleGrantedAuthority> auth = new ArrayList<>();
+        auth.add(new SimpleGrantedAuthority("ROLE_USER"));
+        return auth;
     }
 
     @Override

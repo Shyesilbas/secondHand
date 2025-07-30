@@ -31,11 +31,10 @@ public class UserMapper {
                 .gender(user.getGender())
                 .birthdate(user.getBirthdate())
                 .accountCreationDate(user.getAccountCreationDate())
-                .userType(user.getUserType())
                 .accountStatus(user.getAccountStatus())
                 .fullName(user.getName() + " " + user.getSurname())
-                .canSell(canUserSell(user.getUserType()))
-                .canBuy(canUserBuy(user.getUserType()))
+                .canSell(user.isCanSell())
+                .accountVerified(user.isAccountVerified())
                 .build();
     }
 
@@ -52,19 +51,15 @@ public class UserMapper {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .gender(registerRequest.getGender())
                 .birthdate(registerRequest.getBirthdate())
-                .userType(registerRequest.getUserType())
                 .accountStatus(AccountStatus.ACTIVE)
                 .accountCreationDate(LocalDate.now())
                 .lastLoginDate(null)
                 .LastLoginIp(null)
+                .canSell(false)
+                .verificationAttemptLeft(3)
+                .accountVerified(false)
+                .verificationCode(null)
                 .build();
     }
 
-    private boolean canUserSell(UserType userType) {
-        return userType == UserType.SELLER || userType == UserType.BOTH;
-    }
-
-    private boolean canUserBuy(UserType userType) {
-        return userType == UserType.BUYER || userType == UserType.BOTH;
-    }
 }
