@@ -1,0 +1,80 @@
+package com.serhat.secondhand.listing.api;
+
+import com.serhat.secondhand.listing.application.IVehicleListingService;
+import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.VehicleSearchCriteria;
+import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
+import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
+import com.serhat.secondhand.user.domain.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/vehicles")
+@Tag(name = "Vehicle Listing", description = "Vehicle listing operations")
+public class VehicleListingController {
+    
+    private final IVehicleListingService vehicleListingService;
+    
+    @PostMapping
+    @Operation(summary = "Create a new vehicle listing")
+    public ResponseEntity<Void> createVehicleListing(
+            @Valid @RequestBody VehicleCreateRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        UUID vehicleId = vehicleListingService.createVehicleListing(request, currentUser);
+        URI location = URI.create("/api/vehicles/" + vehicleId);
+        return ResponseEntity.created(location).build();
+    }
+    
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a vehicle listing")
+    public ResponseEntity<Void> updateVehicleListing(
+            @PathVariable UUID id,
+            @Valid @RequestBody VehicleUpdateRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        vehicleListingService.updateVehicleListing(id, request, currentUser);
+        return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/{id}")
+    @Operation(summary = "Get vehicle listing details")
+    public ResponseEntity<VehicleListingDto> getVehicleDetails(@PathVariable UUID id) {
+        VehicleListingDto vehicle = vehicleListingService.getVehicleDetails(id);
+        return ResponseEntity.ok(vehicle);
+    }
+    
+    @GetMapping("/search")
+    @Operation(summary = "Search vehicles by criteria")
+    public ResponseEntity<List<VehicleListingDto>> searchVehicles(
+            @Valid @ModelAttribute VehicleSearchCriteria criteria) {
+        List<VehicleListingDto> vehicles = vehicleListingService.searchVehicles(criteria);
+        return ResponseEntity.ok(vehicles);
+    }
+    
+    @GetMapping("/brand/{brand}/model/{model}")
+    @Operation(summary = "Find vehicles by brand and model")
+    public ResponseEntity<List<VehicleListingDto>> findByBrandAndModel(
+            @PathVariable CarBrand brand,
+            @PathVariable String model) {
+        List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brand, model);
+        return ResponseEntity.ok(vehicles);
+    }
+    
+    @GetMapping("/brands")
+    @Operation(summary = "Get all available car brands")
+    public ResponseEntity<CarBrand[]> getAllBrands() {
+        return ResponseEntity.ok(CarBrand.values());
+    }
+} 

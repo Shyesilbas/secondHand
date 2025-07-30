@@ -1,0 +1,29 @@
+package com.serhat.secondhand.listing.domain.dto.request;
+
+import com.serhat.secondhand.listing.domain.entity.enums.*;
+
+import java.math.BigDecimal;
+
+public record VehicleCreateRequest(
+    String title,
+    String description,
+    BigDecimal price,
+    Currency currency,
+    String city,
+    String district,
+    CarBrand brand,
+    String model,
+    Integer year,
+    Integer mileage,
+    Integer engineCapacity,
+    Integer gearbox,
+    Integer seatCount,
+    Doors doors,
+    Integer wheels,
+    Color color,
+    Integer fuelCapacity,
+    Integer fuelConsumption,
+    Integer horsePower,
+    Integer kilometersPerLiter,
+    FuelType fuelType
+) {} 

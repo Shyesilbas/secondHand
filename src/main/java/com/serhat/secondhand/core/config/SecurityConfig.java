@@ -54,6 +54,8 @@ public class SecurityConfig {
                                 "/api/auth/password/reset",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
+                                "/api/listings/status/{status}",
+                                "/api/listings/{id}",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()

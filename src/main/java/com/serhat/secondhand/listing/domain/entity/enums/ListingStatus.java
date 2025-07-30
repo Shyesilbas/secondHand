@@ -4,5 +4,6 @@ public enum ListingStatus {
     ACTIVE,
     RESERVED,
     CLOSED,
+    DRAFT,
     SOLD
 }
