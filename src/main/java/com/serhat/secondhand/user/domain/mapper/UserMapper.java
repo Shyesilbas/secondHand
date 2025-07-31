@@ -51,7 +51,7 @@ public class UserMapper {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .gender(registerRequest.getGender())
                 .birthdate(registerRequest.getBirthdate())
-                .accountStatus(AccountStatus.ACTIVE)
+                .accountStatus(AccountStatus.PENDING)
                 .accountCreationDate(LocalDate.now())
                 .lastLoginDate(null)
                 .LastLoginIp(null)

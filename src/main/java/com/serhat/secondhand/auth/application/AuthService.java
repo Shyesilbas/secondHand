@@ -47,7 +47,14 @@ public class AuthService {
         userService.save(user);
 
         log.info("User registered successfully: {}", user.getEmail());
-        return new RegisterResponse("Registration Successful", user.getId(), user.getEmail(), user.getName(), user.getSurname());
+
+        return new RegisterResponse(
+                "Registration Successful.",
+                "Account verification is a must for publish listing. Your account status is "+ user.getAccountStatus(),
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname());
     }
 
     public LoginResponse login(LoginRequest request) {

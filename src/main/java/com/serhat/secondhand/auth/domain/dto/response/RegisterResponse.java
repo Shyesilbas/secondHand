@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 public record RegisterResponse(
-        String message,
+        String welcomeMessage,
+        String importantMessage,
         Long userId,
         String email,
         String name,
