@@ -1,6 +1,7 @@
 package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
+import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 
@@ -15,5 +16,6 @@ public interface IUserService {
     void validateUniqueUser(String email, String phoneNumber);
     void verifyUser(VerificationRequest request);
     void sendVerificationCode();
-    void updateEmail(UpdateEmailRequest updateEmailRequest);
+    String updateEmail(UpdateEmailRequest updateEmailRequest);
+    String updatePhone(UpdatePhoneRequest updatePhoneRequest);
 }

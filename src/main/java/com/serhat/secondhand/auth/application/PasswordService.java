@@ -27,7 +27,6 @@ public class PasswordService {
     private final IUserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final IEmailService emailService;
     private final IVerificationService verificationService;
 
     public String changePassword(String username, ChangePasswordRequest request) {
@@ -64,9 +63,10 @@ public class PasswordService {
                     
                     verificationService.generateVerification(user, verificationCode, CodeType.PASSWORD_RESET);
                     
-                    emailService.sendPasswordResetEmail(user, verificationCode);
+                    //emailService.sendPasswordResetEmail(user, verificationCode);
 
                     log.info("Password reset verification code generated and email sent for user: {}", request.getEmail());
+                    log.info("Password reset verification code generated: {}", verificationCode);
                 });
 
         return "Check your email account for password reset verification code.";

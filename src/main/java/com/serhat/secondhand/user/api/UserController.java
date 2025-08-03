@@ -4,6 +4,7 @@ import com.serhat.secondhand.auth.application.AuthService;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
+import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,13 @@ public class UserController {
     }
 
     @PutMapping("/updateEmail")
-    public void updateEmail(@RequestBody @Valid UpdateEmailRequest request) {
-        userService.updateEmail(request);
+    public ResponseEntity<String> updateEmail(@RequestBody @Valid UpdateEmailRequest request) {
+        return ResponseEntity.ok(userService.updateEmail(request));
+    }
+
+    @PutMapping("/updatePhone")
+    public ResponseEntity<String> updateEmail(@RequestBody @Valid UpdatePhoneRequest request) {
+       return ResponseEntity.ok(userService.updatePhone(request));
     }
 
 }

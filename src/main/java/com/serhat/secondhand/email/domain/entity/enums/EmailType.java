@@ -5,6 +5,6 @@ public enum EmailType {
     PASSWORD_RESET,        // Şifre sıfırlama
     WELCOME,              // Hoşgeldin emaili
     NOTIFICATION,         // Genel bildirimler
-    PROMOTIONAL,          // Promosyon emaili
-    SYSTEM                // Sistem emaili
+    PROMOTIONAL,
+    SYSTEM
 }

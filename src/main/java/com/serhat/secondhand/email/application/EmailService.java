@@ -39,11 +39,11 @@ public class EmailService implements IEmailService {
     @Value("${app.email.welcome.content}")
     private String welcomeContentTemplate;
 
-    @Value("${app.email.password-reset.subject}")
-    private String passwordResetSubject;
+    @Value("${app.email.phoneUpdate.subject}")
+    private String phoneUpdateSubject;
 
-    @Value("${app.email.password-reset.content}")
-    private String passwordResetContentTemplate;
+    @Value("${app.email.phoneUpdate.content}")
+    private String phoneUpdateContentTemplate;
 
 
     @Override
@@ -77,6 +77,30 @@ public class EmailService implements IEmailService {
     }
 
     @Override
+    public EmailDto sendPhoneNumberUpdatedEmail(User user) {
+        String subject = phoneUpdateSubject;
+        String content = String.format(phoneUpdateContentTemplate, user.getName());
+        String recipientEmail = user.getEmail();
+        EmailType emailType = EmailType.NOTIFICATION;
+        LocalDateTime now = LocalDateTime.now();
+
+        Email email = Email.builder()
+                .user(user)
+                .recipientEmail(recipientEmail)
+                .senderEmail(defaultSenderEmail)
+                .subject(subject)
+                .content(content)
+                .emailType(emailType)
+                .createdAt(now)
+                .build();
+
+        email = emailRepository.save(email);
+        log.info("Phone update email saved with ID: {}", email.getId());
+
+        return new EmailDto(recipientEmail, defaultSenderEmail, subject, content, emailType, now);
+    }
+
+    @Override
     public EmailDto sendWelcomeEmail(User user) {
         String subject = welcomeSubject;
         String content = String.format(welcomeContentTemplate, user.getName());
@@ -99,31 +123,6 @@ public class EmailService implements IEmailService {
 
         return new EmailDto(recipientEmail, defaultSenderEmail, subject, content, emailType, now);
     }
-
-    @Override
-    public EmailDto sendPasswordResetEmail(User user, String resetToken) {
-        String subject = passwordResetSubject;
-        String content = String.format(passwordResetContentTemplate, user.getName(), resetToken);
-        String recipientEmail = user.getEmail();
-        EmailType emailType = EmailType.PASSWORD_RESET;
-        LocalDateTime now = LocalDateTime.now();
-
-        Email email = Email.builder()
-                .user(user)
-                .recipientEmail(recipientEmail)
-                .senderEmail(defaultSenderEmail)
-                .subject(subject)
-                .content(content)
-                .emailType(emailType)
-                .createdAt(now)
-                .build();
-
-        email = emailRepository.save(email);
-        log.info("Password reset email saved with ID: {}", email.getId());
-
-        return new EmailDto(recipientEmail, defaultSenderEmail, subject, content, emailType, now);
-    }
-
 
 
 

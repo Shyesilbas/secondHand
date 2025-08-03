@@ -8,6 +8,7 @@ import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.IEmailService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
+import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
@@ -66,11 +67,36 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public String updatePhone(UpdatePhoneRequest updatePhoneRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user= findByEmail(authentication.getName());
+
+        String currentPhone = user.getPhoneNumber();
+        String requestedPhone = updatePhoneRequest.newPhoneNumber();
+
+        if(!currentPhone.equals(requestedPhone)) {
+            throw new BusinessException("Phone numbers must be different",HttpStatus.BAD_REQUEST,HttpStatus.BAD_REQUEST.toString());
+        }
+
+        boolean existsByPhoneNumber = userRepository.existsByPhoneNumber(requestedPhone);
+        if(!existsByPhoneNumber) {
+            throw new BusinessException("Phone number is in usage",HttpStatus.CONFLICT,HttpStatus.CONFLICT.toString());
+        }
+
+        user.setPhoneNumber(requestedPhone);
+        update(user);
+        log.info("User phone number updated with email: {} , new Phone number : {}", user.getEmail(), requestedPhone);
+        emailService.sendPhoneNumberUpdatedEmail(user);
+        return "Phone number updated";
+
+    }
+
     public void sendVerificationCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user= findByEmail(authentication.getName());
 
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (!authentication.isAuthenticated()) {
             throw new AuthenticationNotFoundException("Authentication not found", HttpStatus.UNAUTHORIZED.toString());
         }
 
@@ -136,7 +162,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void updateEmail(UpdateEmailRequest updateEmailRequest) {
+    public String updateEmail(UpdateEmailRequest updateEmailRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = findByEmail(authentication.getName());
 
@@ -158,6 +184,7 @@ public class UserService implements IUserService {
         user.setEmail(requestedEmail);
         update(user);
         log.info("Email updated successfully from: {}, to : {} , by user : {}",currentEmail,requestedEmail,user);
+        return "Email updated";
 
     }
 }
