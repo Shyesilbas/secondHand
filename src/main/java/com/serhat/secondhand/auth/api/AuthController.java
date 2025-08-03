@@ -37,12 +37,6 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(
-        summary = "User login",
-        description = "Authenticate user and return JWT tokens"
-    )
-    @ApiResponse(responseCode = "200", description = "Login successful")
-    @ApiResponse(responseCode = "401", description = "Invalid credentials")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         
         LoginResponse response = authService.login(request);
@@ -50,22 +44,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @Operation(
-        summary = "User logout",
-        description = "Revokes all refresh tokens and the current access token for the user"
-    )
-    @SecurityRequirement(name = "JWT")
-    @ApiResponse(responseCode = "200", description = "Logout successful")
-    @ApiResponse(responseCode = "400", description = "User already logged out")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
     public ResponseEntity<Map<String, String>> logout(
             Authentication authentication,
             HttpServletRequest request) {
         
         String username = authentication.getName();
-        
+
         String accessToken = extractTokenFromHeader(request);
-        
+
         String message = authService.logout(username, accessToken);
         
         return ResponseEntity.ok(Map.of(
@@ -82,29 +68,8 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/me")
-    @Operation(
-        summary = "Get current user",
-        description = "Get information about the currently authenticated user"
-    )
-    @SecurityRequirement(name = "JWT")
-    @ApiResponse(responseCode = "200", description = "User information retrieved")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
-    public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {
-        
-        String username = authentication.getName();
-        LoginResponse response = authService.getAuthenticatedUser(username);
-        return ResponseEntity.ok(response);
-    }
 
     @GetMapping("/validate")
-    @Operation(
-        summary = "Validate token",
-        description = "Check if the current access token is valid"
-    )
-    @SecurityRequirement(name = "JWT")
-    @ApiResponse(responseCode = "200", description = "Token is valid")
-    @ApiResponse(responseCode = "401", description = "Token is invalid")
     public ResponseEntity<Map<String, Object>> validateToken(Authentication authentication) {
         
         return ResponseEntity.ok(Map.of(

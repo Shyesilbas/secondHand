@@ -34,8 +34,6 @@ public class JwtUtils {
     @Value("${jwt.refreshToken.expiration}")
     private long refreshTokenExpiration;
 
-    @Value("${jwt.passwordReset.expiration}")
-    private long passwordResetTokenExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -58,27 +56,6 @@ public class JwtUtils {
         return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
     }
 
-    public String generatePasswordResetToken(UserDetails userDetails) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("type", "PASSWORD_RESET");
-        return buildToken(extraClaims, userDetails, passwordResetTokenExpiration);
-    }
-
-    public String generatePasswordResetToken(User user) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("type", "PASSWORD_RESET");
-        extraClaims.put("userId", user.getId());
-        
-        return Jwts.builder()
-                .claims(extraClaims)
-                .subject(user.getEmail())
-                .id(UUID.randomUUID().toString())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + passwordResetTokenExpiration))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .claims(extraClaims)
@@ -93,16 +70,6 @@ public class JwtUtils {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    public boolean isPasswordResetTokenValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            String tokenType = claims.get("type", String.class);
-            return "PASSWORD_RESET".equals(tokenType) && !isTokenExpired(token);
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private boolean isTokenExpired(String token) {

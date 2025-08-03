@@ -4,20 +4,19 @@ import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
-import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
+import com.serhat.secondhand.core.verification.CodeType;
+import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.IEmailService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +27,8 @@ public class PasswordService {
     private final IUserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
     private final IEmailService emailService;
-
-    @Value("${jwt.passwordReset.expiration}")
-    private Long passwordResetTokenExpiration;
+    private final IVerificationService verificationService;
 
     public String changePassword(String username, ChangePasswordRequest request) {
         log.info("Password change attempt for user: {}", username);
@@ -64,26 +60,47 @@ public class PasswordService {
         userService.findOptionalByEmail(request.getEmail())
                 .filter(user -> user.getAccountStatus().equals(AccountStatus.ACTIVE))
                 .ifPresent(user -> {
-                    String resetToken = jwtUtils.generatePasswordResetToken(user);
-                    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(passwordResetTokenExpiration / 1000);
+                    String verificationCode = verificationService.generateCode();
+                    
+                    verificationService.generateVerification(user, verificationCode, CodeType.PASSWORD_RESET);
+                    
+                    emailService.sendPasswordResetEmail(user, verificationCode);
 
-                    tokenService.createPasswordResetToken(user, resetToken, expiresAt);
-
-                    emailService.sendPasswordResetEmail(user, resetToken);
-
-                    log.info("Password reset token generated and email sent for user: {}", request.getEmail());
+                    log.info("Password reset verification code generated and email sent for user: {}", request.getEmail());
                 });
 
-        return "Check your built in email account for password reset instructions.";
+        return "Check your email account for password reset verification code.";
     }
     
     public String resetPassword(ResetPasswordRequest request) {
-        log.info("Password reset attempt with token");
+        log.info("Password reset attempt with verification code for email: {}", request.getEmail());
 
-        User user = tokenService.validateAndGetUserByPasswordResetToken(request.getToken());
+        User user = userService.findByEmail(request.getEmail());
 
         if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
+        }
+
+        var verificationOpt = verificationService.findLatestActiveVerification(user, CodeType.PASSWORD_RESET);
+        
+        if (verificationOpt.isEmpty()) {
+            throw new VerificationCodeMismatchException("No active verification code found. Please request a new code.",
+                    "BAD_REQUEST");
+        }
+
+        var verification = verificationOpt.get();
+        
+        if (!request.getVerificationCode().equals(verification.getCode())) {
+            verificationService.decrementVerificationAttempts(verification);
+            int attemptsLeft = verification.getVerificationAttemptLeft();
+            
+            if (attemptsLeft <= 0) {
+                throw new VerificationCodeMismatchException("Too many failed attempts. Please request a new code.",
+                        "BAD_REQUEST");
+            }
+            
+            throw new VerificationCodeMismatchException("Incorrect verification code. Attempts left: " + attemptsLeft,
+                    "BAD_REQUEST");
         }
 
         validateNewPassword(request.getNewPassword(), request.getConfirmPassword(), user.getPassword());
@@ -91,7 +108,8 @@ public class PasswordService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
         
-        tokenService.revokePasswordResetToken(request.getToken());
+        verificationService.markVerificationAsUsed(verification);
+        
         tokenService.revokeAllUserTokens(user);
         
         log.info("Password reset completed for user: {}", user.getEmail());

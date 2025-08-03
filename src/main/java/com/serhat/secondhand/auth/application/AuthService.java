@@ -6,6 +6,7 @@ import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
+import com.serhat.secondhand.core.jwt.AuthenticationFilter;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.application.IUserService;
@@ -15,11 +16,13 @@ import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +110,6 @@ public class AuthService {
             tokenService.revokeToken(accessToken);
             log.info("Access token revoked during logout.");
         }
-
 
         tokenService.revokeAllUserTokens(user);
 

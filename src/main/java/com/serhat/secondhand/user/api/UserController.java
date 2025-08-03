@@ -1,11 +1,15 @@
 package com.serhat.secondhand.user.api;
 
+import com.serhat.secondhand.auth.application.AuthService;
+import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,10 +19,19 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final IUserService userService;
+    private final AuthService authService;
 
     @PostMapping("/send-code")
     public void sendVerificationCode() {
         userService.sendVerificationCode();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {
+
+        String username = authentication.getName();
+        LoginResponse response = authService.getAuthenticatedUser(username);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verify")
