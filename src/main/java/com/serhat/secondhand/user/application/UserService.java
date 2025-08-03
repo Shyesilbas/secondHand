@@ -6,7 +6,7 @@ import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.core.verification.Verification;
+import com.serhat.secondhand.email.application.IEmailService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -30,6 +30,7 @@ import java.util.Optional;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final IEmailService emailService;
     private final IVerificationService verificationService;
 
     @Override
@@ -82,8 +83,10 @@ public class UserService implements IUserService {
         String code = verificationService.generateCode();
 
         verificationService.generateVerification(user, code, CodeType.ACCOUNT_VERIFICATION);
+        
+        emailService.sendVerificationCodeEmail(user, code);
+        
         log.info("Verification code sent to user with email: {}", email);
-        log.info("Verification code: {}", code);
 
     }
 

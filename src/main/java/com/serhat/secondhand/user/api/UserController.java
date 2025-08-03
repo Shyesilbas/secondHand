@@ -21,7 +21,6 @@ public class UserController {
         userService.sendVerificationCode();
     }
 
-
     @PostMapping("/verify")
     public void verifyUser(@RequestBody VerificationRequest request) {
         userService.verifyUser(request);

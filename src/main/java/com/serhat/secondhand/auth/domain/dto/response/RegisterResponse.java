@@ -6,6 +6,7 @@ import lombok.Builder;
 public record RegisterResponse(
         String welcomeMessage,
         String importantMessage,
+        String informationMessage,
         Long userId,
         String email,
         String name,

@@ -30,13 +30,6 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(
-        summary = "User registration",
-        description = "Register a new user account"
-    )
-    @ApiResponse(responseCode = "200", description = "Registration successful")
-    @ApiResponse(responseCode = "400", description = "Validation failed")
-    @ApiResponse(responseCode = "409", description = "User already exists")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         
         RegisterResponse response = authService.register(request);
@@ -82,12 +75,6 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(
-        summary = "Refresh access token",
-        description = "Generate new access and refresh tokens using refresh token"
-    )
-    @ApiResponse(responseCode = "200", description = "Token refreshed successfully")
-    @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     public ResponseEntity<LoginResponse> refreshToken(@RequestBody Map<String, String> request) {
         
         String refreshToken = request.get("refreshToken");

@@ -5,6 +5,7 @@ import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.email.application.IEmailService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
@@ -28,6 +29,7 @@ public class PasswordService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final IEmailService emailService;
 
     @Value("${jwt.passwordReset.expiration}")
     private Long passwordResetTokenExpiration;
@@ -37,7 +39,6 @@ public class PasswordService {
 
         User user = userService.findByEmail(username);
         
-        // Check account status
         if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
         }
@@ -51,7 +52,6 @@ public class PasswordService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
         
-        // Revoke all active tokens to force re-login
         tokenService.revokeAllUserTokens(user);
         
         log.info("Password changed successfully for user: {}", username);
@@ -69,11 +69,12 @@ public class PasswordService {
 
                     tokenService.createPasswordResetToken(user, resetToken, expiresAt);
 
-                    log.warn("PASSWORD RESET TOKEN (remove this log in production): {}", resetToken);
-                    log.info("Password reset token generated for user: {}", request.getEmail());
+                    emailService.sendPasswordResetEmail(user, resetToken);
+
+                    log.info("Password reset token generated and email sent for user: {}", request.getEmail());
                 });
 
-        return "If the email exists in our system, you will receive a password reset link.";
+        return "Check your built in email account for password reset instructions.";
     }
     
     public String resetPassword(ResetPasswordRequest request) {

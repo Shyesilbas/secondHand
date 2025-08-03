@@ -7,6 +7,7 @@ import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
@@ -38,6 +39,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public RegisterResponse register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
@@ -48,9 +50,12 @@ public class AuthService {
 
         log.info("User registered successfully: {}", user.getEmail());
 
+        emailService.sendWelcomeEmail(user);
+
         return new RegisterResponse(
                 "Registration Successful.",
                 "Account verification is a must for publish listing. Your account status is "+ user.getAccountStatus(),
+                "Your built in email account also created.",
                 user.getId(),
                 user.getEmail(),
                 user.getName(),

@@ -56,9 +56,7 @@ public class UserMapper {
                 .lastLoginDate(null)
                 .LastLoginIp(null)
                 .canSell(false)
-                .verificationAttemptLeft(3)
                 .accountVerified(false)
-                .verificationCode(null)
                 .build();
     }
 
