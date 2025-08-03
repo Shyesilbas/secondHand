@@ -72,12 +72,6 @@ public class User implements UserDetails {
     @Column( nullable = false)
     private boolean canSell;
 
-    @Column( nullable = true)
-    private String verificationCode;
-
-    @Column(nullable = true)
-    private Integer verificationAttemptLeft = 3;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)
     private AccountStatus accountStatus;
