@@ -1,6 +1,8 @@
 package com.serhat.secondhand.user.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.UserType;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;

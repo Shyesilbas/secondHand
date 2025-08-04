@@ -7,7 +7,6 @@ import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.email.application.IEmailService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;

@@ -35,6 +35,7 @@ public class UserMapper {
                 .fullName(user.getName() + " " + user.getSurname())
                 .canSell(user.isCanSell())
                 .accountVerified(user.isAccountVerified())
+
                 .build();
     }
 

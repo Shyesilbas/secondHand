@@ -49,7 +49,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/api/auth/refresh",
                                 "/api/auth/password/forgot",
                                 "/api/auth/password/reset",
                                 "/swagger-ui/**",
@@ -60,15 +59,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         
-                        // Seller-only endpoints
                         .requestMatchers("/api/products/create", "/api/products/update/**", "/api/products/delete/**")
                         .hasRole("SELLER")
-                        
-                        // Buyer-only endpoints  
+
                         .requestMatchers("/api/orders/**", "/api/cart/**")
                         .hasRole("BUYER")
                         
-                        // General user endpoints (both buyers and sellers)
                         .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**", "/api/auth/password/change")
                         .hasAnyRole("BUYER", "SELLER")
                         
@@ -84,19 +80,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Frontend development server
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",  // Next.js development server
-                "http://127.0.0.1:3000",  // Alternative localhost
-                "http://localhost:3001"   // Backup port
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:3001"
         ));
         
-        // Allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         ));
         
-        // Allowed headers
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",

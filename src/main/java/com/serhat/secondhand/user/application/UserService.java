@@ -7,6 +7,9 @@ import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.IEmailService;
+import com.serhat.secondhand.payment.entity.Bank;
+import com.serhat.secondhand.payment.helper.IbanGenerator;
+import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
@@ -23,6 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service

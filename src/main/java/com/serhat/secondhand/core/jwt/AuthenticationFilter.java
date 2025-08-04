@@ -34,7 +34,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/auth/login",
             "/api/auth/register", 
-            "/api/auth/refresh",
             "/swagger-ui",
             "/api-docs",
             "/v3/api-docs",

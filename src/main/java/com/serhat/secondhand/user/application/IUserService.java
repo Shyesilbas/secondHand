@@ -18,4 +18,5 @@ public interface IUserService {
     void sendVerificationCode();
     String updateEmail(UpdateEmailRequest updateEmailRequest);
     String updatePhone(UpdatePhoneRequest updatePhoneRequest);
+
 }
