@@ -3,8 +3,9 @@ package com.serhat.secondhand.user.domain.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.serhat.secondhand.payment.entity.Bank;
+import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.domain.entity.enums.UserType;
+
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
@@ -77,6 +78,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)
     private AccountStatus accountStatus;
+
 
     @Override
     public boolean isAccountNonExpired() {

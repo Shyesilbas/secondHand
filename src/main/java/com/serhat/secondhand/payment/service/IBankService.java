@@ -8,4 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 public interface IBankService {
     BankDto getBankInfo(User user);
     Bank createBank(BankRequest bankRequest);
+    Bank createBankAccount(User user);
+    boolean hasUserBankAccount(User user);
+    Bank findByUser(User user);
 }

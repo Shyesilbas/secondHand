@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -45,14 +46,60 @@ public class BankService implements IBankService {
 
     @Override
     public Bank createBank(BankRequest bankRequest) {
-        Bank bank = new Bank();
-        bank.setIBAN(IbanGenerator.generateIban());
-        bank.setBalance(BigDecimal.ZERO);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
-        bank.setAccountHolder(user);
+        
+        // Check if user already has a bank account
+        if (hasUserBankAccount(user)) {
+            throw new BusinessException("User already has a bank account", 
+                                      HttpStatus.CONFLICT, HttpStatus.CONFLICT.toString());
+        }
+        
+        Bank bank = Bank.builder()
+                .accountHolder(user)
+                .balance(BigDecimal.ZERO)
+                .createdAt(LocalDateTime.now())
+                .IBAN(IbanGenerator.generateIban())
+                .build();
+                
         bank = bankRepository.save(bank);
         log.info("Bank created: {}", bank.getId());
+        return bank;
+    }
+
+    @Override
+    public Bank createBankAccount(User user) {
+        // Check if user already has a bank account
+        if (hasUserBankAccount(user)) {
+            throw new BusinessException("User already has a bank account", 
+                                      HttpStatus.CONFLICT, HttpStatus.CONFLICT.toString());
+        }
+
+        Bank bank = Bank.builder()
+                .accountHolder(user)
+                .balance(BigDecimal.ZERO)
+                .createdAt(LocalDateTime.now())
+                .IBAN(IbanGenerator.generateIban())
+                .build();
+
+        Bank savedBank = bankRepository.save(bank);
+        log.info("Bank account created for user: {} with IBAN: {}", user.getEmail(), savedBank.getIBAN());
+        return savedBank;
+    }
+
+    @Override
+    public boolean hasUserBankAccount(User user) {
+        Bank bank = bankRepository.findByAccountHolder(user);
+        return bank != null;
+    }
+
+    @Override
+    public Bank findByUser(User user) {
+        Bank bank = bankRepository.findByAccountHolder(user);
+        if (bank == null) {
+            throw new BusinessException("User does not have a bank account", 
+                                      HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.toString());
+        }
         return bank;
     }
 }
