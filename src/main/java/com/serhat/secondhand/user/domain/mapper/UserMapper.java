@@ -4,61 +4,36 @@ import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.domain.entity.enums.UserType;
-import lombok.RequiredArgsConstructor;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    private final PasswordEncoder passwordEncoder;
+    @Mapping(target = "fullName", expression = "java(user.getName() + \" \" + user.getSurname())")
+    UserDto toDto(User user);
 
-    public UserDto toDto(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .surname(user.getSurname())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .gender(user.getGender())
-                .birthdate(user.getBirthdate())
-                .accountCreationDate(user.getAccountCreationDate())
-                .accountStatus(user.getAccountStatus())
-                .fullName(user.getName() + " " + user.getSurname())
-                .canSell(user.isCanSell())
-                .accountVerified(user.isAccountVerified())
-
-                .build();
-    }
-
-    public User toEntity(RegisterRequest registerRequest) {
-        if (registerRequest == null) {
-            return null;
-        }
-
-        return User.builder()
-                .name(registerRequest.getName())
-                .surname(registerRequest.getSurname())
-                .email(registerRequest.getEmail())
-                .phoneNumber(registerRequest.getPhoneNumber())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .gender(registerRequest.getGender())
-                .birthdate(registerRequest.getBirthdate())
-                .accountStatus(AccountStatus.PENDING)
-                .accountCreationDate(LocalDate.now())
-                .lastLoginDate(null)
-                .LastLoginIp(null)
-                .canSell(false)
-                .accountVerified(false)
-                .build();
-    }
-
+    @Mappings({
+        @Mapping(target = "id", ignore = true),
+        @Mapping(target = "password", expression = "java(encoder.encode(registerRequest.getPassword()))"),
+        @Mapping(target = "accountStatus", constant = "PENDING"),
+        @Mapping(target = "accountCreationDate", expression = "java(java.time.LocalDate.now())"),
+        @Mapping(target = "lastLoginDate", ignore = true),
+        @Mapping(target = "lastLoginIp", ignore = true),
+        @Mapping(target = "canSell", constant = "false"),
+        @Mapping(target = "accountVerified", constant = "false"),
+        @Mapping(target = "listings", ignore = true),
+        @Mapping(target = "bankAccounts", ignore = true),
+        @Mapping(target = "creditCards", ignore = true),
+        @Mapping(target = "emails", ignore = true),
+        @Mapping(target = "tokens", ignore = true),
+        @Mapping(target = "verifications", ignore = true),
+        @Mapping(target = "fromPayments", ignore = true),
+        @Mapping(target = "toPayments", ignore = true)
+    })
+    User toEntity(RegisterRequest registerRequest, @Context PasswordEncoder encoder);
 }

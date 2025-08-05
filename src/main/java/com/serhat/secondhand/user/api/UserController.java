@@ -1,7 +1,7 @@
 package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
-import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User Management", description = "User profile and verification operations")
 public class UserController {
 
-    private final IUserService userService;
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {

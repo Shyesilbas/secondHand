@@ -1,0 +1,59 @@
+package com.serhat.secondhand.listing.application;
+
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.repository.ListingRepository;
+import com.serhat.secondhand.payment.entity.Payment;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ListingEventListener {
+
+    private final ListingRepository listingRepository;
+
+    @EventListener
+    @Transactional
+    public void handlePaymentCompleted(PaymentCompletedEvent event) {
+        Payment payment = event.getPayment();
+        log.info("Handling PaymentCompletedEvent for payment ID: {} and listing ID: {}", payment.getId(), payment.getListingId());
+
+        if (payment.getListingId() == null) {
+            log.warn("Payment {} has no associated listing ID. Skipping.", payment.getId());
+            return;
+        }
+
+        Listing listing = listingRepository.findById(payment.getListingId())
+                .orElseThrow(() -> new BusinessException("Listing not found for payment: " + payment.getId(),
+                                                         HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+
+        if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION) {
+            if (listing.getStatus() == ListingStatus.DRAFT) {
+                listing.setStatus(ListingStatus.ACTIVE);
+                listingRepository.save(listing);
+                log.info("Listing {} activated due to successful creation payment.", listing.getId());
+            } else {
+                log.warn("Received listing creation payment for listing {} which is not in DRAFT status (current: {}).", 
+                         listing.getId(), listing.getStatus());
+            }
+        } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
+            if (listing.getStatus() == ListingStatus.ACTIVE) {
+                listing.setStatus(ListingStatus.SOLD);
+                listingRepository.save(listing);
+                log.info("Listing {} marked as SOLD due to successful purchase payment.", listing.getId());
+            } else {
+                log.warn("Received item purchase payment for listing {} which is not in ACTIVE status (current: {}).", 
+                         listing.getId(), listing.getStatus());
+            }
+        }
+    }
+}

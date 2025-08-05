@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.listing.application.IVehicleListingService;
+import com.serhat.secondhand.listing.application.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleSearchCriteria;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @Tag(name = "Vehicle Listings", description = "Vehicle listing CRUD operations and search")
 public class VehicleListingController {
     
-    private final IVehicleListingService vehicleListingService;
+    private final VehicleListingService vehicleListingService;
     
     @PostMapping
     @Operation(summary = "Create a new vehicle listing")

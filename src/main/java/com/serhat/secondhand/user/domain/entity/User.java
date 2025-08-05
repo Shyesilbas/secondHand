@@ -1,14 +1,16 @@
 package com.serhat.secondhand.user.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.serhat.secondhand.auth.domain.entity.Token;
+import com.serhat.secondhand.core.verification.Verification;
+import com.serhat.secondhand.email.domain.entity.Email;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.CreditCard;
+import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import jakarta.persistence.*;
-import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,21 +65,52 @@ public class User implements UserDetails {
     @Column(name = "acc_creation_date")
     private LocalDate accountCreationDate;
 
-    @Timestamp
     @Column(name = "last_login_date")
     private LocalDateTime lastLoginDate;
 
-    private String LastLoginIp;
+    private String lastLoginIp;
 
-    @Column( nullable = false)
+    @Column(nullable = false)
     private boolean accountVerified;
 
-    @Column( nullable = false)
+    @Column(nullable = false)
     private boolean canSell;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)
     private AccountStatus accountStatus;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Listing> listings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Bank> bankAccounts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cardHolder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CreditCard> creditCards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Email> emails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Token> tokens = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Verification> verifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Payment> fromPayments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Payment> toPayments = new ArrayList<>();
 
 
     @Override

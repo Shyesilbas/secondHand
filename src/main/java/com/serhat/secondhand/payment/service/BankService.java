@@ -2,41 +2,35 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.BankDto;
-import com.serhat.secondhand.payment.dto.BankRequest;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.helper.IbanGenerator;
 import com.serhat.secondhand.payment.repo.BankRepository;
-import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BankService implements IBankService {
+@Transactional
+public class BankService {
+
     private final BankRepository bankRepository;
-    private final IUserService userService;
+    private final UserService userService;
 
-
-    @Override
-    public BankDto getBankInfo(User user) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        user = userService.findByEmail(auth.getName());
-        Bank bank = bankRepository.findByAccountHolder(user);
-
-        if(bank == null) {
-            throw new BusinessException("Bank not found", HttpStatus.BAD_REQUEST,HttpStatus.BAD_REQUEST.toString());
-        }
+    public BankDto getBankInfo(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Bank bank = findByUserMandatory(user);
 
         return new BankDto(
                 bank.getIBAN(),
@@ -46,120 +40,75 @@ public class BankService implements IBankService {
         );
     }
 
-    @Override
-    public Bank createBank(BankRequest bankRequest) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(auth.getName());
-        
-        // Check if user already has a bank account
-        if (hasUserBankAccount(user)) {
-            throw new BusinessException("User already has a bank account", 
-                                      HttpStatus.CONFLICT, HttpStatus.CONFLICT.toString());
+    public BankDto createBankAccount(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+
+        if (bankRepository.existsByAccountHolder(user)) {
+            throw new BusinessException("User already has a bank account", HttpStatus.CONFLICT, "BANK_ACCOUNT_EXISTS");
         }
-        
+
         Bank bank = Bank.builder()
                 .accountHolder(user)
                 .balance(BigDecimal.ZERO)
                 .createdAt(LocalDateTime.now())
                 .IBAN(IbanGenerator.generateIban())
                 .build();
-                
+
         bank = bankRepository.save(bank);
-        log.info("Bank created: {}", bank.getId());
-        return bank;
+        log.info("Bank account created for user: {} with ID: {}", user.getEmail(), bank.getId());
+
+        return new BankDto(bank.getIBAN(), bank.getBalance(), user.getName(), user.getSurname());
     }
 
-    @Override
-    public Bank createBankAccount(User user) {
-        // Check if user already has a bank account
-        if (hasUserBankAccount(user)) {
-            throw new BusinessException("User already has a bank account", 
-                                      HttpStatus.CONFLICT, HttpStatus.CONFLICT.toString());
-        }
-
-        Bank bank = Bank.builder()
-                .accountHolder(user)
-                .balance(BigDecimal.ZERO)
-                .createdAt(LocalDateTime.now())
-                .IBAN(IbanGenerator.generateIban())
-                .build();
-
-        Bank savedBank = bankRepository.save(bank);
-        log.info("Bank account created for user: {} with IBAN: {}", user.getEmail(), savedBank.getIBAN());
-        return savedBank;
+    public Optional<Bank> findByUser(User user) {
+        return bankRepository.findByAccountHolder(user);
     }
-
-    @Override
-    public boolean hasUserBankAccount(User user) {
-        Bank bank = bankRepository.findByAccountHolder(user);
-        return bank != null;
-    }
-
-    @Override
-    public Bank findByUser(User user) {
-        Bank bank = bankRepository.findByAccountHolder(user);
-        if (bank == null) {
-            throw new BusinessException("User does not have a bank account", 
-                                      HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.toString());
-        }
-        return bank;
-    }
-
-    // Controller-specific methods with Authentication
     
-    @Override
-    public BankDto getBankAccountInfo(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        return getBankInfo(user);
+    public Bank findByUserMandatory(User user) {
+        return findByUser(user)
+            .orElseThrow(() -> new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
     }
 
-    @Override
-    public BankDto createBankAccount(BankRequest bankRequest, Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        Bank createdBank = createBank(bankRequest);
-        return getBankInfo(user);
-    }
-
-    @Override
-    public Map<String, Object> checkBankAccountExists(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        boolean exists = hasUserBankAccount(user);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("hasBankAccount", exists);
-        response.put("userEmail", user.getEmail());
-        
-        if (exists) {
-            Bank bank = findByUser(user);
-            response.put("iban", bank.getIBAN());
-            response.put("createdAt", bank.getCreatedAt());
+    public void credit(User user, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warn("Credit amount must be positive. User: {}, Amount: {}", user.getEmail(), amount);
+            return;
         }
-        
-        return response;
+        Bank bank = findByUserMandatory(user);
+        bank.setBalance(bank.getBalance().add(amount));
+        bankRepository.save(bank);
+        log.info("Credited {} to user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
     }
 
-    @Override
+    public void debit(User user, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Debit amount must be positive.", HttpStatus.BAD_REQUEST, "INVALID_DEBIT_AMOUNT");
+        }
+        Bank bank = findByUserMandatory(user);
+        if (bank.getBalance().compareTo(amount) < 0) {
+            throw new BusinessException("Insufficient funds.", HttpStatus.BAD_REQUEST, "INSUFFICIENT_FUNDS");
+        }
+        bank.setBalance(bank.getBalance().subtract(amount));
+        bankRepository.save(bank);
+        log.info("Debited {} from user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
+    }
+
+    public Map<String, Object> checkBankAccountExists(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Optional<Bank> bankOpt = findByUser(user);
+        return Map.of(
+                "hasBankAccount", bankOpt.isPresent(),
+                "iban", bankOpt.map(Bank::getIBAN).orElse(null)
+        );
+    }
+
     public Map<String, Object> getBankBalance(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        Bank bank = findByUser(user);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("balance", bank.getBalance());
-        response.put("iban", bank.getIBAN());
-        response.put("currency", "TRY");
-        
-        return response;
-    }
-
-    @Override
-    public Map<String, String> getBankIban(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        Bank bank = findByUser(user);
-        
-        Map<String, String> response = new HashMap<>();
-        response.put("iban", bank.getIBAN());
-        response.put("accountHolder", user.getName() + " " + user.getSurname());
-        
-        return response;
+        User user = userService.getAuthenticatedUser(authentication);
+        Bank bank = findByUserMandatory(user);
+        return Map.of(
+                "balance", bank.getBalance(),
+                "iban", bank.getIBAN(),
+                "currency", "TRY"
+        );
     }
 }

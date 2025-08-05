@@ -1,7 +1,9 @@
 package com.serhat.secondhand.email.api;
 
-import com.serhat.secondhand.email.application.IEmailService;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.dto.EmailDto;
+import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -10,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -21,30 +25,15 @@ import java.util.List;
 @Tag(name = "Email Management", description = "Email operations and history")
 public class EmailController {
 
-    private final IEmailService emailService;
+    private final EmailService emailService;
+    private final UserService userService;
 
-    @Operation(summary = "Get current user's email history")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Email history retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     @GetMapping("/my-emails")
     public ResponseEntity<List<EmailDto>> getMyEmails(Authentication authentication) {
         log.info("Getting email history for user: {}", authentication.getName());
-        List<EmailDto> emails = emailService.getUserEmails(authentication);
+        User user = userService.getAuthenticatedUser(authentication);
+        List<EmailDto> emails = emailService.getUserEmails(user);
         return ResponseEntity.ok(emails);
-    }
-
-    @Operation(summary = "Send welcome email to current user")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Welcome email sent successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "500", description = "Email sending failed")
-    })
-    @PostMapping("/send/welcome")
-    public ResponseEntity<EmailDto> sendWelcomeEmail(Authentication authentication) {
-        log.info("Sending welcome email for user: {}", authentication.getName());
-        EmailDto emailDto = emailService.sendWelcomeEmail(authentication);
-        return ResponseEntity.ok(emailDto);
     }
 }

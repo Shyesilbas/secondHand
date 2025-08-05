@@ -6,310 +6,137 @@ import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
-import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CreditCardService implements ICreditCardService {
+@Transactional
+public class CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
-    private final IUserService userService;
+    private final UserService userService;
 
-    @Override
-    public boolean validateCreditCard(CreditCardDto creditCardDto) {
-        if (creditCardDto == null) {
-            log.warn("Credit card DTO is null");
-            return false;
+    public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+
+        if (creditCardRepository.existsByCardHolder(user)) {
+            throw new BusinessException("User already has a credit card", HttpStatus.CONFLICT, "CREDIT_CARD_EXISTS");
+        }
+        if (creditCardRequest.limit() == null || creditCardRequest.limit().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Credit limit must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_LIMIT");
         }
 
-        // Validate card number
-        if (!CreditCardHelper.isValidCardNumber(creditCardDto.number())) {
-            log.warn("Invalid card number provided");
-            return false;
-        }
+        CreditCard creditCard = CreditCard.builder()
+                .cardHolder(user)
+                .number(CreditCardHelper.generateCardNumber())
+                .cvv(CreditCardHelper.generateCvv())
+                .expiryMonth(CreditCardHelper.generateExpiryMonth())
+                .expiryYear(CreditCardHelper.generateExpiryYear())
+                .amount(BigDecimal.ZERO) // Initial amount is zero
+                .limit(creditCardRequest.limit())
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        // Validate CVV
-        if (!CreditCardHelper.isValidCvv(creditCardDto.cvv())) {
-            log.warn("Invalid CVV provided");
-            return false;
-        }
+        creditCard = creditCardRepository.save(creditCard);
+        log.info("Credit card created for user: {} with masked number: {}", user.getEmail(), CreditCardHelper.maskCardNumber(creditCard.getNumber()));
 
-        // Validate expiry date
-        try {
-            int month = Integer.parseInt(creditCardDto.expiryMonth());
-            int year = Integer.parseInt(creditCardDto.expiryYear());
-            
-            if (!CreditCardHelper.isValidExpiryDate(month, year)) {
-                log.warn("Credit card has expired or invalid expiry date");
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            log.warn("Invalid expiry date format");
-            return false;
-        }
-
-        log.info("Credit card validation successful for card ending with: {}", 
-                 CreditCardHelper.maskCardNumber(creditCardDto.number()));
-        return true;
+        return toDto(creditCard);
     }
 
-    @Override
-    public boolean processPayment(CreditCardDto creditCardDto, BigDecimal amount) {
-        if (!validateCreditCard(creditCardDto)) {
-            throw new BusinessException("Invalid credit card details", 
-                                      HttpStatus.BAD_REQUEST, 
-                                      HttpStatus.BAD_REQUEST.toString());
-        }
+    public CreditCardDto getCreditCard(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        CreditCard creditCard = findByUserMandatory(user);
+        return toDto(creditCard);
+    }
+    
+    public boolean processPayment(User user, BigDecimal amount) {
+        CreditCard card = findByUserMandatory(user);
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Invalid payment amount", 
-                                      HttpStatus.BAD_REQUEST, 
-                                      HttpStatus.BAD_REQUEST.toString());
+            throw new BusinessException("Invalid payment amount", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
         }
-
-        // Check available credit
-        if (!hasAvailableCredit(creditCardDto, amount)) {
-            throw new BusinessException("Insufficient credit limit", 
-                                      HttpStatus.PAYMENT_REQUIRED, 
-                                      HttpStatus.PAYMENT_REQUIRED.toString());
+        
+        BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
+        if (availableCredit.compareTo(amount) < 0) {
+            log.warn("Insufficient credit limit for user: {}. Available: {}, Requested: {}", user.getEmail(), availableCredit, amount);
+            return false; // Or throw InsufficientCreditException
         }
 
         // Simulate payment processing
         try {
-            // In a real implementation, this would connect to a payment gateway
-            log.info("Processing payment of {} for card ending with: {}", 
-                     amount, CreditCardHelper.maskCardNumber(creditCardDto.number()));
+            log.info("Processing payment of {} for card ending with: {}", amount, CreditCardHelper.maskCardNumber(card.getNumber()));
+            // In a real scenario, you would integrate with a payment gateway here.
             
-            // Simulate processing time
-            Thread.sleep(1000);
-            
-            // Simulate success rate (95% success rate for demo)
-            double successRate = Math.random();
-            boolean isSuccessful = successRate > 0.05;
-            
+            // Simulate success (e.g., 95% success rate)
+            boolean isSuccessful = Math.random() > 0.05;
+
             if (isSuccessful) {
-                log.info("Payment processed successfully for amount: {}", amount);
+                card.setAmount(card.getAmount().add(amount));
+                creditCardRepository.save(card);
+                log.info("Payment processed successfully for amount: {}. New card balance: {}", amount, card.getAmount());
                 return true;
             } else {
                 log.warn("Payment processing failed for amount: {}", amount);
                 return false;
             }
-            
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Payment processing interrupted", e);
-            return false;
         } catch (Exception e) {
-            log.error("Error processing payment", e);
+            log.error("Error processing payment for user {}", user.getEmail(), e);
             return false;
         }
     }
 
-    @Override
-    public CreditCard saveCreditCard(CreditCardDto creditCardDto) {
-        if (!validateCreditCard(creditCardDto)) {
-            throw new BusinessException("Cannot save invalid credit card", 
-                                      HttpStatus.BAD_REQUEST, 
-                                      HttpStatus.BAD_REQUEST.toString());
-        }
-
-        try {
-            CreditCard creditCard = new CreditCard();
-            creditCard.setNumber(creditCardDto.number());
-            creditCard.setCvv(creditCardDto.cvv());
-            creditCard.setExpiryMonth(Integer.parseInt(creditCardDto.expiryMonth()));
-            creditCard.setExpiryYear(Integer.parseInt(creditCardDto.expiryYear()));
-            creditCard.setAmount(new BigDecimal(creditCardDto.amount()));
-            creditCard.setLimit(new BigDecimal(creditCardDto.limit()));
-            creditCard.setCreatedAt(LocalDateTime.now());
-
-            CreditCard savedCard = creditCardRepository.save(creditCard);
-            log.info("Credit card saved with ID: {}", savedCard.getId());
-            return savedCard;
-        } catch (NumberFormatException e) {
-            throw new BusinessException("Invalid numeric values in credit card data", 
-                                      HttpStatus.BAD_REQUEST, 
-                                      HttpStatus.BAD_REQUEST.toString());
-        }
+    public Optional<CreditCard> findByUser(User user) {
+        return creditCardRepository.findByCardHolder(user);
     }
 
+    public CreditCard findByUserMandatory(User user) {
+        return findByUser(user)
+                .orElseThrow(() -> new BusinessException("User does not have a credit card", HttpStatus.NOT_FOUND, "CREDIT_CARD_NOT_FOUND"));
+    }
+    
+    public Map<String, Object> checkCreditCardExists(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Optional<CreditCard> cardOpt = findByUser(user);
+        return Map.of(
+                "hasCreditCard", cardOpt.isPresent(),
+                "maskedCardNumber", cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null)
+        );
+    }
+    
+    public Map<String, Object> getAvailableCredit(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        CreditCard creditCard = findByUserMandatory(user);
 
+        BigDecimal availableCredit = creditCard.getLimit().subtract(creditCard.getAmount());
 
-    @Override
-    public CreditCardDto createCreditCard(User user, CreditCardRequest creditCardRequest) {
-        if (hasUserCreditCard(user)) {
-            throw new BusinessException("User already has a credit card", 
-                                      HttpStatus.CONFLICT, 
-                                      HttpStatus.CONFLICT.toString());
-        }
-
-        if (creditCardRequest.limit() == null || creditCardRequest.limit().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Credit limit must be greater than zero", 
-                                      HttpStatus.BAD_REQUEST, 
-                                      HttpStatus.BAD_REQUEST.toString());
-        }
-
-        String cardNumber = CreditCardHelper.generateCardNumber();
-        String cvv = CreditCardHelper.generateCvv();
-        int expiryMonth = CreditCardHelper.generateExpiryMonth();
-        int expiryYear = CreditCardHelper.generateExpiryYear();
-
-        CreditCard creditCard = CreditCard.builder()
-                .cardHolder(user)
-                .number(cardNumber)
-                .cvv(cvv)
-                .expiryMonth(expiryMonth)
-                .expiryYear(expiryYear)
-                .amount(BigDecimal.ZERO)
-                .limit(creditCardRequest.limit())
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        CreditCard savedCard = creditCardRepository.save(creditCard);
-        log.info("Credit card created for user: {} with masked number: {} and limit: {}", 
-                 user.getEmail(), CreditCardHelper.maskCardNumber(cardNumber), creditCardRequest.limit());
-
-        // Convert to DTO and return
-        return new CreditCardDto(
-                CreditCardHelper.maskCardNumber(savedCard.getNumber()),
-                "***", //
-                String.valueOf(savedCard.getExpiryMonth()),
-                String.valueOf(savedCard.getExpiryYear()),
-                savedCard.getAmount().toString(),
-                savedCard.getLimit().toString()
+        return Map.of(
+            "availableCredit", availableCredit,
+            "creditLimit", creditCard.getLimit(),
+            "currentUsage", creditCard.getAmount()
         );
     }
 
-    @Override
-    public boolean hasAvailableCredit(CreditCardDto creditCardDto, BigDecimal amount) {
-        try {
-            BigDecimal currentAmount = new BigDecimal(creditCardDto.amount());
-            BigDecimal creditLimit = new BigDecimal(creditCardDto.limit());
-            
-            return CreditCardHelper.hasAvailableCredit(currentAmount, creditLimit, amount);
-        } catch (NumberFormatException e) {
-            log.error("Invalid numeric format in credit card amounts", e);
-            return false;
-        }
-    }
-
-    @Override
-    public String maskCardNumber(String cardNumber) {
-        return CreditCardHelper.maskCardNumber(cardNumber);
-    }
-
-    @Override
-    public CreditCard findById(UUID id) {
-        return creditCardRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Credit card not found", 
-                                                      HttpStatus.NOT_FOUND, 
-                                                      HttpStatus.NOT_FOUND.toString()));
-    }
-
-    @Override
-    public CreditCard findByUser(User user) {
-        return creditCardRepository.findByCardHolder(user)
-                .orElseThrow(() -> new BusinessException("User does not have a credit card", 
-                                                      HttpStatus.NOT_FOUND, 
-                                                      HttpStatus.NOT_FOUND.toString()));
-    }
-
-    @Override
-    public CreditCardDto getUserCreditCardDto(User user) {
-        CreditCard creditCard = findByUser(user);
-        
+    private CreditCardDto toDto(CreditCard creditCard) {
         return new CreditCardDto(
                 CreditCardHelper.maskCardNumber(creditCard.getNumber()),
-                "***", // CVV should not be returned for security
+                "***", // Never expose CVV
                 String.valueOf(creditCard.getExpiryMonth()),
                 String.valueOf(creditCard.getExpiryYear()),
                 creditCard.getAmount().toString(),
                 creditCard.getLimit().toString()
         );
-    }
-
-    @Override
-    public boolean hasUserCreditCard(User user) {
-        return creditCardRepository.existsByCardHolder(user);
-    }
-
-    // Controller-specific methods with Authentication
-    
-    @Override
-    public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        return createCreditCard(user, creditCardRequest);
-    }
-
-    @Override
-    public CreditCardDto getUserCreditCard(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        return getUserCreditCardDto(user);
-    }
-
-    @Override
-    public Map<String, Object> validateCreditCardRequest(CreditCardDto creditCardDto) {
-        Map<String, Object> response = new HashMap<>();
-        
-        boolean isValid = validateCreditCard(creditCardDto);
-        String message = isValid ? "Credit card is valid" : "Credit card validation failed";
-        
-        response.put("valid", isValid);
-        response.put("message", message);
-        response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCardDto.number()));
-        
-        return response;
-    }
-
-    @Override
-    public Map<String, Object> checkCreditCardExists(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        boolean exists = hasUserCreditCard(user);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("hasCreditCard", exists);
-        response.put("userEmail", user.getEmail());
-        
-        if (exists) {
-            CreditCard creditCard = findByUser(user);
-            response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCard.getNumber()));
-            response.put("expiryMonth", creditCard.getExpiryMonth());
-            response.put("expiryYear", creditCard.getExpiryYear());
-            response.put("createdAt", creditCard.getCreatedAt());
-        }
-        
-        return response;
-    }
-
-    @Override
-    public Map<String, Object> getAvailableCredit(BigDecimal requestedAmount, Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        CreditCard creditCard = findByUser(user);
-        
-        BigDecimal availableCredit = creditCard.getLimit().subtract(creditCard.getAmount());
-        boolean canAfford = requestedAmount == null || availableCredit.compareTo(requestedAmount) >= 0;
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("availableCredit", availableCredit);
-        response.put("creditLimit", creditCard.getLimit());
-        response.put("currentAmount", creditCard.getAmount());
-        response.put("requestedAmount", requestedAmount);
-        response.put("canAfford", canAfford);
-        response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCard.getNumber()));
-        
-        return response;
     }
 }

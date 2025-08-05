@@ -5,9 +5,13 @@ import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface BankRepository extends JpaRepository<Bank, UUID> {
-    Bank findByAccountHolder(User user);
+
+    Optional<Bank> findByAccountHolder(User user);
+    
+    boolean existsByAccountHolder(User user);
 }

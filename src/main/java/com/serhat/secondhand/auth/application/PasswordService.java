@@ -7,7 +7,7 @@ import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class PasswordService {
 
-    private final IUserService userService;
+    private final UserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;

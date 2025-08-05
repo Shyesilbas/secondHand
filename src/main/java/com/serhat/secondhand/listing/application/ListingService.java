@@ -18,22 +18,16 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ListingService implements IListingService {
+public class ListingService {
     
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
     
-    @Override
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }
     
-    @Override
-    public List<Listing> findByStatus(ListingStatus status) {
-        return listingRepository.findByStatus(status);
-    }
 
-    @Override
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
         List<Listing> listings = listingRepository.findBySellerOrderByCreatedAtDesc(user);
@@ -42,7 +36,6 @@ public class ListingService implements IListingService {
                 .toList();
     }
 
-    @Override
     public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
         log.info("Getting listings for user: {} with status: {}", user.getEmail(), status);
         List<Listing> listings = listingRepository.findBySellerAndStatus(user, status);
@@ -51,7 +44,6 @@ public class ListingService implements IListingService {
                 .toList();
     }
 
-    @Override
     public List<ListingDto> findByStatusAsDto(ListingStatus status) {
         log.info("Getting all listings with status: {}", status);
         List<Listing> listings = listingRepository.findByStatus(status);
@@ -60,7 +52,6 @@ public class ListingService implements IListingService {
                 .toList();
     }
     
-    @Override
     @Transactional
     public void publish(UUID listingId) {
         Listing listing = findById(listingId)
@@ -71,7 +62,6 @@ public class ListingService implements IListingService {
         log.info("Listing published: {}", listingId);
     }
     
-    @Override
     @Transactional
     public void close(UUID listingId) {
         Listing listing = findById(listingId)
@@ -82,7 +72,6 @@ public class ListingService implements IListingService {
         log.info("Listing closed: {}", listingId);
     }
     
-    @Override
     @Transactional
     public void markAsSold(UUID listingId) {
         Listing listing = findById(listingId)
@@ -93,7 +82,6 @@ public class ListingService implements IListingService {
         log.info("Listing marked as sold: {}", listingId);
     }
     
-    @Override
     @Transactional
     public void deactivate(UUID listingId) {
         Listing listing = findById(listingId)
@@ -104,7 +92,6 @@ public class ListingService implements IListingService {
         log.info("Listing deactivated: {}", listingId);
     }
     
-    @Override
     public void validateOwnership(UUID listingId, User currentUser) {
         Listing listing = findById(listingId)
                 .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
@@ -113,7 +100,6 @@ public class ListingService implements IListingService {
         }
     }
     
-    @Override
     public void validateStatus(Listing listing, ListingStatus... allowedStatuses) {
         for (ListingStatus allowedStatus : allowedStatuses) {
             if (listing.getStatus() == allowedStatus) {
@@ -122,4 +108,4 @@ public class ListingService implements IListingService {
         }
         throw new IllegalArgumentException("Invalid listing status for this operation");
     }
-} 
+}

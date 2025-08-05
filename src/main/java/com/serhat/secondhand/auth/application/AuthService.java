@@ -9,7 +9,7 @@ import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.email.application.EmailService;
-import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
@@ -37,7 +37,7 @@ import java.util.UUID;
 @Slf4j
 public class AuthService {
 
-    private final IUserService userService;
+    private final UserService userService;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
@@ -49,7 +49,7 @@ public class AuthService {
         log.info("User registration attempt: {}", request.getEmail());
 
         userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
-        User user = userMapper.toEntity(request);
+        User user = userMapper.toEntity(request, passwordEncoder);
         userService.save(user);
 
         log.info("User registered successfully: {}", user.getEmail());

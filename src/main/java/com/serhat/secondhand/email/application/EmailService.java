@@ -4,13 +4,10 @@ import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
-import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class EmailService implements IEmailService {
+public class EmailService {
 
     private final EmailRepository emailRepository;
-    private final IUserService userService;
 
     @Value("${app.email.sender}")
     private String defaultSenderEmail;
@@ -47,18 +43,29 @@ public class EmailService implements IEmailService {
     @Value("${app.email.phoneUpdate.content}")
     private String phoneUpdateContentTemplate;
 
-
-    @Override
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {
         String subject = verificationSubject;
         String content = String.format(verificationContentTemplate, user.getName(), verificationCode);
-        String recipientEmail = user.getEmail();
-        EmailType emailType = EmailType.VERIFICATION_CODE;
-        LocalDateTime now = LocalDateTime.now();
+        return sendAndSaveEmail(user, subject, content, EmailType.VERIFICATION_CODE);
+    }
 
+    public EmailDto sendPhoneNumberUpdatedEmail(User user) {
+        String subject = phoneUpdateSubject;
+        String content = String.format(phoneUpdateContentTemplate, user.getName());
+        return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
+    }
+
+    public EmailDto sendWelcomeEmail(User user) {
+        String subject = welcomeSubject;
+        String content = String.format(welcomeContentTemplate, user.getName());
+        return sendAndSaveEmail(user, subject, content, EmailType.WELCOME);
+    }
+
+    private EmailDto sendAndSaveEmail(User user, String subject, String content, EmailType emailType) {
+        LocalDateTime now = LocalDateTime.now();
         Email email = Email.builder()
                 .user(user)
-                .recipientEmail(recipientEmail)
+                .recipientEmail(user.getEmail())
                 .senderEmail(defaultSenderEmail)
                 .subject(subject)
                 .content(content)
@@ -67,10 +74,10 @@ public class EmailService implements IEmailService {
                 .build();
 
         email = emailRepository.save(email);
-        log.info("Verification email saved with ID: {}", email.getId());
+        log.info("{} email saved with ID: {}", emailType, email.getId());
 
         return new EmailDto(
-                recipientEmail,
+                user.getEmail(),
                 defaultSenderEmail,
                 subject,
                 content,
@@ -78,62 +85,8 @@ public class EmailService implements IEmailService {
                 now);
     }
 
-    @Override
-    public EmailDto sendPhoneNumberUpdatedEmail(User user) {
-        String subject = phoneUpdateSubject;
-        String content = String.format(phoneUpdateContentTemplate, user.getName());
-        String recipientEmail = user.getEmail();
-        EmailType emailType = EmailType.NOTIFICATION;
-        LocalDateTime now = LocalDateTime.now();
-
-        Email email = Email.builder()
-                .user(user)
-                .recipientEmail(recipientEmail)
-                .senderEmail(defaultSenderEmail)
-                .subject(subject)
-                .content(content)
-                .emailType(emailType)
-                .createdAt(now)
-                .build();
-
-        email = emailRepository.save(email);
-        log.info("Phone update email saved with ID: {}", email.getId());
-
-        return new EmailDto(recipientEmail, defaultSenderEmail, subject, content, emailType, now);
-    }
-
-    @Override
-    public EmailDto sendWelcomeEmail(User user) {
-        String subject = welcomeSubject;
-        String content = String.format(welcomeContentTemplate, user.getName());
-        String recipientEmail = user.getEmail();
-        EmailType emailType = EmailType.WELCOME;
-        LocalDateTime now = LocalDateTime.now();
-
-        Email email = Email.builder()
-                .user(user)
-                .recipientEmail(recipientEmail)
-                .senderEmail(defaultSenderEmail)
-                .subject(subject)
-                .content(content)
-                .emailType(emailType)
-                .createdAt(now)
-                .build();
-
-        email = emailRepository.save(email);
-        log.info("Welcome email saved with ID: {}", email.getId());
-
-        return new EmailDto(recipientEmail, defaultSenderEmail, subject, content, emailType, now);
-    }
-
-
-
-    @Override
-    public List<EmailDto> getUserEmails() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-
-        List<Email> emails = emailRepository.findByRecipientEmailOrderByCreatedAtDesc(currentUsername);
+    public List<EmailDto> getUserEmails(User user) {
+        List<Email> emails = emailRepository.findByUserOrderByCreatedAtDesc(user);
 
         return emails.stream()
                 .map(email -> new EmailDto(
@@ -144,19 +97,5 @@ public class EmailService implements IEmailService {
                         email.getEmailType(),
                         email.getCreatedAt()
                 )).toList();
-    }
-
-    // Controller-specific methods with Authentication
-    
-    @Override
-    public List<EmailDto> getUserEmails(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        return getUserEmails(); // Delegate to existing method
-    }
-
-    @Override
-    public EmailDto sendWelcomeEmail(Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        return sendWelcomeEmail(user); // Delegate to existing method
     }
 }

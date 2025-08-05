@@ -35,16 +35,5 @@ public class ErrorResponse {
     
     private String debugMessage;
     
-    public ErrorResponse(int status, String error, String message, String path) {
-        this.timestamp = LocalDateTime.now();
-        this.status = status;
-        this.error = error;
-        this.message = message;
-        this.path = path;
-    }
-    
-    public ErrorResponse(int status, String error, String message, String path, Map<String, String> validationErrors) {
-        this(status, error, message, path);
-        this.validationErrors = validationErrors;
-    }
+
 }

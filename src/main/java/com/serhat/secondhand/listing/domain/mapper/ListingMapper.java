@@ -3,48 +3,60 @@ package com.serhat.secondhand.listing.domain.mapper;
 import com.serhat.secondhand.listing.domain.dto.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.ListingResponseDto;
 import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+import java.util.Optional;
+
+@Mapper(
+    componentModel = "spring",
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface ListingMapper {
-    
+
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
-    
-    @Mapping(target = "seller", ignore = true)
+
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    VehicleListing toVehicleEntity(VehicleListingDto dto);
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "status", constant = "DRAFT")
+    VehicleListing toVehicleEntity(VehicleCreateRequest request);
     
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "brand", ignore = true) // Temporarily ignore to debug
+    void updateVehicleFromRequest(VehicleUpdateRequest request, @MappingTarget VehicleListing existing);
+
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "type", expression = "java(getListingType(listing))")
     ListingResponseDto toListingResponseDto(Listing listing);
-    
+
     default String getListingType(Listing listing) {
         if (listing instanceof VehicleListing) {
             return "VEHICLE";
         }
-        // Future listing types can be added here
         return "UNKNOWN";
     }
-    
-    // Dynamic DTO mapping based on instance type
+
     default ListingDto toDynamicDto(Listing listing) {
         if (listing instanceof VehicleListing) {
             return toVehicleDto((VehicleListing) listing);
         }
-        // Future listing types can be added here
-        // else if (listing instanceof ElectronicsListing) {
-        //     return toElectronicsDto((ElectronicsListing) listing);
-        // }
-        
-        // Fallback to basic response DTO
         throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());
     }
-} 
+    
+    default <T> T unwrapOptional(Optional<T> optional) {
+        return optional.orElse(null);
+    }
+}
