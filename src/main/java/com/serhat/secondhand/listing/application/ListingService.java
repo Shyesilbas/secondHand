@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
@@ -8,6 +9,7 @@ import com.serhat.secondhand.listing.domain.repository.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,9 @@ public class ListingService {
         return listingRepository.findById(id);
     }
     
+    public List<Listing> findByStatus(ListingStatus status) {
+        return listingRepository.findByStatus(status);
+    }
 
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
@@ -55,7 +60,12 @@ public class ListingService {
     @Transactional
     public void publish(UUID listingId) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+
+        if (!listing.isListingFeePaid()) {
+            throw new BusinessException("Listing creation fee has not been paid.", HttpStatus.BAD_REQUEST, "FEE_NOT_PAID");
+        }
+
         validateStatus(listing, ListingStatus.DRAFT);
         listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
@@ -65,7 +75,7 @@ public class ListingService {
     @Transactional
     public void close(UUID listingId) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
         listing.setStatus(ListingStatus.CLOSED);
         listingRepository.save(listing);
@@ -75,7 +85,7 @@ public class ListingService {
     @Transactional
     public void markAsSold(UUID listingId) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
         listing.setStatus(ListingStatus.SOLD);
         listingRepository.save(listing);
@@ -85,7 +95,7 @@ public class ListingService {
     @Transactional
     public void deactivate(UUID listingId) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
         validateStatus(listing, ListingStatus.ACTIVE);
         listing.setStatus(ListingStatus.DRAFT);
         listingRepository.save(listing);
@@ -94,9 +104,9 @@ public class ListingService {
     
     public void validateOwnership(UUID listingId, User currentUser) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
         if (!listing.getSeller().getId().equals(currentUser.getId())) {
-            throw new IllegalArgumentException("User is not the owner of this listing");
+            throw new BusinessException("User is not the owner of this listing", HttpStatus.FORBIDDEN, "NOT_OWNER");
         }
     }
     
@@ -106,6 +116,6 @@ public class ListingService {
                 return;
             }
         }
-        throw new IllegalArgumentException("Invalid listing status for this operation");
+        throw new BusinessException("Invalid listing status for this operation", HttpStatus.BAD_REQUEST, "INVALID_STATUS");
     }
 }

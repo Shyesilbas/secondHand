@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -165,5 +166,9 @@ public class UserService {
     public LoginResponse getCurrentUserProfile(Authentication authentication) {
         User user = getAuthenticatedUser(authentication);
         return new LoginResponse("Current user profile", user.getId(), user.getEmail(), null, null);
+    }
+
+    public User findById(Long id){
+        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
     }
 }

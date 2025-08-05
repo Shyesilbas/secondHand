@@ -13,7 +13,6 @@ public record PaymentRequest(
     BigDecimal amount,
     PaymentType paymentType,
     PaymentTransactionType transactionType,
-    PaymentDirection paymentDirection,
-    CreditCardDto creditCard
+    PaymentDirection paymentDirection
 ) {
 }

@@ -37,14 +37,11 @@ public class ListingEventListener {
                                                          HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
         if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION) {
-            if (listing.getStatus() == ListingStatus.DRAFT) {
-                listing.setStatus(ListingStatus.ACTIVE);
-                listingRepository.save(listing);
-                log.info("Listing {} activated due to successful creation payment.", listing.getId());
-            } else {
-                log.warn("Received listing creation payment for listing {} which is not in DRAFT status (current: {}).", 
-                         listing.getId(), listing.getStatus());
-            }
+            listing.setListingFeePaid(true);
+            listing.setStatus(ListingStatus.ACTIVE);
+            listingRepository.save(listing);
+            log.info("Listing {} fee marked as paid.", listing.getId());
+
         } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
             if (listing.getStatus() == ListingStatus.ACTIVE) {
                 listing.setStatus(ListingStatus.SOLD);
