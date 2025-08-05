@@ -1,7 +1,9 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.listing.domain.dto.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class ListingService implements IListingService {
     
     private final ListingRepository listingRepository;
+    private final ListingMapper listingMapper;
     
     @Override
     public Optional<Listing> findById(UUID id) {
@@ -28,6 +31,33 @@ public class ListingService implements IListingService {
     @Override
     public List<Listing> findByStatus(ListingStatus status) {
         return listingRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<ListingDto> getMyListings(User user) {
+        log.info("Getting all listings for user: {}", user.getEmail());
+        List<Listing> listings = listingRepository.findBySellerOrderByCreatedAtDesc(user);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+
+    @Override
+    public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
+        log.info("Getting listings for user: {} with status: {}", user.getEmail(), status);
+        List<Listing> listings = listingRepository.findBySellerAndStatus(user, status);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+
+    @Override
+    public List<ListingDto> findByStatusAsDto(ListingStatus status) {
+        log.info("Getting all listings with status: {}", status);
+        List<Listing> listings = listingRepository.findByStatus(status);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
     }
     
     @Override

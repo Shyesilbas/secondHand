@@ -32,6 +32,7 @@ public abstract class ListingDto {
     private BigDecimal price;
     private Currency currency;
     private ListingStatus status;
+    private boolean isListingFeePaid;
     private String city;
     private String district;
     private String sellerName;

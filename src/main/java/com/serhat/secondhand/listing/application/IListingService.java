@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.listing.domain.dto.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -13,6 +14,11 @@ public interface IListingService {
     Optional<Listing> findById(UUID id);
     List<Listing> findByStatus(ListingStatus status);
     
+    // Methods returning DTOs
+    List<ListingDto> getMyListings(User user);
+    List<ListingDto> getMyListingsByStatus(User user, ListingStatus status);
+    List<ListingDto> findByStatusAsDto(ListingStatus status);
+    
     void publish(UUID listingId);
     void close(UUID listingId);
     void markAsSold(UUID listingId);
@@ -20,4 +26,5 @@ public interface IListingService {
     
     void validateOwnership(UUID listingId, User currentUser);
     void validateStatus(Listing listing, ListingStatus... allowedStatuses);
+
 } 

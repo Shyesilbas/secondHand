@@ -1,0 +1,13 @@
+package com.serhat.secondhand.listing.domain.dto;
+
+import com.serhat.secondhand.payment.dto.CreditCardDto;
+import com.serhat.secondhand.payment.entity.PaymentType;
+
+import java.util.UUID;
+
+public record ListingPaymentRequest(
+    UUID listingId,
+    PaymentType paymentType,
+    CreditCardDto creditCard  // Optional, sadece kredi kartı ödemelerinde gerekli
+) {
+}

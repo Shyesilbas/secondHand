@@ -35,6 +35,10 @@ public abstract class Listing {
     @Enumerated(EnumType.STRING)
     private ListingStatus status;
 
+    @Column(name = "is_listing_fee_paid", nullable = false)
+    @Builder.Default
+    private boolean isListingFeePaid = false;
+
     private String city;
     private String district;
 

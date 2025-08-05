@@ -1,5 +1,7 @@
 package com.serhat.secondhand.payment.dto;
 
+import com.serhat.secondhand.payment.entity.PaymentDirection;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 
 import java.math.BigDecimal;
@@ -14,6 +16,8 @@ public record PaymentDto(
         String receiverSurname,
         BigDecimal amount,
         PaymentType paymentType,
+        PaymentTransactionType transactionType,
+        PaymentDirection paymentDirection,
         UUID listingId,
         LocalDateTime createdAt,
         boolean isSuccess

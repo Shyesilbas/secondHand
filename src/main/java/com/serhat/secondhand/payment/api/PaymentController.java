@@ -191,6 +191,12 @@ public class PaymentController {
         } else if (paymentRequest.paymentType() == null) {
             isValid = false;
             message = "Payment type is required";
+        } else if (paymentRequest.transactionType() == null) {
+            isValid = false;
+            message = "Transaction type is required";
+        } else if (paymentRequest.paymentDirection() == null) {
+            isValid = false;
+            message = "Payment direction is required";
         } else if (paymentRequest.paymentType() == PaymentType.CREDIT_CARD && paymentRequest.creditCard() == null) {
             isValid = false;
             message = "Credit card information is required for credit card payments";

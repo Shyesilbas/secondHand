@@ -45,6 +45,8 @@ public class PaymentService implements IPaymentService {
                         payment.getToUser().getSurname(),
                         payment.getAmount(),
                         payment.getPaymentType(),
+                        payment.getTransactionType(),
+                        payment.getPaymentDirection(),
                         payment.getListingId(),
                         payment.getProcessedAt(),
                         payment.isSuccess()
@@ -96,14 +98,17 @@ public class PaymentService implements IPaymentService {
             }
 
             // Create and save payment record
-            Payment payment = new Payment();
-            payment.setFromUser(fromUser);
-            payment.setToUser(toUser);
-            payment.setAmount(paymentRequest.amount());
-            payment.setPaymentType(paymentRequest.paymentType());
-            payment.setListingId(paymentRequest.listingId());
-            payment.setProcessedAt(LocalDateTime.now());
-            payment.setSuccess(paymentSuccessful);
+            Payment payment = Payment.builder()
+                    .fromUser(fromUser)
+                    .toUser(toUser)
+                    .amount(paymentRequest.amount())
+                    .paymentType(paymentRequest.paymentType())
+                    .transactionType(paymentRequest.transactionType())
+                    .paymentDirection(paymentRequest.paymentDirection())
+                    .listingId(paymentRequest.listingId())
+                    .processedAt(LocalDateTime.now())
+                    .isSuccess(paymentSuccessful)
+                    .build();
 
             Payment savedPayment = paymentRepository.save(payment);
 
@@ -118,6 +123,8 @@ public class PaymentService implements IPaymentService {
                     savedPayment.getToUser().getSurname(),
                     savedPayment.getAmount(),
                     savedPayment.getPaymentType(),
+                    savedPayment.getTransactionType(),
+                    savedPayment.getPaymentDirection(),
                     savedPayment.getListingId(),
                     savedPayment.getProcessedAt(),
                     savedPayment.isSuccess()
