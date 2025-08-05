@@ -18,6 +18,7 @@ import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.exception.EmailExistsException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
+import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -190,6 +191,38 @@ public class UserService implements IUserService {
         update(user);
         log.info("Email updated successfully from: {}, to : {} , by user : {}",currentEmail,requestedEmail,user);
         return "Email updated";
+    }
 
+    // Controller-specific methods with Authentication
+    
+    @Override
+    public LoginResponse getCurrentUserProfile(Authentication authentication) {
+        User user = findByEmail(authentication.getName());
+        return new LoginResponse("Current user profile", user.getId(), user.getEmail(), null, null);
+    }
+
+    @Override
+    public void sendVerificationCode(Authentication authentication) {
+        String email = authentication.getName();
+        log.info("Sending verification code for authenticated user: {}", email);
+        sendVerificationCode(); // Delegate to existing method
+    }
+
+    @Override
+    public void verifyUser(VerificationRequest request, Authentication authentication) {
+        log.info("Verifying user account for: {}", authentication.getName());
+        verifyUser(request); // Delegate to existing method
+    }
+
+    @Override
+    public String updateEmail(UpdateEmailRequest request, Authentication authentication) {
+        log.info("Updating email for authenticated user: {}", authentication.getName());
+        return updateEmail(request); // Delegate to existing method
+    }
+
+    @Override
+    public String updatePhone(UpdatePhoneRequest request, Authentication authentication) {
+        log.info("Updating phone for authenticated user: {}", authentication.getName());
+        return updatePhone(request); // Delegate to existing method
     }
 }

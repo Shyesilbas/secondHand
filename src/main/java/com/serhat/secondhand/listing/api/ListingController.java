@@ -12,6 +12,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,9 +24,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/api/v1/listings")
 @RequiredArgsConstructor
-@RequestMapping("/api/listings")
-@Tag(name = "Listing", description = "General listing operations")
+@Slf4j
+@Tag(name = "Listing Management", description = "General listing operations and payment integration")
 public class ListingController {
     
     private final IListingService listingService;

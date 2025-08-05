@@ -4,6 +4,7 @@ import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.List;
 public class EmailService implements IEmailService {
 
     private final EmailRepository emailRepository;
+    private final IUserService userService;
 
     @Value("${app.email.sender}")
     private String defaultSenderEmail;
@@ -142,5 +144,19 @@ public class EmailService implements IEmailService {
                         email.getEmailType(),
                         email.getCreatedAt()
                 )).toList();
+    }
+
+    // Controller-specific methods with Authentication
+    
+    @Override
+    public List<EmailDto> getUserEmails(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        return getUserEmails(); // Delegate to existing method
+    }
+
+    @Override
+    public EmailDto sendWelcomeEmail(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        return sendWelcomeEmail(user); // Delegate to existing method
     }
 }

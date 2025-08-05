@@ -2,10 +2,7 @@ package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.dto.BankRequest;
-import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.service.IBankService;
-import com.serhat.secondhand.user.application.IUserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,20 +12,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/bank")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Bank Management", description = "Bank account operations")
+@Tag(name = "Bank Account Management", description = "Bank account operations for users")
 public class BankController {
 
     private final IBankService bankService;
-    private final IUserService userService;
 
     @Operation(summary = "Get current user's bank account information")
     @ApiResponses(value = {
@@ -36,12 +31,10 @@ public class BankController {
         @ApiResponse(responseCode = "404", description = "Bank account not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    @GetMapping("/account")
-    public ResponseEntity<BankDto> getBankAccount() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        
-        BankDto bankDto = bankService.getBankInfo(user);
+    @GetMapping
+    public ResponseEntity<BankDto> getBankAccount(Authentication authentication) {
+        log.info("Getting bank account for user: {}", authentication.getName());
+        BankDto bankDto = bankService.getBankAccountInfo(authentication);
         return ResponseEntity.ok(bankDto);
     }
 
@@ -49,12 +42,16 @@ public class BankController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Bank account created successfully"),
         @ApiResponse(responseCode = "409", description = "User already has a bank account"),
+        @ApiResponse(responseCode = "400", description = "Invalid bank account data"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    @PostMapping("/account")
-    public ResponseEntity<Bank> createBankAccount(@RequestBody BankRequest bankRequest) {
-        Bank createdBank = bankService.createBank(bankRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdBank);
+    @PostMapping
+    public ResponseEntity<BankDto> createBankAccount(
+            @RequestBody BankRequest bankRequest,
+            Authentication authentication) {
+        log.info("Creating bank account for user: {}", authentication.getName());
+        BankDto bankDto = bankService.createBankAccount(bankRequest, authentication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(bankDto);
     }
 
     @Operation(summary = "Check if current user has a bank account")
@@ -62,28 +59,24 @@ public class BankController {
         @ApiResponse(responseCode = "200", description = "Check completed successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    @GetMapping("/account/exists")
-    public ResponseEntity<Boolean> hasBankAccount() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        
-        boolean hasAccount = bankService.hasUserBankAccount(user);
-        return ResponseEntity.ok(hasAccount);
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Object>> hasBankAccount(Authentication authentication) {
+        log.info("Checking bank account existence for user: {}", authentication.getName());
+        Map<String, Object> response = bankService.checkBankAccountExists(authentication);
+        return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get current user's bank balance")
+    @Operation(summary = "Get current user's bank account balance")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Balance retrieved successfully"),
         @ApiResponse(responseCode = "404", description = "Bank account not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/balance")
-    public ResponseEntity<BigDecimal> getBankBalance() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        
-        Bank bank = bankService.findByUser(user);
-        return ResponseEntity.ok(bank.getBalance());
+    public ResponseEntity<Map<String, Object>> getBankBalance(Authentication authentication) {
+        log.info("Getting bank balance for user: {}", authentication.getName());
+        Map<String, Object> response = bankService.getBankBalance(authentication);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get current user's IBAN")
@@ -93,11 +86,9 @@ public class BankController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/iban")
-    public ResponseEntity<String> getBankIban() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(authentication.getName());
-        
-        Bank bank = bankService.findByUser(user);
-        return ResponseEntity.ok(bank.getIBAN());
+    public ResponseEntity<Map<String, String>> getBankIban(Authentication authentication) {
+        log.info("Getting bank IBAN for user: {}", authentication.getName());
+        Map<String, String> response = bankService.getBankIban(authentication);
+        return ResponseEntity.ok(response);
     }
 }

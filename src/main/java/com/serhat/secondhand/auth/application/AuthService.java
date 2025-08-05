@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -154,5 +155,33 @@ public class AuthService {
     public LoginResponse getAuthenticatedUser(String username) {
         User user = userService.findByEmail(username);
         return new LoginResponse("Authenticated user", user.getId(), user.getEmail(), null, null);
+    }
+
+    public Map<String, String> logout(Authentication authentication, HttpServletRequest request) {
+        String username = authentication.getName();
+        String accessToken = extractTokenFromHeader(request);
+        String message = logout(username, accessToken);
+        
+        return Map.of(
+            "message", message,
+            "status", "success"
+        );
+    }
+
+    public Map<String, Object> validateToken(Authentication authentication) {
+        return Map.of(
+            "valid", true,
+            "username", authentication.getName(),
+            "authorities", authentication.getAuthorities(),
+            "message", "Token is valid"
+        );
+    }
+
+    private String extractTokenFromHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 }

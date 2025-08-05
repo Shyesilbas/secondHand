@@ -10,15 +10,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,26 +31,29 @@ public class PaymentController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Payment created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid payment data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "402", description = "Payment required - insufficient funds"),
-        @ApiResponse(responseCode = "404", description = "User or listing not found"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+        @ApiResponse(responseCode = "404", description = "User or listing not found")
     })
     @PostMapping
-    public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest) {
-        log.info("Creating payment for listing: {} with amount: {}", 
-                 paymentRequest.listingId(), paymentRequest.amount());
+    public ResponseEntity<PaymentDto> createPayment(
+            @RequestBody PaymentRequest paymentRequest,
+            Authentication authentication) {
+        log.info("Creating payment for listing: {} by user: {}", 
+                 paymentRequest.listingId(), authentication.getName());
         
         PaymentDto createdPayment = paymentService.createPayment(paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
     }
 
-    @Operation(summary = "Get all payments")
+    @Operation(summary = "Get all payments for current user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Payments retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping
-    public ResponseEntity<List<PaymentDto>> getAllPayments() {
+    public ResponseEntity<List<PaymentDto>> getAllPayments(Authentication authentication) {
+        log.info("Getting all payments for user: {}", authentication.getName());
         List<PaymentDto> payments = paymentService.getPayments();
         return ResponseEntity.ok(payments);
     }
@@ -69,27 +68,13 @@ public class PaymentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "processedAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String sortDir,
+            Authentication authentication) {
         
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        log.info("Getting paginated payments for user: {} - page: {}, size: {}", 
+                 authentication.getName(), page, size);
         
-        List<PaymentDto> payments = paymentService.getPayments();
-        
-        // Manual pagination since repository doesn't return Page
-        int start = Math.min((int) pageable.getOffset(), payments.size());
-        int end = Math.min((start + pageable.getPageSize()), payments.size());
-        List<PaymentDto> pageContent = payments.subList(start, end);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", pageContent);
-        response.put("totalElements", payments.size());
-        response.put("totalPages", (int) Math.ceil((double) payments.size() / size));
-        response.put("currentPage", page);
-        response.put("pageSize", size);
-        response.put("hasNext", end < payments.size());
-        response.put("hasPrevious", start > 0);
-        
+        Map<String, Object> response = paymentService.getPaymentsPaginated(page, size, sortBy, sortDir);
         return ResponseEntity.ok(response);
     }
 
@@ -99,33 +84,9 @@ public class PaymentController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getPaymentStatistics() {
-        List<PaymentDto> payments = paymentService.getPayments();
-        
-        long totalPayments = payments.size();
-        long successfulPayments = payments.stream().mapToLong(p -> p.isSuccess() ? 1 : 0).sum();
-        long failedPayments = totalPayments - successfulPayments;
-        
-        BigDecimal totalAmount = payments.stream()
-                .filter(PaymentDto::isSuccess)
-                .map(PaymentDto::amount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        long creditCardPayments = payments.stream()
-                .mapToLong(p -> p.paymentType() == PaymentType.CREDIT_CARD ? 1 : 0).sum();
-        
-        long transferPayments = payments.stream()
-                .mapToLong(p -> p.paymentType() == PaymentType.TRANSFER ? 1 : 0).sum();
-        
-        Map<String, Object> statistics = new HashMap<>();
-        statistics.put("totalPayments", totalPayments);
-        statistics.put("successfulPayments", successfulPayments);
-        statistics.put("failedPayments", failedPayments);
-        statistics.put("successRate", totalPayments > 0 ? (double) successfulPayments / totalPayments * 100 : 0);
-        statistics.put("totalAmount", totalAmount);
-        statistics.put("creditCardPayments", creditCardPayments);
-        statistics.put("transferPayments", transferPayments);
-        
+    public ResponseEntity<Map<String, Object>> getPaymentStatistics(Authentication authentication) {
+        log.info("Getting payment statistics for user: {}", authentication.getName());
+        Map<String, Object> statistics = paymentService.getPaymentStatistics();
         return ResponseEntity.ok(statistics);
     }
 
@@ -144,28 +105,9 @@ public class PaymentController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/can-pay")
-    public ResponseEntity<Map<String, Object>> canUserMakePayments() {
-        // Check if user has at least one payment method
-        boolean hasBankAccount = false;
-        boolean hasCreditCard = false;
-        
-        try {
-            // Note: These methods should be added to user service or accessed differently
-            // For now, using basic logic
-            hasBankAccount = true; // Assume user has bank account for now
-            hasCreditCard = true;  // Assume user has credit card for now
-        } catch (Exception e) {
-            log.warn("Error checking user payment methods: {}", e.getMessage());
-        }
-        
-        boolean canPay = hasBankAccount || hasCreditCard;
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("canMakePayments", canPay);
-        response.put("hasBankAccount", hasBankAccount);
-        response.put("hasCreditCard", hasCreditCard);
-        response.put("availablePaymentTypes", canPay ? PaymentType.values() : new PaymentType[]{});
-        
+    public ResponseEntity<Map<String, Object>> canUserMakePayments(Authentication authentication) {
+        log.info("Checking payment capability for user: {}", authentication.getName());
+        Map<String, Object> response = paymentService.checkUserPaymentCapability(authentication);
         return ResponseEntity.ok(response);
     }
 
@@ -175,38 +117,10 @@ public class PaymentController {
         @ApiResponse(responseCode = "400", description = "Invalid payment data")
     })
     @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validatePaymentRequest(@RequestBody PaymentRequest paymentRequest) {
-        Map<String, Object> response = new HashMap<>();
-        
-        // Basic validation
-        boolean isValid = true;
-        String message = "Payment request is valid";
-        
-        if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            isValid = false;
-            message = "Amount must be greater than zero";
-        } else if (paymentRequest.toUserId() == null) {
-            isValid = false;
-            message = "Recipient user ID is required";
-        } else if (paymentRequest.paymentType() == null) {
-            isValid = false;
-            message = "Payment type is required";
-        } else if (paymentRequest.transactionType() == null) {
-            isValid = false;
-            message = "Transaction type is required";
-        } else if (paymentRequest.paymentDirection() == null) {
-            isValid = false;
-            message = "Payment direction is required";
-        } else if (paymentRequest.paymentType() == PaymentType.CREDIT_CARD && paymentRequest.creditCard() == null) {
-            isValid = false;
-            message = "Credit card information is required for credit card payments";
-        }
-        
-        response.put("valid", isValid);
-        response.put("message", message);
-        response.put("amount", paymentRequest.amount());
-        response.put("paymentType", paymentRequest.paymentType());
-        
+    public ResponseEntity<Map<String, Object>> validatePaymentRequest(
+            @RequestBody PaymentRequest paymentRequest) {
+        log.debug("Validating payment request for listing: {}", paymentRequest.listingId());
+        Map<String, Object> response = paymentService.validatePaymentRequest(paymentRequest);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,11 +1,11 @@
 package com.serhat.secondhand.user.api;
 
-import com.serhat.secondhand.auth.application.AuthService;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,40 +14,56 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User Management", description = "User profile and verification operations")
 public class UserController {
 
     private final IUserService userService;
-    private final AuthService authService;
-
-    @PostMapping("/send-code")
-    public void sendVerificationCode() {
-        userService.sendVerificationCode();
-    }
 
     @GetMapping("/me")
     public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {
-
-        String username = authentication.getName();
-        LoginResponse response = authService.getAuthenticatedUser(username);
+        log.info("Getting current user profile for: {}", authentication.getName());
+        LoginResponse response = userService.getCurrentUserProfile(authentication);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/verify")
-    public void verifyUser(@RequestBody VerificationRequest request) {
-        userService.verifyUser(request);
+
+    @PostMapping("/verification/send")
+    public ResponseEntity<Void> sendVerificationCode(Authentication authentication) {
+        log.info("Sending verification code for user: {}", authentication.getName());
+        userService.sendVerificationCode(authentication);
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/updateEmail")
-    public ResponseEntity<String> updateEmail(@RequestBody @Valid UpdateEmailRequest request) {
-        return ResponseEntity.ok(userService.updateEmail(request));
+
+    @PostMapping("/verification/verify")
+    public ResponseEntity<Void> verifyUser(
+            @Valid @RequestBody VerificationRequest request,
+            Authentication authentication) {
+        log.info("Verifying user account for: {}", authentication.getName());
+        userService.verifyUser(request, authentication);
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/updatePhone")
-    public ResponseEntity<String> updateEmail(@RequestBody @Valid UpdatePhoneRequest request) {
-       return ResponseEntity.ok(userService.updatePhone(request));
+
+    @PutMapping("/email")
+    public ResponseEntity<String> updateEmail(
+            @Valid @RequestBody UpdateEmailRequest request,
+            Authentication authentication) {
+        log.info("Updating email for user: {}", authentication.getName());
+        String response = userService.updateEmail(request, authentication);
+        return ResponseEntity.ok(response);
     }
 
+
+    @PutMapping("/phone")
+    public ResponseEntity<String> updatePhone(
+            @Valid @RequestBody UpdatePhoneRequest request,
+            Authentication authentication) {
+        log.info("Updating phone for user: {}", authentication.getName());
+        String response = userService.updatePhone(request, authentication);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -6,14 +6,18 @@ import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -22,6 +26,7 @@ import java.util.UUID;
 public class CreditCardService implements ICreditCardService {
 
     private final CreditCardRepository creditCardRepository;
+    private final IUserService userService;
 
     @Override
     public boolean validateCreditCard(CreditCardDto creditCardDto) {
@@ -239,5 +244,72 @@ public class CreditCardService implements ICreditCardService {
     @Override
     public boolean hasUserCreditCard(User user) {
         return creditCardRepository.existsByCardHolder(user);
+    }
+
+    // Controller-specific methods with Authentication
+    
+    @Override
+    public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        return createCreditCard(user, creditCardRequest);
+    }
+
+    @Override
+    public CreditCardDto getUserCreditCard(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        return getUserCreditCardDto(user);
+    }
+
+    @Override
+    public Map<String, Object> validateCreditCardRequest(CreditCardDto creditCardDto) {
+        Map<String, Object> response = new HashMap<>();
+        
+        boolean isValid = validateCreditCard(creditCardDto);
+        String message = isValid ? "Credit card is valid" : "Credit card validation failed";
+        
+        response.put("valid", isValid);
+        response.put("message", message);
+        response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCardDto.number()));
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> checkCreditCardExists(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        boolean exists = hasUserCreditCard(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasCreditCard", exists);
+        response.put("userEmail", user.getEmail());
+        
+        if (exists) {
+            CreditCard creditCard = findByUser(user);
+            response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCard.getNumber()));
+            response.put("expiryMonth", creditCard.getExpiryMonth());
+            response.put("expiryYear", creditCard.getExpiryYear());
+            response.put("createdAt", creditCard.getCreatedAt());
+        }
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getAvailableCredit(BigDecimal requestedAmount, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        CreditCard creditCard = findByUser(user);
+        
+        BigDecimal availableCredit = creditCard.getLimit().subtract(creditCard.getAmount());
+        boolean canAfford = requestedAmount == null || availableCredit.compareTo(requestedAmount) >= 0;
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("availableCredit", availableCredit);
+        response.put("creditLimit", creditCard.getLimit());
+        response.put("currentAmount", creditCard.getAmount());
+        response.put("requestedAmount", requestedAmount);
+        response.put("canAfford", canAfford);
+        response.put("maskedCardNumber", CreditCardHelper.maskCardNumber(creditCard.getNumber()));
+        
+        return response;
     }
 }

@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +103,63 @@ public class BankService implements IBankService {
                                       HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND.toString());
         }
         return bank;
+    }
+
+    // Controller-specific methods with Authentication
+    
+    @Override
+    public BankDto getBankAccountInfo(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        return getBankInfo(user);
+    }
+
+    @Override
+    public BankDto createBankAccount(BankRequest bankRequest, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Bank createdBank = createBank(bankRequest);
+        return getBankInfo(user);
+    }
+
+    @Override
+    public Map<String, Object> checkBankAccountExists(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        boolean exists = hasUserBankAccount(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasBankAccount", exists);
+        response.put("userEmail", user.getEmail());
+        
+        if (exists) {
+            Bank bank = findByUser(user);
+            response.put("iban", bank.getIBAN());
+            response.put("createdAt", bank.getCreatedAt());
+        }
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getBankBalance(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Bank bank = findByUser(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("balance", bank.getBalance());
+        response.put("iban", bank.getIBAN());
+        response.put("currency", "TRY");
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, String> getBankIban(Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Bank bank = findByUser(user);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("iban", bank.getIBAN());
+        response.put("accountHolder", user.getName() + " " + user.getSurname());
+        
+        return response;
     }
 }

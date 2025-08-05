@@ -5,10 +5,9 @@ import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
-import com.serhat.secondhand.user.domain.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Authentication", description = "User authentication and authorization operations")
@@ -31,14 +30,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-        
+        log.info("Registration request for email: {}", request.getEmail());
         RegisterResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        
+        log.info("Login request for email: {}", request.email());
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
@@ -48,22 +47,15 @@ public class AuthController {
             Authentication authentication,
             HttpServletRequest request) {
         
-        String username = authentication.getName();
-
-        String accessToken = extractTokenFromHeader(request);
-
-        String message = authService.logout(username, accessToken);
-        
-        return ResponseEntity.ok(Map.of(
-            "message", message,
-            "status", "success"
-        ));
+        log.info("Logout request for user: {}", authentication.getName());
+        Map<String, String> response = authService.logout(authentication, request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refreshToken(@RequestBody Map<String, String> request) {
-        
         String refreshToken = request.get("refreshToken");
+        log.info("Token refresh request");
         LoginResponse response = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(response);
     }
@@ -71,20 +63,8 @@ public class AuthController {
 
     @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validateToken(Authentication authentication) {
-        
-        return ResponseEntity.ok(Map.of(
-            "valid", true,
-            "username", authentication.getName(),
-            "authorities", authentication.getAuthorities(),
-            "message", "Token is valid"
-        ));
+        log.debug("Token validation for user: {}", authentication.getName());
+        Map<String, Object> response = authService.validateToken(authentication);
+        return ResponseEntity.ok(response);
     }
-
-    private String extractTokenFromHeader(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7);
-        }
-        return null;
-    }
-} 
+}

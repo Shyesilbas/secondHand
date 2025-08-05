@@ -13,6 +13,9 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -212,5 +217,131 @@ public class PaymentService implements IPaymentService {
             log.error("Error during bank transfer: {}", e.getMessage(), e);
             return false;
         }
+    }
+
+    // Controller-specific methods
+    
+    @Override
+    public Map<String, Object> getPaymentsPaginated(int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        List<PaymentDto> payments = getPayments();
+        
+        // Manual pagination since repository doesn't return Page
+        int start = Math.min((int) pageable.getOffset(), payments.size());
+        int end = Math.min((start + pageable.getPageSize()), payments.size());
+        List<PaymentDto> pageContent = payments.subList(start, end);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", pageContent);
+        response.put("totalElements", payments.size());
+        response.put("totalPages", (int) Math.ceil((double) payments.size() / size));
+        response.put("currentPage", page);
+        response.put("pageSize", size);
+        response.put("hasNext", end < payments.size());
+        response.put("hasPrevious", start > 0);
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getPaymentStatistics() {
+        List<PaymentDto> payments = getPayments();
+        
+        long totalPayments = payments.size();
+        long successfulPayments = payments.stream().mapToLong(p -> p.isSuccess() ? 1 : 0).sum();
+        long failedPayments = totalPayments - successfulPayments;
+        
+        BigDecimal totalAmount = payments.stream()
+                .filter(PaymentDto::isSuccess)
+                .map(PaymentDto::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        long creditCardPayments = payments.stream()
+                .mapToLong(p -> p.paymentType() == PaymentType.CREDIT_CARD ? 1 : 0).sum();
+        
+        long transferPayments = payments.stream()
+                .mapToLong(p -> p.paymentType() == PaymentType.TRANSFER ? 1 : 0).sum();
+        
+        Map<String, Object> statistics = new HashMap<>();
+        statistics.put("totalPayments", totalPayments);
+        statistics.put("successfulPayments", successfulPayments);
+        statistics.put("failedPayments", failedPayments);
+        statistics.put("successRate", totalPayments > 0 ? (double) successfulPayments / totalPayments * 100 : 0);
+        statistics.put("totalAmount", totalAmount);
+        statistics.put("creditCardPayments", creditCardPayments);
+        statistics.put("transferPayments", transferPayments);
+        
+        return statistics;
+    }
+
+    @Override
+    public Map<String, Object> checkUserPaymentCapability(Authentication authentication) {
+        // Check if user has at least one payment method
+        boolean hasBankAccount = false;
+        boolean hasCreditCard = false;
+        
+        try {
+            User user = userRepository.findByEmail(authentication.getName())
+                    .orElse(null);
+            
+            if (user != null) {
+                Bank bank = bankRepository.findByAccountHolder(user);
+                hasBankAccount = bank != null;
+                
+                hasCreditCard = creditCardService.hasUserCreditCard(user);
+            }
+        } catch (Exception e) {
+            log.warn("Error checking user payment methods: {}", e.getMessage());
+        }
+        
+        boolean canPay = hasBankAccount || hasCreditCard;
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("canMakePayments", canPay);
+        response.put("hasBankAccount", hasBankAccount);
+        response.put("hasCreditCard", hasCreditCard);
+        response.put("availablePaymentTypes", canPay ? PaymentType.values() : new PaymentType[]{});
+        
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> validatePaymentRequest(PaymentRequest paymentRequest) {
+        Map<String, Object> response = new HashMap<>();
+        
+        // Basic validation
+        boolean isValid = true;
+        String message = "Payment request is valid";
+        
+        if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            isValid = false;
+            message = "Amount must be greater than zero";
+        } else if (paymentRequest.toUserId() == null) {
+            isValid = false;
+            message = "Recipient user ID is required";
+        } else if (paymentRequest.paymentType() == null) {
+            isValid = false;
+            message = "Payment type is required";
+        } else if (paymentRequest.transactionType() == null) {
+            isValid = false;
+            message = "Transaction type is required";
+        } else if (paymentRequest.paymentDirection() == null) {
+            isValid = false;
+            message = "Payment direction is required";
+        } else if (paymentRequest.paymentType() == PaymentType.CREDIT_CARD && paymentRequest.creditCard() == null) {
+            isValid = false;
+            message = "Credit card information is required for credit card payments";
+        }
+        
+        response.put("valid", isValid);
+        response.put("message", message);
+        response.put("amount", paymentRequest.amount());
+        response.put("paymentType", paymentRequest.paymentType());
+        response.put("transactionType", paymentRequest.transactionType());
+        response.put("paymentDirection", paymentRequest.paymentDirection());
+        
+        return response;
     }
 }
