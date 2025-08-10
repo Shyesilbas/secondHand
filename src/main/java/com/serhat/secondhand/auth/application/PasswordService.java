@@ -13,6 +13,8 @@ import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,9 @@ public class PasswordService {
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;
 
-    public String changePassword(String username, ChangePasswordRequest request) {
+    public String changePassword(ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         log.info("Password change attempt for user: {}", username);
 
         User user = userService.findByEmail(username);
@@ -37,11 +41,11 @@ public class PasswordService {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
         }
         
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
             throw new BadCredentialsException("Current password is incorrect");
         }
 
-        validateNewPassword(request.getNewPassword(), request.getConfirmPassword(), user.getPassword());
+        validateNewPassword(request.getNewPassword(),  user.getPassword());
         
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
@@ -102,7 +106,7 @@ public class PasswordService {
                     "BAD_REQUEST");
         }
 
-        validateNewPassword(request.getNewPassword(), request.getConfirmPassword(), user.getPassword());
+        validateNewPassword(request.getNewPassword(), user.getPassword());
         
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
@@ -115,10 +119,8 @@ public class PasswordService {
         return "Password has been reset successfully. Please login with your new password.";
     }
 
-    private void validateNewPassword(String newPassword, String confirmPassword, String currentEncodedPassword) {
-        if (!newPassword.equals(confirmPassword)) {
-            throw new IllegalArgumentException("New password and confirmation do not match");
-        }
+    private void validateNewPassword(String newPassword, String currentEncodedPassword) {
+
         if (passwordEncoder.matches(newPassword, currentEncodedPassword)) {
             throw new IllegalArgumentException("New password must be different from current password");
         }

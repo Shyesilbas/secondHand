@@ -3,7 +3,6 @@ package com.serhat.secondhand.listing.api;
 import com.serhat.secondhand.listing.application.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleSearchCriteria;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -29,7 +28,7 @@ public class VehicleListingController {
     
     private final VehicleListingService vehicleListingService;
     
-    @PostMapping
+    @PostMapping("/create-listing")
     @Operation(summary = "Create a new vehicle listing")
     public ResponseEntity<Void> createVehicleListing(
             @Valid @RequestBody VehicleCreateRequest request,
@@ -56,13 +55,7 @@ public class VehicleListingController {
         return ResponseEntity.ok(vehicle);
     }
     
-    @GetMapping("/search")
-    @Operation(summary = "Search vehicles by criteria")
-    public ResponseEntity<List<VehicleListingDto>> searchVehicles(
-            @Valid @ModelAttribute VehicleSearchCriteria criteria) {
-        List<VehicleListingDto> vehicles = vehicleListingService.searchVehicles(criteria);
-        return ResponseEntity.ok(vehicles);
-    }
+
     
     @GetMapping("/brand/{brand}/model/{model}")
     @Operation(summary = "Find vehicles by brand and model")

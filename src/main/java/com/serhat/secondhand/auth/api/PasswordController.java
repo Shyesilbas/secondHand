@@ -6,13 +6,11 @@ import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -26,26 +24,13 @@ public class PasswordController {
 
     private final PasswordService passwordService;
 
-    @PostMapping("/change")
-    @Operation(
-        summary = "Change password",
-        description = "Change the current user's password"
-    )
-    @SecurityRequirement(name = "JWT")
-    @ApiResponse(responseCode = "200", description = "Password changed successfully")
-    @ApiResponse(responseCode = "400", description = "Validation failed or password requirements not met")
-    @ApiResponse(responseCode = "401", description = "Current password is incorrect or unauthorized")
-    public ResponseEntity<Map<String, String>> changePassword(
-            @Valid @RequestBody ChangePasswordRequest request,
-            Authentication authentication) {
+    @PutMapping("/change")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        String message = passwordService.changePassword(request);
         
-        String username = authentication.getName();
-        String message = passwordService.changePassword(username, request);
-        
-        return ResponseEntity.ok(Map.of(
-            "message", message,
-            "status", "success"
-        ));
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping("/forgot")

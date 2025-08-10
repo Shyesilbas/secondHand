@@ -28,10 +28,6 @@ public class ListingService {
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }
-    
-    public List<Listing> findByStatus(ListingStatus status) {
-        return listingRepository.findByStatus(status);
-    }
 
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
@@ -56,6 +52,11 @@ public class ListingService {
                 .map(listingMapper::toDynamicDto)
                 .toList();
     }
+
+    public List<ListingDto> getAllListings() {
+        log.info("Getting all active listings");
+        return findByStatusAsDto(ListingStatus.ACTIVE);
+    }
     
     @Transactional
     public void publish(UUID listingId) {
@@ -73,13 +74,13 @@ public class ListingService {
     }
     
     @Transactional
-    public void close(UUID listingId) {
+    public void reactivate(UUID listingId) {
         Listing listing = findById(listingId)
                 .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
-        validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
-        listing.setStatus(ListingStatus.CLOSED);
+        validateStatus(listing, ListingStatus.INACTIVE);
+        listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
-        log.info("Listing closed: {}", listingId);
+        log.info("Listing reactivated: {}", listingId);
     }
     
     @Transactional

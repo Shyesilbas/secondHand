@@ -2,9 +2,6 @@ package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.service.BankService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/bank")
@@ -40,19 +36,4 @@ public class BankController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bankDto);
     }
 
-
-    @GetMapping("/exists")
-    public ResponseEntity<Map<String, Object>> hasBankAccount(Authentication authentication) {
-        log.info("Checking bank account existence for user: {}", authentication.getName());
-        Map<String, Object> response = bankService.checkBankAccountExists(authentication);
-        return ResponseEntity.ok(response);
-    }
-
-
-    @GetMapping("/balance")
-    public ResponseEntity<Map<String, Object>> getBankBalance(Authentication authentication) {
-        log.info("Getting bank balance for user: {}", authentication.getName());
-        Map<String, Object> response = bankService.getBankBalance(authentication);
-        return ResponseEntity.ok(response);
-    }
 }

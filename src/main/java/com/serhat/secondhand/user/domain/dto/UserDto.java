@@ -21,7 +21,6 @@ public record UserDto(
         @JsonFormat(pattern = "dd/MM/yyyy")
         LocalDate accountCreationDate,
         AccountStatus accountStatus,
-        String fullName,
         boolean accountVerified,
         boolean canSell
 

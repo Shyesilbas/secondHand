@@ -4,9 +4,6 @@ import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.service.PaymentService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -28,19 +24,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @Operation(summary = "Create a generic payment (e.g., for purchasing an item)")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Payment created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid payment data"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    @PostMapping
+    @PostMapping("/pay")
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
         log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
         PaymentDto paymentDto = paymentService.createPayment(paymentRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
     }
-    
 
     @PostMapping("/listings/pay-fee")
     public ResponseEntity<PaymentDto> payListingCreationFee(
@@ -52,11 +41,6 @@ public class PaymentController {
     }
 
 
-    @Operation(summary = "Get current user's payments with pagination")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Payments retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
     @GetMapping("/my-payments")
     public ResponseEntity<Page<PaymentDto>> getMyPayments(
             Authentication authentication,
@@ -69,11 +53,7 @@ public class PaymentController {
         return ResponseEntity.ok(payments);
     }
 
-    @Operation(summary = "Get payment statistics for the current user")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getPaymentStatistics(Authentication authentication) {
         log.info("Getting payment statistics for user: {}", authentication.getName());

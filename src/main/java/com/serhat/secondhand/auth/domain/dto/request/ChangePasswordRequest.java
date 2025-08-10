@@ -27,7 +27,4 @@ public class ChangePasswordRequest {
     @Schema(description = "New password", example = "NewPassword123!")
     private String newPassword;
 
-    @NotBlank(message = "Password confirmation is required")
-    @Schema(description = "New password confirmation", example = "NewPassword123!")
-    private String confirmPassword;
 } 

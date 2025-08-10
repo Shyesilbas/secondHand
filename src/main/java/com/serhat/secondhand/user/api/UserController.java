@@ -1,9 +1,9 @@
 package com.serhat.secondhand.user.api;
 
-import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
+import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,9 +23,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {
-        log.info("Getting current user profile for: {}", authentication.getName());
-        LoginResponse response = userService.getCurrentUserProfile(authentication);
+    public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
+        UserDto response = userService.getCurrentUserProfile(authentication);
         return ResponseEntity.ok(response);
     }
 

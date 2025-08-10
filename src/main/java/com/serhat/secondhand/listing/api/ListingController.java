@@ -42,6 +42,11 @@ public class ListingController {
         return ResponseEntity.ok(dtos);
     }
 
+   @GetMapping("/allListings")
+   public ResponseEntity<List<ListingDto>> getAllListings() {
+        return ResponseEntity.ok(listingService.getAllListings());
+   }
+
     @GetMapping("/my-listings")
     @Operation(summary = "Get current user's all listings")
     public ResponseEntity<List<ListingDto>> getMyListings(@AuthenticationPrincipal User currentUser) {
@@ -68,13 +73,13 @@ public class ListingController {
         return ResponseEntity.ok().build();
     }
     
-    @PutMapping("/{id}/close")
-    @Operation(summary = "Close a listing")
+    @PutMapping("/{id}/reactivate")
+    @Operation(summary = "reactivate a listing")
     public ResponseEntity<Void> closeListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         listingService.validateOwnership(id, currentUser);
-        listingService.close(id);
+        listingService.reactivate(id);
         return ResponseEntity.ok().build();
     }
     

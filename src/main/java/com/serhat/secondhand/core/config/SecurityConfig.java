@@ -24,7 +24,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -53,8 +52,9 @@ public class SecurityConfig {
                                 "/api/auth/password/reset",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
-                                "/api/listings/status/{status}",
-                                "/api/listings/{id}",
+                                "/api/v1/listings/status/{status}",
+                                "/api/v1/listings/{id}",
+                                "/api/v1/listings/allListings",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
@@ -65,8 +65,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/orders/**", "/api/cart/**")
                         .hasRole("BUYER")
                         
-                        .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**", "/api/auth/password/change")
-                        .hasAnyRole("BUYER", "SELLER")
+                        .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**")
+                        .hasAnyRole("BUYER", "SELLER","BOTH")
                         
                         .anyRequest().authenticated()
                 )
@@ -120,10 +120,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setUserDetailsService(userDetailsService);
-        return authProvider;
+        return new DaoAuthenticationProvider(userDetailsService);
     }
 
     @Bean

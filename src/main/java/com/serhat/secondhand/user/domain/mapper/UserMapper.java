@@ -3,7 +3,6 @@ package com.serhat.secondhand.user.domain.mapper;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "fullName", expression = "java(user.getName() + \" \" + user.getSurname())")
+    @Mapping(target = "email", expression = "java(user.getEmail())")
     UserDto toDto(User user);
 
     @Mappings({
@@ -27,8 +26,8 @@ public interface UserMapper {
         @Mapping(target = "canSell", constant = "false"),
         @Mapping(target = "accountVerified", constant = "false"),
         @Mapping(target = "listings", ignore = true),
-        @Mapping(target = "bankAccounts", ignore = true),
-        @Mapping(target = "creditCards", ignore = true),
+        @Mapping(target = "bank", ignore = true),
+        @Mapping(target = "creditCard", ignore = true),
         @Mapping(target = "emails", ignore = true),
         @Mapping(target = "tokens", ignore = true),
         @Mapping(target = "verifications", ignore = true),

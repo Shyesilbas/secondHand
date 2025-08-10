@@ -2,7 +2,6 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleSearchCriteria;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
@@ -51,14 +50,7 @@ public class VehicleListingService {
                 .map(listingMapper::toVehicleDto)
                 .toList();
     }
-    
-    public List<VehicleListingDto> searchVehicles(VehicleSearchCriteria criteria) {
-        List<VehicleListing> vehicles = vehicleRepository.searchByCriteria(criteria);
-        return vehicles.stream()
-                .map(listingMapper::toVehicleDto)
-                .toList();
-    }
-    
+
     public VehicleListingDto getVehicleDetails(UUID id) {
         VehicleListing vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle listing not found"));

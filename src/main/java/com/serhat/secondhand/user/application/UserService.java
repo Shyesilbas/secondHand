@@ -1,6 +1,5 @@
 package com.serhat.secondhand.user.application;
 
-import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
@@ -10,11 +9,13 @@ import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
+import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.exception.EmailExistsException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
+import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -34,6 +34,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final IVerificationService verificationService;
+    private final UserMapper userMapper;
 
     public User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -154,18 +155,16 @@ public class UserService {
         if (userRepository.existsByEmail(requestedEmail)) {
             throw new EmailExistsException("The email is already in use.");
         }
-        
-        // This part is tricky. Changing the email which is the username has security implications.
-        // For now, let's assume we create a new token after this and force re-login.
+
         user.setEmail(requestedEmail);
         update(user);
         log.info("Email updated successfully from: {}, to: {}, by user: {}", currentEmail, requestedEmail, user.getId());
-        return "Email update process initiated. Please check your new email for verification.";
+        return "Email updated successfully.";
     }
 
-    public LoginResponse getCurrentUserProfile(Authentication authentication) {
+    public UserDto getCurrentUserProfile(Authentication authentication) {
         User user = getAuthenticatedUser(authentication);
-        return new LoginResponse("Current user profile", user.getId(), user.getEmail(), null, null);
+        return userMapper.toDto(user);
     }
 
     public User findById(Long id){
