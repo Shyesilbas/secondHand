@@ -64,10 +64,19 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
-        clearTokens();
-        setUserState(null);
-        setIsAuthenticated(false);
+    const logout = async () => {
+        try {
+            // Call backend logout to revoke tokens
+            await authService.logout();
+        } catch (error) {
+            console.error('Backend logout failed:', error);
+            // Continue with local logout even if backend fails
+        } finally {
+            // Always clear local state
+            clearTokens();
+            setUserState(null);
+            setIsAuthenticated(false);
+        }
     };
 
     const updateUser = (updatedUserData) => {
