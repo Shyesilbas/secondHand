@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { passwordService } from '../../features/auth/services/passwordService';
 import { ROUTES } from '../../constants/routes';
+import { useToast } from '../../context/ToastContext';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 
 const ChangePasswordPage = () => {
     const navigate = useNavigate();
+    const { showSuccess, showError } = useToast();
     const [formData, setFormData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -14,7 +16,6 @@ const ChangePasswordPage = () => {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
 
     const validatePassword = (password) => {
         const minLength = password.length >= 8;
@@ -47,11 +48,6 @@ const ChangePasswordPage = () => {
                 [name]: ''
             }));
         }
-
-        // Clear success message
-        if (successMessage) {
-            setSuccessMessage('');
-        }
     };
 
     const validateForm = () => {
@@ -59,29 +55,29 @@ const ChangePasswordPage = () => {
 
         // Current password validation
         if (!formData.currentPassword.trim()) {
-            newErrors.currentPassword = 'Mevcut şifrenizi girin';
+            newErrors.currentPassword = 'Enter your password';
         }
 
         // New password validation
         if (!formData.newPassword.trim()) {
-            newErrors.newPassword = 'Yeni şifrenizi girin';
+            newErrors.newPassword = 'Enter your new password';
         } else {
             const passwordValidation = validatePassword(formData.newPassword);
             if (!passwordValidation.isValid) {
-                newErrors.newPassword = 'Şifre gereksinimleri karşılanmıyor';
+                newErrors.newPassword = 'Requirements did not meet';
             }
         }
 
         // Confirm password validation
         if (!formData.confirmPassword.trim()) {
-            newErrors.confirmPassword = 'Yeni şifrenizi tekrar girin';
+            newErrors.confirmPassword = 'Enter your new password again';
         } else if (formData.newPassword !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Şifreler eşleşmiyor';
+            newErrors.confirmPassword = 'Passwords do not match';
         }
 
         // Same password check
         if (formData.currentPassword === formData.newPassword && formData.newPassword.trim()) {
-            newErrors.newPassword = 'Yeni şifre mevcut şifreden farklı olmalıdır';
+            newErrors.newPassword = 'New Password must be different from the current password';
         }
 
         setErrors(newErrors);
@@ -104,7 +100,7 @@ const ChangePasswordPage = () => {
                 newPassword: formData.newPassword
             });
 
-            setSuccessMessage('Şifreniz başarıyla değiştirildi!');
+            showSuccess('Password changed successfully! Please login with your new password.');
             setFormData({
                 currentPassword: '',
                 newPassword: '',
@@ -120,8 +116,7 @@ const ChangePasswordPage = () => {
             console.error('Password change error:', error);
             
             if (error.response?.data?.message) {
-                // Check if it's a current password error
-                if (error.response.data.message.toLowerCase().includes('current') || 
+                if (error.response.data.message.toLowerCase().includes('current') ||
                     error.response.data.message.toLowerCase().includes('mevcut') ||
                     error.response.data.message.toLowerCase().includes('wrong') ||
                     error.response.data.message.toLowerCase().includes('yanlış')) {
@@ -133,7 +128,7 @@ const ChangePasswordPage = () => {
                     setErrors({ general: error.response.data.message });
                 }
             } else {
-                setErrors({ general: 'Şifre değiştirilirken bir hata oluştu. Lütfen tekrar deneyin.' });
+                showError('An error occurred while changing your password. Please try again later.');
             }
         } finally {
             setIsLoading(false);
@@ -148,30 +143,14 @@ const ChangePasswordPage = () => {
                 {/* Header */}
                 <div className="text-center">
                     <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-                        Şifre Değiştir
+                        Change Password
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Güvenliğiniz için güçlü bir şifre seçin
+                        Please enter a strong password for your account.
                     </p>
                 </div>
 
-                {/* Success Message */}
-                {successMessage && (
-                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                        <div className="flex">
-                            <div className="flex-shrink-0">
-                                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-green-800">
-                                    {successMessage}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
+
 
                 {/* General Error */}
                 {errors.general && (
@@ -196,24 +175,24 @@ const ChangePasswordPage = () => {
                     <div className="space-y-4">
                         {/* Current Password */}
                         <AuthInput
-                            label="Mevcut Şifre"
+                            label="Current Password"
                             type="password"
                             name="currentPassword"
                             value={formData.currentPassword}
                             onChange={handleInputChange}
-                            placeholder="Mevcut şifrenizi girin"
+                            placeholder="Enter your current password"
                             error={errors.currentPassword}
                             required
                         />
 
                         {/* New Password */}
                         <AuthInput
-                            label="Yeni Şifre"
+                            label="New Password"
                             type="password"
                             name="newPassword"
                             value={formData.newPassword}
                             onChange={handleInputChange}
-                            placeholder="Yeni şifrenizi girin"
+                            placeholder="Enter your new password"
                             error={errors.newPassword}
                             required
                         />
@@ -221,27 +200,27 @@ const ChangePasswordPage = () => {
                         {/* Password Requirements */}
                         {formData.newPassword && (
                             <div className="bg-gray-50 rounded-md p-3">
-                                <p className="text-sm font-medium text-gray-700 mb-2">Şifre Gereksinimleri:</p>
+                                <p className="text-sm font-medium text-gray-700 mb-2">Password Requirements:</p>
                                 <div className="space-y-1">
                                     <div className={`text-xs flex items-center ${passwordValidation.minLength ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.minLength ? '✓' : '✗'}</span>
-                                        En az 8 karakter
+                                        At least 8 characters long
                                     </div>
                                     <div className={`text-xs flex items-center ${passwordValidation.hasLowercase ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.hasLowercase ? '✓' : '✗'}</span>
-                                        Küçük harf (a-z)
+                                         At least one Lower Case (a-z)
                                     </div>
                                     <div className={`text-xs flex items-center ${passwordValidation.hasUppercase ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.hasUppercase ? '✓' : '✗'}</span>
-                                        Büyük harf (A-Z)
+                                        At least one Upper Case(A-Z)
                                     </div>
                                     <div className={`text-xs flex items-center ${passwordValidation.hasNumber ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.hasNumber ? '✓' : '✗'}</span>
-                                        Rakam (0-9)
+                                        Number (0-9)
                                     </div>
                                     <div className={`text-xs flex items-center ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.hasSpecialChar ? '✓' : '✗'}</span>
-                                        Özel karakter (@$!%*?&.)
+                                        Special Character (@$!%*?&.)
                                     </div>
                                 </div>
                             </div>
@@ -249,12 +228,12 @@ const ChangePasswordPage = () => {
 
                         {/* Confirm Password */}
                         <AuthInput
-                            label="Yeni Şifre (Tekrar)"
+                            label="New Password (Again)"
                             type="password"
                             name="confirmPassword"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
-                            placeholder="Yeni şifrenizi tekrar girin"
+                            placeholder="Enter your new password again"
                             error={errors.confirmPassword}
                             required
                         />
@@ -268,7 +247,7 @@ const ChangePasswordPage = () => {
                             disabled={isLoading || !passwordValidation.isValid || formData.newPassword !== formData.confirmPassword}
                             className="flex-1"
                         >
-                            {isLoading ? 'Değiştiriliyor...' : 'Şifreyi Değiştir'}
+                            {isLoading ? 'Updating...' : 'Change Password'}
                         </AuthButton>
                         
                         <button
@@ -276,7 +255,7 @@ const ChangePasswordPage = () => {
                             onClick={() => navigate(ROUTES.PROFILE)}
                             className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                         >
-                            İptal
+                            Cancel
                         </button>
                     </div>
                 </form>
@@ -284,14 +263,14 @@ const ChangePasswordPage = () => {
                 {/* Help Text */}
                 <div className="text-center">
                     <p className="text-xs text-gray-500">
-                        Şifrenizi unuttuysanız,{' '}
+                        If you forgot your password, you can{' '}
                         <button
                             onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
                             className="font-medium text-indigo-600 hover:text-indigo-500"
                         >
-                            şifre sıfırlama
+                            use the forgot password form{' '}
                         </button>
-                        {' '}sayfasını kullanabilirsiniz.
+                        {' '}.
                     </p>
                 </div>
             </div>

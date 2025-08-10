@@ -12,6 +12,7 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import ChangePasswordPage from '../pages/auth/ChangePasswordPage';
+import AccountVerificationPage from '../pages/auth/AccountVerificationPage';
 import DashboardPage from '../pages/DashboardPage';
 import ProfilePage from '../pages/user/ProfilePage';
 import ListingsPage from '../pages/listings/ListingsPage';
@@ -95,6 +96,7 @@ const AppRoutes = () => {
                         <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
+        <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />

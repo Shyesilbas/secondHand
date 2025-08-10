@@ -35,7 +35,7 @@ const ListingGrid = ({ listings, isLoading, error }) => {
                     </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    İlanlar yüklenemedi
+                    Listings did not load
                 </h3>
                 <p className="text-gray-600 mb-4">
                     {error}
@@ -44,7 +44,7 @@ const ListingGrid = ({ listings, isLoading, error }) => {
                     onClick={() => window.location.reload()}
                     className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
                 >
-                    Tekrar Dene
+                    Try Again
                 </button>
             </div>
         );
@@ -59,10 +59,10 @@ const ListingGrid = ({ listings, isLoading, error }) => {
                     </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Henüz ilan bulunmuyor
+                    No listings yet
                 </h3>
                 <p className="text-gray-600">
-                    İlk ilanı sen ver ve topluluğumuzun büyümesine katkıda bulun!
+                    Create the first listing and support us!
                 </p>
             </div>
         );

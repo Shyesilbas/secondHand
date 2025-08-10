@@ -18,7 +18,7 @@ const ListingDetailPage = () => {
         const data = await listingService.getListingById(id);
         setListing(data);
       } catch (err) {
-        setError(err.response?.data?.message || 'İlan detayları yüklenirken bir hata oluştu');
+        setError(err.response?.data?.message || 'An error occurred while fetching the listing. Please try again later.');
       } finally {
         setIsLoading(false);
       }
@@ -142,10 +142,10 @@ const ListingDetailPage = () => {
                       ? 'bg-red-100 text-red-800'
                       : 'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {listing.status === 'ACTIVE' && 'Aktif'}
-                    {listing.status === 'SOLD' && 'Satıldı'}
-                    {listing.status === 'DRAFT' && 'Taslak'}
-                    {listing.status === 'PENDING' && 'Beklemede'}
+                    {listing.status === 'ACTIVE' && 'Active'}
+                    {listing.status === 'SOLD' && 'Sold'}
+                    {listing.status === 'DRAFT' && 'Draft'}
+                    {listing.status === 'PENDING' && 'Pending'}
                   </span>
                 </div>
               </div>
@@ -163,12 +163,12 @@ const ListingDetailPage = () => {
 
           {/* General Details */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">İlan Bilgileri</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Listing Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <DetailItem label="İlan Tarihi" value={formatDate(listing.createdAt)} />
-              <DetailItem label="Son Güncelleme" value={formatDate(listing.updatedAt)} />
-              <DetailItem label="Konum" value={`${listing.district}, ${listing.city}`} />
-              <DetailItem label="İlan Ücreti" value={listing.isListingFeePaid ? 'Ödendi' : 'Ödenmedi'} />
+              <DetailItem label="Created At" value={formatDate(listing.createdAt)} />
+              <DetailItem label="Last Update" value={formatDate(listing.updatedAt)} />
+              <DetailItem label="Province" value={`${listing.district}, ${listing.city}`} />
+              <DetailItem label="Listing Fee" value={listing.isListingFeePaid ? 'Paid' : 'Unpaid'} />
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@ const ListingDetailPage = () => {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-4">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Satıcı Bilgileri</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Seller Information</h3>
             
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -189,7 +189,7 @@ const ListingDetailPage = () => {
                   {listing.sellerName} {listing.sellerSurname}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Satıcı
+                  Seller
                 </p>
               </div>
             </div>
@@ -197,23 +197,23 @@ const ListingDetailPage = () => {
             {!isOwner && (
               <div className="space-y-3">
                 <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  Satıcıyla İletişime Geç
+                  Contact Seller
                 </button>
                 <button className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                  Favorilere Ekle
+                  Add to Favorites(Coming Soon)
                 </button>
               </div>
             )}
 
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-3">İlan İstatistikleri</h4>
+              <h4 className="font-medium text-gray-900 mb-3">Listing Statics</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">İlan No:</span>
+                  <span className="text-gray-600">Listing No:</span>
                   <span className="font-medium">{listing.id.slice(0, 8)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Görüntüleme:</span>
+                  <span className="text-gray-600">Views:</span>
                   <span className="font-medium">-</span>
                 </div>
               </div>
@@ -228,14 +228,14 @@ const ListingDetailPage = () => {
 // Vehicle Details Component
 const VehicleDetails = ({ listing }) => (
   <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Araç Özellikleri</h3>
+    <h3 className="text-xl font-semibold text-gray-900 mb-4">Vehicle Information</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <DetailItem label="Marka" value={listing.brand} />
       <DetailItem label="Model" value={listing.model} />
       <DetailItem label="Yıl" value={listing.year} />
       <DetailItem label="Kilometre" value={listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : '-'} />
       <DetailItem label="Motor Hacmi" value={listing.engineCapacity ? `${listing.engineCapacity} cc` : '-'} />
-      <DetailItem label="Vites" value={listing.gearbox === 1 ? 'Manuel' : listing.gearbox === 2 ? 'Otomatik' : '-'} />
+      <DetailItem label="Vites" value={listing.gearbox === 1 ? 'Manuel' : listing.gearbox === 2 ? 'Automatic' : '-'} />
       <DetailItem label="Yakıt Türü" value={listing.fuelType} />
       <DetailItem label="Renk" value={listing.color} />
       <DetailItem label="Kapı Sayısı" value={listing.doors} />

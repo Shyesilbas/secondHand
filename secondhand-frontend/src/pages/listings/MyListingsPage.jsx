@@ -12,10 +12,10 @@ const MyListingsPage = () => {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
-                        İlanlarım
+                        My Listings
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Oluşturduğunuz tüm ilanları buradan yönetebilirsiniz
+                        You can manage your listings here.
                     </p>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -35,7 +35,7 @@ const MyListingsPage = () => {
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>Yeni İlan</span>
+                        <span>New Listing</span>
                     </Link>
                 </div>
             </div>
@@ -48,7 +48,7 @@ const MyListingsPage = () => {
                             {listings.length}
                         </div>
                         <div className="text-sm text-gray-600">
-                            Toplam İlan
+                            Total Listings
                         </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm border">
@@ -56,7 +56,7 @@ const MyListingsPage = () => {
                             {listings.filter(l => l.status === 'ACTIVE').length}
                         </div>
                         <div className="text-sm text-gray-600">
-                            Aktif İlan
+                            Active Listings
                         </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm border">
@@ -64,7 +64,7 @@ const MyListingsPage = () => {
                             {listings.filter(l => l.status === 'DRAFT').length}
                         </div>
                         <div className="text-sm text-gray-600">
-                            Taslak İlan
+                            Draft Listings
                         </div>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm border">
@@ -72,7 +72,7 @@ const MyListingsPage = () => {
                             {listings.filter(l => l.status === 'SOLD').length}
                         </div>
                         <div className="text-sm text-gray-600">
-                            Satılan İlan
+                            Sold Listings
                         </div>
                     </div>
                 </div>

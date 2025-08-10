@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
         CREATE: '/v1/listings',
         UPDATE: (id) => `/v1/listings/${id}`,
         DELETE: (id) => `/v1/listings/${id}`,
+        STATISTICS: '/v1/listings/statistics',
     },
     PAYMENTS: {
         CREATE: '/v1/payments/pay',

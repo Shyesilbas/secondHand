@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.dto.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -101,5 +102,13 @@ public class ListingController {
         listingService.validateOwnership(id, currentUser);
         listingService.deactivate(id);
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/statistics")
+    @Operation(summary = "Get listing statistics", description = "Returns comprehensive statistics about listings")
+    public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
+        log.info("Getting listing statistics");
+        ListingStatisticsDto statistics = listingService.getListingStatistics();
+        return ResponseEntity.ok(statistics);
     }
 }

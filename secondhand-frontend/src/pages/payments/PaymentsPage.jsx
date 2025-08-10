@@ -40,7 +40,7 @@ const PaymentsPage = () => {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('tr-TR', {
+        return new Date(dateString).toLocaleDateString('en-EN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',

@@ -26,4 +26,9 @@ export const listingService = {
     const response = await apiClient.put(`/v1/listings/${id}/publish`);
     return response.data;
   },
+
+  getListingStatistics: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.STATISTICS);
+    return response.data;
+  },
 };

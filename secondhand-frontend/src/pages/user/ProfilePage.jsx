@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { userService } from '../../features/users/services/userService';
+import { ROUTES } from '../../constants/routes';
 
 const ProfilePage = () => {
+    const navigate = useNavigate();
     const { user, updateUser } = useAuth();
+    const { showSuccess, showError } = useToast();
     const [showPhoneModal, setShowPhoneModal] = useState(false);
     const [newPhoneNumber, setNewPhoneNumber] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
@@ -12,12 +17,12 @@ const ProfilePage = () => {
         const cleanPhone = newPhoneNumber.replace(/\D/g, '');
         
         if (!newPhoneNumber.trim()) {
-            alert('Lütfen telefon numaranızı girin');
+            showError('Please enter your phone number');
             return;
         }
 
         if (cleanPhone.length !== 11) {
-            alert('Telefon numarası 11 haneli olmalıdır');
+            showError('Length must be 11');
             return;
         }
 
@@ -25,15 +30,13 @@ const ProfilePage = () => {
         try {
             await userService.updatePhone({ newPhoneNumber: cleanPhone });
             
-            // Update user state and localStorage with new phone number
             updateUser({ phoneNumber: cleanPhone });
             
-            // Close modal and reset form
             setShowPhoneModal(false);
             setNewPhoneNumber('');
-            alert('Telefon numarası başarıyla güncellendi!');
+            showSuccess('Phone number updated successfully!');
         } catch (error) {
-            alert(error.response?.data?.message || error.message || 'Telefon numarası güncellenirken bir hata oluştu');
+            showError(error.response?.data?.message || error.message || 'An error occurred while updating phone number');
         } finally {
             setIsUpdating(false);
         }
@@ -44,6 +47,37 @@ const ProfilePage = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">
                 Profile
             </h1>
+
+            {/* Verification Warning */}
+            {!user?.accountVerified && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-yellow-800">
+                                Account Not Verified
+                            </h3>
+                            <div className="mt-2 text-sm text-yellow-700">
+                                <p>Your account is not verified yet. Please verify your email address to access all features.</p>
+                            </div>
+                            <div className="mt-4">
+                                <div className="-mx-2 -my-1.5 flex">
+                                    <button
+                                        onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
+                                        className="bg-yellow-50 px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-yellow-50 focus:ring-yellow-600"
+                                    >
+                                        Verify Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -60,7 +94,7 @@ const ProfilePage = () => {
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Phone Number</label>
                         <div className="mt-1 flex items-center justify-between">
-                            <p className="text-gray-900">{user?.phoneNumber || 'Telefon numarası belirtilmemiş'}</p>
+                            <p className="text-gray-900">{user?.phoneNumber || 'Undefined'}</p>
                             <button
                                 onClick={() => {
                                     setNewPhoneNumber(user?.phoneNumber || '');
@@ -109,13 +143,22 @@ const ProfilePage = () => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Account Verification</label>
-                        <div className="mt-1">
+                        <div className="mt-1 flex items-center justify-between">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                                 user?.accountVerified 
                                     ? 'bg-green-100 text-green-800' 
                                     : 'bg-red-100 text-red-800'
                             }`}>{user?.accountVerified ? 'Verified' : 'Unverified'}
                             </span>
+                            {!user?.accountVerified && (
+                                <button
+                                    onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
+                                    className="ml-2 px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                                    title="Verify your account"
+                                >
+                                    Verify Now
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -135,12 +178,6 @@ const ProfilePage = () => {
                 {/* Action Buttons */}
                 <div className="mt-8 pt-6 border-t border-gray-200">
                     <div className="flex flex-wrap gap-4">
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                            Profili Düzenle
-                        </button>
-                        <button className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
-                            Change Password
-                        </button>
                         {!user?.accountVerified && (
                             <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
                                 Verify Account
@@ -179,7 +216,7 @@ const ProfilePage = () => {
                                 maxLength="11"
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                11 haneli telefon numarası
+                                Phone Number
                             </p>
                         </div>
 

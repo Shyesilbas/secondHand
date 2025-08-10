@@ -26,7 +26,7 @@ const Header = () => {
                     </Link>
 
                     <nav className="hidden md:flex space-x-8">
-                        <DropdownMenu trigger="İlanlar">
+                        <DropdownMenu trigger="Listings">
                             {isAuthenticated && (
                                 <>
                                     <DropdownItem 
@@ -37,7 +37,7 @@ const Header = () => {
                                             </svg>
                                         }
                                     >
-                                        İlanlarım
+                                        My Listings
                                     </DropdownItem>
                                     <DropdownItem 
                                         to={ROUTES.CREATE_LISTING}
@@ -47,7 +47,7 @@ const Header = () => {
                                             </svg>
                                         }
                                     >
-                                        Yeni İlan
+                                        New Listing
                                     </DropdownItem>
                                     <DropdownDivider />
                                 </>
@@ -60,12 +60,12 @@ const Header = () => {
                                     </svg>
                                 }
                             >
-                                Tüm İlanlar
+                                All Listings
                             </DropdownItem>
                         </DropdownMenu>
                         
                         {isAuthenticated && (
-                            <DropdownMenu trigger="Ödemeler">
+                            <DropdownMenu trigger="Payment">
                                 <DropdownItem 
                                     to={ROUTES.PAY_LISTING_FEE}
                                     icon={
@@ -74,7 +74,7 @@ const Header = () => {
                                         </svg>
                                     }
                                 >
-                                    İlan Ücreti Öde
+                                    Pay Listing Fee
                                 </DropdownItem>
                                 <DropdownDivider />
                                 <DropdownItem 
@@ -85,7 +85,7 @@ const Header = () => {
                                         </svg>
                                     }
                                 >
-                                    Kredi Kartları
+                                    Credit Card
                                 </DropdownItem>
                                 <DropdownItem 
                                     to={ROUTES.BANK_ACCOUNTS}
@@ -95,7 +95,7 @@ const Header = () => {
                                         </svg>
                                     }
                                 >
-                                    Banka Hesapları
+                                    Bank Account
                                 </DropdownItem>
                                 <DropdownDivider />
                                 <DropdownItem 
@@ -106,7 +106,7 @@ const Header = () => {
                                         </svg>
                                     }
                                 >
-                                    Ödeme Geçmişi
+                                    Payment History
                                 </DropdownItem>
                             </DropdownMenu>
                         )}
@@ -140,7 +140,7 @@ const Header = () => {
                                             </svg>
                                         }
                                     >
-                                        Profil
+                                        Profile
                                     </DropdownItem>
                                     <DropdownItem 
                                         to={ROUTES.CHANGE_PASSWORD}
@@ -150,7 +150,7 @@ const Header = () => {
                                             </svg>
                                         }
                                     >
-                                        Şifreyi Değiştir
+                                        Change Password
                                     </DropdownItem>
                                     <DropdownDivider />
                                     <button
@@ -160,7 +160,7 @@ const Header = () => {
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
-                                        <span>Çıkış Yap</span>
+                                        <span>Logout</span>
                                     </button>
                                 </DropdownMenu>
                             </>

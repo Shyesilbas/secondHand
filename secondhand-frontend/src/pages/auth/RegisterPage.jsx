@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '../../context/ToastContext';
 import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
@@ -23,6 +24,7 @@ const RegisterPage = () => {
     const [success, setSuccess] = useState(false);
 
     const navigate = useNavigate();
+    const { showError, showSuccess } = useToast();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -97,6 +99,7 @@ const RegisterPage = () => {
 
             await authService.register(registerData);
             setSuccess(true);
+            showSuccess('Registration successful! Redirecting to login page...');
 
             setTimeout(() => {
                 navigate(ROUTES.LOGIN, {
@@ -105,8 +108,32 @@ const RegisterPage = () => {
             }, 2000);
 
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Kayıt olurken bir hata oluştu';
-            setErrors({ submit: errorMessage });
+            console.error('Registration error:', error);
+            
+            const errorMessage = error.response?.data?.message || 'Registration failed';
+            
+            // Check for specific error types
+            if (error.response?.status === 400) {
+                // Bad request - validation errors, duplicate email, etc.
+                if (errorMessage.toLowerCase().includes('email') && 
+                    errorMessage.toLowerCase().includes('already')) {
+                    showError('This email address is already registered. Please use a different email or try logging in.');
+                } else if (errorMessage.toLowerCase().includes('validation') ||
+                          errorMessage.toLowerCase().includes('invalid')) {
+                    showError(errorMessage);
+                } else {
+                    showError('Please check your information and try again.');
+                }
+            } else if (error.response?.status === 409) {
+                // Conflict - duplicate user
+                showError('An account with this email already exists. Please use a different email or try logging in.');
+            } else if (error.response?.status >= 500) {
+                // Server errors
+                showError('Server error occurred. Please try again later.');
+            } else {
+                // Other errors or network issues
+                showError(errorMessage);
+            }
         } finally {
             setIsLoading(false);
         }

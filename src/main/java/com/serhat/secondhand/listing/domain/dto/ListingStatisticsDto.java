@@ -1,0 +1,28 @@
+package com.serhat.secondhand.listing.domain.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO for listing statistics
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ListingStatisticsDto {
+    
+
+    private long totalListings;
+    
+
+    private long activeListings;
+    
+
+    private long activeSellerCount;
+    
+
+    private long activeCityCount;
+}

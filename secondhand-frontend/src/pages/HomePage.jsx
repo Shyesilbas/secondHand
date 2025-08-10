@@ -2,12 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useListings } from '../features/listings/hooks/useListings';
+import { useListingStatistics } from '../features/listings/hooks/useListingStatistics';
 import { ROUTES } from '../constants/routes';
 import ListingGrid from '../features/listings/components/ListingGrid';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
     const { listings, isLoading, error, refetch } = useListings();
+    const { statistics, isLoading: statsLoading } = useListingStatistics();
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -19,18 +21,18 @@ const HomePage = () => {
                             SecondHand
                         </h1>
                         <p className="text-xl md:text-2xl mb-8 text-blue-100">
-                            İkinci el ürünlerin güvenli adresi
+                            Secure address for the Second Hand market place
                         </p>
                         {isAuthenticated ? (
                             <div className="space-y-4">
                                 <p className="text-lg">
-                                    Hoş geldin, <span className="font-semibold">{user?.name}</span>! 👋
+                                    Welcome, <span className="font-semibold">{user?.name}</span>! 👋
                                 </p>
                                 <Link
                                     to={ROUTES.CREATE_LISTING}
                                     className="inline-block bg-white text-blue-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
                                 >
-                                    İlan Ver
+                                    Publish Listing
                                 </Link>
                             </div>
                         ) : (
@@ -39,13 +41,13 @@ const HomePage = () => {
                                     to={ROUTES.REGISTER}
                                     className="inline-block bg-white text-blue-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
                                 >
-                                    Üye Ol
+                                    Register
                                 </Link>
                                 <Link
                                     to={ROUTES.LOGIN}
                                     className="inline-block border-2 border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition-colors"
                                 >
-                                    Giriş Yap
+                                    Login
                                 </Link>
                             </div>
                         )}
@@ -60,28 +62,28 @@ const HomePage = () => {
                         <div className="flex justify-center items-center space-x-8 text-center">
                             <div>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {listings.length}
+                                    {statsLoading ? '...' : (statistics?.activeListings || 0)}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    Aktif İlan
+                                    Active Listings
                                 </div>
                             </div>
                             <div className="w-px h-8 bg-gray-300"></div>
                             <div>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {new Set(listings.map(l => `${l.sellerName} ${l.sellerSurname}`)).size}
+                                    {statsLoading ? '...' : (statistics?.activeSellerCount || 0)}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    Aktif Satıcı
+                                    Active Sellers
                                 </div>
                             </div>
                             <div className="w-px h-8 bg-gray-300"></div>
                             <div>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {new Set(listings.map(l => l.city)).size}
+                                    {statsLoading ? '...' : (statistics?.activeCityCount || 0)}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    Şehir
+                                    Cities
                                 </div>
                             </div>
                         </div>
@@ -93,13 +95,13 @@ const HomePage = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-3xl font-bold text-gray-900">
-                        Son İlanlar
+                        Last Listings
                     </h2>
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={refetch}
                             className="text-gray-600 hover:text-gray-900 transition-colors"
-                            title="Yenile"
+                            title="Refresh"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -109,7 +111,7 @@ const HomePage = () => {
                             to={ROUTES.LISTINGS}
                             className="text-blue-600 hover:text-blue-700 font-medium"
                         >
-                            Tümünü Gör →
+                            See all →
                         </Link>
                     </div>
                 </div>
@@ -126,10 +128,10 @@ const HomePage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Neden SecondHand?
+                            Why SecondHand?
                         </h2>
                         <p className="text-gray-600 text-lg">
-                            Güvenli, hızlı ve kolay ikinci el alışverişin adresi
+                            Secure, fast and easy
                         </p>
                     </div>
 
@@ -141,10 +143,10 @@ const HomePage = () => {
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Güvenli Alışveriş
+                                Secure market
                             </h3>
                             <p className="text-gray-600">
-                                Tüm üyelerimiz doğrulanmış, güvenli ödeme seçenekleri
+                                All users verified
                             </p>
                         </div>
 
@@ -155,10 +157,10 @@ const HomePage = () => {
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Hızlı İşlemler
+                                Fast operations
                             </h3>
                             <p className="text-gray-600">
-                                Dakikalar içinde ilan ver, anında alıcı bul
+                                Publish it in a second
                             </p>
                         </div>
 
@@ -169,10 +171,10 @@ const HomePage = () => {
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                                Geniş Topluluk
+                                    Wide Community
                             </h3>
                             <p className="text-gray-600">
-                                Binlerce aktif kullanıcı, çok çeşitli ürün seçenekleri
+                                Various Products
                             </p>
                         </div>
                     </div>

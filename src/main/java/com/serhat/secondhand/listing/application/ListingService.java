@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
@@ -36,7 +37,6 @@ public class ListingService {
                 .map(listingMapper::toDynamicDto)
                 .toList();
     }
-
     public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
         log.info("Getting listings for user: {} with status: {}", user.getEmail(), status);
         List<Listing> listings = listingRepository.findBySellerAndStatus(user, status);
@@ -119,4 +119,55 @@ public class ListingService {
         }
         throw new BusinessException("Invalid listing status for this operation", HttpStatus.BAD_REQUEST, "INVALID_STATUS");
     }
+    
+    // Statistics Methods
+    
+    /**
+     * Get total count of all listings (regardless of status)
+     * @return total listing count
+     */
+    public long getTotalListingCount() {
+        log.info("Getting total listing count");
+        return listingRepository.getTotalListingCount();
+    }
+    
+    /**
+     * Get count of users who have active listings
+     * @return count of users with active listings
+     */
+    public long getActiveSellerCount() {
+        log.info("Getting count of users with active listings");
+        return listingRepository.getActiveSellerCount(ListingStatus.ACTIVE);
+    }
+    
+    /**
+     * Get count of cities that have active listings
+     * @return count of cities with active listings
+     */
+    public long getActiveCityCount() {
+        log.info("Getting count of cities with active listings");
+        return listingRepository.getActiveCityCount(ListingStatus.ACTIVE);
+    }
+
+    public long getTotalActiveListingCount(){
+        return listingRepository.getListingCountByStatus(ListingStatus.ACTIVE);
+    }
+    
+
+    public ListingStatisticsDto getListingStatistics() {
+        log.info("Getting comprehensive listing statistics");
+        
+        long totalListings = getTotalListingCount();
+        long activeListings = getTotalActiveListingCount();
+        long activeSellerCount = getActiveSellerCount();
+        long activeCityCount = getActiveCityCount();
+        
+        return ListingStatisticsDto.builder()
+                .totalListings(totalListings)
+                .activeListings(activeListings)
+                .activeSellerCount(activeSellerCount)
+                .activeCityCount(activeCityCount)
+                .build();
+    }
+
 }

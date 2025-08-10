@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
@@ -17,6 +18,7 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { login } = useAuth();
+    const { showError } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -28,7 +30,6 @@ const LoginPage = () => {
             ...prev,
             [name]: value
         }));
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -38,15 +39,15 @@ const LoginPage = () => {
         const newErrors = {};
 
         if (!formData.email.trim()) {
-            newErrors.email = 'E-posta adresi gereklidir';
+            newErrors.email = 'E-mail is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Geçerli bir e-posta adresi giriniz';
+            newErrors.email = 'Please enter a valid email address';
         }
 
         if (!formData.password) {
-            newErrors.password = 'Şifre gereklidir';
+            newErrors.password = 'Password required';
         } else if (formData.password.length < 6) {
-            newErrors.password = 'Şifre en az 6 karakter olmalıdır';
+            newErrors.password = '';
         }
 
         setErrors(newErrors);
@@ -64,8 +65,35 @@ const LoginPage = () => {
             await login(response);
             navigate(from, { replace: true });
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Giriş yapılırken bir hata oluştu';
-            setErrors({ submit: errorMessage });
+            console.error('Login error:', error);
+            
+            // Get the error message from backend
+            const errorMessage = error.response?.data?.message || 'Error Occurred while Logging in';
+            
+            // Check for specific error types
+            if (error.response?.status === 401) {
+                // Unauthorized - Bad credentials or account issues
+                if (errorMessage.toLowerCase().includes('bad credentials') || 
+                    errorMessage.toLowerCase().includes('invalid') ||
+                    errorMessage.toLowerCase().includes('wrong password') ||
+                    errorMessage.toLowerCase().includes('email or password')) {
+                    showError('Invalid email or password. Please check your credentials and try again.');
+                } else if (errorMessage.toLowerCase().includes('account') ||
+                          errorMessage.toLowerCase().includes('user')) {
+                    showError(errorMessage);
+                } else {
+                    showError('Authentication failed. Please check your email and password.');
+                }
+            } else if (error.response?.status === 403) {
+                // Forbidden - Account locked, disabled, etc.
+                showError(errorMessage || 'Your account access is restricted. Please contact support.');
+            } else if (error.response?.status >= 500) {
+                // Server errors
+                showError('Server error occurred. Please try again later.');
+            } else {
+                // Other errors or network issues
+                showError(errorMessage);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -76,10 +104,10 @@ const LoginPage = () => {
             {/* Header */}
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    Hoş Geldiniz
+                    Welcome
                 </h2>
                 <p className="text-gray-600">
-                    Hesabınıza giriş yapın
+                    Login to your account
                 </p>
             </div>
 
@@ -87,12 +115,12 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Input */}
                 <AuthInput
-                    label="E-posta Adresi"
+                    label="E-mail"
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="ornek@email.com"
+                    placeholder="sample@email.com"
                     error={errors.email}
                     required
                 />
@@ -100,7 +128,7 @@ const LoginPage = () => {
                 {/* Password Input */}
                 <div className="relative">
                     <AuthInput
-                        label="Şifre"
+                        label="Password"
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         value={formData.password}
@@ -128,7 +156,7 @@ const LoginPage = () => {
                         to={ROUTES.FORGOT_PASSWORD}
                         className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors"
                     >
-                        Şifrenizi mi unuttunuz?
+                        Forgot Your Password?
                     </Link>
                 </div>
 
@@ -145,7 +173,7 @@ const LoginPage = () => {
                     isLoading={isLoading}
                     className="w-full"
                 >
-                    {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+                    {isLoading ? 'Login...' : 'Login '}
                 </AuthButton>
 
                 {/* Divider */}
@@ -154,19 +182,19 @@ const LoginPage = () => {
                         <div className="w-full border-t border-gray-300" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">veya</span>
+                        <span className="px-2 bg-white text-gray-500">Or</span>
                     </div>
                 </div>
 
                 {/* Register Link */}
                 <div className="text-center">
                     <p className="text-gray-600">
-                        Hesabınız yok mu?{' '}
+                        No Account?{' '}
                         <Link
                             to={ROUTES.REGISTER}
                             className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                         >
-                            Hemen kayıt olun
+                            Register NOW
                         </Link>
                     </p>
                 </div>
