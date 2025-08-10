@@ -7,7 +7,11 @@ export const ROUTES = {
     DASHBOARD: '/dashboard',
     PROFILE: '/profile',
     LISTINGS: '/listings',
+    MY_LISTINGS: '/my-listings',
     LISTING_DETAIL: '/listings/:id',
     CREATE_LISTING: '/listings/create',
     PAYMENTS: '/payments',
+    PAY_LISTING_FEE: '/payments/listing-fee',
+    CREDIT_CARDS: '/payments/credit-cards',
+    BANK_ACCOUNTS: '/payments/bank-accounts',
 };

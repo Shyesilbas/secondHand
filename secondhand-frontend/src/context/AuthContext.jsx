@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Initialize auth state
     useEffect(() => {
         const initializeAuth = () => {
             const token = getToken();
@@ -39,24 +38,27 @@ export const AuthProvider = ({ children }) => {
         // Store tokens
         setTokens(accessToken, refreshToken);
         
-        // Fetch full user profile
         try {
             const userProfile = await authService.getCurrentUser();
+            
             const userData = { 
                 userId, 
                 email,
                 name: userProfile.name,
                 surname: userProfile.surname,
-                phone: userProfile.phone,
-                userType: userProfile.userType,
-                accountStatus: userProfile.accountStatus
+                phoneNumber: userProfile.phoneNumber,
+                gender: userProfile.gender,
+                birthdate: userProfile.birthdate,
+                accountStatus: userProfile.accountStatus,
+                accountVerified: userProfile.accountVerified,
+                canSell: userProfile.canSell,
+                accountCreationDate: userProfile.accountCreationDate
             };
             setUser(userData);
             setUserState(userData);
             setIsAuthenticated(true);
         } catch (error) {
             console.error('Failed to fetch user profile:', error);
-            // Fallback to basic user data
             const userData = { userId, email };
             setUser(userData);
             setUserState(userData);
@@ -66,13 +68,10 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            // Call backend logout to revoke tokens
             await authService.logout();
         } catch (error) {
             console.error('Backend logout failed:', error);
-            // Continue with local logout even if backend fails
         } finally {
-            // Always clear local state
             clearTokens();
             setUserState(null);
             setIsAuthenticated(false);
