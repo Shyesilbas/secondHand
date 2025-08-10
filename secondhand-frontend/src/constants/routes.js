@@ -4,6 +4,7 @@ export const ROUTES = {
     REGISTER: '/register',
     FORGOT_PASSWORD: '/forgot-password',
     RESET_PASSWORD: '/reset-password',
+    CHANGE_PASSWORD: '/change-password',
     DASHBOARD: '/dashboard',
     PROFILE: '/profile',
     LISTINGS: '/listings',
@@ -12,6 +13,7 @@ export const ROUTES = {
     CREATE_LISTING: '/listings/create',
     PAYMENTS: '/payments',
     PAY_LISTING_FEE: '/payments/listing-fee',
-    CREDIT_CARDS: '/payments/credit-cards',
-    BANK_ACCOUNTS: '/payments/bank-accounts',
+    CREDIT_CARDS: '/credit-card',
+    BANK_ACCOUNTS: '/bank',
+    EMAILS: '/emails',
 };

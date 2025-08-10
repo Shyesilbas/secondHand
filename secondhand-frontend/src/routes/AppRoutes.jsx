@@ -11,6 +11,7 @@ import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
+import ChangePasswordPage from '../pages/auth/ChangePasswordPage';
 import DashboardPage from '../pages/DashboardPage';
 import ProfilePage from '../pages/user/ProfilePage';
 import ListingsPage from '../pages/listings/ListingsPage';
@@ -21,6 +22,7 @@ import PaymentsPage from '../pages/payments/PaymentsPage';
 import PayListingFeePage from '../pages/payments/PayListingFeePage';
 import CreditCardsPage from '../pages/payments/CreditCardsPage';
 import BankAccountsPage from '../pages/payments/BankAccountsPage';
+import EmailsPage from '../pages/emails/EmailsPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -92,12 +94,14 @@ const AppRoutes = () => {
             >
                         <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />
         <Route path={ROUTES.CREDIT_CARDS} element={<CreditCardsPage />} />
         <Route path={ROUTES.BANK_ACCOUNTS} element={<BankAccountsPage />} />
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
+        <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
             </Route>
 
             {/* Fallback */}

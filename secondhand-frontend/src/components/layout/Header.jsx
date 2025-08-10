@@ -110,24 +110,59 @@ const Header = () => {
                                 </DropdownItem>
                             </DropdownMenu>
                         )}
+                        
+                        {isAuthenticated && (
+                            <DropdownMenu trigger="E-mails">
+                                <DropdownItem 
+                                    to={ROUTES.EMAILS}
+                                    icon={
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.2a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    }
+                                >
+                                    Email History
+                                </DropdownItem>
+                            </DropdownMenu>
+                        )}
                     </nav>
 
                     {/* User Menu */}
                     <div className="flex items-center space-x-4">
                         {isAuthenticated ? (
                             <>
-                                <Link
-                                    to={ROUTES.PROFILE}
-                                    className="text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                    Profile
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                                >
-                                    Logout
-                                </button>
+                                <DropdownMenu trigger={`${user?.name || 'Profile'}`}>
+                                    <DropdownItem 
+                                        to={ROUTES.PROFILE}
+                                        icon={
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        }
+                                    >
+                                        Profil
+                                    </DropdownItem>
+                                    <DropdownItem 
+                                        to={ROUTES.CHANGE_PASSWORD}
+                                        icon={
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        }
+                                    >
+                                        Şifreyi Değiştir
+                                    </DropdownItem>
+                                    <DropdownDivider />
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                        <span>Çıkış Yap</span>
+                                    </button>
+                                </DropdownMenu>
                             </>
                         ) : (
                             <>

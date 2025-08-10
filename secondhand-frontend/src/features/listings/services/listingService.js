@@ -1,38 +1,29 @@
 import apiClient from '../../../services/api/config';
+import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 
 export const listingService = {
-  // Get all active listings
   getAllListings: async () => {
-    const response = await apiClient.get('/v1/listings/allListings');
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.ALL);
     return response.data;
   },
 
-      // Get my listings by status
   getMyListingsByStatus: async (status) => {
-    const response = await apiClient.get(`/v1/listings/my-listings/status/${status}`);
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_STATUS(status));
     return response.data;
   },
 
-  // Get listing by ID
   getListingById: async (id) => {
-    const response = await apiClient.get(`/v1/listings/${id}`);
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_ID(id));
     return response.data;
   },
 
-    // Get listings by status
-    getListingsByStatus: async (status) => {
-        const response = await apiClient.get(`/v1/listings/status/${status}`);
-        return response.data;
-    },
+  getMyListings: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.MY_LISTINGS);
+    return response.data;
+  },
 
-    getMyListings: async () => {
-        const response = await apiClient.get('/v1/listings/my-listings');
-        return response.data;
-    },
-
-
-    publishListing: async (id) => {
-        const response = await apiClient.put(`/v1/listings/${id}/publish`);
-        return response.data;
-    },
+  publishListing: async (id) => {
+    const response = await apiClient.put(`/v1/listings/${id}/publish`);
+    return response.data;
+  },
 };
