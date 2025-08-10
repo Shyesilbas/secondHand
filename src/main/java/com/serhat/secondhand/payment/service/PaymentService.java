@@ -9,7 +9,6 @@ import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.user.application.UserService;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ public class PaymentService {
     private final UserService userService;
     private final BankService bankService;
     private final CreditCardService creditCardService;
-    private final ListingService listingService; // New dependency
+    private final ListingService listingService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Getter
@@ -57,11 +55,13 @@ public class PaymentService {
 
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
 
-        User toUser = fromUser; 
 
         PaymentRequest fullRequest = new PaymentRequest(
-                toUser.getId(),
-                listingFeePaymentRequest.listingId(),
+                fromUser.getId(),
+                null,
+                fromUser.getName(),
+                fromUser.getSurname(),
+                listing.getId(),
                 listingCreationFee,
                 listingFeePaymentRequest.paymentType(),
                 PaymentTransactionType.LISTING_CREATION,

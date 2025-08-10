@@ -8,7 +8,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record PaymentRequest(
+    Long fromUserId,
     Long toUserId,
+    String receiverName,
+    String receiverSurname,
     UUID listingId,
     BigDecimal amount,
     PaymentType paymentType,

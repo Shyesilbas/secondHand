@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -72,15 +73,12 @@ public class CreditCardService {
         BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
         if (availableCredit.compareTo(amount) < 0) {
             log.warn("Insufficient credit limit for user: {}. Available: {}, Requested: {}", user.getEmail(), availableCredit, amount);
-            return false; // Or throw InsufficientCreditException
+            return false;
         }
 
-        // Simulate payment processing
         try {
             log.info("Processing payment of {} for card ending with: {}", amount, CreditCardHelper.maskCardNumber(card.getNumber()));
-            // In a real scenario, you would integrate with a payment gateway here.
-            
-            // Simulate success (e.g., 95% success rate)
+
             boolean isSuccessful = Math.random() > 0.05;
 
             if (isSuccessful) {
@@ -112,7 +110,7 @@ public class CreditCardService {
         Optional<CreditCard> cardOpt = findByUser(user);
         return Map.of(
                 "hasCreditCard", cardOpt.isPresent(),
-                "maskedCardNumber", cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null)
+                "maskedCardNumber", Objects.requireNonNull(cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null))
         );
     }
     
@@ -132,7 +130,7 @@ public class CreditCardService {
     private CreditCardDto toDto(CreditCard creditCard) {
         return new CreditCardDto(
                 CreditCardHelper.maskCardNumber(creditCard.getNumber()),
-                "***", // Never expose CVV
+                "***",
                 String.valueOf(creditCard.getExpiryMonth()),
                 String.valueOf(creditCard.getExpiryYear()),
                 creditCard.getAmount().toString(),
