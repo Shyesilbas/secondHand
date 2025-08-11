@@ -18,11 +18,13 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Handle both 401 (Unauthorized) and 403 (Forbidden) for token expiration
+        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
                 const refreshToken = getRefreshToken();
+                
                 if (!refreshToken) {
                     clearTokens();
                     window.location.href = '/login';
@@ -44,6 +46,7 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
 
             } catch (refreshError) {
+                console.error('Refresh token failed:', refreshError.response?.status, refreshError.response?.data);
                 clearTokens();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);

@@ -33,7 +33,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     // Public endpoints that should not be filtered
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/auth/login",
-            "/api/auth/register", 
+            "/api/auth/register",
+            "/api/auth/refresh",  // Add refresh endpoint
             "/swagger-ui",
             "/api-docs",
             "/v3/api-docs",
