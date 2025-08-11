@@ -34,7 +34,7 @@ public class VehicleListingController {
             @Valid @RequestBody VehicleCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
         UUID vehicleId = vehicleListingService.createVehicleListing(request, currentUser);
-        URI location = URI.create("/api/vehicles/" + vehicleId);
+        URI location = URI.create("/api/v1/vehicles/" + vehicleId);
         return ResponseEntity.created(location).build();
     }
     

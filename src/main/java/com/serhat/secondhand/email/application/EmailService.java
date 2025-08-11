@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.serhat.secondhand.payment.dto.PaymentDto;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,12 @@ public class EmailService {
     @Value("${app.email.phoneUpdate.content}")
     private String phoneUpdateContentTemplate;
 
+    @Value("${app.email.paymentSuccess.subject}")
+    private String paymentSuccessSubject;
+
+    @Value("${app.email.paymentSuccess.content}")
+    private String paymentSuccessContentTemplate;
+
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {
         String subject = verificationSubject;
         String content = String.format(verificationContentTemplate, user.getName(), verificationCode);
@@ -59,6 +66,12 @@ public class EmailService {
         String subject = welcomeSubject;
         String content = String.format(welcomeContentTemplate, user.getName());
         return sendAndSaveEmail(user, subject, content, EmailType.WELCOME);
+    }
+
+    public EmailDto sendPaymentSuccessEmail(User user, PaymentDto paymentDto, String listingTitle) {
+        String subject = paymentSuccessSubject;
+        String content = String.format(paymentSuccessContentTemplate, user.getName(), listingTitle, paymentDto.amount(), paymentDto.transactionType());
+        return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
     private EmailDto sendAndSaveEmail(User user, String subject, String content, EmailType emailType) {

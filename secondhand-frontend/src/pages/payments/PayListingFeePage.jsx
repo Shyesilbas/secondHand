@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../context/ToastContext';
 import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
+    const { showSuccess, showError } = useToast();
     const [draftListings, setDraftListings] = useState([]);
+    const [feeConfig, setFeeConfig] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isConfigLoading, setIsConfigLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedListing, setSelectedListing] = useState(null);
     const [paymentType, setPaymentType] = useState('CREDIT_CARD');
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-    const LISTING_FEE = 50.00;
-
     useEffect(() => {
         fetchDraftListings();
+        fetchFeeConfig();
     }, []);
+
+    const fetchFeeConfig = async () => {
+        try {
+            setIsConfigLoading(true);
+            const config = await paymentService.getListingFeeConfig();
+            setFeeConfig(config);
+        } catch (err) {
+            console.error('Failed to fetch fee config:', err);
+            showError('Failed to load fee configuration. Please refresh the page.');
+        } finally {
+            setIsConfigLoading(false);
+        }
+    };
 
     const fetchDraftListings = async () => {
         try {
@@ -32,7 +48,15 @@ const PayListingFeePage = () => {
     };
 
     const handlePayment = async () => {
-        if (!selectedListing) return;
+        if (!selectedListing) {
+            showError('Please select a listing to pay for.');
+            return;
+        }
+
+        if (!feeConfig) {
+            showError('Fee configuration not loaded. Please refresh the page.');
+            return;
+        }
 
         setIsProcessingPayment(true);
         try {
@@ -42,14 +66,14 @@ const PayListingFeePage = () => {
             });
 
             // Payment successful
-            alert('Listing fee payment successful. Your listing will be published.');
+            showSuccess('Listing fee payment successful! Your listing will be published.');
             
             // Refresh listings
             await fetchDraftListings();
             setSelectedListing(null);
             
         } catch (err) {
-            alert(err.response?.data?.message || 'Unsuccessful listing fee payment. Please try again later.');
+            showError(err.response?.data?.message || 'Listing fee payment failed. Please try again later.');
         } finally {
             setIsProcessingPayment(false);
         }
@@ -206,21 +230,35 @@ const PayListingFeePage = () => {
                                     </div>
 
                                     <div className="space-y-4 mb-6">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Listing Fee:</span>
-                                            <span className="font-semibold">{formatPrice(LISTING_FEE)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Tax (%18):</span>
-                                            <span className="font-semibold">{formatPrice(LISTING_FEE * 0.18)}</span>
-                                        </div>
-                                        <hr />
-                                        <div className="flex justify-between text-lg">
-                                            <span className="font-semibold">SubTotal:</span>
-                                            <span className="font-bold text-blue-600">
-                                                {formatPrice(LISTING_FEE * 1.18)}
-                                            </span>
-                                        </div>
+                                        {isConfigLoading ? (
+                                            <div className="space-y-2">
+                                                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                                                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                                                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                                            </div>
+                                        ) : feeConfig ? (
+                                            <>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Listing Fee:</span>
+                                                    <span className="font-semibold">{formatPrice(feeConfig.creationFee)}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-600">Tax ({feeConfig.taxPercentage}%):</span>
+                                                    <span className="font-semibold">{formatPrice(feeConfig.creationFeeTax)}</span>
+                                                </div>
+                                                <hr />
+                                                <div className="flex justify-between text-lg">
+                                                    <span className="font-semibold">Total:</span>
+                                                    <span className="font-bold text-blue-600">
+                                                        {formatPrice(feeConfig.totalCreationFee)}
+                                                    </span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-red-600 text-center">
+                                                Failed to load fee configuration
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="mb-6">
@@ -281,7 +319,7 @@ const PayListingFeePage = () => {
                                                Processing...
                                             </div>
                                         ) : (
-                                            `${formatPrice(LISTING_FEE * 1.18)} Öde`
+                                            feeConfig ? `Pay ${formatPrice(feeConfig.totalCreationFee)}` : 'Pay Listing Fee'
                                         )}
                                     </button>
 

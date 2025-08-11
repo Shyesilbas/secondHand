@@ -1,9 +1,11 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.ListingRepository;
+import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
@@ -13,6 +15,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.serhat.secondhand.user.domain.entity.User;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ListingEventListener {
 
     private final ListingRepository listingRepository;
+    private final EmailService emailService;
 
     @EventListener
     @Transactional
@@ -52,5 +56,23 @@ public class ListingEventListener {
                          listing.getId(), listing.getStatus());
             }
         }
+
+        User user = payment.getFromUser();
+        PaymentDto paymentDto = new PaymentDto(
+                payment.getId(),
+                user.getName(),
+                user.getSurname(),
+                payment.getToUser() != null ? payment.getToUser().getName() : "SYSTEM",
+                payment.getToUser() != null ? payment.getToUser().getSurname() : "",
+                payment.getAmount(),
+                payment.getPaymentType(),
+                payment.getTransactionType(),
+                payment.getPaymentDirection(),
+                payment.getListingId(),
+                payment.getProcessedAt(),
+                payment.isSuccess()
+        );
+        emailService.sendPaymentSuccessEmail(user, paymentDto, listing.getTitle());
+        log.info("Payment success email sent for payment ID: {}", payment.getId());
     }
 }

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.api;
 
+import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -59,5 +60,12 @@ public class PaymentController {
         log.info("Getting payment statistics for user: {}", authentication.getName());
         Map<String, Object> statistics = paymentService.getPaymentStatistics(authentication);
         return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/listing-fee-config")
+    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
+        log.info("Getting listing fee configuration");
+        ListingFeeConfigDto config = paymentService.getListingFeeConfig();
+        return ResponseEntity.ok(config);
     }
 }

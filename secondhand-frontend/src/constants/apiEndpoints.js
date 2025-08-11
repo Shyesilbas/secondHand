@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
         LISTING_FEE: '/v1/payments/listings/pay-fee',
         MY_PAYMENTS: '/v1/payments/my-payments',
         STATISTICS: '/v1/payments/statistics',
+        LISTING_FEE_CONFIG: '/v1/payments/listing-fee-config',
     },
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',

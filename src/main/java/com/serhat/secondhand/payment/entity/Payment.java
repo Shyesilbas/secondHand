@@ -47,7 +47,7 @@ public class Payment {
     private User fromUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_user_id", nullable = false)
+    @JoinColumn(name = "to_user_id", nullable = true)
     private User toUser;
 
 

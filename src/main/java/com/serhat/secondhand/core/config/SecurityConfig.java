@@ -38,8 +38,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // No CSRF needed for header-based auth
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -58,15 +58,6 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        
-                        .requestMatchers("/api/products/create", "/api/products/update/**", "/api/products/delete/**")
-                        .hasRole("SELLER")
-
-                        .requestMatchers("/api/orders/**", "/api/cart/**")
-                        .hasRole("BUYER")
-                        
-                        .requestMatchers("/api/user/**", "/api/products/search", "/api/products/view/**")
-                        .hasAnyRole("BUYER", "SELLER","BOTH")
                         
                         .anyRequest().authenticated()
                 )

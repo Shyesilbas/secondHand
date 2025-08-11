@@ -3,6 +3,7 @@ package com.serhat.secondhand.payment.service;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -47,6 +48,14 @@ public class PaymentService {
     @Value("${app.listing.creation.fee:50.00}")
     private BigDecimal listingCreationFee;
 
+    @Getter
+    @Value("${app.listing.promotion.fee:25.00}")
+    private BigDecimal listingPromotionFee;
+
+    @Getter
+    @Value("${app.listing.fee.tax:18.00}")
+    private BigDecimal listingFeeTax;
+
     @Transactional
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
@@ -56,13 +65,16 @@ public class PaymentService {
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
 
 
+        BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
+        BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
+
         PaymentRequest fullRequest = new PaymentRequest(
                 fromUser.getId(),
                 null,
                 fromUser.getName(),
                 fromUser.getSurname(),
                 listing.getId(),
-                listingCreationFee,
+                totalCreationFee, // Use total fee including tax
                 listingFeePaymentRequest.paymentType(),
                 PaymentTransactionType.LISTING_CREATION,
                 PaymentDirection.OUTGOING
@@ -77,7 +89,14 @@ public class PaymentService {
         log.info("Creating payment for listing: {} with amount: {}", paymentRequest.listingId(), paymentRequest.amount());
 
         User fromUser = userService.getAuthenticatedUser(authentication);
-        User toUser = userService.findById(paymentRequest.toUserId());
+        User toUser = null;
+        if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION) {
+            toUser = userService.findById(paymentRequest.toUserId());
+        }
+
+        if (toUser == null && paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION) {
+            throw new BusinessException("Recipient user must not be null for this transaction type", HttpStatus.BAD_REQUEST, "NULL_RECIPIENT");
+        }
 
         if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("Payment amount must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
@@ -118,9 +137,9 @@ public class PaymentService {
     }
 
     private boolean processCreditCardPayment(User fromUser, User toUser, BigDecimal amount) {
-        log.info("Processing credit card payment from user: {} to user: {}", fromUser.getEmail(), toUser.getEmail());
+        log.info("Processing credit card payment from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
         boolean paymentSuccessful = creditCardService.processPayment(fromUser, amount);
-        if (paymentSuccessful && !fromUser.getId().equals(toUser.getId())) {
+        if (paymentSuccessful && toUser != null && !fromUser.getId().equals(toUser.getId())) {
             bankService.credit(toUser, amount);
             log.info("Credited {} to recipient's bank account.", amount);
         }
@@ -128,11 +147,11 @@ public class PaymentService {
     }
 
     private boolean processBankTransfer(User fromUser, User toUser, BigDecimal amount) {
-        log.info("Processing bank transfer from user: {} to user: {}", fromUser.getEmail(), toUser.getEmail());
+        log.info("Processing bank transfer from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
         try {
             bankService.debit(fromUser, amount);
-            if (!fromUser.getId().equals(toUser.getId())) {
-                 bankService.credit(toUser, amount);
+            if (toUser != null && !fromUser.getId().equals(toUser.getId())) {
+                bankService.credit(toUser, amount);
             }
             log.info("Bank transfer successful.");
             return true;
@@ -176,8 +195,8 @@ public class PaymentService {
                 payment.getId(),
                 payment.getFromUser().getName(),
                 payment.getFromUser().getSurname(),
-                payment.getToUser().getName(),
-                payment.getToUser().getSurname(),
+                payment.getToUser() != null ? payment.getToUser().getName() : "SYSTEM",
+                payment.getToUser() != null ? payment.getToUser().getSurname() : "",
                 payment.getAmount(),
                 payment.getPaymentType(),
                 payment.getTransactionType(),
@@ -186,5 +205,28 @@ public class PaymentService {
                 payment.getProcessedAt(),
                 payment.isSuccess()
         );
+    }
+
+
+    public ListingFeeConfigDto getListingFeeConfig() {
+        log.info("Getting listing fee configuration");
+        
+        // Calculate tax amounts
+        BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
+        BigDecimal promotionFeeTax = listingPromotionFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
+        
+        // Calculate total amounts including tax
+        BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
+        BigDecimal totalPromotionFee = listingPromotionFee.add(promotionFeeTax);
+        
+        return ListingFeeConfigDto.builder()
+                .creationFee(listingCreationFee)
+                .promotionFee(listingPromotionFee)
+                .taxPercentage(listingFeeTax)
+                .creationFeeTax(creationFeeTax)
+                .totalCreationFee(totalCreationFee)
+                .promotionFeeTax(promotionFeeTax)
+                .totalPromotionFee(totalPromotionFee)
+                .build();
     }
 }

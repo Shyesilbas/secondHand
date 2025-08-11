@@ -40,4 +40,9 @@ export const paymentService = {
         return response.data;
     },
 
+    getListingFeeConfig: async () => {
+        const response = await apiClient.get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
+        return response.data;
+    },
+
 };
