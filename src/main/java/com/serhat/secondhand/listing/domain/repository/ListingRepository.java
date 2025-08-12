@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.domain.repository;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.ListingType;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +12,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ListingRepository extends JpaRepository<Listing, UUID> {
+public interface ListingRepository extends JpaRepository<Listing, UUID>, ListingRepositoryCustom {
     
     List<Listing> findByStatus(ListingStatus status);
+    
+    List<Listing> findByListingType(ListingType listingType);
+    
+    List<Listing> findByListingTypeAndStatus(ListingType listingType, ListingStatus status);
+    
+    List<Listing> findByListingTypeOrderByCreatedAtDesc(ListingType listingType);
     
     List<Listing> findBySeller(User seller);
     

@@ -1,16 +1,22 @@
 import apiClient from '../../../services/api/config';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
+import { 
+    createPaymentRequest, 
+    createListingFeePaymentRequest 
+} from '../../../types/payments';
 
 export const paymentService = {
     // Pay listing fee
     payListingFee: async (paymentData) => {
-        const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.LISTING_FEE, paymentData);
+        const listingFeeData = createListingFeePaymentRequest(paymentData);
+        const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.LISTING_FEE, listingFeeData);
         return response.data;
     },
 
     // Create general payment
     createPayment: async (paymentData) => {
-        const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.CREATE, paymentData);
+        const paymentRequestData = createPaymentRequest(paymentData);
+        const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData);
         return response.data;
     },
 
@@ -28,18 +34,7 @@ export const paymentService = {
         return response.data;
     },
 
-    // Credit Card operations
-    getCreditCards: async () => {
-        const response = await apiClient.get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
-        return response.data;
-    },
-
-    // Bank Account operations
-    getBankAccounts: async () => {
-        const response = await apiClient.get(API_ENDPOINTS.BANK_ACCOUNTS.GET_ALL);
-        return response.data;
-    },
-
+    // Get listing fee configuration
     getListingFeeConfig: async () => {
         const response = await apiClient.get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
         return response.data;

@@ -127,6 +127,13 @@ public class CreditCardService {
         );
     }
 
+    public void deleteCreditCard(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        CreditCard creditCard = findByUserMandatory(user);
+        creditCardRepository.delete(creditCard);
+        log.info("Credit card deleted for user: {}", user.getEmail());
+    }
+
     private CreditCardDto toDto(CreditCard creditCard) {
         return new CreditCardDto(
                 CreditCardHelper.maskCardNumber(creditCard.getNumber()),

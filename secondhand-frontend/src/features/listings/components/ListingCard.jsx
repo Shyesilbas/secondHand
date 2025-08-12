@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
+import { useEnums } from '../../../hooks/useEnums';
+import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 
 const ListingCard = ({ listing }) => {
+    const { getListingTypeLabel, getListingTypeIcon } = useEnums();
     const formatPrice = (price, currency) => {
         return new Intl.NumberFormat('tr-TR', {
             style: 'currency',
@@ -20,22 +23,11 @@ const ListingCard = ({ listing }) => {
         });
     };
 
-    const getListingTypeIcon = (type) => {
-        switch (type) {
-            case 'VEHICLE':
-                return (
-                    <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 21l4-4 4-4-4-4-4-4" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 17l-4-4 4-4" />
-                    </svg>
-                );
-            default:
-                return (
-                    <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-                    </svg>
-                );
-        }
+    const getTypeIcon = (type) => {
+        const icon = LISTING_TYPE_ICONS[type] || getListingTypeIcon(type) || '📦';
+        return (
+            <span className="text-lg">{icon}</span>
+        );
     };
 
     const getVehicleDetails = (listing) => {
@@ -98,10 +90,10 @@ const ListingCard = ({ listing }) => {
                 {/* Header Section */}
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        {getListingTypeIcon(listing.type)}
+                        {getTypeIcon(listing.type)}
                         <div>
                             <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                                {listing.type === 'VEHICLE' ? 'Araç' : 'Ürün'}
+                                {getListingTypeLabel(listing.type)}
                             </span>
                             <div className="mt-1">
                                 {getStatusBadge(listing.status)}

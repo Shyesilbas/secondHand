@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ResetPasswordRequestDTO } from '../../types/auth';
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -7,8 +8,9 @@ const ResetPasswordPage = () => {
   const token = searchParams.get('token');
 
   const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: ''
+    ...ResetPasswordRequestDTO,
+    token: token || '', // Initialize with token from URL
+    confirmPassword: '' // Additional field for frontend validation
   });
 
   return (

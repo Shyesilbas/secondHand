@@ -3,9 +3,6 @@ package com.serhat.secondhand.payment.api;
 import com.serhat.secondhand.payment.dto.CreditCardDto;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.service.CreditCardService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +23,7 @@ public class CreditCardController {
     private final CreditCardService creditCardService;
 
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CreditCardDto> createCreditCard(@RequestBody CreditCardRequest creditCardRequest, Authentication authentication) {
         log.info("Creating credit card for user: {}", authentication.getName());
         CreditCardDto creditCardDto = creditCardService.createCreditCard(creditCardRequest, authentication);
@@ -55,5 +52,12 @@ public class CreditCardController {
         log.info("Getting available credit for user: {}", authentication.getName());
         Map<String, Object> response = creditCardService.getAvailableCredit(authentication);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteCreditCard(Authentication authentication) {
+        log.info("Deleting credit card for user: {}", authentication.getName());
+        creditCardService.deleteCreditCard(authentication);
+        return ResponseEntity.noContent().build();
     }
 }

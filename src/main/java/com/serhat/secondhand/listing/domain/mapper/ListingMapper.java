@@ -20,6 +20,7 @@ public interface ListingMapper {
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
+    @Mapping(target = "type", source = "listingType")
     VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
 
     @Mapping(target = "id", ignore = true)
@@ -27,6 +28,7 @@ public interface ListingMapper {
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "status", constant = "DRAFT")
+    @Mapping(target = "listingType", constant = "VEHICLE")
     VehicleListing toVehicleEntity(VehicleCreateRequest request);
     
     @Mapping(target = "id", ignore = true)
@@ -39,20 +41,14 @@ public interface ListingMapper {
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
-    @Mapping(target = "type", expression = "java(getListingType(listing))")
+    @Mapping(target = "type", source = "listingType")
     ListingResponseDto toListingResponseDto(Listing listing);
-
-    default String getListingType(Listing listing) {
-        if (listing instanceof VehicleListing) {
-            return "VEHICLE";
-        }
-        return "UNKNOWN";
-    }
 
     default ListingDto toDynamicDto(Listing listing) {
         if (listing instanceof VehicleListing) {
             return toVehicleDto((VehicleListing) listing);
         }
+
         throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());
     }
     

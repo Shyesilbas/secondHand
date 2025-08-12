@@ -7,11 +7,11 @@ import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { LoginRequestDTO, LoginResponseDTO } from '../../types/auth';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
-        email: '',
-        password: ''
+        ...LoginRequestDTO
     });
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});

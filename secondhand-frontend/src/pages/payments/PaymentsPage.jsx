@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../features/payments/services/paymentService';
+import { PaymentDTO } from '../../types/payments';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();

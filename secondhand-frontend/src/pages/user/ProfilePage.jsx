@@ -4,19 +4,22 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { userService } from '../../features/users/services/userService';
 import { ROUTES } from '../../constants/routes';
+import { UserDTO, UpdatePhoneRequestDTO } from '../../types/users';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
     const { user, updateUser } = useAuth();
     const { showSuccess, showError } = useToast();
     const [showPhoneModal, setShowPhoneModal] = useState(false);
-    const [newPhoneNumber, setNewPhoneNumber] = useState('');
+    const [phoneFormData, setPhoneFormData] = useState({
+        ...UpdatePhoneRequestDTO
+    });
     const [isUpdating, setIsUpdating] = useState(false);
 
     const handlePhoneUpdate = async () => {
-        const cleanPhone = newPhoneNumber.replace(/\D/g, '');
+        const cleanPhone = phoneFormData.newPhone.replace(/\D/g, '');
         
-        if (!newPhoneNumber.trim()) {
+        if (!phoneFormData.newPhone.trim()) {
             showError('Please enter your phone number');
             return;
         }
@@ -28,12 +31,15 @@ const ProfilePage = () => {
 
         setIsUpdating(true);
         try {
-            await userService.updatePhone({ newPhoneNumber: cleanPhone });
+            await userService.updatePhone({
+                newPhone: cleanPhone,
+                password: phoneFormData.password
+            });
             
             updateUser({ phoneNumber: cleanPhone });
             
             setShowPhoneModal(false);
-            setNewPhoneNumber('');
+            setPhoneFormData({ ...UpdatePhoneRequestDTO });
             showSuccess('Phone number updated successfully!');
         } catch (error) {
             showError(error.response?.data?.message || error.message || 'An error occurred while updating phone number');
@@ -97,7 +103,10 @@ const ProfilePage = () => {
                             <p className="text-gray-900">{user?.phoneNumber || 'Undefined'}</p>
                             <button
                                 onClick={() => {
-                                    setNewPhoneNumber(user?.phoneNumber || '');
+                                    setPhoneFormData({
+                                        ...UpdatePhoneRequestDTO,
+                                        newPhone: user?.phoneNumber || ''
+                                    });
                                     setShowPhoneModal(true);
                                 }}
                                 className="ml-2 p-1 text-gray-400 hover:text-blue-600 transition-colors"
@@ -203,21 +212,45 @@ const ProfilePage = () => {
                             </button>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                New Phone Number
-                            </label>
-                            <input
-                                type="tel"
-                                value={newPhoneNumber}
-                                onChange={(e) => setNewPhoneNumber(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="05321234567"
-                                maxLength="11"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                Phone Number
-                            </p>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    New Phone Number
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={phoneFormData.newPhone}
+                                    onChange={(e) => setPhoneFormData(prev => ({
+                                        ...prev,
+                                        newPhone: e.target.value
+                                    }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="05321234567"
+                                    maxLength="11"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Enter your new phone number
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Password
+                                </label>
+                                <input
+                                    type="password"
+                                    value={phoneFormData.password}
+                                    onChange={(e) => setPhoneFormData(prev => ({
+                                        ...prev,
+                                        password: e.target.value
+                                    }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Enter your password"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Confirm with your current password
+                                </p>
+                            </div>
                         </div>
 
                         <div className="flex justify-end space-x-3">

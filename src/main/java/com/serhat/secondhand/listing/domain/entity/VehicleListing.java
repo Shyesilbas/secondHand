@@ -9,13 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "vehicle_listings")
-@DiscriminatorValue("VEHICLE")
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 @Data
 public class VehicleListing extends Listing {
 

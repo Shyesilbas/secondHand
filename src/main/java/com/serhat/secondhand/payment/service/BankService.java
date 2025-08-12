@@ -111,4 +111,11 @@ public class BankService {
                 "currency", "TRY"
         );
     }
+
+    public void deleteBankAccount(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Bank bank = findByUserMandatory(user);
+        bankRepository.delete(bank);
+        log.info("Bank account deleted for user: {}", user.getEmail());
+    }
 }

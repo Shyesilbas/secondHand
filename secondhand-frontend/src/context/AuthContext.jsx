@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getUser, getToken, clearTokens, setUser, setTokens } from '../services/storage/tokenStorage';
 import { authService } from '../features/auth/services/authService';
+import { UserDTO } from '../types';
 
 const AuthContext = createContext();
 
@@ -42,7 +43,8 @@ export const AuthProvider = ({ children }) => {
             const userProfile = await authService.getCurrentUser();
             
             const userData = { 
-                userId, 
+                ...UserDTO,
+                id: userId,
                 email,
                 name: userProfile.name,
                 surname: userProfile.surname,
@@ -59,7 +61,11 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
         } catch (error) {
             console.error('Failed to fetch user profile:', error);
-            const userData = { userId, email };
+            const userData = { 
+                ...UserDTO,
+                id: userId, 
+                email 
+            };
             setUser(userData);
             setUserState(userData);
             setIsAuthenticated(true);

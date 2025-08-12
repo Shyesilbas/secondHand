@@ -1,22 +1,27 @@
 import apiClient from '../../../services/api/config';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
+import { 
+    createChangePasswordRequest, 
+    createForgotPasswordRequest, 
+    createResetPasswordRequest 
+} from '../../../types/auth';
 
 export const passwordService = {
     changePassword: async (passwordData) => {
-        const response = await apiClient.put(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, passwordData);
+        const changePasswordData = createChangePasswordRequest(passwordData);
+        const response = await apiClient.put(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, changePasswordData);
         return response.data;
     },
 
     forgotPassword: async (email) => {
-        const response = await apiClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+        const forgotPasswordData = createForgotPasswordRequest({ email });
+        const response = await apiClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, forgotPasswordData);
         return response.data;
     },
 
     resetPassword: async (token, newPassword) => {
-        const response = await apiClient.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, { 
-            token, 
-            newPassword 
-        });
+        const resetPasswordData = createResetPasswordRequest({ token, newPassword });
+        const response = await apiClient.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, resetPasswordData);
         return response.data;
     },
 };

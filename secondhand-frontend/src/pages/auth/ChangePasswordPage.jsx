@@ -5,14 +5,13 @@ import { ROUTES } from '../../constants/routes';
 import { useToast } from '../../context/ToastContext';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
+import { ChangePasswordRequestDTO } from '../../types/auth';
 
 const ChangePasswordPage = () => {
     const navigate = useNavigate();
     const { showSuccess, showError } = useToast();
     const [formData, setFormData] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        ...ChangePasswordRequestDTO
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);

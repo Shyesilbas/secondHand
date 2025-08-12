@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.ListingType;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,8 +18,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "listings")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "listing_type", length = 32)
-public abstract class Listing {
+public class Listing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,6 +34,10 @@ public abstract class Listing {
 
     @Enumerated(EnumType.STRING)
     private ListingStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "listing_type", nullable = false)
+    private ListingType listingType;
 
     @Column(name = "is_listing_fee_paid", nullable = false)
     @Builder.Default

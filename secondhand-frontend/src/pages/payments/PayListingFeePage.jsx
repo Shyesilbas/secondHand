@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
+import { ListingFeePaymentRequestDTO, ListingFeeConfigDTO } from '../../types/payments';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();

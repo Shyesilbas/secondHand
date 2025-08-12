@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { listingService } from '../services/listingService';
+import { ListingResponseDTO } from '../../../types/listings';
 
 export const useMyListings = () => {
     const [listings, setListings] = useState([]);

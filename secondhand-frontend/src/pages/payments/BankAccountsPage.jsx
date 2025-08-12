@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { paymentService } from '../../features/payments/services/paymentService';
+import { bankService } from '../../features/payments/services/bankService';
+import { useToast } from '../../context/ToastContext';
+import { BankDTO } from '../../types/payments';
 
 const BankAccountsPage = () => {
     const navigate = useNavigate();
+    const { showToast } = useToast();
     const [bankAccounts, setBankAccounts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
         fetchBankAccounts();
@@ -17,7 +21,7 @@ const BankAccountsPage = () => {
         try {
             setIsLoading(true);
             setError(null);
-            const data = await paymentService.getBankAccounts();
+            const data = await bankService.getBankAccount();
             setBankAccounts(Array.isArray(data) ? data : [data].filter(Boolean));
         } catch (err) {
             setError(err.response?.data?.message || 'An error occurred while listing bank accounts');
@@ -36,7 +40,48 @@ const BankAccountsPage = () => {
         }).format(amount);
     };
 
+    const handleCreateBankAccount = async () => {
+        try {
+            setIsCreating(true);
+            setError(null);
+            
+            const newBankAccount = await bankService.createBankAccount();
+            
+            // Update the bank accounts list
+            setBankAccounts([newBankAccount]);
+            setShowAddForm(false);
+            showToast('Bank account created successfully!', 'success');
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || 'Error occurred while creating bank account';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
+    const handleDeleteBankAccount = async () => {
+        if (!window.confirm('Are you sure you want to delete this bank account?')) {
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            setError(null);
+            
+            await bankService.deleteBankAccount();
+            
+            // Clear the bank accounts list
+            setBankAccounts([]);
+            showToast('Bank account deleted successfully!', 'success');
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || 'Error occurred while deleting bank account';
+            setError(errorMessage);
+            showToast(errorMessage, 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -67,7 +112,7 @@ const BankAccountsPage = () => {
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                    Geri Dön
+                    Go Back
                 </button>
                 
                 <div className="flex items-center justify-between">
@@ -76,17 +121,18 @@ const BankAccountsPage = () => {
                             Bank Accounts
                         </h1>
                         <p className="text-gray-600 mt-2">
-                            Transfers
+                            Manage your bank accounts
                         </p>
                     </div>
                     <button
                         onClick={() => setShowAddForm(true)}
                         className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                        disabled={isCreating}
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        Add new account
+                        {isCreating ? 'Creating...' : 'Add New Account'}
                     </button>
                 </div>
             </div>
@@ -105,16 +151,17 @@ const BankAccountsPage = () => {
                         </svg>
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No account found
+                        No Bank Account Found
                     </h3>
                     <p className="text-gray-600 mb-6">
-                        You dont have registered bank account yet.
+                        You don't have a registered bank account yet.
                     </p>
                     <button
                         onClick={() => setShowAddForm(true)}
                         className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                        disabled={isCreating}
                     >
-                        Add your bank account.
+                        {isCreating ? 'Creating...' : 'Create Bank Account'}
                     </button>
                 </div>
             ) : (
@@ -130,21 +177,20 @@ const BankAccountsPage = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                            {account.IBAN}
+                                            Bank Account
                                         </h3>
                                         <p className="text-sm text-gray-500">
-                                            Vadesiz Hesap
+                                            Current Account
                                         </p>
                                     </div>
                                 </div>
                                 
                                 <div className="flex space-x-2">
-                                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </button>
-                                    <button className="p-2 text-red-400 hover:text-red-600 transition-colors">
+                                    <button 
+                                        onClick={handleDeleteBankAccount}
+                                        className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                                        title="Delete Account"
+                                    >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -161,7 +207,7 @@ const BankAccountsPage = () => {
                                 </div>
                                 
                                 <div>
-                                    <p className="text-xs text-gray-500 mb-1">Hesap Sahibi</p>
+                                    <p className="text-xs text-gray-500 mb-1">Account Holder</p>
                                     <p className="text-sm text-gray-900">
                                         {account.holderName} {account.holderSurname}
                                     </p>
@@ -170,9 +216,9 @@ const BankAccountsPage = () => {
 
                             <div className="mt-4 pt-4 border-t border-gray-100">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-500">Bakiye</span>
+                                    <span className="text-sm text-gray-500">Balance</span>
                                     <span className="text-xl font-bold text-green-600">
-                                        {formatCurrency(account.balance || 0)}
+                                        {formatCurrency(parseFloat(account.balance) || 0)}
                                     </span>
                                 </div>
                             </div>
@@ -182,7 +228,7 @@ const BankAccountsPage = () => {
                                     <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
-                                    Para Yükle
+                                    Deposit
                                 </button>
                                 <button className="flex-1 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium">
                                     <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,26 +242,52 @@ const BankAccountsPage = () => {
                 </div>
             )}
 
-            {/* Add Bank Account Form Modal - Placeholder for now */}
+            {/* Add Bank Account Confirmation Modal */}
             {showAddForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                        <h3 className="text-lg font-semibold mb-4">Yeni Banka Hesabı Ekle</h3>
-                        <p className="text-gray-600 mb-4">
-                            Banka hesabı ekleme özelliği yakında tamamlanacak...
+                        <h3 className="text-lg font-semibold mb-4">Create New Bank Account</h3>
+                        
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <h4 className="text-sm font-medium text-blue-800">
+                                        Automatic Account Creation
+                                    </h4>
+                                    <div className="mt-2 text-sm text-blue-700">
+                                        <ul className="list-disc list-inside space-y-1">
+                                            <li>System will automatically generate an IBAN for you</li>
+                                            <li>Your name and surname will be used as account holder</li>
+                                            <li>Initial balance will be set to 0 TRY</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to create a bank account?
                         </p>
-                        <div className="flex justify-end space-x-2">
+                        
+                        <div className="flex justify-end space-x-3">
                             <button
                                 onClick={() => setShowAddForm(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                disabled={isCreating}
                             >
-                                İptal
+                                Cancel
                             </button>
                             <button
-                                onClick={() => setShowAddForm(false)}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                                onClick={handleCreateBankAccount}
+                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                disabled={isCreating}
                             >
-                                Tamam
+                                {isCreating ? 'Creating...' : 'Create Account'}
                             </button>
                         </div>
                     </div>

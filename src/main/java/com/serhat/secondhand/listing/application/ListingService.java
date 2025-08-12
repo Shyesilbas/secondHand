@@ -2,9 +2,11 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -17,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +61,44 @@ public class ListingService {
     public List<ListingDto> getAllListings() {
         log.info("Getting all active listings");
         return findByStatusAsDto(ListingStatus.ACTIVE);
+    }
+    
+    public List<ListingDto> getListingsByType(ListingType listingType) {
+        log.info("Getting all listings with type: {}", listingType);
+        List<Listing> listings = listingRepository.findByListingType(listingType);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+    
+    public List<ListingDto> getActiveListingsByType(ListingType listingType) {
+        log.info("Getting active listings with type: {}", listingType);
+        List<Listing> listings = listingRepository.findByListingTypeAndStatus(listingType, ListingStatus.ACTIVE);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+    
+    public List<ListingDto> getListingsByTypeOrderByDate(ListingType listingType) {
+        log.info("Getting listings with type: {} ordered by date", listingType);
+        List<Listing> listings = listingRepository.findByListingTypeOrderByCreatedAtDesc(listingType);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+    
+    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
+        log.info("Getting listings with filters: {}", filters);
+        
+        // Set default values if not provided
+        if (filters.getPage() == null) filters.setPage(0);
+        if (filters.getSize() == null) filters.setSize(20);
+        if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
+        
+        Pageable pageable = PageRequest.of(filters.getPage(), filters.getSize());
+        Page<Listing> listingPage = listingRepository.findWithFilters(filters, pageable);
+        
+        return listingPage.map(listingMapper::toDynamicDto);
     }
     
     @Transactional

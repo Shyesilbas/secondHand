@@ -6,13 +6,16 @@ import { verificationService } from '../../features/auth/services/verificationSe
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
+import { VerificationRequestDTO } from '../../types/users';
 
 const AccountVerificationPage = () => {
     const navigate = useNavigate();
     const { user, updateUser } = useAuth();
     const { showSuccess, showError, showInfo } = useToast();
     
-    const [verificationCode, setVerificationCode] = useState('');
+    const [verificationData, setVerificationData] = useState({
+        ...VerificationRequestDTO
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [isSendingCode, setIsSendingCode] = useState(false);
     const [errors, setErrors] = useState({});
@@ -57,12 +60,12 @@ const AccountVerificationPage = () => {
         e.preventDefault();
 
         // Validation
-        if (!verificationCode.trim()) {
+        if (!verificationData.code.trim()) {
             setErrors({ code: 'Please enter the verification code' });
             return;
         }
 
-        if (verificationCode.length !== 6) {
+        if (verificationData.code.length !== 6) {
             setErrors({ code: 'Verification code must be 6 digits' });
             return;
         }
@@ -71,7 +74,7 @@ const AccountVerificationPage = () => {
         setErrors({});
 
         try {
-            await verificationService.verifyAccount(verificationCode.trim());
+            await verificationService.verifyAccount(verificationData.code.trim());
             
             // Update user verification status
             updateUser({ accountVerified: true });
@@ -104,7 +107,10 @@ const AccountVerificationPage = () => {
 
     const handleInputChange = (e) => {
         const value = e.target.value.replace(/\D/g, '').slice(0, 6); // Only digits, max 6
-        setVerificationCode(value);
+        setVerificationData(prev => ({
+            ...prev,
+            code: value
+        }));
         
         // Clear errors when user types
         if (errors.code) {
@@ -180,7 +186,7 @@ const AccountVerificationPage = () => {
                                 label="Verification Code"
                                 type="text"
                                 name="verificationCode"
-                                value={verificationCode}
+                                value={verificationData.code}
                                 onChange={handleInputChange}
                                 placeholder="Enter 6-digit code"
                                 error={errors.code}
@@ -215,7 +221,7 @@ const AccountVerificationPage = () => {
                             <AuthButton
                                 type="submit"
                                 isLoading={isLoading}
-                                disabled={isLoading || verificationCode.length !== 6}
+                                disabled={isLoading || verificationData.code.length !== 6}
                                 className="flex-1"
                             >
                                 {isLoading ? 'Verifying...' : 'Verify Account'}

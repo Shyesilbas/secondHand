@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/v1/bank")
@@ -29,11 +31,32 @@ public class BankController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<BankDto> createBankAccount(Authentication authentication) {
         log.info("Creating bank account for user: {}", authentication.getName());
         BankDto bankDto = bankService.createBankAccount(authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(bankDto);
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Object>> checkBankAccountExists(Authentication authentication) {
+        log.info("Checking bank account existence for user: {}", authentication.getName());
+        Map<String, Object> response = bankService.checkBankAccountExists(authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/balance")
+    public ResponseEntity<Map<String, Object>> getBankBalance(Authentication authentication) {
+        log.info("Getting bank balance for user: {}", authentication.getName());
+        Map<String, Object> response = bankService.getBankBalance(authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteBankAccount(Authentication authentication) {
+        log.info("Deleting bank account for user: {}", authentication.getName());
+        bankService.deleteBankAccount(authentication);
+        return ResponseEntity.noContent().build();
     }
 
 }

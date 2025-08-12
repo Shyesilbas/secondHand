@@ -6,16 +6,13 @@ import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { RegisterRequestDTO, RegisterResponseDTO } from '../../types/auth';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
-        name: '',
-        surname: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        phone: '',
-        userType: 'BUYER'
+        ...RegisterRequestDTO,
+        confirmPassword: '', // Additional field for frontend validation
+        userType: 'BUYER' // Override default
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -97,13 +94,23 @@ const RegisterPage = () => {
                 userType: formData.userType
             };
 
-            await authService.register(registerData);
+            const response = await authService.register(registerData);
             setSuccess(true);
-            showSuccess('Registration successful! Redirecting to login page...');
+            
+            // Display all messages from backend response
+            if (response.welcomeMessage) {
+                showSuccess(response.welcomeMessage);
+            }
+            if (response.importantMessage) {
+                showSuccess(response.importantMessage);
+            }
+            if (response.informationMessage) {
+                showSuccess(response.informationMessage);
+            }
 
             setTimeout(() => {
                 navigate(ROUTES.LOGIN, {
-                    state: { message: 'Kayıt başarılı! Şimdi giriş yapabilirsiniz.' }
+                    state: { message: 'Registration successful! You can now log in.' }
                 });
             }, 2000);
 

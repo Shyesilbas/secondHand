@@ -4,9 +4,12 @@ import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
+import { ForgotPasswordRequestDTO } from '../../types/auth';
 
 const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState('');
+  const [formData, setFormData] = useState({
+    ...ForgotPasswordRequestDTO
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -14,12 +17,12 @@ const ForgotPasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email.trim()) {
+    if (!formData.email.trim()) {
       setError('E-posta adresi gereklidir');
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('Geçerli bir e-posta adresi giriniz');
       return;
     }
@@ -28,7 +31,7 @@ const ForgotPasswordPage = () => {
     setError('');
 
     try {
-      await authService.forgotPassword(email);
+      await authService.forgotPassword(formData.email);
       setSuccess(true);
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Bir hata oluştu';
@@ -80,8 +83,11 @@ const ForgotPasswordPage = () => {
         <AuthInput
           label="E-posta Adresi"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            email: e.target.value
+          }))}
           placeholder="ornek@email.com"
           error={error}
           required

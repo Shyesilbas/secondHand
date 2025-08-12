@@ -1,5 +1,6 @@
 import apiClient from '../../../services/api/config';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
+import { createVerificationRequest } from '../../../types/users';
 
 export const verificationService = {
     /**
@@ -17,7 +18,8 @@ export const verificationService = {
      * @returns {Promise} API response
      */
     verifyAccount: async (code) => {
-        const response = await apiClient.post(API_ENDPOINTS.USER.VERIFY, { code });
+        const verifyData = createVerificationRequest({ code });
+        const response = await apiClient.post(API_ENDPOINTS.USER.VERIFY, verifyData);
         return response.data;
     },
 };

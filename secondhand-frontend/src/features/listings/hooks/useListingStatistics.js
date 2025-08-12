@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { listingService } from '../services/listingService';
+import { ListingStatisticsDTO } from '../../../types/listings';
 
 export const useListingStatistics = () => {
-    const [statistics, setStatistics] = useState(null);
+    const [statistics, setStatistics] = useState({...ListingStatisticsDTO});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
