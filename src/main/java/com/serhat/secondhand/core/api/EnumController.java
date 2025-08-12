@@ -120,6 +120,34 @@ public class EnumController {
         return ResponseEntity.ok(currencies);
     }
 
+    @GetMapping("/gear-types")
+    @Operation(summary = "Get all gear types")
+    public ResponseEntity<List<Map<String, Object>>> getGearTypes() {
+        List<Map<String, Object>> gearTypes = Arrays.stream(GearType.values())
+                .map(gearType -> {
+                    Map<String, Object> gearTypeMap = new LinkedHashMap<>();
+                    gearTypeMap.put("value", gearType.name());
+                    gearTypeMap.put("label", getGearTypeLabel(gearType));
+                    return gearTypeMap;
+                })
+                .toList();
+        return ResponseEntity.ok(gearTypes);
+    }
+
+    @GetMapping("/seat-counts")
+    @Operation(summary = "Get all seat count options")
+    public ResponseEntity<List<Map<String, Object>>> getSeatCounts() {
+        List<Map<String, Object>> seatCounts = Arrays.stream(SeatCount.values())
+                .map(seatCount -> {
+                    Map<String, Object> seatCountMap = new LinkedHashMap<>();
+                    seatCountMap.put("value", seatCount.name());
+                    seatCountMap.put("label", getSeatCountLabel(seatCount));
+                    return seatCountMap;
+                })
+                .toList();
+        return ResponseEntity.ok(seatCounts);
+    }
+
     // Label helper methods
     private String getListingTypeLabel(ListingType type) {
         return switch (type) {
@@ -242,6 +270,28 @@ public class EnumController {
             case TRY -> "₺";
             case EUR -> "€";
             case USD -> "$";
+        };
+    }
+
+    private String getGearTypeLabel(GearType gearType) {
+        return switch (gearType) {
+            case MANUAL -> "Manuel";
+            case AUTOMATIC -> "Otomatik";
+            case SEMI_AUTOMATIC -> "Yarı Otomatik";
+            case CVT -> "CVT";
+        };
+    }
+
+    private String getSeatCountLabel(SeatCount seatCount) {
+        return switch (seatCount) {
+            case TWO -> "2";
+            case FOUR -> "4";
+            case FIVE -> "5";
+            case SEVEN -> "7";
+            case EIGHT -> "8";
+            case NINE -> "9";
+            case TEN -> "10";
+            case MORE_THAN_TEN -> "10+";
         };
     }
 }

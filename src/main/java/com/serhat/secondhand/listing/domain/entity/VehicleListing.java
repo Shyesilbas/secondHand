@@ -4,6 +4,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.Doors;
 import com.serhat.secondhand.listing.domain.entity.enums.FuelType;
+import com.serhat.secondhand.listing.domain.entity.enums.GearType;
+import com.serhat.secondhand.listing.domain.entity.enums.SeatCount;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,8 +30,12 @@ public class VehicleListing extends Listing {
     private Integer year;
     private Integer mileage;
     private Integer engineCapacity;
-    private Integer gearbox;
-    private Integer seatCount;
+    
+    @Enumerated(EnumType.STRING)
+    private GearType gearbox;
+    
+    @Enumerated(EnumType.STRING)
+    private SeatCount seatCount;
 
     @Enumerated(EnumType.STRING)
     private Doors doors;

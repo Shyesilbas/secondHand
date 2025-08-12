@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCreditCard } from '../../features/payments/hooks/useCreditCard';
 import CreditCardCreateForm from '../../features/payments/components/CreditCardCreateForm';
 import { CreditCardDTO } from '../../types/payments';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 
 const CreditCardsPage = () => {
     const navigate = useNavigate();
-    const { showToast } = useToast();
+    const notification = useNotification();
     const [showAddForm, setShowAddForm] = useState(false);
     
     const {
@@ -30,10 +30,10 @@ const CreditCardsPage = () => {
 
         try {
             await deleteCreditCard();
-            showToast('Credit card deleted successfully!', 'success');
+            notification.showSuccess('Başarılı', 'Kredi kartı başarıyla silindi!');
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Error occurred while deleting credit card';
-            showToast(errorMessage, 'error');
+            notification.showError('Hata', errorMessage);
         }
     };
 

@@ -189,7 +189,7 @@ const ListingDetailPage = () => {
               <DetailItem label="Created At" value={formatDate(listing.createdAt)} />
               <DetailItem label="Last Update" value={formatDate(listing.updatedAt)} />
               <DetailItem label="Province" value={`${listing.district}, ${listing.city}`} />
-              <DetailItem label="Listing Fee" value={listing.isListingFeePaid ? 'Paid' : 'Unpaid'} />
+              <DetailItem label="Listing Fee" value={listing.listingFeePaid ? 'Paid' : 'Unpaid'} />
             </div>
           </div>
         </div>
@@ -253,7 +253,7 @@ const VehicleDetails = ({ listing }) => (
       <DetailItem label="Yıl" value={listing.year} />
       <DetailItem label="Kilometre" value={listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : '-'} />
       <DetailItem label="Motor Hacmi" value={listing.engineCapacity ? `${listing.engineCapacity} cc` : '-'} />
-      <DetailItem label="Vites" value={listing.gearbox === 1 ? 'Manuel' : listing.gearbox === 2 ? 'Automatic' : '-'} />
+      <DetailItem label="Vites" value={listing.gearbox} />
       <DetailItem label="Yakıt Türü" value={listing.fuelType} />
       <DetailItem label="Renk" value={listing.color} />
       <DetailItem label="Kapı Sayısı" value={listing.doors} />

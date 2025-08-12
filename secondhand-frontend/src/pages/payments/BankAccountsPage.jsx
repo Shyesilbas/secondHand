@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { bankService } from '../../features/payments/services/bankService';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { BankDTO } from '../../types/payments';
 
 const BankAccountsPage = () => {
     const navigate = useNavigate();
-    const { showToast } = useToast();
+    const notification = useNotification();
     const [bankAccounts, setBankAccounts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,11 +50,11 @@ const BankAccountsPage = () => {
             // Update the bank accounts list
             setBankAccounts([newBankAccount]);
             setShowAddForm(false);
-            showToast('Bank account created successfully!', 'success');
+            notification.showSuccess('Başarılı', 'Banka hesabı başarıyla oluşturuldu!');
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Error occurred while creating bank account';
             setError(errorMessage);
-            showToast(errorMessage, 'error');
+            notification.showError('Hata', errorMessage);
         } finally {
             setIsCreating(false);
         }
@@ -73,11 +73,11 @@ const BankAccountsPage = () => {
             
             // Clear the bank accounts list
             setBankAccounts([]);
-            showToast('Bank account deleted successfully!', 'success');
+            notification.showSuccess('Başarılı', 'Banka hesabı başarıyla silindi!');
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Error occurred while deleting bank account';
             setError(errorMessage);
-            showToast(errorMessage, 'error');
+            notification.showError('Hata', errorMessage);
         } finally {
             setIsLoading(false);
         }

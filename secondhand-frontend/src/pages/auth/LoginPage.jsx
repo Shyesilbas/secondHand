@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
@@ -18,7 +18,7 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const { login } = useAuth();
-    const { showError } = useToast();
+    const notification = useNotification();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -63,37 +63,44 @@ const LoginPage = () => {
         try {
             const response = await authService.login(formData.email, formData.password);
             await login(response);
-            navigate(from, { replace: true });
+            
+            // Show success notification
+            notification.showSuccess(
+                'Giriş Başarılı', 
+                'Hoş geldiniz! Ana sayfaya yönlendiriliyorsunuz...',
+                { autoCloseDelay: 2000 }
+            );
+            
+            // Navigate after a short delay to show the success message
+            setTimeout(() => {
+                navigate(from, { replace: true });
+            }, 1000);
         } catch (error) {
             console.error('Login error:', error);
             
-            // Get the error message from backend
-            const errorMessage = error.response?.data?.message || 'Error Occurred while Logging in';
-            
-            // Check for specific error types
-            if (error.response?.status === 401) {
-                // Unauthorized - Bad credentials or account issues
-                if (errorMessage.toLowerCase().includes('bad credentials') || 
-                    errorMessage.toLowerCase().includes('invalid') ||
-                    errorMessage.toLowerCase().includes('wrong password') ||
-                    errorMessage.toLowerCase().includes('email or password')) {
-                    showError('Invalid email or password. Please check your credentials and try again.');
-                } else if (errorMessage.toLowerCase().includes('account') ||
-                          errorMessage.toLowerCase().includes('user')) {
-                    showError(errorMessage);
-                } else {
-                    showError('Authentication failed. Please check your email and password.');
-                }
-            } else if (error.response?.status === 403) {
-                // Forbidden - Account locked, disabled, etc.
-                showError(errorMessage || 'Your account access is restricted. Please contact support.');
-            } else if (error.response?.status >= 500) {
-                // Server errors
-                showError('Server error occurred. Please try again later.');
-            } else {
-                // Other errors or network issues
-                showError(errorMessage);
-            }
+            // Use our modern modal error handler
+            const { handleErrorWithModal } = await import('../../utils/errorHandler');
+            handleErrorWithModal(error, notification, {
+                showDetails: process.env.NODE_ENV === 'development', // Show details only in development
+                actions: [
+                    {
+                        label: 'Tekrar Dene',
+                        onClick: () => {
+                            // Clear form errors and focus on email field
+                            setErrors({});
+                            document.querySelector('input[name="email"]')?.focus();
+                        },
+                        primary: true
+                    },
+                    {
+                        label: 'Şifremi Unuttum',
+                        onClick: () => {
+                            navigate(ROUTES.FORGOT_PASSWORD);
+                        },
+                        primary: false
+                    }
+                ]
+            });
         } finally {
             setIsLoading(false);
         }

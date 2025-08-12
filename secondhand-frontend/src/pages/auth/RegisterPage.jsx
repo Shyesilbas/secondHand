@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
@@ -21,7 +21,7 @@ const RegisterPage = () => {
     const [success, setSuccess] = useState(false);
 
     const navigate = useNavigate();
-    const { showError, showSuccess } = useToast();
+    const notification = useNotification();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -99,13 +99,13 @@ const RegisterPage = () => {
             
             // Display all messages from backend response
             if (response.welcomeMessage) {
-                showSuccess(response.welcomeMessage);
+                notification.showSuccess('Kayıt Başarılı', response.welcomeMessage);
             }
             if (response.importantMessage) {
-                showSuccess(response.importantMessage);
+                notification.showInfo('Önemli', response.importantMessage);
             }
             if (response.informationMessage) {
-                showSuccess(response.informationMessage);
+                notification.showInfo('Bilgi', response.informationMessage);
             }
 
             setTimeout(() => {
@@ -124,22 +124,22 @@ const RegisterPage = () => {
                 // Bad request - validation errors, duplicate email, etc.
                 if (errorMessage.toLowerCase().includes('email') && 
                     errorMessage.toLowerCase().includes('already')) {
-                    showError('This email address is already registered. Please use a different email or try logging in.');
+                    notification.showError('E-posta Hatası', 'Bu e-posta adresi zaten kayıtlı. Farklı bir e-posta kullanın veya giriş yapmayı deneyin.');
                 } else if (errorMessage.toLowerCase().includes('validation') ||
                           errorMessage.toLowerCase().includes('invalid')) {
-                    showError(errorMessage);
+                    notification.showError('Doğrulama Hatası', errorMessage);
                 } else {
-                    showError('Please check your information and try again.');
+                    notification.showError('Hata', 'Lütfen bilgilerinizi kontrol edin ve tekrar deneyin.');
                 }
             } else if (error.response?.status === 409) {
                 // Conflict - duplicate user
-                showError('An account with this email already exists. Please use a different email or try logging in.');
+                notification.showError('Hesap Çakışması', 'Bu e-posta ile zaten bir hesap var. Farklı bir e-posta kullanın veya giriş yapmayı deneyin.');
             } else if (error.response?.status >= 500) {
                 // Server errors
-                showError('Server error occurred. Please try again later.');
+                notification.showError('Sunucu Hatası', 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.');
             } else {
                 // Other errors or network issues
-                showError(errorMessage);
+                notification.showError('Hata', errorMessage);
             }
         } finally {
             setIsLoading(false);

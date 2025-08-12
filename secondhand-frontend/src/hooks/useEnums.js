@@ -11,7 +11,9 @@ export const useEnums = () => {
     fuelTypes: [],
     colors: [],
     doors: [],
-    currencies: []
+    currencies: [],
+    gearTypes: [],
+    seatCounts: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,7 +41,9 @@ export const useEnums = () => {
           fuelTypes,
           colors,
           doors,
-          currencies
+          currencies,
+          gearTypes,
+          seatCounts
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -47,7 +51,9 @@ export const useEnums = () => {
           enumService.getFuelTypes(),
           enumService.getColors(),
           enumService.getDoors(),
-          enumService.getCurrencies()
+          enumService.getCurrencies(),
+          enumService.getGearTypes(),
+          enumService.getSeatCounts()
         ]);
 
         const fetchedEnums = {
@@ -57,7 +63,9 @@ export const useEnums = () => {
           fuelTypes,
           colors,
           doors,
-          currencies
+          currencies,
+          gearTypes,
+          seatCounts
         };
 
         setEnums(fetchedEnums);
@@ -125,7 +133,9 @@ export const useEnums = () => {
         fuelTypes,
         colors,
         doors,
-        currencies
+        currencies,
+        gearTypes,
+        seatCounts
       ] = await Promise.all([
         enumService.getListingTypes(),
         enumService.getListingStatuses(),
@@ -133,7 +143,9 @@ export const useEnums = () => {
         enumService.getFuelTypes(),
         enumService.getColors(),
         enumService.getDoors(),
-        enumService.getCurrencies()
+        enumService.getCurrencies(),
+        enumService.getGearTypes(),
+        enumService.getSeatCounts()
       ]);
 
       const freshEnums = {
@@ -143,7 +155,9 @@ export const useEnums = () => {
         fuelTypes,
         colors,
         doors,
-        currencies
+        currencies,
+        gearTypes,
+        seatCounts
       };
 
       setEnums(freshEnums);

@@ -27,15 +27,7 @@ export const BankDTO = {
   holderSurname: '',
 };
 
-// Payment Request DTO
-export const PaymentRequestDTO = {
-  amount: 0,
-  currency: 'TRY',
-  description: '',
-  paymentMethod: '', 
-  creditCardId: '', // If paying with credit card
-  bankAccountId: '', // If paying with bank transfer
-};
+
 
 // Payment Response DTO
 export const PaymentDTO = {
@@ -55,9 +47,7 @@ export const PaymentDTO = {
 // Listing Fee Payment Request DTO
 export const ListingFeePaymentRequestDTO = {
   listingId: '',
-  paymentMethod: '', // CREDIT_CARD, BANK_TRANSFER
-  creditCardId: '', // Required if paymentMethod is CREDIT_CARD
-  bankAccountId: '', // Required if paymentMethod is BANK_TRANSFER
+  paymentType: '', // CREDIT_CARD, TRANSFER
 };
 
 // Listing Fee Config Response DTO
@@ -109,8 +99,6 @@ export const createPaymentRequest = (data) => {
 export const createListingFeePaymentRequest = (data) => {
   return {
     listingId: data.listingId || '',
-    paymentMethod: data.paymentMethod || '',
-    creditCardId: data.paymentMethod === 'CREDIT_CARD' ? data.creditCardId : '',
-    bankAccountId: data.paymentMethod === 'BANK_TRANSFER' ? data.bankAccountId : '',
+    paymentType: data.paymentType || '',
   };
 };

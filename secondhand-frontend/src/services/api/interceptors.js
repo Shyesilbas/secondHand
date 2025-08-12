@@ -1,5 +1,6 @@
 import apiClient, {API_BASE_URL} from './config';
 import { getToken, getRefreshToken, setTokens, clearTokens } from '../storage/tokenStorage';
+import { shouldTriggerLogout } from '../../utils/errorHandler';
 import axios from "axios";
 
 apiClient.interceptors.request.use(
@@ -18,9 +19,29 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Handle both 401 (Unauthorized) and 403 (Forbidden) for token expiration
+        // Don't intercept auth endpoints (login, register, etc.) - let them handle their own errors
+        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                              originalRequest.url?.includes('/auth/register') ||
+                              originalRequest.url?.includes('/auth/forgot-password') ||
+                              originalRequest.url?.includes('/auth/reset-password');
+
+        if (isAuthEndpoint) {
+            return Promise.reject(error);
+        }
+
+        // Handle token refresh for protected endpoints only
         if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true;
+
+            // Check if this error should trigger logout using our error handler
+            const parsedError = { 
+                type: 'authentication', 
+                originalMessage: error.response?.data?.message || error.message 
+            };
+            
+            if (!shouldTriggerLogout(parsedError)) {
+                return Promise.reject(error);
+            }
 
             try {
                 const refreshToken = getRefreshToken();

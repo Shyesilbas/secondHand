@@ -66,6 +66,8 @@ export const API_ENDPOINTS = {
         COLORS: '/v1/enums/colors',
         DOORS: '/v1/enums/doors',
         CURRENCIES: '/v1/enums/currencies',
+        GEAR_TYPES: '/v1/enums/gear-types',
+        SEAT_COUNTS: '/v1/enums/seat-counts',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',

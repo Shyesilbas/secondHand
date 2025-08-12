@@ -7,7 +7,7 @@ import Pagination from '../../components/ui/Pagination';
 import SidebarLayout from '../../components/layout/SidebarLayout';
 import { useEnums } from '../../hooks/useEnums';
 import { listingService } from '../../features/listings/services/listingService';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 
 const ListingsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -30,7 +30,7 @@ const ListingsPage = () => {
     } = useAdvancedListings();
     
     const { getListingTypeLabel } = useEnums();
-    const { showError, showSuccess } = useToast();
+    const notification = useNotification();
 
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
@@ -50,7 +50,7 @@ const ListingsPage = () => {
         e.preventDefault();
         
         if (!searchQuery.trim()) {
-            showError('Please enter a listing number');
+            notification.showError('Hata', 'Lütfen bir ilan numarası girin');
             return;
         }
 
@@ -59,13 +59,13 @@ const ListingsPage = () => {
             const result = await listingService.getListingByNo(searchQuery.trim());
             setSearchResult(result);
             setShowSearchResult(true);
-            showSuccess('Listing found!');
+            notification.showSuccess('Başarılı', 'İlan bulundu!');
         } catch (error) {
             console.error('Search error:', error);
             if (error.response?.status === 404) {
-                showError('No listing found with this number');
+                notification.showError('Bulunamadı', 'Bu numarada ilan bulunamadı');
             } else {
-                showError('Search failed. Please try again.');
+                notification.showError('Hata', 'Arama başarısız. Lütfen tekrar deneyin.');
             }
             setSearchResult(null);
             setShowSearchResult(false);

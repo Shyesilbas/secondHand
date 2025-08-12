@@ -4,7 +4,7 @@
  */
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.0'; // Increment this when backend enum structure changes
+const ENUM_CACHE_VERSION = '1.1'; // Increment this when backend enum structure changes
 const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 
 /**

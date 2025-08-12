@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { userService } from '../../features/users/services/userService';
 import { ROUTES } from '../../constants/routes';
 import { UserDTO, UpdatePhoneRequestDTO } from '../../types/users';
@@ -9,7 +9,7 @@ import { UserDTO, UpdatePhoneRequestDTO } from '../../types/users';
 const ProfilePage = () => {
     const navigate = useNavigate();
     const { user, updateUser } = useAuth();
-    const { showSuccess, showError } = useToast();
+    const notification = useNotification();
     const [showPhoneModal, setShowPhoneModal] = useState(false);
     const [phoneFormData, setPhoneFormData] = useState({
         ...UpdatePhoneRequestDTO
@@ -20,12 +20,12 @@ const ProfilePage = () => {
         const cleanPhone = phoneFormData.newPhone.replace(/\D/g, '');
         
         if (!phoneFormData.newPhone.trim()) {
-            showError('Please enter your phone number');
+            notification.showError('Hata', 'Lütfen telefon numaranızı girin');
             return;
         }
 
         if (cleanPhone.length !== 11) {
-            showError('Length must be 11');
+            notification.showError('Hata', 'Telefon numarası 11 haneli olmalıdır');
             return;
         }
 
@@ -40,9 +40,9 @@ const ProfilePage = () => {
             
             setShowPhoneModal(false);
             setPhoneFormData({ ...UpdatePhoneRequestDTO });
-            showSuccess('Phone number updated successfully!');
+            notification.showSuccess('Başarılı', 'Telefon numarası başarıyla güncellendi!');
         } catch (error) {
-            showError(error.response?.data?.message || error.message || 'An error occurred while updating phone number');
+            notification.showError('Hata', error.response?.data?.message || error.message || 'Telefon numarası güncellenirken hata oluştu');
         } finally {
             setIsUpdating(false);
         }

@@ -3,13 +3,13 @@ import { useVehicle } from '../hooks/useVehicle';
 import { useEnums } from '../../../hooks/useEnums';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
-import { useToast } from '../../../context/ToastContext';
+import { useNotification } from '../../../context/NotificationContext';
 import { VehicleCreateRequestDTO } from '../../../types/vehicles';
 import SearchableDropdown from '../../../components/ui/SearchableDropdown';
 
 const VehicleCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const notification = useNotification();
   const { createVehicle, isLoading } = useVehicle();
   const { enums } = useEnums();
 
@@ -83,6 +83,7 @@ const VehicleCreateForm = ({ onBack }) => {
         break;
       case 3:
         if (!formData.city.trim()) newErrors.city = 'Şehir gereklidir';
+        if (!formData.district.trim()) newErrors.district = 'İlçe gereklidir';
         break;
     }
     
@@ -100,16 +101,53 @@ const VehicleCreateForm = ({ onBack }) => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  const validateAllSteps = () => {
+    const allErrors = {};
+    
+    // Step 1 validation
+    if (!formData.title.trim()) allErrors.title = 'Başlık gereklidir';
+    if (!formData.description.trim()) allErrors.description = 'Açıklama gereklidir';
+    if (!formData.price || parseFloat(formData.price) <= 0) allErrors.price = 'Geçerli bir fiyat giriniz';
+    
+    // Step 2 validation
+    if (!formData.brand) allErrors.brand = 'Marka seçiniz';
+    if (!formData.model.trim()) allErrors.model = 'Model giriniz';
+    if (!formData.year || parseInt(formData.year) < 1950) allErrors.year = 'Geçerli bir yıl giriniz';
+    if (!formData.fuelType) allErrors.fuelType = 'Yakıt türü seçiniz';
+    
+    // Step 3 validation (Location - ZORUNLU!)
+    if (!formData.city.trim()) allErrors.city = 'Şehir gereklidir';
+    if (!formData.district.trim()) allErrors.district = 'İlçe gereklidir';
+    
+    setErrors(allErrors);
+    return Object.keys(allErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Final validation - tüm adımları kontrol et
+    if (!validateAllSteps()) {
+      notification.showError('Eksik Bilgi', 'Lütfen tüm zorunlu alanları doldurun. Özellikle konum bilgileri zorunludur!');
+      
+      // Hata varsa ilk hatanın olduğu step'e git
+      if (errors.title || errors.description || errors.price) {
+        setCurrentStep(1);
+      } else if (errors.brand || errors.model || errors.year || errors.fuelType) {
+        setCurrentStep(2);
+      } else if (errors.city || errors.district) {
+        setCurrentStep(3);
+      }
+      return;
+    }
     
     try {
       // VehicleService will handle DTO transformation
       await createVehicle(formData);
-      showToast('İlan başarıyla oluşturuldu!', 'success');
+      notification.showSuccess('Başarılı', 'İlan başarıyla oluşturuldu!');
       navigate(ROUTES.MY_LISTINGS);
     } catch (error) {
-      showToast('İlan oluşturulurken bir hata oluştu', 'error');
+      notification.showError('Hata', 'İlan oluşturulurken bir hata oluştu');
     }
   };
 
@@ -212,7 +250,7 @@ const VehicleCreateForm = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div>
             <SearchableDropdown
               label="Marka *"
@@ -343,6 +381,96 @@ const VehicleCreateForm = ({ onBack }) => {
               multiple={false}
             />
           </div>
+
+          <div>
+            <SearchableDropdown
+              label="Vites"
+              options={enums.gearTypes || []}
+              selectedValues={formData.gearbox ? [formData.gearbox] : []}
+              onSelectionChange={(values) => handleDropdownChange('gearbox', values)}
+              placeholder="Vites türü seçin..."
+              searchPlaceholder="Vites ara..."
+              multiple={false}
+            />
+          </div>
+
+          <div>
+            <SearchableDropdown
+              label="Koltuk Sayısı"
+              options={enums.seatCounts || []}
+              selectedValues={formData.seatCount ? [formData.seatCount] : []}
+              onSelectionChange={(values) => handleDropdownChange('seatCount', values)}
+              placeholder="Koltuk sayısı seçin..."
+              searchPlaceholder="Koltuk ara..."
+              multiple={false}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Jant Boyutu (inç)
+            </label>
+            <input
+              type="number"
+              name="wheels"
+              value={formData.wheels}
+              onChange={handleInputChange}
+              min="13"
+              max="24"
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="17"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Yakıt Kapasitesi (L)
+            </label>
+            <input
+              type="number"
+              name="fuelCapacity"
+              value={formData.fuelCapacity}
+              onChange={handleInputChange}
+              min="30"
+              max="150"
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="60"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Yakıt Tüketimi (L/100km)
+            </label>
+            <input
+              type="number"
+              name="fuelConsumption"
+              value={formData.fuelConsumption}
+              onChange={handleInputChange}
+              min="1"
+              max="30"
+              step="0.1"
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="7.5"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Kilometre/Litre
+            </label>
+            <input
+              type="number"
+              name="kilometersPerLiter"
+              value={formData.kilometersPerLiter}
+              onChange={handleInputChange}
+              min="5"
+              max="35"
+              step="0.1"
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="13.3"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -381,16 +509,19 @@ const VehicleCreateForm = ({ onBack }) => {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              İlçe
+              İlçe *
             </label>
             <input
               type="text"
               name="district"
               value={formData.district}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.district ? 'border-red-500' : 'border-slate-200'
+              }`}
               placeholder="ör: Kadıköy"
             />
+            {errors.district && <p className="mt-1 text-sm text-red-600">{errors.district}</p>}
           </div>
         </div>
       </div>
@@ -405,7 +536,9 @@ const VehicleCreateForm = ({ onBack }) => {
         </div>
         
         <div className="bg-white rounded-lg border border-slate-200 p-4">
-          <h4 className="text-lg font-semibold text-slate-900 mb-2">{formData.title || 'İlan Başlığı'}</h4>
+          <h4 className="text-lg font-semibold text-slate-900 mb-3">{formData.title || 'İlan Başlığı'}</h4>
+          
+          {/* Main info */}
           <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
             <span className="flex items-center gap-1">
               <span>🚗</span> {formData.brand} {formData.model}
@@ -420,7 +553,23 @@ const VehicleCreateForm = ({ onBack }) => {
                 <span>🛣️</span> {parseInt(formData.mileage).toLocaleString('tr-TR')} km
               </span>
             )}
+            {formData.fuelType && (
+              <span className="flex items-center gap-1">
+                <span>⛽</span> {enums.fuelTypes?.find(f => f.value === formData.fuelType)?.label || formData.fuelType}
+              </span>
+            )}
           </div>
+
+          {/* Additional details */}
+          <div className="grid grid-cols-2 gap-2 text-xs text-slate-500 mb-3">
+            {formData.gearbox && <span>🔧 Vites: {enums.gearTypes?.find(g => g.value === formData.gearbox)?.label || formData.gearbox}</span>}
+            {formData.color && <span>🎨 Renk: {enums.colors?.find(c => c.value === formData.color)?.label || formData.color}</span>}
+            {formData.doors && <span>🚪 Kapı: {enums.doors?.find(d => d.value === formData.doors)?.label || formData.doors}</span>}
+            {formData.seatCount && <span>💺 Koltuk: {enums.seatCounts?.find(s => s.value === formData.seatCount)?.label || formData.seatCount}</span>}
+            {formData.engineCapacity && <span>🔧 Motor: {formData.engineCapacity} cc</span>}
+            {formData.horsePower && <span>💪 Güç: {formData.horsePower} HP</span>}
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-emerald-600">
               {formData.price ? `${parseInt(formData.price).toLocaleString('tr-TR')} ${formData.currency}` : 'Fiyat belirtilmemiş'}
@@ -521,7 +670,7 @@ const VehicleCreateForm = ({ onBack }) => {
               ) : (
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !formData.city.trim() || !formData.district.trim()}
                   className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
                   {isLoading ? (
@@ -542,6 +691,18 @@ const VehicleCreateForm = ({ onBack }) => {
                 </button>
               )}
             </div>
+            
+            {/* Location requirement message */}
+            {currentStep === 3 && (!formData.city.trim() || !formData.district.trim()) && (
+              <div className="text-center text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+                <span className="flex items-center justify-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  Şehir ve ilçe bilgileri zorunludur! İlan oluşturmak için konum bilgilerini doldurun.
+                </span>
+              </div>
+            )}
           </div>
         </form>
       </div>

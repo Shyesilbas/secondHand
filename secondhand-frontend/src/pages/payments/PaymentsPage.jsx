@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../features/payments/services/paymentService';
 import { PaymentDTO } from '../../types/payments';
+import PaymentReceiptModal from '../../components/modals/PaymentReceiptModal';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();
@@ -11,6 +12,8 @@ const PaymentsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize] = useState(10);
+    const [selectedPayment, setSelectedPayment] = useState(null);
+    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
     useEffect(() => {
         fetchPayments(currentPage);
@@ -29,6 +32,16 @@ const PaymentsPage = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const showReceipt = (payment) => {
+        setSelectedPayment(payment);
+        setIsReceiptModalOpen(true);
+    };
+
+    const closeReceipt = () => {
+        setIsReceiptModalOpen(false);
+        setSelectedPayment(null);
     };
 
     const formatCurrency = (amount) => {
@@ -184,7 +197,7 @@ const PaymentsPage = () => {
                             {payments.map((payment, index) => (
                                 <div key={payment.paymentId || index} className="p-6 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
+                                        <div className="flex items-center space-x-4 flex-1">
                                             <div className={`p-3 rounded-lg ${
                                                 payment.paymentDirection === 'INCOMING' 
                                                     ? 'bg-green-100 text-green-600' 
@@ -193,7 +206,7 @@ const PaymentsPage = () => {
                                                 {getPaymentTypeIcon(payment.paymentType)}
                                             </div>
                                             
-                                            <div>
+                                            <div className="flex-1">
                                                 <div className="flex items-center space-x-2">
                                                     <h4 className="text-lg font-semibold text-gray-900">
                                                         {getTransactionTypeLabel(payment.transactionType)}
@@ -208,39 +221,52 @@ const PaymentsPage = () => {
                                                         Listing ID: {payment.listingId}
                                                     </p>
                                                 )}
+                                                
+                                                {payment.receiverName && payment.paymentDirection === 'OUTGOING' && (
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        To: {payment.receiverName} {payment.receiverSurname}
+                                                    </p>
+                                                )}
+                                                {payment.senderName && payment.paymentDirection === 'INCOMING' && (
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        From: {payment.senderName} {payment.senderSurname}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         
-                                        <div className="text-right">
-                                            <div className="flex items-center space-x-3">
-                                                <span className={`text-lg font-bold ${
-                                                    payment.paymentDirection === 'INCOMING' 
-                                                        ? 'text-green-600' 
-                                                        : 'text-gray-900'
-                                                }`}>
-                                                    {payment.paymentDirection === 'INCOMING' ? '+' : '-'}
-                                                    {formatCurrency(payment.amount)}
-                                                </span>
-                                                
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    payment.isSuccess 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-red-100 text-red-800'
-                                                }`}>
-                                                    {payment.isSuccess ? 'Success' : 'Failed'}
-                                                </span>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="text-right">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <span className={`text-lg font-bold ${
+                                                        payment.paymentDirection === 'INCOMING' 
+                                                            ? 'text-green-600' 
+                                                            : 'text-gray-900'
+                                                    }`}>
+                                                        {payment.paymentDirection === 'INCOMING' ? '+' : '-'}
+                                                        {formatCurrency(payment.amount)}
+                                                    </span>
+                                                    
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                        payment.isSuccess 
+                                                            ? 'bg-green-100 text-green-800' 
+                                                            : 'bg-red-100 text-red-800'
+                                                    }`}>
+                                                        {payment.isSuccess ? 'Success' : 'Failed'}
+                                                    </span>
+                                                </div>
                                             </div>
                                             
-                                            {payment.receiverName && payment.paymentDirection === 'OUTGOING' && (
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    To: {payment.receiverName} {payment.receiverSurname}
-                                                </p>
-                                            )}
-                                            {payment.senderName && payment.paymentDirection === 'INCOMING' && (
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    From: {payment.senderName} {payment.senderSurname}
-                                                </p>
-                                            )}
+                                            <button
+                                                onClick={() => showReceipt(payment)}
+                                                className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                                title="Dekont Göster"
+                                            >
+                                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                Dekont
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -280,6 +306,13 @@ const PaymentsPage = () => {
                     )}
                 </>
             )}
+
+            {/* Payment Receipt Modal */}
+            <PaymentReceiptModal
+                isOpen={isReceiptModalOpen}
+                onClose={closeReceipt}
+                payment={selectedPayment}
+            />
         </div>
     );
 };

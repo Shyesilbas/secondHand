@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { favoriteService } from '../services/favoriteService';
-import { useToast } from '../../../context/ToastContext';
+import { useNotification } from '../../../context/NotificationContext';
 import { 
   FavoriteDTO, 
   FavoriteStatsDTO,
@@ -13,7 +13,7 @@ export const useFavorites = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ ...PaginatedResponse });
-  const { showToast } = useToast();
+  const notification = useNotification();
 
   const fetchFavorites = async (params = {}) => {
     try {
@@ -43,12 +43,12 @@ export const useFavorites = () => {
   const addToFavorites = async (listingId) => {
     try {
       await favoriteService.addToFavorites(listingId);
-      showToast('Favorilere eklendi!', 'success');
+      notification.showSuccess('Başarılı', 'Favorilere eklendi!');
       // Don't refresh favorites when adding (user may not be on favorites page)
       return true;
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to add to favorites';
-      showToast(message, 'error');
+      notification.showError('Hata', message);
       console.error('Error adding to favorites:', err);
       return false;
     }
@@ -57,7 +57,7 @@ export const useFavorites = () => {
   const removeFromFavorites = async (listingId) => {
     try {
       await favoriteService.removeFromFavorites(listingId);
-      showToast('Favorilerden kaldırıldı', 'success');
+      notification.showSuccess('Başarılı', 'Favorilerden kaldırıldı');
       // Refresh favorites when item is removed
       if (favorites.length > 0) {
         fetchFavorites({ page: pagination.number });
@@ -65,7 +65,7 @@ export const useFavorites = () => {
       return true;
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to remove from favorites';
-      showToast(message, 'error');
+      notification.showError('Hata', message);
       console.error('Error removing from favorites:', err);
       return false;
     }
@@ -75,7 +75,7 @@ export const useFavorites = () => {
     try {
       const response = await favoriteService.toggleFavorite(listingId);
       const message = response.isFavorited ? 'Favorilere eklendi!' : 'Favorilerden kaldırıldı';
-      showToast(message, 'success');
+      notification.showSuccess('Başarılı', message);
       // Refresh favorites only if the item was removed from favorites
       if (favorites.length > 0 && !response.isFavorited) {
         fetchFavorites({ page: pagination.number });
@@ -83,7 +83,7 @@ export const useFavorites = () => {
       return response;
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to toggle favorite';
-      showToast(message, 'error');
+      notification.showError('Hata', message);
       console.error('Error toggling favorite:', err);
       return null;
     }

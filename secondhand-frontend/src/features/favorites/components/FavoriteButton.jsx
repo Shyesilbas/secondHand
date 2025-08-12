@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { favoriteService } from '../services/favoriteService';
 import { useAuth } from '../../../context/AuthContext';
-import { useToast } from '../../../context/ToastContext';
+import { useNotification } from '../../../context/NotificationContext';
 import { FavoriteStatsDTO } from '../../../types';
 
 const FavoriteButton = ({ 
@@ -20,14 +20,7 @@ const FavoriteButton = ({
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated, user } = useAuth();
   
-  // Safely get showToast function
-  let showToast;
-  try {
-    const toastContext = useToast();
-    showToast = toastContext?.showToast || ((msg, type) => console.log(`${type.toUpperCase()}: ${msg}`));
-  } catch (error) {
-    showToast = (msg, type) => console.log(`${type.toUpperCase()}: ${msg}`);
-  }
+  const notification = useNotification();
 
   // Size configurations
   const sizeConfig = {
@@ -83,7 +76,7 @@ const FavoriteButton = ({
     event.stopPropagation();
     
     if (!isAuthenticated) {
-      showToast('Favorilere eklemek için giriş yapın', 'warning');
+      notification.showWarning('Giriş Gerekli', 'Favorilere eklemek için giriş yapın');
       return;
     }
 
@@ -108,7 +101,7 @@ const FavoriteButton = ({
       console.log('State updated - isFavorited:', statsDto.isFavorited); // Debug
       
       const message = statsDto.isFavorited ? 'Favorilere eklendi!' : 'Favorilerden kaldırıldı';
-      showToast(message, 'success');
+      notification.showSuccess('Başarılı', message);
       
       // Call parent callback if provided
       if (onToggle) {
@@ -116,7 +109,7 @@ const FavoriteButton = ({
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update favorites';
-      showToast(message, 'error');
+      notification.showError('Hata', message);
       console.error('Error toggling favorite:', error);
     } finally {
       setIsLoading(false);

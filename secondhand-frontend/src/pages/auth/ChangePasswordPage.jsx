@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { passwordService } from '../../features/auth/services/passwordService';
 import { ROUTES } from '../../constants/routes';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import { ChangePasswordRequestDTO } from '../../types/auth';
 
 const ChangePasswordPage = () => {
     const navigate = useNavigate();
-    const { showSuccess, showError } = useToast();
+    const notification = useNotification();
     const [formData, setFormData] = useState({
         ...ChangePasswordRequestDTO
     });
@@ -99,7 +99,7 @@ const ChangePasswordPage = () => {
                 newPassword: formData.newPassword
             });
 
-            showSuccess('Password changed successfully! Please login with your new password.');
+            notification.showSuccess('Başarılı', 'Şifre başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz.');
             setFormData({
                 currentPassword: '',
                 newPassword: '',
@@ -127,7 +127,7 @@ const ChangePasswordPage = () => {
                     setErrors({ general: error.response.data.message });
                 }
             } else {
-                showError('An error occurred while changing your password. Please try again later.');
+                notification.showError('Hata', 'Şifre değiştirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
             }
         } finally {
             setIsLoading(false);

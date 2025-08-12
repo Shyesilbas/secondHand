@@ -107,6 +107,11 @@ public class PaymentService {
             throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
         }
 
+        // Validate payment type
+        if (paymentRequest.paymentType() == null) {
+            throw new BusinessException("Payment type is required", HttpStatus.BAD_REQUEST, "PAYMENT_TYPE_REQUIRED");
+        }
+
         boolean paymentSuccessful = switch (paymentRequest.paymentType()) {
             case CREDIT_CARD -> processCreditCardPayment(fromUser, toUser, paymentRequest.amount());
             case TRANSFER -> processBankTransfer(fromUser, toUser, paymentRequest.amount());

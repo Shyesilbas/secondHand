@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { CreditCardRequestDTO, createCreditCardRequest } from '../../../types/payments';
-import { useToast } from '../../../context/ToastContext';
+import { useNotification } from '../../../context/NotificationContext';
 
 const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
-  const { showToast } = useToast();
+  const notification = useNotification();
   const [formData, setFormData] = useState({
     ...CreditCardRequestDTO,
   });
@@ -47,7 +47,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      showToast('Lütfen geçerli bir kredi limiti girin', 'error');
+      notification.showError('Hata', 'Lütfen geçerli bir kredi limiti girin');
       return;
     }
 
@@ -56,7 +56,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       const creditCardData = createCreditCardRequest(formData);
       
       await onSubmit(creditCardData);
-      showToast('Kredi kartı başarıyla oluşturuldu!', 'success');
+      notification.showSuccess('Başarılı', 'Kredi kartı başarıyla oluşturuldu!');
       
       // Reset form
       setFormData({ ...CreditCardRequestDTO });
@@ -64,7 +64,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       
       if (onSuccess) onSuccess();
     } catch (error) {
-      showToast('Kredi kartı oluşturulurken bir hata oluştu', 'error');
+      notification.showError('Hata', 'Kredi kartı oluşturulurken bir hata oluştu');
     }
   };
 

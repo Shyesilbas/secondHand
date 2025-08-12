@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { verificationService } from '../../features/auth/services/verificationService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
@@ -11,7 +11,7 @@ import { VerificationRequestDTO } from '../../types/users';
 const AccountVerificationPage = () => {
     const navigate = useNavigate();
     const { user, updateUser } = useAuth();
-    const { showSuccess, showError, showInfo } = useToast();
+    const notification = useNotification();
     
     const [verificationData, setVerificationData] = useState({
         ...VerificationRequestDTO
@@ -46,11 +46,11 @@ const AccountVerificationPage = () => {
             await verificationService.sendVerificationCode();
             setCodeSent(true);
             setCountdown(60); // 60 seconds cooldown
-            showSuccess('Verification code sent to your email address!');
+            notification.showSuccess('Başarılı', 'Doğrulama kodu e-posta adresinize gönderildi!');
         } catch (error) {
             console.error('Send verification code error:', error);
             const errorMessage = error.response?.data?.message || 'Failed to send verification code. Please try again.';
-            showError(errorMessage);
+            notification.showError('Hata', errorMessage);
         } finally {
             setIsSendingCode(false);
         }
@@ -79,7 +79,7 @@ const AccountVerificationPage = () => {
             // Update user verification status
             updateUser({ accountVerified: true });
             
-            showSuccess('Account verified successfully! Welcome to SecondHand.');
+            notification.showSuccess('Başarılı', 'Hesabınız başarıyla doğrulandı! SecondHand\'e hoş geldiniz.');
             
             // Redirect to profile after 2 seconds
             setTimeout(() => {
@@ -95,10 +95,10 @@ const AccountVerificationPage = () => {
                     error.response.data.message.toLowerCase().includes('expired')) {
                     setErrors({ code: error.response.data.message });
                 } else {
-                    showError(error.response.data.message);
+                    notification.showError('Hata', error.response.data.message);
                 }
             } else {
-                showError('Verification failed. Please check your code and try again.');
+                notification.showError('Hata', 'Doğrulama başarısız. Lütfen kodunuzu kontrol edin ve tekrar deneyin.');
             }
         } finally {
             setIsLoading(false);

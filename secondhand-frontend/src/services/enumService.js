@@ -36,4 +36,14 @@ export const enumService = {
     const response = await apiClient.get(API_ENDPOINTS.ENUMS.CURRENCIES);
     return response.data;
   },
+
+  getGearTypes: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.ENUMS.GEAR_TYPES);
+    return response.data;
+  },
+
+  getSeatCounts: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.ENUMS.SEAT_COUNTS);
+    return response.data;
+  },
 };

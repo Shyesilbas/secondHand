@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '../../context/ToastContext';
+import { useNotification } from '../../context/NotificationContext';
 import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
 import { ListingFeePaymentRequestDTO, ListingFeeConfigDTO } from '../../types/payments';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
-    const { showSuccess, showError } = useToast();
+    const notification = useNotification();
     const [draftListings, setDraftListings] = useState([]);
     const [feeConfig, setFeeConfig] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +29,7 @@ const PayListingFeePage = () => {
             setFeeConfig(config);
         } catch (err) {
             console.error('Failed to fetch fee config:', err);
-            showError('Failed to load fee configuration. Please refresh the page.');
+            notification.showError('Hata', 'Ücret yapılandırması yüklenemedi. Lütfen sayfayı yenileyin.');
         } finally {
             setIsConfigLoading(false);
         }
@@ -50,31 +50,33 @@ const PayListingFeePage = () => {
 
     const handlePayment = async () => {
         if (!selectedListing) {
-            showError('Please select a listing to pay for.');
+            notification.showError('Hata', 'Lütfen ödeme yapacağınız ilanı seçin.');
             return;
         }
 
         if (!feeConfig) {
-            showError('Fee configuration not loaded. Please refresh the page.');
+            notification.showError('Hata', 'Ücret yapılandırması yüklenmedi. Lütfen sayfayı yenileyin.');
             return;
         }
 
         setIsProcessingPayment(true);
         try {
-            await paymentService.payListingFee({
+            const paymentData = {
                 listingId: selectedListing.id,
                 paymentType: paymentType
-            });
+            };
+            console.log('Sending payment request:', paymentData);
+            await paymentService.payListingFee(paymentData);
 
             // Payment successful
-            showSuccess('Listing fee payment successful! Your listing will be published.');
+            notification.showSuccess('Başarılı', 'İlan ücreti ödemesi başarılı! İlanınız yayınlanacak.');
             
             // Refresh listings
             await fetchDraftListings();
             setSelectedListing(null);
             
         } catch (err) {
-            showError(err.response?.data?.message || 'Listing fee payment failed. Please try again later.');
+            notification.showError('Hata', err.response?.data?.message || 'İlan ücreti ödemesi başarısız. Lütfen daha sonra tekrar deneyin.');
         } finally {
             setIsProcessingPayment(false);
         }
