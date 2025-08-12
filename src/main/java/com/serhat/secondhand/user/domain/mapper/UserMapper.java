@@ -23,7 +23,6 @@ public interface UserMapper {
         @Mapping(target = "accountCreationDate", expression = "java(java.time.LocalDate.now())"),
         @Mapping(target = "lastLoginDate", ignore = true),
         @Mapping(target = "lastLoginIp", ignore = true),
-        @Mapping(target = "canSell", constant = "false"),
         @Mapping(target = "accountVerified", constant = "false"),
         @Mapping(target = "listings", ignore = true),
         @Mapping(target = "bank", ignore = true),

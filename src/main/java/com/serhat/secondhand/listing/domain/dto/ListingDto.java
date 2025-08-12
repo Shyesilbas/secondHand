@@ -39,6 +39,7 @@ public abstract class ListingDto {
     private String district;
     private String sellerName;
     private String sellerSurname;
+    private Long sellerId;
     private ListingType type;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

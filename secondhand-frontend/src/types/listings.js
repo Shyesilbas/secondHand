@@ -16,6 +16,7 @@ export const ListingDTO = {
   district: '',
   sellerName: '',
   sellerSurname: '',
+  sellerId: 0,
   type: '',
   createdAt: '',
   updatedAt: '',
@@ -70,6 +71,7 @@ export const ListingResponseDTO = {
   district: '',
   sellerName: '',
   sellerSurname: '',
+  sellerId: 0,
   type: '', // VEHICLE, ELECTRONICS, etc.
   createdAt: '',
   updatedAt: '',

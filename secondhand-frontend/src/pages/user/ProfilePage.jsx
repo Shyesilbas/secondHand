@@ -171,17 +171,6 @@ const ProfilePage = () => {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Can Sell</label>
-                        <div className="mt-1">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                user?.canSell 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-red-100 text-red-800'
-                            }`}>{user?.canSell ? 'Yes' : 'No'}
-                            </span>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Action Buttons */}

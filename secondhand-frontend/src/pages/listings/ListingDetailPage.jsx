@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../../features/listings/services/listingService';
 import { useAuth } from '../../context/AuthContext';
+import FavoriteButton from '../../features/favorites/components/FavoriteButton';
+import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -48,7 +50,7 @@ const ListingDetailPage = () => {
     });
   };
 
-  const isOwner = isAuthenticated && user?.userId === listing?.sellerId;
+  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 
   if (isLoading) {
     return (
@@ -111,16 +113,26 @@ const ListingDetailPage = () => {
           Geri Dön
         </button>
         
-        {isOwner && (
-          <div className="flex space-x-2">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Düzenle
-            </button>
-            <button className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
-              Sil
-            </button>
-          </div>
-        )}
+        <div className="flex items-center space-x-2">
+          {!isOwner && (
+            <FavoriteButton 
+              listingId={listing.id}
+              listing={listing}
+              size="lg"
+              showCount={true}
+            />
+          )}
+          {isOwner && (
+            <div className="flex space-x-2">
+              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                Düzenle
+              </button>
+              <button className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
+                Sil
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -129,7 +141,16 @@ const ListingDetailPage = () => {
           {/* Title and Price */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-start justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-900">{listing.title}</h1>
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+                <FavoriteStats 
+                  listingId={listing.id}
+                  size="sm"
+                  showIcon={true}
+                  showText={true}
+                  className="text-gray-600"
+                />
+              </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-blue-600">
                   {formatPrice(listing.price, listing.currency)}
@@ -184,7 +205,7 @@ const ListingDetailPage = () => {
                   {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
               </div>
-              <div className="ml-4">
+              <div className="ml-4 flex-1">
                 <p className="font-medium text-gray-900">
                   {listing.sellerName} {listing.sellerSurname}
                 </p>
@@ -198,9 +219,6 @@ const ListingDetailPage = () => {
               <div className="space-y-3">
                 <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                   Contact Seller
-                </button>
-                <button className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                  Add to Favorites(Coming Soon)
                 </button>
               </div>
             )}

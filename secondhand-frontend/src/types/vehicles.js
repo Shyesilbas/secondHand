@@ -73,6 +73,7 @@ export const VehicleListingDTO = {
   district: '',
   sellerName: '',
   sellerSurname: '',
+  sellerId: 0,
   type: 'VEHICLE',
   createdAt: '',
   updatedAt: '',

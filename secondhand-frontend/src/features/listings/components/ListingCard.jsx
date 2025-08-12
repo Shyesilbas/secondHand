@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
+import FavoriteButton from '../../favorites/components/FavoriteButton';
+import FavoriteStats from '../../favorites/components/FavoriteStats';
 
 const ListingCard = ({ listing }) => {
     const { getListingTypeLabel, getListingTypeIcon } = useEnums();
@@ -30,28 +32,7 @@ const ListingCard = ({ listing }) => {
         );
     };
 
-    const getVehicleDetails = (listing) => {
-        if (listing.type === 'VEHICLE') {
-            const details = [
-                { label: listing.brand, icon: '🚗' },
-                { label: listing.year, icon: '📅' },
-                { label: listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : null, icon: '🛣️' },
-                { label: listing.fuelType, icon: '⛽' }
-            ].filter(detail => detail.label);
 
-            return (
-                <div className="mt-4 space-y-2">
-                    {details.map((detail, index) => (
-                        <div key={index} className="flex items-center gap-2 text-sm text-slate-600">
-                            <span className="text-xs opacity-60">{detail.icon}</span>
-                            <span>{detail.label}</span>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
 
     const getStatusBadge = (status) => {
         const statusConfig = {
@@ -84,96 +65,110 @@ const ListingCard = ({ listing }) => {
     };
 
     return (
-        <div className="group bg-white rounded-xl shadow-sm border border-slate-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
-            {/* Card Content */}
-            <div className="p-6">
-                {/* Header Section */}
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        {getTypeIcon(listing.type)}
-                        <div>
-                            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+        <div className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden">
+            <Link
+                to={ROUTES.LISTING_DETAIL.replace(':id', listing.id)}
+                className="block"
+            >
+                <div className="flex">
+                    {/* Left Side - Image Placeholder */}
+                    <div className="w-32 h-32 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0">
+                        <div className="text-center">
+                            <div className="text-3xl mb-1">
+                                {getTypeIcon(listing.type)}
+                            </div>
+                            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
                                 {getListingTypeLabel(listing.type)}
                             </span>
-                            <div className="mt-1">
-                                {getStatusBadge(listing.status)}
-                            </div>
                         </div>
                     </div>
-                    <div className="text-right">
-                        <div className="text-2xl font-bold text-slate-900">
-                            {formatPrice(listing.price, listing.currency)}
-                        </div>
-                    </div>
-                </div>
 
-                {/* Title Section */}
-                <Link
-                    to={ROUTES.LISTING_DETAIL.replace(':id', listing.id)}
-                    className="block"
-                >
-                    <h3 className="text-lg font-semibold text-slate-800 hover:text-slate-600 transition-colors line-clamp-2 leading-relaxed mb-2">
-                        {listing.title}
-                    </h3>
-                </Link>
-
-                {/* Description */}
-                <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
-                    {listing.description}
-                </p>
-
-                {/* Vehicle Details */}
-                {getVehicleDetails(listing)}
-
-                {/* Metadata Section */}
-                <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
-                    <div className="flex items-center justify-between text-sm text-slate-500">
-                        <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>
-                                {listing.district && listing.city
-                                    ? `${listing.district}, ${listing.city}`
-                                    : listing.city || 'Location not specified'
-                                }
-                            </span>
-                        </div>
-                        <span className="text-xs text-slate-400">
-                            {formatDate(listing.createdAt)}
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-slate-400">
-                        <span>Listing No: {listing.listingNo || 'N/A'}</span>
-                        <span>{listing.isListingFeePaid ? 'Fee Paid' : 'Fee Pending'}</span>
-                    </div>
-                </div>
-
-                {/* Seller Section */}
-                <div className="mt-4 pt-4 border-t border-slate-100">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-medium">
-                                    {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
-                                </span>
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-800">
-                                    {listing.sellerName} {listing.sellerSurname}
+                    {/* Right Side - Content */}
+                    <div className="flex-1 p-4">
+                        {/* Top Section */}
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                    {getStatusBadge(listing.status)}
+                                    <span className="text-xs text-slate-400">
+                                        {formatDate(listing.createdAt)}
+                                    </span>
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-1 mb-1">
+                                    {listing.title}
+                                </h3>
+                                <p className="text-slate-600 text-sm line-clamp-1">
+                                    {listing.description}
                                 </p>
-                                <p className="text-xs text-slate-500">Satıcı</p>
+                            </div>
+                            <div className="flex flex-col items-end gap-2 ml-4">
+                                <div className="text-xl font-bold text-emerald-600">
+                                    {formatPrice(listing.price, listing.currency)}
+                                </div>
+                                <FavoriteButton 
+                                    listingId={listing.id}
+                                    listing={listing}
+                                    size="sm"
+                                    showCount={true}
+                                />
                             </div>
                         </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                            </svg>
+
+                        {/* Vehicle Details - Compact */}
+                        {listing.type === 'VEHICLE' && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {[
+                                    { label: listing.brand, icon: '🚗' },
+                                    { label: listing.year, icon: '📅' },
+                                    { label: listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : null, icon: '🛣️' },
+                                    { label: listing.fuelType, icon: '⛽' }
+                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
+                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
+                                        <span className="opacity-70">{detail.icon}</span>
+                                        {detail.label}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Bottom Section */}
+                        <div className="flex items-center justify-between text-xs text-slate-500">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span>
+                                        {listing.city || 'N/A'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <div className="w-4 h-4 bg-slate-400 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-[10px] font-medium">
+                                            {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
+                                        </span>
+                                    </div>
+                                    <span>
+                                        {listing.sellerName} {listing.sellerSurname}
+                                    </span>
+                                    <span className="text-slate-300">•</span>
+                                    <FavoriteStats 
+                                        listingId={listing.id}
+                                        size="xs"
+                                        showIcon={false}
+                                        showText={true}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span>#{listing.listingNo}</span>
+                                <div className={`w-2 h-2 rounded-full ${listing.isListingFeePaid ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Link>
         </div>
     );
 };

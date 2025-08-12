@@ -19,6 +19,7 @@ import ListingsPage from '../pages/listings/ListingsPage';
 import MyListingsPage from '../pages/listings/MyListingsPage';
 import ListingDetailPage from '../pages/listings/ListingDetailPage';
 import CreateListingPage from '../pages/listings/CreateListingPage';
+import FavoritesPage from '../pages/favorites/FavoritesPage';
 import PaymentsPage from '../pages/payments/PaymentsPage';
 import PayListingFeePage from '../pages/payments/PayListingFeePage';
 import CreditCardsPage from '../pages/payments/CreditCardsPage';
@@ -98,6 +99,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
+        <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />
         <Route path={ROUTES.CREDIT_CARDS} element={<CreditCardsPage />} />

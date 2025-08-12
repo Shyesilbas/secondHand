@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }) => {
                 birthdate: userProfile.birthdate,
                 accountStatus: userProfile.accountStatus,
                 accountVerified: userProfile.accountVerified,
-                canSell: userProfile.canSell,
                 accountCreationDate: userProfile.accountCreationDate
             };
             setUser(userData);

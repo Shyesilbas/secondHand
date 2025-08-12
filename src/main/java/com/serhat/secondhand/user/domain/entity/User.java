@@ -73,8 +73,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean accountVerified;
 
-    @Column(nullable = false)
-    private boolean canSell;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)

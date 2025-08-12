@@ -27,6 +27,7 @@ public class ListingResponseDto {
     private String district;
     private String sellerName;
     private String sellerSurname;
+    private Long sellerId;
     private String type; // VEHICLE, ELECTRONICS, etc.
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

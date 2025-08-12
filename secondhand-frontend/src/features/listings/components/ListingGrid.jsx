@@ -4,20 +4,24 @@ import ListingCard from './ListingCard';
 const ListingGrid = ({ listings, isLoading, error }) => {
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
                 {[...Array(6)].map((_, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                        <div className="p-4">
-                            <div className="flex justify-between items-start mb-3">
-                                <div className="w-16 h-4 bg-gray-200 rounded"></div>
-                                <div className="w-20 h-6 bg-gray-200 rounded"></div>
-                            </div>
-                            <div className="w-full h-6 bg-gray-200 rounded mb-2"></div>
-                            <div className="w-3/4 h-4 bg-gray-200 rounded mb-2"></div>
-                            <div className="w-full h-4 bg-gray-200 rounded mb-4"></div>
-                            <div className="flex justify-between items-center">
-                                <div className="w-24 h-4 bg-gray-200 rounded"></div>
-                                <div className="w-16 h-4 bg-gray-200 rounded"></div>
+                    <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+                        <div className="flex h-32">
+                            <div className="w-48 bg-gray-200 flex-shrink-0"></div>
+                            <div className="flex-1 p-4 flex flex-col justify-between">
+                                <div>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="w-24 h-4 bg-gray-200 rounded"></div>
+                                        <div className="w-20 h-6 bg-gray-200 rounded"></div>
+                                    </div>
+                                    <div className="w-3/4 h-5 bg-gray-200 rounded mb-2"></div>
+                                    <div className="w-full h-4 bg-gray-200 rounded"></div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <div className="w-32 h-4 bg-gray-200 rounded"></div>
+                                    <div className="w-16 h-4 bg-gray-200 rounded"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -69,7 +73,7 @@ const ListingGrid = ({ listings, isLoading, error }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
             {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
             ))}

@@ -74,4 +74,16 @@ export const API_ENDPOINTS = {
         BY_BRAND_MODEL: (brand, model) => `/v1/vehicles/brand/${brand}/model/${model}`,
         BRANDS: '/v1/vehicles/brands',
     },
+    FAVORITES: {
+        ADD: '/favorites',
+        REMOVE: (listingId) => `/favorites/${listingId}`,
+        TOGGLE: '/favorites/toggle',
+        MY_FAVORITES: '/favorites',
+        STATS: (listingId) => `/favorites/stats/${listingId}`,
+        BULK_STATS: '/favorites/stats',
+        CHECK: (listingId) => `/favorites/check/${listingId}`,
+        COUNT: (listingId) => `/favorites/count/${listingId}`,
+        IDS: '/favorites/ids',
+        TOP: '/favorites/top',
+    },
 };

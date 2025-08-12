@@ -10,6 +10,7 @@ export const ROUTES = {
     PROFILE: '/profile',
     LISTINGS: '/listings',
     MY_LISTINGS: '/my-listings',
+    FAVORITES: '/favorites',
     LISTING_DETAIL: '/listings/:id',
     CREATE_LISTING: '/listings/create',
     PAYMENTS: '/payments',

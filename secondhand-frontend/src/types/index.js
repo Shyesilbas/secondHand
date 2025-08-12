@@ -17,6 +17,9 @@ export * from './vehicles';
 // Payment DTOs
 export * from './payments';
 
+// Favorites DTOs
+export * from './favorites';
+
 // Common Response Types
 export const ApiResponse = {
   success: false,

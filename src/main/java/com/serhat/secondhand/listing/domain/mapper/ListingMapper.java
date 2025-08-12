@@ -20,6 +20,7 @@ public interface ListingMapper {
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
+    @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
 
@@ -41,6 +42,7 @@ public interface ListingMapper {
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
+    @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     ListingResponseDto toListingResponseDto(Listing listing);
 
