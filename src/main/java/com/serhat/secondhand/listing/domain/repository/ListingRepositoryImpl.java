@@ -97,6 +97,14 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
                 vehiclePredicates.add(cb.equal(vehicleRoot.get("doors"), filters.getDoors()));
             }
 
+            if (filters.getGearTypes() != null && !filters.getGearTypes().isEmpty()) {
+                vehiclePredicates.add(vehicleRoot.get("gearbox").in(filters.getGearTypes()));
+            }
+
+            if (filters.getSeatCounts() != null && !filters.getSeatCounts().isEmpty()) {
+                vehiclePredicates.add(vehicleRoot.get("seatCount").in(filters.getSeatCounts()));
+            }
+
             vehicleSubquery.where(vehiclePredicates.toArray(new Predicate[0]));
             predicates.add(cb.exists(vehicleSubquery));
         }
@@ -207,6 +215,12 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
             if (filters.getDoors() != null) {
                 countVehiclePredicates.add(cb.equal(countVehicleRoot.get("doors"), filters.getDoors()));
             }
+            if (filters.getGearTypes() != null && !filters.getGearTypes().isEmpty()) {
+                countVehiclePredicates.add(countVehicleRoot.get("gearbox").in(filters.getGearTypes()));
+            }
+            if (filters.getSeatCounts() != null && !filters.getSeatCounts().isEmpty()) {
+                countVehiclePredicates.add(countVehicleRoot.get("seatCount").in(filters.getSeatCounts()));
+            }
 
             countVehicleSubquery.where(countVehiclePredicates.toArray(new Predicate[0]));
             countPredicates.add(cb.exists(countVehicleSubquery));
@@ -228,6 +242,8 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
                filters.getMaxMileage() != null ||
                (filters.getFuelTypes() != null && !filters.getFuelTypes().isEmpty()) ||
                (filters.getColors() != null && !filters.getColors().isEmpty()) ||
-               filters.getDoors() != null;
+               filters.getDoors() != null ||
+               (filters.getGearTypes() != null && !filters.getGearTypes().isEmpty()) ||
+               (filters.getSeatCounts() != null && !filters.getSeatCounts().isEmpty());
     }
 }

@@ -37,7 +37,7 @@ public interface ListingMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "brand", ignore = true) // Temporarily ignore to debug
+    @Mapping(target = "listingType", ignore = true)
     void updateVehicleFromRequest(VehicleUpdateRequest request, @MappingTarget VehicleListing existing);
 
     @Mapping(target = "sellerName", source = "seller.name")

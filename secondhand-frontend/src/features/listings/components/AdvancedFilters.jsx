@@ -203,6 +203,32 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
                                     multiple={true}
                                 />
                             </div>
+
+                            {/* Vites Türü */}
+                            <div className="mt-4">
+                                <SearchableDropdown
+                                    label="Vites Türü"
+                                    options={enums.gearTypes}
+                                    selectedValues={filters.gearTypes || []}
+                                    onSelectionChange={(values) => handleInputChange('gearTypes', values)}
+                                    placeholder="Vites türü seçin..."
+                                    searchPlaceholder="Vites ara..."
+                                    multiple={true}
+                                />
+                            </div>
+
+                            {/* Koltuk Sayısı */}
+                            <div className="mt-4">
+                                <SearchableDropdown
+                                    label="Koltuk Sayısı"
+                                    options={enums.seatCounts}
+                                    selectedValues={filters.seatCounts || []}
+                                    onSelectionChange={(values) => handleInputChange('seatCounts', values)}
+                                    placeholder="Koltuk sayısı seçin..."
+                                    searchPlaceholder="Koltuk ara..."
+                                    multiple={true}
+                                />
+                            </div>
                         </div>
                     )}
 

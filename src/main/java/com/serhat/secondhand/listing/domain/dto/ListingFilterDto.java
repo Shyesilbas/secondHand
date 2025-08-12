@@ -27,6 +27,8 @@ public class ListingFilterDto {
     private List<FuelType> fuelTypes;
     private List<Color> colors;
     private Doors doors;
+    private List<GearType> gearTypes;
+    private List<SeatCount> seatCounts;
     
     // Sorting
     private String sortBy; // price, createdAt, year, mileage

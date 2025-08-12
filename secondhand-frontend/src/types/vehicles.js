@@ -114,6 +114,8 @@ export const VehicleSearchFiltersDTO = {
   fuelTypes: [],
   colors: [],
   doors: '',
+  gearTypes: [],
+  seatCounts: [],
   
   // Sorting
   sortBy: 'createdAt',

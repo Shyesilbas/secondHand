@@ -40,6 +40,8 @@ export const ListingFilterDTO = {
   fuelTypes: [],
   colors: [],
   doors: '',
+  gearTypes: [],
+  seatCounts: [],
   
   // Sorting
   sortBy: 'createdAt',
