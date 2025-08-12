@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.entity;
 import com.serhat.secondhand.listing.domain.entity.enums.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.ListingType;
+import com.serhat.secondhand.listing.domain.util.ListingNoGenerator;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,9 @@ public class Listing {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(name = "listing_no", unique = true, nullable = false, length = 8)
+    private String listingNo;
 
     private String title;
     @Column(columnDefinition = "TEXT")
@@ -54,7 +58,15 @@ public class Listing {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    void onCreate() { createdAt = updatedAt = LocalDateTime.now(); }
+    void onCreate() { 
+        createdAt = updatedAt = LocalDateTime.now();
+        if (listingNo == null) {
+            listingNo = ListingNoGenerator.generate();
+        }
+    }
+    
     @PreUpdate
-    void onUpdate() { updatedAt = LocalDateTime.now(); }
+    void onUpdate() { 
+        updatedAt = LocalDateTime.now(); 
+    }
 }

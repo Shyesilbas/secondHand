@@ -38,6 +38,22 @@ public class ListingController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/search/listing-no/{listingNo}")
+    @Operation(summary = "Find listing by listing number", description = "Search for a specific listing using its unique listing number")
+    public ResponseEntity<ListingDto> findByListingNo(@PathVariable String listingNo) {
+        log.info("API request to find listing by listingNo: {}", listingNo);
+        
+        return listingService.findByListingNo(listingNo)
+                .map(dto -> {
+                    log.info("Successfully returning listing DTO for listingNo: {}", listingNo);
+                    return ResponseEntity.ok(dto);
+                })
+                .orElseGet(() -> {
+                    log.info("Listing not found for listingNo: {}, returning 404", listingNo);
+                    return ResponseEntity.notFound().build();
+                });
+    }
     
     @GetMapping("/status/{status}")
     @Operation(summary = "Get listings by status - Returns appropriate DTOs based on listing types")

@@ -62,6 +62,7 @@ export const VehicleUpdateRequestDTO = {
 export const VehicleListingDTO = {
   // Basic Listing Info
   id: '',
+  listingNo: '',
   title: '',
   description: '',
   price: 0,

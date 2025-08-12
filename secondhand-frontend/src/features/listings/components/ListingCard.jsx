@@ -126,7 +126,7 @@ const ListingCard = ({ listing }) => {
                 {getVehicleDetails(listing)}
 
                 {/* Metadata Section */}
-                <div className="mt-6 pt-4 border-t border-slate-100">
+                <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
                     <div className="flex items-center justify-between text-sm text-slate-500">
                         <div className="flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,13 +136,17 @@ const ListingCard = ({ listing }) => {
                             <span>
                                 {listing.district && listing.city
                                     ? `${listing.district}, ${listing.city}`
-                                    : listing.city || 'Konum belirtilmemiş'
+                                    : listing.city || 'Location not specified'
                                 }
                             </span>
                         </div>
                         <span className="text-xs text-slate-400">
                             {formatDate(listing.createdAt)}
                         </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span>Listing No: {listing.listingNo || 'N/A'}</span>
+                        <span>{listing.isListingFeePaid ? 'Fee Paid' : 'Fee Pending'}</span>
                     </div>
                 </div>
 

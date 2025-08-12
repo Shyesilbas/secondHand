@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { enumService } from '../services/enumService';
 import { LISTING_TYPE_ICONS, LISTING_TYPE_LABELS } from '../utils/constants';
+import { getCachedEnums, setCachedEnums, clearEnumCache } from '../services/storage/enumCache';
 
 export const useEnums = () => {
   const [enums, setEnums] = useState({
@@ -21,6 +22,16 @@ export const useEnums = () => {
         setIsLoading(true);
         setError(null);
         
+        // Try to get cached enums first
+        const cachedEnums = getCachedEnums();
+        if (cachedEnums) {
+          setEnums(cachedEnums);
+          setIsLoading(false);
+          return;
+        }
+        
+        // If no cache, fetch from API
+        console.log('Fetching enums from API...');
         const [
           listingTypes,
           listingStatuses,
@@ -39,7 +50,7 @@ export const useEnums = () => {
           enumService.getCurrencies()
         ]);
 
-        setEnums({
+        const fetchedEnums = {
           listingTypes,
           listingStatuses,
           carBrands,
@@ -47,7 +58,11 @@ export const useEnums = () => {
           colors,
           doors,
           currencies
-        });
+        };
+
+        setEnums(fetchedEnums);
+        // Cache the fetched enums
+        setCachedEnums(fetchedEnums);
       } catch (err) {
         setError(err.response?.data?.message || 'An error occurred while fetching enums.');
         console.error('Error fetching enums:', err);
@@ -95,6 +110,52 @@ export const useEnums = () => {
     return currency?.symbol || value;
   };
 
+  // Function to force refresh enums from API
+  const refreshEnums = async () => {
+    clearEnumCache();
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log('Force refreshing enums from API...');
+      const [
+        listingTypes,
+        listingStatuses,
+        carBrands,
+        fuelTypes,
+        colors,
+        doors,
+        currencies
+      ] = await Promise.all([
+        enumService.getListingTypes(),
+        enumService.getListingStatuses(),
+        enumService.getCarBrands(),
+        enumService.getFuelTypes(),
+        enumService.getColors(),
+        enumService.getDoors(),
+        enumService.getCurrencies()
+      ]);
+
+      const freshEnums = {
+        listingTypes,
+        listingStatuses,
+        carBrands,
+        fuelTypes,
+        colors,
+        doors,
+        currencies
+      };
+
+      setEnums(freshEnums);
+      setCachedEnums(freshEnums);
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred while refreshing enums.');
+      console.error('Error refreshing enums:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     enums,
     isLoading,
@@ -105,6 +166,7 @@ export const useEnums = () => {
     getFuelTypeLabel,
     getColorLabel,
     getCurrencyLabel,
-    getCurrencySymbol
+    getCurrencySymbol,
+    refreshEnums
   };
 };

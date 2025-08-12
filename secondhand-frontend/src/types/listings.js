@@ -5,6 +5,7 @@
 // Base Listing DTO
 export const ListingDTO = {
   id: '',
+  listingNo: '',
   title: '',
   description: '',
   price: 0,
@@ -59,6 +60,7 @@ export const ListingStatisticsDTO = {
 // Listing Response DTO (for general listings)
 export const ListingResponseDTO = {
   id: '',
+  listingNo: '',
   title: '',
   description: '',
   price: 0,

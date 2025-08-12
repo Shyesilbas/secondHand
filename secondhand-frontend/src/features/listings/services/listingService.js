@@ -5,6 +5,7 @@ import { createListingFilterRequest } from '../../../types/listings';
 export const listingService = {
   getAllListings: async () => {
     const response = await apiClient.get(API_ENDPOINTS.LISTINGS.ALL);
+    console.log('API Response for getAllListings:', response.data);
     return response.data;
   },
 
@@ -15,6 +16,12 @@ export const listingService = {
 
   getListingById: async (id) => {
     const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_ID(id));
+    return response.data;
+  },
+
+  getListingByNo: async (listingNo) => {
+    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(listingNo));
+    console.log('API Response for getListingByNo:', response.data);
     return response.data;
   },
 

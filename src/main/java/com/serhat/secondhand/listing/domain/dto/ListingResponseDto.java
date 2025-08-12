@@ -17,6 +17,7 @@ import java.util.UUID;
 public class ListingResponseDto {
     
     private UUID id;
+    private String listingNo;
     private String title;
     private String description;
     private BigDecimal price;

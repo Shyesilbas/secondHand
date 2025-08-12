@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -27,6 +28,11 @@ public interface ListingRepository extends JpaRepository<Listing, UUID>, Listing
     List<Listing> findBySellerOrderByCreatedAtDesc(User seller);
     
     List<Listing> findBySellerAndStatus(User seller, ListingStatus status);
+    
+    /**
+     * Find listing by listing number
+     */
+    Optional<Listing> findByListingNo(String listingNo);
     
     // Statistics queries
     

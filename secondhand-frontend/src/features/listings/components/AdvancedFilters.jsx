@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
+import SearchableDropdown from '../../../components/ui/SearchableDropdown';
 
 const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -41,49 +42,22 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            {/* Header */}
-            <div className="p-6 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-lg font-semibold text-slate-800">Gelişmiş Filtreler</h3>
-                        <p className="text-sm text-slate-500 mt-1">
-                            İhtiyacınıza göre arama yapın
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={onReset}
-                            className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Temizle
-                        </button>
-                        <button
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="flex items-center gap-2 px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
-                        >
-                            <span className="text-sm font-medium">
-                                {isExpanded ? 'Gizle' : 'Filtreler'}
-                            </span>
-                            <svg 
-                                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+        <div className="space-y-6">
+            {/* Header with Reset Button */}
+            <div className="flex items-center justify-between">
+                <button
+                    onClick={onReset}
+                    className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Clear All
+                </button>
             </div>
 
             {/* Filters Content */}
-            {isExpanded && (
-                <div className="p-6 space-y-6">
+            <div className="space-y-6">
 
 
                     {/* Fiyat Aralığı */}
@@ -155,22 +129,15 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
                             
                             {/* Markalar */}
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-slate-700 mb-3">Markalar</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {enums.carBrands.map((brand) => (
-                                        <button
-                                            key={brand.value}
-                                            onClick={() => handleArrayChange('brands', brand.value)}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-                                                (filters.brands || []).includes(brand.value)
-                                                    ? 'bg-blue-500 text-white border-blue-500'
-                                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            {brand.label}
-                                        </button>
-                                    ))}
-                                </div>
+                                <SearchableDropdown
+                                    label="Markalar"
+                                    options={enums.carBrands}
+                                    selectedValues={filters.brands || []}
+                                    onSelectionChange={(values) => handleInputChange('brands', values)}
+                                    placeholder="Select brands..."
+                                    searchPlaceholder="Search brands..."
+                                    multiple={true}
+                                />
                             </div>
 
                             {/* Yıl ve Kilometre */}
@@ -213,42 +180,28 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
 
                             {/* Yakıt Türü */}
                             <div className="mt-4">
-                                <label className="block text-sm font-medium text-slate-700 mb-3">Yakıt Türü</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {enums.fuelTypes.map((fuel) => (
-                                        <button
-                                            key={fuel.value}
-                                            onClick={() => handleArrayChange('fuelTypes', fuel.value)}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-                                                (filters.fuelTypes || []).includes(fuel.value)
-                                                    ? 'bg-green-500 text-white border-green-500'
-                                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            {fuel.label}
-                                        </button>
-                                    ))}
-                                </div>
+                                <SearchableDropdown
+                                    label="Yakıt Türü"
+                                    options={enums.fuelTypes}
+                                    selectedValues={filters.fuelTypes || []}
+                                    onSelectionChange={(values) => handleInputChange('fuelTypes', values)}
+                                    placeholder="Select fuel types..."
+                                    searchPlaceholder="Search fuel types..."
+                                    multiple={true}
+                                />
                             </div>
 
                             {/* Renk */}
                             <div className="mt-4">
-                                <label className="block text-sm font-medium text-slate-700 mb-3">Renk</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {enums.colors.map((color) => (
-                                        <button
-                                            key={color.value}
-                                            onClick={() => handleArrayChange('colors', color.value)}
-                                            className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
-                                                (filters.colors || []).includes(color.value)
-                                                    ? 'bg-purple-500 text-white border-purple-500'
-                                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                            }`}
-                                        >
-                                            {color.label}
-                                        </button>
-                                    ))}
-                                </div>
+                                <SearchableDropdown
+                                    label="Renk"
+                                    options={enums.colors}
+                                    selectedValues={filters.colors || []}
+                                    onSelectionChange={(values) => handleInputChange('colors', values)}
+                                    placeholder="Select colors..."
+                                    searchPlaceholder="Search colors..."
+                                    multiple={true}
+                                />
                             </div>
                         </div>
                     )}
@@ -287,8 +240,7 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+            </div>
         </div>
     );
 };

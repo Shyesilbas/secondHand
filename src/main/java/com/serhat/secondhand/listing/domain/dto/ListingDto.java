@@ -28,6 +28,7 @@ import java.util.UUID;
 public abstract class ListingDto {
 
     private UUID id;
+    private String listingNo;
     private String title;
     private String description;
     private BigDecimal price;

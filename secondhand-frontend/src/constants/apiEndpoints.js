@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
         MY_LISTINGS: '/v1/listings/my-listings',
         BY_STATUS: (status) => `/v1/listings/my-listings/status/${status}`,
         BY_ID: (id) => `/v1/listings/${id}`,
+        BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
         CREATE: '/v1/listings',
         UPDATE: (id) => `/v1/listings/${id}`,
         DELETE: (id) => `/v1/listings/${id}`,

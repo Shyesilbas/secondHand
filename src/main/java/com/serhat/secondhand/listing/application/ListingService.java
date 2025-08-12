@@ -35,6 +35,28 @@ public class ListingService {
         return listingRepository.findById(id);
     }
 
+    public Optional<ListingDto> findByListingNo(String listingNo) {
+        log.info("Searching for listing with listingNo: {}", listingNo);
+        
+        if (listingNo == null || listingNo.trim().isEmpty()) {
+            log.warn("Empty or null listing number provided");
+            return Optional.empty();
+        }
+        
+        String cleanListingNo = listingNo.trim().toUpperCase();
+        log.debug("Cleaned listing number: {}", cleanListingNo);
+        
+        Optional<Listing> listing = listingRepository.findByListingNo(cleanListingNo);
+        
+        if (listing.isPresent()) {
+            log.info("Found listing with listingNo: {} - ID: {}", cleanListingNo, listing.get().getId());
+            return Optional.of(listingMapper.toDynamicDto(listing.get()));
+        } else {
+            log.info("No listing found with listingNo: {}", cleanListingNo);
+            return Optional.empty();
+        }
+    }
+
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
         List<Listing> listings = listingRepository.findBySellerOrderByCreatedAtDesc(user);
@@ -90,7 +112,6 @@ public class ListingService {
     public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
         log.info("Getting listings with filters: {}", filters);
         
-        // Set default values if not provided
         if (filters.getPage() == null) filters.setPage(0);
         if (filters.getSize() == null) filters.setSize(20);
         if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
@@ -163,30 +184,19 @@ public class ListingService {
         throw new BusinessException("Invalid listing status for this operation", HttpStatus.BAD_REQUEST, "INVALID_STATUS");
     }
     
-    // Statistics Methods
-    
-    /**
-     * Get total count of all listings (regardless of status)
-     * @return total listing count
-     */
+
     public long getTotalListingCount() {
         log.info("Getting total listing count");
         return listingRepository.getTotalListingCount();
     }
     
-    /**
-     * Get count of users who have active listings
-     * @return count of users with active listings
-     */
+
     public long getActiveSellerCount() {
         log.info("Getting count of users with active listings");
         return listingRepository.getActiveSellerCount(ListingStatus.ACTIVE);
     }
     
-    /**
-     * Get count of cities that have active listings
-     * @return count of cities with active listings
-     */
+
     public long getActiveCityCount() {
         log.info("Getting count of cities with active listings");
         return listingRepository.getActiveCityCount(ListingStatus.ACTIVE);
