@@ -28,32 +28,18 @@ const ListingCard = ({ listing, onDeleted }) => {
 
 
     const getStatusBadge = (status) => {
-        const statusConfig = {
-            'ACTIVE': { 
-                label: 'Aktif',
-                dot: 'bg-emerald-500'
-            },
-            'SOLD': { 
-                label: 'Satıldı',
-                dot: 'bg-red-500'
-            },
-            'DRAFT': { 
-                label: 'Taslak',
-                dot: 'bg-slate-400'
-            },
-            'PENDING': { 
-                label: 'Beklemede',
-                dot: 'bg-amber-500'
-            }
+        const statusLabels = {
+            'ACTIVE': 'Aktif',
+            'SOLD': 'Satıldı',
+            'DRAFT': 'Taslak',
+            'PENDING': 'Beklemede',
+            'INACTIVE': 'Pasif',
         };
-
-        const config = statusConfig[status] || statusConfig['DRAFT'];
-        
+        const label = statusLabels[status] || 'Taslak';
         return (
-            <div className="inline-flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${config.dot}`}></div>
-                <span className="text-xs font-medium text-slate-600">{config.label}</span>
-            </div>
+            <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-600">
+                {label}
+            </span>
         );
     };
 
@@ -98,7 +84,7 @@ const ListingCard = ({ listing, onDeleted }) => {
                                 </p>
                             </div>
                             <div className="flex flex-col items-end gap-2 ml-4">
-                                <div className="text-xl font-bold text-emerald-600">
+                                <div className="text-xl font-bold text-slate-900">
                                     {formatPrice(listing.price, listing.currency)}
                                 </div>
                                 <FavoriteButton 
@@ -113,13 +99,53 @@ const ListingCard = ({ listing, onDeleted }) => {
                                             e.preventDefault();
                                             navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
                                         }}
-                                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs"
+                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
                                         title="Düzenle"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" />
                                         </svg>
                                         <span>Düzenle</span>
+                                    </button>
+                                )}
+                                {user?.id === listing.sellerId && listing.status === 'ACTIVE' && (
+                                    <button
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            try {
+                                                await listingService.deactivateListing(listing.id);
+                                                onDeleted && onDeleted(listing.id);
+                                            } catch (err) {
+                                                console.error('Deactivate failed', err);
+                                            }
+                                        }}
+                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
+                                        title="Deactivate"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728M6 6l12 12" />
+                                        </svg>
+                                        <span>Deactivate</span>
+                                    </button>
+                                )}
+                                {user?.id === listing.sellerId && listing.status === 'INACTIVE' && (
+                                    <button
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            try {
+                                                await listingService.activateListing(listing.id);
+                                                onDeleted && onDeleted(listing.id);
+                                            } catch (err) {
+                                                console.error('Reactivate failed', err);
+                                            }
+                                        }}
+                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
+                                        title="Reactivate"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Reactivate</span>
                                     </button>
                                 )}
                                 {user?.id === listing.sellerId && (
@@ -198,7 +224,7 @@ const ListingCard = ({ listing, onDeleted }) => {
                             </div>
                             <div className="flex items-center gap-2">
                                 <span>#{listing.listingNo}</span>
-                                <div className={`w-2 h-2 rounded-full ${listing.isListingFeePaid ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                                <div className={`w-2 h-2 rounded-full ${listing.isListingFeePaid ? 'bg-slate-500' : 'bg-slate-300'}`}></div>
                             </div>
                         </div>
                     </div>

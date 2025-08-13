@@ -17,6 +17,7 @@ import DashboardPage from '../pages/DashboardPage';
 import ProfilePage from '../pages/user/ProfilePage';
 import ListingsPage from '../pages/listings/ListingsPage';
 import MyListingsPage from '../pages/listings/MyListingsPage';
+import InactiveListingsPage from '../pages/listings/InactiveListingsPage';
 import ListingDetailPage from '../pages/listings/ListingDetailPage';
 import CreateListingPage from '../pages/listings/CreateListingPage';
 import FavoritesPage from '../pages/favorites/FavoritesPage';
@@ -102,6 +103,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
+        <Route path={ROUTES.MY_LISTINGS_INACTIVE} element={<InactiveListingsPage />} />
         <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />

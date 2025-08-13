@@ -162,7 +162,7 @@ public class ListingService {
         Listing listing = findById(listingId)
                 .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
         validateStatus(listing, ListingStatus.ACTIVE);
-        listing.setStatus(ListingStatus.DRAFT);
+        listing.setStatus(ListingStatus.INACTIVE);
         listingRepository.save(listing);
         log.info("Listing deactivated: {}", listingId);
     }

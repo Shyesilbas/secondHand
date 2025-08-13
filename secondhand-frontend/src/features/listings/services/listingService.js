@@ -15,6 +15,10 @@ export const listingService = {
 
   publishListing: async (id) => put(API_ENDPOINTS.LISTINGS.PUBLISH(id)),
 
+  activateListing: async (id) => put(API_ENDPOINTS.LISTINGS.ACTIVATE(id)),
+
+  deactivateListing: async (id) => put(API_ENDPOINTS.LISTINGS.DEACTIVATE(id)),
+
   getListingStatistics: async () => get(API_ENDPOINTS.LISTINGS.STATISTICS),
 
   deleteListing: async (id) => del(API_ENDPOINTS.LISTINGS.DELETE(id)),

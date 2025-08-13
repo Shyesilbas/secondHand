@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listingService } from '../services/listingService';
 
-export const useMyListings = () => {
+export const useMyListings = (status = null) => {
     const [listings, setListings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -10,7 +10,9 @@ export const useMyListings = () => {
         try {
             setIsLoading(true);
             setError(null);
-            const data = await listingService.getMyListings();
+            const data = status 
+                ? await listingService.getMyListingsByStatus(status)
+                : await listingService.getMyListings();
             setListings(data);
         } catch (err) {
             setError(err.response?.data?.message || 'İlanlarınız yüklenirken bir hata oluştu');
@@ -22,7 +24,8 @@ export const useMyListings = () => {
 
     useEffect(() => {
         fetchMyListings();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [status]);
 
     const refetch = () => {
         fetchMyListings();
