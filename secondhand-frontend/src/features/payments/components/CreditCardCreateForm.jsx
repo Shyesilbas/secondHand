@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CreditCardRequestDTO, createCreditCardRequest } from '../../../types/payments';
+import { formatCurrency } from '../../../utils/formatters';
 import { useNotification } from '../../../context/NotificationContext';
 
 const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
@@ -68,14 +69,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
     }
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value || 0);
-  };
+  const formatAmount = (value) => formatCurrency(value || 0, 'TRY', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,7 +120,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
         )}
         {formData.limit && !errors.limit && (
           <p className="text-gray-600 text-sm mt-1">
-            Belirlenen limit: {formatCurrency(formData.limit)}
+            Belirlenen limit: {formatAmount(formData.limit)}
           </p>
         )}
       </div>

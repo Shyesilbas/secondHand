@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
-import SearchableDropdown from '../../../components/ui/SearchableDropdown';
+import EnumDropdown from '../../../components/ui/EnumDropdown';
 
 const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -129,15 +129,7 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
                             
                             {/* Markalar */}
                             <div className="mb-4">
-                                <SearchableDropdown
-                                    label="Markalar"
-                                    options={enums.carBrands}
-                                    selectedValues={filters.brands || []}
-                                    onSelectionChange={(values) => handleInputChange('brands', values)}
-                                    placeholder="Select brands..."
-                                    searchPlaceholder="Search brands..."
-                                    multiple={true}
-                                />
+                                <EnumDropdown label="Markalar" enumKey="carBrands" value={filters.brands || []} onChange={(values) => handleInputChange('brands', values)} multiple={true} />
                             </div>
 
                             {/* Yıl ve Kilometre */}
@@ -180,54 +172,22 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
 
                             {/* Yakıt Türü */}
                             <div className="mt-4">
-                                <SearchableDropdown
-                                    label="Yakıt Türü"
-                                    options={enums.fuelTypes}
-                                    selectedValues={filters.fuelTypes || []}
-                                    onSelectionChange={(values) => handleInputChange('fuelTypes', values)}
-                                    placeholder="Select fuel types..."
-                                    searchPlaceholder="Search fuel types..."
-                                    multiple={true}
-                                />
+                                <EnumDropdown label="Yakıt Türü" enumKey="fuelTypes" value={filters.fuelTypes || []} onChange={(values) => handleInputChange('fuelTypes', values)} multiple={true} />
                             </div>
 
                             {/* Renk */}
                             <div className="mt-4">
-                                <SearchableDropdown
-                                    label="Renk"
-                                    options={enums.colors}
-                                    selectedValues={filters.colors || []}
-                                    onSelectionChange={(values) => handleInputChange('colors', values)}
-                                    placeholder="Select colors..."
-                                    searchPlaceholder="Search colors..."
-                                    multiple={true}
-                                />
+                                <EnumDropdown label="Renk" enumKey="colors" value={filters.colors || []} onChange={(values) => handleInputChange('colors', values)} multiple={true} />
                             </div>
 
                             {/* Vites Türü */}
                             <div className="mt-4">
-                                <SearchableDropdown
-                                    label="Vites Türü"
-                                    options={enums.gearTypes}
-                                    selectedValues={filters.gearTypes || []}
-                                    onSelectionChange={(values) => handleInputChange('gearTypes', values)}
-                                    placeholder="Vites türü seçin..."
-                                    searchPlaceholder="Vites ara..."
-                                    multiple={true}
-                                />
+                                <EnumDropdown label="Vites Türü" enumKey="gearTypes" value={filters.gearTypes || []} onChange={(values) => handleInputChange('gearTypes', values)} multiple={true} />
                             </div>
 
                             {/* Koltuk Sayısı */}
                             <div className="mt-4">
-                                <SearchableDropdown
-                                    label="Koltuk Sayısı"
-                                    options={enums.seatCounts}
-                                    selectedValues={filters.seatCounts || []}
-                                    onSelectionChange={(values) => handleInputChange('seatCounts', values)}
-                                    placeholder="Koltuk sayısı seçin..."
-                                    searchPlaceholder="Koltuk ara..."
-                                    multiple={true}
-                                />
+                                <EnumDropdown label="Koltuk Sayısı" enumKey="seatCounts" value={filters.seatCounts || []} onChange={(values) => handleInputChange('seatCounts', values)} multiple={true} />
                             </div>
                         </div>
                     )}

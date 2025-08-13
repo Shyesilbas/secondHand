@@ -8,32 +8,19 @@ import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import { VehicleListingDTO } from '../../types/vehicles';
 import { ROUTES } from '../../constants/routes';
 import { listingService } from '../../features/listings/services/listingService';
+import { useNotification } from '../../context/NotificationContext';
+import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
 const VehicleDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const notification = useNotification();
   const { vehicle, isLoading, error, fetchVehicle } = useVehicle(id);
   const { enums } = useEnums();
 
-  const formatPrice = (price, currency) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: currency === 'TRY' ? 'TRY' : 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatPrice = (price, currency) => formatCurrency(price, currency);
+  const formatDate = (dateString) => formatDateTime(dateString);
 
   const getEnumLabel = (enumArray, value) => {
     const item = enumArray?.find(item => item.value === value);
@@ -50,14 +37,20 @@ const VehicleDetailPage = () => {
 
   const handleDelete = async () => {
     if (!isOwner || !vehicle) return;
-    if (!confirm('İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
-    try {
-      await listingService.deleteListing(vehicle.id);
-      navigate(-1);
-    } catch (e) {
-      // eslint-disable-next-line no-alert
-      alert('Silme sırasında bir hata oluştu');
-    }
+    notification.showConfirmation(
+      'İlanı Sil',
+      'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      async () => {
+        try {
+          await listingService.deleteListing(vehicle.id);
+          notification.showSuccess('Başarılı', 'İlan silindi');
+          navigate(-1);
+        } catch (e) {
+          notification.showError('Hata', 'Silme sırasında bir hata oluştu');
+        }
+      },
+      () => {}
+    );
   };
 
   if (isLoading) {

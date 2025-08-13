@@ -4,6 +4,7 @@ import { listingService } from '../../features/listings/services/listingService'
 import { useAuth } from '../../context/AuthContext';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
+import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -31,24 +32,8 @@ const ListingDetailPage = () => {
     }
   }, [id]);
 
-  const formatPrice = (price, currency) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: currency === 'TRY' ? 'TRY' : 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatPrice = (price, currency) => formatCurrency(price, currency);
+  const formatDate = (dateString) => formatDateTime(dateString);
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 

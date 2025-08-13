@@ -5,7 +5,9 @@ import { useEnums } from '../../hooks/useEnums';
 import { useNotification } from '../../context/NotificationContext';
 import { ROUTES } from '../../constants/routes';
 import { vehicleFormSteps } from '../../features/vehicles/config/vehicleFormSteps';
-import SearchableDropdown from '../../components/ui/SearchableDropdown';
+import EnumDropdown from '../../components/ui/EnumDropdown';
+import ListingBasics from '../../components/forms/ListingBasics';
+import LocationFields from '../../components/forms/LocationFields';
 
 const VehicleEditPage = () => {
   const { id } = useParams();
@@ -55,20 +57,18 @@ const VehicleEditPage = () => {
 
   const validateStep = (step) => {
     const newErrors = {};
-    switch (step) {
-      case 1:
-        if (!formData.title.trim()) newErrors.title = 'Başlık gereklidir';
-        if (!formData.description.trim()) newErrors.description = 'Açıklama gereklidir';
-        if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Geçerli bir fiyat giriniz';
-        break;
-      case 2:
-        if (!formData.model.trim()) newErrors.model = 'Model giriniz';
-        if (formData.year && parseInt(formData.year) < 1950) newErrors.year = 'Geçerli bir yıl giriniz';
-        break;
-      case 3:
-        if (!formData.city.trim()) newErrors.city = 'Şehir gereklidir';
-        if (!formData.district.trim()) newErrors.district = 'İlçe gereklidir';
-        break;
+    if (step === 1) {
+      if (!formData.title || !String(formData.title).trim()) newErrors.title = 'Başlık gereklidir';
+      if (!formData.description || !String(formData.description).trim()) newErrors.description = 'Açıklama gereklidir';
+      if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Geçerli bir fiyat giriniz';
+    }
+    if (step === 2) {
+      if (!formData.model || !String(formData.model).trim()) newErrors.model = 'Model giriniz';
+      if (formData.year && parseInt(formData.year) < 1950) newErrors.year = 'Geçerli bir yıl giriniz';
+    }
+    if (step === 3) {
+      if (!formData.city || !String(formData.city).trim()) newErrors.city = 'Şehir gereklidir';
+      if (!formData.district || !String(formData.district).trim()) newErrors.district = 'İlçe gereklidir';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -171,7 +171,7 @@ const VehicleEditPage = () => {
 
         {/* Step 1 */}
         {currentStep === 1 && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-xl">📝</span></div>
               <div>
@@ -179,33 +179,7 @@ const VehicleEditPage = () => {
                 <p className="text-sm text-slate-600">Başlık, açıklama ve fiyat</p>
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">İlan Başlığı *</label>
-              <input type="text" name="title" value={formData.title} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.title ? 'border-red-500' : 'border-slate-200'}`} />
-              {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Fiyat *</label>
-                <div className="flex">
-                  <input type="number" name="price" value={formData.price} onChange={handleInputChange} className={`flex-1 px-4 py-3 border rounded-l-lg ${errors.price ? 'border-red-500' : 'border-slate-200'}`} />
-                  <select name="currency" value={formData.currency} onChange={handleInputChange} className="px-4 py-3 border border-l-0 border-slate-200 rounded-r-lg bg-slate-50">
-                    {enums.currencies?.map(c => (
-                      <option key={c.value} value={c.value}>{c.symbol} {c.label}</option>
-                    ))}
-                  </select>
-                </div>
-                {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Açıklama *</label>
-              <textarea name="description" value={formData.description} onChange={handleInputChange} rows={5} className={`w-full px-4 py-3 border rounded-lg resize-none ${errors.description ? 'border-red-500' : 'border-slate-200'}`} />
-              {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-            </div>
+            <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
           </div>
         )}
 
@@ -239,27 +213,11 @@ const VehicleEditPage = () => {
               </div>
 
               <div>
-                <SearchableDropdown
-                  label="Yakıt Türü"
-                  options={enums.fuelTypes || []}
-                  selectedValues={formData.fuelType ? [formData.fuelType] : []}
-                  onSelectionChange={(values) => handleDropdownChange('fuelType', values)}
-                  placeholder="Yakıt türü seçin..."
-                  searchPlaceholder="Yakıt türü ara..."
-                  multiple={false}
-                />
+                <EnumDropdown label="Yakıt Türü" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => setFormData(prev => ({...prev, fuelType: v}))} />
               </div>
 
               <div>
-                <SearchableDropdown
-                  label="Renk"
-                  options={enums.colors || []}
-                  selectedValues={formData.color ? [formData.color] : []}
-                  onSelectionChange={(values) => handleDropdownChange('color', values)}
-                  placeholder="Renk seçin..."
-                  searchPlaceholder="Renk ara..."
-                  multiple={false}
-                />
+                <EnumDropdown label="Renk" enumKey="colors" value={formData.color} onChange={(v) => setFormData(prev => ({...prev, color: v}))} />
               </div>
 
               <div>
@@ -273,39 +231,15 @@ const VehicleEditPage = () => {
               </div>
 
               <div>
-                <SearchableDropdown
-                  label="Kapı Sayısı"
-                  options={enums.doors || []}
-                  selectedValues={formData.doors ? [formData.doors] : []}
-                  onSelectionChange={(values) => handleDropdownChange('doors', values)}
-                  placeholder="Kapı sayısı seçin..."
-                  searchPlaceholder="Kapı ara..."
-                  multiple={false}
-                />
+                <EnumDropdown label="Kapı Sayısı" enumKey="doors" value={formData.doors} onChange={(v) => setFormData(prev => ({...prev, doors: v}))} />
               </div>
 
               <div>
-                <SearchableDropdown
-                  label="Vites"
-                  options={enums.gearTypes || []}
-                  selectedValues={formData.gearbox ? [formData.gearbox] : []}
-                  onSelectionChange={(values) => handleDropdownChange('gearbox', values)}
-                  placeholder="Vites türü seçin..."
-                  searchPlaceholder="Vites ara..."
-                  multiple={false}
-                />
+                <EnumDropdown label="Vites" enumKey="gearTypes" value={formData.gearbox} onChange={(v) => setFormData(prev => ({...prev, gearbox: v}))} />
               </div>
 
               <div>
-                <SearchableDropdown
-                  label="Koltuk Sayısı"
-                  options={enums.seatCounts || []}
-                  selectedValues={formData.seatCount ? [formData.seatCount] : []}
-                  onSelectionChange={(values) => handleDropdownChange('seatCount', values)}
-                  placeholder="Koltuk sayısı seçin..."
-                  searchPlaceholder="Koltuk ara..."
-                  multiple={false}
-                />
+                <EnumDropdown label="Koltuk Sayısı" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => setFormData(prev => ({...prev, seatCount: v}))} />
               </div>
 
               <div>
@@ -341,19 +275,7 @@ const VehicleEditPage = () => {
                 <p className="text-sm text-slate-600">Şehir ve ilçe</p>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Şehir *</label>
-                <input type="text" name="city" value={formData.city} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.city ? 'border-red-500' : 'border-slate-200'}`} />
-                {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">İlçe *</label>
-                <input type="text" name="district" value={formData.district} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.district ? 'border-red-500' : 'border-slate-200'}`} />
-                {errors.district && <p className="mt-1 text-sm text-red-600">{errors.district}</p>}
-              </div>
-            </div>
+            <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
           </div>
         )}
 

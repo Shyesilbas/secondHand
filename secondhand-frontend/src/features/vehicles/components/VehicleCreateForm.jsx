@@ -5,8 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useNotification } from '../../../context/NotificationContext';
 import { VehicleCreateRequestDTO } from '../../../types/vehicles';
-import SearchableDropdown from '../../../components/ui/SearchableDropdown';
+import EnumDropdown from '../../../components/ui/EnumDropdown';
+import ListingBasics from '../../../components/forms/ListingBasics';
+import LocationFields from '../../../components/forms/LocationFields';
 import { vehicleFormSteps } from '../config/vehicleFormSteps';
+import { validateVehicleStep1, validateVehicleStep2, validateVehicleStep3, validateVehicleAll } from '../../../utils/validators/vehicleValidators';
 
 const VehicleCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -64,26 +67,10 @@ const VehicleCreateForm = ({ onBack }) => {
   };
 
   const validateStep = (step) => {
-    const newErrors = {};
-    
-    switch (step) {
-      case 1:
-        if (!formData.title.trim()) newErrors.title = 'Başlık gereklidir';
-        if (!formData.description.trim()) newErrors.description = 'Açıklama gereklidir';
-        if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Geçerli bir fiyat giriniz';
-        break;
-      case 2:
-        if (!formData.brand) newErrors.brand = 'Marka seçiniz';
-        if (!formData.model.trim()) newErrors.model = 'Model giriniz';
-        if (!formData.year || parseInt(formData.year) < 1950) newErrors.year = 'Geçerli bir yıl giriniz';
-        if (!formData.fuelType) newErrors.fuelType = 'Yakıt türü seçiniz';
-        break;
-      case 3:
-        if (!formData.city.trim()) newErrors.city = 'Şehir gereklidir';
-        if (!formData.district.trim()) newErrors.district = 'İlçe gereklidir';
-        break;
-    }
-    
+    let newErrors = {};
+    if (step === 1) newErrors = validateVehicleStep1(formData);
+    if (step === 2) newErrors = validateVehicleStep2(formData, { isCreate: true });
+    if (step === 3) newErrors = validateVehicleStep3(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -99,23 +86,7 @@ const VehicleCreateForm = ({ onBack }) => {
   };
 
   const validateAllSteps = () => {
-    const allErrors = {};
-    
-    // Step 1 validation
-    if (!formData.title.trim()) allErrors.title = 'Başlık gereklidir';
-    if (!formData.description.trim()) allErrors.description = 'Açıklama gereklidir';
-    if (!formData.price || parseFloat(formData.price) <= 0) allErrors.price = 'Geçerli bir fiyat giriniz';
-    
-    // Step 2 validation
-    if (!formData.brand) allErrors.brand = 'Marka seçiniz';
-    if (!formData.model.trim()) allErrors.model = 'Model giriniz';
-    if (!formData.year || parseInt(formData.year) < 1950) allErrors.year = 'Geçerli bir yıl giriniz';
-    if (!formData.fuelType) allErrors.fuelType = 'Yakıt türü seçiniz';
-    
-    // Step 3 validation (Location - ZORUNLU!)
-    if (!formData.city.trim()) allErrors.city = 'Şehir gereklidir';
-    if (!formData.district.trim()) allErrors.district = 'İlçe gereklidir';
-    
+    const allErrors = validateVehicleAll(formData);
     setErrors(allErrors);
     return Object.keys(allErrors).length === 0;
   };
@@ -150,87 +121,18 @@ const VehicleCreateForm = ({ onBack }) => {
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-            <span className="text-xl">📝</span>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900">Temel Bilgiler</h3>
-            <p className="text-sm text-slate-600">İlanınızın başlığını, açıklamasını ve fiyatını belirleyin</p>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              İlan Başlığı *
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                errors.title ? 'border-red-500' : 'border-slate-200'
-              }`}
-              placeholder="ör: 2020 BMW 320i Luxury Line"
-            />
-            {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Fiyat *
-              </label>
-              <div className="flex">
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  className={`flex-1 px-4 py-3 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.price ? 'border-red-500' : 'border-slate-200'
-                  }`}
-                  placeholder="0"
-                />
-                <select
-                  name="currency"
-                  value={formData.currency}
-                  onChange={handleInputChange}
-                  className="px-4 py-3 border border-l-0 border-slate-200 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50"
-                >
-                  {enums.currencies?.map(currency => (
-                    <option key={currency.value} value={currency.value}>
-                      {currency.symbol} {currency.label}
-                    </option>
-                  ))}
-                </select>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-xl">📝</span>
               </div>
-              {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Temel Bilgiler</h3>
+                <p className="text-sm text-slate-600">İlanınızın başlığını, açıklamasını ve fiyatını belirleyin</p>
+              </div>
             </div>
+            <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Açıklama *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={5}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none ${
-                errors.description ? 'border-red-500' : 'border-slate-200'
-              }`}
-              placeholder="Aracınızın detaylı açıklamasını yazın. Özellikler, durum, bakım geçmişi gibi bilgiler ekleyebilirsiniz..."
-            />
-            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-            <p className="mt-2 text-xs text-slate-500">İyi bir açıklama potansiyel alıcıları çeker.</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -249,15 +151,7 @@ const VehicleCreateForm = ({ onBack }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div>
-            <SearchableDropdown
-              label="Marka *"
-              options={enums.carBrands || []}
-              selectedValues={formData.brand ? [formData.brand] : []}
-              onSelectionChange={(values) => handleDropdownChange('brand', values)}
-              placeholder="Marka seçin..."
-              searchPlaceholder="Marka ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Marka *" enumKey="carBrands" value={formData.brand} onChange={(v) => setFormData(prev => ({...prev, brand: v}))} />
             {errors.brand && <p className="mt-1 text-sm text-red-600">{errors.brand}</p>}
           </div>
 
@@ -313,28 +207,12 @@ const VehicleCreateForm = ({ onBack }) => {
           </div>
 
           <div>
-            <SearchableDropdown
-              label="Yakıt Türü *"
-              options={enums.fuelTypes || []}
-              selectedValues={formData.fuelType ? [formData.fuelType] : []}
-              onSelectionChange={(values) => handleDropdownChange('fuelType', values)}
-              placeholder="Yakıt türü seçin..."
-              searchPlaceholder="Yakıt türü ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Yakıt Türü *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => setFormData(prev => ({...prev, fuelType: v}))} />
             {errors.fuelType && <p className="mt-1 text-sm text-red-600">{errors.fuelType}</p>}
           </div>
 
           <div>
-            <SearchableDropdown
-              label="Renk"
-              options={enums.colors || []}
-              selectedValues={formData.color ? [formData.color] : []}
-              onSelectionChange={(values) => handleDropdownChange('color', values)}
-              placeholder="Renk seçin..."
-              searchPlaceholder="Renk ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Renk" enumKey="colors" value={formData.color} onChange={(v) => setFormData(prev => ({...prev, color: v}))} />
           </div>
 
           <div>
@@ -368,39 +246,15 @@ const VehicleCreateForm = ({ onBack }) => {
           </div>
 
           <div>
-            <SearchableDropdown
-              label="Kapı Sayısı"
-              options={enums.doors || []}
-              selectedValues={formData.doors ? [formData.doors] : []}
-              onSelectionChange={(values) => handleDropdownChange('doors', values)}
-              placeholder="Kapı sayısı seçin..."
-              searchPlaceholder="Kapı ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Kapı Sayısı" enumKey="doors" value={formData.doors} onChange={(v) => setFormData(prev => ({...prev, doors: v}))} />
           </div>
 
           <div>
-            <SearchableDropdown
-              label="Vites"
-              options={enums.gearTypes || []}
-              selectedValues={formData.gearbox ? [formData.gearbox] : []}
-              onSelectionChange={(values) => handleDropdownChange('gearbox', values)}
-              placeholder="Vites türü seçin..."
-              searchPlaceholder="Vites ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Vites" enumKey="gearTypes" value={formData.gearbox} onChange={(v) => setFormData(prev => ({...prev, gearbox: v}))} />
           </div>
 
           <div>
-            <SearchableDropdown
-              label="Koltuk Sayısı"
-              options={enums.seatCounts || []}
-              selectedValues={formData.seatCount ? [formData.seatCount] : []}
-              onSelectionChange={(values) => handleDropdownChange('seatCount', values)}
-              placeholder="Koltuk sayısı seçin..."
-              searchPlaceholder="Koltuk ara..."
-              multiple={false}
-            />
+            <EnumDropdown label="Koltuk Sayısı" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => setFormData(prev => ({...prev, seatCount: v}))} />
           </div>
 
           <div>
@@ -486,41 +340,7 @@ const VehicleCreateForm = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Şehir *
-            </label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                errors.city ? 'border-red-500' : 'border-slate-200'
-              }`}
-              placeholder="ör: İstanbul"
-            />
-            {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              İlçe *
-            </label>
-            <input
-              type="text"
-              name="district"
-              value={formData.district}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                errors.district ? 'border-red-500' : 'border-slate-200'
-              }`}
-              placeholder="ör: Kadıköy"
-            />
-            {errors.district && <p className="mt-1 text-sm text-red-600">{errors.district}</p>}
-          </div>
-        </div>
+        <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
       </div>
 
       {/* Preview */}

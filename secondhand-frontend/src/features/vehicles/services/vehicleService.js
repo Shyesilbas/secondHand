@@ -1,4 +1,4 @@
-import apiClient from '../../../services/api/config';
+import { get, post, put } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 import { createVehicleCreateRequest, createVehicleUpdateRequest } from '../../../types/vehicles';
 import { createListingFilterRequest } from '../../../types/listings';
@@ -12,8 +12,7 @@ export const vehicleService = {
       // eslint-disable-next-line no-console
       console.log('[vehicleService.createVehicleListing] payload', createData);
     }
-    const response = await apiClient.post(API_ENDPOINTS.VEHICLES.CREATE, createData);
-    return response.data;
+    return post(API_ENDPOINTS.VEHICLES.CREATE, createData);
   },
 
   // Update an existing vehicle listing
@@ -23,29 +22,19 @@ export const vehicleService = {
       // eslint-disable-next-line no-console
       console.log('[vehicleService.updateVehicleListing] payload', { id, updateData });
     }
-    const response = await apiClient.put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
-    return response.data;
+    return put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
   },
 
   // Get vehicle details by ID
-  getVehicleById: async (id) => {
-    const response = await apiClient.get(API_ENDPOINTS.VEHICLES.BY_ID(id));
-    return response.data;
-  },
+  getVehicleById: async (id) => get(API_ENDPOINTS.VEHICLES.BY_ID(id)),
 
 
 
   // Find vehicles by brand and model
-  findVehiclesByBrandAndModel: async (brand, model) => {
-    const response = await apiClient.get(API_ENDPOINTS.VEHICLES.BY_BRAND_MODEL(brand, model));
-    return response.data;
-  },
+  findVehiclesByBrandAndModel: async (brand, model) => get(API_ENDPOINTS.VEHICLES.BY_BRAND_MODEL(brand, model)),
 
   // Get all car brands (if this endpoint exists)
-  getCarBrands: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.VEHICLES.BRANDS);
-    return response.data;
-  },
+  getCarBrands: async () => get(API_ENDPOINTS.VEHICLES.BRANDS),
 
   // Search vehicles with filters (if needed in the future)
   searchVehicles: async (filters) => {
@@ -55,7 +44,6 @@ export const vehicleService = {
       listingType: 'VEHICLE'
     };
     const filterData = createListingFilterRequest(vehicleFilters);
-    const response = await apiClient.post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
-    return response.data;
+    return post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
   },
 };

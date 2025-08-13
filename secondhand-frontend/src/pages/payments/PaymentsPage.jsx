@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../features/payments/services/paymentService';
 import { PaymentDTO } from '../../types/payments';
 import PaymentReceiptModal from '../../components/modals/PaymentReceiptModal';
+import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();
@@ -44,24 +45,7 @@ const PaymentsPage = () => {
         setSelectedPayment(null);
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: 'TRY',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(amount);
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-EN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+    const formatDate = (dateString) => formatDateTime(dateString);
 
     const getPaymentTypeIcon = (type) => {
         switch (type) {

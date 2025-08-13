@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { bankService } from '../../features/payments/services/bankService';
 import { useNotification } from '../../context/NotificationContext';
 import { BankDTO } from '../../types/payments';
+import { formatCurrency } from '../../utils/formatters';
 
 const BankAccountsPage = () => {
     const navigate = useNavigate();
@@ -31,14 +32,7 @@ const BankAccountsPage = () => {
         }
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: 'TRY',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(amount);
-    };
+    const formatAmount = (amount) => formatCurrency(amount, 'TRY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const handleCreateBankAccount = async () => {
         try {
@@ -61,26 +55,26 @@ const BankAccountsPage = () => {
     };
 
     const handleDeleteBankAccount = async () => {
-        if (!window.confirm('Are you sure you want to delete this bank account?')) {
-            return;
-        }
-
-        try {
-            setIsLoading(true);
-            setError(null);
-            
-            await bankService.deleteBankAccount();
-            
-            // Clear the bank accounts list
-            setBankAccounts([]);
-            notification.showSuccess('Başarılı', 'Banka hesabı başarıyla silindi!');
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Error occurred while deleting bank account';
-            setError(errorMessage);
-            notification.showError('Hata', errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
+        notification.showConfirmation(
+            'Delete Bank Account',
+            'Are you sure you want to delete this bank account?',
+            async () => {
+                try {
+                    setIsLoading(true);
+                    setError(null);
+                    await bankService.deleteBankAccount();
+                    setBankAccounts([]);
+                    notification.showSuccess('Başarılı', 'Banka hesabı başarıyla silindi!');
+                } catch (err) {
+                    const errorMessage = err.response?.data?.message || 'Error occurred while deleting bank account';
+                    setError(errorMessage);
+                    notification.showError('Hata', errorMessage);
+                } finally {
+                    setIsLoading(false);
+                }
+            },
+            () => {}
+        );
     };
 
     if (isLoading) {
@@ -218,7 +212,7 @@ const BankAccountsPage = () => {
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm text-gray-500">Balance</span>
                                     <span className="text-xl font-bold text-green-600">
-                                        {formatCurrency(parseFloat(account.balance) || 0)}
+                                        {formatAmount(parseFloat(account.balance) || 0)}
                                     </span>
                                 </div>
                             </div>

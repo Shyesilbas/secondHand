@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { emailService } from '../../features/emails/services/emailService';
+import { formatDateTime } from '../../utils/formatters';
 
 const EmailsPage = () => {
     const navigate = useNavigate();
@@ -28,15 +29,7 @@ const EmailsPage = () => {
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('tr-TR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+    const formatDate = (dateString) => formatDateTime(dateString);
 
     const getEmailTypeIcon = (type) => {
         switch (type) {

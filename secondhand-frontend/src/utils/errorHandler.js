@@ -263,9 +263,8 @@ export const handleError = (error, showError, options = {}) => {
                 showError(customTitle || getErrorTitle(parsedError), messageToShow);
             }
         } catch (e) {
-            // Final fallback
-            console.error('Error notification failed:', e);
-            alert(messageToShow);
+            // Final fallback - avoid blocking alerts
+            console.error('Error notification failed:', e, messageToShow);
         }
     } else {
         // Use traditional toast or simple error notification

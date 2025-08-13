@@ -7,27 +7,16 @@ import FavoriteButton from '../../favorites/components/FavoriteButton';
 import FavoriteStats from '../../favorites/components/FavoriteStats';
 import { useAuth } from '../../../context/AuthContext';
 import { listingService } from '../services/listingService';
+import { formatCurrency, formatDateTime } from '../../../utils/formatters';
+import { useNotification } from '../../../context/NotificationContext';
 
 const ListingCard = ({ listing, onDeleted }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const notification = useNotification();
     const { getListingTypeLabel, getListingTypeIcon } = useEnums();
-    const formatPrice = (price, currency) => {
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: currency === 'TRY' ? 'TRY' : 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(price);
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('tr-TR', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-        });
-    };
+    const formatPrice = (price, currency) => formatCurrency(price, currency);
+    const formatDate = (dateString) => formatDateTime(dateString);
 
     const getTypeIcon = (type) => {
         const icon = LISTING_TYPE_ICONS[type] || getListingTypeIcon(type) || '📦';
@@ -137,9 +126,16 @@ const ListingCard = ({ listing, onDeleted }) => {
                                     <button
                                         onClick={async (e) => {
                                             e.preventDefault();
-                                            if (!confirm('İlanı silmek istediğinize emin misiniz?')) return;
-                                            await listingService.deleteListing(listing.id);
-                                            onDeleted && onDeleted(listing.id);
+                                            notification.showConfirmation(
+                                                'İlanı Sil',
+                                                'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+                                                async () => {
+                                                    await listingService.deleteListing(listing.id);
+                                                    onDeleted && onDeleted(listing.id);
+                                                    notification.showSuccess('Başarılı', 'İlan silindi');
+                                                },
+                                                () => {}
+                                            );
                                         }}
                                         className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs"
                                         title="Sil"

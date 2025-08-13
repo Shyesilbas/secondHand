@@ -1,68 +1,32 @@
-import apiClient from '../../../services/api/config';
+import { get, post, put, del } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 import { createListingFilterRequest } from '../../../types/listings';
 
 export const listingService = {
-  getAllListings: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.ALL);
-    console.log('API Response for getAllListings:', response.data);
-    return response.data;
-  },
+  getAllListings: async () => get(API_ENDPOINTS.LISTINGS.ALL),
 
-  getMyListingsByStatus: async (status) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_STATUS(status));
-    return response.data;
-  },
+  getMyListingsByStatus: async (status) => get(API_ENDPOINTS.LISTINGS.BY_STATUS(status)),
 
-  getListingById: async (id) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_ID(id));
-    return response.data;
-  },
+  getListingById: async (id) => get(API_ENDPOINTS.LISTINGS.BY_ID(id)),
 
-  getListingByNo: async (listingNo) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(listingNo));
-    console.log('API Response for getListingByNo:', response.data);
-    return response.data;
-  },
+  getListingByNo: async (listingNo) => get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(listingNo)),
 
-  getMyListings: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.MY_LISTINGS);
-    return response.data;
-  },
+  getMyListings: async () => get(API_ENDPOINTS.LISTINGS.MY_LISTINGS),
 
-  publishListing: async (id) => {
-    const response = await apiClient.put(API_ENDPOINTS.LISTINGS.PUBLISH(id));
-    return response.data;
-  },
+  publishListing: async (id) => put(API_ENDPOINTS.LISTINGS.PUBLISH(id)),
 
-  getListingStatistics: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.STATISTICS);
-    return response.data;
-  },
+  getListingStatistics: async () => get(API_ENDPOINTS.LISTINGS.STATISTICS),
 
-  deleteListing: async (id) => {
-    const response = await apiClient.delete(API_ENDPOINTS.LISTINGS.DELETE(id));
-    return response.data;
-  },
+  deleteListing: async (id) => del(API_ENDPOINTS.LISTINGS.DELETE(id)),
 
-  getListingsByType: async (listingType) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_TYPE(listingType));
-    return response.data;
-  },
+  getListingsByType: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE(listingType)),
 
-  getActiveListingsByType: async (listingType) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_TYPE_ACTIVE(listingType));
-    return response.data;
-  },
+  getActiveListingsByType: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ACTIVE(listingType)),
 
-  getListingsByTypeOrderByDate: async (listingType) => {
-    const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_TYPE_ORDERED(listingType));
-    return response.data;
-  },
+  getListingsByTypeOrderByDate: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ORDERED(listingType)),
 
   getListingsWithFilters: async (filters) => {
     const filterData = createListingFilterRequest(filters);
-    const response = await apiClient.post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
-    return response.data;
+    return post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
   },
 };

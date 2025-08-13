@@ -1,12 +1,54 @@
-# React + Vite
+# SecondHand Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Architecture Overview
 
-Currently, two official plugins are available:
+- src/
+  - components/
+    - forms/
+      - ListingBasics.jsx
+      - LocationFields.jsx
+    - notifications/
+      - NotificationModal.jsx
+    - ui/
+      - EnumDropdown.jsx
+      - SearchableDropdown.jsx
+  - features/
+    - auth/ | emails/ | favorites/ | listings/ | payments/ | vehicles/ | users/
+      - services/ → API calls (via services/api/request.js)
+      - components/ → Feature-specific UI
+      - hooks/ → Feature hooks
+  - pages/ → Route pages
+  - services/
+    - api/
+      - config.js → Axios base
+      - interceptors.js → Token, retry
+      - request.js → Shared request wrapper (get/post/put/del)
+    - storage/
+      - tokenStorage.js | enumCache.js
+  - utils/
+    - formatters.js → formatCurrency, formatDateTime
+    - errorHandler.js → parse/notify helpers
+    - validators/
+      - vehicleValidators.js
+  - context/
+    - AuthContext.jsx
+    - NotificationContext.jsx
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Conventions
 
-## Expanding the ESLint configuration
+- API calls MUST use `services/api/request.js` for consistency and logging.
+- Use `EnumDropdown` for enum-based selections (carBrands, colors, fuelTypes, ...).
+- Use shared form blocks: `ListingBasics` and `LocationFields` in create/edit flows.
+- Display currency/dates via `formatters.js`.
+- Use `NotificationContext` for all toasts, confirmations, and errors. Avoid alert/confirm.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Token Refresh
+
+- Interceptors are initialized in `src/main.jsx` by importing `services/api/interceptors.js`.
+- 401/403 → refresh token automatically; retried with new access token.
+
+## Development
+
+- Start: `npm run dev`
+- Build: `npm run build`
+

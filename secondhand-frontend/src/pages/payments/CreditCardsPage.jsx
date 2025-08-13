@@ -4,6 +4,7 @@ import { useCreditCard } from '../../features/payments/hooks/useCreditCard';
 import CreditCardCreateForm from '../../features/payments/components/CreditCardCreateForm';
 import { CreditCardDTO } from '../../types/payments';
 import { useNotification } from '../../context/NotificationContext';
+import { formatCurrency } from '../../utils/formatters';
 
 const CreditCardsPage = () => {
     const navigate = useNavigate();
@@ -24,27 +25,23 @@ const CreditCardsPage = () => {
     };
 
     const handleDeleteCreditCard = async () => {
-        if (!window.confirm('Are you sure you want to delete this credit card?')) {
-            return;
-        }
-
-        try {
-            await deleteCreditCard();
-            notification.showSuccess('Başarılı', 'Kredi kartı başarıyla silindi!');
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || 'Error occurred while deleting credit card';
-            notification.showError('Hata', errorMessage);
-        }
+        notification.showConfirmation(
+            'Delete Credit Card',
+            'Are you sure you want to delete this credit card?',
+            async () => {
+                try {
+                    await deleteCreditCard();
+                    notification.showSuccess('Başarılı', 'Kredi kartı başarıyla silindi!');
+                } catch (err) {
+                    const errorMessage = err.response?.data?.message || 'Error occurred while deleting credit card';
+                    notification.showError('Hata', errorMessage);
+                }
+            },
+            () => {}
+        );
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: 'TRY',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(amount);
-    };
+    const formatAmount = (amount) => formatCurrency(amount, 'TRY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 
     if (isLoading) {
@@ -163,13 +160,13 @@ const CreditCardsPage = () => {
                                     <div>
                                         <p className="opacity-75">Current Amount</p>
                                         <p className="font-semibold">
-                                            {formatCurrency(parseFloat(card.amount) || 0)}
+                                            {formatAmount(parseFloat(card.amount) || 0)}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="opacity-75">Limit</p>
                                         <p className="font-semibold">
-                                            {formatCurrency(parseFloat(card.limit) || 0)}
+                                            {formatAmount(parseFloat(card.limit) || 0)}
                                         </p>
                                     </div>
                                 </div>

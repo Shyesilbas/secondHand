@@ -4,6 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
 import { ListingFeePaymentRequestDTO, ListingFeeConfigDTO } from '../../types/payments';
+import { formatCurrency } from '../../utils/formatters';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
@@ -82,14 +83,7 @@ const PayListingFeePage = () => {
         }
     };
 
-    const formatPrice = (price, currency = 'TRY') => {
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: currency,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }).format(price);
-    };
+    const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     if (isLoading) {
         return (

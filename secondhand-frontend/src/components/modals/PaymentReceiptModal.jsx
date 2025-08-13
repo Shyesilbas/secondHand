@@ -1,29 +1,14 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { XMarkIcon, PrinterIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { formatCurrency, formatDateTime } from '../../utils/formatters';
+import { useNotification } from '../../context/NotificationContext';
 
 const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   if (!isOpen || !payment) return null;
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
+  const formatAmount = (amount) => formatCurrency(amount, 'TRY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatDate = (dateString) => formatDateTime(dateString);
 
   const getPaymentTypeLabel = (type) => {
     switch (type) {
@@ -62,12 +47,14 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
     window.print();
   };
 
+  const notification = useNotification();
+
   const handleShare = async () => {
     const receiptText = `
 SecondHand Ödeme Dekontu
 Dekont No: ${payment.paymentId}
 Tarih: ${formatDate(payment.createdAt)}
-Tutar: ${formatCurrency(payment.amount)}
+      Tutar: ${formatAmount(payment.amount)}
 İşlem Türü: ${getTransactionTypeLabel(payment.transactionType)}
 Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
     `.trim();
@@ -85,7 +72,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
       // Fallback: Copy to clipboard
       try {
         await navigator.clipboard.writeText(receiptText);
-        alert('Dekont bilgileri panoya kopyalandı!');
+        notification.showSuccess('Kopyalandı', 'Dekont bilgileri panoya kopyalandı');
       } catch (err) {
         console.log('Error copying to clipboard:', err);
       }
