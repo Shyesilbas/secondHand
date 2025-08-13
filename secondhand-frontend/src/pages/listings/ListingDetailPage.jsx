@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../../features/listings/services/listingService';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
+import { ROUTES } from '../../constants/routes';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
@@ -10,32 +12,82 @@ const ListingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const notification = useNotification();
   const [listing, setListing] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchListing = async () => {
-      try {
-        setIsLoading(true);
-        const data = await listingService.getListingById(id);
-        setListing(data);
-      } catch (err) {
-        setError(err.response?.data?.message || 'An error occurred while fetching the listing. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchListing = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await listingService.getListingById(id);
+      setListing(data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred while fetching the listing. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
 
+  useEffect(() => {
     if (id) {
       fetchListing();
     }
-  }, [id]);
+  }, [id, fetchListing]);
 
   const formatPrice = (price, currency) => formatCurrency(price, currency);
   const formatDate = (dateString) => formatDateTime(dateString);
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
+
+  const getStatusBadge = (status) => {
+    const statusLabels = {
+      ACTIVE: 'Active',
+      INACTIVE: 'Inactive',
+      SOLD: 'Sold',
+      DRAFT: 'Draft',
+      PENDING: 'Pending',
+    };
+    const label = statusLabels[status] || 'Draft';
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-600">
+        {label}
+      </span>
+    );
+  };
+
+  const handleEdit = () => {
+    if (!listing) return;
+    if (listing.type === 'VEHICLE') {
+      navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
+    }
+  };
+
+  const handleDelete = () => {
+    if (!listing) return;
+    notification.showConfirmation(
+      'İlanı Sil',
+      'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      async () => {
+        await listingService.deleteListing(listing.id);
+        navigate(-1);
+        notification.showSuccess('Başarılı', 'İlan silindi');
+      },
+      () => {}
+    );
+  };
+
+  const handleDeactivate = async () => {
+    if (!listing) return;
+    await listingService.deactivateListing(listing.id);
+    await fetchListing();
+  };
+
+  const handleReactivate = async () => {
+    if (!listing) return;
+    await listingService.activateListing(listing.id);
+    await fetchListing();
+  };
 
   if (isLoading) {
     return (
@@ -109,11 +161,25 @@ const ListingDetailPage = () => {
           )}
           {isOwner && (
             <div className="flex space-x-2">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                Düzenle
+              <button onClick={handleEdit} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" /></svg>
+                <span>Edit</span>
               </button>
-              <button className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
-                Sil
+              {listing.status === 'ACTIVE' && (
+                <button onClick={handleDeactivate} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm" title="Deactivate">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728M6 6l12 12" /></svg>
+                  <span>Deactivate</span>
+                </button>
+              )}
+              {listing.status === 'INACTIVE' && (
+                <button onClick={handleReactivate} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm" title="Reactivate">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  <span>Reactivate</span>
+                </button>
+              )}
+              <button onClick={handleDelete} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+                <span>Delete</span>
               </button>
             </div>
           )}
@@ -137,22 +203,11 @@ const ListingDetailPage = () => {
                 />
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold text-blue-600">
+                <div className="text-3xl font-bold text-slate-900">
                   {formatPrice(listing.price, listing.currency)}
                 </div>
                 <div className="flex items-center justify-end mt-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    listing.status === 'ACTIVE' 
-                      ? 'bg-green-100 text-green-800' 
-                      : listing.status === 'SOLD'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {listing.status === 'ACTIVE' && 'Active'}
-                    {listing.status === 'SOLD' && 'Sold'}
-                    {listing.status === 'DRAFT' && 'Draft'}
-                    {listing.status === 'PENDING' && 'Pending'}
-                  </span>
+                  {getStatusBadge(listing.status)}
                 </div>
               </div>
             </div>
@@ -185,7 +240,7 @@ const ListingDetailPage = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Seller Information</h3>
             
             <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
                 <span className="text-white text-lg font-medium">
                   {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
@@ -202,14 +257,12 @@ const ListingDetailPage = () => {
 
             {!isOwner && (
               <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  Contact Seller
-                </button>
+                <button className="w-full border border-slate-200 bg-white text-slate-800 py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors font-medium">Contact Seller</button>
               </div>
             )}
 
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <h4 className="font-medium text-gray-900 mb-3">Listing Statics</h4>
+              <h4 className="font-medium text-gray-900 mb-3">Listing Stats</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Listing No:</span>

@@ -46,10 +46,7 @@ const ListingCard = ({ listing, onDeleted }) => {
     return (
         <div className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden">
             <Link
-                to={listing.type === 'VEHICLE' 
-                    ? ROUTES.VEHICLE_DETAIL.replace(':id', listing.id)
-                    : ROUTES.LISTING_DETAIL.replace(':id', listing.id)
-                }
+                to={ROUTES.LISTING_DETAIL.replace(':id', listing.id)}
                 className="block"
             >
                 <div className="flex">
