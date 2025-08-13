@@ -1,7 +1,7 @@
 import React from 'react';
 import ListingCard from './ListingCard';
 
-const ListingGrid = ({ listings, isLoading, error }) => {
+const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
     if (isLoading) {
         return (
             <div className="space-y-4">
@@ -75,7 +75,7 @@ const ListingGrid = ({ listings, isLoading, error }) => {
     return (
         <div className="space-y-4">
             {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard key={listing.id} listing={listing} onDeleted={onDeleted} />
             ))}
         </div>
     );

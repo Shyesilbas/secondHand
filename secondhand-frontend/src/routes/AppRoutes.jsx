@@ -26,6 +26,7 @@ import CreditCardsPage from '../pages/payments/CreditCardsPage';
 import BankAccountsPage from '../pages/payments/BankAccountsPage';
 import EmailsPage from '../pages/emails/EmailsPage';
 import VehicleDetailPage from '../pages/vehicles/VehicleDetailPage';
+import VehicleEditPage from '../pages/vehicles/VehicleEditPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -108,6 +109,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.BANK_ACCOUNTS} element={<BankAccountsPage />} />
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
+        <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
             </Route>
 
             {/* Fallback */}

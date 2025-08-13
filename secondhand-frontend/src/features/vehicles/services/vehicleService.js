@@ -7,7 +7,23 @@ export const vehicleService = {
   // Create a new vehicle listing
   createVehicleListing: async (vehicleData) => {
     const createData = createVehicleCreateRequest(vehicleData);
+    // Debug: inspect payload
+    if (import.meta && import.meta.env && import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('[vehicleService.createVehicleListing] payload', createData);
+    }
     const response = await apiClient.post(API_ENDPOINTS.VEHICLES.CREATE, createData);
+    return response.data;
+  },
+
+  // Update an existing vehicle listing
+  updateVehicleListing: async (id, vehicleData) => {
+    const updateData = createVehicleUpdateRequest(vehicleData);
+    if (import.meta && import.meta.env && import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('[vehicleService.updateVehicleListing] payload', { id, updateData });
+    }
+    const response = await apiClient.put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
     return response.data;
   },
 
@@ -17,12 +33,7 @@ export const vehicleService = {
     return response.data;
   },
 
-  // Update vehicle listing
-  updateVehicleListing: async (id, vehicleData) => {
-    const updateData = createVehicleUpdateRequest(vehicleData);
-    const response = await apiClient.put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
-    return response.data;
-  },
+
 
   // Find vehicles by brand and model
   findVehiclesByBrandAndModel: async (brand, model) => {

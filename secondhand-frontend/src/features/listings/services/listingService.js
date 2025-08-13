@@ -40,6 +40,11 @@ export const listingService = {
     return response.data;
   },
 
+  deleteListing: async (id) => {
+    const response = await apiClient.delete(API_ENDPOINTS.LISTINGS.DELETE(id));
+    return response.data;
+  },
+
   getListingsByType: async (listingType) => {
     const response = await apiClient.get(API_ENDPOINTS.LISTINGS.BY_TYPE(listingType));
     return response.data;

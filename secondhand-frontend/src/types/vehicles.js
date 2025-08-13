@@ -30,33 +30,7 @@ export const VehicleCreateRequestDTO = {
   fuelType: '',
 };
 
-// Vehicle Update Request DTO
-export const VehicleUpdateRequestDTO = {
-  // Basic Info
-  title: '',
-  description: '',
-  price: 0,
-  currency: 'TRY',
-  city: '',
-  district: '',
-  
-  // Vehicle Specs
-  brand: '',
-  model: '',
-  year: 0,
-  mileage: 0,
-  engineCapacity: 0,
-  gearbox: '',
-  seatCount: '',
-  doors: '',
-  wheels: 0,
-  color: '',
-  fuelCapacity: 0,
-  fuelConsumption: 0,
-  horsePower: 0,
-  kilometersPerLiter: 0,
-  fuelType: '',
-};
+
 
 // Vehicle Response DTO
 export const VehicleListingDTO = {
@@ -134,16 +108,16 @@ export const VehicleSearchFiltersDTO = {
 export const createVehicleCreateRequest = (data) => {
   return {
     // Basic Info
-    title: data.title || '',
-    description: data.description || '',
+    title: (data.title || '').trim(),
+    description: (data.description || '').trim(),
     price: parseFloat(data.price) || 0,
     currency: data.currency || 'TRY',
-    city: data.city || '',
-    district: data.district || '',
+    city: (data.city || '').trim(),
+    district: (data.district || '').trim(),
     
     // Vehicle Specs
     brand: data.brand || '',
-    model: data.model || '',
+    model: (data.model || '').trim(),
     year: parseInt(data.year) || 0,
     mileage: parseInt(data.mileage) || 0,
     engineCapacity: parseInt(data.engineCapacity) || 0,
@@ -161,10 +135,34 @@ export const createVehicleCreateRequest = (data) => {
 };
 
 /**
- * Create Vehicle Update Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
+ * Vehicle Update Request DTO - All fields are optional
+ * @param {Object} data - Form data with only changed fields
+ * @returns {Object} - Update DTO with only provided fields
  */
 export const createVehicleUpdateRequest = (data) => {
-  return createVehicleCreateRequest(data); // Same structure for update
+  const updateData = {};
+  
+  // Only include fields that are provided and not empty
+  if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
+  if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
+  if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
+  if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
+  if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
+  if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
+  if (data.model !== undefined && data.model !== '') updateData.model = data.model.trim();
+  if (data.mileage !== undefined && data.mileage !== '') updateData.mileage = parseInt(data.mileage);
+  if (data.engineCapacity !== undefined && data.engineCapacity !== '') updateData.engineCapacity = parseInt(data.engineCapacity);
+  if (data.gearbox !== undefined && data.gearbox !== '') updateData.gearbox = data.gearbox;
+  if (data.seatCount !== undefined && data.seatCount !== '') updateData.seatCount = data.seatCount;
+  if (data.doors !== undefined && data.doors !== '') updateData.doors = data.doors;
+  if (data.wheels !== undefined && data.wheels !== '') updateData.wheels = parseInt(data.wheels);
+  if (data.color !== undefined && data.color !== '') updateData.color = data.color;
+  if (data.fuelCapacity !== undefined && data.fuelCapacity !== '') updateData.fuelCapacity = parseInt(data.fuelCapacity);
+  if (data.fuelConsumption !== undefined && data.fuelConsumption !== '') updateData.fuelConsumption = parseInt(data.fuelConsumption);
+  if (data.horsePower !== undefined && data.horsePower !== '') updateData.horsePower = parseInt(data.horsePower);
+  if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter);
+  if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
+  
+  return updateData;
 };
+

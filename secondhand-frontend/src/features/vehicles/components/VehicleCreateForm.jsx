@@ -6,6 +6,7 @@ import { ROUTES } from '../../../constants/routes';
 import { useNotification } from '../../../context/NotificationContext';
 import { VehicleCreateRequestDTO } from '../../../types/vehicles';
 import SearchableDropdown from '../../../components/ui/SearchableDropdown';
+import { vehicleFormSteps } from '../config/vehicleFormSteps';
 
 const VehicleCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -32,11 +33,7 @@ const VehicleCreateForm = ({ onBack }) => {
     kilometersPerLiter: '',
   });
 
-  const steps = [
-    { id: 1, title: 'Temel Bilgiler', icon: '📝', description: 'Başlık, açıklama ve fiyat' },
-    { id: 2, title: 'Araç Özellikleri', icon: '🚗', description: 'Marka, model ve teknik detaylar' },
-    { id: 3, title: 'Konum & Önizleme', icon: '📍', description: 'Konum bilgileri ve son kontrol' }
-  ];
+  const steps = vehicleFormSteps;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

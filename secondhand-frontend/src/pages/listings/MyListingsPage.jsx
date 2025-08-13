@@ -82,7 +82,7 @@ const MyListingsPage = () => {
                 listings={listings} 
                 isLoading={isLoading} 
                 error={error}
-                showActions={true}
+                onDeleted={() => refetch()}
             />
         </div>
     );

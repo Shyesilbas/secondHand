@@ -1,15 +1,18 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.VehicleListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +40,40 @@ public class VehicleListingService {
     @Transactional
     public void updateVehicleListing(UUID id, VehicleUpdateRequest request, User currentUser) {
         listingService.validateOwnership(id, currentUser);
+
         VehicleListing existing = vehicleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Vehicle listing not found"));
-        listingMapper.updateVehicleFromRequest(request, existing);
+                .orElseThrow(() -> new BusinessException(
+                        "Vehicle listing not found",
+                        HttpStatus.NOT_FOUND,
+                        "LISTING_NOT_FOUND"
+                ));
+
+        // Do not allow updates on SOLD listings
+        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+
+        // Base listing fields
+        request.title().ifPresent(existing::setTitle);
+        request.description().ifPresent(existing::setDescription);
+        request.price().ifPresent(existing::setPrice);
+        request.currency().ifPresent(existing::setCurrency);
+        request.city().ifPresent(existing::setCity);
+        request.district().ifPresent(existing::setDistrict);
+
+        // Vehicle specific fields
+        request.model().ifPresent(existing::setModel);
+        request.mileage().ifPresent(existing::setMileage);
+        request.engineCapacity().ifPresent(existing::setEngineCapacity);
+        request.gearbox().ifPresent(existing::setGearbox);
+        request.seatCount().ifPresent(existing::setSeatCount);
+        request.doors().ifPresent(existing::setDoors);
+        request.wheels().ifPresent(existing::setWheels);
+        request.color().ifPresent(existing::setColor);
+        request.fuelCapacity().ifPresent(existing::setFuelCapacity);
+        request.fuelConsumption().ifPresent(existing::setFuelConsumption);
+        request.horsePower().ifPresent(existing::setHorsePower);
+        request.kilometersPerLiter().ifPresent(existing::setKilometersPerLiter);
+        request.fuelType().ifPresent(existing::setFuelType);
+
         vehicleRepository.save(existing);
         log.info("Vehicle listing updated: {}", id);
     }

@@ -6,6 +6,8 @@ import { useEnums } from '../../hooks/useEnums';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import { VehicleListingDTO } from '../../types/vehicles';
+import { ROUTES } from '../../constants/routes';
+import { listingService } from '../../features/listings/services/listingService';
 
 const VehicleDetailPage = () => {
   const { id } = useParams();
@@ -39,6 +41,24 @@ const VehicleDetailPage = () => {
   };
 
   const isOwner = isAuthenticated && user?.id === vehicle?.sellerId;
+
+  const handleEdit = () => {
+    if (vehicle?.type === 'VEHICLE') {
+      navigate(ROUTES.VEHICLE_EDIT.replace(':id', vehicle.id));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!isOwner || !vehicle) return;
+    if (!confirm('İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
+    try {
+      await listingService.deleteListing(vehicle.id);
+      navigate(-1);
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      alert('Silme sırasında bir hata oluştu');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -115,6 +135,7 @@ const VehicleDetailPage = () => {
                     {getEnumLabel(enums.carBrands, vehicle.brand)} {vehicle.model} • {vehicle.year}
                   </span>
                 </div>
+                <div className="flex items-center gap-2">
                 <FavoriteStats 
                   listingId={vehicle.id}
                   size="sm"
@@ -122,6 +143,31 @@ const VehicleDetailPage = () => {
                   showText={true}
                   className="text-gray-600"
                 />
+                {isOwner && vehicle.status !== 'SOLD' && (
+                  <button
+                    onClick={handleEdit}
+                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                    title="Düzenle"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" />
+                    </svg>
+                    <span>Düzenle</span>
+                  </button>
+                )}
+                {isOwner && (
+                  <button
+                    onClick={handleDelete}
+                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                    title="Sil"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                    <span>Sil</span>
+                  </button>
+                )}
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-blue-600">

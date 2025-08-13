@@ -184,6 +184,17 @@ public class ListingService {
         throw new BusinessException("Invalid listing status for this operation", HttpStatus.BAD_REQUEST, "INVALID_STATUS");
     }
     
+    @Transactional
+    public void deleteListing(UUID listingId, User currentUser) {
+        Listing listing = findById(listingId)
+                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+        if (!listing.getSeller().getId().equals(currentUser.getId())) {
+            throw new BusinessException("User is not the owner of this listing", HttpStatus.FORBIDDEN, "NOT_OWNER");
+        }
+        listingRepository.deleteById(listingId);
+        log.info("Listing deleted: {}", listingId);
+    }
+
 
     public long getTotalListingCount() {
         log.info("Getting total listing count");

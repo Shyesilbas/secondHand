@@ -1,12 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 import FavoriteButton from '../../favorites/components/FavoriteButton';
 import FavoriteStats from '../../favorites/components/FavoriteStats';
+import { useAuth } from '../../../context/AuthContext';
+import { listingService } from '../services/listingService';
 
-const ListingCard = ({ listing }) => {
+const ListingCard = ({ listing, onDeleted }) => {
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const { getListingTypeLabel, getListingTypeIcon } = useEnums();
     const formatPrice = (price, currency) => {
         return new Intl.NumberFormat('tr-TR', {
@@ -114,6 +118,38 @@ const ListingCard = ({ listing }) => {
                                     size="sm"
                                     showCount={true}
                                 />
+                                {listing.type === 'VEHICLE' && user?.id === listing.sellerId && listing.status !== 'SOLD' && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
+                                        }}
+                                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs"
+                                        title="Düzenle"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" />
+                                        </svg>
+                                        <span>Düzenle</span>
+                                    </button>
+                                )}
+                                {user?.id === listing.sellerId && (
+                                    <button
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            if (!confirm('İlanı silmek istediğinize emin misiniz?')) return;
+                                            await listingService.deleteListing(listing.id);
+                                            onDeleted && onDeleted(listing.id);
+                                        }}
+                                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs"
+                                        title="Sil"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                        </svg>
+                                        <span>Sil</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 

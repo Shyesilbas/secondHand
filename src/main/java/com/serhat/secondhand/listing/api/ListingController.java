@@ -160,4 +160,13 @@ public class ListingController {
         ListingStatisticsDto statistics = listingService.getListingStatistics();
         return ResponseEntity.ok(statistics);
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a listing")
+    public ResponseEntity<Void> deleteListing(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+        listingService.deleteListing(id, currentUser);
+        return ResponseEntity.noContent().build();
+    }
 }
