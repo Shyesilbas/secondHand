@@ -42,8 +42,10 @@ export const useVehicle = (vehicleId = null) => {
       setIsLoading(true);
       setError(null);
       const response = await vehicleService.updateVehicleListing(id, vehicleData);
-      // Refresh vehicle data after update
-      await fetchVehicle(id);
+      // Optimistic update: merge changes locally to avoid full page refresh
+      setVehicle(prev => ({ ...prev, ...(vehicleData || {}) }));
+      // Also refetch in background to stay consistent with backend
+      fetchVehicle(id);
       return response;
     } catch (err) {
       setError(err.response?.data?.message || 'İlan güncellenirken bir hata oluştu');
