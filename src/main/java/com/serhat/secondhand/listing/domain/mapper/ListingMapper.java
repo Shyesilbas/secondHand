@@ -45,12 +45,6 @@ public interface ListingMapper {
     ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
 
-    @Mapping(target = "sellerName", source = "seller.name")
-    @Mapping(target = "sellerSurname", source = "seller.surname")
-    @Mapping(target = "sellerId", source = "seller.id")
-    @Mapping(target = "type", source = "listingType")
-    ListingResponseDto toListingResponseDto(Listing listing);
-
     default ListingDto toDynamicDto(Listing listing) {
         if (listing instanceof VehicleListing) {
             return toVehicleDto((VehicleListing) listing);

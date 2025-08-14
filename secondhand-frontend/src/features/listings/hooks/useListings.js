@@ -1,49 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { listingService } from '../services/listingService';
 import { ListingResponseDTO } from '../../../types/listings';
+import useApi from '../../../hooks/useApi';
 
 export const useListings = (listingType = null, onlyActive = true) => {
-  const [listings, setListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchListings = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      let data;
-      if (listingType) {
-        if (onlyActive) {
-          data = await listingService.getActiveListingsByType(listingType);
-        } else {
-          data = await listingService.getListingsByTypeOrderByDate(listingType);
-        }
-      } else {
-        data = await listingService.getAllListings();
-      }
-      
-      setListings(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'İlanlar yüklenirken bir hata oluştu');
-      console.error('Error fetching listings:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data, isLoading, error, callApi, setData } = useApi([]);
 
   useEffect(() => {
-    fetchListings();
+    const run = async () => {
+      if (listingType) {
+        if (onlyActive) {
+          await callApi(listingService.getActiveListingsByType, listingType);
+        } else {
+          await callApi(listingService.getListingsByTypeOrderByDate, listingType);
+        }
+      } else {
+        await callApi(listingService.getAllListings);
+      }
+    };
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listingType, onlyActive]);
 
-  const refetch = () => {
-    fetchListings();
-  };
-
   return {
-    listings,
+    listings: data,
     isLoading,
     error,
-    refetch,
+    refetch: () => {
+      // Re-run the same selection
+      if (listingType) {
+        if (onlyActive) {
+          return callApi(listingService.getActiveListingsByType, listingType);
+        }
+        return callApi(listingService.getListingsByTypeOrderByDate, listingType);
+      }
+      return callApi(listingService.getAllListings);
+    },
+    setListings: setData,
   };
 };

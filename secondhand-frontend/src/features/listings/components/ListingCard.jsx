@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
+import StatusBadge from '../../../components/ui/StatusBadge';
 import FavoriteButton from '../../favorites/components/FavoriteButton';
 import FavoriteStats from '../../favorites/components/FavoriteStats';
 import { useAuth } from '../../../context/AuthContext';
 import { listingService } from '../services/listingService';
 import { formatCurrency, formatDateTime } from '../../../utils/formatters';
 import { useNotification } from '../../../context/NotificationContext';
+import ListingCardActions from './ListingCardActions';
 
 const ListingCard = ({ listing, onDeleted }) => {
     const navigate = useNavigate();
@@ -27,21 +29,12 @@ const ListingCard = ({ listing, onDeleted }) => {
 
 
 
-    const getStatusBadge = (status) => {
-        const statusLabels = {
-            'ACTIVE': 'Aktif',
-            'SOLD': 'Satıldı',
-            'DRAFT': 'Taslak',
-            'PENDING': 'Beklemede',
-            'INACTIVE': 'Pasif',
-        };
-        const label = statusLabels[status] || 'Taslak';
-        return (
-            <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-600">
-                {label}
-            </span>
-        );
-    };
+    const getStatusBadge = (status) => (
+        <StatusBadge
+            status={status}
+            labels={{ ACTIVE: 'Aktif', INACTIVE: 'Pasif', SOLD: 'Satıldı', DRAFT: 'Taslak', PENDING: 'Beklemede' }}
+        />
+    );
 
     return (
         <div className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden">
@@ -90,85 +83,7 @@ const ListingCard = ({ listing, onDeleted }) => {
                                     size="sm"
                                     showCount={true}
                                 />
-                                {listing.type === 'VEHICLE' && user?.id === listing.sellerId && listing.status !== 'SOLD' && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
-                                        }}
-                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
-                                        title="Düzenle"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" />
-                                        </svg>
-                                        <span>Düzenle</span>
-                                    </button>
-                                )}
-                                {user?.id === listing.sellerId && listing.status === 'ACTIVE' && (
-                                    <button
-                                        onClick={async (e) => {
-                                            e.preventDefault();
-                                            try {
-                                                await listingService.deactivateListing(listing.id);
-                                                onDeleted && onDeleted(listing.id);
-                                            } catch (err) {
-                                                console.error('Deactivate failed', err);
-                                            }
-                                        }}
-                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
-                                        title="Deactivate"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728M6 6l12 12" />
-                                        </svg>
-                                        <span>Deactivate</span>
-                                    </button>
-                                )}
-                                {user?.id === listing.sellerId && listing.status === 'INACTIVE' && (
-                                    <button
-                                        onClick={async (e) => {
-                                            e.preventDefault();
-                                            try {
-                                                await listingService.activateListing(listing.id);
-                                                onDeleted && onDeleted(listing.id);
-                                            } catch (err) {
-                                                console.error('Reactivate failed', err);
-                                            }
-                                        }}
-                                        className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
-                                        title="Reactivate"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Reactivate</span>
-                                    </button>
-                                )}
-                                {user?.id === listing.sellerId && (
-                                    <button
-                                        onClick={async (e) => {
-                                            e.preventDefault();
-                                            notification.showConfirmation(
-                                                'İlanı Sil',
-                                                'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
-                                                async () => {
-                                                    await listingService.deleteListing(listing.id);
-                                                    onDeleted && onDeleted(listing.id);
-                                                    notification.showSuccess('Başarılı', 'İlan silindi');
-                                                },
-                                                () => {}
-                                            );
-                                        }}
-                                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs"
-                                        title="Sil"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                        </svg>
-                                        <span>Sil</span>
-                                    </button>
-                                )}
+                                <ListingCardActions listing={listing} onChanged={onDeleted} />
                             </div>
                         </div>
 

@@ -1,60 +1,27 @@
-import apiClient from './api/config';
+import { get } from './api/request';
 import { API_ENDPOINTS } from '../constants/apiEndpoints';
 
 export const enumService = {
-  getListingTypes: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.LISTING_TYPES);
-    return response.data;
-  },
+  getListingTypes: async () => get(API_ENDPOINTS.ENUMS.LISTING_TYPES),
 
-  getListingStatuses: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.LISTING_STATUSES);
-    return response.data;
-  },
+  getListingStatuses: async () => get(API_ENDPOINTS.ENUMS.LISTING_STATUSES),
 
-  getCarBrands: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.CAR_BRANDS);
-    return response.data;
-  },
+  getCarBrands: async () => get(API_ENDPOINTS.ENUMS.CAR_BRANDS),
 
-  getFuelTypes: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.FUEL_TYPES);
-    return response.data;
-  },
+  getFuelTypes: async () => get(API_ENDPOINTS.ENUMS.FUEL_TYPES),
 
-  getColors: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.COLORS);
-    return response.data;
-  },
+  getColors: async () => get(API_ENDPOINTS.ENUMS.COLORS),
 
-  getDoors: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.DOORS);
-    return response.data;
-  },
+  getDoors: async () => get(API_ENDPOINTS.ENUMS.DOORS),
 
-  getCurrencies: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.CURRENCIES);
-    return response.data;
-  },
+  getCurrencies: async () => get(API_ENDPOINTS.ENUMS.CURRENCIES),
 
-  getGearTypes: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.GEAR_TYPES);
-    return response.data;
-  },
+  getGearTypes: async () => get(API_ENDPOINTS.ENUMS.GEAR_TYPES),
 
-  getSeatCounts: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.SEAT_COUNTS);
-    return response.data;
-  },
+  getSeatCounts: async () => get(API_ENDPOINTS.ENUMS.SEAT_COUNTS),
 
   // Electronics enums
-  getElectronicTypes: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.ELECTRONIC_TYPES);
-    return response.data;
-  },
+  getElectronicTypes: async () => get(API_ENDPOINTS.ENUMS.ELECTRONIC_TYPES),
 
-  getElectronicBrands: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ENUMS.ELECTRONIC_BRANDS);
-    return response.data;
-  },
+  getElectronicBrands: async () => get(API_ENDPOINTS.ENUMS.ELECTRONIC_BRANDS),
 };

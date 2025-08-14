@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
@@ -24,6 +25,7 @@ public class ListingEventListener {
 
     private final ListingRepository listingRepository;
     private final EmailService emailService;
+    private final PaymentMapper paymentMapper;
 
     @EventListener
     @Transactional
@@ -58,20 +60,7 @@ public class ListingEventListener {
         }
 
         User user = payment.getFromUser();
-        PaymentDto paymentDto = new PaymentDto(
-                payment.getId(),
-                user.getName(),
-                user.getSurname(),
-                payment.getToUser() != null ? payment.getToUser().getName() : "SYSTEM",
-                payment.getToUser() != null ? payment.getToUser().getSurname() : "",
-                payment.getAmount(),
-                payment.getPaymentType(),
-                payment.getTransactionType(),
-                payment.getPaymentDirection(),
-                payment.getListingId(),
-                payment.getProcessedAt(),
-                payment.isSuccess()
-        );
+        PaymentDto paymentDto = paymentMapper.toDto(payment);
         emailService.sendPaymentSuccessEmail(user, paymentDto, listing.getTitle());
         log.info("Payment success email sent for payment ID: {}", payment.getId());
     }

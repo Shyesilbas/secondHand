@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { listingService } from '../services/listingService';
 import { ListingFilterDTO, ListingResponseDTO } from '../../../types/listings';
+import { cleanObject } from '../../../utils/formatters';
 
-export const useAdvancedListings = () => {
+export const useAdvancedListings = (initialFilters = {}) => {
   const [listings, setListings] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -11,7 +12,8 @@ export const useAdvancedListings = () => {
   const [error, setError] = useState(null);
 
   const [filters, setFilters] = useState({
-    ...ListingFilterDTO
+    ...ListingFilterDTO,
+    ...(initialFilters || {})
   });
 
   const fetchListings = async (newFilters = filters) => {
@@ -19,16 +21,8 @@ export const useAdvancedListings = () => {
       setIsLoading(true);
       setError(null);
       
-      // Clean filters - remove empty values
-      const cleanFilters = Object.entries(newFilters).reduce((acc, [key, value]) => {
-        if (value !== '' && value !== null && value !== undefined) {
-          if (Array.isArray(value) && value.length === 0) {
-            return acc;
-          }
-          acc[key] = value;
-        }
-        return acc;
-      }, {});
+      // Clean filters - remove empty values using shared util
+      const cleanFilters = cleanObject(newFilters);
 
       const response = await listingService.getListingsWithFilters(cleanFilters);
       
@@ -64,6 +58,7 @@ export const useAdvancedListings = () => {
 
   useEffect(() => {
     fetchListings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

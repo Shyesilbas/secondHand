@@ -26,3 +26,25 @@ export const formatDateTime = (dateString) => {
   });
 };
 
+// Remove empty or nullish fields from an object. Useful before sending filters/requests
+export const cleanObject = (obj) => {
+  return Object.entries(obj || {}).reduce((acc, [key, value]) => {
+    if (value === '' || value === null || value === undefined) {
+      return acc;
+    }
+    if (Array.isArray(value) && value.length === 0) {
+      return acc;
+    }
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      const cleaned = cleanObject(value);
+      if (Object.keys(cleaned).length === 0) {
+        return acc;
+      }
+      acc[key] = cleaned;
+      return acc;
+    }
+    acc[key] = value;
+    return acc;
+  }, {});
+};
+

@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
@@ -43,6 +44,7 @@ public class PaymentService {
     private final CreditCardService creditCardService;
     private final ListingService listingService;
     private final ApplicationEventPublisher eventPublisher;
+    private final PaymentMapper paymentMapper;
 
     @Getter
     @Value("${app.listing.creation.fee:50.00}")
@@ -138,7 +140,7 @@ public class PaymentService {
             log.info("Published PaymentCompletedEvent for payment ID: {}", payment.getId());
         }
 
-        return toDto(payment);
+        return paymentMapper.toDto(payment);
     }
 
     private boolean processCreditCardPayment(User fromUser, User toUser, BigDecimal amount) {
@@ -172,7 +174,7 @@ public class PaymentService {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
-        return payments.map(this::toDto);
+        return payments.map(paymentMapper::toDto);
     }
 
     public Map<String, Object> getPaymentStatistics(Authentication authentication) {
@@ -195,22 +197,7 @@ public class PaymentService {
         );
     }
 
-    private PaymentDto toDto(Payment payment) {
-        return new PaymentDto(
-                payment.getId(),
-                payment.getFromUser().getName(),
-                payment.getFromUser().getSurname(),
-                payment.getToUser() != null ? payment.getToUser().getName() : "SYSTEM",
-                payment.getToUser() != null ? payment.getToUser().getSurname() : "",
-                payment.getAmount(),
-                payment.getPaymentType(),
-                payment.getTransactionType(),
-                payment.getPaymentDirection(),
-                payment.getListingId(),
-                payment.getProcessedAt(),
-                payment.isSuccess()
-        );
-    }
+    // mapping handled by PaymentMapper
 
 
     public ListingFeeConfigDto getListingFeeConfig() {

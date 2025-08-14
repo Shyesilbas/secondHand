@@ -1,40 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { listingService } from '../services/listingService';
+import useApi from '../../../hooks/useApi';
 
 export const useMyListings = (status = null) => {
-    const [listings, setListings] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchMyListings = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const data = status 
-                ? await listingService.getMyListingsByStatus(status)
-                : await listingService.getMyListings();
-            setListings(data);
-        } catch (err) {
-            setError(err.response?.data?.message || 'İlanlarınız yüklenirken bir hata oluştu');
-            console.error('Error fetching my listings:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { data, isLoading, error, callApi } = useApi([]);
 
     useEffect(() => {
-        fetchMyListings();
+        const run = async () => {
+            if (status) {
+                await callApi(listingService.getMyListingsByStatus, status);
+            } else {
+                await callApi(listingService.getMyListings);
+            }
+        };
+        run();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status]);
 
-    const refetch = () => {
-        fetchMyListings();
-    };
-
     return {
-        listings,
+        listings: data,
         isLoading,
         error,
-        refetch,
+        refetch: () => (status ? callApi(listingService.getMyListingsByStatus, status) : callApi(listingService.getMyListings)),
     };
 };

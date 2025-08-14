@@ -4,6 +4,7 @@ import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
+import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 public class EmailService {
 
     private final EmailRepository emailRepository;
+    private final EmailMapper emailMapper;
 
     @Value("${app.email.sender}")
     private String defaultSenderEmail;
@@ -89,26 +91,12 @@ public class EmailService {
         email = emailRepository.save(email);
         log.info("{} email saved with ID: {}", emailType, email.getId());
 
-        return new EmailDto(
-                user.getEmail(),
-                defaultSenderEmail,
-                subject,
-                content,
-                emailType,
-                now);
+        return emailMapper.toDto(email);
     }
 
     public List<EmailDto> getUserEmails(User user) {
         List<Email> emails = emailRepository.findByUserOrderByCreatedAtDesc(user);
 
-        return emails.stream()
-                .map(email -> new EmailDto(
-                        email.getRecipientEmail(),
-                        defaultSenderEmail,
-                        email.getSubject(),
-                        email.getContent(),
-                        email.getEmailType(),
-                        email.getCreatedAt()
-                )).toList();
+        return emails.stream().map(emailMapper::toDto).toList();
     }
 }

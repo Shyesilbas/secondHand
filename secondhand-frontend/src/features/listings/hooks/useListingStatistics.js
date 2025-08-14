@@ -1,49 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { listingService } from '../services/listingService';
 import { ListingStatisticsDTO } from '../../../types/listings';
+import useApi from '../../../hooks/useApi';
 
 export const useListingStatistics = () => {
-    const [statistics, setStatistics] = useState({...ListingStatisticsDTO});
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { data, isLoading, error, callApi } = useApi({ ...ListingStatisticsDTO });
 
     useEffect(() => {
-        const fetchStatistics = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const data = await listingService.getListingStatistics();
-                setStatistics(data);
-            } catch (err) {
-                console.error('Failed to fetch listing statistics:', err);
-                setError(err.response?.data?.message || 'Failed to load statistics');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchStatistics();
+        callApi(listingService.getListingStatistics);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return {
-        statistics,
+        statistics: data,
         isLoading,
         error,
-        refetch: () => {
-            const fetchStatistics = async () => {
-                try {
-                    setIsLoading(true);
-                    setError(null);
-                    const data = await listingService.getListingStatistics();
-                    setStatistics(data);
-                } catch (err) {
-                    console.error('Failed to fetch listing statistics:', err);
-                    setError(err.response?.data?.message || 'Failed to load statistics');
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            fetchStatistics();
-        }
+        refetch: () => callApi(listingService.getListingStatistics)
     };
 };

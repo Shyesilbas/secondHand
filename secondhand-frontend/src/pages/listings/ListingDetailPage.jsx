@@ -6,6 +6,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { ROUTES } from '../../constants/routes';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
+import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
 const ListingDetailPage = () => {
@@ -40,21 +41,9 @@ const ListingDetailPage = () => {
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 
-  const getStatusBadge = (status) => {
-    const statusLabels = {
-      ACTIVE: 'Active',
-      INACTIVE: 'Inactive',
-      SOLD: 'Sold',
-      DRAFT: 'Draft',
-      PENDING: 'Pending',
-    };
-    const label = statusLabels[status] || 'Draft';
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-600">
-        {label}
-      </span>
-    );
-  };
+  const renderStatusBadge = (status) => (
+    <StatusBadge status={status} />
+  );
 
   const handleEdit = () => {
     if (!listing) return;
@@ -210,7 +199,7 @@ const ListingDetailPage = () => {
                   {formatPrice(listing.price, listing.currency)}
                 </div>
                 <div className="flex items-center justify-end mt-2">
-                  {getStatusBadge(listing.status)}
+                  {renderStatusBadge(listing.status)}
                 </div>
               </div>
             </div>

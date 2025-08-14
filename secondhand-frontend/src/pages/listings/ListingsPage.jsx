@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAdvancedListings } from '../../features/listings/hooks/useAdvancedListings';
 import ListingGrid from '../../features/listings/components/ListingGrid';
 import AdvancedFilters from '../../features/listings/components/AdvancedFilters';
@@ -16,6 +16,8 @@ const ListingsPage = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [showSearchResult, setShowSearchResult] = useState(false);
     
+    const navState = useMemo(() => window.history.state && window.history.state.usr, []);
+    const initialListingType = navState?.listingType || null;
     const {
         listings,
         totalPages,
@@ -27,10 +29,18 @@ const ListingsPage = () => {
         updateFilters,
         updatePage,
         resetFilters
-    } = useAdvancedListings();
+    } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : {});
     
     const { getListingTypeLabel } = useEnums();
     const notification = useNotification();
+
+    // If navigated from Home with a preselected category
+    useEffect(() => {
+        if (initialListingType) {
+            setSelectedCategory(initialListingType);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialListingType]);
 
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);

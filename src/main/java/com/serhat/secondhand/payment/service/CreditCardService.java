@@ -29,6 +29,7 @@ public class CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
     private final UserService userService;
+    private final com.serhat.secondhand.payment.mapper.CreditCardMapper creditCardMapper;
 
     public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
@@ -54,13 +55,13 @@ public class CreditCardService {
         creditCard = creditCardRepository.save(creditCard);
         log.info("Credit card created for user: {} with masked number: {}", user.getEmail(), CreditCardHelper.maskCardNumber(creditCard.getNumber()));
 
-        return toDto(creditCard);
+        return creditCardMapper.toDto(creditCard);
     }
 
     public CreditCardDto getCreditCard(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         CreditCard creditCard = findByUserMandatory(user);
-        return toDto(creditCard);
+        return creditCardMapper.toDto(creditCard);
     }
     
     public boolean processPayment(User user, BigDecimal amount) {
@@ -134,14 +135,5 @@ public class CreditCardService {
         log.info("Credit card deleted for user: {}", user.getEmail());
     }
 
-    private CreditCardDto toDto(CreditCard creditCard) {
-        return new CreditCardDto(
-                CreditCardHelper.maskCardNumber(creditCard.getNumber()),
-                "***",
-                String.valueOf(creditCard.getExpiryMonth()),
-                String.valueOf(creditCard.getExpiryYear()),
-                creditCard.getAmount().toString(),
-                creditCard.getLimit().toString()
-        );
-    }
+    // mapping handled by CreditCardMapper
 }

@@ -1,6 +1,7 @@
-import apiClient, {API_BASE_URL} from './config';
+import apiClient from './config';
 import { getToken, getRefreshToken, setTokens, clearTokens } from '../storage/tokenStorage';
 import axios from "axios";
+import { API_ENDPOINTS, API_BASE_URL } from '../../constants/apiEndpoints';
 
 apiClient.interceptors.request.use(
     (config) => {
@@ -19,10 +20,9 @@ apiClient.interceptors.response.use(
         const originalRequest = error.config;
 
         // Don't intercept auth endpoints (login, register, etc.) - let them handle their own errors
-        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
-                              originalRequest.url?.includes('/auth/register') ||
-                              originalRequest.url?.includes('/auth/forgot-password') ||
-                              originalRequest.url?.includes('/auth/reset-password');
+        const AUTH = API_ENDPOINTS.AUTH;
+        const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD]
+            .some(path => originalRequest.url?.includes(path));
 
         if (isAuthEndpoint) {
             return Promise.reject(error);
@@ -42,9 +42,7 @@ apiClient.interceptors.response.use(
                 }
 
                 // Call refresh endpoint
-                const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-                    refreshToken: refreshToken
-                });
+                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`, { refreshToken });
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data;
 

@@ -3,6 +3,7 @@ package com.serhat.secondhand.payment.service;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.entity.Bank;
+import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.helper.IbanGenerator;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.user.application.UserService;
@@ -27,17 +28,13 @@ public class BankService {
 
     private final BankRepository bankRepository;
     private final UserService userService;
+    private final BankMapper bankMapper;
 
     public BankDto getBankInfo(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         Bank bank = findByUserMandatory(user);
 
-        return new BankDto(
-                bank.getIBAN(),
-                bank.getBalance(),
-                bank.getAccountHolder().getName(),
-                bank.getAccountHolder().getSurname()
-        );
+        return bankMapper.toDto(bank);
     }
 
     public BankDto createBankAccount(Authentication authentication) {
@@ -57,7 +54,7 @@ public class BankService {
         bank = bankRepository.save(bank);
         log.info("Bank account created for user: {} with ID: {}", user.getEmail(), bank.getId());
 
-        return new BankDto(bank.getIBAN(), bank.getBalance(), user.getName(), user.getSurname());
+        return bankMapper.toDto(bank);
     }
 
     public Optional<Bank> findByUser(User user) {
