@@ -20,7 +20,7 @@ export const NotificationProvider = ({ children }) => {
             id,
             isOpen: true,
             autoClose: true,
-            autoCloseDelay: 5000,
+            autoCloseDelay: 2000,
             showCloseButton: true,
             size: 'md',
             ...notification
@@ -42,9 +42,9 @@ export const NotificationProvider = ({ children }) => {
     const showSuccess = useCallback((title, message, options = {}) => {
         return addNotification({
             type: 'success',
-            title: title || 'Başarılı',
+            title: title || 'Success',
             message,
-            autoCloseDelay: 4000,
+            autoCloseDelay: 2000,
             ...options
         });
     }, [addNotification]);
@@ -52,7 +52,7 @@ export const NotificationProvider = ({ children }) => {
     const showError = useCallback((title, message, options = {}) => {
         return addNotification({
             type: 'error',
-            title: title || 'Hata',
+            title: title || 'Error',
             message,
             autoClose: false, // Errors should be manually dismissed
             ...options
@@ -62,9 +62,9 @@ export const NotificationProvider = ({ children }) => {
     const showWarning = useCallback((title, message, options = {}) => {
         return addNotification({
             type: 'warning',
-            title: title || 'Uyarı',
+            title: title || 'Warning',
             message,
-            autoCloseDelay: 6000,
+            autoCloseDelay: 2000,
             ...options
         });
     }, [addNotification]);
@@ -72,9 +72,9 @@ export const NotificationProvider = ({ children }) => {
     const showInfo = useCallback((title, message, options = {}) => {
         return addNotification({
             type: 'info',
-            title: title || 'Bilgi',
+            title: title || 'Information',
             message,
-            autoCloseDelay: 5000,
+            autoCloseDelay: 2000,
             ...options
         });
     }, [addNotification]);
@@ -89,11 +89,11 @@ export const NotificationProvider = ({ children }) => {
         } = options;
 
         const title = customTitle || getErrorTitle(errorData);
-        const message = customMessage || errorData.message || 'Bilinmeyen bir hata oluştu';
+        const message = customMessage || errorData.message || 'Unknown error occurred. Please try again later.';
         
         const defaultActions = actions.length > 0 ? actions : [
             {
-                label: 'Tamam',
+                label: 'Okay',
                 onClick: () => {},
                 primary: true
             }
@@ -118,14 +118,14 @@ export const NotificationProvider = ({ children }) => {
     // Confirmation dialog
     const showConfirmation = useCallback((title, message, onConfirm, onCancel, options = {}) => {
         const {
-            confirmText = 'Evet',
-            cancelText = 'Hayır',
+            confirmText = 'Yes',
+            cancelText = 'No',
             type = 'warning'
         } = options;
 
         return addNotification({
             type,
-            title: title || 'Onay',
+            title: title || 'Approve',
             message,
             autoClose: false,
             actions: [
@@ -174,20 +174,20 @@ export const NotificationProvider = ({ children }) => {
 
 // Helper function to get error title based on error type
 const getErrorTitle = (errorData) => {
-    if (!errorData || !errorData.type) return 'Hata';
+    if (!errorData || !errorData.type) return 'Error';
     
     switch (errorData.type) {
         case 'authentication':
-            return 'Giriş Hatası';
+            return 'Authentication Error';
         case 'authorization':
-            return 'Yetki Hatası';
+            return 'Authorization Error';
         case 'validation':
-            return 'Doğrulama Hatası';
+            return 'Validation Error';
         case 'network':
-            return 'Bağlantı Hatası';
+            return 'Network Error';
         case 'server':
-            return 'Sunucu Hatası';
+            return 'Server Error';
         default:
-            return 'Hata';
+            return 'Error';
     }
 };

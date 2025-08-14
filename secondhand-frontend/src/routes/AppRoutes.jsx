@@ -33,6 +33,7 @@ import ElectronicEditPage from '../pages/electronics/ElectronicEditPage';
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
+import SoldListingsPage from "../pages/listings/SoldListingsPage.jsx";
 
 const AppRoutes = () => {
     const { isLoading } = useAuth();
@@ -105,6 +106,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
         <Route path={ROUTES.MY_LISTINGS_INACTIVE} element={<InactiveListingsPage />} />
+        <Route path={ROUTES.MY_LISTINGS_SOLD} element={<SoldListingsPage />} />
         <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />

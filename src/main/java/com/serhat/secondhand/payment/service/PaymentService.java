@@ -168,9 +168,9 @@ public class PaymentService {
         }
     }
 
-    public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size, String sortBy, String sortDir) {
+    public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size) {
         User user = userService.getAuthenticatedUser(authentication);
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        Sort sort = Sort.by(Sort.Direction.DESC, "processedAt");
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);

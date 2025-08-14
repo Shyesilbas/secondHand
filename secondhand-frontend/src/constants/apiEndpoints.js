@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
         CREATE: '/v1/listings',
         DELETE: (id) => `/v1/listings/${id}`,
         PUBLISH: (id) => `/v1/listings/${id}/publish`,
+        MARK_SOLD: (id) => `/v1/listings/${id}/mark-sold`,
         ACTIVATE: (id) => `/v1/listings/${id}/reactivate`,
         DEACTIVATE: (id) => `/v1/listings/${id}/deactivate`,
         STATISTICS: '/v1/listings/statistics',

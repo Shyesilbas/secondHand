@@ -3,18 +3,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu';
+import {useNotification} from "../../context/NotificationContext.jsx";
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
+    const notification = useNotification();
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate(ROUTES.HOME);
-        } catch (error) {
-            console.error('Logout error:', error);
-        }
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        notification.showConfirmation(
+         'Logout',
+         'Are you sure you want to logout?',
+            async () => {
+             await logout();
+             navigate(ROUTES.HOME);
+             notification.showSuccess('Successful', 'Logout successful.');
+
+            })
     };
 
     return (
@@ -48,6 +55,15 @@ const Header = () => {
                                         }
                                     >
                                         Inactive Listings
+                                    </DropdownItem>
+                                    <DropdownItem
+                                        to={ROUTES.MY_LISTINGS_SOLD}
+                                        icon={
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />                                            </svg>
+                                        }
+                                    >
+                                        Sold Listings
                                     </DropdownItem>
                                     <DropdownItem 
                                         to={ROUTES.CREATE_LISTING}

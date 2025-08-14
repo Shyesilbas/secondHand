@@ -17,6 +17,8 @@ export const listingService = {
 
   activateListing: async (id) => put(API_ENDPOINTS.LISTINGS.ACTIVATE(id)),
 
+  markListingSold: async (id) => put(API_ENDPOINTS.LISTINGS.MARK_SOLD(id)),
+
   deactivateListing: async (id) => put(API_ENDPOINTS.LISTINGS.DEACTIVATE(id)),
 
   getListingStatistics: async () => get(API_ENDPOINTS.LISTINGS.STATISTICS),

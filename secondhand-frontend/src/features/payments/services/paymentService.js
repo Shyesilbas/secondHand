@@ -19,8 +19,8 @@ export const paymentService = {
     },
 
     // Get my payments
-    getMyPayments: async (page = 0, size = 10, sortBy = 'processedAt', sortDir = 'DESC') => {
-        return get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size, sortBy, sortDir } });
+    getMyPayments: async (page = 0, size = 5) => {
+        return get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size } });
     },
 
     // Get payment statistics

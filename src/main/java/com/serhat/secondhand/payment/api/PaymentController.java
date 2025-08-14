@@ -46,11 +46,9 @@ public class PaymentController {
     public ResponseEntity<Page<PaymentDto>> getMyPayments(
             Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "processedAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @RequestParam(defaultValue = "10") int size) {
         log.info("Getting paginated payments for user: {}", authentication.getName());
-        Page<PaymentDto> payments = paymentService.getMyPayments(authentication, page, size, sortBy, sortDir);
+        Page<PaymentDto> payments = paymentService.getMyPayments(authentication, page, size);
         return ResponseEntity.ok(payments);
     }
 

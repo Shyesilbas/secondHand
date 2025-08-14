@@ -11,6 +11,7 @@ export const ROUTES = {
     LISTINGS: '/listings',
     MY_LISTINGS: '/my-listings',
     MY_LISTINGS_INACTIVE: '/my-listings/inactive',
+    MY_LISTINGS_SOLD: '/my-listings/sold',
     FAVORITES: '/favorites',
     LISTING_DETAIL: '/listings/:id',
     VEHICLE_DETAIL: '/vehicles/:id',

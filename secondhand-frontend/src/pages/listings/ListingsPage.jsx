@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useAdvancedListings } from '../../features/listings/hooks/useAdvancedListings';
-import ListingGrid from '../../features/listings/components/ListingGrid';
-import AdvancedFilters from '../../features/listings/components/AdvancedFilters';
-import CategorySelector from '../../features/listings/components/CategorySelector';
+import { useAdvancedListings } from '@listing/application';
+import { ListingGrid, AdvancedFilters, CategorySelector } from '@listing/ui';
 import Pagination from '../../components/ui/Pagination';
 import SidebarLayout from '../../components/layout/SidebarLayout';
 import { useEnums } from '../../hooks/useEnums';
-import { listingService } from '../../features/listings/services/listingService';
+import { listingService } from '@listing/infrastructure';
 import { useNotification } from '../../context/NotificationContext';
 
 const ListingsPage = () => {

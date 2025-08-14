@@ -12,13 +12,14 @@ const PaymentsPage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [pageSize] = useState(10);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
     useEffect(() => {
         fetchPayments(currentPage);
-    }, [currentPage]);
+    }, [currentPage, pageSize]);
 
     const fetchPayments = async (page = 0) => {
         try {
@@ -27,6 +28,7 @@ const PaymentsPage = () => {
             const data = await paymentService.getMyPayments(page, pageSize);
             setPayments(data.content || []);
             setTotalPages(data.totalPages || 0);
+            setTotalElements(data.totalElements || 0);
         } catch (err) {
             setError(err.response?.data?.message || 'An error occurred while loading payment history');
             setPayments([]);
@@ -244,12 +246,12 @@ const PaymentsPage = () => {
                                             <button
                                                 onClick={() => showReceipt(payment)}
                                                 className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                                                title="Dekont Göster"
+                                                title="Show Receipt"
                                             >
                                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
-                                                Dekont
+                                                Receipt
                                             </button>
                                         </div>
                                     </div>
@@ -283,8 +285,24 @@ const PaymentsPage = () => {
                                 </button>
                             </div>
                             
-                            <div className="text-sm text-gray-700">
-                                Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, payments.length)} results
+                            <div className="flex items-center space-x-4">
+                                <div className="text-sm text-gray-700">
+                                    Showing {totalElements === 0 ? 0 : currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} results
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <label htmlFor="pageSize" className="text-sm text-gray-700">Per page:</label>
+                                    <select
+                                        id="pageSize"
+                                        className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        value={pageSize}
+                                        onChange={(e) => { setCurrentPage(0); setPageSize(Number(e.target.value)); }}
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     )}

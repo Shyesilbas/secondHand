@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMyListings } from '../../features/listings/hooks/useMyListings';
-import ListingGrid from '../../features/listings/components/ListingGrid';
+import { useMyListings } from '@listing/application';
+import { ListingGrid } from '@listing/ui';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
 const MyListingsPage = () => {
-    const { listings, isLoading, error, refetch } = useMyListings();
+    const { listings, isLoading, error, refetch } = useMyListings('ACTIVE','DRAFT','INACTIVE');
 
     return (
         <div className="container mx-auto px-4 py-8">

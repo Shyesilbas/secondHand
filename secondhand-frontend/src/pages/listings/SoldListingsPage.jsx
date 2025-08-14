@@ -5,17 +5,17 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
 const InactiveListingsPage = () => {
-    const { listings, isLoading, error, refetch } = useMyListings('INACTIVE');
+    const { listings, isLoading, error, refetch } = useMyListings('SOLD');
 
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Inactive Listings
+                        Sold Listings
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Listings you have deactivated. You can reactivate them anytime.
+                        Listings you have Sold
                     </p>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -37,9 +37,9 @@ const InactiveListingsPage = () => {
                 </div>
             </div>
 
-            <ListingGrid 
-                listings={listings} 
-                isLoading={isLoading} 
+            <ListingGrid
+                listings={listings}
+                isLoading={isLoading}
                 error={error}
                 onDeleted={() => refetch()}
             />

@@ -28,7 +28,6 @@ const ListingCardActions = ({ listing, onChanged }) => {
       await listingService.deactivateListing(listing.id);
       onChanged && onChanged(listing.id);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Deactivate failed', err);
     }
   };
@@ -44,15 +43,30 @@ const ListingCardActions = ({ listing, onChanged }) => {
     }
   };
 
+
+  const handleMarkAsSold = async (e) => {
+    e.preventDefault();
+    notification.showConfirmation(
+        'Mark As Sold?',
+        'Are you sure you want to mark this listing as sold? This action cannot be reverted.',
+        async() => {
+          await listingService.markListingSold(listing.id);
+          onChanged && onChanged(listing.id);
+          notification.showSuccess('Successful', 'Listing Mark As Sold');
+        },
+        () => {}
+
+    )};
+
   const handleDelete = async (e) => {
     e.preventDefault();
     notification.showConfirmation(
-      'İlanı Sil',
-      'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
+      'Delete Listings',
+      'Are you sure you want to delete this listing? This action cannot be reverted.',
       async () => {
         await listingService.deleteListing(listing.id);
         onChanged && onChanged(listing.id);
-        notification.showSuccess('Başarılı', 'İlan silindi');
+        notification.showSuccess('Successful', 'Listing Deleted');
       },
       () => {}
     );
@@ -72,7 +86,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" />
           </svg>
-          <span>Düzenle</span>
+          <span>Edit</span>
         </button>
       )}
 
@@ -112,6 +126,19 @@ const ListingCardActions = ({ listing, onChanged }) => {
         </svg>
         <span>Sil</span>
       </button>
+
+      {listing.status !== 'SOLD' && (
+
+          <button
+          onClick={handleMarkAsSold}
+          className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 text-xs"
+          title="Mark As Sold"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+        <span>Mark As Sold</span>
+      </button>)}
     </div>
   );
 };

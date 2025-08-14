@@ -66,34 +66,31 @@ const LoginPage = () => {
             
             // Show success notification
             notification.showSuccess(
-                'Giriş Başarılı', 
-                'Hoş geldiniz! Ana sayfaya yönlendiriliyorsunuz...',
-                { autoCloseDelay: 2000 }
+                'Login Successful',
+                'Welcome!',
+                { autoCloseDelay: 1000 }
             );
             
-            // Navigate after a short delay to show the success message
             setTimeout(() => {
                 navigate(from, { replace: true });
-            }, 1000);
+            });
         } catch (error) {
             console.error('Login error:', error);
             
-            // Use our modern modal error handler
             const { handleErrorWithModal } = await import('../../utils/errorHandler');
             handleErrorWithModal(error, notification, {
                 showDetails: process.env.NODE_ENV === 'development', // Show details only in development
                 actions: [
                     {
-                        label: 'Tekrar Dene',
+                        label: 'Try Again',
                         onClick: () => {
-                            // Clear form errors and focus on email field
                             setErrors({});
                             document.querySelector('input[name="email"]')?.focus();
                         },
                         primary: true
                     },
                     {
-                        label: 'Şifremi Unuttum',
+                        label: 'Forgot Password',
                         onClick: () => {
                             navigate(ROUTES.FORGOT_PASSWORD);
                         },

@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { listingService } from '../../features/listings/services/listingService';
+import { listingService } from '@listing/infrastructure';
 import { useAuth } from '../../context/AuthContext';
-import { useNotification } from '../../context/NotificationContext';
 import { ROUTES } from '../../constants/routes';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
+import { ListingCardActions } from '@listing/ui';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const notification = useNotification();
   const [listing, setListing] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,41 +44,7 @@ const ListingDetailPage = () => {
     <StatusBadge status={status} />
   );
 
-  const handleEdit = () => {
-    if (!listing) return;
-    if (listing.type === 'VEHICLE') {
-      navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
-    }
-    if (listing.type === 'ELECTRONICS') {
-      navigate(ROUTES.ELECTRONIC_EDIT.replace(':id', listing.id));
-    }
-  };
-
-  const handleDelete = () => {
-    if (!listing) return;
-    notification.showConfirmation(
-      'İlanı Sil',
-      'İlanı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.',
-      async () => {
-        await listingService.deleteListing(listing.id);
-        navigate(-1);
-        notification.showSuccess('Başarılı', 'İlan silindi');
-      },
-      () => {}
-    );
-  };
-
-  const handleDeactivate = async () => {
-    if (!listing) return;
-    await listingService.deactivateListing(listing.id);
-    await fetchListing();
-  };
-
-  const handleReactivate = async () => {
-    if (!listing) return;
-    await listingService.activateListing(listing.id);
-    await fetchListing();
-  };
+  // Actions are handled by ListingCardActions
 
   if (isLoading) {
     return (
@@ -111,13 +76,13 @@ const ListingDetailPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">İlan bulunamadı</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Listing not found</h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
             onClick={() => navigate(-1)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Geri Dön
+            Go Back
           </button>
         </div>
       </div>
@@ -139,7 +104,7 @@ const ListingDetailPage = () => {
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Geri Dön
+          Go Back
         </button>
         
         <div className="flex items-center space-x-2">
@@ -152,28 +117,7 @@ const ListingDetailPage = () => {
             />
           )}
           {isOwner && (
-            <div className="flex space-x-2">
-              <button onClick={handleEdit} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h2m2 0h2m-6 4h6m-6 4h6m-6 4h6M7 7h.01M7 11h.01M7 15h.01" /></svg>
-                <span>Edit</span>
-              </button>
-              {listing.status === 'ACTIVE' && (
-                <button onClick={handleDeactivate} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm" title="Deactivate">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728M6 6l12 12" /></svg>
-                  <span>Deactivate</span>
-                </button>
-              )}
-              {listing.status === 'INACTIVE' && (
-                <button onClick={handleReactivate} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm" title="Reactivate">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                  <span>Reactivate</span>
-                </button>
-              )}
-              <button onClick={handleDelete} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
-                <span>Delete</span>
-              </button>
-            </div>
+            <ListingCardActions listing={listing} onChanged={() => fetchListing()} />
           )}
         </div>
       </div>

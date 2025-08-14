@@ -66,7 +66,7 @@ const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
                     No listings yet
                 </h3>
                 <p className="text-gray-600">
-                    Create the first listing and support us!
+                    No Listing found for the criteria.
                 </p>
             </div>
         );
