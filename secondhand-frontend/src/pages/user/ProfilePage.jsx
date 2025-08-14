@@ -20,12 +20,12 @@ const ProfilePage = () => {
         const cleanPhone = phoneFormData.newPhone.replace(/\D/g, '');
         
         if (!phoneFormData.newPhone.trim()) {
-            notification.showError('Hata', 'Lütfen telefon numaranızı girin');
+            notification.showError('Error', 'Please enter a phone number');
             return;
         }
 
         if (cleanPhone.length !== 11) {
-            notification.showError('Hata', 'Telefon numarası 11 haneli olmalıdır');
+            notification.showError('Error', 'Phone number must be 11 digits');
             return;
         }
 
@@ -40,9 +40,9 @@ const ProfilePage = () => {
             
             setShowPhoneModal(false);
             setPhoneFormData({ ...UpdatePhoneRequestDTO });
-            notification.showSuccess('Başarılı', 'Telefon numarası başarıyla güncellendi!');
+            notification.showSuccess('Success', 'Phone number updated successfully. Please refresh the page to see the changes.!');
         } catch (error) {
-            notification.showError('Hata', error.response?.data?.message || error.message || 'Telefon numarası güncellenirken hata oluştu');
+            notification.showError('Error', error.response?.data?.message || error.message || 'An error occurred while updating phone number. Please try again.');
         } finally {
             setIsUpdating(false);
         }

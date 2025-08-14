@@ -149,7 +149,7 @@ const NotificationModal = ({
                                 className="rounded-md bg-white text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                 onClick={handleClose}
                             >
-                                <span className="sr-only">Kapat</span>
+                                <span className="sr-only">Close</span>
                                 <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                             </button>
                         </div>
@@ -178,7 +178,7 @@ const NotificationModal = ({
                                 {details && (
                                     <details className="mt-3">
                                         <summary className={`cursor-pointer text-sm font-medium ${config.titleColor} hover:underline`}>
-                                            Detayları Göster
+                                            Show Details
                                         </summary>
                                         <div className="mt-2 p-3 bg-white rounded-md border border-gray-200">
                                             <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
@@ -217,7 +217,7 @@ const NotificationModal = ({
                                     className="inline-flex w-full justify-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 sm:w-auto"
                                     onClick={handleClose}
                                 >
-                                    Tamam
+                                    Okay
                                 </button>
                             )}
                         </div>

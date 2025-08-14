@@ -1,21 +1,15 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link} from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useEnums } from '../../../hooks/useEnums';
 import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import FavoriteButton from '../../favorites/components/FavoriteButton';
 import FavoriteStats from '../../favorites/components/FavoriteStats';
-import { useAuth } from '../../../context/AuthContext';
-import { listingService } from '../services/listingService';
 import { formatCurrency, formatDateTime } from '../../../utils/formatters';
-import { useNotification } from '../../../context/NotificationContext';
 import ListingCardActions from './ListingCardActions';
 
 const ListingCard = ({ listing, onDeleted }) => {
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const notification = useNotification();
     const { getListingTypeLabel, getListingTypeIcon } = useEnums();
     const formatPrice = (price, currency) => formatCurrency(price, currency);
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -32,7 +26,7 @@ const ListingCard = ({ listing, onDeleted }) => {
     const getStatusBadge = (status) => (
         <StatusBadge
             status={status}
-            labels={{ ACTIVE: 'Aktif', INACTIVE: 'Pasif', SOLD: 'Satıldı', DRAFT: 'Taslak', PENDING: 'Beklemede' }}
+            labels={{ ACTIVE: 'Active', INACTIVE: 'Inactive', SOLD: 'Sold', DRAFT: 'Draft', PENDING: 'Pending' }}
         />
     );
 

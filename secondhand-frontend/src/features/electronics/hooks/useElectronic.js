@@ -14,7 +14,7 @@ export const useElectronic = (electronicId = null) => {
       const data = await electronicService.getElectronicById(id);
       setElectronic(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Elektronik ilan yüklenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
       // eslint-disable-next-line no-console
       console.error('Error fetching electronic:', err);
     } finally {
@@ -29,7 +29,7 @@ export const useElectronic = (electronicId = null) => {
       const response = await electronicService.createElectronicListing(payload);
       return response;
     } catch (err) {
-      setError(err.response?.data?.message || 'Elektronik ilan oluşturulurken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
       // eslint-disable-next-line no-console
       console.error('Error creating electronic:', err);
       throw err;
@@ -47,7 +47,7 @@ export const useElectronic = (electronicId = null) => {
       fetchElectronic(id);
       return response;
     } catch (err) {
-      setError(err.response?.data?.message || 'Elektronik ilan güncellenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
       // eslint-disable-next-line no-console
       console.error('Error updating electronic:', err);
       throw err;

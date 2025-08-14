@@ -90,7 +90,7 @@ const FavoriteStats = ({
       )}
       {showText && (
         <span className={`${config.text} text-gray-500`}>
-          {favoriteCount} {favoriteCount === 1 ? 'favori' : 'favori'}
+          {favoriteCount} {favoriteCount === 1 ? 'Favorite' : 'Favorite'}
         </span>
       )}
     </div>

@@ -25,10 +25,10 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
                 className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
             >
                 <span>{trigger}</span>
-                <svg 
+                <svg
                     className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none" 
-                    stroke="currentColor" 
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

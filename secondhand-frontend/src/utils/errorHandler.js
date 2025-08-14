@@ -29,7 +29,7 @@ export const parseError = (error) => {
     const defaultError = {
         type: ERROR_TYPES.UNKNOWN,
         severity: ERROR_SEVERITY.MEDIUM,
-        message: 'Bilinmeyen bir hata oluştu',
+        message: 'Unknown error occurred. Please try again later.',
         originalMessage: '',
         statusCode: null,
         timestamp: new Date().toISOString(),
@@ -44,7 +44,7 @@ export const parseError = (error) => {
             ...defaultError,
             type: ERROR_TYPES.NETWORK,
             severity: ERROR_SEVERITY.HIGH,
-            message: 'İnternet bağlantınızı kontrol edin',
+            message: 'Check your internet connection and try again',
             originalMessage: error.message || 'Network error'
         };
     }
@@ -94,7 +94,7 @@ export const parseError = (error) => {
                 ...parsedError,
                 type: ERROR_TYPES.VALIDATION,
                 severity: ERROR_SEVERITY.MEDIUM,
-                message: 'Aradığınız sayfa veya kaynak bulunamadı'
+                message: 'Page or source not found'
             };
             break;
 
@@ -112,7 +112,7 @@ export const parseError = (error) => {
                 ...parsedError,
                 type: ERROR_TYPES.VALIDATION,
                 severity: ERROR_SEVERITY.MEDIUM,
-                message: 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyin'
+                message: 'Too many requests'
             };
             break;
 
@@ -124,14 +124,14 @@ export const parseError = (error) => {
                 ...parsedError,
                 type: ERROR_TYPES.SERVER,
                 severity: ERROR_SEVERITY.HIGH,
-                message: 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin'
+                message: 'Network error. Please try again later'
             };
             break;
 
         default:
             parsedError = {
                 ...parsedError,
-                message: errorData?.message || 'Beklenmeyen bir hata oluştu'
+                message: errorData?.message || 'Unexpected error occurred. Please try again later',
             };
     }
 
@@ -148,25 +148,25 @@ const getAuthenticationErrorMessage = (errorData) => {
         message.includes('bad credentials') ||
         message.includes('invalid') ||
         message.includes('wrong password')) {
-        return 'E-posta adresi veya şifre hatalı';
+        return 'E-mail or password is wrong';
     }
     
     if (message.includes('account not found') ||
         message.includes('user not found')) {
-        return 'Bu e-posta adresi ile kayıtlı hesap bulunamadı';
+        return 'No account found with this e-mail address';
     }
     
     if (message.includes('account locked') ||
         message.includes('account disabled')) {
-        return 'Hesabınız kilitlenmiş. Lütfen destek ekibi ile iletişime geçin';
+        return 'Your account is locked. Contact support for more information';
     }
     
     if (message.includes('account not verified') ||
         message.includes('email not verified')) {
-        return 'Hesabınız henüz doğrulanmamış. Lütfen e-postanızı kontrol edin';
+        return 'Your account is not verified. Please check your e-mail for verification link';
     }
 
-    return errorData?.message || 'Giriş yapılırken hata oluştu';
+    return errorData?.message || 'Error occurred while authenticating. Please try again later';
 };
 
 /**
@@ -177,14 +177,11 @@ const getAuthorizationErrorMessage = (errorData) => {
     
     if (message.includes('access denied') ||
         message.includes('forbidden')) {
-        return 'Bu işlemi gerçekleştirme yetkiniz bulunmuyor';
-    }
-    
-    if (message.includes('insufficient permissions')) {
-        return 'Yetersiz yetki. Bu özelliği kullanabilmek için gerekli izinlere sahip değilsiniz';
+        return 'You do not have permission to perform this action';
     }
 
-    return errorData?.message || 'Erişim reddedildi';
+
+    return errorData?.message || 'Access rejected.';
 };
 
 /**
@@ -204,18 +201,18 @@ const getValidationErrorMessage = (errorData) => {
     
     // Common validation messages
     if (message.includes('email already exists')) {
-        return 'Bu e-posta adresi zaten kullanımda';
+        return 'E-mail is in use';
     }
     
     if (message.includes('invalid email format')) {
-        return 'Geçersiz e-posta adresi formatı';
+        return 'Invalid e-mail format';
     }
     
     if (message.includes('password too short')) {
-        return 'Şifre en az 6 karakter olmalıdır';
+        return 'Password must be at least 6 characters long';
     }
 
-    return message || 'Girilen bilgilerde hata var';
+    return message || 'Error in form fields. Please check and try again.';
 };
 
 /**
@@ -313,21 +310,21 @@ export const handleErrorWithModal = (error, notificationContext, options = {}) =
 
 // Helper function to get error title
 const getErrorTitle = (errorData) => {
-    if (!errorData || !errorData.type) return 'Hata';
+    if (!errorData || !errorData.type) return 'Error';
     
     switch (errorData.type) {
         case 'authentication':
-            return 'Giriş Hatası';
+            return 'Authentication error';
         case 'authorization':
-            return 'Yetki Hatası';
+            return 'Authorization Error';
         case 'validation':
-            return 'Doğrulama Hatası';
+            return 'Validation Error';
         case 'network':
-            return 'Bağlantı Hatası';
+            return 'Network Error';
         case 'server':
-            return 'Sunucu Hatası';
+            return 'Server Error';
         default:
-            return 'Hata';
+            return 'Error';
     }
 };
 

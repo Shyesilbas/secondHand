@@ -10,6 +10,7 @@ import { ElectronicCreateRequestDTO } from '../../../types/electronics';
 import { useElectronic } from '../hooks/useElectronic';
 import { electronicFormSteps } from '../config/electronicFormSteps';
 import ListingWizard from '../../listings/components/ListingWizard';
+import { validateElectronicStep1, validateElectronicStep2, validateElectronicStep3, validateElectronicAll } from '../../../utils/validators/electronicValidators';
 
 const ElectronicCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -35,41 +36,18 @@ const ElectronicCreateForm = ({ onBack }) => {
   };
 
   const validate = () => {
-    const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.price || Number(formData.price) <= 0) newErrors.price = 'Price must be greater than 0';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.district.trim()) newErrors.district = 'District is required';
-    if (!formData.electronicType) newErrors.electronicType = 'Electronic type is required';
-    if (!formData.electronicBrand) newErrors.electronicBrand = 'Brand is required';
-    if (!formData.model.trim()) newErrors.model = 'Model is required';
-    if (!formData.year || Number(formData.year) <= 0) newErrors.year = 'Year is required';
-    if (!formData.color) newErrors.color = 'Color is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const allErrors = validateElectronicAll(formData);
+    setErrors(allErrors);
+    return Object.keys(allErrors).length === 0;
   };
 
   const validateStep = (step) => {
-    const newErrors = {};
-    if (step === 1) {
-      if (!formData.title.trim()) newErrors.title = 'Title is required';
-      if (!formData.description.trim()) newErrors.description = 'Description is required';
-      if (!formData.price || Number(formData.price) <= 0) newErrors.price = 'Price must be greater than 0';
-    }
-    if (step === 2) {
-      if (!formData.electronicType) newErrors.electronicType = 'Electronic type is required';
-      if (!formData.electronicBrand) newErrors.electronicBrand = 'Brand is required';
-      if (!formData.model.trim()) newErrors.model = 'Model is required';
-      if (!formData.year || Number(formData.year) <= 0) newErrors.year = 'Year is required';
-      if (!formData.color) newErrors.color = 'Color is required';
-    }
-    if (step === 3) {
-      if (!formData.city.trim()) newErrors.city = 'City is required';
-      if (!formData.district.trim()) newErrors.district = 'District is required';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    let stepErrors = {};
+    if (step === 1) stepErrors = validateElectronicStep1(formData);
+    if (step === 2) stepErrors = validateElectronicStep2(formData);
+    if (step === 3) stepErrors = validateElectronicStep3(formData);
+    setErrors(stepErrors);
+    return Object.keys(stepErrors).length === 0;
   };
 
   const steps = useMemo(() => electronicFormSteps, []);

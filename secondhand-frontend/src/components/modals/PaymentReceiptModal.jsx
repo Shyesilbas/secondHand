@@ -13,9 +13,9 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const getPaymentTypeLabel = (type) => {
     switch (type) {
       case 'CREDIT_CARD':
-        return 'Kredi Kartı';
+        return 'Credit Card';
       case 'TRANSFER':
-        return 'Banka Transferi';
+        return 'Bank Transfer';
       default:
         return type;
     }
@@ -24,9 +24,9 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const getTransactionTypeLabel = (type) => {
     switch (type) {
       case 'LISTING_CREATION':
-        return 'İlan Oluşturma Ücreti';
+        return 'Listing Creation Fee';
       case 'ITEM_PURCHASE':
-        return 'Ürün Satın Alma';
+        return 'Item Purchase';
       default:
         return type;
     }
@@ -35,9 +35,9 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const getDirectionLabel = (direction) => {
     switch (direction) {
       case 'INCOMING':
-        return 'Gelen Ödeme';
+        return 'Incoming';
       case 'OUTGOING':
-        return 'Giden Ödeme';
+        return 'Outgoing';
       default:
         return direction;
     }
@@ -51,18 +51,18 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
 
   const handleShare = async () => {
     const receiptText = `
-SecondHand Ödeme Dekontu
-Dekont No: ${payment.paymentId}
-Tarih: ${formatDate(payment.createdAt)}
-      Tutar: ${formatAmount(payment.amount)}
-İşlem Türü: ${getTransactionTypeLabel(payment.transactionType)}
-Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
+SecondHand Payment Receipt
+Payment No: ${payment.paymentId}
+Date: ${formatDate(payment.createdAt)}
+      Amount: ${formatAmount(payment.amount)}
+Transaction Type: ${getTransactionTypeLabel(payment.transactionType)}
+Durum: ${payment.isSuccess ? 'Successful' : 'Unsuccessful'}
     `.trim();
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Ödeme Dekontu',
+          title: 'Payment Receipt',
           text: receiptText,
         });
       } catch (err) {
@@ -72,7 +72,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
       // Fallback: Copy to clipboard
       try {
         await navigator.clipboard.writeText(receiptText);
-        notification.showSuccess('Kopyalandı', 'Dekont bilgileri panoya kopyalandı');
+        notification.showSuccess('Copied', 'Receipt text copied to clipboard. You can now share it with your friends.');
       } catch (err) {
         console.log('Error copying to clipboard:', err);
       }
@@ -93,7 +93,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              Ödeme Dekontu
+              Payment Receipt
             </h3>
             <div className="flex items-center space-x-2">
               <button
@@ -127,14 +127,14 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
                 <span className="text-2xl">💳</span>
               </div>
               <h2 className="text-xl font-bold text-gray-900">SecondHand</h2>
-              <p className="text-sm text-gray-600">Ödeme Dekontu</p>
+              <p className="text-sm text-gray-600">Payment Receipt</p>
             </div>
 
             {/* Receipt Details */}
             <div className="space-y-4">
               {/* Transaction ID */}
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-600">Dekont No:</span>
+                <span className="text-sm font-medium text-gray-600">Receipt No:</span>
                 <span className="text-sm font-mono text-gray-900 break-all">
                   {payment.paymentId}
                 </span>
@@ -142,7 +142,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
 
               {/* Date */}
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-600">İşlem Tarihi:</span>
+                <span className="text-sm font-medium text-gray-600">Process Date:</span>
                 <span className="text-sm text-gray-900">
                   {formatDate(payment.createdAt)}
                 </span>
@@ -150,7 +150,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
 
               {/* Transaction Type */}
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-600">İşlem Türü:</span>
+                <span className="text-sm font-medium text-gray-600">Transaction Type:</span>
                 <span className="text-sm text-gray-900">
                   {getTransactionTypeLabel(payment.transactionType)}
                 </span>
@@ -158,7 +158,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
 
               {/* Payment Direction */}
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-600">İşlem Yönü:</span>
+                <span className="text-sm font-medium text-gray-600">Payment Direction:</span>
                 <span className={`text-sm font-medium ${
                   payment.paymentDirection === 'INCOMING' 
                     ? 'text-green-600' 
@@ -170,7 +170,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
 
               {/* Payment Type */}
               <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="text-sm font-medium text-gray-600">Ödeme Yöntemi:</span>
+                <span className="text-sm font-medium text-gray-600">Payment Method:</span>
                 <span className="text-sm text-gray-900">
                   {getPaymentTypeLabel(payment.paymentType)}
                 </span>
@@ -179,7 +179,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
               {/* Sender Info */}
               {payment.senderName && (
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">Gönderen:</span>
+                  <span className="text-sm font-medium text-gray-600">Sender:</span>
                   <span className="text-sm text-gray-900">
                     {payment.senderName} {payment.senderSurname}
                   </span>
@@ -189,7 +189,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
               {/* Receiver Info */}
               {payment.receiverName && (
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">Alıcı:</span>
+                  <span className="text-sm font-medium text-gray-600">Receiver:</span>
                   <span className="text-sm text-gray-900">
                     {payment.receiverName} {payment.receiverSurname}
                   </span>
@@ -199,7 +199,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
               {/* Listing ID */}
               {payment.listingId && (
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">İlan No:</span>
+                  <span className="text-sm font-medium text-gray-600">Listing No:</span>
                   <span className="text-sm font-mono text-gray-900">
                     {payment.listingId}
                   </span>
@@ -208,7 +208,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
 
               {/* Amount */}
               <div className="flex justify-between items-center py-3 bg-gray-100 rounded-lg px-4 mt-4">
-                <span className="text-base font-semibold text-gray-700">Tutar:</span>
+                <span className="text-base font-semibold text-gray-700">Amount:</span>
                 <span className={`text-xl font-bold ${
                   payment.paymentDirection === 'INCOMING' 
                     ? 'text-green-600' 
@@ -227,7 +227,7 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
                     ? 'bg-green-100 text-green-800' 
                     : 'bg-red-100 text-red-800'
                 }`}>
-                  {payment.isSuccess ? '✅ Başarılı' : '❌ Başarısız'}
+                  {payment.isSuccess ? '✅ Successful' : '❌ Unsuccessful'}
                 </span>
               </div>
             </div>
@@ -235,13 +235,13 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
             {/* Footer */}
             <div className="mt-6 pt-4 border-t-2 border-dashed border-gray-300 text-center">
               <p className="text-xs text-gray-500 mb-2">
-                Bu dekont elektronik olarak oluşturulmuştur.
+                This receipt is generated by <a href="https://secondhand.com" className="text-blue-600 hover:underline">SecondHand</a>./
               </p>
               <p className="text-xs text-gray-400">
-                SecondHand - Güvenli Al-Sat Platformu
+                SecondHand - Secure Marketplace
               </p>
               <p className="text-xs text-gray-400">
-                Dekont oluşturma zamanı: {formatDate(new Date().toISOString())}
+                Receipt Created:{formatDate(payment.createdAt)}
               </p>
             </div>
           </div>
@@ -252,13 +252,13 @@ Durum: ${payment.isSuccess ? 'Başarılı' : 'Başarısız'}
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
             >
-              Kapat
+              Close
             </button>
             <button
               onClick={handlePrint}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 transition-colors"
             >
-              Yazdır
+              Print
             </button>
           </div>
         </div>

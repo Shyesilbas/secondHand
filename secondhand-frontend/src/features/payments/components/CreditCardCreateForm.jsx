@@ -37,7 +37,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
 
     const limitValue = parseFloat(formData.limit);
     if (!formData.limit || isNaN(limitValue) || limitValue <= 0) {
-      newErrors.limit = 'Geçerli bir kredi limiti girin';
+      newErrors.limit = 'Enter a valid limit. Limit must be greater than 0.';
     }
 
     setErrors(newErrors);
@@ -48,7 +48,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      notification.showError('Hata', 'Lütfen geçerli bir kredi limiti girin');
+      notification.showError('Error', 'Please fill in all required fields. Limit must be greater than 0.');
       return;
     }
 
@@ -57,7 +57,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       const creditCardData = createCreditCardRequest(formData);
       
       await onSubmit(creditCardData);
-      notification.showSuccess('Başarılı', 'Kredi kartı başarıyla oluşturuldu!');
+      notification.showSuccess('Success', 'Credit Card Created Successfully!');
       
       // Reset form
       setFormData({ ...CreditCardRequestDTO });
@@ -65,7 +65,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       
       if (onSuccess) onSuccess();
     } catch (error) {
-      notification.showError('Hata', 'Kredi kartı oluşturulurken bir hata oluştu');
+      notification.showError('Error', 'An error occurred while creating the credit card');
     }
   };
 
@@ -82,12 +82,11 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
           </div>
           <div className="ml-3">
             <h3 className="text-sm font-medium text-blue-800">
-              Kredi Kartı Hakkında
+              About Credit Card
             </h3>
             <div className="mt-2 text-sm text-blue-700">
               <ul className="list-disc list-inside space-y-1">
-                <li>Sistem sizin için otomatik olarak kart numarası, CVV ve son kullanma tarihi oluşturacak</li>
-                <li>Sadece kredi limitinizi belirtmeniz yeterli</li>
+                <li>Enter the limit you want</li>
               </ul>
             </div>
           </div>
@@ -97,7 +96,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       {/* Credit Limit */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Kredi Limiti *
+          Credit Limit *
         </label>
         <div className="relative">
           <input
@@ -120,7 +119,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
         )}
         {formData.limit && !errors.limit && (
           <p className="text-gray-600 text-sm mt-1">
-            Belirlenen limit: {formatAmount(formData.limit)}
+            Limit: {formatAmount(formData.limit)}
           </p>
         )}
       </div>
@@ -133,14 +132,14 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
           className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
           disabled={isLoading}
         >
-          İptal
+          Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {isLoading ? 'Oluşturuluyor...' : 'Kredi Kartı Oluştur'}
+          {isLoading ? 'Creation...' : 'Create Credit Card'}
         </button>
       </div>
     </form>

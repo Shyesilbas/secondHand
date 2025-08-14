@@ -1,6 +1,5 @@
 export const vehicleFormSteps = [
-  { id: 1, title: 'Temel Bilgiler', icon: '📝', description: 'Başlık, açıklama ve fiyat' },
-  { id: 2, title: 'Araç Özellikleri', icon: '🚗', description: 'Marka, model ve teknik detaylar' },
-  { id: 3, title: 'Konum & Önizleme', icon: '📍', description: 'Konum bilgileri ve son kontrol' }
+  { id: 1, title: 'Basic Information', icon: '📝', description: 'Title, description, and price' },
+  { id: 2, title: 'Vehicle Features', icon: '🚗', description: 'Brand, model, and technical details' },
+  { id: 3, title: 'Location & Preview', icon: '📍', description: 'Location details and final review' }
 ];
-

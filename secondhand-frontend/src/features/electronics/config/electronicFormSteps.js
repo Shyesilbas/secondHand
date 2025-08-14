@@ -1,7 +1,7 @@
 export const electronicFormSteps = [
-  { id: 1, title: 'Temel Bilgiler', icon: '📝', description: 'Başlık, açıklama ve fiyat' },
-  { id: 2, title: 'Elektronik Özellikleri', icon: '📱', description: 'Tür, marka ve teknik detaylar' },
-  { id: 3, title: 'Konum & Önizleme', icon: '📍', description: 'Konum bilgileri ve son kontrol' }
+  { id: 1, title: 'Essential Informations', icon: '📝', description: 'Essential informations like title, description, price, etc.' },
+  { id: 2, title: 'Features', icon: '📱', description: 'Details' },
+  { id: 3, title: 'Location & Review', icon: '📍', description: 'Location and review' }
 ];
 
 

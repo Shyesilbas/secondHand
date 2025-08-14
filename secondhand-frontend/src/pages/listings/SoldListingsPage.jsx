@@ -1,8 +1,8 @@
 import React from 'react';
-import { useMyListings } from '@listing/application';
-import { ListingGrid } from '@listing/ui';
+import ListingGrid from '../../features/listings/components/ListingGrid';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import {useMyListings} from "../../features/listings/hooks/useMyListings.js";
 
 const InactiveListingsPage = () => {
     const { listings, isLoading, error, refetch } = useMyListings('SOLD');

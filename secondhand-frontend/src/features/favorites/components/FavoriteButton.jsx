@@ -76,7 +76,7 @@ const FavoriteButton = ({
     event.stopPropagation();
     
     if (!isAuthenticated) {
-      notification.showWarning('Giriş Gerekli', 'Favorilere eklemek için giriş yapın');
+      notification.showWarning('Authentication required', 'Login to add favorite listings');
       return;
     }
 
@@ -100,8 +100,8 @@ const FavoriteButton = ({
       setFavoriteCount(statsDto.favoriteCount);
       console.log('State updated - isFavorited:', statsDto.isFavorited); // Debug
       
-      const message = statsDto.isFavorited ? 'Favorilere eklendi!' : 'Favorilerden kaldırıldı';
-      notification.showSuccess('Başarılı', message);
+      const message = statsDto.isFavorited ? 'Added to Favorites!' : 'Removed from Favorites!';
+      notification.showSuccess('Success', message);
       
       // Call parent callback if provided
       if (onToggle) {
@@ -109,18 +109,16 @@ const FavoriteButton = ({
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update favorites';
-      notification.showError('Hata', message);
+      notification.showError('Error', message);
       console.error('Error toggling favorite:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Get seller ID from props
   const actualSellerId = sellerId || (listing && listing.sellerId) || null;
   
-  // Check if current user is the seller - handle both string and number comparisons
-  const isCurrentUserSeller = user && actualSellerId && 
+  const isCurrentUserSeller = user && actualSellerId &&
     (user.id === actualSellerId || user.id === String(actualSellerId) || String(user.id) === String(actualSellerId));
   
   if (!isAuthenticated || isCurrentUserSeller) {
@@ -144,7 +142,7 @@ const FavoriteButton = ({
           }
           ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
         `}
-        title={isFavorited ? 'Favorilerden kaldır' : 'Favorilere ekle'}
+        title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
       >
         {isLoading ? (
           <svg className={`${config.icon} animate-spin`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

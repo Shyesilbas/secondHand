@@ -13,12 +13,6 @@ export const passwordService = {
         return response.data;
     },
 
-    forgotPassword: async (email) => {
-        const forgotPasswordData = createForgotPasswordRequest({ email });
-        const response = await apiClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, forgotPasswordData);
-        return response.data;
-    },
-
     resetPassword: async (token, newPassword) => {
         const resetPasswordData = createResetPasswordRequest({ token, newPassword });
         const response = await apiClient.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, resetPasswordData);

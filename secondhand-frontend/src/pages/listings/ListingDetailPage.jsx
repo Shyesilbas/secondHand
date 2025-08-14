@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { listingService } from '@listing/infrastructure';
+import { listingService } from '../../features/listings/services/listingService';
 import { useAuth } from '../../context/AuthContext';
-import { ROUTES } from '../../constants/routes';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { ListingCardActions } from '@listing/ui';
+import  ListingCardActions  from '../../features/listings/components/ListingCardActions';
 
 const ListingDetailPage = () => {
   const { id } = useParams();

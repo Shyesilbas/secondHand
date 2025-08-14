@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { listingService } from '@listing/infrastructure';
+import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
-import { ListingFeePaymentRequestDTO, ListingFeeConfigDTO } from '../../types/payments';
 import { formatCurrency } from '../../utils/formatters';
 
 const PayListingFeePage = () => {

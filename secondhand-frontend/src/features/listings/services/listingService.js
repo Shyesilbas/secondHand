@@ -13,7 +13,6 @@ export const listingService = {
 
   getMyListings: async () => get(API_ENDPOINTS.LISTINGS.MY_LISTINGS),
 
-  publishListing: async (id) => put(API_ENDPOINTS.LISTINGS.PUBLISH(id)),
 
   activateListing: async (id) => put(API_ENDPOINTS.LISTINGS.ACTIVATE(id)),
 
@@ -25,7 +24,6 @@ export const listingService = {
 
   deleteListing: async (id) => del(API_ENDPOINTS.LISTINGS.DELETE(id)),
 
-  getListingsByType: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE(listingType)),
 
   getActiveListingsByType: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ACTIVE(listingType)),
 
@@ -34,15 +32,6 @@ export const listingService = {
   getListingsWithFilters: async (filters) => {
     const filterData = createListingFilterRequest(filters);
     return post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
-  },
-
-  // Compute counts per listing type using filter endpoint (no extra backend needed)
-  getCountForType: async (listingType) => {
-    const response = await post(
-      API_ENDPOINTS.LISTINGS.FILTER,
-      createListingFilterRequest({ listingType, status: 'ACTIVE', page: 0, size: 1 })
-    );
-    return response?.totalElements || 0;
   },
 
   getCountsForTypes: async (types) => {

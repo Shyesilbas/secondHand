@@ -15,7 +15,7 @@ export const useVehicle = (vehicleId = null) => {
       const data = await vehicleService.getVehicleById(id);
       setVehicle(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Araç bilgileri yüklenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while updating vehicle. Please try again later.');
       console.error('Error fetching vehicle:', err);
     } finally {
       setIsLoading(false);
@@ -29,7 +29,7 @@ export const useVehicle = (vehicleId = null) => {
       const response = await vehicleService.createVehicleListing(vehicleData);
       return response;
     } catch (err) {
-      setError(err.response?.data?.message || 'İlan oluşturulurken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while creating vehicle. Please try again later.');
       console.error('Error creating vehicle:', err);
       throw err;
     } finally {
@@ -48,7 +48,7 @@ export const useVehicle = (vehicleId = null) => {
       fetchVehicle(id);
       return response;
     } catch (err) {
-      setError(err.response?.data?.message || 'İlan güncellenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while updating vehicle. Please try again later.');
       console.error('Error updating vehicle:', err);
       throw err;
     } finally {
@@ -87,7 +87,7 @@ export const useVehicleSearch = () => {
       setVehicles(data);
       return data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Araç arama sırasında bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while searching vehicles. Please try again later.');
       console.error('Error searching vehicles:', err);
     } finally {
       setIsLoading(false);
@@ -102,7 +102,7 @@ export const useVehicleSearch = () => {
       setVehicles(data.content || data); // Handle paginated vs non-paginated responses
       return data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Araç filtreleme sırasında bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while filtering vehicles. Please try again later.');
       console.error('Error filtering vehicles:', err);
     } finally {
       setIsLoading(false);
@@ -132,7 +132,7 @@ export const useCarBrands = () => {
       const data = await vehicleService.getCarBrands();
       setBrands(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Araç markaları yüklenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error occurred while fetching car brands. Please try again later.');
       console.error('Error fetching car brands:', err);
     } finally {
       setIsLoading(false);

@@ -40,42 +40,11 @@ export const useFavorites = () => {
     }
   };
 
-  const addToFavorites = async (listingId) => {
-    try {
-      await favoriteService.addToFavorites(listingId);
-      notification.showSuccess('Başarılı', 'Favorilere eklendi!');
-      // Don't refresh favorites when adding (user may not be on favorites page)
-      return true;
-    } catch (err) {
-      const message = err.response?.data?.message || 'Failed to add to favorites';
-      notification.showError('Hata', message);
-      console.error('Error adding to favorites:', err);
-      return false;
-    }
-  };
-
-  const removeFromFavorites = async (listingId) => {
-    try {
-      await favoriteService.removeFromFavorites(listingId);
-      notification.showSuccess('Başarılı', 'Favorilerden kaldırıldı');
-      // Refresh favorites when item is removed
-      if (favorites.length > 0) {
-        fetchFavorites({ page: pagination.number });
-      }
-      return true;
-    } catch (err) {
-      const message = err.response?.data?.message || 'Failed to remove from favorites';
-      notification.showError('Hata', message);
-      console.error('Error removing from favorites:', err);
-      return false;
-    }
-  };
-
   const toggleFavorite = async (listingId) => {
     try {
       const response = await favoriteService.toggleFavorite(listingId);
-      const message = response.isFavorited ? 'Favorilere eklendi!' : 'Favorilerden kaldırıldı';
-      notification.showSuccess('Başarılı', message);
+      const message = response.isFavorited ? 'Added to favorites!' : 'Removed from favorites!';
+      notification.showSuccess('Successful', message);
       // Refresh favorites only if the item was removed from favorites
       if (favorites.length > 0 && !response.isFavorited) {
         fetchFavorites({ page: pagination.number });
@@ -83,7 +52,7 @@ export const useFavorites = () => {
       return response;
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to toggle favorite';
-      notification.showError('Hata', message);
+      notification.showError('Error', message);
       console.error('Error toggling favorite:', err);
       return null;
     }
@@ -99,8 +68,6 @@ export const useFavorites = () => {
     error,
     pagination,
     fetchFavorites,
-    addToFavorites,
-    removeFromFavorites,
     toggleFavorite,
     loadPage
   };
