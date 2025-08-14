@@ -1,6 +1,7 @@
-package com.serhat.secondhand.listing.domain.dto;
+package com.serhat.secondhand.listing.domain.dto.response.listing;
 
-import com.serhat.secondhand.listing.domain.entity.enums.*;
+import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import lombok.Data;
 
 import java.math.BigDecimal;

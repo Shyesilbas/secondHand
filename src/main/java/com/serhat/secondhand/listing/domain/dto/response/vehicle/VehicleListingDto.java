@@ -1,11 +1,12 @@
-package com.serhat.secondhand.listing.domain.dto;
+package com.serhat.secondhand.listing.domain.dto.response.vehicle;
 
-import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.Color;
-import com.serhat.secondhand.listing.domain.entity.enums.Doors;
-import com.serhat.secondhand.listing.domain.entity.enums.FuelType;
-import com.serhat.secondhand.listing.domain.entity.enums.GearType;
-import com.serhat.secondhand.listing.domain.entity.enums.SeatCount;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

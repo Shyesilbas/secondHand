@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.domain.dto;
+package com.serhat.secondhand.listing.domain.dto.response.listing;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

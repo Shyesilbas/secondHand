@@ -1,6 +1,7 @@
-package com.serhat.secondhand.listing.domain.dto.request;
+package com.serhat.secondhand.listing.domain.dto.request.vehicle;
 
-import com.serhat.secondhand.listing.domain.entity.enums.*;
+import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 
 import java.math.BigDecimal;
 

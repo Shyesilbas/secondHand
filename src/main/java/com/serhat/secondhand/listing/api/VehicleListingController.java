@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.listing.application.VehicleListingService;
-import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
-import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
+import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,10 +65,5 @@ public class VehicleListingController {
         List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brand, model);
         return ResponseEntity.ok(vehicles);
     }
-    
-    @GetMapping("/brands")
-    @Operation(summary = "Get all available car brands")
-    public ResponseEntity<CarBrand[]> getAllBrands() {
-        return ResponseEntity.ok(CarBrand.values());
-    }
+
 } 

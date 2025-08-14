@@ -1,11 +1,11 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.listing.application.ListingService;
-import com.serhat.secondhand.listing.domain.dto.ListingDto;
-import com.serhat.secondhand.listing.domain.dto.ListingFilterDto;
-import com.serhat.secondhand.listing.domain.dto.ListingStatisticsDto;
-import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.ListingType;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;

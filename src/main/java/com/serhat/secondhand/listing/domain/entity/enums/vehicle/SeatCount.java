@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.domain.entity.enums;
+package com.serhat.secondhand.listing.domain.entity.enums.vehicle;
 
 public enum SeatCount {
     TWO,

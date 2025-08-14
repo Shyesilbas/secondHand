@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.domain.dto;
+package com.serhat.secondhand.listing.domain.dto.request.listing;
 
 import com.serhat.secondhand.payment.dto.CreditCardDto;
 import com.serhat.secondhand.payment.entity.PaymentType;

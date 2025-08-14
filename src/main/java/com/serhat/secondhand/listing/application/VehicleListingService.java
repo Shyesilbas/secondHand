@@ -1,14 +1,14 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.listing.domain.dto.VehicleListingDto;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.VehicleUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import com.serhat.secondhand.listing.domain.entity.enums.CarBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.repository.VehicleListingRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,10 +48,8 @@ public class VehicleListingService {
                         "LISTING_NOT_FOUND"
                 ));
 
-        // Do not allow updates on SOLD listings
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
-        // Base listing fields
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -59,7 +57,6 @@ public class VehicleListingService {
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
 
-        // Vehicle specific fields
         request.model().ifPresent(existing::setModel);
         request.mileage().ifPresent(existing::setMileage);
         request.engineCapacity().ifPresent(existing::setEngineCapacity);

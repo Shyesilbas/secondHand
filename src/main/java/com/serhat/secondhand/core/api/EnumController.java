@@ -1,6 +1,7 @@
 package com.serhat.secondhand.core.api;
 
-import com.serhat.secondhand.listing.domain.entity.enums.*;
+import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
