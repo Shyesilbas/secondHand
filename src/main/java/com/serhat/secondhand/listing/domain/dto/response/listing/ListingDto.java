@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
@@ -21,7 +22,8 @@ import java.util.UUID;
     property = "type"
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE")
+    @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE"),
+    @JsonSubTypes.Type(value = ElectronicListingDto.class, name = "ELECTRONICS")
 })
 @Data
 @NoArgsConstructor

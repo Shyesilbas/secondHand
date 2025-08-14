@@ -6,13 +6,11 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingResponseDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import org.mapstruct.*;
 
-import java.util.Optional;
 
 @Mapper(
     componentModel = "spring",
@@ -36,18 +34,14 @@ public interface ListingMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "status", constant = "DRAFT")
     @Mapping(target = "listingType", constant = "VEHICLE")
     VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "status", constant = "DRAFT")
-    @Mapping(target = "listingType", constant = "VEHICLE")
+    @Mapping(target = "listingType", constant = "ELECTRONICS")
     ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
 
@@ -68,7 +62,5 @@ public interface ListingMapper {
         throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());
     }
     
-    default <T> T unwrapOptional(Optional<T> optional) {
-        return optional.orElse(null);
-    }
+    // no-op
 }

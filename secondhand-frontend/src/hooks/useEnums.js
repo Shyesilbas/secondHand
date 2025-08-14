@@ -13,7 +13,9 @@ export const useEnums = () => {
     doors: [],
     currencies: [],
     gearTypes: [],
-    seatCounts: []
+    seatCounts: [],
+    electronicTypes: [],
+    electronicBrands: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,7 +45,9 @@ export const useEnums = () => {
           doors,
           currencies,
           gearTypes,
-          seatCounts
+          seatCounts,
+          electronicTypes,
+          electronicBrands
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -53,7 +57,9 @@ export const useEnums = () => {
           enumService.getDoors(),
           enumService.getCurrencies(),
           enumService.getGearTypes(),
-          enumService.getSeatCounts()
+          enumService.getSeatCounts(),
+          enumService.getElectronicTypes(),
+          enumService.getElectronicBrands()
         ]);
 
         const fetchedEnums = {
@@ -65,7 +71,9 @@ export const useEnums = () => {
           doors,
           currencies,
           gearTypes,
-          seatCounts
+          seatCounts,
+          electronicTypes,
+          electronicBrands
         };
 
         setEnums(fetchedEnums);
@@ -135,7 +143,9 @@ export const useEnums = () => {
         doors,
         currencies,
         gearTypes,
-        seatCounts
+        seatCounts,
+        electronicTypes,
+        electronicBrands
       ] = await Promise.all([
         enumService.getListingTypes(),
         enumService.getListingStatuses(),
@@ -145,7 +155,9 @@ export const useEnums = () => {
         enumService.getDoors(),
         enumService.getCurrencies(),
         enumService.getGearTypes(),
-        enumService.getSeatCounts()
+        enumService.getSeatCounts(),
+        enumService.getElectronicTypes(),
+        enumService.getElectronicBrands()
       ]);
 
       const freshEnums = {
@@ -157,7 +169,9 @@ export const useEnums = () => {
         doors,
         currencies,
         gearTypes,
-        seatCounts
+        seatCounts,
+        electronicTypes,
+        electronicBrands
       };
 
       setEnums(freshEnums);

@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.repository.vehicle;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
+import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -107,6 +108,33 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
 
             vehicleSubquery.where(vehiclePredicates.toArray(new Predicate[0]));
             predicates.add(cb.exists(vehicleSubquery));
+        }
+
+        // Electronics specific filters using subquery (generic approach similar to vehicle)
+        if (hasElectronicFilters(filters)) {
+            Subquery<ElectronicListing> elSub = query.subquery(ElectronicListing.class);
+            Root<ElectronicListing> elRoot = elSub.from(ElectronicListing.class);
+            elSub.select(elRoot);
+
+            List<Predicate> elPreds = new ArrayList<>();
+            elPreds.add(cb.equal(elRoot.get("id"), listing.get("id")));
+            if (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) {
+                elPreds.add(elRoot.get("electronicType").in(filters.getElectronicTypes()));
+            }
+            if (filters.getElectronicBrands() != null && !filters.getElectronicBrands().isEmpty()) {
+                elPreds.add(elRoot.get("electronicBrand").in(filters.getElectronicBrands()));
+            }
+            if (filters.getMinYear() != null) {
+                elPreds.add(cb.greaterThanOrEqualTo(elRoot.get("year"), filters.getMinYear()));
+            }
+            if (filters.getMaxYear() != null) {
+                elPreds.add(cb.lessThanOrEqualTo(elRoot.get("year"), filters.getMaxYear()));
+            }
+            if (filters.getColors() != null && !filters.getColors().isEmpty()) {
+                elPreds.add(elRoot.get("color").in(filters.getColors()));
+            }
+            elSub.where(elPreds.toArray(new Predicate[0]));
+            predicates.add(cb.exists(elSub));
         }
 
         // Apply all predicates
@@ -226,6 +254,33 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
             countPredicates.add(cb.exists(countVehicleSubquery));
         }
 
+        // Electronics filters for count query
+        if (hasElectronicFilters(filters)) {
+            Subquery<ElectronicListing> countElSub = countQuery.subquery(ElectronicListing.class);
+            Root<ElectronicListing> countElRoot = countElSub.from(ElectronicListing.class);
+            countElSub.select(countElRoot);
+
+            List<Predicate> countElPreds = new ArrayList<>();
+            countElPreds.add(cb.equal(countElRoot.get("id"), countRoot.get("id")));
+            if (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) {
+                countElPreds.add(countElRoot.get("electronicType").in(filters.getElectronicTypes()));
+            }
+            if (filters.getElectronicBrands() != null && !filters.getElectronicBrands().isEmpty()) {
+                countElPreds.add(countElRoot.get("electronicBrand").in(filters.getElectronicBrands()));
+            }
+            if (filters.getMinYear() != null) {
+                countElPreds.add(cb.greaterThanOrEqualTo(countElRoot.get("year"), filters.getMinYear()));
+            }
+            if (filters.getMaxYear() != null) {
+                countElPreds.add(cb.lessThanOrEqualTo(countElRoot.get("year"), filters.getMaxYear()));
+            }
+            if (filters.getColors() != null && !filters.getColors().isEmpty()) {
+                countElPreds.add(countElRoot.get("color").in(filters.getColors()));
+            }
+            countElSub.where(countElPreds.toArray(new Predicate[0]));
+            countPredicates.add(cb.exists(countElSub));
+        }
+
         if (!countPredicates.isEmpty()) {
             countQuery.where(countPredicates.toArray(new Predicate[0]));
         }
@@ -245,5 +300,13 @@ public class ListingRepositoryImpl implements ListingRepositoryCustom {
                filters.getDoors() != null ||
                (filters.getGearTypes() != null && !filters.getGearTypes().isEmpty()) ||
                (filters.getSeatCounts() != null && !filters.getSeatCounts().isEmpty());
+    }
+
+    private boolean hasElectronicFilters(ListingFilterDto filters) {
+        return (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) ||
+               (filters.getElectronicBrands() != null && !filters.getElectronicBrands().isEmpty()) ||
+               filters.getMinYear() != null ||
+               filters.getMaxYear() != null ||
+               (filters.getColors() != null && !filters.getColors().isEmpty());
     }
 }

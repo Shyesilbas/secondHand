@@ -4,7 +4,21 @@
  */
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.1'; // Increment this when backend enum structure changes
+const ENUM_CACHE_VERSION = '1.2'; // Increment this when backend enum structure changes
+const REQUIRED_ENUM_KEYS = [
+  'listingTypes',
+  'listingStatuses',
+  'carBrands',
+  'fuelTypes',
+  'colors',
+  'doors',
+  'currencies',
+  'gearTypes',
+  'seatCounts',
+  // Newly added keys for electronics
+  'electronicTypes',
+  'electronicBrands',
+];
 const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 
 /**
@@ -21,6 +35,14 @@ export const getCachedEnums = () => {
         // Check version compatibility
         if (version !== ENUM_CACHE_VERSION) {
             console.log('Enum cache version mismatch, clearing cache');
+            clearEnumCache();
+            return null;
+        }
+
+        // Schema/key presence check
+        const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
+        if (missingKeys.length > 0) {
+            console.log('Enum cache missing keys', missingKeys, '— clearing cache');
             clearEnumCache();
             return null;
         }

@@ -43,6 +43,10 @@ export const ListingFilterDTO = {
   gearTypes: [],
   seatCounts: [],
   
+  // Electronics specific filters
+  electronicTypes: [],
+  electronicBrands: [],
+  
   // Sorting
   sortBy: 'createdAt',
   sortDirection: 'DESC',
@@ -102,6 +106,10 @@ export const createListingFilterRequest = (data) => {
     fuelTypes: Array.isArray(data.fuelTypes) ? data.fuelTypes : [],
     colors: Array.isArray(data.colors) ? data.colors : [],
     doors: data.doors || null,
+    
+    // Electronics specific filters
+    electronicTypes: Array.isArray(data.electronicTypes) ? data.electronicTypes : [],
+    electronicBrands: Array.isArray(data.electronicBrands) ? data.electronicBrands : [],
     
     // Sorting
     sortBy: data.sortBy || 'createdAt',

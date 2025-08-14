@@ -14,6 +14,9 @@ export * from './listings';
 // Vehicle DTOs
 export * from './vehicles';
 
+// Electronics DTOs
+export * from './electronics';
+
 // Payment DTOs
 export * from './payments';
 

@@ -46,4 +46,15 @@ export const enumService = {
     const response = await apiClient.get(API_ENDPOINTS.ENUMS.SEAT_COUNTS);
     return response.data;
   },
+
+  // Electronics enums
+  getElectronicTypes: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.ENUMS.ELECTRONIC_TYPES);
+    return response.data;
+  },
+
+  getElectronicBrands: async () => {
+    const response = await apiClient.get(API_ENDPOINTS.ENUMS.ELECTRONIC_BRANDS);
+    return response.data;
+  },
 };

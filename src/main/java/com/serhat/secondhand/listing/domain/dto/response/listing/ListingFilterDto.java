@@ -1,6 +1,8 @@
 package com.serhat.secondhand.listing.domain.dto.response.listing;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import lombok.Data;
 
@@ -30,6 +32,11 @@ public class ListingFilterDto {
     private Doors doors;
     private List<GearType> gearTypes;
     private List<SeatCount> seatCounts;
+    
+    // Electronics specific filters
+    private List<ElectronicType> electronicTypes;
+    private List<ElectronicBrand> electronicBrands;
+    // Reuse year and colors above
     
     // Sorting
     private String sortBy; // price, createdAt, year, mileage

@@ -15,6 +15,7 @@ export const ROUTES = {
     LISTING_DETAIL: '/listings/:id',
     VEHICLE_DETAIL: '/vehicles/:id',
     VEHICLE_EDIT: '/vehicles/:id/edit',
+    ELECTRONIC_EDIT: '/electronics/:id/edit',
     CREATE_LISTING: '/listings/create',
     PAYMENTS: '/payments',
     PAY_LISTING_FEE: '/payments/listing-fee',

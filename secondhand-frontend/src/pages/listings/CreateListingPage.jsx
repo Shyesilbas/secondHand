@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useEnums } from '../../hooks/useEnums';
 import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateForm';
+import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
 import { LISTING_TYPE_ICONS } from '../../utils/constants';
 
 const CreateListingPage = () => {
@@ -18,6 +19,10 @@ const CreateListingPage = () => {
     if (selectedType === 'VEHICLE') {
         return <VehicleCreateForm onBack={handleBackToSelection} />;
     }
+
+  if (selectedType === 'ELECTRONICS') {
+      return <ElectronicCreateForm onBack={handleBackToSelection} />;
+  }
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -54,7 +59,7 @@ const CreateListingPage = () => {
                     ))}
                 </div>
 
-                {selectedType && selectedType !== 'VEHICLE' && (
+                {selectedType && selectedType !== 'VEHICLE' && selectedType !== 'ELECTRONICS' && (
                     <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-yellow-800">
                             {selectedType} tipi için form henüz hazır değil. Şimdilik sadece Vehicle listingi desteklenmektedir.

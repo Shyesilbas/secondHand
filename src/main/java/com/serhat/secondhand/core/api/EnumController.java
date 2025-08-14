@@ -1,6 +1,8 @@
 package com.serhat.secondhand.core.api;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -149,6 +151,34 @@ public class EnumController {
         return ResponseEntity.ok(seatCounts);
     }
 
+    @GetMapping("/electronic-types")
+    @Operation(summary = "Get all electronic types")
+    public ResponseEntity<List<Map<String, Object>>> getElectronicTypes() {
+        List<Map<String, Object>> types = Arrays.stream(ElectronicType.values())
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", type.name());
+                    map.put("label", getElectronicTypeLabel(type));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
+    }
+
+    @GetMapping("/electronic-brands")
+    @Operation(summary = "Get all electronic brands")
+    public ResponseEntity<List<Map<String, Object>>> getElectronicBrands() {
+        List<Map<String, Object>> brands = Arrays.stream(ElectronicBrand.values())
+                .map(brand -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", brand.name());
+                    map.put("label", getElectronicBrandLabel(brand));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(brands);
+    }
+
     // Label helper methods
     private String getListingTypeLabel(ListingType type) {
         return switch (type) {
@@ -293,6 +323,43 @@ public class EnumController {
             case NINE -> "9";
             case TEN -> "10";
             case MORE_THAN_TEN -> "10+";
+        };
+    }
+
+    private String getElectronicTypeLabel(ElectronicType type) {
+        return switch (type) {
+            case MOBILE_PHONE -> "Mobile Phone";
+            case LAPTOP -> "Laptop";
+            case TV -> "TV";
+            case AIR_CONDITIONER -> "Air Conditioner";
+            case WASHING_MACHINE -> "Washing Machine";
+            case KITCHENARY -> "Kitchen Appliances";
+            case GAMES_CONSOLE -> "Game Console";
+            case HEADPHONES -> "Headphones";
+            case MICROPHONE -> "Microphone";
+            case SPEAKER -> "Speaker";
+            case TV_STB -> "TV Set-Top Box";
+            case VIDEO_PLAYER -> "Video Player";
+        };
+    }
+
+    private String getElectronicBrandLabel(ElectronicBrand brand) {
+        return switch (brand) {
+            case APPLE -> "Apple";
+            case SAMSUNG -> "Samsung";
+            case MICROSOFT -> "Microsoft";
+            case GOOGLE -> "Google";
+            case SONY -> "Sony";
+            case LG -> "LG";
+            case ASUS -> "ASUS";
+            case XIAOMI -> "Xiaomi";
+            case HUAWEI -> "Huawei";
+            case FUJITSU -> "Fujitsu";
+            case OKI -> "OKI";
+            case BENQ -> "BenQ";
+            case KODAK -> "Kodak";
+            case NIKON -> "Nikon";
+            case PHILLIPS -> "Phillips";
         };
     }
 }

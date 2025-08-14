@@ -69,6 +69,8 @@ export const API_ENDPOINTS = {
         CURRENCIES: '/v1/enums/currencies',
         GEAR_TYPES: '/v1/enums/gear-types',
         SEAT_COUNTS: '/v1/enums/seat-counts',
+        ELECTRONIC_TYPES: '/v1/enums/electronic-types',
+        ELECTRONIC_BRANDS: '/v1/enums/electronic-brands',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
@@ -76,6 +78,12 @@ export const API_ENDPOINTS = {
         UPDATE: (id) => `/v1/vehicles/${id}`,
         BY_BRAND_MODEL: (brand, model) => `/v1/vehicles/brand/${brand}/model/${model}`,
         BRANDS: '/v1/vehicles/brands',
+    },
+    ELECTRONICS: {
+        CREATE: '/v1/electronics/create-listing',
+        BY_ID: (id) => `/v1/electronics/${id}`,
+        UPDATE: (id) => `/v1/electronics/${id}`,
+        BY_TYPE: (electronicType) => `/v1/electronics/electronicType/${electronicType}`,
     },
     FAVORITES: {
         ADD: '/favorites',

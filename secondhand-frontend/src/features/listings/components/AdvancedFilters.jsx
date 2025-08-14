@@ -192,6 +192,54 @@ const AdvancedFilters = ({ filters, onFiltersChange, onReset, selectedCategory }
                         </div>
                     )}
 
+                    {/* Elektronik Spesifik Filtreler */}
+                    {selectedCategory === 'ELECTRONICS' && (
+                        <div className="border-t border-slate-200 pt-6">
+                            <h4 className="text-md font-medium text-slate-800 mb-4">Elektronik Filtreleri</h4>
+
+                            {/* Türler */}
+                            <div className="mb-4">
+                                <EnumDropdown label="Türler" enumKey="electronicTypes" value={filters.electronicTypes || []} onChange={(values) => handleInputChange('electronicTypes', values)} multiple={true} />
+                            </div>
+
+                            {/* Markalar */}
+                            <div className="mb-4">
+                                <EnumDropdown label="Markalar" enumKey="electronicBrands" value={filters.electronicBrands || []} onChange={(values) => handleInputChange('electronicBrands', values)} multiple={true} />
+                            </div>
+
+                            {/* Yıl ve Renk */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Min Yıl</label>
+                                    <input
+                                        type="number"
+                                        min="1990"
+                                        max={currentYear}
+                                        value={filters.minYear || ''}
+                                        onChange={(e) => handleInputChange('minYear', parseInt(e.target.value) || '')}
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                                        placeholder="2015"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Max Yıl</label>
+                                    <input
+                                        type="number"
+                                        min="1990"
+                                        max={currentYear}
+                                        value={filters.maxYear || ''}
+                                        onChange={(e) => handleInputChange('maxYear', parseInt(e.target.value) || '')}
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                                        placeholder={currentYear.toString()}
+                                    />
+                                </div>
+                                <div>
+                                    <EnumDropdown label="Renk" enumKey="colors" value={filters.colors || []} onChange={(values) => handleInputChange('colors', values)} multiple={true} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Sıralama */}
                     <div className="border-t border-slate-200 pt-6">
                         <h4 className="text-md font-medium text-slate-800 mb-4">Sıralama</h4>
