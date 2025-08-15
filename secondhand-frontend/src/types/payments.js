@@ -1,13 +1,8 @@
-/**
- * Payment Related DTOs
- */
 
-// Credit Card Request DTO
 export const CreditCardRequestDTO = {
   limit: 0,
 };
 
-// Credit Card Response DTO  
 export const CreditCardDTO = {
   number: '',
   cvv: '',
@@ -17,9 +12,6 @@ export const CreditCardDTO = {
   limit: '',
 };
 
-// Bank Account Request DTO - Not needed, bank account creation requires no parameters
-
-// Bank Account Response DTO
 export const BankDTO = {
   IBAN: '',
   balance: 0,
@@ -27,9 +19,6 @@ export const BankDTO = {
   holderSurname: '',
 };
 
-
-
-// Payment Response DTO
 export const PaymentDTO = {
   id: '',
   amount: 0,
@@ -44,13 +33,6 @@ export const PaymentDTO = {
   updatedAt: '',
 };
 
-// Listing Fee Payment Request DTO
-export const ListingFeePaymentRequestDTO = {
-  listingId: '',
-  paymentType: '', // CREDIT_CARD, TRANSFER
-};
-
-// Listing Fee Config Response DTO
 export const ListingFeeConfigDTO = {
   vehicleFee: 0,
   electronicsFee: 0,
@@ -62,24 +44,12 @@ export const ListingFeeConfigDTO = {
   currency: 'TRY',
 };
 
-/**
- * Create Credit Card Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createCreditCardRequest = (data) => {
   return {
     limit: parseFloat(data.limit) || 0,
   };
 };
 
-// Bank account creation requires no parameters, so no createBankRequest function needed
-
-/**
- * Create Payment Request DTO with validation
- * @param {Object} data - Payment data
- * @returns {Object} - Validated DTO
- */
 export const createPaymentRequest = (data) => {
   return {
     amount: parseFloat(data.amount) || 0,
@@ -88,16 +58,6 @@ export const createPaymentRequest = (data) => {
     paymentMethod: data.paymentMethod || '',
     creditCardId: data.creditCardId || '',
     bankAccountId: data.bankAccountId || '',
-  };
-};
-
-/**
- * Create Listing Fee Payment Request DTO with validation
- * @param {Object} data - Payment data
- * @returns {Object} - Validated DTO
- */
-export const createListingFeePaymentRequest = (data) => {
-  return {
     listingId: data.listingId || '',
     paymentType: data.paymentType || '',
   };

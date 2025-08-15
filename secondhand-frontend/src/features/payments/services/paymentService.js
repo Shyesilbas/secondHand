@@ -2,14 +2,10 @@ import { get, post } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 import { 
     createPaymentRequest, 
-    createListingFeePaymentRequest 
+    ListingFeeConfigDTO,
 } from '../../../types/payments';
 
 export const paymentService = {
-    payListingFee: async (paymentData) => {
-        const listingFeeData = createListingFeePaymentRequest(paymentData);
-        return post(API_ENDPOINTS.PAYMENTS.LISTING_FEE, listingFeeData);
-    },
 
     createPayment: async (paymentData) => {
         const paymentRequestData = createPaymentRequest(paymentData);
@@ -20,6 +16,9 @@ export const paymentService = {
         return get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size } });
     },
 
-    getListingFeeConfig: async () => get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG),
+    getListingFeeConfig: async () => {
+        const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
+        return { ...ListingFeeConfigDTO, ...response.data };
+    },
 
 };

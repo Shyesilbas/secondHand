@@ -1,19 +1,13 @@
-/**
- * User Related DTOs
- */
 
-// User DTO
 export const UserDTO = {
   id: '',
   name: '',
   surname: '',
   email: '',
-  phone: '',
+  phoneNumber: '',
   gender: '',
   accountStatus: '',
-  userType: '',
-  isEmailVerified: false,
-  isPhoneVerified: false,
+  accountVerified: false,
   createdAt: '',
   updatedAt: '',
 };
@@ -44,11 +38,10 @@ export const createUpdatePhoneRequest = (data) => {
     newPhone: data.newPhone?.trim() || '',
     password: data.password || '',
   };
-};
-
-
-export const createVerificationRequest = (data) => {
+};export const createVerificationRequest = (data) => {
   return {
     code: data.code?.trim() || '',
   };
 };
+
+

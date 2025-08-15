@@ -1,8 +1,4 @@
-/**
- * General Listing Related DTOs
- */
 
-// Base Listing DTO
 export const ListingDTO = {
   id: '',
   listingNo: '',
@@ -22,7 +18,6 @@ export const ListingDTO = {
   updatedAt: '',
 };
 
-// Listing Filter DTO
 export const ListingFilterDTO = {
   listingType: '',
   status: 'ACTIVE',
@@ -32,7 +27,6 @@ export const ListingFilterDTO = {
   maxPrice: 0,
   currency: 'TRY',
   
-  // Vehicle specific filters
   brands: [],
   minYear: 0,
   maxYear: 0,
@@ -43,15 +37,12 @@ export const ListingFilterDTO = {
   gearTypes: [],
   seatCounts: [],
   
-  // Electronics specific filters
   electronicTypes: [],
   electronicBrands: [],
   
-  // Sorting
   sortBy: 'createdAt',
   sortDirection: 'DESC',
   
-  // Pagination
   page: 0,
   size: 20,
 };

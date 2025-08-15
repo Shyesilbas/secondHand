@@ -1,3 +1,5 @@
+import { ListingDTO } from './listings';
+
 /**
  * Vehicle Related DTOs
  */
@@ -34,24 +36,7 @@ export const VehicleCreateRequestDTO = {
 
 // Vehicle Response DTO
 export const VehicleListingDTO = {
-  // Basic Listing Info
-  id: '',
-  listingNo: '',
-  title: '',
-  description: '',
-  price: 0,
-  currency: 'TRY',
-  status: '',
-  listingFeePaid: false,
-  city: '',
-  district: '',
-  sellerName: '',
-  sellerSurname: '',
-  sellerId: 0,
-  type: 'VEHICLE',
-  createdAt: '',
-  updatedAt: '',
-  
+  ...ListingDTO,
   // Vehicle Specific Info
   brand: '',
   model: '',

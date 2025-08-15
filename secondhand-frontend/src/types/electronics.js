@@ -1,3 +1,5 @@
+import { ListingDTO } from './listings';
+
 // Electronics Create Request DTO
 export const ElectronicCreateRequestDTO = {
   // Basic Info
@@ -20,22 +22,7 @@ export const ElectronicCreateRequestDTO = {
 
 // Electronics Response DTO (subset + base Listing fields come from backend)
 export const ElectronicListingDTO = {
-  id: '',
-  listingNo: '',
-  title: '',
-  description: '',
-  price: 0,
-  currency: 'TRY',
-  status: '',
-  city: '',
-  district: '',
-  sellerName: '',
-  sellerSurname: '',
-  sellerId: 0,
-  type: 'ELECTRONICS',
-  createdAt: '',
-  updatedAt: '',
-
+  ...ListingDTO,
   // Electronics fields
   electronicType: '',
   electronicBrand: '',

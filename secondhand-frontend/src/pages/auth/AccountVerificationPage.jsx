@@ -6,7 +6,6 @@ import { verificationService } from '../../features/auth/services/verificationSe
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
-import { VerificationRequestDTO } from '../../types/users';
 
 const AccountVerificationPage = () => {
     const navigate = useNavigate();
@@ -14,7 +13,7 @@ const AccountVerificationPage = () => {
     const notification = useNotification();
     
     const [verificationData, setVerificationData] = useState({
-        ...VerificationRequestDTO
+        code: '',
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isSendingCode, setIsSendingCode] = useState(false);
@@ -46,11 +45,11 @@ const AccountVerificationPage = () => {
             await verificationService.sendVerificationCode();
             setCodeSent(true);
             setCountdown(60); // 60 seconds cooldown
-            notification.showSuccess('Başarılı', 'Doğrulama kodu e-posta adresinize gönderildi!');
+            notification.showSuccess('Success', 'Verification code has been sent to your built in Email!');
         } catch (error) {
             console.error('Send verification code error:', error);
             const errorMessage = error.response?.data?.message || 'Failed to send verification code. Please try again.';
-            notification.showError('Hata', errorMessage);
+            notification.showError('Error', errorMessage);
         } finally {
             setIsSendingCode(false);
         }
@@ -74,12 +73,11 @@ const AccountVerificationPage = () => {
         setErrors({});
 
         try {
-            await verificationService.verifyAccount(verificationData.code.trim());
+            await verificationService.verify(verificationData);
             
-            // Update user verification status
             updateUser({ accountVerified: true });
             
-            notification.showSuccess('Başarılı', 'Hesabınız başarıyla doğrulandı! SecondHand\'e hoş geldiniz.');
+            notification.showSuccess('Success', 'Your .');
             
             // Redirect to profile after 2 seconds
             setTimeout(() => {
@@ -95,10 +93,10 @@ const AccountVerificationPage = () => {
                     error.response.data.message.toLowerCase().includes('expired')) {
                     setErrors({ code: error.response.data.message });
                 } else {
-                    notification.showError('Hata', error.response.data.message);
+                    notification.showError('Error', error.response.data.message);
                 }
             } else {
-                notification.showError('Hata', 'Doğrulama başarısız. Lütfen kodunuzu kontrol edin ve tekrar deneyin.');
+                notification.showError('Error', 'Verification Failed. Please check your code again');
             }
         } finally {
             setIsLoading(false);

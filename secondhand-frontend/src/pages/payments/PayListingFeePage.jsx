@@ -63,10 +63,15 @@ const PayListingFeePage = () => {
         try {
             const paymentData = {
                 listingId: selectedListing.id,
-                paymentType: paymentType
+                paymentType: paymentType,
+                amount: feeConfig.totalCreationFee,
+                currency: feeConfig.currency,
+                description: 'Listing Creation Fee',
+                paymentMethod: paymentType, // Assuming paymentType maps directly to paymentMethod
+                // transactionType will be handled by backend based on listingId being present
             };
             console.log('Sending payment request:', paymentData);
-            await paymentService.payListingFee(paymentData);
+            await paymentService.createPayment(paymentData);
 
             // Payment successful
             notification.showSuccess('Başarılı', 'İlan ücreti ödemesi başarılı! İlanınız yayınlanacak.');
