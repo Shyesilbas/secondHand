@@ -1,17 +1,25 @@
-export const formatCurrency = (amount, currency = 'TRY', options = {}) => {
-  if (amount === null || amount === undefined || amount === '') return '';
-  const value = typeof amount === 'string' ? parseFloat(amount) : amount;
-  try {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-      ...options,
-    }).format(value);
-  } catch {
-    return `${value} ${currency}`;
+export const formatCurrency = (value, currency = 'TRY', options = {}) => {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+
+  if (numValue === null || numValue === undefined || isNaN(numValue)) {
+    console.warn('Invalid value for currency formatting:', value);
+    return '0.00 ₺';
   }
+
+  const symbols = {
+    'TRY': '₺',
+    'USD': '$',
+    'EUR': '€'
+  };
+
+  const symbol = symbols[currency] || currency;
+
+  const formatted = numValue.toLocaleString('tr-TR', {
+    minimumFractionDigits: options.minimumFractionDigits || 2,
+    maximumFractionDigits: options.maximumFractionDigits || 2
+  });
+
+  return `${formatted} ${symbol}`;
 };
 
 export const formatDateTime = (dateString) => {

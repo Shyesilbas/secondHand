@@ -14,8 +14,7 @@ export const verificationService = {
     },
 
     verify: async (verificationData) => {
-        const verifyData = VerificationRequestDTO;
-        verifyData.code = verificationData.code?.trim() || '';
-        return post(API_ENDPOINTS.USER.VERIFY, verifyData);
+        const requestPayload = { code: verificationData.code };
+        return post(API_ENDPOINTS.USER.VERIFY, requestPayload);
     },
 };

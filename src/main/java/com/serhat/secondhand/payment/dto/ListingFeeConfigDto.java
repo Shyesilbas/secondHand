@@ -25,13 +25,5 @@ public class ListingFeeConfigDto {
 
     private BigDecimal taxPercentage;
 
-    private BigDecimal creationFeeTax;
-    
-
     private BigDecimal totalCreationFee;
-
-    private BigDecimal promotionFeeTax;
-    
-
-    private BigDecimal totalPromotionFee;
 }

@@ -47,15 +47,15 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
 
     @Getter
-    @Value("${app.listing.creation.fee:50.00}")
+    @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
 
     @Getter
-    @Value("${app.listing.promotion.fee:25.00}")
+    @Value("${app.listing.promotion.fee}")
     private BigDecimal listingPromotionFee;
 
     @Getter
-    @Value("${app.listing.fee.tax:18.00}")
+    @Value("${app.listing.fee.tax}")
     private BigDecimal listingFeeTax;
 
     @Transactional
@@ -65,7 +65,6 @@ public class PaymentService {
                 .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
-
 
         BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
@@ -85,7 +84,6 @@ public class PaymentService {
         return createPayment(fullRequest, authentication);
     }
 
-
     @Transactional
     public PaymentDto createPayment(PaymentRequest paymentRequest, Authentication authentication) {
         log.info("Creating payment for listing: {} with amount: {}", paymentRequest.listingId(), paymentRequest.amount());
@@ -103,7 +101,7 @@ public class PaymentService {
         if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("Payment amount must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
         }
-        
+
         // This check is tricky for listing fees where you pay "to the system" (represented as yourself)
         if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION && fromUser.getId().equals(toUser.getId())) {
             throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
@@ -197,28 +195,20 @@ public class PaymentService {
         );
     }
 
-    // mapping handled by PaymentMapper
-
-
     public ListingFeeConfigDto getListingFeeConfig() {
         log.info("Getting listing fee configuration");
-        
-        // Calculate tax amounts
-        BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
-        BigDecimal promotionFeeTax = listingPromotionFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
-        
-        // Calculate total amounts including tax
+
+        BigDecimal creationFeeTax = listingCreationFee
+                .multiply(listingFeeTax)
+                .divide(BigDecimal.valueOf(100));
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
-        BigDecimal totalPromotionFee = listingPromotionFee.add(promotionFeeTax);
-        
+
         return ListingFeeConfigDto.builder()
                 .creationFee(listingCreationFee)
                 .promotionFee(listingPromotionFee)
                 .taxPercentage(listingFeeTax)
-                .creationFeeTax(creationFeeTax)
                 .totalCreationFee(totalCreationFee)
-                .promotionFeeTax(promotionFeeTax)
-                .totalPromotionFee(totalPromotionFee)
                 .build();
     }
+
 }

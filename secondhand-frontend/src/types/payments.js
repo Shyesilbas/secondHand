@@ -20,29 +20,27 @@ export const BankDTO = {
 };
 
 export const PaymentDTO = {
-  id: '',
+  paymentId: '',
+  senderName: '',
+  senderSurname: '',
+  receiverName: '',
+  receiverSurname: '',
   amount: 0,
-  currency: 'TRY',
-  description: '',
-  paymentMethod: '',
-  paymentType: '', // LISTING_CREATION, ITEM_PURCHASE
-  direction: '', // INCOMING, OUTGOING
-  status: '',
-  processedAt: '',
+  paymentType: '',
+  transactionType: '',
+  paymentDirection: '',
+  listingId: '',
   createdAt: '',
-  updatedAt: '',
+  isSuccess: false
 };
 
 export const ListingFeeConfigDTO = {
-  vehicleFee: 0,
-  electronicsFee: 0,
-  houseFee: 0,
-  clothingFee: 0,
-  booksFee: 0,
-  sportsFee: 0,
-  otherFee: 0,
-  currency: 'TRY',
+  creationFee: undefined,
+  promotionFee: undefined,
+  taxPercentage: undefined,
+  currency: undefined,
 };
+
 
 export const createCreditCardRequest = (data) => {
   return {
@@ -60,5 +58,12 @@ export const createPaymentRequest = (data) => {
     bankAccountId: data.bankAccountId || '',
     listingId: data.listingId || '',
     paymentType: data.paymentType || '',
+  };
+};
+
+export const createListingFeePaymentRequest = (data) => {
+  return {
+    paymentType: data.paymentType || '',
+    listingId: data.listingId || '',
   };
 };

@@ -14,7 +14,6 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Only allow positive numbers for limit
     if (name === 'limit') {
       const numericValue = value.replace(/[^0-9.]/g, '');
       setFormData(prev => ({
@@ -23,7 +22,6 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
       }));
     }
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -53,13 +51,11 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
     }
 
     try {
-      // Use DTO creator to validate and transform data
       const creditCardData = createCreditCardRequest(formData);
       
       await onSubmit(creditCardData);
       notification.showSuccess('Success', 'Credit Card Created Successfully!');
       
-      // Reset form
       setFormData({ ...CreditCardRequestDTO });
       setErrors({});
       

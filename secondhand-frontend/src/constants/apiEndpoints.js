@@ -36,7 +36,7 @@ export const API_ENDPOINTS = {
     },
     PAYMENTS: {
         CREATE: '/v1/payments/pay',
-        LISTING_FEE: '/v1/payments/listings/pay-fee',
+        LISTING_FEE_PAYMENT: '/v1/payments/listings/pay-fee',
         MY_PAYMENTS: '/v1/payments/my-payments',
         STATISTICS: '/v1/payments/statistics',
         LISTING_FEE_CONFIG: '/v1/payments/listing-fee-config',
@@ -69,8 +69,7 @@ export const API_ENDPOINTS = {
         GEAR_TYPES: '/v1/enums/gear-types',
         SEAT_COUNTS: '/v1/enums/seat-counts',
         ELECTRONIC_TYPES: '/v1/enums/electronic-types',
-        ELECTRONIC_BRANDS: '/v1/enums/electronic-brands',
-    },
+        ELECTRONIC_BRANDS: '/v1/enums/electronic-brands'},
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
         BY_ID: (id) => `/v1/vehicles/${id}`,

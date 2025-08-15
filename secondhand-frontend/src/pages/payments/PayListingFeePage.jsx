@@ -4,10 +4,12 @@ import { useNotification } from '../../context/NotificationContext';
 import { listingService } from '../../features/listings/services/listingService';
 import { paymentService } from '../../features/payments/services/paymentService';
 import { formatCurrency } from '../../utils/formatters';
+import { createListingFeePaymentRequest } from '../../types/payments';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
     const notification = useNotification();
+    // Removed: const { enums, isLoading: isEnumsLoading } = useEnums();
     const [draftListings, setDraftListings] = useState([]);
     const [feeConfig, setFeeConfig] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -22,19 +24,6 @@ const PayListingFeePage = () => {
         fetchFeeConfig();
     }, []);
 
-    const fetchFeeConfig = async () => {
-        try {
-            setIsConfigLoading(true);
-            const config = await paymentService.getListingFeeConfig();
-            setFeeConfig(config);
-        } catch (err) {
-            console.error('Failed to fetch fee config:', err);
-            notification.showError('Hata', 'Ücret yapılandırması yüklenemedi. Lütfen sayfayı yenileyin.');
-        } finally {
-            setIsConfigLoading(false);
-        }
-    };
-
     const fetchDraftListings = async () => {
         try {
             setIsLoading(true);
@@ -45,6 +34,19 @@ const PayListingFeePage = () => {
             setError(err.response?.data?.message || 'An error occurred while fetching listings. Please try again later.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchFeeConfig = async () => {
+        try {
+            setIsConfigLoading(true);
+            const config = await paymentService.getListingFeeConfig();
+            setFeeConfig(config);
+        } catch (err) {
+            console.error('Failed to fetch fee config:', err);
+            notification.showError('Error', 'Ücret yapılandırması yüklenemedi. Lütfen sayfayı yenileyin.');
+        } finally {
+            setIsConfigLoading(false);
         }
     };
 
@@ -61,17 +63,12 @@ const PayListingFeePage = () => {
 
         setIsProcessingPayment(true);
         try {
-            const paymentData = {
+            const paymentData = createListingFeePaymentRequest({
                 listingId: selectedListing.id,
                 paymentType: paymentType,
-                amount: feeConfig.totalCreationFee,
-                currency: feeConfig.currency,
-                description: 'Listing Creation Fee',
-                paymentMethod: paymentType, // Assuming paymentType maps directly to paymentMethod
-                // transactionType will be handled by backend based on listingId being present
-            };
+            });
             console.log('Sending payment request:', paymentData);
-            await paymentService.createPayment(paymentData);
+            await paymentService.createListingFeePayment(paymentData);
 
             // Payment successful
             notification.showSuccess('Başarılı', 'İlan ücreti ödemesi başarılı! İlanınız yayınlanacak.');
@@ -89,7 +86,7 @@ const PayListingFeePage = () => {
 
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    if (isLoading) {
+    if (isLoading || isConfigLoading) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <div className="animate-pulse space-y-6">
@@ -245,7 +242,7 @@ const PayListingFeePage = () => {
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span className="text-gray-600">Tax ({feeConfig.taxPercentage}%):</span>
-                                                    <span className="font-semibold">{formatPrice(feeConfig.creationFeeTax)}</span>
+                                                    <span className="font-semibold">{formatPrice(feeConfig.creationFee * feeConfig.taxPercentage / 100)}</span>
                                                 </div>
                                                 <hr />
                                                 <div className="flex justify-between text-lg">

@@ -56,6 +56,7 @@ public class SecurityConfig {
                                 "/api/v1/listings/{id}",
                                 "/api/v1/listings/allListings",
                                 "/swagger-ui.html",
+                                "/api/v1/payments/listing-fee-config",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         

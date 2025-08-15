@@ -141,7 +141,7 @@ const PaymentsPage = () => {
                     </svg>
                     Back
                 </button>
-                
+
                 <h1 className="text-3xl font-bold text-gray-900">
                     Payment History
                 </h1>
@@ -178,20 +178,20 @@ const PaymentsPage = () => {
                                 Recent Transactions ({payments.length})
                             </h3>
                         </div>
-                        
+
                         <div className="divide-y divide-gray-200">
                             {payments.map((payment, index) => (
                                 <div key={payment.paymentId || index} className="p-6 hover:bg-gray-50 transition-colors">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4 flex-1">
                                             <div className={`p-3 rounded-lg ${
-                                                payment.paymentDirection === 'INCOMING' 
-                                                    ? 'bg-green-100 text-green-600' 
+                                                payment.paymentDirection === 'INCOMING'
+                                                    ? 'bg-green-100 text-green-600'
                                                     : 'bg-blue-100 text-blue-600'
                                             }`}>
                                                 {getPaymentTypeIcon(payment.paymentType)}
                                             </div>
-                                            
+
                                             <div className="flex-1">
                                                 <div className="flex items-center space-x-2">
                                                     <h4 className="text-lg font-semibold text-gray-900">
@@ -207,7 +207,7 @@ const PaymentsPage = () => {
                                                         Listing ID: {payment.listingId}
                                                     </p>
                                                 )}
-                                                
+
                                                 {payment.receiverName && payment.paymentDirection === 'OUTGOING' && (
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         To: {payment.receiverName} {payment.receiverSurname}
@@ -220,29 +220,29 @@ const PaymentsPage = () => {
                                                 )}
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex items-center space-x-4">
                                             <div className="text-right">
                                                 <div className="flex items-center space-x-3 mb-2">
                                                     <span className={`text-lg font-bold ${
-                                                        payment.paymentDirection === 'INCOMING' 
-                                                            ? 'text-green-600' 
+                                                        payment.paymentDirection === 'INCOMING'
+                                                            ? 'text-green-600'
                                                             : 'text-gray-900'
                                                     }`}>
                                                         {payment.paymentDirection === 'INCOMING' ? '+' : '-'}
                                                         {formatCurrency(payment.amount)}
                                                     </span>
-                                                    
+
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                        payment.isSuccess 
-                                                            ? 'bg-green-100 text-green-800' 
+                                                        payment.isSuccess
+                                                            ? 'bg-green-100 text-green-800'
                                                             : 'bg-red-100 text-red-800'
                                                     }`}>
                                                         {payment.isSuccess ? 'Success' : 'Failed'}
                                                     </span>
                                                 </div>
                                             </div>
-                                            
+
                                             <button
                                                 onClick={() => showReceipt(payment)}
                                                 className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -271,11 +271,11 @@ const PaymentsPage = () => {
                                 >
                                     Previous
                                 </button>
-                                
+
                                 <span className="text-sm text-gray-700">
                                     Page {currentPage + 1} of {totalPages}
                                 </span>
-                                
+
                                 <button
                                     onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                                     disabled={currentPage >= totalPages - 1}
@@ -284,7 +284,7 @@ const PaymentsPage = () => {
                                     Next
                                 </button>
                             </div>
-                            
+
                             <div className="flex items-center space-x-4">
                                 <div className="text-sm text-gray-700">
                                     Showing {totalElements === 0 ? 0 : currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} results
