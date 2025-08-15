@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAdvancedListings } from '../../features/listings/hooks/useAdvancedListings';
 import ListingGrid from '../../features/listings/components/ListingGrid';
-import AdvancedFilters from '../../features/listings/components/AdvancedFilters';import Pagination from '../../components/ui/Pagination';
+import AdvancedFilters from '../../features/listings/components/AdvancedFilters';
+import Pagination from '../../components/ui/Pagination';
 import SidebarLayout from '../../components/layout/SidebarLayout';
 import { useEnums } from '../../hooks/useEnums';
 import { useNotification } from '../../context/NotificationContext';
+import CategorySelector from '../../features/listings/components/CategorySelector';
+import { listingService } from '../../features/listings/services/listingService.js'
 
 const ListingsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -12,7 +15,7 @@ const ListingsPage = () => {
     const [searchResult, setSearchResult] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
     const [showSearchResult, setShowSearchResult] = useState(false);
-    
+
     const navState = useMemo(() => window.history.state && window.history.state.usr, []);
     const initialListingType = navState?.listingType || null;
     const {
@@ -27,21 +30,18 @@ const ListingsPage = () => {
         updatePage,
         resetFilters
     } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : {});
-    
+
     const { getListingTypeLabel } = useEnums();
     const notification = useNotification();
 
-    // If navigated from Home with a preselected category
     useEffect(() => {
         if (initialListingType) {
             setSelectedCategory(initialListingType);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialListingType]);
 
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
-        // Update filters to match the selected category
         updateFilters({ listingType: category });
     };
 
@@ -55,7 +55,7 @@ const ListingsPage = () => {
 
     const handleSearch = async (e) => {
         e.preventDefault();
-        
+
         if (!searchQuery.trim()) {
             notification.showError('Hata', 'Lütfen bir ilan numarası girin');
             return;
@@ -87,19 +87,16 @@ const ListingsPage = () => {
         setSearchQuery('');
     };
 
-    // Sidebar Content
+    // ✅ Sidebar Content
     const sidebarContent = (
         <div className="space-y-6">
-            {/* Category Selector */}
             <div>
                 <h3 className="text-md font-semibold text-gray-900 mb-4">Categories</h3>
-                <CategorySelector 
+                <CategorySelector
                     selectedCategory={selectedCategory}
                     onCategoryChange={handleCategoryChange}
                 />
             </div>
-
-            {/* Advanced Filters */}
             <div>
                 <h3 className="text-md font-semibold text-gray-900 mb-4">Advanced Filters</h3>
                 <AdvancedFilters
@@ -112,18 +109,15 @@ const ListingsPage = () => {
         </div>
     );
 
-    // Main Content
     const mainContent = (
         <div className="p-6">
             {/* Header and Search */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-slate-900">
-                    Listings
-                </h1>
+                <h1 className="text-3xl font-bold text-slate-900">Listings</h1>
                 <p className="text-slate-600 mt-2">
                     Search by listing number or use advanced filters to find products easily.
                 </p>
-                
+
                 {/* Search Bar */}
                 <div className="mt-6">
                     <form onSubmit={handleSearch} className="flex gap-4 max-w-md">
@@ -157,18 +151,14 @@ const ListingsPage = () => {
                 </div>
             </div>
 
-            {/* Search Result or Results Summary */}
+            {/* Search Result */}
             {showSearchResult && searchResult ? (
                 <div className="mb-6">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                         <h3 className="text-lg font-semibold text-blue-900 mb-2">Search Result</h3>
                         <p className="text-blue-700">Found listing: <span className="font-mono font-bold">{searchResult.listingNo}</span></p>
                     </div>
-                    <ListingGrid
-                        listings={[searchResult]}
-                        isLoading={false}
-                        error={null}
-                    />
+                    <ListingGrid listings={[searchResult]} isLoading={false} error={null} />
                 </div>
             ) : !isLoading && !showSearchResult && (
                 <div className="mb-6">
@@ -182,15 +172,11 @@ const ListingsPage = () => {
                                     </span>
                                 )}
                             </p>
-                            
-                            {/* Active Filters Indicator */}
-                            {(filters.minPrice || filters.maxPrice || filters.city || 
-                              (filters.brands && filters.brands.length > 0) ||
-                              (filters.fuelTypes && filters.fuelTypes.length > 0)) && (
+                            {(filters.minPrice || filters.maxPrice || filters.city ||
+                                (filters.brands && filters.brands.length > 0) ||
+                                (filters.fuelTypes && filters.fuelTypes.length > 0)) && (
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                        Filtre aktif
-                                    </span>
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Filtre aktif</span>
                                     <button
                                         onClick={resetFilters}
                                         className="text-xs text-slate-500 hover:text-slate-700 underline"
@@ -200,29 +186,21 @@ const ListingsPage = () => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Sort Info */}
                         <div className="text-sm text-slate-500">
                             {filters.sortBy === 'price' ? 'Fiyata göre' :
-                             filters.sortBy === 'year' ? 'Yıla göre' :
-                             filters.sortBy === 'mileage' ? 'Kilometreye göre' : 'Tarihe göre'} sıralı
+                                filters.sortBy === 'year' ? 'Yıla göre' :
+                                    filters.sortBy === 'mileage' ? 'Kilometreye göre' : 'Tarihe göre'} sıralı
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Listings Grid - Only show if not showing search result */}
+            {/* Listings Grid */}
             {!showSearchResult && (
                 <>
                     <div className="mb-8">
-                        <ListingGrid
-                            listings={listings}
-                            isLoading={isLoading}
-                            error={error}
-                        />
+                        <ListingGrid listings={listings} isLoading={isLoading} error={error} />
                     </div>
-
-                    {/* Pagination */}
                     {!isLoading && totalPages > 1 && (
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                             <Pagination

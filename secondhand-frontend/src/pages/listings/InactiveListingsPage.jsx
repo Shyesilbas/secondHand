@@ -1,5 +1,5 @@
 import React from 'react';
-import {useMyListings} from "../../features/listings/hooks/useMyListings.js";
+import { useMyListings } from '../../features/listings/hooks/useMyListings.js';
 import ListingGrid from '../../features/listings/components/ListingGrid';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
