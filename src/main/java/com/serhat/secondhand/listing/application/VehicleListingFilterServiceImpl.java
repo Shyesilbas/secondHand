@@ -31,15 +31,11 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
     private final ListingMapper listingMapper;
 
-    @Override
+        @Override
     public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
         log.info("Filtering vehicles with criteria: {}", filters);
-
-        if (filters.getPage() == null) filters.setPage(0);
-        if (filters.getSize() == null) filters.setSize(20);
-        if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
-
-        Pageable pageable = PageRequest.of(filters.getPage(), filters.getSize());
+        
+        Pageable pageable = FilterHelper.initializeFilter(filters);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
@@ -72,7 +68,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         // Convert to DTOs
         List<ListingDto> dtos = results.stream()
-                .map(listing -> listingMapper.toDynamicDto(listing))
+                .map(listingMapper::toDynamicDto)
                 .toList();
 
         return new PageImpl<>(dtos, pageable, total);
@@ -82,42 +78,11 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
                                             VehicleListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
 
-        // Listing type is automatically filtered since we're using VehicleListing entity
-        // But we can add it explicitly for safety
+
         predicates.add(cb.equal(root.get("listingType"), ListingType.VEHICLE));
 
-        // Basic filters from parent Listing class
-        if (filters.getStatus() != null) {
-            predicates.add(cb.equal(root.get("status"), filters.getStatus()));
-        }
-
-        if (filters.getCity() != null && !filters.getCity().trim().isEmpty()) {
-            predicates.add(cb.like(
-                    cb.lower(root.get("city")),
-                    "%" + filters.getCity().toLowerCase() + "%"
-            ));
-        }
-
-        if (filters.getDistrict() != null && !filters.getDistrict().trim().isEmpty()) {
-            predicates.add(cb.like(
-                    cb.lower(root.get("district")),
-                    "%" + filters.getDistrict().toLowerCase() + "%"
-            ));
-        }
-
-        // Price range
-        if (filters.getMinPrice() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filters.getMinPrice()));
-        }
-
-        if (filters.getMaxPrice() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("price"), filters.getMaxPrice()));
-        }
-
-        // Currency
-        if (filters.getCurrency() != null) {
-            predicates.add(cb.equal(root.get("currency"), filters.getCurrency()));
-        }
+        // Add base predicates from helper
+        predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
 
         // Vehicle-specific filters - directly accessible since root is VehicleListing
         if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
@@ -169,41 +134,18 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
             String sortBy = filters.getSortBy().toLowerCase();
             boolean isDesc = "DESC".equalsIgnoreCase(filters.getSortDirection());
 
-            Expression<?> sortExpression;
-            switch (sortBy) {
-                case "price":
-                    sortExpression = root.get("price");
-                    break;
-                case "createdat":
-                case "created_at":
-                    sortExpression = root.get("createdAt");
-                    break;
-                case "year":
-                    sortExpression = root.get("year");
-                    break;
-                case "mileage":
-                    sortExpression = root.get("mileage");
-                    break;
-                case "brand":
-                    sortExpression = root.get("brand");
-                    break;
-                case "doors":
-                    sortExpression = root.get("doors");
-                    break;
-                case "fueltype":
-                case "fuel_type":
-                    sortExpression = root.get("fuelType");
-                    break;
-                case "geartype":
-                case "gear_type":
-                    sortExpression = root.get("gearType");
-                    break;
-                case "model":
-                    sortExpression = root.get("model");
-                    break;
-                default:
-                    sortExpression = root.get("createdAt");
-            }
+            Expression<?> sortExpression = switch (sortBy) {
+                case "price" -> root.get("price");
+                case "createdat", "created_at" -> root.get("createdAt");
+                case "year" -> root.get("year");
+                case "mileage" -> root.get("mileage");
+                case "brand" -> root.get("brand");
+                case "doors" -> root.get("doors");
+                case "fueltype", "fuel_type" -> root.get("fuelType");
+                case "geartype", "gear_type" -> root.get("gearType");
+                case "model" -> root.get("model");
+                default -> root.get("createdAt");
+            };
 
             orders.add(isDesc ? cb.desc(sortExpression) : cb.asc(sortExpression));
         } else {

@@ -113,9 +113,7 @@ public class ListingService {
     public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters, ListingType listingType) {
         log.info("Getting listings with filters: {} and type: {}", filters, listingType);
         
-        if (filters.getPage() == null) filters.setPage(0);
-        if (filters.getSize() == null) filters.setSize(20);
-        if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
+        FilterHelper.initializeFilter(filters);
         
         if (listingType != null) {
             switch (listingType) {
