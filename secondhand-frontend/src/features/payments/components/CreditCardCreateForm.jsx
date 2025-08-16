@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCardRequestDTO, createCreditCardRequest } from '../../../types/payments';
+import { CreditCardRequestDto, CREDIT_CARD_FIELD_LABELS, CREDIT_CARD_FIELD_PLACEHOLDERS, CREDIT_CARD_FIELD_TYPES } from '../../../types/creditCards';
 import { formatCurrency } from '../../../utils/formatters';
 import { useNotification } from '../../../context/NotificationContext';
 
@@ -51,7 +51,7 @@ const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
     }
 
     try {
-      const creditCardData = createCreditCardRequest(formData);
+              const creditCardData = CreditCardRequestDto(formData);
       
       await onSubmit(creditCardData);
       notification.showSuccess('Success', 'Credit Card Created Successfully!');

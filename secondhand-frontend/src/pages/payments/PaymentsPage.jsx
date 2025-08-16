@@ -3,6 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../features/payments/services/paymentService';
 import PaymentReceiptModal from '../../components/modals/PaymentReceiptModal';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
+import { 
+    PAYMENT_TYPES, 
+    PAYMENT_TRANSACTION_TYPES, 
+    PAYMENT_DIRECTIONS,
+    PAYMENT_TYPE_LABELS, 
+    TRANSACTION_TYPE_LABELS, 
+    PAYMENT_DIRECTION_LABELS,
+    PAYMENT_STATUS_BADGE_COLORS,
+    PAYMENT_DIRECTION_BADGE_COLORS 
+} from '../../types/payments';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();
@@ -50,13 +60,13 @@ const PaymentsPage = () => {
 
     const getPaymentTypeIcon = (type) => {
         switch (type) {
-            case 'CREDIT_CARD':
+            case PAYMENT_TYPES.CREDIT_CARD:
                 return (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 );
-            case 'TRANSFER':
+            case PAYMENT_TYPES.TRANSFER:
                 return (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -72,29 +82,15 @@ const PaymentsPage = () => {
     };
 
     const getTransactionTypeLabel = (type) => {
-        switch (type) {
-            case 'LISTING_CREATION':
-                return 'Listing Fee';
-            case 'ITEM_PURCHASE':
-                return 'Product Purchase';
-            default:
-                return type;
-        }
+        return TRANSACTION_TYPE_LABELS[type] || type;
     };
 
     const getPaymentTypeLabel = (type) => {
-        switch (type) {
-            case 'CREDIT_CARD':
-                return 'Credit Card';
-            case 'TRANSFER':
-                return 'Bank Transfer';
-            default:
-                return type;
-        }
+        return PAYMENT_TYPE_LABELS[type] || type;
     };
 
     const getDirectionIcon = (direction) => {
-        if (direction === 'INCOMING') {
+        if (direction === PAYMENT_DIRECTIONS.INCOMING) {
             return (
                 <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -184,9 +180,9 @@ const PaymentsPage = () => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4 flex-1">
                                             <div className={`p-3 rounded-lg ${
-                                                payment.paymentDirection === 'INCOMING'
-                                                    ? 'bg-green-100 text-green-600'
-                                                    : 'bg-blue-100 text-blue-600'
+                                                payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING
+                                                    ? PAYMENT_DIRECTION_BADGE_COLORS[PAYMENT_DIRECTIONS.INCOMING]
+                                                    : PAYMENT_DIRECTION_BADGE_COLORS[PAYMENT_DIRECTIONS.OUTGOING]
                                             }`}>
                                                 {getPaymentTypeIcon(payment.paymentType)}
                                             </div>
@@ -196,7 +192,12 @@ const PaymentsPage = () => {
                                                     <h4 className="text-lg font-semibold text-gray-900">
                                                         {getTransactionTypeLabel(payment.transactionType)}
                                                     </h4>
-                                                    {getDirectionIcon(payment.paymentDirection)}
+                                                    <div className="flex items-center space-x-1">
+                                                        {getDirectionIcon(payment.paymentDirection)}
+                                                        <span className="text-xs text-gray-500">
+                                                            {PAYMENT_DIRECTION_LABELS[payment.paymentDirection]}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <p className="text-sm text-gray-500 mt-1">
                                                     {getPaymentTypeLabel(payment.paymentType)} • {formatDate(payment.createdAt)}
@@ -207,12 +208,12 @@ const PaymentsPage = () => {
                                                     </p>
                                                 )}
 
-                                                {payment.receiverName && payment.paymentDirection === 'OUTGOING' && (
+                                                {payment.receiverName && payment.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING && (
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         To: {payment.receiverName} {payment.receiverSurname}
                                                     </p>
                                                 )}
-                                                {payment.senderName && payment.paymentDirection === 'INCOMING' && (
+                                                {payment.senderName && payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING && (
                                                     <p className="text-xs text-gray-500 mt-1">
                                                         From: {payment.senderName} {payment.senderSurname}
                                                     </p>
@@ -224,18 +225,18 @@ const PaymentsPage = () => {
                                             <div className="text-right">
                                                 <div className="flex items-center space-x-3 mb-2">
                                                     <span className={`text-lg font-bold ${
-                                                        payment.paymentDirection === 'INCOMING'
+                                                        payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING
                                                             ? 'text-green-600'
                                                             : 'text-gray-900'
                                                     }`}>
-                                                        {payment.paymentDirection === 'INCOMING' ? '+' : '-'}
+                                                        {payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '+' : '-'}
                                                         {formatCurrency(payment.amount)}
                                                     </span>
 
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                         payment.isSuccess
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-red-100 text-red-800'
+                                                            ? PAYMENT_STATUS_BADGE_COLORS.success
+                                                            : PAYMENT_STATUS_BADGE_COLORS.failed
                                                     }`}>
                                                         {payment.isSuccess ? 'Success' : 'Failed'}
                                                     </span>

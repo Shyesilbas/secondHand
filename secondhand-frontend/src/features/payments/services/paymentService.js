@@ -1,6 +1,6 @@
 import { get, post } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
-import { ListingFeeConfigDTO, createPaymentRequest } from '../../../types/payments';
+import { PaymentDto, ListingFeeConfigDTO, createPaymentRequest } from '../../../types/payments';
 
 export const paymentService = {
 
@@ -16,9 +16,12 @@ export const paymentService = {
     },
 
     getMyPayments: async (page = 0, size = 5) => {
-        return get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size } });
+        const data = await get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size } });
+        if (data.content && Array.isArray(data.content)) {
+            data.content = data.content.map(PaymentDto);
+        }
+        return data;
     },
-
 
     getListingFeeConfig: async () => {
         const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);

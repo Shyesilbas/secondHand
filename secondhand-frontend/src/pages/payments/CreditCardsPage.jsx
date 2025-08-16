@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreditCard } from '../../features/payments/hooks/useCreditCard';
-import CreditCardCreateForm from '../../features/payments/components/CreditCardCreateForm';
-import { CreditCardDTO } from '../../types/payments';
 import { useNotification } from '../../context/NotificationContext';
-import { formatCurrency } from '../../utils/formatters';
+import CreditCardItem from '../../features/payments/components/CreditCardItem';
+import EmptyCreditCards from '../../features/payments/components/EmptyCreditCards';
+import CreditCardModal from '../../features/payments/components/CreditCardModal';
 
 const CreditCardsPage = () => {
     const navigate = useNavigate();
@@ -31,17 +31,14 @@ const CreditCardsPage = () => {
             async () => {
                 try {
                     await deleteCreditCard();
-                    notification.showSuccess('Başarılı', 'Kredi kartı başarıyla silindi!');
+                    notification.showSuccess('Success', 'Credit card deleted successfully!');
                 } catch (err) {
                     const errorMessage = err.response?.data?.message || 'Error occurred while deleting credit card';
-                    notification.showError('Hata', errorMessage);
+                    notification.showError('Error', errorMessage);
                 }
-            },
-            () => {}
+            }
         );
     };
-
-    const formatAmount = (amount) => formatCurrency(amount, 'TRY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 
     if (isLoading) {
@@ -104,104 +101,26 @@ const CreditCardsPage = () => {
             )}
 
             {creditCards.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        Kayıtlı Kredi Kartı Bulunamadı
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                        Henüz sistemde kayıtlı kredi kartınız bulunmuyor.
-                    </p>
-                    <button
-                        onClick={() => setShowAddForm(true)}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                        Add your first card
-                    </button>
-                </div>
+                <EmptyCreditCards onCreate={() => setShowAddForm(true)} />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {creditCards.map((card, index) => (
-                        <div key={index} className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 text-white shadow-lg">
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-medium opacity-90">
-                                    Credit Card
-                                </span>
-                                <svg className="w-8 h-8 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                </svg>
-                            </div>
-                            
-                            <div className="mb-6">
-                                <p className="text-lg font-mono tracking-wider">
-                                    {card.number || '**** **** **** ****'}
-                                </p>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <p className="opacity-75 mb-1">Expiry Date</p>
-                                    <p className="font-mono">
-                                        {card.expiryMonth?.padStart(2, '0')}/{card.expiryYear?.slice(-2)}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="opacity-75 mb-1">CVV</p>
-                                    <p className="font-mono">{card.cvv || '***'}</p>
-                                </div>
-                            </div>
-                            
-                            <div className="mt-4 pt-4 border-t border-white/20">
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <p className="opacity-75">Current Amount</p>
-                                        <p className="font-semibold">
-                                            {formatAmount(parseFloat(card.amount) || 0)}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="opacity-75">Limit</p>
-                                        <p className="font-semibold">
-                                            {formatAmount(parseFloat(card.limit) || 0)}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 flex justify-end">
-                                <button 
-                                    onClick={handleDeleteCreditCard}
-                                    className="p-2 bg-red-500/20 rounded-lg hover:bg-red-500/30 transition-colors"
-                                    title="Delete Credit Card"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                        <CreditCardItem
+                            key={index}
+                            card={card}
+                            onDelete={handleDeleteCreditCard}
+                            isDeleting={isLoading}
+                        />
                     ))}
                 </div>
             )}
 
-            {/* Add Card Form Modal */}
-            {showAddForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-                        <h3 className="text-lg font-semibold mb-4">Yeni Kredi Kartı Ekle</h3>
-                        <CreditCardCreateForm
-                            onSuccess={() => setShowAddForm(false)}
-                            onCancel={() => setShowAddForm(false)}
-                            onSubmit={handleCreateCreditCard}
-                            isLoading={isLoading}
-                        />
-                    </div>
-                </div>
-            )}
+            <CreditCardModal
+                isOpen={showAddForm}
+                onClose={() => setShowAddForm(false)}
+                onSubmit={handleCreateCreditCard}
+                isLoading={isLoading}
+            />
         </div>
     );
 };

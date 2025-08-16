@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { creditCardService } from '../services/creditCardService';
-import { CreditCardDTO } from '../../../types/payments';
+import { CreditCardDto } from '../../../types/creditCards';
 
 export const useCreditCard = () => {
   const [creditCards, setCreditCards] = useState([]);
@@ -12,7 +12,9 @@ export const useCreditCard = () => {
       setIsLoading(true);
       setError(null);
       const data = await creditCardService.getAllCreditCards();
-      setCreditCards(Array.isArray(data) ? data : [data].filter(Boolean));
+      const rawData = Array.isArray(data) ? data : [data].filter(Boolean);
+      const transformedData = rawData.map(CreditCardDto);
+      setCreditCards(transformedData);
     } catch (err) {
       setError(err.response?.data?.message || 'Error occurred while fetching credit cards.');
       console.error('Error fetching credit cards:', err);
