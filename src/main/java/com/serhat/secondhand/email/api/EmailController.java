@@ -12,11 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/emails")
@@ -35,5 +34,16 @@ public class EmailController {
         User user = userService.getAuthenticatedUser(authentication);
         List<EmailDto> emails = emailService.getUserEmails(user);
         return ResponseEntity.ok(emails);
+    }
+
+    @DeleteMapping("/delete/{emailId}")
+    public ResponseEntity<String> delete(@PathVariable UUID emailId) {
+        return ResponseEntity.ok(emailService.deleteEmail(emailId));
+    }
+
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<String> delete(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        return ResponseEntity.ok(emailService.deleteAllEmails(user));
     }
 }

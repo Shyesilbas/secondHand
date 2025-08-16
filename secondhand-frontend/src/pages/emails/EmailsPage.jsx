@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { emailService } from '../../features/emails/services/emailService';
 import { formatDateTime } from '../../utils/formatters';
+import { useNotification } from '../../context/NotificationContext';
+import { EMAIL_TYPES, EMAIL_TYPE_LABELS, EMAIL_TYPE_BADGE_COLORS } from '../../types/emails';
 
 const EmailsPage = () => {
     const navigate = useNavigate();
+    const notification = useNotification();
     const [emails, setEmails] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [filterType, setFilterType] = useState('ALL');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         fetchEmails();
@@ -29,41 +33,94 @@ const EmailsPage = () => {
         }
     };
 
+    const handleDeleteEmail = async (emailId, emailSubject) => {
+        if (!emailId) {
+            notification.showError('Error', 'Email ID is missing. Cannot delete email.');
+            return;
+        }
+        
+        notification.showConfirmation(
+            'Delete Email',
+            `Are you sure you want to delete "${emailSubject}"?`,
+            async () => {
+                try {
+                    setIsDeleting(true);
+                    await emailService.deleteEmail(emailId);
+                    notification.showSuccess('Success', 'Email deleted successfully.');
+                    
+                    // Remove the deleted email from the list
+                    setEmails(prevEmails => prevEmails.filter(email => email.id !== emailId));
+                    
+                    // If the deleted email was selected, clear the selection
+                    if (selectedEmail && selectedEmail.id === emailId) {
+                        setSelectedEmail(null);
+                    }
+                } catch (err) {
+                    notification.showError('Error', err.response?.data?.message || 'Failed to delete email.');
+                } finally {
+                    setIsDeleting(false);
+                }
+            }
+        );
+    };
+
+    const handleDeleteAllEmails = async () => {
+        notification.showConfirmation(
+            'Delete All Emails',
+            'Are you sure you want to delete all emails? This action cannot be undone.',
+            async () => {
+                try {
+                    setIsDeleting(true);
+                    await emailService.deleteAll();
+                    notification.showSuccess('Success', 'All emails deleted successfully.');
+                    
+                    // Clear all emails from the list
+                    setEmails([]);
+                    setSelectedEmail(null);
+                } catch (err) {
+                    notification.showError('Error', err.response?.data?.message || 'Failed to delete all emails.');
+                } finally {
+                    setIsDeleting(false);
+                }
+            }
+        );
+    };
+
     const formatDate = (dateString) => formatDateTime(dateString);
 
     const getEmailTypeIcon = (type) => {
         switch (type) {
-            case 'VERIFICATION_CODE':
+            case EMAIL_TYPES.VERIFICATION_CODE:
                 return (
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 );
-            case 'WELCOME':
+            case EMAIL_TYPES.WELCOME:
                 return (
                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
                     </svg>
                 );
-            case 'PASSWORD_RESET':
+            case EMAIL_TYPES.PASSWORD_RESET:
                 return (
                     <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 );
-            case 'NOTIFICATION':
+            case EMAIL_TYPES.NOTIFICATION:
                 return (
                     <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 3h16a1 1 0 011 1v12a1 1 0 01-1 1H5l-4 4V4a1 1 0 011-1z" />
                     </svg>
                 );
-            case 'PROMOTIONAL':
+            case EMAIL_TYPES.PROMOTIONAL:
                 return (
                     <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v3.586l2.707 2.707A1 1 0 0121 11v8a1 1 0 01-1 1H4a1 1 0 01-1-1v-8a1 1 0 01.293-.707L6 7.586V4a1 1 0 011-1h0z" />
                     </svg>
                 );
-            case 'SYSTEM':
+            case EMAIL_TYPES.SYSTEM:
                 return (
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -80,27 +137,11 @@ const EmailsPage = () => {
     };
 
     const getEmailTypeLabel = (type) => {
-        const labels = {
-            'VERIFICATION_CODE': 'Verification Code',
-            'PASSWORD_RESET': 'Password Reset',
-            'WELCOME': 'Welcome Email',
-            'NOTIFICATION': 'Notification',
-            'PROMOTIONAL': 'Promotional',
-            'SYSTEM': 'System Email'
-        };
-        return labels[type] || type;
+        return EMAIL_TYPE_LABELS[type] || type;
     };
 
     const getEmailTypeBadgeColor = (type) => {
-        const colors = {
-            'VERIFICATION_CODE': 'bg-blue-100 text-blue-800',
-            'PASSWORD_RESET': 'bg-orange-100 text-orange-800',
-            'WELCOME': 'bg-green-100 text-green-800',
-            'NOTIFICATION': 'bg-purple-100 text-purple-800',
-            'PROMOTIONAL': 'bg-pink-100 text-pink-800',
-            'SYSTEM': 'bg-gray-100 text-gray-800'
-        };
-        return colors[type] || 'bg-gray-100 text-gray-800';
+        return EMAIL_TYPE_BADGE_COLORS[type] || 'bg-gray-100 text-gray-800';
     };
 
     const filteredEmails = filterType === 'ALL' 
@@ -161,9 +202,9 @@ const EmailsPage = () => {
                         </p>
                     </div>
                     
-                    {/* Filter Tabs */}
+                    {/* Filter Tabs and Delete All Button */}
                     <div className="flex items-center space-x-2">
-                        {['ALL', 'VERIFICATION_CODE', 'WELCOME', 'NOTIFICATION'].map((type) => (
+                        {['ALL', EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.WELCOME, EMAIL_TYPES.NOTIFICATION].map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}
@@ -176,6 +217,19 @@ const EmailsPage = () => {
                                 {type === 'ALL' ? 'All' : getEmailTypeLabel(type)}
                             </button>
                         ))}
+                        
+                        {filteredEmails.length > 0 && (
+                            <button
+                                onClick={handleDeleteAllEmails}
+                                disabled={isDeleting}
+                                className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Delete All</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -216,8 +270,7 @@ const EmailsPage = () => {
                                 {filteredEmails.map((email, index) => (
                                     <div
                                         key={index}
-                                        onClick={() => setSelectedEmail(email)}
-                                        className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 ${
+                                        className={`p-4 transition-colors hover:bg-gray-50 ${
                                             selectedEmail === email ? 'bg-blue-50 border-r-2 border-blue-500' : ''
                                         }`}
                                     >
@@ -225,7 +278,10 @@ const EmailsPage = () => {
                                             <div className="flex-shrink-0 mt-1">
                                                 {getEmailTypeIcon(email.emailType)}
                                             </div>
-                                            <div className="flex-1 min-w-0">
+                                            <div 
+                                                className="flex-1 min-w-0 cursor-pointer"
+                                                onClick={() => setSelectedEmail(email)}
+                                            >
                                                 <p className="text-sm font-medium text-gray-900 truncate">
                                                     {email.subject}
                                                 </p>
@@ -237,6 +293,24 @@ const EmailsPage = () => {
                                                 }`}>
                                                     {getEmailTypeLabel(email.emailType)}
                                                 </span>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        console.log('Email object for deletion:', email); // Debug log
+                                                        const emailId = email.id
+                                                        console.log('Using email ID:', emailId); // Debug log
+                                                        handleDeleteEmail(emailId, email.subject);
+                                                    }}
+                                                    disabled={isDeleting}
+                                                    className="p-1 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    title="Delete email"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

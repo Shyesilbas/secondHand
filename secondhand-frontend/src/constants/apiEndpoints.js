@@ -57,6 +57,8 @@ export const API_ENDPOINTS = {
     },
     EMAILS: {
         MY_EMAILS: '/v1/emails/my-emails',
+        DELETE: (emailId) => `/v1/emails/delete/${emailId}`,
+        DELETE_ALL:  `/v1/emails/deleteAll`,
     },
     ENUMS: {
         LISTING_TYPES: '/v1/enums/listing-types',

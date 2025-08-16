@@ -18,13 +18,4 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
 
     List<Email> findByUserOrderByCreatedAtDesc(User user);
 
-    List<Email> findByEmailTypeOrderByCreatedAtDesc(EmailType emailType);
-
-    @Query("SELECT e FROM Email e WHERE e.createdAt BETWEEN :startDate AND :endDate ORDER BY e.createdAt DESC")
-    List<Email> findEmailsBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
-
-    List<Email> findByUserAndEmailTypeOrderByCreatedAtDesc(User user, EmailType emailType);
-
-
-    List<Email> findByRecipientEmailOrderByCreatedAtDesc(String recipientEmail);
 }

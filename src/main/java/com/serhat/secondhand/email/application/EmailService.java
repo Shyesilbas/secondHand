@@ -1,5 +1,6 @@
 package com.serhat.secondhand.email.application;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
@@ -8,12 +9,17 @@ import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+
 import com.serhat.secondhand.payment.dto.PaymentDto;
 
 @Service
@@ -99,4 +105,25 @@ public class EmailService {
 
         return emails.stream().map(emailMapper::toDto).toList();
     }
+
+    public String deleteEmail(UUID emailId) {
+        Email email = emailRepository.findById(emailId).orElse(null);
+        if (email != null) {
+            emailRepository.delete(email);
+            return "Email deleted" + email.getId();
+        } else {
+            throw new BusinessException(
+                    "Email not found",
+                    HttpStatus.NOT_FOUND,
+                    HttpStatus.NOT_FOUND.toString()
+            );
+        }
+    }
+
+    public String deleteAllEmails(User user) {
+        List<Email> emails = emailRepository.findByUserOrderByCreatedAtDesc(user);
+        emailRepository.deleteAll(emails);
+        return "Emails deleted for user : "+user.getEmail();
+    }
+
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paymentService } from '../../features/payments/services/paymentService';
-import { PaymentDTO } from '../../types/payments';
 import PaymentReceiptModal from '../../components/modals/PaymentReceiptModal';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 
@@ -204,7 +203,7 @@ const PaymentsPage = () => {
                                                 </p>
                                                 {payment.listingId && (
                                                     <p className="text-xs text-gray-400 mt-1">
-                                                        Listing ID: {payment.listingId}
+                                                        Listing : {payment.listingId}
                                                     </p>
                                                 )}
 
