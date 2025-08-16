@@ -91,9 +91,11 @@ public class ListingController {
    @PostMapping("/filter")
    @Operation(summary = "Get listings with advanced filters", 
               description = "Filter listings by multiple criteria including price, location, vehicle specs, etc.")
-   public ResponseEntity<Page<ListingDto>> getListingsWithFilters(@RequestBody ListingFilterDto filters) {
-        log.info("Filtering listings with criteria: {}", filters);
-        Page<ListingDto> result = listingService.getListingsWithFilters(filters);
+   public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
+           @RequestBody ListingFilterDto filters,
+           @RequestParam(required = false) ListingType listingType) {
+        log.info("Filtering listings with criteria: {} and type: {}", filters, listingType);
+        Page<ListingDto> result = listingService.getListingsWithFilters(filters, listingType);
         return ResponseEntity.ok(result);
    }
 

@@ -4,6 +4,8 @@ import com.serhat.secondhand.listing.application.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/v1/vehicles")
@@ -64,6 +67,14 @@ public class VehicleListingController {
             @PathVariable String model) {
         List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brand, model);
         return ResponseEntity.ok(vehicles);
+    }
+
+    @PostMapping("/filter")
+    @Operation(summary = "Filter vehicle listings with advanced criteria")
+    public ResponseEntity<Page<ListingDto>> filterVehicles(@RequestBody VehicleListingFilterDto filters) {
+        log.info("Filtering vehicles with criteria: {}", filters);
+        Page<ListingDto> result = vehicleListingService.filterVehicles(filters);
+        return ResponseEntity.ok(result);
     }
 
 } 

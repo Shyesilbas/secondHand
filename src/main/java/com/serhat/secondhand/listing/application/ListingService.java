@@ -1,9 +1,7 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
-import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
@@ -30,6 +28,9 @@ public class ListingService {
     
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
+    private final BaseListingFilterService baseListingFilterService;
+    private final VehicleListingFilterService vehicleListingFilterService;
+    private final ElectronicListingFilterService electronicListingFilterService;
     
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -109,17 +110,43 @@ public class ListingService {
                 .toList();
     }
     
-    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
-        log.info("Getting listings with filters: {}", filters);
+    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters, ListingType listingType) {
+        log.info("Getting listings with filters: {} and type: {}", filters, listingType);
         
         if (filters.getPage() == null) filters.setPage(0);
         if (filters.getSize() == null) filters.setSize(20);
         if (filters.getStatus() == null) filters.setStatus(ListingStatus.ACTIVE);
         
-        Pageable pageable = PageRequest.of(filters.getPage(), filters.getSize());
-        Page<Listing> listingPage = listingRepository.findWithFilters(filters, pageable);
-        
-        return listingPage.map(listingMapper::toDynamicDto);
+        if (listingType != null) {
+            switch (listingType) {
+                case VEHICLE:
+                    if (filters instanceof VehicleListingFilterDto) {
+                        return vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) filters);
+                    } else {
+                        log.warn("Vehicle listing type requested but non-vehicle filter provided");
+                        return baseListingFilterService.filterAllListings(filters);
+                    }
+                case ELECTRONICS:
+                    if (filters instanceof ElectronicListingFilterDto) {
+                        return electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) filters);
+                    } else {
+                        log.warn("Electronics listing type requested but non-electronics filter provided");
+                        return baseListingFilterService.filterAllListings(filters);
+                    }
+                default:
+                    log.info("Using base filter service for listing type: {}", listingType);
+                    return baseListingFilterService.filterAllListings(filters);
+            }
+        } else {
+            // No specific type requested, use base filter service
+            log.info("No listing type specified, using base filter service");
+            return baseListingFilterService.filterAllListings(filters);
+        }
+    }
+    
+    // Overloaded method for backward compatibility
+    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
+        return getListingsWithFilters(filters, null);
     }
     
     @Transactional

@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class ElectronicListingService {
     private final ElectronicListingRepository repository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
+    private final ElectronicListingFilterService electronicListingFilterService;
 
 
     @Transactional
@@ -80,6 +84,12 @@ public class ElectronicListingService {
         ElectronicListing electronic = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("electronic listing not found"));
         return listingMapper.toElectronicDto(electronic);
+    }
+
+
+    public Page<ListingDto> filterElectronics(ElectronicListingFilterDto filters) {
+        log.info("Filtering electronics listings with criteria: {}", filters);
+        return electronicListingFilterService.filterElectronics(filters);
     }
 
 }

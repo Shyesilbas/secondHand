@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class VehicleListingService {
     private final VehicleListingRepository vehicleRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
+    private final VehicleListingFilterService vehicleListingFilterService;
     
     @Transactional
     public UUID createVehicleListing(VehicleCreateRequest request, User seller) {
@@ -86,5 +90,11 @@ public class VehicleListingService {
         VehicleListing vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle listing not found"));
         return listingMapper.toVehicleDto(vehicle);
+    }
+
+
+    public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
+        log.info("Filtering vehicle listings with criteria: {}", filters);
+        return vehicleListingFilterService.filterVehicles(filters);
     }
 }
