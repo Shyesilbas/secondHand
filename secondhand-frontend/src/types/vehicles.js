@@ -85,11 +85,7 @@ export const VehicleSearchFiltersDTO = {
   size: 20,
 };
 
-/**
- * Create Vehicle Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
+
 export const createVehicleCreateRequest = (data) => {
   return {
     // Basic Info
@@ -119,11 +115,6 @@ export const createVehicleCreateRequest = (data) => {
   };
 };
 
-/**
- * Vehicle Update Request DTO - All fields are optional
- * @param {Object} data - Form data with only changed fields
- * @returns {Object} - Update DTO with only provided fields
- */
 export const createVehicleUpdateRequest = (data) => {
   const updateData = {};
   
