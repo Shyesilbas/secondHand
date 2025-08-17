@@ -3,6 +3,7 @@ import { useEnums } from '../../hooks/useEnums';
 import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateForm';
 import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
 import RealEstateCreateForm from '../../features/realEstates/components/RealEstateCreateForm';
+import ClothingCreateForm from '../../features/clothing/components/ClothingCreateForm';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -26,6 +27,10 @@ const CreateListingPage = () => {
 
   if (selectedType === 'REAL_ESTATE') {
       return <RealEstateCreateForm onBack={handleBackToSelection} />;
+  }
+
+  if (selectedType === 'CLOTHING') {
+      return <ClothingCreateForm onBack={handleBackToSelection} />;
   }
 
     return (
@@ -63,10 +68,10 @@ const CreateListingPage = () => {
                     ))}
                 </div>
 
-                {selectedType && selectedType !== 'VEHICLE' && selectedType !== 'ELECTRONICS' && selectedType !== 'REAL_ESTATE' && (
+                {selectedType && selectedType !== 'VEHICLE' && selectedType !== 'ELECTRONICS' && selectedType !== 'REAL_ESTATE' && selectedType !== 'CLOTHING' && (
                     <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-yellow-800">
-                            {selectedType} tipi için form henüz hazır değil. Şimdilik sadece Vehicle, Electronics ve Real Estate listingleri desteklenmektedir.
+                            {selectedType} tipi için form henüz hazır değil. Şimdilik sadece Vehicle, Electronics, Real Estate ve Clothing listingleri desteklenmektedir.
                         </p>
                         <button
                             onClick={handleBackToSelection}

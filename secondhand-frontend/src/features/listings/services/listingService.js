@@ -5,6 +5,7 @@ import {
   createElectronicsFilterRequest,
   createRealEstateFilterRequest
 } from '../../../types/listings';
+import { createClothingFilterRequest } from '../../../types/clothing';
 import {createRealEstateCreateRequest} from "../../../types/realEstates.js";
 
 export const listingService = {
@@ -35,11 +36,6 @@ export const listingService = {
 
   getListingsByTypeOrderByDate: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ORDERED(listingType)),
 
-  // Advanced filtering operations
-  getListingsWithFilters: async (filters) => {
-    const filterData = createListingFilterRequest(filters);
-    return post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
-  },
 
   // Vehicle-specific filtering
   filterVehicles: async (filters) => {
@@ -59,6 +55,13 @@ export const listingService = {
     return post(API_ENDPOINTS.REAL_ESTATES.FILTER, filterData);
   },
 
+  // Clothing-specific filtering
+  filterClothing: async (filters) => {
+    const filterData = createClothingFilterRequest(filters);
+    return post(API_ENDPOINTS.CLOTHING.FILTER, filterData);
+
+  },
+
   // Smart filtering - automatically chooses the right endpoint based on listing type
   filterListings: async (filters) => {
     const listingType = filters.listingType?.toUpperCase();
@@ -70,8 +73,9 @@ export const listingService = {
         return listingService.filterElectronics(filters);
       case 'REAL_ESTATE':
         return listingService.filterRealEstates(filters);
+      case 'CLOTHING':
+        return listingService.filterClothing(filters);
       default:
-        // For other categories, return empty result without API call
         return {
           content: [],
           totalPages: 0,

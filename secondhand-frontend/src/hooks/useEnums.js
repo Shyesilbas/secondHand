@@ -18,7 +18,10 @@ export const useEnums = () => {
     realEstateTypes: [],
     realEstateAdTypes: [],
     heatingTypes: [],
-    ownerTypes: []
+    ownerTypes: [],
+    clothingBrands: [],
+    clothingTypes: [],
+    clothingConditions: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -54,7 +57,10 @@ export const useEnums = () => {
           realEstateTypes,
           realEstateAdTypes,
           heatingTypes,
-          ownerTypes
+          ownerTypes,
+          clothingBrands,
+          clothingTypes,
+          clothingConditions
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -70,7 +76,10 @@ export const useEnums = () => {
           enumService.getRealEstateTypes(),
           enumService.getRealEstateAdTypes(),
           enumService.getHeatingTypes(),
-          enumService.getOwnerTypes()
+          enumService.getOwnerTypes(),
+          enumService.getClothingBrands(),
+          enumService.getClothingTypes(),
+          enumService.getClothingConditions()
         ]);
 
         const fetchedEnums = {
@@ -88,7 +97,10 @@ export const useEnums = () => {
           realEstateTypes,
           realEstateAdTypes,
           heatingTypes,
-          ownerTypes
+          ownerTypes,
+          clothingBrands,
+          clothingTypes,
+          clothingConditions
         };
 
         setEnums(fetchedEnums);
@@ -164,7 +176,10 @@ export const useEnums = () => {
         realEstateTypes,
         realEstateAdTypes,
         heatingTypes,
-        ownerTypes
+        ownerTypes,
+        clothingBrands,
+        clothingTypes,
+        clothingConditions
       ] = await Promise.all([
         enumService.getListingTypes(),
         enumService.getListingStatuses(),
@@ -180,7 +195,10 @@ export const useEnums = () => {
         enumService.getRealEstateTypes(),
         enumService.getRealEstateAdTypes(),
         enumService.getHeatingTypes(),
-        enumService.getOwnerTypes()
+        enumService.getOwnerTypes(),
+        enumService.getClothingBrands(),
+        enumService.getClothingTypes(),
+        enumService.getClothingConditions()
       ]);
 
       const freshEnums = {
@@ -198,7 +216,10 @@ export const useEnums = () => {
         realEstateTypes,
         realEstateAdTypes,
         heatingTypes,
-        ownerTypes
+        ownerTypes,
+        clothingBrands,
+        clothingTypes,
+        clothingConditions
       };
 
       setEnums(freshEnums);

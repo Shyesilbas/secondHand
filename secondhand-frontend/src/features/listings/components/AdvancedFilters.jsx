@@ -507,6 +507,79 @@ const AdvancedFilters = ({
                         </div>
                     )}
 
+                    {/* Clothing-specific filters */}
+                    {selectedCategory === 'CLOTHING' && (
+                        <div className="border-t border-slate-200 pt-6">
+                            <h4 className="text-md font-medium text-slate-800 mb-4">Clothing Filters</h4>
+                            
+                            {/* Brand and Type */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <EnumDropdown 
+                                        label="Brand" 
+                                        enumKey="clothingBrands" 
+                                        value={filters.brands || []} 
+                                        onChange={(values) => handleInputChange('brands', values)} 
+                                        multiple={true} 
+                                    />
+                                </div>
+                                <div>
+                                    <EnumDropdown 
+                                        label="Type" 
+                                        enumKey="clothingTypes" 
+                                        value={filters.types || []} 
+                                        onChange={(values) => handleInputChange('types', values)} 
+                                        multiple={true} 
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Color and Condition */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <EnumDropdown 
+                                        label="Color" 
+                                        enumKey="colors" 
+                                        value={filters.colors || []} 
+                                        onChange={(values) => handleInputChange('colors', values)} 
+                                        multiple={true} 
+                                    />
+                                </div>
+                                <div>
+                                    <EnumDropdown 
+                                        label="Condition" 
+                                        enumKey="clothingConditions" 
+                                        value={filters.conditions || []} 
+                                        onChange={(values) => handleInputChange('conditions', values)} 
+                                        multiple={true} 
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Purchase Date Range */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Min Purchase Date</label>
+                                    <input
+                                        type="date"
+                                        value={filters.minPurchaseDate || ''}
+                                        onChange={(e) => handleInputChange('minPurchaseDate', e.target.value)}
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Max Purchase Date</label>
+                                    <input
+                                        type="date"
+                                        value={filters.maxPurchaseDate || ''}
+                                        onChange={(e) => handleInputChange('maxPurchaseDate', e.target.value)}
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Sorting */}
                     <div className="border-t border-slate-200 pt-6">
                         <h4 className="text-md font-medium text-slate-800 mb-4">Sorting</h4>
@@ -540,6 +613,14 @@ const AdvancedFilters = ({
                                             <option value="roomCount">Room Count</option>
                                             <option value="buildingAge">Building Age</option>
                                             <option value="floor">Floor</option>
+                                        </>
+                                    )}
+                                    {selectedCategory === 'CLOTHING' && (
+                                        <>
+                                            <option value="brand">Brand</option>
+                                            <option value="type">Type</option>
+                                            <option value="condition">Condition</option>
+                                            <option value="purchaseDate">Purchase Date</option>
                                         </>
                                     )}
                                 </select>

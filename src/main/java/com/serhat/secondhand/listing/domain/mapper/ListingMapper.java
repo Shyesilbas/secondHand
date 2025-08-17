@@ -1,13 +1,16 @@
 package com.serhat.secondhand.listing.domain.mapper;
 
+import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingResponseDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
@@ -42,6 +45,12 @@ public interface ListingMapper {
     @Mapping(target = "type", source = "listingType")
     RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
 
+    @Mapping(target = "sellerName", source = "seller.name")
+    @Mapping(target = "sellerSurname", source = "seller.surname")
+    @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "type", source = "listingType")
+    ClothingListingDto toClothingDto(ClothingListing clothingListing);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
     @Mapping(target = "status", constant = "DRAFT")
@@ -60,6 +69,12 @@ public interface ListingMapper {
     @Mapping(target = "listingType", constant = "ELECTRONICS")
     ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "status", constant = "DRAFT")
+    @Mapping(target = "listingType", constant = "CLOTHING")
+    ClothingListing toClothingEntity(ClothingCreateRequest request);
+
 
     default ListingDto toDynamicDto(Listing listing) {
         if (listing instanceof VehicleListing) {
@@ -70,6 +85,9 @@ public interface ListingMapper {
         }
         if(listing instanceof RealEstateListing) {
             return toRealEstateDto((RealEstateListing) listing);
+        }
+        if(listing instanceof ClothingListing) {
+            return toClothingDto((ClothingListing) listing);
         }
 
         throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());

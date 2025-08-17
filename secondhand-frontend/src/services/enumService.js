@@ -33,4 +33,11 @@ export const enumService = {
   getHeatingTypes: async () => get(API_ENDPOINTS.ENUMS.HEATING_TYPES),
 
   getOwnerTypes: async () => get(API_ENDPOINTS.ENUMS.OWNER_TYPES),
+
+  // Clothing enums
+  getClothingBrands: async () => get(API_ENDPOINTS.ENUMS.CLOTHING_BRANDS),
+
+  getClothingTypes: async () => get(API_ENDPOINTS.ENUMS.CLOTHING_TYPES),
+
+  getClothingConditions: async () => get(API_ENDPOINTS.ENUMS.CLOTHING_CONDITIONS),
 };

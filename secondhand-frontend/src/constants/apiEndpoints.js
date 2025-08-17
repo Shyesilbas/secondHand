@@ -76,6 +76,9 @@ export const API_ENDPOINTS = {
         REAL_ESTATE_AD_TYPES: '/v1/enums/real-estate-ad-types',
         HEATING_TYPES: '/v1/enums/heating-types',
         OWNER_TYPES: '/v1/enums/owner-types',
+        CLOTHING_BRANDS: '/v1/enums/clothing-brands',
+        CLOTHING_TYPES: '/v1/enums/clothing-types',
+        CLOTHING_CONDITIONS: '/v1/enums/clothing-conditions',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
@@ -97,6 +100,13 @@ export const API_ENDPOINTS = {
         BY_ID: (id) => `/v1/realEstates/${id}`,
         UPDATE: (id) => `/v1/realEstates/${id}`,
         FILTER: '/v1/realEstates/filter',
+    },
+    CLOTHING: {
+        CREATE: '/v1/clothing/create-listing',
+        BY_ID: (id) => `/v1/clothing/${id}`,
+        UPDATE: (id) => `/v1/clothing/${id}`,
+        BY_BRAND_TYPE: (brand, clothingType) => `/v1/clothing/brand/${brand}/type/${clothingType}`,
+        FILTER: '/v1/clothing/filter',
     },
     FAVORITES: {
         ADD: '/favorites',

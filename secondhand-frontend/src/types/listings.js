@@ -134,6 +134,32 @@ export const RealEstateListingFilterDTO = {
   size: 20,
 };
 
+// Clothing-specific filter DTO
+export const ClothingListingFilterDTO = {
+  type: 'CLOTHING',
+  listingType: 'CLOTHING',
+  status: 'ACTIVE',
+  city: '',
+  district: '',
+  minPrice: 0,
+  maxPrice: 0,
+  currency: 'TRY',
+  
+  // Clothing-specific filters
+  brands: [],
+  types: [],
+  colors: [],
+  conditions: [],
+  minPurchaseDate: null,
+  maxPurchaseDate: null,
+  
+  sortBy: 'createdAt',
+  sortDirection: 'DESC',
+  
+  page: 0,
+  size: 20,
+};
+
 // Listing Statistics DTO
 export const ListingStatisticsDTO = {
   totalListings: 0,

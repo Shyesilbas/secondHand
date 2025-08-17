@@ -21,6 +21,8 @@ const ListingCardActions = ({ listing, onChanged }) => {
       navigate(ROUTES.ELECTRONIC_EDIT.replace(':id', listing.id));
     } else if (listing.type === 'REAL_ESTATE') {
       navigate(ROUTES.REAL_ESTATE_EDIT.replace(':id', listing.id));
+    } else if (listing.type === 'CLOTHING') {
+      navigate(ROUTES.CLOTHING_EDIT.replace(':id', listing.id));
     }
   };
 

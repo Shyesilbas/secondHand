@@ -1,28 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { listingService } from '../../features/listings/services/listingService';
+import { clothingService } from '../../features/clothing/services/clothingService';
 import { useAuth } from '../../context/AuthContext';
 import FavoriteButton from '../../features/favorites/components/FavoriteButton';
 import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import  ListingCardActions  from '../../features/listings/components/ListingCardActions';
+import ListingCardActions from '../../features/listings/components/ListingCardActions';
 
-const ListingDetailPage = () => {
+const ClothingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const [listing, setListing] = useState(null);
+  const [clothing, setClothing] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchListing = useCallback(async () => {
+  const fetchClothing = useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await listingService.getListingById(id);
-      setListing(data);
+      const data = await clothingService.getClothingDetails(id);
+      setClothing(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred while fetching the listing. Please try again later.');
+      setError(err.response?.data?.message || 'An error occurred while fetching the clothing listing. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -30,20 +30,18 @@ const ListingDetailPage = () => {
 
   useEffect(() => {
     if (id) {
-      fetchListing();
+      fetchClothing();
     }
-  }, [id, fetchListing]);
+  }, [id, fetchClothing]);
 
   const formatPrice = (price, currency) => formatCurrency(price, currency);
   const formatDate = (dateString) => formatDateTime(dateString);
 
-  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
+  const isOwner = isAuthenticated && user?.id === clothing?.sellerId;
 
   const renderStatusBadge = (status) => (
     <StatusBadge status={status} />
   );
-
-  // Actions are handled by ListingCardActions
 
   if (isLoading) {
     return (
@@ -75,7 +73,7 @@ const ListingDetailPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Listing not found</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Clothing listing not found</h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
             onClick={() => navigate(-1)}
@@ -88,7 +86,7 @@ const ListingDetailPage = () => {
     );
   }
 
-  if (!listing) {
+  if (!clothing) {
     return null;
   }
 
@@ -109,14 +107,14 @@ const ListingDetailPage = () => {
         <div className="flex items-center space-x-2">
           {!isOwner && (
             <FavoriteButton 
-              listingId={listing.id}
-              listing={listing}
+              listingId={clothing.id}
+              listing={clothing}
               size="lg"
               showCount={true}
             />
           )}
           {isOwner && (
-            <ListingCardActions listing={listing} onChanged={() => fetchListing()} />
+            <ListingCardActions listing={clothing} onChanged={() => fetchClothing()} />
           )}
         </div>
       </div>
@@ -128,9 +126,9 @@ const ListingDetailPage = () => {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{clothing.title}</h1>
                 <FavoriteStats 
-                  listingId={listing.id}
+                  listingId={clothing.id}
                   size="sm"
                   showIcon={true}
                   showText={true}
@@ -139,47 +137,39 @@ const ListingDetailPage = () => {
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-slate-900">
-                  {formatPrice(listing.price, listing.currency)}
+                  {formatPrice(clothing.price, clothing.currency)}
                 </div>
                 <div className="flex items-center justify-end mt-2">
-                  {renderStatusBadge(listing.status)}
+                  {renderStatusBadge(clothing.status)}
                 </div>
               </div>
             </div>
 
             <div className="prose max-w-none">
-              <p className="text-gray-700 text-lg leading-relaxed">{listing.description}</p>
+              <p className="text-gray-700 text-lg leading-relaxed">{clothing.description}</p>
             </div>
           </div>
 
-          {/* Vehicle Details */}
-          {listing.type === 'VEHICLE' && (
-            <VehicleDetails listing={listing} />
-          )}
-
-          {/* Electronics Details */}
-          {listing.type === 'ELECTRONICS' && (
-            <ElectronicsDetails listing={listing} />
-          )}
-
-          {/* Real Estate Details */}
-          {listing.type === 'REAL_ESTATE' && (
-            <RealEstateDetails listing={listing} />
-          )}
-
           {/* Clothing Details */}
-          {listing.type === 'CLOTHING' && (
-            <ClothingDetails listing={listing} />
-          )}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Clothing Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <DetailItem label="Brand" value={clothing.brand} />
+              <DetailItem label="Type" value={clothing.clothingType} />
+              <DetailItem label="Color" value={clothing.color} />
+              <DetailItem label="Condition" value={clothing.condition} />
+              <DetailItem label="Purchase Date" value={formatDate(clothing.purchaseDate)} />
+            </div>
+          </div>
 
           {/* General Details */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Listing Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <DetailItem label="Created At" value={formatDate(listing.createdAt)} />
-              <DetailItem label="Last Update" value={formatDate(listing.updatedAt)} />
-              <DetailItem label="Province" value={`${listing.district}, ${listing.city}`} />
-              <DetailItem label="Listing Fee" value={listing.listingFeePaid ? 'Paid' : 'Unpaid'} />
+              <DetailItem label="Created At" value={formatDate(clothing.createdAt)} />
+              <DetailItem label="Last Update" value={formatDate(clothing.updatedAt)} />
+              <DetailItem label="Province" value={`${clothing.district}, ${clothing.city}`} />
+              <DetailItem label="Listing Fee" value={clothing.listingFeePaid ? 'Paid' : 'Unpaid'} />
             </div>
           </div>
         </div>
@@ -192,12 +182,12 @@ const ListingDetailPage = () => {
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
                 <span className="text-white text-lg font-medium">
-                  {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
+                  {clothing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
               </div>
               <div className="ml-4 flex-1">
                 <p className="font-medium text-gray-900">
-                  {listing.sellerName} {listing.sellerSurname}
+                  {clothing.sellerName} {clothing.sellerSurname}
                 </p>
                 <p className="text-sm text-gray-500">
                   Seller
@@ -216,7 +206,7 @@ const ListingDetailPage = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Listing No:</span>
-                  <span className="font-medium">{listing.listingNo || 'N/A'}</span>
+                  <span className="font-medium">{clothing.listingNo || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Views:</span>
@@ -231,76 +221,6 @@ const ListingDetailPage = () => {
   );
 };
 
-// Vehicle Details Component
-const VehicleDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Vehicle Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Marka" value={listing.brand} />
-      <DetailItem label="Model" value={listing.model} />
-      <DetailItem label="Yıl" value={listing.year} />
-      <DetailItem label="Kilometre" value={listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : '-'} />
-      <DetailItem label="Motor Hacmi" value={listing.engineCapacity ? `${listing.engineCapacity} cc` : '-'} />
-      <DetailItem label="Vites" value={listing.gearbox} />
-      <DetailItem label="Yakıt Türü" value={listing.fuelType} />
-      <DetailItem label="Renk" value={listing.color} />
-      <DetailItem label="Kapı Sayısı" value={listing.doors} />
-      <DetailItem label="Koltuk Sayısı" value={listing.seatCount} />
-      <DetailItem label="Beygir Gücü" value={listing.horsePower ? `${listing.horsePower} HP` : '-'} />
-      <DetailItem label="Yakıt Tüketimi" value={listing.fuelConsumption ? `${listing.fuelConsumption} L/100km` : '-'} />
-    </div>
-  </div>
-);
-
-// Electronics Details Component
-const ElectronicsDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Electronics Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Type" value={listing.electronicType} />
-      <DetailItem label="Brand" value={listing.electronicBrand} />
-      <DetailItem label="Model" value={listing.model} />
-      <DetailItem label="Origin" value={listing.origin} />
-      <DetailItem label="Year" value={listing.year} />
-      <DetailItem label="Color" value={listing.color} />
-      <DetailItem label="Warranty Proof" value={listing.warrantyProof ? 'Yes' : 'No'} />
-    </div>
-  </div>
-);
-
-// Real Estate Details Component
-const RealEstateDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Real Estate Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Ad Type" value={listing.adType} />
-      <DetailItem label="Property Type" value={listing.realEstateType} />
-      <DetailItem label="Heating Type" value={listing.heatingType} />
-      <DetailItem label="Owner Type" value={listing.ownerType} />
-      <DetailItem label="Square Meters" value={listing.squareMeters ? `${listing.squareMeters} m²` : '-'} />
-      <DetailItem label="Room Count" value={listing.roomCount} />
-      <DetailItem label="Bathroom Count" value={listing.bathroomCount} />
-      <DetailItem label="Floor" value={listing.floor} />
-      <DetailItem label="Building Age" value={listing.buildingAge ? `${listing.buildingAge} years` : '-'} />
-      <DetailItem label="Furnished" value={listing.furnished ? 'Yes' : 'No'} />
-    </div>
-  </div>
-);
-
-// Clothing Details Component
-const ClothingDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Clothing Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Brand" value={listing.brand} />
-      <DetailItem label="Type" value={listing.clothingType} />
-      <DetailItem label="Color" value={listing.color} />
-      <DetailItem label="Condition" value={listing.condition} />
-      <DetailItem label="Purchase Date" value={listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : '-'} />
-    </div>
-  </div>
-);
-
 // Detail Item Component
 const DetailItem = ({ label, value }) => (
   <div>
@@ -309,4 +229,4 @@ const DetailItem = ({ label, value }) => (
   </div>
 );
 
-export default ListingDetailPage;
+export default ClothingDetailPage;

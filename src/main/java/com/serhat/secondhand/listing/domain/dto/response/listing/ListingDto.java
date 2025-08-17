@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.dto.response.listing;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
@@ -25,7 +26,8 @@ import java.util.UUID;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE"),
     @JsonSubTypes.Type(value = ElectronicListingDto.class, name = "ELECTRONICS"),
-    @JsonSubTypes.Type(value = RealEstateListingDto.class, name = "REAL_ESTATE")
+    @JsonSubTypes.Type(value = RealEstateListingDto.class, name = "REAL_ESTATE"),
+    @JsonSubTypes.Type(value = ClothingListingDto.class, name = "CLOTHING")
 })
 @Data
 @NoArgsConstructor

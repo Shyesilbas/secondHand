@@ -1,5 +1,8 @@
 package com.serhat.secondhand.core.api;
 
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
@@ -236,6 +239,48 @@ public class EnumController {
         return ResponseEntity.ok(ownerTypes);
     }
 
+    @GetMapping("/clothing-brands")
+    @Operation(summary = "Get all clothing brands")
+    public ResponseEntity<List<Map<String, Object>>> getClothingBrands() {
+        List<Map<String, Object>> brands = Arrays.stream(ClothingBrand.values())
+                .map(brand -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", brand.name());
+                    map.put("label", getClothingBrandLabel(brand));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(brands);
+    }
+
+    @GetMapping("/clothing-types")
+    @Operation(summary = "Get all clothing types")
+    public ResponseEntity<List<Map<String, Object>>> getClothingTypes() {
+        List<Map<String, Object>> types = Arrays.stream(ClothingType.values())
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", type.name());
+                    map.put("label", getClothingTypeLabel(type));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
+    }
+
+    @GetMapping("/clothing-conditions")
+    @Operation(summary = "Get all clothing conditions")
+    public ResponseEntity<List<Map<String, Object>>> getClothingConditions() {
+        List<Map<String, Object>> conditions = Arrays.stream(ClothingCondition.values())
+                .map(condition -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", condition.name());
+                    map.put("label", getClothingConditionLabel(condition));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(conditions);
+    }
+
     // Label helper methods
     private String getListingTypeLabel(ListingType type) {
         return switch (type) {
@@ -459,6 +504,78 @@ public class EnumController {
         return switch (ownerType) {
             case OWNER -> "Owner";
             case AGENCY -> "Agency";
+        };
+    }
+
+    private String getClothingBrandLabel(ClothingBrand brand) {
+        return switch (brand) {
+            case NIKE -> "Nike";
+            case ADIDAS -> "Adidas";
+            case PUMA -> "Puma";
+            case UNDER_ARMOUR -> "Under Armour";
+            case ZARA -> "Zara";
+            case H_M -> "H&M";
+            case UNIQLO -> "Uniqlo";
+            case GAP -> "Gap";
+            case TOMMY_HILFIGER -> "Tommy Hilfiger";
+            case CALVIN_KLEIN -> "Calvin Klein";
+            case LACOSTE -> "Lacoste";
+            case RALPH_LAUREN -> "Ralph Lauren";
+            case LEVI_S -> "Levi's";
+            case DIESEL -> "Diesel";
+            case ARMANI -> "Armani";
+            case GUCCI -> "Gucci";
+            case PRADA -> "Prada";
+            case LOUIS_VUITTON -> "Louis Vuitton";
+            case CHANEL -> "Chanel";
+            case HERMES -> "Hermès";
+            case OTHER -> "Other";
+        };
+    }
+
+    private String getClothingTypeLabel(ClothingType type) {
+        return switch (type) {
+            case TSHIRT -> "T-Shirt";
+            case SHIRT -> "Shirt";
+            case PANTS -> "Pants";
+            case JEANS -> "Jeans";
+            case SHORTS -> "Shorts";
+            case DRESS -> "Dress";
+            case SKIRT -> "Skirt";
+            case JACKET -> "Jacket";
+            case COAT -> "Coat";
+            case SWEATER -> "Sweater";
+            case HOODIE -> "Hoodie";
+            case SWEATSHIRT -> "Sweatshirt";
+            case SUIT -> "Suit";
+            case BLAZER -> "Blazer";
+            case VEST -> "Vest";
+            case UNDERWEAR -> "Underwear";
+            case SOCKS -> "Socks";
+            case HAT -> "Hat";
+            case CAP -> "Cap";
+            case SCARF -> "Scarf";
+            case GLOVES -> "Gloves";
+            case BELT -> "Belt";
+            case TIE -> "Tie";
+            case BAG -> "Bag";
+            case SHOES -> "Shoes";
+            case SNEAKERS -> "Sneakers";
+            case BOOTS -> "Boots";
+            case SANDALS -> "Sandals";
+            case HEELS -> "Heels";
+            case FLATS -> "Flats";
+            case OTHER -> "Other";
+        };
+    }
+
+    private String getClothingConditionLabel(ClothingCondition condition) {
+        return switch (condition) {
+            case EXCELLENT -> "Excellent";
+            case GOOD -> "Good";
+            case FAIR -> "Fair";
+            case WORN -> "Worn";
+            case DAMAGED -> "Damaged";
         };
     }
 }

@@ -30,7 +30,9 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
       const cleanFilters = cleanObject(newFilters);
       
       // Use smart filtering that automatically chooses the right endpoint
+      console.log('[useAdvancedListings] cleanFilters:', cleanFilters);
       const response = await listingService.filterListings(cleanFilters);
+      console.log('[useAdvancedListings] response:', response);
       
       setListings(response.content || []);
       setTotalPages(response.totalPages || 0);

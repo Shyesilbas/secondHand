@@ -3,7 +3,8 @@ import {
   ListingFilterDTO, 
   VehicleListingFilterDTO, 
   ElectronicListingFilterDTO,
-  RealEstateListingFilterDTO
+  RealEstateListingFilterDTO,
+  ClothingListingFilterDTO
 } from '../../../types/listings';
 
 export const useListingFilters = (initialFilters = {}, listingType = null) => {
@@ -21,6 +22,8 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
         return { ...ElectronicListingFilterDTO, ...initialFilters };
       } else if (listingType === 'REAL_ESTATE') {
         return { ...RealEstateListingFilterDTO, ...initialFilters };
+      } else if (listingType === 'CLOTHING') {
+        return { ...ClothingListingFilterDTO, ...initialFilters };
       } else {
         // For other categories, return empty result
         return { 
@@ -90,7 +93,10 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
       filters.minRoomCount || filters.maxRoomCount ||
       filters.minBathroomCount || filters.maxBathroomCount ||
       filters.floor || filters.minBuildingAge || filters.maxBuildingAge ||
-      filters.minYear || filters.maxYear || filters.maxMileage;
+      filters.minYear || filters.maxYear || filters.maxMileage ||
+      (filters.types && filters.types.length > 0) ||
+      (filters.conditions && filters.conditions.length > 0) ||
+      filters.minPurchaseDate || filters.maxPurchaseDate;
   }, [filters]);
 
   const getActiveFilterCount = useCallback(() => {
@@ -116,6 +122,9 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
     if (filters.minBuildingAge || filters.maxBuildingAge) count++;
     if (filters.minYear || filters.maxYear) count++;
     if (filters.maxMileage) count++;
+    if (filters.types && filters.types.length > 0) count++;
+    if (filters.conditions && filters.conditions.length > 0) count++;
+    if (filters.minPurchaseDate || filters.maxPurchaseDate) count++;
     return count;
   }, [filters]);
 
