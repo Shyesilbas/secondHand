@@ -4,7 +4,7 @@
  */
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.2'; // Increment this when backend enum structure changes
+const ENUM_CACHE_VERSION = '1.3'; // Increment this when backend enum structure changes
 const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
@@ -18,6 +18,11 @@ const REQUIRED_ENUM_KEYS = [
   // Newly added keys for electronics
   'electronicTypes',
   'electronicBrands',
+  // Newly added keys for real estate
+  'realEstateTypes',
+  'realEstateAdTypes',
+  'heatingTypes',
+  'ownerTypes',
 ];
 const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 

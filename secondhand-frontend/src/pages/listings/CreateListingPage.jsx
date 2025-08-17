@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useEnums } from '../../hooks/useEnums';
 import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateForm';
 import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
-import { LISTING_TYPE_ICONS } from '../../utils/constants';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -44,7 +43,7 @@ const CreateListingPage = () => {
                         >
                             <div className="flex items-center space-x-4">
                                 <div className="text-3xl">
-                                    {LISTING_TYPE_ICONS[type.value] || type.icon || '📦'}
+                                    {type.icon || '📦'}
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-gray-900 group-hover:text-blue-700">

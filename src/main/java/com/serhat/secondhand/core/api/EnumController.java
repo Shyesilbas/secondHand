@@ -3,6 +3,7 @@ package com.serhat.secondhand.core.api;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -179,12 +180,68 @@ public class EnumController {
         return ResponseEntity.ok(brands);
     }
 
+    @GetMapping("/real-estate-types")
+    @Operation(summary = "Get all real estate types")
+    public ResponseEntity<List<Map<String, Object>>> getRealEstateTypes() {
+        List<Map<String, Object>> types = Arrays.stream(RealEstateType.values())
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", type.name());
+                    map.put("label", getRealEstateTypeLabel(type));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
+    }
+
+    @GetMapping("/real-estate-ad-types")
+    @Operation(summary = "Get all real estate ad types")
+    public ResponseEntity<List<Map<String, Object>>> getRealEstateAdTypes() {
+        List<Map<String, Object>> adTypes = Arrays.stream(RealEstateAdType.values())
+                .map(adType -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", adType.name());
+                    map.put("label", getRealEstateAdTypeLabel(adType));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(adTypes);
+    }
+
+    @GetMapping("/heating-types")
+    @Operation(summary = "Get all heating types")
+    public ResponseEntity<List<Map<String, Object>>> getHeatingTypes() {
+        List<Map<String, Object>> heatingTypes = Arrays.stream(HeatingType.values())
+                .map(heatingType -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", heatingType.name());
+                    map.put("label", getHeatingTypeLabel(heatingType));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(heatingTypes);
+    }
+
+    @GetMapping("/owner-types")
+    @Operation(summary = "Get all owner types")
+    public ResponseEntity<List<Map<String, Object>>> getOwnerTypes() {
+        List<Map<String, Object>> ownerTypes = Arrays.stream(ListingOwnerType.values())
+                .map(ownerType -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", ownerType.name());
+                    map.put("label", getOwnerTypeLabel(ownerType));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(ownerTypes);
+    }
+
     // Label helper methods
     private String getListingTypeLabel(ListingType type) {
         return switch (type) {
             case VEHICLE -> "Vehicle";
             case ELECTRONICS -> "Electronics";
-            case HOUSE -> "House";
+            case REAL_ESTATE -> "Real Estate";
             case CLOTHING -> "Clothing";
             case BOOKS -> "Books";
             case SPORTS -> "Sports";
@@ -196,7 +253,7 @@ public class EnumController {
         return switch (type) {
             case VEHICLE -> "🚗";
             case ELECTRONICS -> "📱";
-            case HOUSE -> "🏠";
+            case REAL_ESTATE -> "🏠";
             case CLOTHING -> "👕";
             case BOOKS -> "📚";
             case SPORTS -> "⚽";
@@ -307,8 +364,8 @@ public class EnumController {
     private String getGearTypeLabel(GearType gearType) {
         return switch (gearType) {
             case MANUAL -> "Manuel";
-            case AUTOMATIC -> "Otomatik";
-            case SEMI_AUTOMATIC -> "Yarı Otomatik";
+            case AUTOMATIC -> "Automatic";
+            case SEMI_AUTOMATIC -> "Semi Automatic";
             case CVT -> "CVT";
         };
     }
@@ -360,6 +417,48 @@ public class EnumController {
             case KODAK -> "Kodak";
             case NIKON -> "Nikon";
             case PHILLIPS -> "Phillips";
+        };
+    }
+
+    private String getRealEstateTypeLabel(RealEstateType type) {
+        return switch (type) {
+            case APARTMENT -> "Apartment";
+            case HOUSE -> "House";
+            case VILLA -> "Villa";
+            case LAND -> "Land";
+            case COMMERCIAL -> "Commercial";
+            case INDUSTRIAL -> "Industrial";
+            case FARM -> "Farm";
+            case RESIDENCE -> "Residence";
+            case SUMMER_HOUSE -> "Summer House";
+        };
+    }
+
+    private String getRealEstateAdTypeLabel(RealEstateAdType adType) {
+        return switch (adType) {
+            case FOR_SALE -> "For Sale";
+            case FOR_RENT -> "For Rent";
+        };
+    }
+
+    private String getHeatingTypeLabel(HeatingType heatingType) {
+        return switch (heatingType) {
+            case NONE -> "None";
+            case STOVE -> "Stove";
+            case NATURAL_GAS -> "Natural Gas";
+            case CENTRAL_SYSTEM -> "Central System";
+            case COMBI_BOILER -> "Combi Boiler";
+            case AIR_CONDITIONER -> "Air Conditioner";
+            case GEOTHERMAL -> "Geothermal";
+            case FLOOR_HEATING -> "Floor Heating";
+            case OTHER -> "Other";
+        };
+    }
+
+    private String getOwnerTypeLabel(ListingOwnerType ownerType) {
+        return switch (ownerType) {
+            case OWNER -> "Owner";
+            case AGENCY -> "Agency";
         };
     }
 }

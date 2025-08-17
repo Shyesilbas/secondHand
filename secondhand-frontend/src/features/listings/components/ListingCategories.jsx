@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useEnums } from '../../../hooks/useEnums';
-import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 import { ROUTES } from '../../../constants/routes';
 import { listingService } from '../services/listingService';
 import useApi from '../../../hooks/useApi';
@@ -42,7 +41,7 @@ const ListingCategories = () => {
           className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all p-4 flex flex-col items-center text-center"
         >
           <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-2 text-2xl">
-            {LISTING_TYPE_ICONS[cat.value] || cat.icon || '📦'}
+            {cat.icon || '📦'}
           </div>
           <div className="text-sm font-medium text-slate-800 group-hover:text-slate-900">{cat.label}</div>
           <div className="text-xs text-slate-500">{counts[cat.value] != null ? `${counts[cat.value]} listings` : 'Explore'}</div>

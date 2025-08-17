@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { enumService } from '../services/enumService';
-import { LISTING_TYPE_ICONS, LISTING_TYPE_LABELS } from '../utils/constants';
 import { getCachedEnums, setCachedEnums, clearEnumCache } from '../services/storage/enumCache';
 
 export const useEnums = () => {
@@ -15,7 +14,11 @@ export const useEnums = () => {
     gearTypes: [],
     seatCounts: [],
     electronicTypes: [],
-    electronicBrands: []
+    electronicBrands: [],
+    realEstateTypes: [],
+    realEstateAdTypes: [],
+    heatingTypes: [],
+    ownerTypes: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,7 +50,11 @@ export const useEnums = () => {
           gearTypes,
           seatCounts,
           electronicTypes,
-          electronicBrands
+          electronicBrands,
+          realEstateTypes,
+          realEstateAdTypes,
+          heatingTypes,
+          ownerTypes
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -59,7 +66,11 @@ export const useEnums = () => {
           enumService.getGearTypes(),
           enumService.getSeatCounts(),
           enumService.getElectronicTypes(),
-          enumService.getElectronicBrands()
+          enumService.getElectronicBrands(),
+          enumService.getRealEstateTypes(),
+          enumService.getRealEstateAdTypes(),
+          enumService.getHeatingTypes(),
+          enumService.getOwnerTypes()
         ]);
 
         const fetchedEnums = {
@@ -73,7 +84,11 @@ export const useEnums = () => {
           gearTypes,
           seatCounts,
           electronicTypes,
-          electronicBrands
+          electronicBrands,
+          realEstateTypes,
+          realEstateAdTypes,
+          heatingTypes,
+          ownerTypes
         };
 
         setEnums(fetchedEnums);
@@ -93,12 +108,12 @@ export const useEnums = () => {
   // Helper functions to get labels by value
   const getListingTypeLabel = (value) => {
     const type = enums.listingTypes.find(t => t.value === value);
-    return type?.label || LISTING_TYPE_LABELS[value] || value;
+    return type?.label || value;
   };
 
   const getListingTypeIcon = (value) => {
     const type = enums.listingTypes.find(t => t.value === value);
-    return type?.icon || LISTING_TYPE_ICONS[value] || '📦';
+    return type?.icon || '📦';
   };
 
   const getCarBrandLabel = (value) => {
@@ -145,7 +160,11 @@ export const useEnums = () => {
         gearTypes,
         seatCounts,
         electronicTypes,
-        electronicBrands
+        electronicBrands,
+        realEstateTypes,
+        realEstateAdTypes,
+        heatingTypes,
+        ownerTypes
       ] = await Promise.all([
         enumService.getListingTypes(),
         enumService.getListingStatuses(),
@@ -157,7 +176,11 @@ export const useEnums = () => {
         enumService.getGearTypes(),
         enumService.getSeatCounts(),
         enumService.getElectronicTypes(),
-        enumService.getElectronicBrands()
+        enumService.getElectronicBrands(),
+        enumService.getRealEstateTypes(),
+        enumService.getRealEstateAdTypes(),
+        enumService.getHeatingTypes(),
+        enumService.getOwnerTypes()
       ]);
 
       const freshEnums = {
@@ -171,7 +194,11 @@ export const useEnums = () => {
         gearTypes,
         seatCounts,
         electronicTypes,
-        electronicBrands
+        electronicBrands,
+        realEstateTypes,
+        realEstateAdTypes,
+        heatingTypes,
+        ownerTypes
       };
 
       setEnums(freshEnums);

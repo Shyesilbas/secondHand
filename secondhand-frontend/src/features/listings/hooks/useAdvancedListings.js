@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { listingService } from '../services/listingService';
-import { ListingFilterDTO, ListingResponseDTO } from '../../../types/listings';
+import { useListingFilters } from './useListingFilters';
 import { cleanObject } from '../../../utils/formatters';
 
-export const useAdvancedListings = (initialFilters = {}) => {
+export const useAdvancedListings = (initialFilters = {}, listingType = null) => {
   const [listings, setListings] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -11,55 +11,59 @@ export const useAdvancedListings = (initialFilters = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [filters, setFilters] = useState({
-    ...ListingFilterDTO,
-    ...(initialFilters || {})
-  });
+  // Use the new filter management hook
+  const {
+    filters,
+    updateFilters,
+    updatePage,
+    resetFilters,
+    hasActiveFilters,
+    getActiveFilterCount
+  } = useListingFilters(initialFilters, listingType);
 
-  const fetchListings = async (newFilters = filters) => {
+  const fetchListings = useCallback(async (newFilters = filters) => {
     try {
       setIsLoading(true);
       setError(null);
       
       // Clean filters - remove empty values using shared util
       const cleanFilters = cleanObject(newFilters);
-
-      const response = await listingService.getListingsWithFilters(cleanFilters);
+      
+      // Use smart filtering that automatically chooses the right endpoint
+      const response = await listingService.filterListings(cleanFilters);
       
       setListings(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
       setCurrentPage(response.number || 0);
     } catch (err) {
-      setError(err.response?.data?.message || 'İlanlar yüklenirken bir hata oluştu');
+      setError(err.response?.data?.message || 'Error loading listings');
       console.error('Error fetching listings with filters:', err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters]);
 
-  const updateFilters = (newFilters) => {
-    const updatedFilters = { ...filters, ...newFilters, page: 0 };
-    setFilters(updatedFilters);
-    fetchListings(updatedFilters);
-  };
+  const handleUpdateFilters = useCallback((newFilters) => {
+    updateFilters(newFilters);
+  }, [updateFilters]);
 
-  const updatePage = (page) => {
-    const updatedFilters = { ...filters, page };
-    setFilters(updatedFilters);
-    fetchListings(updatedFilters);
-  };
+  const handleUpdatePage = useCallback((page) => {
+    updatePage(page);
+  }, [updatePage]);
 
-  const resetFilters = () => {
-    const defaultFilters = { ...ListingFilterDTO };
-    setFilters(defaultFilters);
-    fetchListings(defaultFilters);
-  };
+  const handleResetFilters = useCallback(() => {
+    resetFilters();
+  }, [resetFilters]);
 
+  const refreshListings = useCallback(() => {
+    fetchListings();
+  }, [fetchListings]);
+
+  // Fetch listings when filters change
   useEffect(() => {
     fetchListings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [filters]);
 
   return {
     listings,
@@ -69,9 +73,12 @@ export const useAdvancedListings = (initialFilters = {}) => {
     isLoading,
     error,
     filters,
-    updateFilters,
-    updatePage,
-    resetFilters,
-    refetch: () => fetchListings()
+    updateFilters: handleUpdateFilters,
+    updatePage: handleUpdatePage,
+    resetFilters: handleResetFilters,
+    refreshListings,
+    refetch: refreshListings,
+    hasActiveFilters,
+    getActiveFilterCount
   };
 };

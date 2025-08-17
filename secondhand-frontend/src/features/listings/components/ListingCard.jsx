@@ -2,7 +2,6 @@ import React from 'react';
 import { Link} from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useEnums } from '../../../hooks/useEnums';
-import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import FavoriteButton from '../../favorites/components/FavoriteButton';
 import FavoriteStats from '../../favorites/components/FavoriteStats';
@@ -13,13 +12,6 @@ const ListingCard = ({ listing, onDeleted }) => {
     const { getListingTypeLabel, getListingTypeIcon } = useEnums();
     const formatPrice = (price, currency) => formatCurrency(price, currency);
     const formatDate = (dateString) => formatDateTime(dateString);
-
-    const getTypeIcon = (type) => {
-        const icon = LISTING_TYPE_ICONS[type] || getListingTypeIcon(type) || '📦';
-        return (
-            <span className="text-lg">{icon}</span>
-        );
-    };
 
 
 
@@ -40,9 +32,6 @@ const ListingCard = ({ listing, onDeleted }) => {
                     {/* Left Side - Image Placeholder */}
                     <div className="w-32 h-32 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center flex-shrink-0">
                         <div className="text-center">
-                            <div className="text-3xl mb-1">
-                                {getTypeIcon(listing.type)}
-                            </div>
                             <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
                                 {getListingTypeLabel(listing.type)}
                             </span>

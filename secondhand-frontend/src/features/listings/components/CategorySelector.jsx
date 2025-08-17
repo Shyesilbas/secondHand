@@ -1,6 +1,5 @@
 import React from 'react';
 import { useEnums } from '../../../hooks/useEnums';
-import { LISTING_TYPE_ICONS } from '../../../utils/constants';
 import SearchableDropdown from '../../../components/ui/SearchableDropdown';
 
 const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
@@ -20,25 +19,19 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
     }
 
     // Prepare options for dropdown with icons
-    const categoryOptions = [
-        {
-            value: null,
-            label: "🏷️ All Categories"
-        },
-        ...enums.listingTypes.map((type) => ({
-            value: type.value,
-            label: `${LISTING_TYPE_ICONS[type.value] || type.icon || '📦'} ${type.label}`
-        }))
-    ];
+    const categoryOptions = enums.listingTypes.map((type) => ({
+        value: type.value,
+        label: `${type.icon || '📦'} ${type.label}`
+    }));
 
     const handleCategoryChange = (values) => {
-        // Since this is single selection, take the first value or null
+        // Since this is single selection, take the first value
         const selectedValue = values.length > 0 ? values[0] : null;
         onCategoryChange(selectedValue);
     };
 
     const getCurrentSelection = () => {
-        return selectedCategory ? [selectedCategory] : [null];
+        return selectedCategory ? [selectedCategory] : [];
     };
 
     return (

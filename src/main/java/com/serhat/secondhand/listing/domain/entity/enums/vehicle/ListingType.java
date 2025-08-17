@@ -3,7 +3,7 @@ package com.serhat.secondhand.listing.domain.entity.enums.vehicle;
 public enum ListingType {
     VEHICLE,
     ELECTRONICS, 
-    HOUSE,
+    REAL_ESTATE,
     CLOTHING,
     BOOKS,
     SPORTS,

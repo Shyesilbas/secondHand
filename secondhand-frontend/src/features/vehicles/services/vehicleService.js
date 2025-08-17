@@ -1,7 +1,6 @@
 import { get, post, put } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 import { createVehicleCreateRequest, createVehicleUpdateRequest } from '../../../types/vehicles';
-import { createListingFilterRequest } from '../../../types/listings';
 
 export const vehicleService = {
   // Create a new vehicle listing

@@ -8,6 +8,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,9 +29,9 @@ public class ListingService {
     
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
-    private final BaseListingFilterService baseListingFilterService;
     private final VehicleListingFilterService vehicleListingFilterService;
     private final ElectronicListingFilterService electronicListingFilterService;
+    private final BaseListingFilterService baseListingFilterService;
     
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -110,43 +111,25 @@ public class ListingService {
                 .toList();
     }
     
-    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters, ListingType listingType) {
-        log.info("Getting listings with filters: {} and type: {}", filters, listingType);
+    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
+        log.info("Getting listings with filters: {}", filters);
         
         FilterHelper.initializeFilter(filters);
         
-        if (listingType != null) {
-            switch (listingType) {
-                case VEHICLE:
-                    if (filters instanceof VehicleListingFilterDto) {
-                        return vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) filters);
-                    } else {
-                        log.warn("Vehicle listing type requested but non-vehicle filter provided");
-                        return baseListingFilterService.filterAllListings(filters);
-                    }
-                case ELECTRONICS:
-                    if (filters instanceof ElectronicListingFilterDto) {
-                        return electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) filters);
-                    } else {
-                        log.warn("Electronics listing type requested but non-electronics filter provided");
-                        return baseListingFilterService.filterAllListings(filters);
-                    }
-                default:
-                    log.info("Using base filter service for listing type: {}", listingType);
-                    return baseListingFilterService.filterAllListings(filters);
-            }
+        // Use the actual type of the filter DTO to determine which service to use
+        if (filters instanceof VehicleListingFilterDto) {
+            log.info("Using vehicle filter service");
+            return vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) filters);
+        } else if (filters instanceof ElectronicListingFilterDto) {
+            log.info("Using electronics filter service");
+            return electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) filters);
         } else {
-            // No specific type requested, use base filter service
-            log.info("No listing type specified, using base filter service");
-            return baseListingFilterService.filterAllListings(filters);
+            // Use base filter service for general filtering
+            log.info("Using base filter service");
+            return Page.empty();
         }
     }
-    
-    // Overloaded method for backward compatibility
-    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
-        return getListingsWithFilters(filters, null);
-    }
-    
+
     @Transactional
     public void publish(UUID listingId) {
         Listing listing = findById(listingId)

@@ -29,7 +29,7 @@ const ListingsPage = () => {
         updateFilters,
         updatePage,
         resetFilters
-    } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : {});
+    } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
 
     const { getListingTypeLabel } = useEnums();
     const notification = useNotification();
@@ -46,7 +46,7 @@ const ListingsPage = () => {
     };
 
     const handleResetFilters = () => {
-        setSelectedCategory(null);
+        setSelectedCategory('VEHICLE');
         resetFilters();
         setShowSearchResult(false);
         setSearchResult(null);
