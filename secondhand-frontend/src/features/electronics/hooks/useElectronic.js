@@ -1,73 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEntity } from '../../../hooks/useEntity';
+import { useEntitySearch } from '../../../hooks/useEntitySearch';
+import { createElectronicsServiceAdapter } from '../../../services/entityAdapters';
 import { electronicService } from '../services/electronicService';
+import { ElectronicListingDTO } from '../../../types/electronics';
+import { useMemo } from 'react';
 
 export const useElectronic = (electronicId = null) => {
-  const [electronic, setElectronic] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
+  
+  const result = useEntity({
+    entityId: electronicId,
+    service: electronicsServiceAdapter,
+    defaultData: ElectronicListingDTO,
+    entityName: 'Electronic'
+  });
 
-  const fetchElectronic = async (id = electronicId) => {
-    if (!id) return;
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await electronicService.getElectronicById(id);
-      setElectronic(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
-      // eslint-disable-next-line no-console
-      console.error('Error fetching electronic:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createElectronic = async (payload) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await electronicService.createElectronicListing(payload);
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
-      // eslint-disable-next-line no-console
-      console.error('Error creating electronic:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateElectronic = async (id, payload) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await electronicService.updateElectronicListing(id, payload);
-      setElectronic(prev => ({ ...prev, ...(payload || {}) }));
-      fetchElectronic(id);
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while updating electronic listing.');
-      // eslint-disable-next-line no-console
-      console.error('Error updating electronic:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (electronicId) fetchElectronic();
-  }, [electronicId]);
-
+  // Map entity to electronic for backward compatibility
   return {
-    electronic,
-    isLoading,
-    error,
-    fetchElectronic,
-    createElectronic,
-    updateElectronic,
-    refetch: () => fetchElectronic(electronicId),
+    ...result,
+    electronic: result.entity,
+    fetchElectronic: result.fetchEntity,
+    createElectronic: result.createEntity,
+    updateElectronic: result.updateEntity,
+    deleteElectronic: result.deleteEntity
+  };
+};
+
+// Hook for electronic search operations
+export const useElectronicSearch = () => {
+  const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
+  
+  const result = useEntitySearch({
+    service: electronicsServiceAdapter,
+    entityName: 'Electronic',
+    defaultData: []
+  });
+
+  // Map entities to electronics for backward compatibility
+  return {
+    ...result,
+    electronics: result.entities,
+    searchByType: result.searchByCriteria
   };
 };
 

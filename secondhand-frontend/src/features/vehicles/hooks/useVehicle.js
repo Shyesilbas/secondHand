@@ -1,121 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useEntity } from '../../../hooks/useEntity';
+import { useEntitySearch } from '../../../hooks/useEntitySearch';
+import { createVehicleServiceAdapter } from '../../../services/entityAdapters';
 import { vehicleService } from '../services/vehicleService';
+import { VehicleListingDTO } from '../../../types/vehicles';
+import { useMemo } from 'react';
 
 export const useVehicle = (vehicleId = null) => {
-  const [vehicle, setVehicle] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const vehicleServiceAdapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
+  
+  const result = useEntity({
+    entityId: vehicleId,
+    service: vehicleServiceAdapter,
+    defaultData: VehicleListingDTO,
+    entityName: 'Vehicle'
+  });
 
-  const fetchVehicle = async (id = vehicleId) => {
-    if (!id) return;
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await vehicleService.getVehicleById(id);
-      setVehicle(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while updating vehicle. Please try again later.');
-      console.error('Error fetching vehicle:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const createVehicle = async (vehicleData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await vehicleService.createVehicleListing(vehicleData);
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while creating vehicle. Please try again later.');
-      console.error('Error creating vehicle:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateVehicle = async (id, vehicleData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await vehicleService.updateVehicleListing(id, vehicleData);
-      // Optimistic update: merge changes locally to avoid full page refresh
-      setVehicle(prev => ({ ...prev, ...(vehicleData || {}) }));
-      // Also refetch in background to stay consistent with backend
-      fetchVehicle(id);
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while updating vehicle. Please try again later.');
-      console.error('Error updating vehicle:', err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (vehicleId) {
-      fetchVehicle();
-    }
-  }, [vehicleId]);
-
+  // Map entity to vehicle for backward compatibility
   return {
-    vehicle,
-    isLoading,
-    error,
-    fetchVehicle,
-    createVehicle,
-    updateVehicle,
-    refetch: () => fetchVehicle(vehicleId),
+    ...result,
+    vehicle: result.entity,
+    fetchVehicle: result.fetchEntity,
+    createVehicle: result.createEntity,
+    updateVehicle: result.updateEntity,
+    deleteVehicle: result.deleteEntity
   };
 };
 
 // Hook for vehicle search operations
 export const useVehicleSearch = () => {
-  const [vehicles, setVehicles] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const vehicleServiceAdapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
+  
+  const result = useEntitySearch({
+    service: vehicleServiceAdapter,
+    entityName: 'Vehicle',
+    defaultData: []
+  });
 
-  const searchByBrandAndModel = async (brand, model) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await vehicleService.findVehiclesByBrandAndModel(brand, model);
-      setVehicles(data);
-      return data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while searching vehicles. Please try again later.');
-      console.error('Error searching vehicles:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const searchWithFilters = async (filters) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await vehicleService.searchVehicles(filters);
-      setVehicles(data.content || data); // Handle paginated vs non-paginated responses
-      return data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while filtering vehicles. Please try again later.');
-      console.error('Error filtering vehicles:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Map entities to vehicles for backward compatibility
   return {
-    vehicles,
-    isLoading,
-    error,
-    searchByBrandAndModel,
-    searchWithFilters,
-    clearResults: () => setVehicles([]),
+    ...result,
+    vehicles: result.entities,
+    searchByBrandAndModel: result.searchByCriteria
   };
 };
 
