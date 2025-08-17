@@ -19,6 +19,8 @@ const ListingCardActions = ({ listing, onChanged }) => {
       navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
     } else if (listing.type === 'ELECTRONICS') {
       navigate(ROUTES.ELECTRONIC_EDIT.replace(':id', listing.id));
+    } else if (listing.type === 'REAL_ESTATE') {
+      navigate(ROUTES.REAL_ESTATE_EDIT.replace(':id', listing.id));
     }
   };
 

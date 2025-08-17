@@ -41,6 +41,7 @@ const PayListingFeePage = () => {
         try {
             setIsConfigLoading(true);
             const config = await paymentService.getListingFeeConfig();
+            console.log('Fee config received:', config);
             setFeeConfig(config);
         } catch (err) {
             console.error('Failed to fetch fee config:', err);

@@ -25,7 +25,8 @@ export const paymentService = {
 
     getListingFeeConfig: async () => {
         const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
-        return { ...ListingFeeConfigDTO, ...response.data };
+        console.log('Fee config response:', response);
+        return response;
     }
 
 };

@@ -18,6 +18,8 @@ export const ROUTES = {
     VEHICLE_EDIT: '/vehicles/:id/edit',
     ELECTRONIC_EDIT: '/electronics/:id/edit',
     CREATE_LISTING: '/listings/create',
+    CREATE_REAL_ESTATE: '/real-estates/create',
+  REAL_ESTATE_EDIT: '/real-estates/:id/edit',
     PAYMENTS: '/payments',
     PAY_LISTING_FEE: '/payments/listing-fee',
     CREDIT_CARDS: '/credit-card',

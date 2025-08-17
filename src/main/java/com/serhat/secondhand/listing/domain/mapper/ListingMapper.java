@@ -68,6 +68,9 @@ public interface ListingMapper {
         if(listing instanceof ElectronicListing) {
             return toElectronicDto((ElectronicListing) listing);
         }
+        if(listing instanceof RealEstateListing) {
+            return toRealEstateDto((RealEstateListing) listing);
+        }
 
         throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());
     }

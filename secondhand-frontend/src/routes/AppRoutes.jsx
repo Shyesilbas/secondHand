@@ -29,6 +29,8 @@ import EmailsPage from '../pages/emails/EmailsPage';
 import VehicleDetailPage from '../pages/vehicles/VehicleDetailPage';
 import VehicleEditPage from '../pages/vehicles/VehicleEditPage';
 import ElectronicEditPage from '../pages/electronics/ElectronicEditPage';
+import CreateRealEstatePage from '../pages/realEstates/CreateRealEstatePage';
+import RealEstateEditPage from '../pages/realEstates/RealEstateEditPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -116,6 +118,8 @@ const AppRoutes = () => {
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
         <Route path={ROUTES.ELECTRONIC_EDIT} element={<ElectronicEditPage />} />
+                  <Route path={ROUTES.CREATE_REAL_ESTATE} element={<CreateRealEstatePage />} />
+          <Route path={ROUTES.REAL_ESTATE_EDIT} element={<RealEstateEditPage />} />
             </Route>
 
             {/* Fallback */}
