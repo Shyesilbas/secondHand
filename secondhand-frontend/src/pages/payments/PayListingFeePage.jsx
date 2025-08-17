@@ -5,6 +5,7 @@ import { listingService } from '../../features/listings/services/listingService'
 import { paymentService } from '../../features/payments/services/paymentService';
 import { formatCurrency } from '../../utils/formatters';
 import { createListingFeePaymentRequest } from '../../types/payments';
+import ListingCardActions from '../../features/listings/components/ListingCardActions';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
@@ -191,7 +192,7 @@ const PayListingFeePage = () => {
                                             </div>
                                         </div>
                                         
-                                        <div className="ml-4">
+                                        <div className="ml-4 flex flex-col items-end gap-2">
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                                                 selectedListing?.id === listing.id
                                                     ? 'border-blue-500 bg-blue-500'
@@ -203,6 +204,7 @@ const PayListingFeePage = () => {
                                                     </svg>
                                                 )}
                                             </div>
+                                            <ListingCardActions listing={listing} onChanged={() => fetchDraftListings()} />
                                         </div>
                                     </div>
                                 </div>
