@@ -1,108 +1,49 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useVehicle } from '../hooks/useVehicle';
 import { useEnums } from '../../../hooks/useEnums';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../constants/routes';
-import { useNotification } from '../../../context/NotificationContext';
 import { VehicleCreateRequestDTO } from '../../../types/vehicles';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
-import { vehicleFormSteps } from '../config/vehicleFormSteps';
 import ListingWizard from '../../listings/components/ListingWizard';
 import { validateVehicleStep1, validateVehicleStep2, validateVehicleStep3, validateVehicleAll } from '../../../utils/validators/vehicleValidators';
+import { useFormState } from '../../../forms/hooks/useFormState';
+import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
+import { vehicleFormConfig } from '../../../forms/config/formConfigs';
 
 const VehicleCreateForm = ({ onBack }) => {
-  const navigate = useNavigate();
-  const notification = useNotification();
   const { createVehicle, isLoading } = useVehicle();
   const { enums } = useEnums();
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [errors, setErrors] = useState({});
+  // Validation functions
+  const validateStep = (step, formData) => {
+    if (step === 1) return validateVehicleStep1(formData);
+    if (step === 2) return validateVehicleStep2(formData, { isCreate: true });
+    if (step === 3) return validateVehicleStep3(formData);
+    return {};
+  };
 
-  const [formData, setFormData] = useState({
-    ...VehicleCreateRequestDTO,
-    price: '',
-    year: '',
-    mileage: '',
-    engineCapacity: '',
-    gearbox: '',
-    seatCount: '',
-    wheels: '',
-    fuelCapacity: '',
-    fuelConsumption: '',
-    horsePower: '',
-    kilometersPerLiter: '',
+  // Form state management
+  const formState = useFormState({
+    initialData: {
+      ...VehicleCreateRequestDTO,
+      ...vehicleFormConfig.initialData
+    },
+    totalSteps: vehicleFormConfig.totalSteps,
+    validateStep,
+    validateAll: validateVehicleAll
   });
 
-  const steps = vehicleFormSteps;
+  // Form submission
+  const { handleSubmit } = useFormSubmission({
+    submitFunction: createVehicle,
+    validateAll: validateVehicleAll,
+    formState
+  });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+  const steps = vehicleFormConfig.steps;
 
-  const validateStep = (step) => {
-    let newErrors = {};
-    if (step === 1) newErrors = validateVehicleStep1(formData);
-    if (step === 2) newErrors = validateVehicleStep2(formData, { isCreate: true });
-    if (step === 3) newErrors = validateVehicleStep3(formData);
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 3));
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  const validateAllSteps = () => {
-    const allErrors = validateVehicleAll(formData);
-    setErrors(allErrors);
-    return Object.keys(allErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateAllSteps()) {
-      notification.showError('Missing Information', 'Please fill in all required fields. Location information is especially required!');
-
-      if (errors.title || errors.description || errors.price) {
-        setCurrentStep(1);
-      } else if (errors.brand || errors.model || errors.year || errors.fuelType) {
-        setCurrentStep(2);
-      } else if (errors.city || errors.district) {
-        setCurrentStep(3);
-      }
-      return;
-    }
-
-    try {
-      // VehicleService will handle DTO transformation
-      await createVehicle(formData);
-      notification.showSuccess('Success', 'Listing created successfully!');
-      navigate(ROUTES.MY_LISTINGS);
-    } catch (error) {
-      notification.showError('Error', 'An error occurred while creating the listing');
-    }
-  };
+  const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
 
   const renderStep1 = () => (
       <div className="space-y-6">
@@ -136,7 +77,7 @@ const VehicleCreateForm = ({ onBack }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <div>
-              <EnumDropdown label="Brand *" enumKey="carBrands" value={formData.brand} onChange={(v) => setFormData(prev => ({...prev, brand: v}))} />
+              <EnumDropdown label="Brand *" enumKey="carBrands" value={formData.brand} onChange={(v) => handleDropdownChange('brand', v)} />
               {errors.brand && <p className="mt-1 text-sm text-red-600">{errors.brand}</p>}
             </div>
 
@@ -192,12 +133,12 @@ const VehicleCreateForm = ({ onBack }) => {
             </div>
 
             <div>
-              <EnumDropdown label="Fuel Type *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => setFormData(prev => ({...prev, fuelType: v}))} />
+              <EnumDropdown label="Fuel Type *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => handleDropdownChange('fuelType', v)} />
               {errors.fuelType && <p className="mt-1 text-sm text-red-600">{errors.fuelType}</p>}
             </div>
 
             <div>
-              <EnumDropdown label="Color" enumKey="colors" value={formData.color} onChange={(v) => setFormData(prev => ({...prev, color: v}))} />
+              <EnumDropdown label="Color" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
             </div>
 
             <div>
@@ -391,7 +332,7 @@ const VehicleCreateForm = ({ onBack }) => {
           subtitle="Create your vehicle listing step by step"
           steps={steps}
           currentStep={currentStep}
-          onBack={onBack || (() => navigate(-1))}
+          onBack={onBack}
           onNext={nextStep}
           onPrev={prevStep}
           onSubmit={handleSubmit}

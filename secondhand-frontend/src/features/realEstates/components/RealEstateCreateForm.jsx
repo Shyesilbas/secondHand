@@ -1,103 +1,48 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRealEstate } from '../hooks/useRealEstate';
 import { useEnums } from '../../../hooks/useEnums';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../constants/routes';
-import { useNotification } from '../../../context/NotificationContext';
 import { RealEstateCreateRequestDTO } from '../../../types/realEstates';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
-import { realEstateFormSteps } from '../config/realEstateFormSteps';
 import ListingWizard from '../../listings/components/ListingWizard';
 import { validateRealEstateStep1, validateRealEstateStep2, validateRealEstateStep3, validateRealEstateAll } from '../../../utils/validators/realEstateValidators';
+import { useFormState } from '../../../forms/hooks/useFormState';
+import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
+import { realEstateFormConfig } from '../../../forms/config/formConfigs';
 
 const RealEstateCreateForm = ({ onBack }) => {
-  const navigate = useNavigate();
-  const notification = useNotification();
   const { createRealEstate, isLoading } = useRealEstate();
   const { enums } = useEnums();
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [errors, setErrors] = useState({});
+  // Validation functions
+  const validateStep = (step, formData) => {
+    if (step === 1) return validateRealEstateStep1(formData);
+    if (step === 2) return validateRealEstateStep2(formData, { isCreate: true });
+    if (step === 3) return validateRealEstateStep3(formData);
+    return {};
+  };
 
-  const [formData, setFormData] = useState({
-    ...RealEstateCreateRequestDTO,
-    price: '',
-    squareMeters: '',
-    roomCount: '',
-    bathroomCount: '',
-    floor: '',
-    buildingAge: '',
+  // Form state management
+  const formState = useFormState({
+    initialData: {
+      ...RealEstateCreateRequestDTO,
+      ...realEstateFormConfig.initialData
+    },
+    totalSteps: realEstateFormConfig.totalSteps,
+    validateStep,
+    validateAll: validateRealEstateAll
   });
 
-  const steps = realEstateFormSteps;
+  // Form submission
+  const { handleSubmit } = useFormSubmission({
+    submitFunction: createRealEstate,
+    validateAll: validateRealEstateAll,
+    formState
+  });
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateStep = (step) => {
-    let newErrors = {};
-    if (step === 1) newErrors = validateRealEstateStep1(formData);
-    if (step === 2) newErrors = validateRealEstateStep2(formData, { isCreate: true });
-    if (step === 3) newErrors = validateRealEstateStep3(formData);
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 3));
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  const validateAllSteps = () => {
-    const allErrors = validateRealEstateAll(formData);
-    setErrors(allErrors);
-    return Object.keys(allErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateAllSteps()) {
-      notification.showError('Missing Information', 'Please fill in all required fields. Location information is especially required!');
-
-      if (errors.title || errors.description || errors.price) {
-        setCurrentStep(1);
-      } else if (errors.adType || errors.realEstateType || errors.heatingType || errors.ownerType || errors.squareMeters || errors.roomCount) {
-        setCurrentStep(2);
-      } else if (errors.city || errors.district) {
-        setCurrentStep(3);
-      }
-      return;
-    }
-
-    try {
-      // RealEstateService will handle DTO transformation
-      await createRealEstate(formData);
-      notification.showSuccess('Success', 'Listing created successfully!');
-      navigate(ROUTES.MY_LISTINGS);
-    } catch (error) {
-      notification.showError('Error', 'An error occurred while creating the listing');
-    }
-  };
+  const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
+  const steps = realEstateFormConfig.steps;
 
   const renderStep1 = () => (
     <div className="space-y-6">
@@ -135,7 +80,7 @@ const RealEstateCreateForm = ({ onBack }) => {
               label="Ad Type *" 
               enumKey="realEstateAdTypes" 
               value={formData.adType} 
-              onChange={(v) => setFormData(prev => ({...prev, adType: v}))} 
+              onChange={(v) => handleDropdownChange('adType', v)} 
             />
             {errors.adType && <p className="mt-1 text-sm text-red-600">{errors.adType}</p>}
           </div>
@@ -145,7 +90,7 @@ const RealEstateCreateForm = ({ onBack }) => {
               label="Property Type *" 
               enumKey="realEstateTypes" 
               value={formData.realEstateType} 
-              onChange={(v) => setFormData(prev => ({...prev, realEstateType: v}))} 
+              onChange={(v) => handleDropdownChange('realEstateType', v)} 
             />
             {errors.realEstateType && <p className="mt-1 text-sm text-red-600">{errors.realEstateType}</p>}
           </div>
@@ -155,7 +100,7 @@ const RealEstateCreateForm = ({ onBack }) => {
               label="Heating Type *" 
               enumKey="heatingTypes" 
               value={formData.heatingType} 
-              onChange={(v) => setFormData(prev => ({...prev, heatingType: v}))} 
+              onChange={(v) => handleDropdownChange('heatingType', v)} 
             />
             {errors.heatingType && <p className="mt-1 text-sm text-red-600">{errors.heatingType}</p>}
           </div>
@@ -165,7 +110,7 @@ const RealEstateCreateForm = ({ onBack }) => {
               label="Owner Type *" 
               enumKey="ownerTypes" 
               value={formData.ownerType} 
-              onChange={(v) => setFormData(prev => ({...prev, ownerType: v}))} 
+              onChange={(v) => handleDropdownChange('ownerType', v)} 
             />
             {errors.ownerType && <p className="mt-1 text-sm text-red-600">{errors.ownerType}</p>}
           </div>
@@ -349,7 +294,7 @@ const RealEstateCreateForm = ({ onBack }) => {
       subtitle="Create your real estate listing step by step"
       steps={steps}
       currentStep={currentStep}
-      onBack={onBack || (() => navigate(-1))}
+      onBack={onBack}
       onNext={nextStep}
       onPrev={prevStep}
       onSubmit={handleSubmit}
