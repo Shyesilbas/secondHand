@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link} from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
+import { listingTypeRegistry } from './typeRegistry';
 import { useEnums } from '../../../hooks/useEnums';
 import StatusBadge from '../../../components/ui/StatusBadge';
 import FavoriteButton from '../../favorites/components/FavoriteButton';
@@ -70,109 +71,23 @@ const ListingCard = ({ listing, onDeleted }) => {
                             </div>
                         </div>
 
-                        {/* Vehicle Details - Compact */}
-                        {listing.type === 'VEHICLE' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.brand, icon: '🚗' },
-                                    { label: listing.year, icon: '📅' },
-                                    { label: listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : null, icon: '🛣️' },
-                                    { label: listing.fuelType, icon: '⛽' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Electronics Details - Compact */}
-                        {listing.type === 'ELECTRONICS' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.electronicType, icon: '📱' },
-                                    { label: listing.electronicBrand, icon: '🏷️' },
-                                    { label: listing.year, icon: '📅' },
-                                    { label: listing.color, icon: '🎨' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Real Estate Details - Compact */}
-                        {listing.type === 'REAL_ESTATE' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.realEstateType, icon: '🏠' },
-                                    { label: listing.adType, icon: '📋' },
-                                    { label: listing.squareMeters ? `${listing.squareMeters} m²` : null, icon: '📏' },
-                                    { label: listing.roomCount ? `${listing.roomCount} rooms` : null, icon: '🚪' },
-                                    { label: listing.heatingType, icon: '🔥' },
-                                    { label: listing.ownerType, icon: '👤' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Clothing Details - Compact */}
-                        {listing.type === 'CLOTHING' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.brand, icon: '🏷️' },
-                                    { label: listing.clothingType, icon: '👕' },
-                                    { label: listing.color, icon: '🎨' },
-                                    { label: listing.condition, icon: '⭐' },
-                                    { label: listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : null, icon: '📅' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Books Details - Compact */}
-                        {listing.type === 'BOOKS' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.author, icon: '✍️' },
-                                    { label: listing.genre, icon: '🏷️' },
-                                    { label: listing.publicationYear, icon: '📅' },
-                                    { label: listing.pageCount ? `${listing.pageCount} pages` : null, icon: '📖' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Sports Details - Compact */}
-                        {listing.type === 'SPORTS' && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {[
-                                    { label: listing.discipline, icon: '🏅' },
-                                    { label: listing.equipmentType, icon: '🎽' },
-                                    { label: listing.condition, icon: '⭐' }
-                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
-                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
-                                        <span className="opacity-70">{detail.icon}</span>
-                                        {detail.label}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
+                        {/* Type-specific compact badges */}
+                        {(() => {
+                            const cfg = listingTypeRegistry[listing.type];
+                            if (!cfg) return null;
+                            const items = (cfg.compactBadges(listing) || []).filter(d => d.label).slice(0, 3);
+                            if (items.length === 0) return null;
+                            return (
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {items.map((detail, index) => (
+                                        <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
+                                            <span className="opacity-70">{detail.icon}</span>
+                                            {detail.label}
+                                        </span>
+                                    ))}
+                                </div>
+                            );
+                        })()}
 
                         {/* Bottom Section */}
                         <div className="flex items-center justify-between text-xs text-slate-500">

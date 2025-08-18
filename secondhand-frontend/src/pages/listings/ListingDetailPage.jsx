@@ -7,6 +7,7 @@ import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 import  ListingCardActions  from '../../features/listings/components/ListingCardActions';
+import { listingTypeRegistry } from '../../features/listings/components/typeRegistry';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -152,35 +153,13 @@ const ListingDetailPage = () => {
             </div>
           </div>
 
-          {/* Vehicle Details */}
-          {listing.type === 'VEHICLE' && (
-            <VehicleDetails listing={listing} />
-          )}
-
-          {/* Electronics Details */}
-          {listing.type === 'ELECTRONICS' && (
-            <ElectronicsDetails listing={listing} />
-          )}
-
-          {/* Real Estate Details */}
-          {listing.type === 'REAL_ESTATE' && (
-            <RealEstateDetails listing={listing} />
-          )}
-
-          {/* Clothing Details */}
-          {listing.type === 'CLOTHING' && (
-            <ClothingDetails listing={listing} />
-          )}
-
-          {/* Books Details */}
-          {listing.type === 'BOOKS' && (
-            <BooksDetails listing={listing} />
-          )}
-
-          {/* Sports Details */}
-          {listing.type === 'SPORTS' && (
-            <SportsDetails listing={listing} />
-          )}
+          {/* Type-specific Details */}
+          {(() => {
+            const cfg = listingTypeRegistry[listing.type];
+            if (!cfg?.detailsComponent) return null;
+            const Details = cfg.detailsComponent;
+            return <Details listing={listing} />;
+          })()}
 
           {/* General Details */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -241,104 +220,7 @@ const ListingDetailPage = () => {
   );
 };
 
-// Vehicle Details Component
-const VehicleDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Vehicle Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Marka" value={listing.brand} />
-      <DetailItem label="Model" value={listing.model} />
-      <DetailItem label="Yıl" value={listing.year} />
-      <DetailItem label="Kilometre" value={listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : '-'} />
-      <DetailItem label="Motor Hacmi" value={listing.engineCapacity ? `${listing.engineCapacity} cc` : '-'} />
-      <DetailItem label="Vites" value={listing.gearbox} />
-      <DetailItem label="Yakıt Türü" value={listing.fuelType} />
-      <DetailItem label="Renk" value={listing.color} />
-      <DetailItem label="Kapı Sayısı" value={listing.doors} />
-      <DetailItem label="Koltuk Sayısı" value={listing.seatCount} />
-      <DetailItem label="Beygir Gücü" value={listing.horsePower ? `${listing.horsePower} HP` : '-'} />
-      <DetailItem label="Yakıt Tüketimi" value={listing.fuelConsumption ? `${listing.fuelConsumption} L/100km` : '-'} />
-    </div>
-  </div>
-);
 
-// Electronics Details Component
-const ElectronicsDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Electronics Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Type" value={listing.electronicType} />
-      <DetailItem label="Brand" value={listing.electronicBrand} />
-      <DetailItem label="Model" value={listing.model} />
-      <DetailItem label="Origin" value={listing.origin} />
-      <DetailItem label="Year" value={listing.year} />
-      <DetailItem label="Color" value={listing.color} />
-      <DetailItem label="Warranty Proof" value={listing.warrantyProof ? 'Yes' : 'No'} />
-    </div>
-  </div>
-);
-
-// Real Estate Details Component
-const RealEstateDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Real Estate Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Ad Type" value={listing.adType} />
-      <DetailItem label="Property Type" value={listing.realEstateType} />
-      <DetailItem label="Heating Type" value={listing.heatingType} />
-      <DetailItem label="Owner Type" value={listing.ownerType} />
-      <DetailItem label="Square Meters" value={listing.squareMeters ? `${listing.squareMeters} m²` : '-'} />
-      <DetailItem label="Room Count" value={listing.roomCount} />
-      <DetailItem label="Bathroom Count" value={listing.bathroomCount} />
-      <DetailItem label="Floor" value={listing.floor} />
-      <DetailItem label="Building Age" value={listing.buildingAge ? `${listing.buildingAge} years` : '-'} />
-      <DetailItem label="Furnished" value={listing.furnished ? 'Yes' : 'No'} />
-    </div>
-  </div>
-);
-
-// Clothing Details Component
-const ClothingDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Clothing Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Brand" value={listing.brand} />
-      <DetailItem label="Type" value={listing.clothingType} />
-      <DetailItem label="Color" value={listing.color} />
-      <DetailItem label="Condition" value={listing.condition} />
-      <DetailItem label="Purchase Date" value={listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : '-'} />
-    </div>
-  </div>
-);
-
-// Books Details Component
-const BooksDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Books Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Author" value={listing.author} />
-      <DetailItem label="Genre" value={listing.genre} />
-      <DetailItem label="Language" value={listing.language} />
-      <DetailItem label="Publication Year" value={listing.publicationYear} />
-      <DetailItem label="Page Count" value={listing.pageCount} />
-      <DetailItem label="Format" value={listing.format} />
-      <DetailItem label="Condition" value={listing.condition} />
-      <DetailItem label="ISBN" value={listing.isbn} />
-    </div>
-  </div>
-);
-
-// Sports Details Component
-const SportsDetails = ({ listing }) => (
-  <div className="bg-white rounded-lg shadow-sm border p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">Sports Information</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <DetailItem label="Discipline" value={listing.discipline} />
-      <DetailItem label="Equipment Type" value={listing.equipmentType} />
-      <DetailItem label="Condition" value={listing.condition} />
-    </div>
-  </div>
-);
 
 // Detail Item Component
 const DetailItem = ({ label, value }) => (
