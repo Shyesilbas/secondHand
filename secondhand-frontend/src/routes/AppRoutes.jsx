@@ -29,11 +29,13 @@ import EmailsPage from '../pages/emails/EmailsPage';
 import VehicleDetailPage from '../pages/vehicles/VehicleDetailPage';
 import VehicleEditPage from '../pages/vehicles/VehicleEditPage';
 import ElectronicEditPage from '../pages/electronics/ElectronicEditPage';
+import BooksEditPage from '../pages/books/BooksEditPage';
 import CreateRealEstatePage from '../pages/realEstates/CreateRealEstatePage';
 import RealEstateEditPage from '../pages/realEstates/RealEstateEditPage';
 import CreateClothingPage from '../pages/clothing/CreateClothingPage';
 import ClothingEditPage from '../pages/clothing/ClothingEditPage';
 import ClothingDetailPage from '../pages/clothing/ClothingDetailPage';
+import SportsEditPage from '../pages/sports/SportsEditPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -124,10 +126,12 @@ const AppRoutes = () => {
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
         <Route path={ROUTES.ELECTRONIC_EDIT} element={<ElectronicEditPage />} />
+        <Route path={ROUTES.BOOKS_EDIT} element={<BooksEditPage />} />
                   <Route path={ROUTES.CREATE_REAL_ESTATE} element={<CreateRealEstatePage />} />
           <Route path={ROUTES.REAL_ESTATE_EDIT} element={<RealEstateEditPage />} />
                   <Route path={ROUTES.CREATE_CLOTHING} element={<CreateClothingPage />} />
                   <Route path={ROUTES.CLOTHING_EDIT} element={<ClothingEditPage />} />
+                  <Route path={ROUTES.SPORTS_EDIT} element={<SportsEditPage />} />
             </Route>
 
             {/* Fallback */}

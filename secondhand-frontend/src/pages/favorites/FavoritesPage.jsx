@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useFavorites } from '../../features/favorites/hooks/useFavorites';
 import ListingGrid from '../../features/listings/components/ListingGrid';
 import Pagination from '../../components/ui/Pagination';
-import { FavoriteDTO } from '../../types';
 
 const FavoritesPage = () => {
   const {
@@ -30,7 +29,7 @@ const FavoritesPage = () => {
             <svg className="animate-spin w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span>Favorileriniz yükleniyor...</span>
+            <span>Loading Favorites...</span>
           </div>
         </div>
       </div>
@@ -47,7 +46,7 @@ const FavoritesPage = () => {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Favoriler Yüklenirken Hata
+            Error Loading Favorites
           </h3>
           <p className="text-gray-600 mb-4">
             {error}
@@ -56,7 +55,7 @@ const FavoritesPage = () => {
             onClick={() => fetchFavorites()}
             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
           >
-            Tekrar Dene
+            Try Again
           </button>
         </div>
       </div>
@@ -67,9 +66,9 @@ const FavoritesPage = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Favorilerim</h1>
+          <h1 className="text-3xl font-bold text-slate-900">My Favorites</h1>
           <p className="text-slate-600 mt-2">
-            İlginizi çeken ilanları takip edin
+            Follow the listings you like and add them to your favorites.
           </p>
         </div>
 
@@ -80,16 +79,16 @@ const FavoritesPage = () => {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Henüz favori yok
+            No Favorites Yet
           </h3>
           <p className="text-gray-600 mb-4">
-            İlanları keşfetmeye başlayın ve kalp ikonuna tıklayarak favorilerinize ekleyin
+            Add listings to your favorites to see them here.
           </p>
           <a
             href="/listings"
             className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
           >
-            İlanları Keşfet
+            Discover Listings
           </a>
         </div>
       </div>
@@ -105,9 +104,9 @@ const FavoritesPage = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Favorilerim</h1>
+            <h1 className="text-3xl font-bold text-slate-900">My Favorites</h1>
             <p className="text-slate-600 mt-2">
-              {pagination.totalElements} favori bulundu
+              {pagination.totalElements} Favorites found
             </p>
           </div>
           
@@ -125,7 +124,7 @@ const FavoritesPage = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            Yenile
+            Refresh
           </button>
         </div>
       </div>

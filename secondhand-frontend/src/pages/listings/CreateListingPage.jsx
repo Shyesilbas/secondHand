@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { useEnums } from '../../hooks/useEnums';
-import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateForm';
-import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
-import RealEstateCreateForm from '../../features/realEstates/components/RealEstateCreateForm';
-import ClothingCreateForm from '../../features/clothing/components/ClothingCreateForm';
-import BooksCreateForm from '../../features/books/components/BooksCreateForm';
-import SportsCreateForm from '../../features/sports/components/SportsCreateForm';
+import { createFormRegistry } from '../../features/listings/components/createFormRegistry';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -19,39 +14,21 @@ const CreateListingPage = () => {
         setSelectedType(null);
     };
 
-    if (selectedType === 'VEHICLE') {
-        return <VehicleCreateForm onBack={handleBackToSelection} />;
+    const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
+
+    if (SelectedForm) {
+        return <SelectedForm onBack={handleBackToSelection} />;
     }
-
-  if (selectedType === 'ELECTRONICS') {
-      return <ElectronicCreateForm onBack={handleBackToSelection} />;
-  }
-
-  if (selectedType === 'REAL_ESTATE') {
-      return <RealEstateCreateForm onBack={handleBackToSelection} />;
-  }
-
-  if (selectedType === 'CLOTHING') {
-      return <ClothingCreateForm onBack={handleBackToSelection} />;
-  }
-
-  if (selectedType === 'BOOKS') {
-      return <BooksCreateForm onBack={handleBackToSelection} />;
-  }
-
-  if (selectedType === 'SPORTS') {
-      return <SportsCreateForm onBack={handleBackToSelection} />;
-  }
 
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">
-                İlan Ver
+                Publish Listing
             </h1>
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                    İlan Tipini Seçin
+                    Select Listing Type
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -78,16 +55,16 @@ const CreateListingPage = () => {
                     ))}
                 </div>
 
-                {selectedType && selectedType !== 'VEHICLE' && selectedType !== 'ELECTRONICS' && selectedType !== 'REAL_ESTATE' && selectedType !== 'CLOTHING' && (
+                {selectedType && !SelectedForm && (
                     <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-yellow-800">
-                            {selectedType} tipi için form henüz hazır değil. Şimdilik sadece Vehicle, Electronics, Real Estate ve Clothing listingleri desteklenmektedir.
+                            {selectedType} is not ready now.
                         </p>
                         <button
                             onClick={handleBackToSelection}
                             className="mt-2 text-yellow-600 hover:text-yellow-800 underline"
                         >
-                            Geri dön
+                            Go Back
                         </button>
                     </div>
                 )}
@@ -99,21 +76,21 @@ const CreateListingPage = () => {
 const getTypeDescription = (type) => {
     switch (type) {
         case 'VEHICLE':
-            return 'Araba, motor, bisiklet vb.';
+            return 'Vehicle, Motorcycle, Cycle eg..';
         case 'ELECTRONICS':
-            return 'Telefon, laptop, TV vb.';
+            return 'Mobile Phone, Laptop, TV eg...';
         case 'REAL_ESTATE':
-            return 'Ev, apartman, arsa vb.';
+            return 'House, Apartment, Land eg..';
         case 'CLOTHING':
-            return 'Giyim ve aksesuar ürünleri';
+            return 'Clothing and accessories eg..';
         case 'BOOKS':
-            return 'Kitap, dergi vb.';
+            return 'Books, Magazines, Newspapers eg..';
         case 'SPORTS':
-            return 'Spor malzemeleri';
+            return 'Sport equipment, accessories eg..';
         case 'OTHER':
-            return 'Diğer kategoriler';
+            return 'Other categories eg..';
         default:
-            return 'Ürün kategorisi';
+            return 'NULL';
     }
 };
 
