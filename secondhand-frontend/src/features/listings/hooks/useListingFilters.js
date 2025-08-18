@@ -4,7 +4,8 @@ import {
   VehicleListingFilterDTO, 
   ElectronicListingFilterDTO,
   RealEstateListingFilterDTO,
-  ClothingListingFilterDTO
+  ClothingListingFilterDTO,
+  BooksListingFilterDTO,
 } from '../../../types/listings';
 
 export const useListingFilters = (initialFilters = {}, listingType = null) => {
@@ -24,7 +25,10 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
         return { ...RealEstateListingFilterDTO, ...initialFilters };
       } else if (listingType === 'CLOTHING') {
         return { ...ClothingListingFilterDTO, ...initialFilters };
-      } else {
+      } else if (listingType === 'BOOKS') {
+        return { ...BooksListingFilterDTO, ...initialFilters };
+      }
+      else {
         // For other categories, return empty result
         return { 
           type: listingType,
@@ -96,7 +100,12 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
       filters.minYear || filters.maxYear || filters.maxMileage ||
       (filters.types && filters.types.length > 0) ||
       (filters.conditions && filters.conditions.length > 0) ||
-      filters.minPurchaseDate || filters.maxPurchaseDate;
+      filters.minPurchaseDate || filters.maxPurchaseDate ||
+      (filters.genres && filters.genres.length > 0) ||
+      (filters.languages && filters.languages.length > 0) ||
+      (filters.formats && filters.formats.length > 0) ||
+      (filters.conditions && filters.conditions.length > 0) ||
+      filters.minPageCount || filters.maxPageCount;
   }, [filters]);
 
   const getActiveFilterCount = useCallback(() => {
@@ -125,6 +134,10 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
     if (filters.types && filters.types.length > 0) count++;
     if (filters.conditions && filters.conditions.length > 0) count++;
     if (filters.minPurchaseDate || filters.maxPurchaseDate) count++;
+    if (filters.genres && filters.genres.length > 0) count++;
+    if (filters.languages && filters.languages.length > 0) count++;
+    if (filters.formats && filters.formats.length > 0) count++;
+    if (filters.minPageCount || filters.maxPageCount) count++;
     return count;
   }, [filters]);
 

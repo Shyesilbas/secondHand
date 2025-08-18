@@ -40,4 +40,10 @@ export const enumService = {
   getClothingTypes: async () => get(API_ENDPOINTS.ENUMS.CLOTHING_TYPES),
 
   getClothingConditions: async () => get(API_ENDPOINTS.ENUMS.CLOTHING_CONDITIONS),
+
+  // Books
+  getBookGenres: async () => get(API_ENDPOINTS.ENUMS.BOOK_GENRES),
+  getBookLanguages: async () => get(API_ENDPOINTS.ENUMS.BOOK_LANGUAGES),
+  getBookFormats: async () => get(API_ENDPOINTS.ENUMS.BOOK_FORMATS),
+  getBookConditions: async () => get(API_ENDPOINTS.ENUMS.BOOK_CONDITIONS),
 };

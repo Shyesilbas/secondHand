@@ -6,6 +6,10 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondit
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -275,6 +279,62 @@ public class EnumController {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", condition.name());
                     map.put("label", getClothingConditionLabel(condition));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(conditions);
+    }
+
+    @GetMapping("/book-genres")
+    @Operation(summary = "Get all book genres")
+    public ResponseEntity<List<Map<String, Object>>> getBookGenres() {
+        List<Map<String, Object>> genres = Arrays.stream(BookGenre.values())
+                .map(genre -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", genre.name());
+                    map.put("label", genre.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(genres);
+    }
+
+    @GetMapping("/book-languages")
+    @Operation(summary = "Get all book languages")
+    public ResponseEntity<List<Map<String, Object>>> getBookLanguages() {
+        List<Map<String, Object>> langs = Arrays.stream(BookLanguage.values())
+                .map(lang -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", lang.name());
+                    map.put("label", lang.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(langs);
+    }
+
+    @GetMapping("/book-formats")
+    @Operation(summary = "Get all book formats")
+    public ResponseEntity<List<Map<String, Object>>> getBookFormats() {
+        List<Map<String, Object>> formats = Arrays.stream(BookFormat.values())
+                .map(fmt -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", fmt.name());
+                    map.put("label", fmt.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(formats);
+    }
+
+    @GetMapping("/book-conditions")
+    @Operation(summary = "Get all book conditions")
+    public ResponseEntity<List<Map<String, Object>>> getBookConditions() {
+        List<Map<String, Object>> conditions = Arrays.stream(BookCondition.values())
+                .map(cond -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", cond.name());
+                    map.put("label", cond.name());
                     return map;
                 })
                 .toList();

@@ -141,6 +141,23 @@ const ListingCard = ({ listing, onDeleted }) => {
                             </div>
                         )}
 
+                        {/* Books Details - Compact */}
+                        {listing.type === 'BOOKS' && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {[
+                                    { label: listing.author, icon: '✍️' },
+                                    { label: listing.genre, icon: '🏷️' },
+                                    { label: listing.publicationYear, icon: '📅' },
+                                    { label: listing.pageCount ? `${listing.pageCount} pages` : null, icon: '📖' }
+                                ].filter(detail => detail.label).slice(0, 3).map((detail, index) => (
+                                    <span key={index} className="inline-flex items-center gap-1 bg-slate-50 px-2 py-1 rounded text-xs text-slate-700">
+                                        <span className="opacity-70">{detail.icon}</span>
+                                        {detail.label}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Bottom Section */}
                         <div className="flex items-center justify-between text-xs text-slate-500">
                             <div className="flex items-center gap-3">

@@ -79,6 +79,10 @@ export const API_ENDPOINTS = {
         CLOTHING_BRANDS: '/v1/enums/clothing-brands',
         CLOTHING_TYPES: '/v1/enums/clothing-types',
         CLOTHING_CONDITIONS: '/v1/enums/clothing-conditions',
+        BOOK_GENRES: '/v1/enums/book-genres',
+        BOOK_LANGUAGES: '/v1/enums/book-languages',
+        BOOK_FORMATS: '/v1/enums/book-formats',
+        BOOK_CONDITIONS: '/v1/enums/book-conditions',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
@@ -107,6 +111,12 @@ export const API_ENDPOINTS = {
         UPDATE: (id) => `/v1/clothing/${id}`,
         BY_BRAND_TYPE: (brand, clothingType) => `/v1/clothing/brand/${brand}/type/${clothingType}`,
         FILTER: '/v1/clothing/filter',
+    },
+    BOOKS: {
+        CREATE: '/v1/books/create-listing',
+        BY_ID: (id) => `/v1/books/${id}`,
+        UPDATE: (id) => `/v1/books/${id}`,
+        FILTER: '/v1/books/filter',
     },
     FAVORITES: {
         ADD: '/favorites',

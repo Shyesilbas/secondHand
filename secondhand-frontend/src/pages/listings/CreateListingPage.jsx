@@ -4,6 +4,7 @@ import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateF
 import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
 import RealEstateCreateForm from '../../features/realEstates/components/RealEstateCreateForm';
 import ClothingCreateForm from '../../features/clothing/components/ClothingCreateForm';
+import BooksCreateForm from '../../features/books/components/BooksCreateForm';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -31,6 +32,10 @@ const CreateListingPage = () => {
 
   if (selectedType === 'CLOTHING') {
       return <ClothingCreateForm onBack={handleBackToSelection} />;
+  }
+
+  if (selectedType === 'BOOKS') {
+      return <BooksCreateForm onBack={handleBackToSelection} />;
   }
 
     return (

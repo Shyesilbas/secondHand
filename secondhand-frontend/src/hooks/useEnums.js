@@ -21,7 +21,11 @@ export const useEnums = () => {
     ownerTypes: [],
     clothingBrands: [],
     clothingTypes: [],
-    clothingConditions: []
+    clothingConditions: [],
+    bookGenres: [],
+    bookLanguages: [],
+    bookFormats: [],
+    bookConditions: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,7 +64,11 @@ export const useEnums = () => {
           ownerTypes,
           clothingBrands,
           clothingTypes,
-          clothingConditions
+          clothingConditions,
+          bookGenres,
+          bookLanguages,
+          bookFormats,
+          bookConditions
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -79,7 +87,11 @@ export const useEnums = () => {
           enumService.getOwnerTypes(),
           enumService.getClothingBrands(),
           enumService.getClothingTypes(),
-          enumService.getClothingConditions()
+          enumService.getClothingConditions(),
+          enumService.getBookGenres(),
+          enumService.getBookLanguages(),
+          enumService.getBookFormats(),
+          enumService.getBookConditions()
         ]);
 
         const fetchedEnums = {
@@ -100,7 +112,11 @@ export const useEnums = () => {
           ownerTypes,
           clothingBrands,
           clothingTypes,
-          clothingConditions
+          clothingConditions,
+          bookGenres,
+          bookLanguages,
+          bookFormats,
+          bookConditions
         };
 
         setEnums(fetchedEnums);

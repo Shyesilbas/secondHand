@@ -16,6 +16,30 @@ export const ListingDTO = {
   updatedAt: '',
 };
 
+
+export const BooksListingFilterDTO = {
+  type: 'BOOKS',
+  listingType: 'BOOKS',
+  status: 'ACTIVE',
+  city: '',
+  district: '',
+  minPrice: 0,
+  maxPrice: 0,
+  currency: 'TRY',
+  genres: [],
+  languages: [],
+  formats: [],
+  conditions: [],
+  minYear: 0,
+  maxYear: 0,
+  minPageCount: 0,
+  maxPageCount: 0,
+  sortBy: 'createdAt',
+  sortDirection: 'DESC',
+  page: 0,
+  size: 20,
+};
+
 export const ListingFilterDTO = {
   type: '',
   listingType: '',
