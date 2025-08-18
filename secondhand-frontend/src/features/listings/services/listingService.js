@@ -8,10 +8,8 @@ import {
 import { createClothingFilterRequest } from '../../../types/clothing';
 import { createBooksFilterRequest } from '../../../types/books';
 import { createSportsFilterRequest } from '../../../types/sports';
-import {createRealEstateCreateRequest} from "../../../types/realEstates.js";
 
 export const listingService = {
-  getAllListings: async () => get(API_ENDPOINTS.LISTINGS.ALL),
 
   getMyListingsByStatus: async (status) => get(API_ENDPOINTS.LISTINGS.BY_STATUS(status)),
 
@@ -21,7 +19,6 @@ export const listingService = {
 
   getMyListings: async () => get(API_ENDPOINTS.LISTINGS.MY_LISTINGS),
 
-  // Listing management operations
   activateListing: async (id) => put(API_ENDPOINTS.LISTINGS.ACTIVATE(id)),
 
   markListingSold: async (id) => put(API_ENDPOINTS.LISTINGS.MARK_SOLD(id)),
@@ -32,13 +29,7 @@ export const listingService = {
 
   deleteListing: async (id) => del(API_ENDPOINTS.LISTINGS.DELETE(id)),
 
-  // Type-based listing operations
-  getActiveListingsByType: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ACTIVE(listingType)),
 
-  getListingsByTypeOrderByDate: async (listingType) => get(API_ENDPOINTS.LISTINGS.BY_TYPE_ORDERED(listingType)),
-
-
-  // Vehicle-specific filtering
   filterVehicles: async (filters) => {
     const filterData = createVehicleFilterRequest(filters);
     return post(API_ENDPOINTS.VEHICLES.FILTER, filterData);
