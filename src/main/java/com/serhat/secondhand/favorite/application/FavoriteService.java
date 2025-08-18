@@ -100,13 +100,9 @@ public class FavoriteService {
             addToFavorites(user, listingId);
         }
         
-        // Return updated stats
         return getFavoriteStats(listingId, user.getEmail());
     }
-    
-    /**
-     * Get user's favorite listings with pagination
-     */
+
     public Page<FavoriteDto> getUserFavorites(User user, Pageable pageable) {
         String userEmail = user.getEmail();
         log.info("Getting favorites for user {} with pagination", userEmail);

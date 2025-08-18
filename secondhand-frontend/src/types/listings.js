@@ -25,7 +25,7 @@ export const BooksListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   genres: [],
   languages: [],
   formats: [],

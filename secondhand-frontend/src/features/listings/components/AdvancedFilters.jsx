@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEnums } from '../../../hooks/useEnums';
-import EnumDropdown from '../../../components/ui/EnumDropdown';
 import { filtersRegistry } from './filters/filtersRegistry';
 import FiltersHeader from './filters/shared/FiltersHeader';
 import PriceLocationFields from './filters/shared/PriceLocationFields';
