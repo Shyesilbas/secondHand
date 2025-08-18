@@ -4,7 +4,7 @@
  */
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.3'; // Increment this when backend enum structure changes
+const ENUM_CACHE_VERSION = '1.4'; // Increment this when backend enum structure changes
 const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
@@ -23,6 +23,19 @@ const REQUIRED_ENUM_KEYS = [
   'realEstateAdTypes',
   'heatingTypes',
   'ownerTypes',
+  // Clothing
+  'clothingBrands',
+  'clothingTypes',
+  'clothingConditions',
+  // Books
+  'bookGenres',
+  'bookLanguages',
+  'bookFormats',
+  'bookConditions',
+  // Sports
+  'sportDisciplines',
+  'sportEquipmentTypes',
+  'sportConditions',
 ];
 const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
 

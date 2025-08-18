@@ -46,4 +46,9 @@ export const enumService = {
   getBookLanguages: async () => get(API_ENDPOINTS.ENUMS.BOOK_LANGUAGES),
   getBookFormats: async () => get(API_ENDPOINTS.ENUMS.BOOK_FORMATS),
   getBookConditions: async () => get(API_ENDPOINTS.ENUMS.BOOK_CONDITIONS),
+
+  // Sports
+  getSportDisciplines: async () => get(API_ENDPOINTS.ENUMS.SPORT_DISCIPLINES),
+  getSportEquipmentTypes: async () => get(API_ENDPOINTS.ENUMS.SPORT_EQUIPMENT_TYPES),
+  getSportConditions: async () => get(API_ENDPOINTS.ENUMS.SPORT_CONDITIONS),
 };

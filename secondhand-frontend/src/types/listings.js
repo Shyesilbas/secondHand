@@ -40,6 +40,24 @@ export const BooksListingFilterDTO = {
   size: 20,
 };
 
+export const SportsListingFilterDTO = {
+  type: 'SPORTS',
+  listingType: 'SPORTS',
+  status: 'ACTIVE',
+  city: '',
+  district: '',
+  minPrice: 0,
+  maxPrice: 0,
+  currency: 'TRY',
+  disciplines: [],
+  equipmentTypes: [],
+  conditions: [],
+  sortBy: 'createdAt',
+  sortDirection: 'DESC',
+  page: 0,
+  size: 20,
+};
+
 export const ListingFilterDTO = {
   type: '',
   listingType: '',

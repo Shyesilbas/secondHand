@@ -83,6 +83,9 @@ export const API_ENDPOINTS = {
         BOOK_LANGUAGES: '/v1/enums/book-languages',
         BOOK_FORMATS: '/v1/enums/book-formats',
         BOOK_CONDITIONS: '/v1/enums/book-conditions',
+        SPORT_DISCIPLINES: '/v1/enums/sport-disciplines',
+        SPORT_EQUIPMENT_TYPES: '/v1/enums/sport-equipment-types',
+        SPORT_CONDITIONS: '/v1/enums/sport-conditions',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
@@ -117,6 +120,12 @@ export const API_ENDPOINTS = {
         BY_ID: (id) => `/v1/books/${id}`,
         UPDATE: (id) => `/v1/books/${id}`,
         FILTER: '/v1/books/filter',
+    },
+    SPORTS: {
+        CREATE: '/v1/sports/create-listing',
+        BY_ID: (id) => `/v1/sports/${id}`,
+        UPDATE: (id) => `/v1/sports/${id}`,
+        FILTER: '/v1/sports/filter',
     },
     FAVORITES: {
         ADD: '/favorites',

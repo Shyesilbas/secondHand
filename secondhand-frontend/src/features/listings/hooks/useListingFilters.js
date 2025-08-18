@@ -6,6 +6,7 @@ import {
   RealEstateListingFilterDTO,
   ClothingListingFilterDTO,
   BooksListingFilterDTO,
+  SportsListingFilterDTO
 } from '../../../types/listings';
 
 export const useListingFilters = (initialFilters = {}, listingType = null) => {
@@ -27,6 +28,8 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
         return { ...ClothingListingFilterDTO, ...initialFilters };
       } else if (listingType === 'BOOKS') {
         return { ...BooksListingFilterDTO, ...initialFilters };
+      } else if (listingType === 'SPORTS') {
+        return { ...SportsListingFilterDTO, ...initialFilters };
       }
       else {
         // For other categories, return empty result

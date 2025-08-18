@@ -10,6 +10,9 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
+import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
+import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -339,6 +342,48 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(conditions);
+    }
+
+    @GetMapping("/sport-disciplines")
+    @Operation(summary = "Get all sport disciplines")
+    public ResponseEntity<List<Map<String, Object>>> getSportDisciplines() {
+        List<Map<String, Object>> list = Arrays.stream(SportDiscipline.values())
+                .map(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", v.name());
+                    map.put("label", v.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/sport-equipment-types")
+    @Operation(summary = "Get all sport equipment types")
+    public ResponseEntity<List<Map<String, Object>>> getSportEquipmentTypes() {
+        List<Map<String, Object>> list = Arrays.stream(SportEquipmentType.values())
+                .map(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", v.name());
+                    map.put("label", v.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/sport-conditions")
+    @Operation(summary = "Get all sport conditions")
+    public ResponseEntity<List<Map<String, Object>>> getSportConditions() {
+        List<Map<String, Object>> list = Arrays.stream(SportCondition.values())
+                .map(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", v.name());
+                    map.put("label", v.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
     }
 
     // Label helper methods

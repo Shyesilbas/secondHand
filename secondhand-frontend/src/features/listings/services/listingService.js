@@ -7,6 +7,7 @@ import {
 } from '../../../types/listings';
 import { createClothingFilterRequest } from '../../../types/clothing';
 import { createBooksFilterRequest } from '../../../types/books';
+import { createSportsFilterRequest } from '../../../types/sports';
 import {createRealEstateCreateRequest} from "../../../types/realEstates.js";
 
 export const listingService = {
@@ -69,6 +70,12 @@ export const listingService = {
     return post(API_ENDPOINTS.BOOKS.FILTER, filterData);
   },
 
+  // Sports-specific filtering
+  filterSports: async (filters) => {
+    const filterData = createSportsFilterRequest(filters);
+    return post(API_ENDPOINTS.SPORTS.FILTER, filterData);
+  },
+
   // Smart filtering - automatically chooses the right endpoint based on listing type
   filterListings: async (filters) => {
     const listingType = filters.listingType?.toUpperCase();
@@ -84,6 +91,8 @@ export const listingService = {
         return listingService.filterClothing(filters);
       case 'BOOKS':
         return listingService.filterBooks(filters);
+      case 'SPORTS':
+        return listingService.filterSports(filters);
       default:
         return {
           content: [],
