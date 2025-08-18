@@ -11,7 +11,6 @@ import { createSportsFilterRequest } from '../../../types/sports';
 import {createRealEstateCreateRequest} from "../../../types/realEstates.js";
 
 export const listingService = {
-  // Basic listing operations
   getAllListings: async () => get(API_ENDPOINTS.LISTINGS.ALL),
 
   getMyListingsByStatus: async (status) => get(API_ENDPOINTS.LISTINGS.BY_STATUS(status)),
