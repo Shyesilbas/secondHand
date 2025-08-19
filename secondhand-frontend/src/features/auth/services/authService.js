@@ -34,9 +34,13 @@ export const authService = {
         return post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, forgotPasswordData);
     },
 
-    resetPassword: async (token, newPassword) => {
-        const resetPasswordData = createResetPasswordRequest({ token, newPassword });
-        return post(API_ENDPOINTS.AUTH.RESET_PASSWORD, resetPasswordData);
+    resetPassword: async ({ email, verificationCode, newPassword, confirmPassword }) => {
+        return post(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
+            email,
+            verificationCode,
+            newPassword,
+            confirmPassword,
+        });
     },
 
     validateToken: async () => get(API_ENDPOINTS.AUTH.VALIDATE),

@@ -5,6 +5,7 @@ import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import com.serhat.secondhand.auth.domain.dto.response.ForgotPasswordResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -40,15 +41,16 @@ public class PasswordController {
     )
     @ApiResponse(responseCode = "200", description = "Password reset instructions sent (if email exists)")
     @ApiResponse(responseCode = "400", description = "Invalid email format")
-    public ResponseEntity<Map<String, String>> forgotPassword(
+    public ResponseEntity<ForgotPasswordResponse> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
         
-        String message = passwordService.forgotPassword(request);
-        
-        return ResponseEntity.ok(Map.of(
-            "message", message,
-            "status", "success"
-        ));
+        String code = passwordService.forgotPasswordWithCode(request);
+
+        return ResponseEntity.ok(ForgotPasswordResponse.builder()
+                .message("Check your email account for password reset verification code.")
+                .status("success")
+                .verificationCode(code)
+                .build());
     }
 
     @PostMapping("/reset")

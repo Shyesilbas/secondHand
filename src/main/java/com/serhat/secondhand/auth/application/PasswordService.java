@@ -74,6 +74,24 @@ public class PasswordService {
 
         return "Check your email account for password reset verification code.";
     }
+
+    // Returns only the code (for dev display)
+    public String forgotPasswordWithCode(ForgotPasswordRequest request) {
+        log.info("Password reset requested (with code response) for email: {}", request.getEmail());
+
+        final String[] codeHolder = { null };
+
+        userService.findOptionalByEmail(request.getEmail())
+                .filter(user -> user.getAccountStatus().equals(AccountStatus.ACTIVE))
+                .ifPresent(user -> {
+                    String verificationCode = verificationService.generateCode();
+                    verificationService.generateVerification(user, verificationCode, CodeType.PASSWORD_RESET);
+                    codeHolder[0] = verificationCode;
+                    log.info("Password reset code: {}", verificationCode);
+                });
+
+        return codeHolder[0];
+    }
     
     public String resetPassword(ResetPasswordRequest request) {
         log.info("Password reset attempt with verification code for email: {}", request.getEmail());

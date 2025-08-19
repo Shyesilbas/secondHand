@@ -29,6 +29,10 @@ public class VerificationService implements IVerificationService {
 
     @Override
     public Verification generateVerification(User user, String code ,CodeType codeType) {
+        // Invalidate any previous active verifications for this user and code type
+        verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user, codeType, LocalDateTime.now())
+                .forEach(v -> { v.setCodeExpiresAt(LocalDateTime.now()); v.setVerified(true); });
+        
         Verification verification = new Verification();
         verification.setUser(user);
         verification.setCode(code);
@@ -43,7 +47,7 @@ public class VerificationService implements IVerificationService {
     
     @Override
     public Optional<Verification> findLatestActiveVerification(User user, CodeType codeType) {
-        return verificationRepository.findLatestActiveVerificationByUserAndCodeType(user, codeType, LocalDateTime.now());
+        return verificationRepository.findTopByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfterOrderByCreatedAtDesc(user, codeType, LocalDateTime.now());
     }
     
     @Override
