@@ -36,6 +36,8 @@ import CreateClothingPage from '../pages/clothing/CreateClothingPage';
 import ClothingEditPage from '../pages/clothing/ClothingEditPage';
 import ClothingDetailPage from '../pages/clothing/ClothingDetailPage';
 import SportsEditPage from '../pages/sports/SportsEditPage';
+import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
+import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -63,6 +65,22 @@ const AppRoutes = () => {
                     element={
                         <PublicRoute>
                             <LoginPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_CALLBACK}
+                    element={
+                        <PublicRoute>
+                            <OAuthCallbackPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_ERROR}
+                    element={
+                        <PublicRoute>
+                            <OAuthErrorPage />
                         </PublicRoute>
                     }
                 />

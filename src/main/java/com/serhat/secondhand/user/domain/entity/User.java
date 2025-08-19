@@ -10,6 +10,7 @@ import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import com.serhat.secondhand.user.domain.entity.enums.Provider;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +41,9 @@ public class User implements UserDetails {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
     @Column(name = "surname", nullable = false)
     private String surname;

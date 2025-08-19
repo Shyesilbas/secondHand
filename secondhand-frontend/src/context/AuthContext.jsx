@@ -71,6 +71,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const loginWithTokens = async (accessToken, refreshToken) => {
+        // Store tokens first
+        setTokens(accessToken, refreshToken);
+
+        try {
+            const userProfile = await authService.getCurrentUser();
+            const userData = {
+                ...UserDTO,
+                id: userProfile.id,
+                email: userProfile.email,
+                name: userProfile.name,
+                surname: userProfile.surname,
+                phoneNumber: userProfile.phoneNumber,
+                gender: userProfile.gender,
+                birthdate: userProfile.birthdate,
+                accountStatus: userProfile.accountStatus,
+                accountVerified: userProfile.accountVerified,
+                accountCreationDate: userProfile.accountCreationDate
+            };
+            setUser(userData);
+            setUserState(userData);
+            setIsAuthenticated(true);
+        } catch (error) {
+            console.error('Failed to fetch user profile after OAuth login:', error);
+            // Minimal auth state so the app can proceed; user can refresh profile later
+            setIsAuthenticated(true);
+        }
+    };
+
     const logout = async () => {
         try {
             await authService.logout();
@@ -94,6 +123,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         isLoading,
         login,
+        loginWithTokens,
         logout,
         updateUser,
     };

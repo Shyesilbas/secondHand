@@ -39,6 +39,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             "/api-docs",
             "/v3/api-docs",
             "/swagger-resources",
+            "/api/auth/oauth2/**",
+            "/login/oauth2/code/**",
+            "/oauth2/**",
             "/webjars"
     );
 

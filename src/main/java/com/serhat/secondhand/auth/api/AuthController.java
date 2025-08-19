@@ -42,6 +42,11 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/oauth2/google")
+    public String redirectToGoogle() {
+        return "redirect:/oauth2/authorization/google";
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(
             Authentication authentication,
