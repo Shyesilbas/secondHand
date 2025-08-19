@@ -38,6 +38,7 @@ import ClothingDetailPage from '../pages/clothing/ClothingDetailPage';
 import SportsEditPage from '../pages/sports/SportsEditPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
+import OAuthCompletePage from '../pages/auth/OAuthCompletePage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -81,6 +82,14 @@ const AppRoutes = () => {
                     element={
                         <PublicRoute>
                             <OAuthErrorPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_COMPLETE}
+                    element={
+                        <PublicRoute>
+                            <OAuthCompletePage />
                         </PublicRoute>
                     }
                 />

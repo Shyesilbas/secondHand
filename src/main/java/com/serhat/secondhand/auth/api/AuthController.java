@@ -3,6 +3,7 @@ package com.serhat.secondhand.auth.api;
 import com.serhat.secondhand.auth.application.AuthService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
+import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +15,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,8 +46,10 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/google")
-    public String redirectToGoogle() {
-        return "redirect:/oauth2/authorization/google";
+    public ResponseEntity<Void> redirectToGoogle() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/oauth2/authorization/google"))
+                .build();
     }
 
     @PostMapping("/logout")
@@ -70,6 +75,13 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> validateToken(Authentication authentication) {
         log.debug("Token validation for user: {}", authentication.getName());
         Map<String, Object> response = authService.validateToken(authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/oauth2/complete")
+    public ResponseEntity<LoginResponse> completeOAuth(@Valid @RequestBody OAuthCompleteRequest request) {
+        log.info("Completing OAuth registration for email: {}", request.getEmail());
+        LoginResponse response = authService.completeOAuthRegistration(request);
         return ResponseEntity.ok(response);
     }
 }

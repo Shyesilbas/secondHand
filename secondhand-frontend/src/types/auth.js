@@ -26,6 +26,7 @@ export const RegisterRequestDTO = {
   password: '',
   phone: '',
   gender: '',
+  birthdate: '',
   userType: 'CUSTOMER',
 };
 
@@ -88,8 +89,9 @@ export const createRegisterRequest = (data) => {
     surname: data.surname?.trim() || '',
     email: data.email?.trim().toLowerCase() || '',
     password: data.password || '',
-    phone: data.phone?.trim() || '',
+    phoneNumber: data.phone?.trim() || '',
     gender: data.gender || '',
+    birthdate: data.birthdate || '',
     userType: data.userType || 'CUSTOMER',
   };
 };

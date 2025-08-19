@@ -2,6 +2,7 @@ package com.serhat.secondhand.auth.application;
 
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
+import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
@@ -183,5 +184,50 @@ public class AuthService {
             return authorizationHeader.substring(7);
         }
         return null;
+    }
+
+    public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request) {
+        // If user already exists, just log them in
+        User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
+        if (existing != null) {
+            existing.setLastLoginDate(LocalDateTime.now());
+            userService.update(existing);
+
+            String accessToken = jwtUtils.generateAccessToken(existing);
+            String refreshToken = jwtUtils.generateRefreshToken(existing);
+
+            tokenService.revokeAllUserTokens(existing);
+            tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, existing, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
+            tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, existing, LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+
+            return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
+        }
+
+        // Create user without password (social login) and with provided fields
+        User user = User.builder()
+                .name(request.getName())
+                .surname(request.getSurname())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .gender(request.getGender())
+                .birthdate(request.getBirthdate())
+                .provider(com.serhat.secondhand.user.domain.entity.enums.Provider.GOOGLE)
+                .accountStatus(AccountStatus.ACTIVE)
+                .accountVerified(true)
+                .accountCreationDate(java.time.LocalDate.now())
+                .lastLoginDate(LocalDateTime.now())
+                .build();
+
+        userService.save(user);
+        emailService.sendWelcomeEmail(user);
+
+        String accessToken = jwtUtils.generateAccessToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+
+        tokenService.revokeAllUserTokens(user);
+        tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
+        tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+
+        return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);
     }
 }

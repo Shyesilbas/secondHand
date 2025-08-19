@@ -21,6 +21,10 @@ export const authService = {
         return post(API_ENDPOINTS.AUTH.REGISTER, registerData);
     },
 
+    completeOAuth: async (payload) => {
+        return post(API_ENDPOINTS.AUTH.OAUTH_COMPLETE, payload);
+    },
+
     logout: async () => post(API_ENDPOINTS.AUTH.LOGOUT),
 
     refreshToken: async (refreshToken) => post(API_ENDPOINTS.AUTH.REFRESH, { refreshToken }),

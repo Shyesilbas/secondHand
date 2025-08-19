@@ -178,6 +178,16 @@ const Header = () => {
                             <>
                                 <DropdownMenu trigger={`${user?.name || 'Profile'}`}>
                                     <DropdownItem 
+                                        to={ROUTES.DASHBOARD}
+                                        icon={
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M13 5v6a2 2 0 002 2h6" />
+                                            </svg>
+                                        }
+                                    >
+                                        Dashboard
+                                    </DropdownItem>
+                                    <DropdownItem 
                                         to={ROUTES.PROFILE}
                                         icon={
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -22,7 +22,8 @@ const OAuthCallbackPage = () => {
                 }
             })();
         } else {
-            navigate(ROUTES.AUTH_ERROR + '?message=Missing tokens', { replace: true });
+            // If the backend redirected for completion, route could already be /auth/complete
+            navigate(ROUTES.AUTH_COMPLETE + window.location.search, { replace: true });
         }
     }, [params, navigate, loginWithTokens]);
 

@@ -199,7 +199,7 @@ Durum: ${payment.isSuccess ? 'Successful' : 'Unsuccessful'}
               {/* Listing ID */}
               {payment.listingId && (
                 <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="text-sm font-medium text-gray-600">Listing No:</span>
+                  <span className="text-sm font-medium text-gray-600">Listing Id:</span>
                   <span className="text-sm font-mono text-gray-900">
                     {payment.listingId}
                   </span>

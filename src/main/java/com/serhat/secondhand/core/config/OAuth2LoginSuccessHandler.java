@@ -5,6 +5,7 @@ import com.serhat.secondhand.auth.application.TokenService;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
@@ -33,7 +34,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserService userService;
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
-    private final ObjectMapper objectMapper;
+    private final EmailService emailService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -50,27 +51,41 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             log.info("OAuth2 login attempt for email: {}", email);
 
-            User user = findOrCreateUser(email, name, surname, picture);
+            Optional<User> existingUser = userService.findOptionalByEmail(email);
 
-            String accessToken = jwtUtils.generateAccessToken(user);
-            String refreshToken = jwtUtils.generateRefreshToken(user);
+            if (existingUser.isPresent()) {
+                User user = existingUser.get();
+                user.setLastLoginDate(LocalDateTime.now());
+                user.setProvider(Provider.GOOGLE);
+                userService.update(user);
 
-            tokenService.revokeAllUserTokens(user);
+                String accessToken = jwtUtils.generateAccessToken(user);
+                String refreshToken = jwtUtils.generateRefreshToken(user);
 
-            tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user,
-                    LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
-            tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
-                    LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+                tokenService.revokeAllUserTokens(user);
 
-            LoginResponse loginResponse = new LoginResponse(
-                    "OAuth2 login successful",
-                    user.getId(),
-                    user.getEmail(),
-                    accessToken,
-                    refreshToken
-            );
+                tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user,
+                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
+                tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
+                        LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
 
-            handleSuccessResponse(response, loginResponse);
+                LoginResponse loginResponse = new LoginResponse(
+                        "OAuth2 login successful",
+                        user.getId(),
+                        user.getEmail(),
+                        accessToken,
+                        refreshToken
+                );
+
+                handleSuccessResponse(response, loginResponse);
+            } else {
+                // New user: do NOT create yet. Redirect to frontend to complete required fields.
+                String redirectUrl = String.format(
+                        "http://localhost:5173/auth/complete?email=%s&name=%s&surname=%s&picture=%s",
+                        urlEncode(email), urlEncode(name), urlEncode(surname), urlEncode(picture)
+                );
+                response.sendRedirect(redirectUrl);
+            }
 
         } catch (Exception e) {
             log.error("OAuth2 authentication error", e);
@@ -78,33 +93,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
     }
 
-    private User findOrCreateUser(String email, String name, String surname, String picture) {
-        Optional<User> existingUser = userService.findOptionalByEmail(email);
-
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            user.setLastLoginDate(LocalDateTime.now());
-            user.setProvider(Provider.GOOGLE);
-             userService.update(user);
-        } else {
-            User newUser = User.builder()
-                    .email(email)
-                    .name(name)
-                    .surname(surname)
-                    .provider(Provider.GOOGLE)
-                    .accountStatus(AccountStatus.ACTIVE)
-                    .accountVerified(true)
-                    .gender(Gender.PREFER_NOT_TO_SAY)
-                    .password("")
-                    .phoneNumber("")
-                    .birthdate(LocalDate.of(1, 1, 1))
-                    .accountCreationDate(LocalDate.from(LocalDateTime.now()))
-                    .lastLoginDate(LocalDateTime.now())
-                    .build();
-
-             userService.save(newUser);
+    private String urlEncode(String value) {
+        try {
+            return value == null ? "" : java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "";
         }
-        return userService.findByEmail(email);
     }
 
     private void handleSuccessResponse(HttpServletResponse response, LoginResponse loginResponse) throws IOException {
