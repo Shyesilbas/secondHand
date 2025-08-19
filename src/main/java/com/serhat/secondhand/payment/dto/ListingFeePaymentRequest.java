@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record ListingFeePaymentRequest(
         PaymentType paymentType,
-        UUID listingId
+        UUID listingId,
+        String verificationCode
 ) {
 }

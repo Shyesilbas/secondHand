@@ -1,10 +1,11 @@
 package com.serhat.secondhand.email.domain.entity.enums;
 
 public enum EmailType {
-    VERIFICATION_CODE,     // Hesap doğrulama kodu
-    PASSWORD_RESET,        // Şifre sıfırlama
-    WELCOME,              // Hoşgeldin emaili
-    NOTIFICATION,         // Genel bildirimler
+    VERIFICATION_CODE,
+    PASSWORD_RESET,
+    WELCOME,
+    NOTIFICATION,
     PROMOTIONAL,
+    PAYMENT_VERIFICATION,
     SYSTEM
 }

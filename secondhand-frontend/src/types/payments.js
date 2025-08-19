@@ -85,5 +85,6 @@ export const createListingFeePaymentRequest = (data) => {
   return {
     paymentType: data.paymentType || '',
     listingId: data.listingId || '',
+    verificationCode: data.verificationCode || null,
   };
 };

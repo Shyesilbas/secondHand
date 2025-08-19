@@ -1,6 +1,9 @@
 package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.verification.CodeType;
+import com.serhat.secondhand.core.verification.IVerificationService;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
@@ -45,6 +48,8 @@ public class PaymentService {
     private final ListingService listingService;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
+    private final IVerificationService verificationService;
+    private final EmailService emailService;
 
     @Getter
     @Value("${app.listing.creation.fee}")
@@ -58,13 +63,30 @@ public class PaymentService {
     @Value("${app.listing.fee.tax}")
     private BigDecimal listingFeeTax;
 
-    @Transactional
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(listingFeePaymentRequest.listingId())
                 .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
+
+        // If verificationCode is not provided, generate and send, and ask client to submit code
+        if (listingFeePaymentRequest.verificationCode() == null || listingFeePaymentRequest.verificationCode().isBlank()) {
+            String code = verificationService.generateCode();
+            verificationService.generateVerification(fromUser, code, CodeType.PAYMENT_VERIFICATION);
+            emailService.sendPaymentVerificationEmail(fromUser, code);
+            
+            // Log the verification code for development purposes
+            log.info("Payment verification code generated for user {}: {}", fromUser.getEmail(), code);
+            
+            throw new BusinessException("Verification code required. Code sent via email.", HttpStatus.PRECONDITION_REQUIRED, "PAYMENT_VERIFICATION_REQUIRED");
+        }
+
+        // Validate provided verification code
+        boolean valid = verificationService.validateVerificationCode(fromUser, listingFeePaymentRequest.verificationCode(), CodeType.PAYMENT_VERIFICATION);
+        if (!valid) {
+            throw new BusinessException("Invalid or expired verification code", HttpStatus.BAD_REQUEST, "INVALID_VERIFICATION_CODE");
+        }
 
         BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
@@ -81,7 +103,11 @@ public class PaymentService {
                 PaymentDirection.OUTGOING
         );
 
-        return createPayment(fullRequest, authentication);
+        PaymentDto result = createPayment(fullRequest, authentication);
+        // Mark code as used
+        verificationService.findLatestActiveVerification(fromUser, CodeType.PAYMENT_VERIFICATION)
+                .ifPresent(verificationService::markVerificationAsUsed);
+        return result;
     }
 
     @Transactional

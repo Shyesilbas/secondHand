@@ -29,7 +29,6 @@ public class VerificationService implements IVerificationService {
 
     @Override
     public Verification generateVerification(User user, String code ,CodeType codeType) {
-        // Invalidate any previous active verifications for this user and code type
         verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user, codeType, LocalDateTime.now())
                 .forEach(v -> { v.setCodeExpiresAt(LocalDateTime.now()); v.setVerified(true); });
         

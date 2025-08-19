@@ -58,6 +58,12 @@ public class EmailService {
     @Value("${app.email.paymentSuccess.content}")
     private String paymentSuccessContentTemplate;
 
+    @Value("${app.email.paymentVerification.subject:SecondHand - Payment Verification}")
+    private String paymentVerificationSubject;
+
+    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for 10 minutes.}")
+    private String paymentVerificationContentTemplate;
+
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {
         String subject = verificationSubject;
         String content = String.format(verificationContentTemplate, user.getName(), verificationCode);
@@ -82,7 +88,19 @@ public class EmailService {
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
+    public EmailDto sendPaymentVerificationEmail(User user, String code) {
+        log.info("Sending payment verification email to user: {} with code: {}", user.getEmail(), code);
+        String subject = paymentVerificationSubject;
+        String content = String.format(paymentVerificationContentTemplate, user.getName(), code);
+        log.info("Payment verification email subject: {}", subject);
+        log.info("Payment verification email content: {}", content);
+        EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
+        log.info("Payment verification email sent successfully with ID: {}", result.id());
+        return result;
+    }
+
     private EmailDto sendAndSaveEmail(User user, String subject, String content, EmailType emailType) {
+        log.info("sendAndSaveEmail called for user: {}, emailType: {}", user.getEmail(), emailType);
         LocalDateTime now = LocalDateTime.now();
         Email email = Email.builder()
                 .user(user)
@@ -94,10 +112,15 @@ public class EmailService {
                 .createdAt(now)
                 .build();
 
+        log.info("Email entity built: recipientEmail={}, subject={}, emailType={}", email.getRecipientEmail(), email.getSubject(), email.getEmailType());
+        
         email = emailRepository.save(email);
         log.info("{} email saved with ID: {}", emailType, email.getId());
 
-        return emailMapper.toDto(email);
+        EmailDto result = emailMapper.toDto(email);
+        log.info("Email mapped to DTO: id={}, recipientEmail={}, subject={}", result.id(), result.recipientEmail(), result.subject());
+        
+        return result;
     }
 
     public List<EmailDto> getUserEmails(User user) {
