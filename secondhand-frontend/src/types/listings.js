@@ -4,7 +4,7 @@ export const ListingDTO = {
   title: '',
   description: '',
   price: 0,
-  currency: 'TRY',
+  currency: '',
   status: '',
   city: '',
   district: '',
@@ -48,7 +48,7 @@ export const SportsListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   disciplines: [],
   equipmentTypes: [],
   conditions: [],
@@ -66,7 +66,7 @@ export const ListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   
   brands: [],
   minYear: 0,
@@ -97,7 +97,7 @@ export const VehicleListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   
   // Vehicle-specific filters
   brands: [],
@@ -126,7 +126,7 @@ export const ElectronicListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   
   // Electronics-specific filters
   electronicTypes: [],
@@ -151,7 +151,7 @@ export const RealEstateListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   
   // Real Estate-specific filters
   adType: '',
@@ -185,7 +185,7 @@ export const ClothingListingFilterDTO = {
   district: '',
   minPrice: 0,
   maxPrice: 0,
-  currency: 'TRY',
+  currency: '',
   
   // Clothing-specific filters
   brands: [],
@@ -217,7 +217,7 @@ export const ListingResponseDTO = {
   title: '',
   description: '',
   price: 0,
-  currency: 'TRY',
+  currency: '',
   status: '',
   city: '',
   district: '',
@@ -235,7 +235,7 @@ export const ListingResponseDTO = {
  * @returns {Object} - Validated Vehicle Filter DTO
  */
 export const createVehicleFilterRequest = (data) => {
-  return {
+  const payload = {
     type: 'VEHICLE',
     listingType: 'VEHICLE',
     status: data.status || 'ACTIVE',
@@ -243,8 +243,6 @@ export const createVehicleFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    currency: data.currency || 'TRY',
-    
     // Vehicle specific filters
     brands: Array.isArray(data.brands) ? data.brands : [],
     minYear: parseInt(data.minYear) || null,
@@ -255,15 +253,15 @@ export const createVehicleFilterRequest = (data) => {
     doors: data.doors || null,
     gearTypes: Array.isArray(data.gearTypes) ? data.gearTypes : [],
     seatCounts: Array.isArray(data.seatCounts) ? data.seatCounts : [],
-    
     // Sorting
     sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    
     // Pagination
     page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
+  if (data.currency) payload.currency = data.currency;
+  return payload;
 };
 
 /**
@@ -272,7 +270,7 @@ export const createVehicleFilterRequest = (data) => {
  * @returns {Object} - Validated Electronics Filter DTO
  */
 export const createElectronicsFilterRequest = (data) => {
-  return {
+  const payload = {
     type: 'ELECTRONICS',
     listingType: 'ELECTRONICS',
     status: data.status || 'ACTIVE',
@@ -280,23 +278,21 @@ export const createElectronicsFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    currency: data.currency || 'TRY',
-    
     // Electronics specific filters
     electronicTypes: Array.isArray(data.electronicTypes) ? data.electronicTypes : [],
     electronicBrands: Array.isArray(data.electronicBrands) ? data.electronicBrands : [],
     minYear: parseInt(data.minYear) || null,
     maxYear: parseInt(data.maxYear) || null,
     colors: Array.isArray(data.colors) ? data.colors : [],
-    
     // Sorting
     sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    
     // Pagination
     page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
+  if (data.currency) payload.currency = data.currency;
+  return payload;
 };
 
 /**
@@ -305,7 +301,7 @@ export const createElectronicsFilterRequest = (data) => {
  * @returns {Object} - Validated Real Estate Filter DTO
  */
 export const createRealEstateFilterRequest = (data) => {
-  return {
+  const payload = {
     type: 'REAL_ESTATE',
     listingType: 'REAL_ESTATE',
     status: data.status || 'ACTIVE',
@@ -313,8 +309,6 @@ export const createRealEstateFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    currency: data.currency || 'TRY',
-    
     // Real Estate specific filters
     adType: data.adType || null,
     realEstateTypes: Array.isArray(data.realEstateTypes) ? data.realEstateTypes : [],
@@ -330,13 +324,13 @@ export const createRealEstateFilterRequest = (data) => {
     minBuildingAge: parseInt(data.minBuildingAge) || null,
     maxBuildingAge: parseInt(data.maxBuildingAge) || null,
     furnished: Boolean(data.furnished),
-    
     // Sorting
     sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    
     // Pagination
     page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
+  if (data.currency) payload.currency = data.currency;
+  return payload;
 };

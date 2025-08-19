@@ -31,7 +31,7 @@ const PriceLocationFields = ({ filters, onPriceChange, onInputChange }) => (
         <EnumDropdown 
           label="" 
           enumKey="currencies" 
-          value={filters.currency || 'TRY'} 
+          value={filters.currency || ''} 
           onChange={(value) => onInputChange('currency', value)} 
           multiple={false} 
         />
