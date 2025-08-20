@@ -61,7 +61,7 @@ public class EmailService {
     @Value("${app.email.paymentVerification.subject:SecondHand - Payment Verification}")
     private String paymentVerificationSubject;
 
-    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for 10 minutes.}")
+    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for 15 minutes.}")
     private String paymentVerificationContentTemplate;
 
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {

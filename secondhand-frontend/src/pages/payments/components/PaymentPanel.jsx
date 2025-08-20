@@ -7,16 +7,8 @@ const PaymentPanel = ({
     paymentType,
     onPaymentTypeChange,
     isProcessingPayment,
-    showVerify,
-    verificationCode,
-    onVerificationCodeChange,
-    codeExpiryTime,
-    isResendingCode,
     onPayment,
-    onConfirmPayment,
-    onResendCode,
-    onShowEmails,
-    isLoadingEmails
+    
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -127,53 +119,6 @@ const PaymentPanel = ({
                                 feeConfig ? `Pay ${formatPrice(feeConfig.totalCreationFee)}` : 'Pay Listing Fee'
                             )}
                         </button>
-
-                        {showVerify && (
-                            <div className="mt-4 p-4 border rounded bg-gray-50">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Doğrulama Kodu</label>
-                                <input
-                                    type="text"
-                                    value={verificationCode}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                                        onVerificationCodeChange(value);
-                                    }}
-                                    className="w-full px-3 py-2 border rounded"
-                                    placeholder="E-postanıza gönderilen kod"
-                                    maxLength={6}
-                                />
-                                
-                                {codeExpiryTime && (
-                                    <div className="mt-2 text-sm text-gray-600">
-                                        Kod süresi: {Math.max(0, Math.floor((new Date(codeExpiryTime).getTime() - new Date().getTime()) / 1000 / 60))} dakika
-                                    </div>
-                                )}
-                                
-                                <button
-                                    onClick={onConfirmPayment}
-                                    className="mt-3 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-                                >
-                                    Kodu Doğrula ve Öde
-                                </button>
-                                
-                                <div className="mt-4 pt-4 border-t space-y-2">
-                                    <button
-                                        onClick={onShowEmails}
-                                        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-                                    >
-                                        {isLoadingEmails ? 'Yükleniyor...' : 'Email\'leri Göster'}
-                                    </button>
-                                    
-                                    <button
-                                        onClick={onResendCode}
-                                        disabled={isResendingCode}
-                                        className="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700 disabled:opacity-50"
-                                    >
-                                        {isResendingCode ? 'Gönderiliyor...' : 'Yeni Kod Gönder'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
                         <p className="text-xs text-gray-500 mt-3 text-center">
                            After successful payment, your listing will be published.

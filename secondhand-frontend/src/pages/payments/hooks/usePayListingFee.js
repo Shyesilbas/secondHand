@@ -7,7 +7,8 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
     const [paymentType, setPaymentType] = useState('CREDIT_CARD');
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-    const [showVerify, setShowVerify] = useState(false);
+    // Modal step: REVIEW -> VERIFY
+    const [modalStep, setModalStep] = useState('REVIEW');
     const [verificationCode, setVerificationCode] = useState('');
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [codeExpiryTime, setCodeExpiryTime] = useState(null);
@@ -42,12 +43,11 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
             notification.showError('Hata', 'Ücret yapılandırması yüklenmedi. Lütfen sayfayı yenileyin.');
             return;
         }
-
+        setModalStep('REVIEW');
         setShowConfirmModal(true);
     };
 
     const confirmPayment = async () => {
-        setShowConfirmModal(false);
         setIsProcessingPayment(true);
         
         try {
@@ -65,8 +65,9 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
             // Reset state
             setSelectedListing(null);
             setVerificationCode('');
-            setShowVerify(false);
             setCodeExpiryTime(null);
+            setModalStep('REVIEW');
+            setShowConfirmModal(false);
             
             // Call success callback
             if (onSuccess) {
@@ -76,30 +77,12 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         } catch (err) {
             console.log('Payment error:', err.response?.data);
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                notification.showInfo('Doğrulama Gerekli', 'E-postanıza gönderilen kodu giriniz. Email\'leri görüntülemek için "Email\'leri Göster" butonuna tıklayın.');
-                setShowVerify(true);
-                
-                // Call verification required callback
-                if (onVerificationRequired) {
-                    const emailData = await onVerificationRequired();
-                    
-                    // Auto-extract code from latest email
-                    if (emailData && emailData.length > 0) {
-                        const latestEmail = emailData[0];
-                        if (latestEmail.emailType === 'PAYMENT_VERIFICATION') {
-                            const codeMatch = latestEmail.content.match(/(\d{6})/);
-                            if (codeMatch) {
-                                const extractedCode = codeMatch[1];
-                                setVerificationCode(extractedCode);
-                                notification.showSuccess('Doğrulama Kodu', `Kod otomatik olarak girildi: ${extractedCode}`);
-                            }
-                            // Set code expiry time (15 minutes)
-                            const expiryTime = new Date();
-                            expiryTime.setMinutes(expiryTime.getMinutes() + 15);
-                            setCodeExpiryTime(expiryTime);
-                        }
-                    }
-                }
+                notification.showInfo('Doğrulama Gerekli', 'E-postanıza gönderilen doğrulama kodunu giriniz.');
+                setModalStep('VERIFY');
+                // Set code expiry time (15 minutes) without auto-fetching emails
+                const expiryTime = new Date();
+                expiryTime.setMinutes(expiryTime.getMinutes() + 15);
+                setCodeExpiryTime(expiryTime);
             } else {
                 notification.showError('Hata', err.response?.data?.message || 'İlan ücreti ödemesi başarısız. Lütfen daha sonra tekrar deneyin.');
             }
@@ -127,9 +110,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
                 notification.showSuccess('Yeni Kod Gönderildi', 'Yeni doğrulama kodu e-postanıza gönderildi.');
                 setVerificationCode('');
-                if (onVerificationRequired) {
-                    await onVerificationRequired();
-                }
+                // Do not auto-fetch emails; user can open via modal action
             } else {
                 notification.showError('Hata', err.response?.data?.message || 'Yeni kod gönderilemedi.');
             }
@@ -144,7 +125,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         paymentType,
         setPaymentType,
         isProcessingPayment,
-        showVerify,
+        modalStep,
         verificationCode,
         setVerificationCode,
         codeExpiryTime,

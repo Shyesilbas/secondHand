@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePayListingFee } from './hooks/usePayListingFee';
 import { useDraftListings } from './hooks/useDraftListings';
@@ -28,7 +28,7 @@ const PayListingFeePage = () => {
         paymentType, 
         setPaymentType,
         isProcessingPayment,
-        showVerify,
+        modalStep,
         verificationCode,
         setVerificationCode,
         codeExpiryTime,
@@ -47,6 +47,12 @@ const PayListingFeePage = () => {
 
     const isLoading = isListingsLoading || isConfigLoading;
     const error = listingsError || configError;
+
+    useEffect(() => {
+        if (showConfirmModal) {
+            refetchPaymentMethods();
+        }
+    }, [showConfirmModal]);
 
     if (isLoading) {
         return <LoadingSpinner />;
@@ -89,16 +95,10 @@ const PayListingFeePage = () => {
                         paymentType={paymentType}
                         onPaymentTypeChange={setPaymentType}
                         isProcessingPayment={isProcessingPayment}
-                        showVerify={showVerify}
-                        verificationCode={verificationCode}
-                        onVerificationCodeChange={setVerificationCode}
-                        codeExpiryTime={codeExpiryTime}
-                        isResendingCode={isResendingCode}
-                        onPayment={handlePayment}
-                        onConfirmPayment={confirmPayment}
-                        onResendCode={resendVerificationCode}
-                        onShowEmails={fetchEmails}
-                        isLoadingEmails={isEmailsLoading}
+                        onPayment={async () => {
+                            await refetchPaymentMethods();
+                            handlePayment();
+                        }}
                     />
                 </div>
             )}
@@ -116,6 +116,14 @@ const PayListingFeePage = () => {
                         setShowConfirmModal(false);
                         navigate(`/payments/${type === 'CREDIT_CARD' ? 'credit-cards' : 'bank-accounts'}`);
                     }}
+                    step={modalStep}
+                    isProcessing={isProcessingPayment}
+                    verificationCode={verificationCode}
+                    onChangeVerificationCode={setVerificationCode}
+                    codeExpiryTime={codeExpiryTime}
+                    onShowEmails={fetchEmails}
+                    onResendCode={resendVerificationCode}
+                    isResendingCode={isResendingCode}
                 />
             )}
 
