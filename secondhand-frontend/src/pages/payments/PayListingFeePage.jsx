@@ -16,16 +16,15 @@ import EmailDisplayModal from './components/EmailDisplayModal';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
-    
-    // Custom hooks for different concerns
+
     const { draftListings, isLoading: isListingsLoading, error: listingsError, refetch: refetchListings } = useDraftListings();
     const { feeConfig, isLoading: isConfigLoading, error: configError } = useFeeConfig();
     const { paymentMethods, isLoading: isPaymentMethodsLoading, refetch: refetchPaymentMethods } = usePaymentMethods();
     const { emails, isLoading: isEmailsLoading, fetchEmails, clearEmails } = useEmails();
-    const { 
-        selectedListing, 
-        setSelectedListing, 
-        paymentType, 
+    const {
+        selectedListing,
+        setSelectedListing,
+        paymentType,
         setPaymentType,
         isProcessingPayment,
         modalStep,
