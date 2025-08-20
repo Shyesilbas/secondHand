@@ -24,10 +24,10 @@ export const RegisterRequestDTO = {
   surname: '',
   email: '',
   password: '',
-  phone: '',
+  phoneNumber: '',
   gender: '',
   birthdate: '',
-  userType: 'CUSTOMER',
+  agreementsAccepted: false,
 };
 
 // Register Response DTO
@@ -89,10 +89,10 @@ export const createRegisterRequest = (data) => {
     surname: data.surname?.trim() || '',
     email: data.email?.trim().toLowerCase() || '',
     password: data.password || '',
-    phoneNumber: data.phone?.trim() || '',
+    phoneNumber: data.phoneNumber?.trim() || '',
     gender: data.gender || '',
     birthdate: data.birthdate || '',
-    userType: data.userType || 'CUSTOMER',
+    agreementsAccepted: data.agreementsAccepted || false,
   };
 };
 

@@ -34,6 +34,20 @@ export const formatDateTime = (dateString) => {
   });
 };
 
+export const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
+  // Handle dd/MM/yyyy format from backend
+  if (typeof dateString === 'string' && dateString.includes('/')) {
+    const [day, month, year] = dateString.split('/');
+    const date = new Date(year, month - 1, day); // month is 0-indexed
+    return date.toLocaleDateString('tr-TR');
+  }
+  
+  const date = new Date(dateString);
+  return date.toLocaleDateString('tr-TR');
+};
+
 // Remove empty or nullish fields from an object. Useful before sending filters/requests
 export const cleanObject = (obj) => {
   return Object.entries(obj || {}).reduce((acc, [key, value]) => {

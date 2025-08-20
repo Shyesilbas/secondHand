@@ -84,10 +84,7 @@ export const getCachedEnums = () => {
     }
 };
 
-/**
- * Cache enums to localStorage
- * @param {Object} enums - Enum data to cache
- */
+
 export const setCachedEnums = (enums) => {
     try {
         const cacheData = {
@@ -100,46 +97,14 @@ export const setCachedEnums = (enums) => {
         console.log('Enums cached to localStorage');
     } catch (error) {
         console.error('Error caching enums:', error);
-        // If localStorage is full or unavailable, continue without caching
     }
 };
 
-/**
- * Clear enum cache from localStorage
- */
 export const clearEnumCache = () => {
     try {
         localStorage.removeItem(ENUM_CACHE_KEY);
         console.log('Enum cache cleared');
     } catch (error) {
         console.error('Error clearing enum cache:', error);
-    }
-};
-
-/**
- * Get cache info for debugging
- * @returns {Object} Cache metadata
- */
-export const getEnumCacheInfo = () => {
-    try {
-        const cached = localStorage.getItem(ENUM_CACHE_KEY);
-        if (!cached) return { exists: false };
-
-        const { timestamp, version } = JSON.parse(cached);
-        const now = Date.now();
-        const age = now - timestamp;
-        const expiryTime = timestamp + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
-        const isExpired = now > expiryTime;
-
-        return {
-            exists: true,
-            version,
-            timestamp: new Date(timestamp).toISOString(),
-            age: Math.floor(age / 1000 / 60), // age in minutes
-            isExpired,
-            expiresAt: new Date(expiryTime).toISOString()
-        };
-    } catch (error) {
-        return { exists: false, error: error.message };
     }
 };

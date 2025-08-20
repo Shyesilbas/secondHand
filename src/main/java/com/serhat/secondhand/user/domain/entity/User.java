@@ -1,6 +1,7 @@
 package com.serhat.secondhand.user.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.core.verification.Verification;
 import com.serhat.secondhand.email.domain.entity.Email;
@@ -85,6 +86,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Listing> listings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserAgreement> userAgreements = new ArrayList<>();
 
     @OneToOne(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
     private Bank bank;

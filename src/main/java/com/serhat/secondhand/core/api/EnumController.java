@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.api;
 
+import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
@@ -103,6 +104,20 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(colors);
+    }
+
+    @GetMapping("/genders")
+    @Operation(summary = "Get all genders")
+    public ResponseEntity<List<Map<String, Object>>> getGenders() {
+        List<Map<String, Object>> genders = Arrays.stream(Gender.values())
+                .map(gender -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", gender.name());
+                    map.put("label", getGenderLabel(gender));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(genders);
     }
 
     @GetMapping("/doors")
@@ -681,6 +696,14 @@ public class EnumController {
             case FAIR -> "Fair";
             case WORN -> "Worn";
             case DAMAGED -> "Damaged";
+        };
+    }
+
+    private String getGenderLabel(Gender gender) {
+        return switch (gender) {
+            case MALE -> "Male";
+            case FEMALE -> "Female";
+            case PREFER_NOT_TO_SAY -> "Prefer not to say";
         };
     }
 }

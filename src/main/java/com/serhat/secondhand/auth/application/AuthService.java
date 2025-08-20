@@ -1,5 +1,6 @@
 package com.serhat.secondhand.auth.application;
 
+import com.serhat.secondhand.agreements.service.AgreementService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
@@ -17,6 +18,9 @@ import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
+import com.serhat.secondhand.agreements.service.UserAgreementService;
+import com.serhat.secondhand.agreements.entity.enums.AgreementType;
+import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,13 +49,24 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserAgreementService userAgreementService;
+    private final AgreementService agreementService;
 
     public RegisterResponse register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
 
+
+
         userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
+
+        if (!request.getAgreementsAccepted()) {
+            throw new IllegalArgumentException("All required agreements must be accepted for registration");
+        }
+
         User user = userMapper.toEntity(request, passwordEncoder);
         userService.save(user);
+
+        acceptRequiredAgreements(user);
 
         log.info("User registered successfully: {}", user.getEmail());
 
@@ -65,6 +80,28 @@ public class AuthService {
                 user.getEmail(),
                 user.getName(),
                 user.getSurname());
+    }
+
+    private void acceptRequiredAgreements(User user) {
+        log.info("Accepting required agreements for user: {}", user.getEmail());
+        
+        for (AgreementType agreementType : AgreementType.getRequiredForRegistration()) {
+            try {
+                var agreement = agreementService.getAgreementByType(agreementType);
+                
+                AcceptAgreementRequest acceptRequest = AcceptAgreementRequest.builder()
+                        .agreementId(agreement.getAgreementId())
+                        .isAcceptedTheLastVersion(true)
+                        .build();
+                
+                userAgreementService.acceptAgreement(user, acceptRequest);
+                log.info("Accepted agreement {} for user {}", agreementType, user.getEmail());
+                
+            } catch (Exception e) {
+                log.error("Failed to accept agreement {} for user {}: {}", agreementType, user.getEmail(), e.getMessage());
+                throw new RuntimeException("Failed to accept required agreements during registration", e);
+            }
+        }
     }
 
     public LoginResponse login(LoginRequest request) {

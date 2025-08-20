@@ -39,6 +39,9 @@ import SportsEditPage from '../pages/sports/SportsEditPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
 import OAuthCompletePage from '../pages/auth/OAuthCompletePage.jsx';
+import PendingAgreementsPage from '../pages/agreements/PendingAgreementsPage';
+import AcceptedAgreementsPage from '../pages/agreements/AcceptedAgreementsPage';
+import AllAgreementsPage from '../pages/agreements/AllAgreementsPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -159,6 +162,9 @@ const AppRoutes = () => {
                   <Route path={ROUTES.CREATE_CLOTHING} element={<CreateClothingPage />} />
                   <Route path={ROUTES.CLOTHING_EDIT} element={<ClothingEditPage />} />
                   <Route path={ROUTES.SPORTS_EDIT} element={<SportsEditPage />} />
+                  <Route path={ROUTES.AGREEMENTS_PENDING} element={<PendingAgreementsPage />} />
+                  <Route path={ROUTES.AGREEMENTS_ACCEPTED} element={<AcceptedAgreementsPage />} />
+                  <Route path={ROUTES.AGREEMENTS_ALL} element={<AllAgreementsPage />} />
             </Route>
 
             {/* Fallback */}

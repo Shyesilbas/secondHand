@@ -84,6 +84,7 @@ export const API_ENDPOINTS = {
         BOOK_LANGUAGES: '/v1/enums/book-languages',
         BOOK_FORMATS: '/v1/enums/book-formats',
         BOOK_CONDITIONS: '/v1/enums/book-conditions',
+        GENDERS: '/v1/enums/genders',
         SPORT_DISCIPLINES: '/v1/enums/sport-disciplines',
         SPORT_EQUIPMENT_TYPES: '/v1/enums/sport-equipment-types',
         SPORT_CONDITIONS: '/v1/enums/sport-conditions',
@@ -139,5 +140,21 @@ export const API_ENDPOINTS = {
         COUNT: (listingId) => `/favorites/count/${listingId}`,
         IDS: '/favorites/ids',
         TOP: '/favorites/top',
+    },
+    AGREEMENTS: {
+        // Base: API_BASE_URL already includes /api
+        INITIALIZE: '/agreements/initialize',
+        ALL: '/agreements',
+        REQUIRED: '/agreements/required',
+        BY_TYPE: (agreementType) => `/agreements/${agreementType}`,
+        CREATE: '/agreements',
+        UPDATE_BY_ID: (agreementId) => `/agreements/${agreementId}`,
+        UPDATE_BY_TYPE: (agreementType) => `/agreements/type/${agreementType}`,
+        ACCEPT: '/agreements/accept',
+        USER_AGREEMENTS: '/agreements/user/agreements',
+        USER_STATUS_ALL: '/agreements/user/status',
+        USER_STATUS_BY_TYPE: (agreementType) => `/agreements/user/status/${agreementType}`,
+        ADMIN_ACCEPT_ALL: '/agreements/admin/accept-all-users',
+        // ADMIN_ACCEPT_USER is currently disabled in backend controller
     },
 };

@@ -51,6 +51,6 @@ public class RegisterRequest {
     @Past(message = "Birth date must be in the past")
     private LocalDate birthdate;
 
-    @NotNull(message = "User type is required")
-    private UserType userType;
+    @NotNull(message = "Agreement acceptance is required")
+    private Boolean agreementsAccepted;
 } 
