@@ -8,10 +8,9 @@ import EnumDropdown from '../../../components/ui/EnumDropdown';
 import LocationFields from '../../../components/forms/LocationFields';
 import { ElectronicCreateRequestDTO } from '../../../types/index.js';
 import { useElectronic } from '../hooks/useElectronic';
-import { electronicFormSteps } from '../config/electronicFormSteps';
 import ListingWizard from '../../listings/components/ListingWizard';
-import {validateElectronicStep2, validateElectronicStep3, validateElectronicAll } from '../../../utils/validators/electronicValidators';
-import {validateBasicListingStep1} from "../../../utils/validators/commonListingValidators.js";
+import electronicValidators from '../../../utils/validators/electronicValidators.js';
+import { createFormConfig } from '../../../forms/config/formConfigs.js';
 
 const ElectronicCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -27,6 +26,9 @@ const ElectronicCreateForm = ({ onBack }) => {
     year: '',
   });
 
+  const formConfig = useMemo(() => createFormConfig('electronics'), []);
+  const { steps } = formConfig;
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -36,25 +38,15 @@ const ElectronicCreateForm = ({ onBack }) => {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const validate = () => {
-    const allErrors = validateElectronicAll(formData);
-    setErrors(allErrors);
-    return Object.keys(allErrors).length === 0;
+  const handleDropdownChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
-
-  const validateStep = (step) => {
-    let stepErrors = {};
-    if (step === 1) stepErrors = validateBasicListingStep1(formData);
-    if (step === 2) stepErrors = validateElectronicStep2(formData);
-    if (step === 3) stepErrors = validateElectronicStep3(formData);
-    setErrors(stepErrors);
-    return Object.keys(stepErrors).length === 0;
-  };
-
-  const steps = useMemo(() => electronicFormSteps, []);
 
   const nextStep = () => {
-    if (validateStep(currentStep)) setCurrentStep((s) => Math.min(s + 1, steps.length));
+    if (electronicValidators.validateStep(currentStep, formData, setErrors)) {
+      setCurrentStep((s) => Math.min(s + 1, steps.length));
+    }
   };
 
   const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 1));
@@ -62,10 +54,10 @@ const ElectronicCreateForm = ({ onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentStep < steps.length) {
-      if (validateStep(currentStep)) setCurrentStep((s) => Math.min(s + 1, steps.length));
+      nextStep();
       return;
     }
-    if (!validate()) {
+    if (!electronicValidators.validateStep(null, formData, setErrors)) {
       notification.showError('Missing Information', 'Please fill in all required fields.');
       return;
     }
@@ -79,142 +71,88 @@ const ElectronicCreateForm = ({ onBack }) => {
   };
 
   return (
-    <ListingWizard
-      title="Create Electronics Listing"
-      subtitle="Enter product details and location"
-      steps={steps}
-      currentStep={currentStep}
-      onBack={onBack || (() => navigate(-1))}
-      onNext={nextStep}
-      onPrev={prevStep}
-      onSubmit={handleSubmit}
-      isLoading={isLoading}
-      canSubmit={Boolean(formData.city?.trim() && formData.district?.trim())}
-      renderStep={(step) => (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">📝</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Basic Information</h3>
-                <p className="text-sm text-slate-600">Title, description and price</p>
-              </div>
-            </div>
-            {step === 1 && (
-              <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
-            )}
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">📱</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Electronics Details</h3>
-                <p className="text-sm text-slate-600">Type, brand and specifications</p>
-              </div>
-            </div>
-
-            {step === 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <div>
-                <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => setFormData(prev => ({...prev, electronicType: v}))} />
-                {errors.electronicType && <p className="mt-1 text-sm text-red-600">{errors.electronicType}</p>}
-              </div>
-
-              <div>
-                <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => setFormData(prev => ({...prev, electronicBrand: v}))} />
-                {errors.electronicBrand && <p className="mt-1 text-sm text-red-600">{errors.electronicBrand}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Model *</label>
-                <input
-                  type="text"
-                  name="model"
-                  value={formData.model}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg ${errors.model ? 'border-red-500' : 'border-slate-200'}`}
-                  placeholder="e.g. iPhone 13"
-                />
-                {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Origin</label>
-                <input
-                  type="text"
-                  name="origin"
-                  value={formData.origin}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-lg"
-                  placeholder="e.g. TR"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <input
-                  id="warrantyProof"
-                  type="checkbox"
-                  name="warrantyProof"
-                  checked={Boolean(formData.warrantyProof)}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 border-slate-300 rounded"
-                />
-                <label htmlFor="warrantyProof" className="text-sm font-medium text-slate-700">Warranty Proof Available</label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Year *</label>
-                <input
-                  type="number"
-                  name="year"
-                  value={formData.year}
-                  onChange={handleInputChange}
-                  min="1990"
-                  max={new Date().getFullYear() + 1}
-                  className={`w-full px-4 py-3 border rounded-lg ${errors.year ? 'border-red-500' : 'border-slate-200'}`}
-                  placeholder="2022"
-                />
-                {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
-              </div>
-
-              <div>
-                <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => setFormData(prev => ({...prev, color: v}))} />
-                {errors.color && <p className="mt-1 text-sm text-red-600">{errors.color}</p>}
-              </div>
-            </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">📍</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Location</h3>
-                <p className="text-sm text-slate-600">Specify where the item is located</p>
-              </div>
-            </div>
-            {step === 3 && (
-              <>
-                <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
-                {(!formData.city.trim() || !formData.district.trim()) && (
-                  <div className="mt-3 text-sm text-red-600">City and district are required</div>
+      <ListingWizard
+          title="Create Electronics Listing"
+          subtitle="Enter product details and location"
+          steps={steps}
+          currentStep={currentStep}
+          onBack={onBack || (() => navigate(-1))}
+          onNext={nextStep}
+          onPrev={prevStep}
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+          canSubmit={Boolean(formData.city?.trim() && formData.district?.trim())}
+          renderStep={(step) => (
+              <div className="space-y-6">
+                {step === 1 && (
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xl">{steps[0].icon}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">{steps[0].title}</h3>
+                          <p className="text-sm text-slate-600">{steps[0].description}</p>
+                        </div>
+                      </div>
+                      <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
+                    </div>
                 )}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    />
+
+                {step === 2 && (
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: steps[1].bgColor }}>
+                          <span className="text-xl">{steps[1].icon}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">{steps[1].title}</h3>
+                          <p className="text-sm text-slate-600">{steps[1].description}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
+                        <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.brand} onChange={(v) => handleDropdownChange('brand', v)} />
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Model *</label>
+                          <input type="text" name="model" value={formData.model} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.model ? 'border-red-500' : 'border-slate-200'}`} />
+                          {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Year *</label>
+                          <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear() + 1} className={`w-full px-4 py-3 border rounded-lg ${errors.year ? 'border-red-500' : 'border-slate-200'}`} />
+                          {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
+                        </div>
+                        <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
+                        <div className="flex items-center gap-3">
+                          <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-4 w-4 text-blue-600 border-slate-300 rounded" />
+                          <label htmlFor="warrantyProof" className="text-sm font-medium text-slate-700">Warranty Proof Available</label>
+                        </div>
+                      </div>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: steps[2].bgColor }}>
+                          <span className="text-xl">{steps[2].icon}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-slate-900">{steps[2].title}</h3>
+                          <p className="text-sm text-slate-600">{steps[2].description}</p>
+                        </div>
+                      </div>
+                      <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+                      {(!formData.city?.trim() || !formData.district?.trim()) && (
+                          <div className="mt-3 text-sm text-red-600">City and district are required</div>
+                      )}
+                    </div>
+                )}
+              </div>
+          )}
+      />
   );
 };
 
 export default ElectronicCreateForm;
-
-

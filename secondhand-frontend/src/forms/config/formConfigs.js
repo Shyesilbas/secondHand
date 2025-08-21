@@ -171,14 +171,159 @@ export const electronicsFormConfig = {
   }
 };
 
-/**
- * Generic Form Configuration Factory
- */
+export const sportsFormConfig = {
+  entityName: 'Sports',
+  totalSteps: 3,
+  initialData: {
+    title: '',
+    description: '',
+    price: '',
+    sportType: '',
+    brand: '',
+    model: '',
+    condition: '',
+    warranty: '',
+    city: '',
+    district: '',
+    address: '',
+    latitude: '',
+    longitude: ''
+  },
+  steps: [
+    {
+      id: 1,
+      title: 'Basic Information',
+      description: 'Set the title, description and price of your listing',
+      icon: '📝',
+      bgColor: 'bg-blue-100'
+    },
+    {
+      id: 2,
+      title: 'Sports Details',
+      description: 'Specify the sports equipment specifications',
+      icon: '🏀',
+      bgColor: 'bg-green-100'
+    },
+    {
+      id: 3,
+      title: 'Location',
+      description: 'Set the location of your sports equipment',
+      icon: '📍',
+      bgColor: 'bg-purple-100'
+    }
+  ],
+  fieldGroups: {
+    step1: ['title', 'description', 'price'],
+    step2: ['sportType', 'brand', 'model', 'condition', 'warranty'],
+    step3: ['city', 'district', 'address', 'latitude', 'longitude']
+  }
+};
+
+export const booksFormConfig = {
+  entityName: 'Books',
+  totalSteps: 3,
+  initialData: {
+    title: '',
+    description: '',
+    price: '',
+    currency: 'TRY',
+    author: '',
+    genre: '',
+    language: '',
+    publicationYear: '',
+    pageCount: '',
+    format: '',
+    condition: '',
+    isbn: '',
+    city: '',
+    district: ''
+  },
+  steps: [
+    {
+      id: 1,
+      title: 'Basic Information',
+      description: 'Set the title, description and price of your listing',
+      icon: '📝',
+      bgColor: 'bg-blue-100'
+    },
+    {
+      id: 2,
+      title: 'Book Specifications',
+      description: 'Specify the details of your book',
+      icon: '📚',
+      bgColor: 'bg-green-100'
+    },
+    {
+      id: 3,
+      title: 'Location',
+      description: 'Set the location of your book',
+      icon: '📍',
+      bgColor: 'bg-purple-100'
+    }
+  ],
+  fieldGroups: {
+    step1: ['title', 'description', 'price'],
+    step2: ['author', 'genre', 'language', 'publicationYear', 'pageCount', 'format', 'condition', 'isbn'],
+    step3: ['city', 'district']
+  }
+};
+
+export const clothingFormConfig = {
+  entityName: 'Clothing',
+  totalSteps: 3,
+  initialData: {
+    title: '',
+    description: '',
+    price: '',
+    currency: 'TRY',
+    brand: '',
+    clothingType: '',
+    color: '',
+    condition: '',
+    purchaseDate: '',
+    city: '',
+    district: ''
+  },
+  steps: [
+    {
+      id: 1,
+      title: 'Basic Information',
+      description: 'Set the title, description and price of your listing',
+      icon: '📝',
+      bgColor: 'bg-blue-100'
+    },
+    {
+      id: 2,
+      title: 'Clothing Specifications',
+      description: 'Specify the details of your clothing item',
+      icon: '👕',
+      bgColor: 'bg-green-100'
+    },
+    {
+      id: 3,
+      title: 'Location',
+      description: 'Set the location of your clothing item',
+      icon: '📍',
+      bgColor: 'bg-purple-100'
+    }
+  ],
+  fieldGroups: {
+    step1: ['title', 'description', 'price'],
+    step2: ['brand', 'clothingType', 'color', 'condition', 'purchaseDate'],
+    step3: ['city', 'district']
+  }
+};
+
+
+
 export const createFormConfig = (entityType, customConfig = {}) => {
   const baseConfigs = {
     vehicle: vehicleFormConfig,
     realEstate: realEstateFormConfig,
-    electronics: electronicsFormConfig
+    electronics: electronicsFormConfig,
+    sports: sportsFormConfig,
+    books: booksFormConfig,
+    clothing: clothingFormConfig
   };
 
   const baseConfig = baseConfigs[entityType];

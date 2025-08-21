@@ -1,4 +1,4 @@
-import {validateBasicListingStep1} from "./commonListingValidators.js";
+import {validateBasicListingStep1,validateBasicListingStep3} from "./commonListingValidators.js";
 
 export const validateRealEstateStep2 = (formData, { isCreate = false } = {}) => {
   const errors = {};
@@ -16,17 +16,23 @@ export const validateRealEstateStep2 = (formData, { isCreate = false } = {}) => 
   return errors;
 };
 
-export const validateRealEstateStep3 = (formData) => {
-  const errors = {};
-  if (!formData.city || !String(formData.city).trim()) errors.city = 'City is required';
-  if (!formData.district || !String(formData.district).trim()) errors.district = 'District is required';
-  return errors;
+
+const validateStep = (step, formData) => {
+  if (step === 1) return validateBasicListingStep1(formData);
+  if (step === 2) return validateRealEstateStep2(formData);
+  if (step === 3) return validateBasicListingStep3(formData);
+  return {};
 };
 
-export const validateRealEstateAll = (formData) => {
-  return {
-    ...validateBasicListingStep1(formData),
-    ...validateRealEstateStep2(formData, { isCreate: true }),
-    ...validateRealEstateStep3(formData),
-  };
+const validateRealEstateAll = (formData) => ({
+  ...validateBasicListingStep1(formData),
+  ...validateRealEstateStep2(formData),
+  ...validateBasicListingStep3(formData),
+});
+
+export default {
+  validateStep,
+  validateRealEstateAll,
 };
+
+

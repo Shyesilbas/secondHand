@@ -7,3 +7,10 @@ export const validateBasicListingStep1 = (formData) => {
     if (!formData.currency) errors.currency = 'Currency is required';
     return errors;
 };
+
+export const validateBasicListingStep3 = (formData) => {
+    const errors = {};
+    if (!formData.city || !String(formData.city).trim()) errors.city = 'City is required';
+    if (!formData.district || !String(formData.district).trim()) errors.district = 'District is required';
+    return errors;
+};

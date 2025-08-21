@@ -1,4 +1,4 @@
-import {validateBasicListingStep1} from "./commonListingValidators.js";
+import {validateBasicListingStep1,validateBasicListingStep3} from "./commonListingValidators.js";
 
 export const validateVehicleStep2 = (formData, { isCreate = false } = {}) => {
   const errors = {};
@@ -11,17 +11,23 @@ export const validateVehicleStep2 = (formData, { isCreate = false } = {}) => {
   return errors;
 };
 
-export const validateVehicleStep3 = (formData) => {
-  const errors = {};
-  if (!formData.city || !String(formData.city).trim()) errors.city = 'City is required';
-  if (!formData.district || !String(formData.district).trim()) errors.district = 'District is required';
-  return errors;
+
+const validateStep = (step, formData) => {
+  if (step === 1) return validateBasicListingStep1(formData);
+  if (step === 2) return validateVehicleStep2(formData, { isCreate: true });
+  if (step === 3) return validateBasicListingStep3(formData);
+  return {};
 };
 
-export const validateVehicleAll = (formData) => {
+ const validateVehicleAll = (formData) => {
   return {
     ...validateBasicListingStep1(formData),
     ...validateVehicleStep2(formData, { isCreate: true }),
-    ...validateVehicleStep3(formData),
+    ...validateBasicListingStep3(formData),
   };
 };
+
+ export default {
+   validateStep,
+   validateVehicleAll,
+ }
