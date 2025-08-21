@@ -157,40 +157,6 @@ const ProfilePage = () => {
                 )}
             </div>
 
-            {/* Agreements Section */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mt-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Sözleşmeler</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Link
-                        to={ROUTES.AGREEMENTS_PENDING}
-                        className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                    >
-                        <div className="flex items-center space-x-3">
-                            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Bekleyen Sözleşmeler</span>
-                        </div>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-
-                    <Link
-                        to={ROUTES.AGREEMENTS_ACCEPTED}
-                        className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                    >
-                        <div className="flex items-center space-x-3">
-                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Onayladığım Sözleşmeler</span>
-                        </div>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-
                     <Link
                         to={ROUTES.AGREEMENTS_ALL}
                         className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
@@ -199,14 +165,12 @@ const ProfilePage = () => {
                             <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span>Bütün Sözleşmeler</span>
+                            <span>Agreements</span>
                         </div>
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </Link>
-                </div>
-            </div>
 
             {/* Phone Update Modal */}
             {showPhoneModal && (
