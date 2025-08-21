@@ -23,7 +23,7 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
 
   const { handleSubmit } = useFormSubmission({
     submitFunction: (isEdit && onUpdate) ? onUpdate : (data) => sportsService.createSportsListing(data),
-    validateAll: sportsValidator.validateAll(),
+    validateAll: sportsValidator.validateAll,
     formState,
     successMessage: isEdit ? 'Sports listing updated successfully!' : 'Sports listing created successfully!',
     errorMessage: isEdit ? 'Failed to update sports listing' : 'Failed to create sports listing',

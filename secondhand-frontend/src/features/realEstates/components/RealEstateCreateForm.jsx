@@ -24,7 +24,7 @@ const RealEstateCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
 
   const { handleSubmit } = useFormSubmission({
     submitFunction: (isEdit && onUpdate) ? onUpdate : createRealEstate,
-    validateAll: realEstateValidator.validateAll(),
+    validateAll: realEstateValidator.validateAll,
     formState,
     successMessage: isEdit ? 'Real estate listing updated successfully!' : undefined,
     errorMessage: isEdit ? 'Failed to update real estate listing' : undefined
