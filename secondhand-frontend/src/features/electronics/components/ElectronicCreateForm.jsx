@@ -6,11 +6,12 @@ import { ROUTES } from '../../../constants/routes';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import LocationFields from '../../../components/forms/LocationFields';
-import { ElectronicCreateRequestDTO } from '../../../types/electronics';
+import { ElectronicCreateRequestDTO } from '../../../types/index.js';
 import { useElectronic } from '../hooks/useElectronic';
 import { electronicFormSteps } from '../config/electronicFormSteps';
 import ListingWizard from '../../listings/components/ListingWizard';
-import { validateElectronicStep1, validateElectronicStep2, validateElectronicStep3, validateElectronicAll } from '../../../utils/validators/electronicValidators';
+import {validateElectronicStep2, validateElectronicStep3, validateElectronicAll } from '../../../utils/validators/electronicValidators';
+import {validateBasicListingStep1} from "../../../utils/validators/commonListingValidators.js";
 
 const ElectronicCreateForm = ({ onBack }) => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const ElectronicCreateForm = ({ onBack }) => {
 
   const validateStep = (step) => {
     let stepErrors = {};
-    if (step === 1) stepErrors = validateElectronicStep1(formData);
+    if (step === 1) stepErrors = validateBasicListingStep1(formData);
     if (step === 2) stepErrors = validateElectronicStep2(formData);
     if (step === 3) stepErrors = validateElectronicStep3(formData);
     setErrors(stepErrors);

@@ -6,27 +6,18 @@ import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
 import ListingWizard from '../../listings/components/ListingWizard';
 import { useFormState } from '../../../forms/hooks/useFormState';
+import {validateBasicListingStep1} from '../../../utils/validators/commonListingValidators.js'
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
 
 const ClothingCreateForm = ({ onBack }) => {
   const { createClothingListing, isLoading } = useClothing();
   const { enums } = useEnums();
 
-  // Validation functions
   const validateStep = (step, formData) => {
-    if (step === 1) return validateClothingStep1(formData);
+    if (step === 1) return validateBasicListingStep1(formData);
     if (step === 2) return validateClothingStep2(formData);
     if (step === 3) return validateClothingStep3(formData);
     return {};
-  };
-
-  const validateClothingStep1 = (formData) => {
-    const errors = {};
-    if (!formData.title?.trim()) errors.title = 'Title is required';
-    if (!formData.description?.trim()) errors.description = 'Description is required';
-    if (!formData.price || formData.price <= 0) errors.price = 'Valid price is required';
-    if (!formData.currency) errors.currency = 'Currency is required';
-    return errors;
   };
 
   const validateClothingStep2 = (formData) => {
@@ -48,7 +39,7 @@ const ClothingCreateForm = ({ onBack }) => {
 
   const validateClothingAll = (formData) => {
     return {
-      ...validateClothingStep1(formData),
+      ...validateBasicListingStep1(formData),
       ...validateClothingStep2(formData),
       ...validateClothingStep3(formData)
     };

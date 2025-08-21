@@ -6,25 +6,17 @@ import ListingWizard from '../../listings/components/ListingWizard';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
+import {validateBasicListingStep1} from '../../../utils/validators/commonListingValidators.js'
 import { booksService } from '../services/booksService';
 
 const BooksCreateForm = ({ onBack }) => {
   const { enums } = useEnums();
 
   const validateStep = (step, formData) => {
-    if (step === 1) return validateBooksStep1(formData);
+    if (step === 1) return validateBasicListingStep1(formData);
     if (step === 2) return validateBooksStep2(formData);
     if (step === 3) return validateBooksStep3(formData);
     return {};
-  };
-
-  const validateBooksStep1 = (formData) => {
-    const errors = {};
-    if (!formData.title?.trim()) errors.title = 'Title is required';
-    if (!formData.description?.trim()) errors.description = 'Description is required';
-    if (!formData.price || formData.price <= 0) errors.price = 'Valid price is required';
-    if (!formData.currency) errors.currency = 'Currency is required';
-    return errors;
   };
 
   const validateBooksStep2 = (formData) => {
@@ -47,7 +39,7 @@ const BooksCreateForm = ({ onBack }) => {
   };
 
   const validateBooksAll = (formData) => ({
-    ...validateBooksStep1(formData),
+    ...validateBasicListingStep1(formData),
     ...validateBooksStep2(formData),
     ...validateBooksStep3(formData),
   });

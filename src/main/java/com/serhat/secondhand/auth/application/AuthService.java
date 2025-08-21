@@ -224,7 +224,6 @@ public class AuthService {
     }
 
     public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request) {
-        // If user already exists, just log them in
         User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
         if (existing != null) {
             existing.setLastLoginDate(LocalDateTime.now());

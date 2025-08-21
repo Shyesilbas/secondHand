@@ -6,25 +6,17 @@ import ListingWizard from '../../listings/components/ListingWizard';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
+import {validateBasicListingStep1} from '../../../utils/validators/commonListingValidators.js'
 import { sportsService } from '../services/sportsService';
 
 const SportsCreateForm = ({ onBack }) => {
   const { enums } = useEnums();
 
   const validateStep = (step, formData) => {
-    if (step === 1) return validateSportsStep1(formData);
+    if (step === 1) return validateBasicListingStep1(formData);
     if (step === 2) return validateSportsStep2(formData);
     if (step === 3) return validateSportsStep3(formData);
     return {};
-  };
-
-  const validateSportsStep1 = (formData) => {
-    const errors = {};
-    if (!formData.title?.trim()) errors.title = 'Title is required';
-    if (!formData.description?.trim()) errors.description = 'Description is required';
-    if (!formData.price || formData.price <= 0) errors.price = 'Valid price is required';
-    if (!formData.currency) errors.currency = 'Currency is required';
-    return errors;
   };
 
   const validateSportsStep2 = (formData) => {
@@ -43,7 +35,7 @@ const SportsCreateForm = ({ onBack }) => {
   };
 
   const validateSportsAll = (formData) => ({
-    ...validateSportsStep1(formData),
+    ...validateBasicListingStep1(formData),
     ...validateSportsStep2(formData),
     ...validateSportsStep3(formData),
   });
@@ -54,11 +46,9 @@ const SportsCreateForm = ({ onBack }) => {
       description: '',
       price: '',
       currency: 'TRY',
-      // sports specific
       discipline: '',
       equipmentType: '',
       condition: '',
-      // location
       city: '',
       district: '',
     },

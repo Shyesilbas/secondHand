@@ -6,18 +6,18 @@ import EnumDropdown from '../../../components/ui/EnumDropdown';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
 import ListingWizard from '../../listings/components/ListingWizard';
-import { validateVehicleStep1, validateVehicleStep2, validateVehicleStep3, validateVehicleAll } from '../../../utils/validators/vehicleValidators';
+import {validateVehicleStep2, validateVehicleStep3, validateVehicleAll } from '../../../utils/validators/vehicleValidators';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
+import {validateBasicListingStep1} from '../../../utils/validators/commonListingValidators.js'
 import { vehicleFormConfig } from '../../../forms/config/formConfigs';
 
 const VehicleCreateForm = ({ onBack }) => {
   const { createVehicle, isLoading } = useVehicle();
   const { enums } = useEnums();
 
-  // Validation functions
   const validateStep = (step, formData) => {
-    if (step === 1) return validateVehicleStep1(formData);
+    if (step === 1) return validateBasicListingStep1(formData);
     if (step === 2) return validateVehicleStep2(formData, { isCreate: true });
     if (step === 3) return validateVehicleStep3(formData);
     return {};

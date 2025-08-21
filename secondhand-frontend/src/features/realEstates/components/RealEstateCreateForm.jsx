@@ -6,18 +6,18 @@ import EnumDropdown from '../../../components/ui/EnumDropdown';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
 import ListingWizard from '../../listings/components/ListingWizard';
-import { validateRealEstateStep1, validateRealEstateStep2, validateRealEstateStep3, validateRealEstateAll } from '../../../utils/validators/realEstateValidators';
+import { validateRealEstateStep2, validateRealEstateStep3, validateRealEstateAll } from '../../../utils/validators/realEstateValidators';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
 import { realEstateFormConfig } from '../../../forms/config/formConfigs';
+import {validateBasicListingStep1} from "../../../utils/validators/commonListingValidators.js";
 
 const RealEstateCreateForm = ({ onBack }) => {
   const { createRealEstate, isLoading } = useRealEstate();
   const { enums } = useEnums();
 
-  // Validation functions
   const validateStep = (step, formData) => {
-    if (step === 1) return validateRealEstateStep1(formData);
+    if (step === 1) return validateBasicListingStep1(formData);
     if (step === 2) return validateRealEstateStep2(formData, { isCreate: true });
     if (step === 3) return validateRealEstateStep3(formData);
     return {};

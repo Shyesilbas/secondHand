@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BackButton = ({ onClick, className = '', children = 'Geri Dön' }) => {
+const BackButton = ({ onClick, className = '', children = 'Go Back' }) => {
     return (
         <button
             onClick={onClick}

@@ -31,8 +31,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final VehicleListingFilterService vehicleListingFilterService;
     private final ElectronicListingFilterService electronicListingFilterService;
-    private final BaseListingFilterService baseListingFilterService;
-    
+
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }

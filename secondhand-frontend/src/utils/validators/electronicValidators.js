@@ -1,10 +1,4 @@
-export const validateElectronicStep1 = (formData) => {
-  const errors = {};
-  if (!formData.title || !String(formData.title).trim()) errors.title = 'Title is required';
-  if (!formData.description || !String(formData.description).trim()) errors.description = 'Description is required';
-  if (!formData.price || Number(formData.price) <= 0) errors.price = 'Price must be greater than 0';
-  return errors;
-};
+import {validateBasicListingStep1} from "./commonListingValidators.js";
 
 export const validateElectronicStep2 = (formData) => {
   const errors = {};
@@ -25,7 +19,7 @@ export const validateElectronicStep3 = (formData) => {
 
 export const validateElectronicAll = (formData) => {
   return {
-    ...validateElectronicStep1(formData),
+    ...validateBasicListingStep1(formData),
     ...validateElectronicStep2(formData),
     ...validateElectronicStep3(formData),
   };

@@ -1,10 +1,4 @@
-export const validateVehicleStep1 = (formData) => {
-  const errors = {};
-  if (!formData.title || !String(formData.title).trim()) errors.title = 'Title is required';
-  if (!formData.description || !String(formData.description).trim()) errors.description = 'Description is required';
-  if (!formData.price || parseFloat(formData.price) <= 0) errors.price = 'Please enter a valid price';
-  return errors;
-};
+import {validateBasicListingStep1} from "./commonListingValidators.js";
 
 export const validateVehicleStep2 = (formData, { isCreate = false } = {}) => {
   const errors = {};
@@ -26,7 +20,7 @@ export const validateVehicleStep3 = (formData) => {
 
 export const validateVehicleAll = (formData) => {
   return {
-    ...validateVehicleStep1(formData),
+    ...validateBasicListingStep1(formData),
     ...validateVehicleStep2(formData, { isCreate: true }),
     ...validateVehicleStep3(formData),
   };
