@@ -15,7 +15,7 @@ const validateStep = (step, formData) => {
     return {};
 };
 
-const validateSportsAll = (formData) => ({
+const validateAll = (formData) => ({
     ...validateBasicListingStep1(formData),
     ...validateSportsStep2(formData),
     ...validateBasicListingStep3(formData),
@@ -23,5 +23,5 @@ const validateSportsAll = (formData) => ({
 
 export default {
     validateStep,
-    validateSportsAll,
+    validateAll,
 };

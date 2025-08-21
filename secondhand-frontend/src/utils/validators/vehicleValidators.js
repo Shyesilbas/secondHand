@@ -19,7 +19,7 @@ const validateStep = (step, formData) => {
   return {};
 };
 
- const validateVehicleAll = (formData) => {
+ const validateAll = (formData) => {
   return {
     ...validateBasicListingStep1(formData),
     ...validateVehicleStep2(formData, { isCreate: true }),
@@ -29,5 +29,5 @@ const validateStep = (step, formData) => {
 
  export default {
    validateStep,
-   validateVehicleAll,
+     validateAll,
  }

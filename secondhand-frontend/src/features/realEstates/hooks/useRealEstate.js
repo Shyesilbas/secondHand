@@ -15,7 +15,6 @@ export const useRealEstate = (realEstateId = null) => {
     entityName: 'Real Estate'
   });
 
-  // Map entity to realEstate for backward compatibility
   return {
     ...result,
     realEstate: result.entity,

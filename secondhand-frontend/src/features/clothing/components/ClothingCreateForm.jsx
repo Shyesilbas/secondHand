@@ -9,24 +9,28 @@ import LocationFields from '../../../components/forms/LocationFields';
 import { createFormConfig } from '../../../forms/config/formConfigs';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 
-const ClothingCreateForm = ({ onBack }) => {
+const ClothingCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const { createClothingListing, isLoading } = useClothing();
   const { enums } = useEnums();
   const formConfig = createFormConfig('clothing');
 
+  const mergedInitialData = initialData
+    ? { ...formConfig.initialData, ...initialData }
+    : formConfig.initialData;
+
   const formState = useFormState({
-    initialData: formConfig.initialData,
+    initialData: mergedInitialData,
     totalSteps: formConfig.totalSteps,
     validateStep: clothingValidator.validateStep,
     validateAll: clothingValidator.validateAll,
   });
 
   const { handleSubmit } = useFormSubmission({
-    submitFunction: createClothingListing,
+    submitFunction: (isEdit && onUpdate) ? onUpdate : createClothingListing,
     validateAll: clothingValidator.validateAll,
     formState,
-    successMessage: 'Clothing listing created successfully!',
-    errorMessage: 'Failed to create clothing listing'
+    successMessage: isEdit ? 'Clothing listing updated successfully!' : 'Clothing listing created successfully!',
+    errorMessage: isEdit ? 'Failed to update clothing listing' : 'Failed to create clothing listing'
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
@@ -124,8 +128,8 @@ const ClothingCreateForm = ({ onBack }) => {
 
   return (
       <ListingWizard
-          title="Create Clothing Listing"
-          subtitle="Create your clothing listing step by step"
+          title={isEdit ? 'Edit Clothing Listing' : 'Create Clothing Listing'}
+          subtitle={isEdit ? 'Update your clothing listing details' : 'Create your clothing listing step by step'}
           steps={formConfig.steps}
           currentStep={currentStep}
           onBack={onBack}

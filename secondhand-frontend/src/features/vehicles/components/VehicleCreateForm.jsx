@@ -12,22 +12,24 @@ import vehicleValidator from '../../../utils/validators/vehicleValidators.js';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
 
-const VehicleCreateForm = ({ onBack }) => {
+const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const navigate = useNavigate();
   const { createVehicle, isLoading } = useVehicle();
   const { enums } = useEnums();
 
   const formState = useFormState({
-    initialData: { ...VehicleCreateRequestDTO, ...vehicleFormConfig.initialData },
+    initialData: { ...VehicleCreateRequestDTO, ...vehicleFormConfig.initialData, ...(initialData || {}) },
     totalSteps: vehicleFormConfig.totalSteps,
     validateStep: vehicleValidator.validateStep,
     validateAll: vehicleValidator.validateAll
   });
 
   const { handleSubmit } = useFormSubmission({
-    submitFunction: createVehicle,
+    submitFunction: (isEdit && onUpdate) ? onUpdate : createVehicle,
     validateAll: vehicleValidator.validateAll,
-    formState
+    formState,
+    successMessage: isEdit ? 'Vehicle listing updated successfully!' : undefined,
+    errorMessage: isEdit ? 'Failed to update vehicle listing' : undefined
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
@@ -111,8 +113,8 @@ const VehicleCreateForm = ({ onBack }) => {
 
   return (
       <ListingWizard
-          title="Create Vehicle Listing"
-          subtitle="Create your vehicle listing step by step"
+          title={isEdit ? 'Edit Vehicle Listing' : 'Create Vehicle Listing'}
+          subtitle={isEdit ? 'Update your vehicle listing details' : 'Create your vehicle listing step by step'}
           steps={vehicleFormConfig.steps}
           currentStep={currentStep}
           onBack={onBack || (() => navigate(-1))}

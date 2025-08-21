@@ -14,7 +14,6 @@ export const useMyListings = (status = null) => {
             }
         };
         run();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status]);
 
     return {

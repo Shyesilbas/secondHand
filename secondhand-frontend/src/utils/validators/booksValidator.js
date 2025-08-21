@@ -19,7 +19,7 @@ const validateStep = (step, formData) => {
     return {};
 };
 
-const validateBooksAll = (formData) => ({
+const validateAll = (formData) => ({
     ...validateBasicListingStep1(formData),
     ...validateBooksStep2(formData),
     ...validateBasicListingStep3(formData),
@@ -27,5 +27,5 @@ const validateBooksAll = (formData) => ({
 
 export default {
     validateStep,
-    validateBooksAll,
+    validateAll,
 };

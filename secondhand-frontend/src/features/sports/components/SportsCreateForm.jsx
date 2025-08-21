@@ -10,23 +10,23 @@ import { sportsService } from '../services/sportsService';
 import sportsValidator from '../../../utils/validators/sportsValidator';
 import { createFormConfig } from '../../../forms/config/formConfigs';
 
-const SportsCreateForm = ({ onBack }) => {
+const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const { enums } = useEnums();
   const formConfig = createFormConfig('sports');
 
   const formState = useFormState({
-    initialData: formConfig.initialData,
+    initialData: { ...formConfig.initialData, ...(initialData || {}) },
     totalSteps: formConfig.totalSteps,
     validateStep: sportsValidator.validateStep,
-    validateAll: sportsValidator.validateSportsAll,
+    validateAll: sportsValidator.validateAll,
   });
 
   const { handleSubmit } = useFormSubmission({
-    submitFunction: (data) => sportsService.createSportsListing(data),
-    validateAll: sportsValidator.validateSportsAll,
+    submitFunction: (isEdit && onUpdate) ? onUpdate : (data) => sportsService.createSportsListing(data),
+    validateAll: sportsValidator.validateAll(),
     formState,
-    successMessage: 'Sports listing created successfully!',
-    errorMessage: 'Failed to create sports listing',
+    successMessage: isEdit ? 'Sports listing updated successfully!' : 'Sports listing created successfully!',
+    errorMessage: isEdit ? 'Failed to update sports listing' : 'Failed to create sports listing',
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
@@ -92,8 +92,8 @@ const SportsCreateForm = ({ onBack }) => {
 
   return (
       <ListingWizard
-          title="Create Sports Listing"
-          subtitle="Create your sports listing step by step"
+          title={isEdit ? 'Edit Sports Listing' : 'Create Sports Listing'}
+          subtitle={isEdit ? 'Update your sports listing details' : 'Create your sports listing step by step'}
           steps={formConfig.steps}
           currentStep={currentStep}
           onBack={onBack}

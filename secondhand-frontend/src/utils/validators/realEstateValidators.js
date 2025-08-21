@@ -24,15 +24,15 @@ const validateStep = (step, formData) => {
   return {};
 };
 
-const validateRealEstateAll = (formData) => ({
+const validateAll = (formData) => ({
   ...validateBasicListingStep1(formData),
   ...validateRealEstateStep2(formData),
   ...validateBasicListingStep3(formData),
-});
+})
 
 export default {
   validateStep,
-  validateRealEstateAll,
+  validateAll,
 };
 
 

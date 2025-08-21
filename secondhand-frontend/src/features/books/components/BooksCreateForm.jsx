@@ -9,23 +9,23 @@ import { booksService } from '../services/booksService';
 import booksValidator from '../../../utils/validators/booksValidator.js';
 import { createFormConfig } from '../../../forms/config/formConfigs.js';
 
-const BooksCreateForm = ({ onBack }) => {
+const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const { enums } = useEnums();
   const formConfig = createFormConfig('books');
 
   const formState = useFormState({
-    initialData: formConfig.initialData,
+    initialData: { ...formConfig.initialData, ...(initialData || {}) },
     totalSteps: formConfig.totalSteps,
     validateStep: booksValidator.validateStep,
-    validateAll: booksValidator.validateBooksAll,
+    validateAll: booksValidator.validateAll,
   });
 
   const { handleSubmit } = useFormSubmission({
-    submitFunction: booksService.createBooksListing,
-    validateAll: booksValidator.validateBooksAll,
+    submitFunction: (isEdit && onUpdate) ? onUpdate : booksService.createBooksListing,
+    validateAll: booksValidator.validateAll,
     formState,
-    successMessage: 'Books listing created successfully!',
-    errorMessage: 'Failed to create books listing',
+    successMessage: isEdit ? 'Books listing updated successfully!' : 'Books listing created successfully!',
+    errorMessage: isEdit ? 'Failed to update books listing' : 'Failed to create books listing',
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
@@ -73,8 +73,8 @@ const BooksCreateForm = ({ onBack }) => {
 
   return (
       <ListingWizard
-          title="Create Books Listing"
-          subtitle="Create your book listing step by step"
+          title={isEdit ? 'Edit Books Listing' : 'Create Books Listing'}
+          subtitle={isEdit ? 'Update your book listing details' : 'Create your book listing step by step'}
           steps={formConfig.steps}
           currentStep={currentStep}
           onBack={onBack}

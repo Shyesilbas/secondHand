@@ -12,7 +12,7 @@ import ListingWizard from '../../listings/components/ListingWizard';
 import electronicValidators from '../../../utils/validators/electronicValidators.js';
 import { createFormConfig } from '../../../forms/config/formConfigs.js';
 
-const ElectronicCreateForm = ({ onBack }) => {
+const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const navigate = useNavigate();
   const notification = useNotification();
   const { createElectronic, isLoading } = useElectronic();
@@ -20,11 +20,12 @@ const ElectronicCreateForm = ({ onBack }) => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     ...ElectronicCreateRequestDTO,
     price: '',
     year: '',
-  });
+    ...(initialData || {}),
+  }));
 
   const formConfig = useMemo(() => createFormConfig('electronics'), []);
   const { steps } = formConfig;
@@ -62,18 +63,23 @@ const ElectronicCreateForm = ({ onBack }) => {
       return;
     }
     try {
-      await createElectronic(formData);
-      notification.showSuccess('Success', 'Listing created successfully');
+      if (isEdit && onUpdate) {
+        await onUpdate(formData);
+        notification.showSuccess('Success', 'Listing updated successfully');
+      } else {
+        await createElectronic(formData);
+        notification.showSuccess('Success', 'Listing created successfully');
+      }
       navigate(ROUTES.MY_LISTINGS);
     } catch (err) {
-      notification.showError('Error', 'An error occurred while creating the listing');
+      notification.showError('Error', isEdit ? 'An error occurred while updating the listing' : 'An error occurred while creating the listing');
     }
   };
 
   return (
       <ListingWizard
-          title="Create Electronics Listing"
-          subtitle="Enter product details and location"
+          title={isEdit ? 'Edit Electronics Listing' : 'Create Electronics Listing'}
+          subtitle={isEdit ? 'Update product details and location' : 'Enter product details and location'}
           steps={steps}
           currentStep={currentStep}
           onBack={onBack || (() => navigate(-1))}
@@ -112,7 +118,7 @@ const ElectronicCreateForm = ({ onBack }) => {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
-                        <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.brand} onChange={(v) => handleDropdownChange('brand', v)} />
+                        <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => handleDropdownChange('electronicBrand', v)} />
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-2">Model *</label>
                           <input type="text" name="model" value={formData.model} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.model ? 'border-red-500' : 'border-slate-200'}`} />

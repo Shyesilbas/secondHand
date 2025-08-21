@@ -3,19 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../context/NotificationContext';
 import { ROUTES } from '../../constants/routes';
 
-/**
- * Generic Form Submission Hook
- * @param {Object} config - Submission configuration
- * @param {Function} config.submitFunction - Function to submit form data
- * @param {Function} config.validateAll - Function to validate all steps
- * @param {Object} config.formState - Form state from useFormState
- * @param {string} config.successMessage - Success message
- * @param {string} config.errorMessage - Error message
- * @param {string} config.redirectRoute - Route to redirect after success
- * @param {Function} config.onSuccess - Custom success callback
- * @param {Function} config.onError - Custom error callback
- * @returns {Object} - Submission state and operations
- */
 export const useFormSubmission = (config) => {
   const {
     submitFunction,

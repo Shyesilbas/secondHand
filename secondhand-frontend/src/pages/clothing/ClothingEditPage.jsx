@@ -90,14 +90,7 @@ const ClothingEditPage = () => {
                 <ClothingCreateForm 
                     initialData={clothing}
                     isEdit={true}
-                    onUpdate={async (data) => {
-                        try {
-                            await updateClothingListing(id, data);
-                            navigate(ROUTES.MY_LISTINGS);
-                        } catch (err) {
-                            console.error('Failed to update clothing listing:', err);
-                        }
-                    }}
+                    onUpdate={(data) => updateClothingListing(id, data)}
                 />
             </div>
         </div>

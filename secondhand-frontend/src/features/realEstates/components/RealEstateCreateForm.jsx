@@ -10,22 +10,24 @@ import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';
 import { createFormConfig } from '../../../forms/config/formConfigs';
 import realEstateValidator from "../../../utils/validators/realEstateValidators.js";
 
-const RealEstateCreateForm = ({ onBack }) => {
+const RealEstateCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const { createRealEstate, isLoading } = useRealEstate();
   const { enums } = useEnums();
   const formConfig = createFormConfig('realEstate');
 
   const formState = useFormState({
-    initialData: formConfig.initialData,
+    initialData: { ...formConfig.initialData, ...(initialData || {}) },
     totalSteps: formConfig.totalSteps,
     validateStep:realEstateValidator.validateStep,
-    validateAll: realEstateValidator.validateRealEstateAll,
+    validateAll: realEstateValidator.validateAll,
   });
 
   const { handleSubmit } = useFormSubmission({
-    submitFunction: createRealEstate,
-    validateAll: realEstateValidator.validateRealEstateAll,
-    formState
+    submitFunction: (isEdit && onUpdate) ? onUpdate : createRealEstate,
+    validateAll: realEstateValidator.validateAll(),
+    formState,
+    successMessage: isEdit ? 'Real estate listing updated successfully!' : undefined,
+    errorMessage: isEdit ? 'Failed to update real estate listing' : undefined
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
@@ -90,8 +92,8 @@ const RealEstateCreateForm = ({ onBack }) => {
 
   return (
       <ListingWizard
-          title="Create Real Estate Listing"
-          subtitle="Create your real estate listing step by step"
+          title={isEdit ? 'Edit Real Estate Listing' : 'Create Real Estate Listing'}
+          subtitle={isEdit ? 'Update your real estate listing details' : 'Create your real estate listing step by step'}
           steps={formConfig.steps}
           currentStep={currentStep}
           onBack={onBack}
