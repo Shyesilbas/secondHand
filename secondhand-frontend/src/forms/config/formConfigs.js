@@ -1,63 +1,78 @@
-/**
- * Form Configuration Factory
- * Centralized form configurations for different entity types
- */
 
-/**
- * Vehicle Form Configuration
- */
+const basicInfoStep = {
+  id: 1,
+  title: 'Basic Information',
+  description: 'Set the title, description and price of your listing',
+  icon: '📝',
+  bgColor: 'bg-blue-100'
+};
+
+const locationStep = {
+  id: 3,
+  title: 'Location',
+  description: 'Set the location of your item',
+  icon: '📍',
+  bgColor: 'bg-purple-100'
+};
+
+const vehicleDetailsStep = {
+  id: 2,
+  title: 'Vehicle Specifications',
+  description: 'Specify the technical details of your vehicle',
+  icon: '🚗',
+  bgColor: 'bg-green-100'
+};
+
+const realEstateDetailsStep = {
+  id: 2,
+  title: 'Property Details',
+  description: 'Specify the property specifications',
+  icon: '🏠',
+  bgColor: 'bg-green-100'
+};
+
+const electronicsDetailsStep = {
+  id: 2,
+  title: 'Electronic Details',
+  description: 'Specify the electronic specifications',
+  icon: '📱',
+  bgColor: 'bg-green-100'
+};
+
+const sportsDetailsStep = {
+  id: 2,
+  title: 'Sports Details',
+  description: 'Specify the sports equipment specifications',
+  icon: '🏀',
+  bgColor: 'bg-green-100'
+};
+
+const bookDetailsStep = {
+  id: 2,
+  title: 'Book Specifications',
+  description: 'Specify the details of your book',
+  icon: '📚',
+  bgColor: 'bg-green-100'
+};
+
+const clothingDetailsStep = {
+  id: 2,
+  title: 'Clothing Specifications',
+  description: 'Specify the details of your clothing item',
+  icon: '👕',
+  bgColor: 'bg-green-100'
+};
+
 export const vehicleFormConfig = {
   entityName: 'Vehicle',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    brand: '',
-    model: '',
-    year: '',
-    mileage: '',
-    engineCapacity: '',
-    gearbox: '',
-    seatCount: '',
-    wheels: '',
-    fuelCapacity: '',
-    fuelConsumption: '',
-    horsePower: '',
-    kilometersPerLiter: '',
-    fuelType: '',
-    color: '',
-    transmission: '',
-    bodyType: '',
-    city: '',
-    district: '',
-    address: '',
-    latitude: '',
-    longitude: ''
+    title: '', description: '', price: '', brand: '', model: '', year: '', mileage: '',
+    engineCapacity: '', gearbox: '', seatCount: '', wheels: '', fuelCapacity: '', fuelConsumption: '',
+    horsePower: '', kilometersPerLiter: '', fuelType: '', color: '', transmission: '', bodyType: '',
+    city: '', district: '', address: '', latitude: '', longitude: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Vehicle Specifications',
-      description: 'Specify the technical details of your vehicle',
-      icon: '🚗',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your vehicle',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, vehicleDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['brand', 'model', 'year', 'mileage', 'fuelType', 'color', 'transmission', 'bodyType'],
@@ -65,54 +80,15 @@ export const vehicleFormConfig = {
   }
 };
 
-/**
- * Real Estate Form Configuration
- */
 export const realEstateFormConfig = {
   entityName: 'Real Estate',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    adType: '',
-    realEstateType: '',
-    heatingType: '',
-    ownerType: '',
-    squareMeters: '',
-    roomCount: '',
-    bathroomCount: '',
-    floor: '',
-    buildingAge: '',
-    city: '',
-    district: '',
-    address: '',
-    latitude: '',
-    longitude: ''
+    title: '', description: '', price: '', adType: '', realEstateType: '', heatingType: '', ownerType: '',
+    squareMeters: '', roomCount: '', bathroomCount: '', floor: '', buildingAge: '', city: '', district: '',
+    address: '', latitude: '', longitude: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Property Details',
-      description: 'Specify the property specifications',
-      icon: '🏠',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your property',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, realEstateDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['adType', 'realEstateType', 'heatingType', 'ownerType', 'squareMeters', 'roomCount', 'bathroomCount', 'floor', 'buildingAge'],
@@ -120,50 +96,14 @@ export const realEstateFormConfig = {
   }
 };
 
-/**
- * Electronics Form Configuration
- */
 export const electronicsFormConfig = {
   entityName: 'Electronic',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    electronicType: '',
-    brand: '',
-    model: '',
-    condition: '',
-    warranty: '',
-    city: '',
-    district: '',
-    address: '',
-    latitude: '',
-    longitude: ''
+    title: '', description: '', price: '', electronicType: '', brand: '', model: '', condition: '', warranty: '',
+    city: '', district: '', address: '', latitude: '', longitude: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Electronic Details',
-      description: 'Specify the electronic specifications',
-      icon: '📱',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your electronic',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, electronicsDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['electronicType', 'brand', 'model', 'condition', 'warranty'],
@@ -175,43 +115,10 @@ export const sportsFormConfig = {
   entityName: 'Sports',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    sportType: '',
-    brand: '',
-    model: '',
-    condition: '',
-    warranty: '',
-    city: '',
-    district: '',
-    address: '',
-    latitude: '',
-    longitude: ''
+    title: '', description: '', price: '', sportType: '', brand: '', model: '', condition: '', warranty: '',
+    city: '', district: '', address: '', latitude: '', longitude: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Sports Details',
-      description: 'Specify the sports equipment specifications',
-      icon: '🏀',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your sports equipment',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, sportsDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['sportType', 'brand', 'model', 'condition', 'warranty'],
@@ -223,44 +130,10 @@ export const booksFormConfig = {
   entityName: 'Books',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    currency: 'TRY',
-    author: '',
-    genre: '',
-    language: '',
-    publicationYear: '',
-    pageCount: '',
-    format: '',
-    condition: '',
-    isbn: '',
-    city: '',
-    district: ''
+    title: '', description: '', price: '', currency: 'TRY', author: '', genre: '', language: '',
+    publicationYear: '', pageCount: '', format: '', condition: '', isbn: '', city: '', district: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Book Specifications',
-      description: 'Specify the details of your book',
-      icon: '📚',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your book',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, bookDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['author', 'genre', 'language', 'publicationYear', 'pageCount', 'format', 'condition', 'isbn'],
@@ -272,49 +145,16 @@ export const clothingFormConfig = {
   entityName: 'Clothing',
   totalSteps: 3,
   initialData: {
-    title: '',
-    description: '',
-    price: '',
-    currency: 'TRY',
-    brand: '',
-    clothingType: '',
-    color: '',
-    condition: '',
-    purchaseDate: '',
-    city: '',
-    district: ''
+    title: '', description: '', price: '', currency: 'TRY', brand: '', clothingType: '', color: '',
+    condition: '', purchaseDate: '', city: '', district: ''
   },
-  steps: [
-    {
-      id: 1,
-      title: 'Basic Information',
-      description: 'Set the title, description and price of your listing',
-      icon: '📝',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 2,
-      title: 'Clothing Specifications',
-      description: 'Specify the details of your clothing item',
-      icon: '👕',
-      bgColor: 'bg-green-100'
-    },
-    {
-      id: 3,
-      title: 'Location',
-      description: 'Set the location of your clothing item',
-      icon: '📍',
-      bgColor: 'bg-purple-100'
-    }
-  ],
+  steps: [basicInfoStep, clothingDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
     step2: ['brand', 'clothingType', 'color', 'condition', 'purchaseDate'],
     step3: ['city', 'district']
   }
 };
-
-
 
 export const createFormConfig = (entityType, customConfig = {}) => {
   const baseConfigs = {
@@ -327,9 +167,7 @@ export const createFormConfig = (entityType, customConfig = {}) => {
   };
 
   const baseConfig = baseConfigs[entityType];
-  if (!baseConfig) {
-    throw new Error(`Form configuration not found for entity type: ${entityType}`);
-  }
+  if (!baseConfig) throw new Error(`Form configuration not found for entity type: ${entityType}`);
 
   return {
     ...baseConfig,
