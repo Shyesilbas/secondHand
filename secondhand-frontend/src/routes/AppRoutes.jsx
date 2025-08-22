@@ -26,7 +26,6 @@ import PayListingFeePage from '../pages/payments/PayListingFeePage';
 import CreditCardsPage from '../pages/payments/CreditCardsPage';
 import BankAccountsPage from '../pages/payments/BankAccountsPage';
 import EmailsPage from '../pages/emails/EmailsPage';
-import VehicleDetailPage from '../pages/vehicles/VehicleDetailPage';
 import VehicleEditPage from '../pages/vehicles/VehicleEditPage';
 import ElectronicEditPage from '../pages/electronics/ElectronicEditPage';
 import BooksEditPage from '../pages/books/BooksEditPage';
@@ -34,7 +33,6 @@ import CreateRealEstatePage from '../pages/realEstates/CreateRealEstatePage';
 import RealEstateEditPage from '../pages/realEstates/RealEstateEditPage';
 import CreateClothingPage from '../pages/clothing/CreateClothingPage';
 import ClothingEditPage from '../pages/clothing/ClothingEditPage';
-import ClothingDetailPage from '../pages/clothing/ClothingDetailPage';
 import SportsEditPage from '../pages/sports/SportsEditPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
@@ -125,8 +123,6 @@ const AppRoutes = () => {
                 <Route path={ROUTES.HOME} element={<HomePage />} />
                 <Route path={ROUTES.LISTINGS} element={<ListingsPage />} />
                 <Route path={ROUTES.LISTING_DETAIL} element={<ListingDetailPage />} />
-                <Route path={ROUTES.VEHICLE_DETAIL} element={<VehicleDetailPage />} />
-                <Route path={ROUTES.CLOTHING_DETAIL} element={<ClothingDetailPage />} />
             </Route>
 
             {/* Protected Routes with Main Layout */}
