@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getUser, getToken, clearTokens, setUser, setTokens } from '../services/storage/tokenStorage';
+import {
+    getUser,
+    getToken,
+    getRefreshToken,
+    clearTokens,
+    setUser,
+    setTokens,
+    hasValidTokens
+} from '../services/storage/tokenStorage';
 import { authService } from '../features/auth/services/authService';
 import { UserDTO } from '../types';
 
@@ -19,51 +27,73 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const initializeAuth = () => {
-            const token = getToken();
-            const userData = getUser();
+        const initializeAuth = async () => {
+            try {
+                if (!hasValidTokens()) {
+                    setIsLoading(false);
+                    return;
+                }
 
-            if (token && userData) {
-                setUserState(userData);
-                setIsAuthenticated(true);
+                const token = getToken();
+                const userData = getUser();
+
+                if (token && userData) {
+                    setUserState(userData);
+                    setIsAuthenticated(true);
+
+                    try {
+                        await authService.validateToken();
+                    } catch (error) {
+                        // Token will be refreshed by interceptor
+                    }
+                } else if (token) {
+                    try {
+                        const userProfile = await authService.getCurrentUser();
+                        const userData = {
+                            ...UserDTO,
+                            ...userProfile
+                        };
+                        setUser(userData);
+                        setUserState(userData);
+                        setIsAuthenticated(true);
+                    } catch (error) {
+                        await logout();
+                    }
+                }
+            } catch (error) {
+                await logout();
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
 
         initializeAuth();
     }, []);
 
-        const login = async (loginResponse) => {
+    const login = async (loginResponse) => {
         const { accessToken, refreshToken, userId, email } = loginResponse;
-        
-        // Store tokens
+
         setTokens(accessToken, refreshToken);
-        
+
         try {
             const userProfile = await authService.getCurrentUser();
-            
-            const userData = { 
+
+            const userData = {
                 ...UserDTO,
                 id: userId,
                 email,
-                name: userProfile.name,
-                surname: userProfile.surname,
-                phoneNumber: userProfile.phoneNumber,
-                gender: userProfile.gender,
-                birthdate: userProfile.birthdate,
-                accountStatus: userProfile.accountStatus,
-                accountVerified: userProfile.accountVerified,
-                accountCreationDate: userProfile.accountCreationDate
+                ...userProfile
             };
+
             setUser(userData);
             setUserState(userData);
             setIsAuthenticated(true);
         } catch (error) {
-            console.error('Failed to fetch user profile:', error);
-            const userData = { 
+            // Set basic user data from login response
+            const userData = {
                 ...UserDTO,
-                id: userId, 
-                email 
+                id: userId,
+                email
             };
             setUser(userData);
             setUserState(userData);
@@ -72,39 +102,30 @@ export const AuthProvider = ({ children }) => {
     };
 
     const loginWithTokens = async (accessToken, refreshToken) => {
-        // Store tokens first
         setTokens(accessToken, refreshToken);
 
         try {
             const userProfile = await authService.getCurrentUser();
             const userData = {
                 ...UserDTO,
-                id: userProfile.id,
-                email: userProfile.email,
-                name: userProfile.name,
-                surname: userProfile.surname,
-                phoneNumber: userProfile.phoneNumber,
-                gender: userProfile.gender,
-                birthdate: userProfile.birthdate,
-                accountStatus: userProfile.accountStatus,
-                accountVerified: userProfile.accountVerified,
-                accountCreationDate: userProfile.accountCreationDate
+                ...userProfile
             };
             setUser(userData);
             setUserState(userData);
             setIsAuthenticated(true);
         } catch (error) {
-            console.error('Failed to fetch user profile after OAuth login:', error);
-            // Minimal auth state so the app can proceed; user can refresh profile later
             setIsAuthenticated(true);
         }
     };
 
     const logout = async () => {
         try {
-            await authService.logout();
+            const token = getToken();
+            if (token) {
+                await authService.logout();
+            }
         } catch (error) {
-            console.error('Backend logout failed:', error);
+            // Continue with local logout
         } finally {
             clearTokens();
             setUserState(null);
@@ -118,6 +139,14 @@ export const AuthProvider = ({ children }) => {
         setUserState(newUserData);
     };
 
+    const handleTokenRefresh = (newAccessToken, newRefreshToken) => {
+        setTokens(newAccessToken, newRefreshToken);
+    };
+
+    const handleTokenRefreshFailure = () => {
+        logout();
+    };
+
     const value = {
         user,
         isAuthenticated,
@@ -126,6 +155,8 @@ export const AuthProvider = ({ children }) => {
         loginWithTokens,
         logout,
         updateUser,
+        handleTokenRefresh,
+        handleTokenRefreshFailure,
     };
 
     return (

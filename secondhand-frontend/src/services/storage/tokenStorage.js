@@ -1,35 +1,76 @@
-const TOKEN_KEY = 'secondhand_access_token';
-const REFRESH_TOKEN_KEY = 'secondhand_refresh_token';
-const USER_KEY = 'secondhand_user';
+// tokenStorage.js - Production ready version
+const ACCESS_TOKEN_KEY = 'accessToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
+const USER_KEY = 'user';
+
+// Token management
+export const setTokens = (accessToken, refreshToken) => {
+    if (accessToken) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    }
+    if (refreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
+};
 
 export const getToken = () => {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
 export const getRefreshToken = () => {
     return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-export const getUser = () => {
-    const user = localStorage.getItem(USER_KEY);
-    return user ? JSON.parse(user) : null;
-};
-
-export const setTokens = (accessToken, refreshToken) => {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-};
-
-export const setUser = (user) => {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-};
-
 export const clearTokens = () => {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
 };
 
-export const isAuthenticated = () => {
-    return !!getToken();
+// User management
+export const setUser = (userData) => {
+    if (userData) {
+        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+    } else {
+        localStorage.removeItem(USER_KEY);
+    }
+};
+
+export const getUser = () => {
+    try {
+        const userData = localStorage.getItem(USER_KEY);
+        if (userData) {
+            return JSON.parse(userData);
+        }
+    } catch (error) {
+        localStorage.removeItem(USER_KEY);
+    }
+    return null;
+};
+
+export const clearUser = () => {
+    localStorage.removeItem(USER_KEY);
+};
+
+// Helper functions
+export const isTokenExpired = (token) => {
+    if (!token) return true;
+
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 < Date.now();
+    } catch (error) {
+        return true;
+    }
+};
+
+export const hasValidTokens = () => {
+    const accessToken = getToken();
+    const refreshToken = getRefreshToken();
+
+    if (!accessToken || !refreshToken) {
+        return false;
+    }
+
+    return !isTokenExpired(refreshToken);
 };

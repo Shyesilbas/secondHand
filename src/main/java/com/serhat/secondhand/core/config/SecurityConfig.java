@@ -17,12 +17,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.Instant;
 import java.util.Arrays;
 
 @EnableWebSecurity
@@ -36,7 +40,6 @@ public class SecurityConfig {
     private final AuthenticationFilter authenticationFilter;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -68,7 +71,7 @@ public class SecurityConfig {
                                 "/api/v1/payments/listing-fee-config",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        
+
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -79,16 +82,95 @@ public class SecurityConfig {
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                 )
+                // ✅ Bu kısmı ekleyin - Exception handling
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint())
+                        .accessDeniedHandler(customAccessDeniedHandler())
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // ✅ API endpoint'leri için JSON response döndüren AuthenticationEntryPoint
+    @Bean
+    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return (request, response, authException) -> {
+            String requestURI = request.getRequestURI();
+            String acceptHeader = request.getHeader("Accept");
+            String userAgent = request.getHeader("User-Agent");
+
+            log.warn("Authentication failed for URI: {}, Accept: {}", requestURI, acceptHeader);
+
+            // API endpoint'leri veya JSON istekleri için JSON response döndür
+            if (requestURI.startsWith("/api/") ||
+                    (acceptHeader != null && acceptHeader.contains("application/json")) ||
+                    (userAgent != null && userAgent.toLowerCase().contains("axios"))) {
+
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                // CORS headers ekle
+                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+                response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+
+                String jsonResponse = String.format(
+                        "{\"error\":\"UNAUTHORIZED\",\"message\":\"Token expired or invalid\",\"timestamp\":\"%s\",\"path\":\"%s\"}",
+                        Instant.now().toString(),
+                        requestURI
+                );
+
+                response.getWriter().write(jsonResponse);
+                log.info("Sent JSON unauthorized response for API endpoint: {}", requestURI);
+                return;
+            }
+
+            // Browser request'leri için OAuth2 redirect
+            log.info("Redirecting to OAuth2 for browser request: {}", requestURI);
+            response.sendRedirect("/oauth2/authorization/google");
+        };
+    }
+
+    // ✅ Access denied için JSON response
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            String requestURI = request.getRequestURI();
+            String acceptHeader = request.getHeader("Accept");
+
+            log.warn("Access denied for URI: {}", requestURI);
+
+            if (requestURI.startsWith("/api/") ||
+                    (acceptHeader != null && acceptHeader.contains("application/json"))) {
+
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+                // CORS headers
+                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                response.setHeader("Access-Control-Allow-Credentials", "true");
+
+                String jsonResponse = String.format(
+                        "{\"error\":\"FORBIDDEN\",\"message\":\"Access denied\",\"timestamp\":\"%s\",\"path\":\"%s\"}",
+                        Instant.now().toString(),
+                        requestURI
+                );
+
+                response.getWriter().write(jsonResponse);
+                return;
+            }
+
+            response.sendRedirect("/login");
+        };
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://127.0.0.1:3000",
@@ -96,11 +178,11 @@ public class SecurityConfig {
                 "http://localhost:5173",  // Vite default port
                 "http://127.0.0.1:5173"
         ));
-        
+
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         ));
-        
+
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",
@@ -110,22 +192,22 @@ public class SecurityConfig {
                 "Cache-Control",
                 "X-File-Name"
         ));
-        
+
         // Allow credentials (important for JWT tokens)
         configuration.setAllowCredentials(true);
-        
+
         // Exposed headers
         configuration.setExposedHeaders(Arrays.asList(
                 "Authorization",
                 "X-Total-Count"
         ));
-        
+
         // Max age for preflight requests
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
+
         return source;
     }
 
@@ -133,9 +215,7 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setPasswordEncoder(passwordEncoder());
-
         authProvider.setUserDetailsService(userDetailsService);
-
         return authProvider;
     }
 
@@ -143,7 +223,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
