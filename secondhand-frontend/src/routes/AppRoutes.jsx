@@ -38,6 +38,7 @@ import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
 import OAuthCompletePage from '../pages/auth/OAuthCompletePage.jsx';
 import AgreementsPage from '../pages/agreements/AgreementsPage';
+import ChatPage from '../pages/chat/ChatPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
@@ -148,6 +149,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.BANK_ACCOUNTS} element={<BankAccountsPage />} />
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
+        <Route path={ROUTES.CHAT} element={<ChatPage />} />
         <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
         <Route path={ROUTES.ELECTRONIC_EDIT} element={<ElectronicEditPage />} />
         <Route path={ROUTES.BOOKS_EDIT} element={<BooksEditPage />} />

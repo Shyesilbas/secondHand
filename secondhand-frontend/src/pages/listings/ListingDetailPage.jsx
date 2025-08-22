@@ -7,6 +7,7 @@ import FavoriteStats from '../../features/favorites/components/FavoriteStats';
 import StatusBadge from '../../components/ui/StatusBadge';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
 import ListingCardActions from '../../features/listings/components/ListingCardActions';
+import ContactSellerButton from '../../features/chat/components/ContactSellerButton';
 import { listingTypeRegistry } from '../../features/listings/components/typeRegistry';
 
 const ListingDetailPage = ({
@@ -202,7 +203,10 @@ const ListingDetailPage = ({
 
               {!isOwner && (
                   <div className="space-y-3">
-                    <button className="w-full border border-slate-200 bg-white text-slate-800 py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors font-medium">Contact Seller</button>
+                    <ContactSellerButton 
+                      listing={listing}
+                      className="w-full py-3 px-4 text-base font-medium"
+                    />
                   </div>
               )}
 

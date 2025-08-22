@@ -42,7 +42,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             "/api/auth/oauth2/**",
             "/login/oauth2/code/**",
             "/oauth2/**",
-            "/webjars"
+            "/webjars",
+            "/ws/**"
     );
 
     @Override

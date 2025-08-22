@@ -34,6 +34,7 @@ export const ROUTES = {
     CREDIT_CARDS: '/credit-card',
     BANK_ACCOUNTS: '/bank',
     EMAILS: '/emails',
+    CHAT: '/chat',
     AGREEMENTS: '/agreements',
     AGREEMENTS_ALL: '/agreements/all',
 };

@@ -157,4 +157,22 @@ export const API_ENDPOINTS = {
         ADMIN_ACCEPT_ALL: '/agreements/admin/accept-all-users',
         // ADMIN_ACCEPT_USER is currently disabled in backend controller
     },
+    CHAT: {
+        // Chat Room endpoints
+        CREATE_ROOM: '/chat/rooms',
+        USER_ROOMS: (userId) => `/chat/rooms/user/${userId}`,
+        DIRECT_ROOM: '/chat/rooms/direct',
+        LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
+        CREATE_LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
+        
+        // Message endpoints
+        SEND_MESSAGE: '/chat/messages',
+        ROOM_MESSAGES: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages`,
+        MARK_READ: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/read`,
+        UNREAD_COUNT: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/unread-count`,
+        
+        // User messages endpoints
+        ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
+        TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,
+    },
 };
