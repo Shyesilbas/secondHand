@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomDto {
-    
+
     private Long id;
     private String roomName;
     private ChatRoom.RoomType roomType;
@@ -21,13 +21,15 @@ public class ChatRoomDto {
     private String lastMessage;
     private LocalDateTime lastMessageTime;
     private Long lastMessageSenderId;
+    private String lastMessageSenderName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
-    // Ek bilgiler (frontend için)
+
     private Integer unreadCount;
-    private String otherParticipantName; // Direct chat için diğer kullanıcının adı
-    
+    private String otherParticipantName;
+    private Long otherParticipantId;
+    private String listingTitle;
+
     public static ChatRoomDto fromEntity(ChatRoom chatRoom) {
         ChatRoomDto dto = new ChatRoomDto();
         dto.setId(chatRoom.getId());

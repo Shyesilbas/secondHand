@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
@@ -14,6 +15,7 @@ const ChatWindow = ({
     isConnected 
 }) => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
@@ -50,7 +52,30 @@ const ChatWindow = ({
         }
     };
 
+    const handleListingTitleClick = () => {
+        if (selectedChatRoom?.listingId) {
+            // İlan detay sayfasına yönlendir
+            navigate(`/listings/${selectedChatRoom.listingId}`);
+            // Chat'i kapat
+            onClose();
+        }
+    };
+
     if (!isOpen) return null;
+
+    const getHeaderName = () => {
+        if (selectedChatRoom?.otherParticipantName) {
+            return selectedChatRoom.otherParticipantName;
+        }
+
+        if (selectedChatRoom?.roomType === 'LISTING') {
+            return 'Satıcı';
+        }
+
+        return selectedChatRoom?.roomName || 'Chat';
+    };
+
+
 
     return (
         <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
@@ -60,8 +85,17 @@ const ChatWindow = ({
                     <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     <div>
                         <h3 className="font-semibold text-sm">
-                            {selectedChatRoom?.roomName || 'Chat'}
+                            {getHeaderName()}
                         </h3>
+                        {selectedChatRoom?.listingTitle && (
+                            <button
+                                onClick={handleListingTitleClick}
+                                className="text-xs opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-all"
+                                title="İlanı görüntüle"
+                            >
+                                {selectedChatRoom.listingTitle}
+                            </button>
+                        )}
                         <p className="text-xs opacity-90">
                             {isConnected ? 'Online' : 'Offline'}
                         </p>

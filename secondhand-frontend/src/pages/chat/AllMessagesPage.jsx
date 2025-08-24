@@ -137,7 +137,7 @@ const MessageItem = ({ message, isOwnMessage }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-gray-900">
-              {isOwnMessage ? 'Sen' : `Kullanıcı ${message.senderId}`}
+              {isOwnMessage ? 'Sen' : message.senderName || `Kullanıcı ${message.senderId}`}
             </p>
             <p className="text-xs text-gray-500">
               {formatDistanceToNow(new Date(message.createdAt), { 

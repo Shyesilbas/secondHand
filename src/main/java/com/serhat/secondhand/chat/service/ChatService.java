@@ -43,7 +43,7 @@ public class ChatService {
         log.info("Found {} chat rooms for user {}", chatRooms.size(), userId);
         
         return chatRooms.stream()
-                .map(this::enrichChatRoomDto)
+                .map(room -> enrichChatRoomDtoForUser(room, userId))
                 .collect(Collectors.toList());
     }
     
@@ -55,7 +55,7 @@ public class ChatService {
         Optional<ChatRoom> existingRoom = chatRoomRepository.findDirectChatRoom(userId1, userId2);
         if (existingRoom.isPresent()) {
             log.info("Found existing direct chat room: {}", existingRoom.get().getId());
-            return enrichChatRoomDto(existingRoom.get());
+            return enrichChatRoomDtoForUser(existingRoom.get(), userId1);
         }
         
         ChatRoom newRoom = new ChatRoom();
@@ -66,7 +66,7 @@ public class ChatService {
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
         log.info("Created new direct chat room: {}", savedRoom.getId());
         
-        return enrichChatRoomDto(savedRoom);
+        return enrichChatRoomDtoForUser(savedRoom, userId1);
     }
     
 
@@ -77,7 +77,7 @@ public class ChatService {
         List<ChatRoom> existingRooms = chatRoomRepository.findByListingIdAndUserIdOrderByCreatedAtDesc(listingId, userId);
         if (!existingRooms.isEmpty()) {
             log.info("Found existing listing chat room: {}", existingRooms.get(0).getId());
-            return enrichChatRoomDto(existingRooms.get(0));
+            return enrichChatRoomDtoForUser(existingRooms.get(0), userId);
         }
         
         // Listing'i bul ve seller'ı al
@@ -97,26 +97,20 @@ public class ChatService {
         ChatRoom savedRoom = chatRoomRepository.save(newRoom);
         log.info("Created new listing chat room: {} with participants: {}", savedRoom.getId(), savedRoom.getParticipantIds());
         
-        return enrichChatRoomDto(savedRoom);
+        return enrichChatRoomDtoForUser(savedRoom, userId);
     }
     
-    // ==================== MESAJ İŞLEMLERİ ====================
-    
-    /**
-     * Mesaj gönder
-     */
+
     @Transactional
     public ChatMessageDto sendMessage(ChatMessageDto messageDto) {
         log.info("Sending message - sender: {}, recipient: {}, room: {}, content: {}", 
                 messageDto.getSenderId(), messageDto.getRecipientId(), messageDto.getChatRoomId(), messageDto.getContent());
         
-        // Sender ve recipient user'ları bul
         User sender = userRepository.findById(messageDto.getSenderId())
                 .orElseThrow(() -> new RuntimeException("Sender user not found"));
         User recipient = userRepository.findById(messageDto.getRecipientId())
                 .orElseThrow(() -> new RuntimeException("Recipient user not found"));
         
-        // Mesajı kaydet
         Message message = new Message();
         message.setContent(messageDto.getContent());
         message.setSender(sender);
@@ -203,16 +197,88 @@ public class ChatService {
      */
     private ChatRoomDto enrichChatRoomDto(ChatRoom chatRoom) {
         ChatRoomDto dto = ChatRoomDto.fromEntity(chatRoom);
-        
+
         // Okunmamış mesaj sayısını hesapla (ilk participant için)
         if (!chatRoom.getParticipantIds().isEmpty()) {
             Long firstParticipant = chatRoom.getParticipantIds().get(0);
             dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoom.getId(), firstParticipant).intValue());
         }
-        
+
         return dto;
     }
-    
+
+    private ChatRoomDto enrichChatRoomDtoForUser(ChatRoom chatRoom, Long currentUserId) {
+        ChatRoomDto dto = ChatRoomDto.fromEntity(chatRoom);
+
+        // Okunmamış mesaj sayısını current user için hesapla
+        dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoom.getId(), currentUserId).intValue());
+
+        // Diğer kullanıcı bilgilerini ekle
+        enrichOtherParticipantInfo(dto, chatRoom, currentUserId);
+
+        // Son mesajı gönderen kişinin adını ekle
+        if (chatRoom.getLastMessageSenderId() != null) {
+            User lastMessageSender = userRepository.findById(chatRoom.getLastMessageSenderId()).orElse(null);
+            if (lastMessageSender != null) {
+                dto.setLastMessageSenderName(lastMessageSender.getName() + " " + lastMessageSender.getSurname());
+            }
+        }
+
+        return dto;
+    }
+
+
+    /**
+     * Chat room'daki diğer kullanıcının bilgilerini ekle
+     */
+    private void enrichOtherParticipantInfo(ChatRoomDto dto, ChatRoom chatRoom, Long currentUserId) {
+        if (chatRoom.getRoomType() == ChatRoom.RoomType.DIRECT) {
+            if (chatRoom.getParticipantIds().size() >= 2) {
+                Long otherParticipantId = chatRoom.getParticipantIds().stream()
+                        .filter(id -> !id.equals(currentUserId))
+                        .findFirst()
+                        .orElse(null);
+
+                if (otherParticipantId != null) {
+                    User otherUser = userRepository.findById(otherParticipantId).orElse(null);
+                    if (otherUser != null) {
+                        dto.setOtherParticipantId(otherUser.getId());
+                        dto.setOtherParticipantName(otherUser.getName() + " " + otherUser.getSurname());
+                    }
+                }
+            }
+        } else if (chatRoom.getRoomType() == ChatRoom.RoomType.LISTING) {
+            if (chatRoom.getListingId() != null) {
+                Listing listing = listingRepository.findById(UUID.fromString(chatRoom.getListingId())).orElse(null);
+                if (listing != null) {
+                    dto.setListingTitle(listing.getTitle());
+
+                    Long sellerId = listing.getSeller().getId();
+                    if (currentUserId.equals(sellerId)) {
+                        // Login user seller → otherParticipant = buyer
+                        Long buyerId = chatRoom.getParticipantIds().stream()
+                                .filter(id -> !id.equals(sellerId))
+                                .findFirst()
+                                .orElse(null);
+                        if (buyerId != null) {
+                            User buyer = userRepository.findById(buyerId).orElse(null);
+                            if (buyer != null) {
+                                dto.setOtherParticipantId(buyer.getId());
+                                dto.setOtherParticipantName(buyer.getName() + " " + buyer.getSurname());
+                            }
+                        }
+                    } else {
+                        // Login user buyer → otherParticipant = seller
+                        User seller = listing.getSeller();
+                        dto.setOtherParticipantId(seller.getId());
+                        dto.setOtherParticipantName(seller.getName() + " " + seller.getSurname());
+                    }
+                }
+            }
+        }
+    }
+
+
     /**
      * Chat room'un son mesaj bilgilerini güncelle
      */
