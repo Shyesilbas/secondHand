@@ -6,6 +6,7 @@ import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
+import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
@@ -32,6 +33,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -124,17 +126,36 @@ public class AuthService {
         user.setLastLoginDate(LocalDateTime.now());
         userService.update(user);
 
+        Token oldRefreshToken = tokenService.findActiveTokensByUser(user).stream()
+                .filter(t -> t.getTokenType() == TokenType.REFRESH_TOKEN)
+                .findFirst()
+                .orElse(null);
+
+        tokenService.revokeAllUserTokens(user);
+
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);
 
-        tokenService.revokeAllUserTokens(user);
-        tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
-        tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+        tokenService.saveToken(
+                accessToken,
+                TokenType.ACCESS_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
+                null
+        );
 
+        tokenService.saveToken(
+                refreshToken,
+                TokenType.REFRESH_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
+                oldRefreshToken
+        );
 
         log.info("User logged in successfully: {}", user.getEmail());
         return new LoginResponse("Login success", user.getId(), user.getEmail(), accessToken, refreshToken);
     }
+
 
     public String logout(String username, String accessToken) {
         log.info("Logout request: {}", username);
@@ -156,43 +177,50 @@ public class AuthService {
         return "Logout successful";
     }
 
-    public LoginResponse refreshToken(String refreshToken) {
+    public LoginResponse refreshToken(String refreshTokenValue) {
         log.info("Token refresh request");
 
-        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+        if (refreshTokenValue == null || refreshTokenValue.trim().isEmpty()) {
             throw InvalidRefreshTokenException.notFound();
         }
 
-        String username = jwtUtils.extractUsername(refreshToken);
+        String username = jwtUtils.extractUsername(refreshTokenValue);
         User user = userService.findByEmail(username);
 
-        if (!jwtUtils.isTokenValid(refreshToken, user)) {
+        if (!jwtUtils.isTokenValid(refreshTokenValue, user)) {
             throw InvalidRefreshTokenException.invalid();
         }
 
-        if (!tokenService.isTokenValid(refreshToken)) {
+        if (!tokenService.isTokenValid(refreshTokenValue)) {
             throw InvalidRefreshTokenException.revoked();
         }
+
+        Token oldRefreshToken = tokenService.findByToken(refreshTokenValue)
+                .orElseThrow(InvalidRefreshTokenException::invalid);
 
         String newAccessToken = jwtUtils.generateAccessToken(user);
         String newRefreshToken = jwtUtils.generateRefreshToken(user);
 
-        // Revoke the old refresh token
-        tokenService.revokeToken(refreshToken);
+        tokenService.revokeToken(refreshTokenValue);
 
-        // Persist new tokens
-        tokenService.saveToken(newAccessToken, TokenType.ACCESS_TOKEN, user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
-        tokenService.saveToken(newRefreshToken, TokenType.REFRESH_TOKEN, user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+        tokenService.saveToken(
+                newAccessToken,
+                TokenType.ACCESS_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
+                null
+        );
+
+        tokenService.saveToken(
+                newRefreshToken,
+                TokenType.REFRESH_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
+                oldRefreshToken
+        );
 
         log.info("Tokens rotated successfully for user: {}", username);
         return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, newRefreshToken);
-    }
-
-    public LoginResponse getAuthenticatedUser(String username) {
-        User user = userService.findByEmail(username);
-        return new LoginResponse("Authenticated user", user.getId(), user.getEmail(), null, null);
     }
 
     public Map<String, String> logout(Authentication authentication, HttpServletRequest request) {
@@ -225,21 +253,38 @@ public class AuthService {
 
     public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request) {
         User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
+
+        Token oldRefreshToken = null;
         if (existing != null) {
             existing.setLastLoginDate(LocalDateTime.now());
             userService.update(existing);
 
+            tokenService.revokeAllUserTokens(existing);
+
             String accessToken = jwtUtils.generateAccessToken(existing);
             String refreshToken = jwtUtils.generateRefreshToken(existing);
 
-            tokenService.revokeAllUserTokens(existing);
-            tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, existing, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
-            tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, existing, LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+            oldRefreshToken = tokenService.findByUserAndType(existing, TokenType.REFRESH_TOKEN).orElse(null);
+
+            tokenService.saveToken(
+                    accessToken,
+                    TokenType.ACCESS_TOKEN,
+                    existing,
+                    LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
+                    null
+            );
+            tokenService.saveToken(
+                    refreshToken,
+                    TokenType.REFRESH_TOKEN,
+                    existing,
+                    LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
+                    oldRefreshToken
+            );
 
             return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
         }
 
-        // Create user without password (social login) and with provided fields
+        // Yeni kullanıcı (social login)
         User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -250,7 +295,7 @@ public class AuthService {
                 .provider(com.serhat.secondhand.user.domain.entity.enums.Provider.GOOGLE)
                 .accountStatus(AccountStatus.ACTIVE)
                 .accountVerified(true)
-                .accountCreationDate(java.time.LocalDate.now())
+                .accountCreationDate(LocalDate.now())
                 .lastLoginDate(LocalDateTime.now())
                 .build();
 
@@ -261,9 +306,23 @@ public class AuthService {
         String refreshToken = jwtUtils.generateRefreshToken(user);
 
         tokenService.revokeAllUserTokens(user);
-        tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
-        tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user, LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+
+        tokenService.saveToken(
+                accessToken,
+                TokenType.ACCESS_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
+                null
+        );
+        tokenService.saveToken(
+                refreshToken,
+                TokenType.REFRESH_TOKEN,
+                user,
+                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
+                null
+        );
 
         return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);
     }
+
 }

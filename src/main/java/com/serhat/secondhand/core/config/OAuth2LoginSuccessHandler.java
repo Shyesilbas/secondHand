@@ -1,15 +1,12 @@
 package com.serhat.secondhand.core.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.auth.application.TokenService;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
+import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.core.jwt.JwtUtils;
-import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import com.serhat.secondhand.user.domain.entity.enums.Provider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +19,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -34,7 +30,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserService userService;
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
-    private final EmailService emailService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -51,13 +46,15 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             log.info("OAuth2 login attempt for email: {}", email);
 
-            Optional<User> existingUser = userService.findOptionalByEmail(email);
+            Optional<User> existingUserOpt = userService.findOptionalByEmail(email);
 
-            if (existingUser.isPresent()) {
-                User user = existingUser.get();
+            if (existingUserOpt.isPresent()) {
+                User user = existingUserOpt.get();
                 user.setLastLoginDate(LocalDateTime.now());
                 user.setProvider(Provider.GOOGLE);
                 userService.update(user);
+
+                Optional<Token> oldRefreshToken = tokenService.findByUserAndType(user, TokenType.REFRESH_TOKEN);
 
                 String accessToken = jwtUtils.generateAccessToken(user);
                 String refreshToken = jwtUtils.generateRefreshToken(user);
@@ -65,9 +62,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 tokenService.revokeAllUserTokens(user);
 
                 tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user,
-                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000));
+                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000), null);
+
                 tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
-                        LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000));
+                        LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
+                        oldRefreshToken.orElse(null));
 
                 LoginResponse loginResponse = new LoginResponse(
                         "OAuth2 login successful",
@@ -92,6 +91,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             handleErrorResponse(response, "Authentication failed");
         }
     }
+
 
     private String urlEncode(String value) {
         try {

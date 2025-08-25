@@ -1,6 +1,5 @@
 package com.serhat.secondhand.core.jwt;
 
-import com.serhat.secondhand.user.domain.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -16,9 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.UUID;
-import java.util.List;
-import java.util.stream.Collectors;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtils {

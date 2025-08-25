@@ -42,4 +42,10 @@ public class Token {
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
+
+    @Column(name = "family_id")
+    private UUID familyId;
+
+    @Column(name = "parent_token_id")
+    private UUID parentId;
 }
