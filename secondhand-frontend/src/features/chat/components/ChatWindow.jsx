@@ -1,9 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useChatWindow } from '../hooks/useChatWindow';
+import LoadingIndicator from '../../../components/ui/LoadingIndicator';
+import EmptyState from '../../../components/ui/EmptyState';
 
 const ChatWindow = ({ 
     isOpen, 
@@ -16,41 +19,14 @@ const ChatWindow = ({
 }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [messageText, setMessageText] = useState('');
-    const messagesEndRef = useRef(null);
-    const inputRef = useRef(null);
-
-    // Mesajları otomatik scroll
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    // Enter tuşu ile mesaj gönderme
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
-    };
-
-    const handleSendMessage = () => {
-        console.log('Sending message:', messageText);
-        console.log('Selected chat room:', selectedChatRoom);
-        console.log('Selected chat room id:', selectedChatRoom?.id);
-        if (messageText.trim() && selectedChatRoom?.id) {
-            onSendMessage(messageText.trim());
-            setMessageText('');
-        } else {
-            console.log('Cannot send message - missing text or chat room');
-            console.log('Message text:', messageText.trim());
-            console.log('Selected chat room exists:', !!selectedChatRoom);
-            console.log('Selected chat room id exists:', !!selectedChatRoom?.id);
-        }
-    };
+    const {
+        messageText,
+        setMessageText,
+        messagesEndRef,
+        inputRef,
+        handleKeyPress,
+        handleSendMessage
+    } = useChatWindow({ selectedChatRoom, onSendMessage });
 
     const handleListingTitleClick = () => {
         if (selectedChatRoom?.listingId) {
@@ -113,13 +89,10 @@ const ChatWindow = ({
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
                 {isLoadingMessages ? (
                     <div className="flex justify-center items-center h-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                        <LoadingIndicator size="h-8 w-8" />
                     </div>
                 ) : messages.length === 0 ? (
-                    <div className="text-center text-gray-500 mt-8">
-                        <p>Henüz mesaj yok</p>
-                        <p className="text-sm">İlk mesajı siz gönderin!</p>
-                    </div>
+                    <EmptyState title="Henüz mesaj yok" description="İlk mesajı siz gönderin!" />
                 ) : (
                     messages.map((message) => (
                         <MessageBubble

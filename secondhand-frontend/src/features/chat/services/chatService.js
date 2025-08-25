@@ -1,4 +1,4 @@
-import { request } from '../../../services/api/request';
+import { request, requestWithParams } from '../../../services/api/request';
 import { API_ENDPOINTS } from '../../../constants/apiEndpoints';
 
 export const chatService = {
@@ -15,16 +15,14 @@ export const chatService = {
      * İki kullanıcı arasında direct chat oluştur veya mevcut olanı getir
      */
     createOrGetDirectChat: async (userId1, userId2) => {
-        const params = new URLSearchParams({ userId1, userId2 });
-        return request('POST', `${API_ENDPOINTS.CHAT.DIRECT_ROOM}?${params}`);
+        return requestWithParams('POST', API_ENDPOINTS.CHAT.DIRECT_ROOM, { userId1, userId2 });
     },
     
     /**
      * Listing ile ilgili chat oluştur veya mevcut olanı getir
      */
     createOrGetListingChat: async (userId, listingId, listingTitle) => {
-        const params = new URLSearchParams({ userId, listingTitle });
-        return request('POST', `${API_ENDPOINTS.CHAT.CREATE_LISTING_ROOM(listingId)}?${params}`);
+        return requestWithParams('POST', API_ENDPOINTS.CHAT.CREATE_LISTING_ROOM(listingId), { userId, listingTitle });
     },
     
     // ==================== MESAJ İŞLEMLERİ ====================
@@ -40,32 +38,28 @@ export const chatService = {
      * Chat room'daki mesajları getir
      */
     getChatMessages: async (chatRoomId, page = 0, size = 20) => {
-        const params = new URLSearchParams({ page, size });
-        return request('GET', `${API_ENDPOINTS.CHAT.ROOM_MESSAGES(chatRoomId)}?${params}`);
+        return requestWithParams('GET', API_ENDPOINTS.CHAT.ROOM_MESSAGES(chatRoomId), { page, size });
     },
     
     /**
      * Mesajları okundu olarak işaretle
      */
     markMessagesAsRead: async (chatRoomId, userId) => {
-        const params = new URLSearchParams({ userId });
-        return request('PUT', `${API_ENDPOINTS.CHAT.MARK_READ(chatRoomId)}?${params}`);
+        return requestWithParams('PUT', API_ENDPOINTS.CHAT.MARK_READ(chatRoomId), { userId });
     },
     
     /**
      * Chat room'daki okunmamış mesaj sayısını getir
      */
     getUnreadMessageCount: async (chatRoomId, userId) => {
-        const params = new URLSearchParams({ userId });
-        return request('GET', `${API_ENDPOINTS.CHAT.UNREAD_COUNT(chatRoomId)}?${params}`);
+        return requestWithParams('GET', API_ENDPOINTS.CHAT.UNREAD_COUNT(chatRoomId), { userId });
     },
     
     /**
      * Kullanıcının tüm mesajlarını getir (tüm chat room'lardan)
      */
     getAllUserMessages: async (userId, page = 0, size = 20) => {
-        const params = new URLSearchParams({ page, size });
-        return request('GET', `${API_ENDPOINTS.CHAT.ALL_USER_MESSAGES(userId)}?${params}`);
+        return requestWithParams('GET', API_ENDPOINTS.CHAT.ALL_USER_MESSAGES(userId), { page, size });
     },
     
     /**

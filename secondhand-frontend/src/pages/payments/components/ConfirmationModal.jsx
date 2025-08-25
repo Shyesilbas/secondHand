@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatCurrency } from '../../../utils/formatters';
+import LoadingIndicator from '../../../components/ui/LoadingIndicator';
 
 const ConfirmationModal = ({
     selectedListing,
@@ -26,7 +27,7 @@ const ConfirmationModal = ({
         if (isLoadingPaymentMethods) {
             return (
                 <div className="flex items-center justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <LoadingIndicator size="h-6 w-6" />
                     <span className="ml-2 text-gray-600">Yükleniyor...</span>
                 </div>
             );

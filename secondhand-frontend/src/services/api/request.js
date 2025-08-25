@@ -24,3 +24,9 @@ export const post = (url, data, config) => request('post', url, data, config);
 export const put = (url, data, config) => request('put', url, data, config);
 export const del = (url, config) => request('delete', url, undefined, config);
 
+// Helper for requests with query params to avoid manual URL string building
+export const requestWithParams = async (method, url, params = {}, data, config = {}) => {
+  const mergedConfig = { ...config, params };
+  return request(method, url, data, mergedConfig);
+};
+

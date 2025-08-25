@@ -3,9 +3,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useChat } from '../../features/chat/hooks/useChat';
 import ChatWindow from '../../features/chat/components/ChatWindow';
 import { useNavigate } from 'react-router-dom';
-import { ChatBubbleLeftRightIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import LoadingIndicator from '../../components/ui/LoadingIndicator';
+import EmptyState from '../../components/ui/EmptyState';
+import AvatarMessageItem from '../../components/ui/AvatarMessageItem';
 
 const ChatPage = () => {
   const { user } = useAuth();
@@ -73,17 +76,13 @@ const ChatPage = () => {
                 <div className="max-h-96 overflow-y-auto">
                   {isLoadingRooms ? (
                       <div className="p-4 text-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                        <LoadingIndicator />
                       </div>
                   ) : chatRooms.length === 0 ? (
-                      <div className="p-8 text-center text-gray-500">
-                        <ChatBubbleLeftRightIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                        <p>No Messages Yet</p>
-                        <p className="text-sm">Contact with a seller</p>
-                      </div>
+                      <EmptyState icon={ChatBubbleLeftRightIcon} title="No Messages Yet" description="Contact with a seller" />
                   ) : (
                       chatRooms.map((room) => (
-                          <ChatRoomItem
+                          <ChatRoomListItem
                               key={room.id}
                               room={room}
                               isSelected={selectedChatRoom?.id === room.id}
@@ -122,7 +121,7 @@ const ChatPage = () => {
   );
 };
 
-const ChatRoomItem = ({ room, isSelected, onClick, onListingClick }) => {
+const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick }) => {
   const { user } = useAuth();
 
   const getRoomTitle = () => {
@@ -146,65 +145,27 @@ const ChatRoomItem = ({ room, isSelected, onClick, onListingClick }) => {
   };
 
   return (
-      <div
-          onClick={onClick}
-          className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-              isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-          }`}
-      >
-        <div className="flex items-start justify-between">
-          {/* Sol: Profil + Mesaj */}
-          <div className="flex items-center space-x-3 flex-1 min-w-0">
-            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-              <UserCircleIcon className="w-6 h-6 text-gray-500" />
+      <div onClick={onClick} className={`cursor-pointer ${isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}>
+        <AvatarMessageItem
+          containerClassName="p-4 border-b border-gray-100"
+          title={room.listingTitle ? (
+            <div className="flex flex-col">
+              <span className="text-gray-700">{room.otherParticipantName}</span>
+              <div className="flex items-center space-x-1">
+                <span>İlan:</span>
+                <button
+                  onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
+                  className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors"
+                  title="İlanı görüntüle"
+                >
+                  {room.listingTitle}
+                </button>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-gray-900 truncate">
-                {room.listingTitle ? (
-                    <div className="flex flex-col">
-                      <span className="text-gray-700">{room.otherParticipantName}</span>
-                      <div className="flex items-center space-x-1">
-                        <span>İlan:</span>
-                        <button
-                            onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
-                            className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors"
-                            title="İlanı görüntüle"
-                        >
-                          {room.listingTitle}
-                        </button>
-                      </div>
-                    </div>
-                ) : (
-                    getRoomTitle()
-                )}
-              </h3>
-              <p className="text-xs text-gray-500 truncate">
-                {room.lastMessage ? (
-                    <>
-                      <span className="font-medium">{getLastMessageSenderName()}: </span>
-                      {room.lastMessage}
-                    </>
-                ) : (
-                    getRoomSubtitle()
-                )}
-              </p>
-            </div>
-          </div>
-
-          {/* Sağ üst: son mesaj zamanı + unread */}
-          <div className="flex flex-col items-end ml-2">
-            {room.lastMessageTime && (
-                <span className="text-xs text-gray-400">
-              {formatDistanceToNow(new Date(room.lastMessageTime), { addSuffix: true, locale: tr })}
-            </span>
-            )}
-            {room.unreadCount > 0 && (
-                <div className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center mt-1">
-                  {room.unreadCount}
-                </div>
-            )}
-          </div>
-        </div>
+          ) : getRoomTitle()}
+          subtitle={room.lastMessage ? `${getLastMessageSenderName()}: ${room.lastMessage}` : getRoomSubtitle()}
+          createdAt={room.lastMessageTime}
+        />
       </div>
   );
 };

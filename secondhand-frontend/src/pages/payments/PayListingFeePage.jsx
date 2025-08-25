@@ -6,13 +6,13 @@ import { useFeeConfig } from './hooks/useFeeConfig';
 import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { useEmails } from './hooks/useEmails';
 import BackButton from '../../components/ui/BackButton';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import EmptyState from '../../components/ui/EmptyState';
 import DraftListingsList from './components/DraftListingsList';
 import PaymentPanel from './components/PaymentPanel';
 import ConfirmationModal from './components/ConfirmationModal';
 import EmailDisplayModal from './components/EmailDisplayModal';
+import LoadingIndicator from "../../components/ui/LoadingIndicator.jsx";
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
@@ -54,7 +54,7 @@ const PayListingFeePage = () => {
     }, [showConfirmModal]);
 
     if (isLoading) {
-        return <LoadingSpinner />;
+        return <LoadingIndicator />;
     }
 
     return (

@@ -1,4 +1,3 @@
-// AgreementsPage.jsx
 import React, { useState, useEffect } from 'react';
 import AgreementsList from './AgreementsList.jsx';
 import { useNotification } from '../../context/NotificationContext';

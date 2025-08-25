@@ -1,13 +1,13 @@
-// AgreementsList.jsx
 import React, { useState } from 'react';
-import { CheckIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import { AGREEMENT_TYPE_LABELS } from '../../types/agreements';
-import { formatDate } from '../../utils/formatters';
+import AgreementCard from '../../components/agreements/AgreementCard.jsx';
+import AgreementModal from '../../components/agreements/AgreementModal.jsx';
+import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { agreementService } from '../../services/agreementService';
 import { useNotification } from '../../context/NotificationContext';
 
 const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter }) => {
     const [acceptingAgreement, setAcceptingAgreement] = useState(null);
+    const [modalAgreement, setModalAgreement] = useState(null);
     const notification = useNotification();
 
     const handleAcceptAgreement = async (agreement) => {
@@ -32,7 +32,7 @@ const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter
         return { status: 'outdated', text: 'Outdated', icon: ClockIcon, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' };
     };
 
-    const filteredAgreements = agreements.filter(agreement => {
+    const filteredAgreements = agreements.filter((agreement) => {
         const ua = userAgreements.find(ua => ua.agreementId === agreement.agreementId);
         const isAccepted = ua?.isAcceptedTheLastVersion;
         if (filter === 'all') return true;
@@ -57,46 +57,28 @@ const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter
             </div>
 
             <div className="space-y-6">
-                {filteredAgreements.map(agreement => {
+                {filteredAgreements.map((agreement) => {
                     const status = getUserAgreementStatus(agreement.agreementId);
-                    const StatusIcon = status.icon;
                     return (
-                        <div key={agreement.agreementId} className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center space-x-3">
-                                    <DocumentTextIcon className="h-8 w-8 text-blue-600" />
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900">{AGREEMENT_TYPE_LABELS[agreement.agreementType]}</h3>
-                                        <p className="text-sm text-gray-500">Version: {agreement.version} | Updated: {formatDate(agreement.updatedDate)}</p>
-                                    </div>
-                                </div>
-                                <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${status.bgColor} ${status.borderColor} border`}>
-                                    <StatusIcon className={`h-4 w-4 ${status.color}`} />
-                                    <span className={`text-sm font-medium ${status.color}`}>{status.text}</span>
-                                </div>
-                            </div>
-
-                            <div className="mb-4 bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto prose prose-sm max-w-none">
-                                <div dangerouslySetInnerHTML={{ __html: agreement.content }} />
-                            </div>
-
-                            {status.status === 'pending' && (
-                                <div className="flex justify-end">
-                                    <button
-                                        disabled={acceptingAgreement === agreement.agreementId}
-                                        onClick={() => handleAcceptAgreement(agreement)}
-                                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {acceptingAgreement === agreement.agreementId ? 'Accepting...' : <><CheckIcon className="h-4 w-4 mr-2" /> Accept</>}
-                                    </button>
-                                </div>
-                            )}
-
-                            {status.acceptedDate && <p className="text-green-700 text-sm mt-2">Accepted on: {formatDate(status.acceptedDate)}</p>}
-                        </div>
+                        <AgreementCard
+                            key={agreement.agreementId}
+                            agreement={agreement}
+                            status={status}
+                            onAccept={handleAcceptAgreement}
+                            accepting={acceptingAgreement === agreement.agreementId}
+                            onRead={(agreement) => setModalAgreement(agreement)}
+                        />
                     );
                 })}
             </div>
+
+            {modalAgreement && (
+                <AgreementModal
+                    open={!!modalAgreement}
+                    agreement={modalAgreement}
+                    onClose={() => setModalAgreement(null)}
+                />
+            )}
         </div>
     );
 };

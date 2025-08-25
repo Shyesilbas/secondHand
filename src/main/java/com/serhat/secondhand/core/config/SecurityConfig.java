@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/api/auth/password/forgot",
                                 "/api/auth/password/reset",
                                 "/swagger-ui/**",
+                                "/api/v1/enums/genders",
                                 "/api-docs/**",
                                 "/api/v1/listings/status/{status}",
                                 "/api/v1/listings/{id}",
@@ -86,7 +87,6 @@ public class SecurityConfig {
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                 )
-                // ✅ Bu kısmı ekleyin - Exception handling
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(customAuthenticationEntryPoint())
                         .accessDeniedHandler(customAccessDeniedHandler())
@@ -97,7 +97,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ API endpoint'leri için JSON response döndüren AuthenticationEntryPoint
     @Bean
     public AuthenticationEntryPoint customAuthenticationEntryPoint() {
         return (request, response, authException) -> {
@@ -107,7 +106,6 @@ public class SecurityConfig {
 
             log.warn("Authentication failed for URI: {}, Accept: {}", requestURI, acceptHeader);
 
-            // API endpoint'leri veya JSON istekleri için JSON response döndür
             if (requestURI.startsWith("/api/") ||
                     (acceptHeader != null && acceptHeader.contains("application/json")) ||
                     (userAgent != null && userAgent.toLowerCase().contains("axios"))) {
@@ -115,7 +113,6 @@ public class SecurityConfig {
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-                // CORS headers ekle
                 response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -132,13 +129,11 @@ public class SecurityConfig {
                 return;
             }
 
-            // Browser request'leri için OAuth2 redirect
             log.info("Redirecting to OAuth2 for browser request: {}", requestURI);
             response.sendRedirect("/oauth2/authorization/google");
         };
     }
 
-    // ✅ Access denied için JSON response
     @Bean
     public AccessDeniedHandler customAccessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
