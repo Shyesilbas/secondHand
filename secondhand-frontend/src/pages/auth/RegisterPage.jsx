@@ -4,12 +4,11 @@ import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import LoadingIndicator from '../../components/ui/LoadingIndicator';
-import AgreementsSection from '../../components/agreements/AgreementsSection';
-import AgreementModal from '../../components/agreements/AgreementModal';
+import AgreementsSection from '../../agreements/components/AgreementsSection.jsx';
+import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import PasswordInput from '../../components/ui/PasswordInput';
 import SelectField from '../../components/ui/SelectField';
-import { useRegisterForm } from '../../features/auth/hooks/useRegisterForm';
-
+import useRegisterForm from "../../features/auth/hooks/useRegisterForm.js";
 const RegisterPage = () => {
     const {
         formData,

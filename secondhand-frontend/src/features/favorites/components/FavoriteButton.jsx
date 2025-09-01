@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { favoriteService } from '../services/favoriteService';
 import { useAuth } from '../../../context/AuthContext';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../../../types';
 
 const FavoriteButton = ({ 

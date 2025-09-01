@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { emailService } from '../../../features/emails/services/emailService';
 
 export const useEmails = () => {

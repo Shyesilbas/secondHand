@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { userService } from '../services/userService';
 import { useAuth } from '../../../context/AuthContext';
 import { UpdatePhoneRequestDTO } from '../../../types/users';

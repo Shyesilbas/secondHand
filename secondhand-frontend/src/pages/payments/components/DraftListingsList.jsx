@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatCurrency } from '../../../utils/formatters';
-import ListingCardActions from '../../../features/listings/components/ListingCardActions';
+import ListingCardActions from '../../../listing/components/ListingCardActions';
 
 const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListingChanged }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });

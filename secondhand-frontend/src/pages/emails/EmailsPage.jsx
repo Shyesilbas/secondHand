@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { emailService } from '../../features/emails/services/emailService';
-import { useNotification } from '../../context/NotificationContext';
-import { EMAIL_TYPES } from '../../types/emails';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import EmailListItem from '../../features/emails/components/EmailListItem';
 import EmailContent from '../../features/emails/components/EmailContent';
 import EmailFilterTabs from '../../features/emails/components/EmailFilterTabs';
 import EmptyState from '../../components/ui/EmptyState';
-import PageHeader from '../../features/listings/components/PageHeader';
+import PageHeader from '../../listing/components/PageHeader.jsx';
 
 const EmailsPage = () => {
     const navigate = useNavigate();

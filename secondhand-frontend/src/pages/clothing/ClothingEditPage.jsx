@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useClothing } from '../../features/clothing/hooks/useClothing';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../../constants/routes';
 import ClothingCreateForm from '../../features/clothing/components/ClothingCreateForm';
 

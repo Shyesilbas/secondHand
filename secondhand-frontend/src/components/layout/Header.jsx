@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../constants/routes';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu';
-import {useNotification} from "../../context/NotificationContext.jsx";
+import {useNotification} from "../../notification/NotificationContext.jsx";
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();

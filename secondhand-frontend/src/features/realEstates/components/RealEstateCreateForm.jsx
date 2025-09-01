@@ -3,7 +3,7 @@ import { useRealEstate } from '../hooks/useRealEstate';
 import { useEnums } from '../../../hooks/useEnums';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import LocationFields from '../../../components/forms/LocationFields';
-import ListingWizard from '../../listings/components/ListingWizard';
+import ListingWizard from '../../../listing/components/ListingWizard.jsx';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import { useFormState } from '../../../forms/hooks/useFormState';
 import { useFormSubmission } from '../../../forms/hooks/useFormSubmission';

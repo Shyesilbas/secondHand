@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { userService } from '../../features/users/services/userService';
 import { ROUTES } from '../../constants/routes';
 import { UpdatePhoneRequestDTO } from '../../types/users';

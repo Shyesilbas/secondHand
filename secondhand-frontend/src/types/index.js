@@ -9,7 +9,7 @@ export * from './auth';
 export * from './users';
 
 // Listing DTOs
-export * from './listings';
+export * from '../listing/listings.js';
 
 // Vehicle DTOs
 export * from './vehicles';

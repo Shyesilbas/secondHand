@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listingService } from '../../../features/listings/services/listingService';
+import { listingService } from '../../../listing/services/listingService.js';
 
 export const useDraftListings = () => {
     const [draftListings, setDraftListings] = useState([]);

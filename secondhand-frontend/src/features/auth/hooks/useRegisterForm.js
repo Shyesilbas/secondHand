@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RegisterRequestDTO } from '../../../types/auth';
-import { enumService } from '../../../services/enumService';
-import { authService } from '../services/authService';
-import { useNotification } from '../../../context/NotificationContext';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../constants/routes';
-import { useRegisterAgreements } from './useRegisterAgreements';
-import { validateRegisterForm } from '../../../utils/validators/registerValidator';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {RegisterRequestDTO} from '../../../types/auth';
+import {enumService} from '../../../services/enumService';
+import {authService} from '../services/authService';
+import {useNotification} from '../../../notification/NotificationContext.jsx';
+import {useNavigate} from 'react-router-dom';
+import {ROUTES} from '../../../constants/routes';
+import {useRegisterAgreements} from '../../../agreements/hooks/useRegisterAgreements.js';
+import {validateRegisterForm} from '../../../utils/validators/registerValidator';
 
 export const useRegisterForm = () => {
   const [formData, setFormData] = useState({ ...RegisterRequestDTO, confirmPassword: '' });
@@ -73,7 +73,7 @@ export const useRegisterForm = () => {
     }
   }, [validateForm, formData, agreementsApi.acceptedAgreements, agreementsApi.agreements, notification, navigate]);
 
-  const api = useMemo(() => ({
+  return useMemo(() => ({
     formData,
     setFormData,
     errors,
@@ -85,8 +85,6 @@ export const useRegisterForm = () => {
     submit,
     ...agreementsApi
   }), [formData, errors, isLoading, genderOptions, handleChange, validateForm, submit, agreementsApi]);
-
-  return api;
 };
 
 export default useRegisterForm;

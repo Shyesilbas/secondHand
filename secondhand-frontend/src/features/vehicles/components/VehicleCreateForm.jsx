@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../hooks/useVehicle';
 import { useEnums } from '../../../hooks/useEnums';
 import { VehicleCreateRequestDTO } from '../../../types/vehicles';
-import ListingWizard from '../../listings/components/ListingWizard';
+import ListingWizard from '../../../listing/components/ListingWizard.jsx';
 import ListingBasics from '../../../components/forms/ListingBasics';
 import EnumDropdown from '../../../components/ui/EnumDropdown';
 import LocationFields from '../../../components/forms/LocationFields';

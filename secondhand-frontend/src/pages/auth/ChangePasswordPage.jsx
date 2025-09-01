@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { passwordService } from '../../features/auth/services/passwordService';
 import { ROUTES } from '../../constants/routes';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import { ChangePasswordRequestDTO } from '../../types/auth';

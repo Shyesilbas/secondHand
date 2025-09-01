@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreditCard } from '../../features/payments/hooks/useCreditCard';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import CreditCardItem from '../../features/payments/components/CreditCardItem';
 import EmptyState from '../../components/ui/EmptyState';
 import CreditCardModal from '../../features/payments/components/CreditCardModal';

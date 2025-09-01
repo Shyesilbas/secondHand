@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCardRequestDto, CREDIT_CARD_FIELD_LABELS, CREDIT_CARD_FIELD_PLACEHOLDERS, CREDIT_CARD_FIELD_TYPES } from '../../../types/creditCards';
 import { formatCurrency } from '../../../utils/formatters';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 
 const CreditCardCreateForm = ({ onSuccess, onCancel, isLoading, onSubmit }) => {
   const notification = useNotification();

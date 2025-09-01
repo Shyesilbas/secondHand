@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRealEstate } from '../../features/realEstates/hooks/useRealEstate';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import RealEstateCreateForm from '../../features/realEstates/components/RealEstateCreateForm';
 
 const RealEstateEditPage = () => {

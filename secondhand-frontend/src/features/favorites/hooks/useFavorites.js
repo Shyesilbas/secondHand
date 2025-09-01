@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { favoriteService } from '../services/favoriteService';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { 
   FavoriteDTO, 
   FavoriteStatsDTO,

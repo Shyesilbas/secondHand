@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useElectronic } from '../../features/electronics/hooks/useElectronic';
 import ElectronicCreateForm from '../../features/electronics/components/ElectronicCreateForm';
 

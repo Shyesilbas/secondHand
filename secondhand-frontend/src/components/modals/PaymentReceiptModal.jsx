@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { XMarkIcon, PrinterIcon, ShareIcon } from '@heroicons/react/24/outline';
 import { formatCurrency, formatDateTime } from '../../utils/formatters';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const notification = useNotification();

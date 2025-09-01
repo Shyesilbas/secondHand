@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { paymentService } from '../../../features/payments/services/paymentService';
 import { createListingFeePaymentRequest } from '../../../types/payments';
 

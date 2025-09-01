@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useVehicle } from '../../features/vehicles/hooks/useVehicle';
 import VehicleCreateForm from '../../features/vehicles/components/VehicleCreateForm';
 

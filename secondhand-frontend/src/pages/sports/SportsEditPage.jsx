@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useSports } from '../../features/sports/hooks/useSports';
 import SportsCreateForm from '../../features/sports/components/SportsCreateForm';
 

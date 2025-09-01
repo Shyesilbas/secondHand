@@ -5,7 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
 import { ForgotPasswordRequestDTO } from '../../types/auth';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const ForgotPasswordPage = () => {
   const [formData, setFormData] = useState({

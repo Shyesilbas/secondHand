@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useBooks } from '../../features/books/hooks/useBooks';
 import BooksCreateForm from '../../features/books/components/BooksCreateForm';
 

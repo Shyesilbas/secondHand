@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { bankService } from '../../features/payments/services/bankService';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { BankDto } from '../../types/banks';
 import BankAccountCard from '../../features/payments/components/BankAccountCard';
 import CreateBankAccountModal from '../../features/payments/components/CreateBankAccountModal';

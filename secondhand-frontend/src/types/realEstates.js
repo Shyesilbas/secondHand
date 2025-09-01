@@ -1,4 +1,4 @@
-import { ListingDTO } from './listings';
+import { ListingDTO } from '../listing/listings.js';
 
 /**
  * Real Estate Related DTOs

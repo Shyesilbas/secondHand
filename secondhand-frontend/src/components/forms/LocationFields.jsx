@@ -4,7 +4,7 @@ const LocationFields = ({ formData, errors = {}, onInputChange }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">Şehir *</label>
+        <label className="block text-sm font-medium text-slate-700 mb-2">City *</label>
         <input
           type="text"
           name="city"
@@ -16,7 +16,7 @@ const LocationFields = ({ formData, errors = {}, onInputChange }) => {
         {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
       </div>
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">İlçe *</label>
+        <label className="block text-sm font-medium text-slate-700 mb-2">District *</label>
         <input
           type="text"
           name="district"

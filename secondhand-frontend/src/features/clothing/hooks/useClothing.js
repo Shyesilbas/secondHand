@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { clothingService } from '../services/clothingService';
 
 export const useClothing = () => {

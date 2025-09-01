@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useListingStatistics } from '../features/listings/hooks/useListingStatistics';
+import { useListingStatistics } from '../listing/hooks/useListingStatistics.js';
 import { ROUTES } from '../constants/routes';
-import ListingCategories from '../features/listings/components/ListingCategories';
+import ListingCategories from '../listing/components/ListingCategories.jsx';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();

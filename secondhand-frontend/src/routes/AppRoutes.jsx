@@ -15,11 +15,11 @@ import ChangePasswordPage from '../pages/auth/ChangePasswordPage';
 import AccountVerificationPage from '../pages/auth/AccountVerificationPage';
 import DashboardPage from '../pages/DashboardPage';
 import ProfilePage from '../pages/user/ProfilePage';
-import ListingsPage from '../pages/listings/ListingsPage';
-import MyListingsPage from '../pages/listings/MyListingsPage';
-import InactiveListingsPage from '../pages/listings/InactiveListingsPage';
-import ListingDetailPage from '../pages/listings/ListingDetailPage';
-import CreateListingPage from '../pages/listings/CreateListingPage';
+import ListingsPage from '../listing/pages/ListingsPage.jsx';
+import MyListingsPage from '../listing/pages/MyListingsPage.jsx';
+import InactiveListingsPage from '../listing/pages/InactiveListingsPage.jsx';
+import ListingDetailPage from '../listing/pages/ListingDetailPage.jsx';
+import CreateListingPage from '../listing/pages/CreateListingPage.jsx';
 import FavoritesPage from '../pages/favorites/FavoritesPage';
 import PaymentsPage from '../pages/payments/PaymentsPage';
 import PayListingFeePage from '../pages/payments/PayListingFeePage';
@@ -37,14 +37,14 @@ import SportsEditPage from '../pages/sports/SportsEditPage';
 import OAuthCallbackPage from '../pages/auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../pages/auth/OAuthErrorPage.jsx';
 import OAuthCompletePage from '../pages/auth/OAuthCompletePage.jsx';
-import AgreementsPage from '../pages/agreements/AgreementsPage';
+import AgreementsPage from '../agreements/pages/AgreementsPage.jsx';
 import ChatPage from '../pages/chat/ChatPage';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
-import SoldListingsPage from "../pages/listings/SoldListingsPage.jsx";
-import DraftListingsPage from "../pages/listings/DraftListingsPage.jsx";
+import SoldListingsPage from "../listing/pages/SoldListingsPage.jsx";
+import DraftListingsPage from "../listing/pages/DraftListingsPage.jsx";
 
 const AppRoutes = () => {
     const { isLoading } = useAuth();

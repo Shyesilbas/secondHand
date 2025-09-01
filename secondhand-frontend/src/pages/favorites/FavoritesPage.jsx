@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useFavorites } from '../../features/favorites/hooks/useFavorites';
-import ListingGrid from '../../features/listings/components/ListingGrid';
+import ListingGrid from '../../listing/components/ListingGrid.jsx';
 import Pagination from '../../components/ui/Pagination';
 
 const FavoritesPage = () => {

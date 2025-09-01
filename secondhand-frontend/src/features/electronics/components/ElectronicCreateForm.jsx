@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNotification } from '../../../context/NotificationContext';
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { useEnums } from '../../../hooks/useEnums';
 import { ROUTES } from '../../../constants/routes';
 import ListingBasics from '../../../components/forms/ListingBasics';
@@ -8,7 +8,7 @@ import EnumDropdown from '../../../components/ui/EnumDropdown';
 import LocationFields from '../../../components/forms/LocationFields';
 import { ElectronicCreateRequestDTO } from '../../../types/index.js';
 import { useElectronic } from '../hooks/useElectronic';
-import ListingWizard from '../../listings/components/ListingWizard';
+import ListingWizard from '../../../listing/components/ListingWizard.jsx';
 import electronicValidators from '../../../utils/validators/electronicValidators.js';
 import { createFormConfig } from '../../../forms/config/formConfigs.js';
 

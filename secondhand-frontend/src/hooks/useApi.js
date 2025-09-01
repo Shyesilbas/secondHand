@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { handleError } from '../utils/errorHandler';
-import { useNotification } from '../context/NotificationContext';
+import { useNotification } from '../notification/NotificationContext.jsx';
 
 const useApi = (defaultData = null) => {
   const [data, setData] = useState(defaultData);
