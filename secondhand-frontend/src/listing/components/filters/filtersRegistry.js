@@ -1,13 +1,10 @@
-import VehicleFilters from './VehicleFilters';
-import ElectronicsFilters from './ElectronicsFilters';
-import RealEstateFilters from './RealEstateFilters';
-import ClothingFilters from './ClothingFilters';
-import BooksFilters from './BooksFilters';
-import SportsFilters from './SportsFilters';
+import FilterRenderer from './FilterRenderer';
+import { filterConfigs } from './filterConfigs';
 
 export const filtersRegistry = {
   VEHICLE: {
-    component: VehicleFilters,
+    component: FilterRenderer,
+    config: filterConfigs.VEHICLE,
     sortOptions: [
       { value: 'year', label: 'Year' },
       { value: 'mileage', label: 'Mileage' },
@@ -15,7 +12,8 @@ export const filtersRegistry = {
     ],
   },
   ELECTRONICS: {
-    component: ElectronicsFilters,
+    component: FilterRenderer,
+    config: filterConfigs.ELECTRONICS,
     sortOptions: [
       { value: 'year', label: 'Year' },
       { value: 'brand', label: 'Brand' },
@@ -23,7 +21,8 @@ export const filtersRegistry = {
     ],
   },
   REAL_ESTATE: {
-    component: RealEstateFilters,
+    component: FilterRenderer,
+    config: filterConfigs.REAL_ESTATE,
     sortOptions: [
       { value: 'squareMeters', label: 'Square Meters' },
       { value: 'roomCount', label: 'Room Count' },
@@ -32,7 +31,8 @@ export const filtersRegistry = {
     ],
   },
   CLOTHING: {
-    component: ClothingFilters,
+    component: FilterRenderer,
+    config: filterConfigs.CLOTHING,
     sortOptions: [
       { value: 'brand', label: 'Brand' },
       { value: 'type', label: 'Type' },
@@ -41,7 +41,8 @@ export const filtersRegistry = {
     ],
   },
   BOOKS: {
-    component: BooksFilters,
+    component: FilterRenderer,
+    config: filterConfigs.BOOKS,
     sortOptions: [
       { value: 'author', label: 'Author' },
       { value: 'publicationYear', label: 'Year' },
@@ -49,7 +50,8 @@ export const filtersRegistry = {
     ],
   },
   SPORTS: {
-    component: SportsFilters,
+    component: FilterRenderer,
+    config: filterConfigs.SPORTS,
     sortOptions: [
       { value: 'discipline', label: 'Discipline' },
       { value: 'equipmentType', label: 'Equipment Type' },

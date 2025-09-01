@@ -1,5 +1,5 @@
 import React from 'react';
-import EnumDropdown from '../../../../components/ui/EnumDropdown.jsx';
+import EnumDropdown from '../../../../common/components/ui/EnumDropdown.jsx';
 
 const PriceLocationFields = ({ filters, onPriceChange, onInputChange }) => (
   <>

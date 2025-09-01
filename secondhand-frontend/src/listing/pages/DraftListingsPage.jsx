@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingService } from '../services/listingService.js';
-import { formatCurrency } from '../../utils/formatters.js';
+import { formatCurrency } from '../../common/formatters.js';
 import ListingCardActions from '..//components/ListingCardActions.jsx';
 
 const DraftListingsPage = () => {

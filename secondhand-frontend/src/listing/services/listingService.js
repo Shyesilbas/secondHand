@@ -1,13 +1,13 @@
-import { get, post, put, del } from '../../services/api/request';
-import { API_ENDPOINTS } from '../../constants/apiEndpoints';
+import { get, post, put, del } from '../../common/services/api/request';
+import { API_ENDPOINTS } from '../../common/constants/apiEndpoints';
 import {
   createVehicleFilterRequest, 
   createElectronicsFilterRequest,
   createRealEstateFilterRequest
 } from '../listings.js';
-import { createClothingFilterRequest } from '../../types/clothing';
-import { createBooksFilterRequest } from '../../types/books';
-import { createSportsFilterRequest } from '../../types/sports';
+import { createClothingFilterRequest } from '../../clothing/clothing.js';
+import { createBooksFilterRequest } from '../../books/books.js';
+import { createSportsFilterRequest } from '../../sports/sports.js';
 
 export const listingService = {
 

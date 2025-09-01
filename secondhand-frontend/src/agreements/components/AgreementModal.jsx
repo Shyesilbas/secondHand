@@ -1,5 +1,5 @@
 import React from 'react';
-import { AGREEMENT_TYPE_LABELS } from '../../types/agreements.js';
+import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
 
 const AgreementModal = ({ agreement, open, onClose }) => {
   if (!open || !agreement) return null;

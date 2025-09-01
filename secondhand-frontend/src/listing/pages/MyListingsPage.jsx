@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMyListings } from '../hooks/useMyListings.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
-import { ROUTES } from '../../constants/routes.js';
+import { ROUTES } from '../../common/constants/routes.js';
 import PageHeader from '../../listing/components/PageHeader.jsx';
 import ListingStats from '../../listing/components/ListingStats.jsx';
 

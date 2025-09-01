@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../constants/routes';
-import { useAuth } from '../../context/AuthContext';
+import { ROUTES } from '../../common/constants/routes';
+import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingService } from '../services/listingService';
 

@@ -1,0 +1,168 @@
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext.jsx';
+import { ROUTES } from '../constants/routes.js';
+
+import MainLayout from '../components/layout/MainLayout.jsx';
+import AuthLayout from '../components/layout/AuthLayout.jsx';
+
+import HomePage from '../../user/HomePage.jsx';
+import LoginPage from '../../auth/LoginPage.jsx';
+import RegisterPage from '../../auth/RegisterPage.jsx';
+import ForgotPasswordPage from '../../auth/ForgotPasswordPage.jsx';
+import ResetPasswordPage from '../../auth/ResetPasswordPage.jsx';
+import ChangePasswordPage from '../../auth/ChangePasswordPage.jsx';
+import AccountVerificationPage from '../../auth/AccountVerificationPage.jsx';
+import DashboardPage from '../../user/DashboardPage.jsx';
+import ProfilePage from '../../user/ProfilePage.jsx';
+import ListingsPage from '../../listing/pages/ListingsPage.jsx';
+import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
+import InactiveListingsPage from '../../listing/pages/InactiveListingsPage.jsx';
+import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';
+import CreateListingPage from '../../listing/pages/CreateListingPage.jsx';
+import FavoritesPage from '../../favorites/FavoritesPage';
+import PaymentsPage from '../../payments/PaymentsPage.jsx';
+import PayListingFeePage from '../../payments/PayListingFeePage.jsx';
+import PaymentMethodsPage from '../../payments/PaymentMethodsPage.jsx';
+import EmailsPage from '../../emails/EmailsPage';
+import VehicleEditPage from '../../vehicle/VehicleEditPage.jsx';
+import ElectronicEditPage from '../../electronics/ElectronicEditPage.jsx';
+import BooksEditPage from '../../books/BooksEditPage.jsx';
+import CreateRealEstatePage from '../../realEstate/CreateRealEstatePage.jsx';
+import RealEstateEditPage from '../../realEstate/RealEstateEditPage.jsx';
+import CreateClothingPage from '../../clothing/CreateClothingPage.jsx';
+import ClothingEditPage from '../../clothing/ClothingEditPage.jsx';
+import SportsEditPage from '../../sports/SportsEditPage.jsx';
+import OAuthCallbackPage from '../../auth/OAuthCallbackPage.jsx';
+import OAuthErrorPage from '../../auth/OAuthErrorPage.jsx';
+import OAuthCompletePage from '../../auth/OAuthCompletePage.jsx';
+import AgreementsPage from '../../agreements/pages/AgreementsPage.jsx';
+import ChatPage from '../../chat/ChatPage.jsx';
+
+// Route Guards
+import ProtectedRoute from './ProtectedRoute.jsx';
+import PublicRoute from './PublicRoute.jsx';
+import SoldListingsPage from "../../listing/pages/SoldListingsPage.jsx";
+import DraftListingsPage from "../../listing/pages/DraftListingsPage.jsx";
+
+const AppRoutes = () => {
+    const { isLoading } = useAuth();
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    return (
+        <Routes>
+            {/* Public Routes with Auth Layout */}
+            <Route element={<AuthLayout />}>
+                <Route
+                    path={ROUTES.LOGIN}
+                    element={
+                        <PublicRoute>
+                            <LoginPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_CALLBACK}
+                    element={
+                        <PublicRoute>
+                            <OAuthCallbackPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_ERROR}
+                    element={
+                        <PublicRoute>
+                            <OAuthErrorPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.AUTH_COMPLETE}
+                    element={
+                        <PublicRoute>
+                            <OAuthCompletePage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.REGISTER}
+                    element={
+                        <PublicRoute>
+                            <RegisterPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.FORGOT_PASSWORD}
+                    element={
+                        <PublicRoute>
+                            <ForgotPasswordPage />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path={ROUTES.RESET_PASSWORD}
+                    element={
+                        <PublicRoute>
+                            <ResetPasswordPage />
+                        </PublicRoute>
+                    }
+                />
+            </Route>
+
+            {/* Public Routes with Main Layout */}
+            <Route element={<MainLayout />}>
+                <Route path={ROUTES.HOME} element={<HomePage />} />
+                <Route path={ROUTES.LISTINGS} element={<ListingsPage />} />
+                <Route path={ROUTES.LISTING_DETAIL} element={<ListingDetailPage />} />
+            </Route>
+
+            {/* Protected Routes with Main Layout */}
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <MainLayout />
+                    </ProtectedRoute>
+                }
+            >
+                        <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
+        <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
+        <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
+        <Route path={ROUTES.MY_LISTINGS_INACTIVE} element={<InactiveListingsPage />} />
+        <Route path={ROUTES.MY_LISTINGS_SOLD} element={<SoldListingsPage />} />
+        <Route path={ROUTES.MY_LISTINGS_DRAFT} element={<DraftListingsPage />} />
+        <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
+        <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
+        <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />
+        <Route path={ROUTES.PAYMENT_METHODS} element={<PaymentMethodsPage />} />
+        <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
+        <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
+        <Route path={ROUTES.CHAT} element={<ChatPage />} />
+        <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
+        <Route path={ROUTES.ELECTRONIC_EDIT} element={<ElectronicEditPage />} />
+        <Route path={ROUTES.BOOKS_EDIT} element={<BooksEditPage />} />
+                  <Route path={ROUTES.CREATE_REAL_ESTATE} element={<CreateRealEstatePage />} />
+          <Route path={ROUTES.REAL_ESTATE_EDIT} element={<RealEstateEditPage />} />
+                  <Route path={ROUTES.CREATE_CLOTHING} element={<CreateClothingPage />} />
+                  <Route path={ROUTES.CLOTHING_EDIT} element={<ClothingEditPage />} />
+                  <Route path={ROUTES.SPORTS_EDIT} element={<SportsEditPage />} />
+                  <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
+            </Route>
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        </Routes>
+    );
+};
+
+export default AppRoutes;

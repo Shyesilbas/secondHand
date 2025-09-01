@@ -1,6 +1,6 @@
-import { get, post, put } from '../../services/api/request.js';
-import { API_ENDPOINTS } from '../../constants/apiEndpoints.js';
-import { AGREEMENT_TYPES } from '../../types/agreements.js';
+import { get, post, put } from '../../common/services/api/request.js';
+import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { AGREEMENT_TYPES } from '../agreements.js';
 
 /**
  * Agreement Service

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import { AGREEMENT_TYPE_LABELS } from '../../types/agreements.js';
-import { formatDate } from '../../utils/formatters.js';
+import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
+import { formatDate } from '../../common/formatters.js';
 
 const AgreementCard = ({ agreement, status = {}, onAccept, accepting, onRead }) => {
   const StatusIcon = status.icon || ClockIcon;

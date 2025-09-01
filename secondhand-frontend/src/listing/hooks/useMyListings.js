@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { listingService } from '../services/listingService';
-import useApi from '../../hooks/useApi.js';
+import useApi from '../../common/hooks/useApi.js';
 
 export const useMyListings = (status = null) => {
     const { data, isLoading, error, callApi } = useApi([]);

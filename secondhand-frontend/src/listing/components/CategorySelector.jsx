@@ -1,6 +1,6 @@
 import React from 'react';
-import { useEnums } from '../../hooks/useEnums';
-import SearchableDropdown from '../../components/ui/SearchableDropdown';
+import { useEnums } from '../../common/hooks/useEnums';
+import SearchableDropdown from '../../common/components/ui/SearchableDropdown';
 
 const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
     const { enums, isLoading: enumsLoading } = useEnums();

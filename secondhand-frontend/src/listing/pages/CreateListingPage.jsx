@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEnums } from '../../hooks/useEnums.js';
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry } from '../components/createFormRegistry.js';
 
 const CreateListingPage = () => {

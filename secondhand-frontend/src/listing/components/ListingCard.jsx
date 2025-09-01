@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link} from 'react-router-dom';
-import { ROUTES } from '../../constants/routes.js';
+import { ROUTES } from '../../common/constants/routes.js';
 import { listingTypeRegistry } from './typeRegistry';
-import { useEnums } from '../../hooks/useEnums';
-import StatusBadge from '../../components/ui/StatusBadge';
-import FavoriteButton from '../../features/favorites/components/FavoriteButton.jsx';
-import FavoriteStats from '../../features/favorites/components/FavoriteStats.jsx';
-import { formatCurrency, formatDateTime } from '../../utils/formatters';
+import { useEnums } from '../../common/hooks/useEnums';
+import StatusBadge from '../../common/components/ui/StatusBadge';
+import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
+import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import ListingCardActions from './ListingCardActions';
 
 const ListingCard = ({ listing, onDeleted }) => {

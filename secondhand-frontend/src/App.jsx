@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './auth/AuthContext.jsx';
 import { NotificationProvider } from './notification/NotificationContext.jsx';
-import AppRoutes from './routes/AppRoutes';
-import './services/api/interceptors';
+import AppRoutes from './common/routes/AppRoutes';
+import './common/services/api/interceptors';
 
 // Create a client
 const queryClient = new QueryClient({

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
-import { useAuth } from '../../context/AuthContext.jsx';
-import FavoriteButton from '../../features/favorites/components/FavoriteButton.jsx';
-import FavoriteStats from '../../features/favorites/components/FavoriteStats.jsx';
-import StatusBadge from '../../components/ui/StatusBadge.jsx';
-import { formatCurrency, formatDateTime } from '../../utils/formatters.js';
+import { useAuth } from '../../auth/AuthContext.jsx';
+import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
+import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
+import StatusBadge from '../../common/components/ui/StatusBadge.jsx';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import ListingCardActions from '../components/ListingCardActions.jsx';
-import ContactSellerButton from '../../features/chat/components/ContactSellerButton.jsx';
+import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 
 const ListingDetailPage = ({

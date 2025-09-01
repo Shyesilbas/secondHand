@@ -1,6 +1,6 @@
 import React from 'react';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import { AGREEMENT_TYPE_LABELS } from '../../types/agreements.js';
+import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
 
 const AgreementsSection = ({ agreements, acceptedAgreements, onToggle, onRead, error }) => {
     if (!agreements?.length) return null;

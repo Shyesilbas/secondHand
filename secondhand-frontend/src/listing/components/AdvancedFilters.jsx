@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useEnums } from '../../hooks/useEnums';
+import { useEnums } from '../../common/hooks/useEnums';
 import { filtersRegistry } from './filters/filtersRegistry';
 import FiltersHeader from './filters/shared/FiltersHeader';
 import PriceLocationFields from './filters/shared/PriceLocationFields';
@@ -59,7 +59,7 @@ const AdvancedFilters = ({
                         if (!entry?.component) return null;
                         const FilterComp = entry.component;
                         const onChange = (field, value) => handleInputChange(field, value);
-                        return <FilterComp filters={filters} onChange={onChange} />;
+                        return <FilterComp filters={filters} onChange={onChange} config={entry.config} />;
                     })()}
                     <SortingControls 
                       filters={filters} 

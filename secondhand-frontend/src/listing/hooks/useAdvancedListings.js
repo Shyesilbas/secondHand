@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { listingService } from '../services/listingService';
 import { useListingFilters } from './useListingFilters';
-import { cleanObject } from '../../utils/formatters';
+import { cleanObject } from '../../common/formatters.js';
 
 export const useAdvancedListings = (initialFilters = {}, listingType = null) => {
   const [listings, setListings] = useState([]);

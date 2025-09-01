@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useEnums } from '../../hooks/useEnums';
-import { ROUTES } from '../../constants/routes';
+import { useEnums } from '../../common/hooks/useEnums';
+import { ROUTES } from '../../common/constants/routes';
 import { listingService } from '../services/listingService';
-import useApi from '../../hooks/useApi';
+import useApi from '../../common/hooks/useApi';
 
 const ListingCategories = () => {
   const { enums, isLoading } = useEnums();

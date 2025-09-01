@@ -2,7 +2,7 @@ import React from 'react';
 import { useMyListings } from '../hooks/useMyListings.js';
 import ListingGrid from '../components/ListingGrid.jsx';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../constants/routes.js';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const InactiveListingsPage = () => {
     const { listings, isLoading, error, refetch } = useMyListings('INACTIVE');
