@@ -6,7 +6,7 @@ import { authService } from '../../features/auth/services/authService';
 import { ROUTES } from '../../constants/routes';
 import AuthInput from '../../components/ui/AuthInput';
 import AuthButton from '../../components/ui/AuthButton';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import PasswordInput from '../../components/ui/PasswordInput';
 import { LoginRequestDTO, LoginResponseDTO } from '../../types/auth';
 import { API_BASE_URL } from '../../constants/apiEndpoints';
 
@@ -14,7 +14,7 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({
         ...LoginRequestDTO
     });
-    const [showPassword, setShowPassword] = useState(false);
+    
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
@@ -131,29 +131,15 @@ const LoginPage = () => {
                 />
 
                 {/* Password Input */}
-                <div className="relative">
-                    <AuthInput
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        error={errors.password}
-                        required
-                    />
-                    <button
-                        type="button"
-                        className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? (
-                            <EyeSlashIcon className="h-5 w-5" />
-                        ) : (
-                            <EyeIcon className="h-5 w-5" />
-                        )}
-                    </button>
-                </div>
+                <PasswordInput
+                    label="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    error={errors.password}
+                    required
+                />
 
                 {/* Forgot Password Link */}
                 <div className="text-right">

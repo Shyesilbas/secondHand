@@ -19,7 +19,7 @@ export const useRegisterAgreements = () => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error loading agreements:', error);
-      notification.showError('Hata', 'Sözleşmeler yüklenirken bir hata oluştu.');
+      notification.showError('Error', 'Error occurred while listing agreements..');
     } finally {
       setAgreementsLoading(false);
     }

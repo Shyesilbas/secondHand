@@ -5,7 +5,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { BankDto } from '../../types/banks';
 import BankAccountCard from '../../features/payments/components/BankAccountCard';
 import CreateBankAccountModal from '../../features/payments/components/CreateBankAccountModal';
-import EmptyBankAccounts from '../../features/payments/components/EmptyBankAccounts';
+import EmptyState from '../../components/ui/EmptyState';
 
 const BankAccountsPage = () => {
     const navigate = useNavigate();
@@ -141,7 +141,17 @@ const BankAccountsPage = () => {
             )}
 
             {bankAccounts.length === 0 ? (
-                <EmptyBankAccounts onCreate={() => setShowAddForm(true)} isCreating={isCreating} />
+                <EmptyState
+                    title="No Bank Account Found"
+                    description="You don't have a registered bank account yet."
+                    variant="green"
+                    primaryAction={{
+                        label: isCreating ? 'Creating...' : 'Create Bank Account',
+                        onClick: () => setShowAddForm(true),
+                        disabled: isCreating,
+                        variant: 'green'
+                    }}
+                />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {bankAccounts.map((account, index) => (

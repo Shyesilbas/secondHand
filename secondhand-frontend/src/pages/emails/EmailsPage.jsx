@@ -6,7 +6,7 @@ import { EMAIL_TYPES } from '../../types/emails';
 import EmailListItem from '../../features/emails/components/EmailListItem';
 import EmailContent from '../../features/emails/components/EmailContent';
 import EmailFilterTabs from '../../features/emails/components/EmailFilterTabs';
-import EmptyEmails from '../../features/emails/components/EmptyEmails';
+import EmptyState from '../../components/ui/EmptyState';
 import PageHeader from '../../features/listings/components/PageHeader';
 
 const EmailsPage = () => {
@@ -152,7 +152,10 @@ const EmailsPage = () => {
             )}
 
             {filteredEmails.length === 0 ? (
-                <EmptyEmails filterType={filterType} />
+                <EmptyState
+                  title="No Emails Found"
+                  description={filterType === 'ALL' ? "You haven't received any emails yet." : `No ${filterType?.toLowerCase?.() || ''} emails found.`}
+                />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Email List */}

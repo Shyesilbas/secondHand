@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCreditCard } from '../../features/payments/hooks/useCreditCard';
 import { useNotification } from '../../context/NotificationContext';
 import CreditCardItem from '../../features/payments/components/CreditCardItem';
-import EmptyCreditCards from '../../features/payments/components/EmptyCreditCards';
+import EmptyState from '../../components/ui/EmptyState';
 import CreditCardModal from '../../features/payments/components/CreditCardModal';
 
 const CreditCardsPage = () => {
@@ -101,7 +101,16 @@ const CreditCardsPage = () => {
             )}
 
             {creditCards.length === 0 ? (
-                <EmptyCreditCards onCreate={() => setShowAddForm(true)} />
+                <EmptyState
+                    title="No Credit Cards Found"
+                    description="You don't have any credit cards registered yet."
+                    variant="blue"
+                    primaryAction={{
+                        label: 'Add your first card',
+                        onClick: () => setShowAddForm(true),
+                        variant: 'blue'
+                    }}
+                />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {creditCards.map((card, index) => (
