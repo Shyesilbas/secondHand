@@ -4,10 +4,12 @@ import RealEstateDetails from './details/RealEstateDetails';
 import ClothingDetails from './details/ClothingDetails';
 import BooksDetails from './details/BooksDetails';
 import SportsDetails from './details/SportsDetails';
+import { createFormRegistry } from './createFormRegistry';
 
 export const listingTypeRegistry = {
   VEHICLE: {
     detailsComponent: VehicleDetails,
+    editComponent: createFormRegistry.VEHICLE,
     compactBadges: (l) => ([
       { label: l.brand, icon: '🚗' },
       { label: l.year, icon: '📅' },
@@ -17,6 +19,7 @@ export const listingTypeRegistry = {
   },
   ELECTRONICS: {
     detailsComponent: ElectronicsDetails,
+    editComponent: createFormRegistry.ELECTRONICS,
     compactBadges: (l) => ([
       { label: l.electronicType, icon: '📱' },
       { label: l.electronicBrand, icon: '🏷️' },
@@ -26,6 +29,7 @@ export const listingTypeRegistry = {
   },
   REAL_ESTATE: {
     detailsComponent: RealEstateDetails,
+    editComponent: createFormRegistry.REAL_ESTATE,
     compactBadges: (l) => ([
       { label: l.realEstateType, icon: '🏠' },
       { label: l.adType, icon: '📋' },
@@ -37,6 +41,7 @@ export const listingTypeRegistry = {
   },
   CLOTHING: {
     detailsComponent: ClothingDetails,
+    editComponent: createFormRegistry.CLOTHING,
     compactBadges: (l) => ([
       { label: l.brand, icon: '🏷️' },
       { label: l.clothingType, icon: '👕' },
@@ -47,6 +52,7 @@ export const listingTypeRegistry = {
   },
   BOOKS: {
     detailsComponent: BooksDetails,
+    editComponent: createFormRegistry.BOOKS,
     compactBadges: (l) => ([
       { label: l.author, icon: '✍️' },
       { label: l.genre, icon: '🏷️' },
@@ -56,6 +62,7 @@ export const listingTypeRegistry = {
   },
   SPORTS: {
     detailsComponent: SportsDetails,
+    editComponent: createFormRegistry.SPORTS,
     compactBadges: (l) => ([
       { label: l.discipline, icon: '🏅' },
       { label: l.equipmentType, icon: '🎽' },

@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry } from '../components/createFormRegistry.js';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
     const { enums } = useEnums();
+
+    // URL'den type parametresini oku
+    useEffect(() => {
+        const typeFromUrl = searchParams.get('type');
+        if (typeFromUrl && createFormRegistry[typeFromUrl]) {
+            setSelectedType(typeFromUrl);
+        }
+    }, [searchParams]);
 
     const handleTypeSelect = (type) => {
         setSelectedType(type);
@@ -12,6 +22,11 @@ const CreateListingPage = () => {
 
     const handleBackToSelection = () => {
         setSelectedType(null);
+        // URL'den type parametresini temizle
+        if (searchParams.has('type')) {
+            searchParams.delete('type');
+            setSearchParams(searchParams);
+        }
     };
 
     const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;

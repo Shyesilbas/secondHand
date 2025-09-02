@@ -20,19 +20,13 @@ import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
 import InactiveListingsPage from '../../listing/pages/InactiveListingsPage.jsx';
 import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';
 import CreateListingPage from '../../listing/pages/CreateListingPage.jsx';
+import EditListingPage from '../../listing/pages/EditListingPage.jsx';
 import FavoritesPage from '../../favorites/FavoritesPage';
 import PaymentsPage from '../../payments/PaymentsPage.jsx';
 import PayListingFeePage from '../../payments/PayListingFeePage.jsx';
 import PaymentMethodsPage from '../../payments/PaymentMethodsPage.jsx';
 import EmailsPage from '../../emails/EmailsPage';
-import VehicleEditPage from '../../vehicle/VehicleEditPage.jsx';
-import ElectronicEditPage from '../../electronics/ElectronicEditPage.jsx';
-import BooksEditPage from '../../books/BooksEditPage.jsx';
-import CreateRealEstatePage from '../../realEstate/CreateRealEstatePage.jsx';
-import RealEstateEditPage from '../../realEstate/RealEstateEditPage.jsx';
-import CreateClothingPage from '../../clothing/CreateClothingPage.jsx';
-import ClothingEditPage from '../../clothing/ClothingEditPage.jsx';
-import SportsEditPage from '../../sports/SportsEditPage.jsx';
+
 import OAuthCallbackPage from '../../auth/OAuthCallbackPage.jsx';
 import OAuthErrorPage from '../../auth/OAuthErrorPage.jsx';
 import OAuthCompletePage from '../../auth/OAuthCompletePage.jsx';
@@ -148,14 +142,9 @@ const AppRoutes = () => {
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.CHAT} element={<ChatPage />} />
-        <Route path={ROUTES.VEHICLE_EDIT} element={<VehicleEditPage />} />
-        <Route path={ROUTES.ELECTRONIC_EDIT} element={<ElectronicEditPage />} />
-        <Route path={ROUTES.BOOKS_EDIT} element={<BooksEditPage />} />
-                  <Route path={ROUTES.CREATE_REAL_ESTATE} element={<CreateRealEstatePage />} />
-          <Route path={ROUTES.REAL_ESTATE_EDIT} element={<RealEstateEditPage />} />
-                  <Route path={ROUTES.CREATE_CLOTHING} element={<CreateClothingPage />} />
-                  <Route path={ROUTES.CLOTHING_EDIT} element={<ClothingEditPage />} />
-                  <Route path={ROUTES.SPORTS_EDIT} element={<SportsEditPage />} />
+        <Route path={ROUTES.EDIT_LISTING} element={<EditListingPage />} />
+                  <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
+                  <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />
                   <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
             </Route>
 

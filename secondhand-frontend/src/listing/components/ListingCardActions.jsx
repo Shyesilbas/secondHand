@@ -15,19 +15,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
   const handleEdit = (e) => {
     e.preventDefault();
-    if (listing.type === 'VEHICLE') {
-      navigate(ROUTES.VEHICLE_EDIT.replace(':id', listing.id));
-    } else if (listing.type === 'ELECTRONICS') {
-      navigate(ROUTES.ELECTRONIC_EDIT.replace(':id', listing.id));
-    } else if (listing.type === 'REAL_ESTATE') {
-      navigate(ROUTES.REAL_ESTATE_EDIT.replace(':id', listing.id));
-    } else if (listing.type === 'CLOTHING') {
-      navigate(ROUTES.CLOTHING_EDIT.replace(':id', listing.id));
-    } else if (listing.type === 'BOOKS') {
-      navigate(ROUTES.BOOKS_EDIT.replace(':id', listing.id));
-    } else if (listing.type === 'SPORTS') {
-      navigate(ROUTES.SPORTS_EDIT.replace(':id', listing.id));
-    }
+    navigate(ROUTES.EDIT_LISTING.replace(':id', listing.id));
   };
 
   const handleDeactivate = async (e) => {

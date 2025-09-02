@@ -47,9 +47,6 @@ const ListingDetailPage = ({
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 
-  const renderStatusBadge = (status) => (
-      <StatusBadge status={status} />
-  );
 
   if (isLoading) {
     return (
@@ -242,13 +239,5 @@ const ListingDetailPage = ({
       </div>
   );
 };
-
-// Detail Item Component
-const DetailItem = ({ label, value }) => (
-    <div>
-      <dt className="text-sm font-medium text-gray-500">{label}</dt>
-      <dd className="mt-1 text-sm text-gray-900">{value || '-'}</dd>
-    </div>
-);
 
 export default ListingDetailPage;
