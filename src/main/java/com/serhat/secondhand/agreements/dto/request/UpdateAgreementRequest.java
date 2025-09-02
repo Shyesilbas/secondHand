@@ -12,9 +12,9 @@ import jakarta.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateAgreementRequest {
-    @NotBlank(message = "Version is required")
+    // Version artık optional - otomatik versiyonlama kullanılıyor
     private String version;
-    
+
     @NotBlank(message = "Content is required")
     private String content;
 }

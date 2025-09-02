@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { useNotification } from '../notification/NotificationContext.jsx';
-import { userService } from './services/userService.js';
+import { usePhoneUpdate } from './hooks/usePhoneUpdate.js';
 import { ROUTES } from '../common/constants/routes.js';
 import { UpdatePhoneRequestDTO } from './users.js';
 import PhoneUpdateModal from '../common/components/modals/PhoneUpdateModal.jsx';
@@ -11,40 +10,16 @@ import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, updateUser } = useAuth();
-    const notification = useNotification();
+    const { user } = useAuth();
     const [showPhoneModal, setShowPhoneModal] = useState(false);
     const [phoneFormData, setPhoneFormData] = useState({ ...UpdatePhoneRequestDTO });
-    const [isUpdating, setIsUpdating] = useState(false);
+    const { updatePhone, isUpdating } = usePhoneUpdate();
 
     const handlePhoneUpdate = async () => {
-        const cleanPhone = phoneFormData.newPhone.replace(/\D/g, '');
-
-        if (!phoneFormData.newPhone.trim()) {
-            notification.showError('Error', 'Please enter a phone number');
-            return;
-        }
-
-        if (cleanPhone.length !== 11) {
-            notification.showError('Error', 'Phone number must be 11 digits');
-            return;
-        }
-
-        setIsUpdating(true);
-        try {
-            await userService.updatePhone({
-                newPhone: cleanPhone,
-                password: phoneFormData.password
-            });
-
-            updateUser({ phoneNumber: cleanPhone });
+        const success = await updatePhone(phoneFormData);
+        if (success) {
             setShowPhoneModal(false);
             setPhoneFormData({ ...UpdatePhoneRequestDTO });
-            notification.showSuccess('Success', 'Phone number updated successfully. Please refresh the page to see the changes.');
-        } catch (error) {
-            notification.showError('Error', error.response?.data?.message || error.message || 'An error occurred while updating phone number. Please try again.');
-        } finally {
-            setIsUpdating(false);
         }
     };
 
@@ -143,7 +118,7 @@ const ProfilePage = () => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Account Creation Date</label>
-                        <p className="mt-1 text-gray-900">{formatDate(user?.accountCreationDate)}</p>
+                        <p className="mt-1 text-gray-900">{user?.accountCreationDate}</p>
                     </div>
                 </div>
 

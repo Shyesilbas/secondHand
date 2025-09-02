@@ -1,10 +1,7 @@
 import React from 'react';
 import EnumDropdown from '../../../common/components/ui/EnumDropdown';
 
-/**
- * FilterRenderer - Dinamik filtre bileşeni oluşturucu
- * FilterConfig yapılandırmasına göre filtre alanlarını render eder
- */
+
 const FilterRenderer = ({ config, filters, onChange, title = "Filters" }) => {
   if (!config || !config.getFields) {
     return null;
@@ -12,23 +9,14 @@ const FilterRenderer = ({ config, filters, onChange, title = "Filters" }) => {
 
   const fields = config.getFields();
 
-  /**
-   * Sayısal değer değişikliğini handle eder
-   * @param {string} field - Alan adı
-   * @param {string} value - Değer
-   * @param {string} type - Dönüşüm türü ('int', 'float')
-   */
+
   const handleNumericChange = (field, value, type = 'int') => {
     const numericValue = value === '' ? null :
       type === 'float' ? parseFloat(value) : parseInt(value);
     onChange(field, numericValue);
   };
 
-  /**
-   * Alan bileşenini render eder
-   * @param {Object} field - Alan yapılandırması
-   * @returns {JSX.Element} Render edilmiş alan
-   */
+
   const renderField = (field) => {
     switch (field.type) {
       case 'enum':
@@ -151,11 +139,6 @@ const FilterRenderer = ({ config, filters, onChange, title = "Filters" }) => {
     }
   };
 
-  /**
-   * Alanları gruplara böler ve render eder
-   * @param {Array} fields - Alanlar dizisi
-   * @returns {Array} Gruplandırılmış JSX elementleri
-   */
   const renderFieldGroups = (fields) => {
     const groups = [];
     let currentGroup = [];
@@ -163,7 +146,6 @@ const FilterRenderer = ({ config, filters, onChange, title = "Filters" }) => {
     fields.forEach((field, index) => {
       currentGroup.push(field);
 
-      // Her 2 alanda bir grup oluştur (daha iyi düzen için)
       if (currentGroup.length === 2 || index === fields.length - 1) {
         groups.push(
           <div key={`group-${groups.length}`} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

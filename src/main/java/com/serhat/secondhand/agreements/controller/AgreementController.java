@@ -1,5 +1,6 @@
 package com.serhat.secondhand.agreements.controller;
 
+import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.dto.AgreementDto;
 import com.serhat.secondhand.agreements.dto.UserAgreementDto;
@@ -75,21 +76,35 @@ public class AgreementController {
     }
 
     @PutMapping("/{agreementId}")
-    @Operation(summary = "Update agreement by ID", description = "Updates agreement version and content by ID")
+    @Operation(summary = "Update agreement by ID", description = "Updates agreement version and content by ID. Version is auto-incremented if not provided.")
     public ResponseEntity<AgreementDto> updateAgreement(
             @PathVariable UUID agreementId,
             @Valid @RequestBody UpdateAgreementRequest request) {
-        var agreement = agreementService.updateAgreement(agreementId, request.getVersion(), request.getContent());
+        Agreement agreement;
+        if (request.getVersion() != null && !request.getVersion().trim().isEmpty()) {
+            // Manuel versiyon belirtildi
+            agreement = agreementService.updateAgreementWithVersion(agreementId, request.getVersion(), request.getContent());
+        } else {
+            // Otomatik versiyonlama
+            agreement = agreementService.updateAgreement(agreementId, request.getContent());
+        }
         var agreementDto = agreementMapper.toDto(agreement);
         return ResponseEntity.ok(agreementDto);
     }
 
     @PutMapping("/type/{agreementType}")
-    @Operation(summary = "Update agreement by type", description = "Updates agreement version and content by type")
+    @Operation(summary = "Update agreement by type", description = "Updates agreement version and content by type. Version is auto-incremented if not provided.")
     public ResponseEntity<AgreementDto> updateAgreementByType(
             @PathVariable AgreementType agreementType,
             @Valid @RequestBody UpdateAgreementRequest request) {
-        var agreement = agreementService.updateAgreementByType(agreementType, request.getVersion(), request.getContent());
+        Agreement agreement;
+        if (request.getVersion() != null && !request.getVersion().trim().isEmpty()) {
+            // Manuel versiyon belirtildi
+            agreement = agreementService.updateAgreementByTypeWithVersion(agreementType, request.getVersion(), request.getContent());
+        } else {
+            // Otomatik versiyonlama
+            agreement = agreementService.updateAgreementByType(agreementType, request.getContent());
+        }
         var agreementDto = agreementMapper.toDto(agreement);
         return ResponseEntity.ok(agreementDto);
     }

@@ -82,19 +82,62 @@ public class AgreementService {
     }
 
     private String getVersionForType(AgreementType agreementType) {
-        if (agreementType instanceof AgreementType) {
-            switch (agreementType) {
-                case TERMS_OF_SERVICE:
-                    return "1.0.0";
-                case PRIVACY_POLICY:
-                    return "1.0.0";
-                case KVKK:
-                    return "1.0.0";
-                default:
-                    return "1.0.0";
-            }
+        Optional<Agreement> existingAgreement = agreementRepository.findAll().stream()
+                .filter(agreement -> agreement.getAgreementType() == agreementType)
+                .findFirst();
+
+        if (existingAgreement.isPresent()) {
+            return incrementVersion(existingAgreement.get().getVersion());
         }
+
         return "1.0.0";
+    }
+
+
+    private String incrementVersion(String currentVersion) {
+        if (currentVersion == null || currentVersion.trim().isEmpty()) {
+            return "1.0.0";
+        }
+
+        try {
+            String[] parts = currentVersion.split("\\.");
+            if (parts.length != 3) {
+                log.warn("Invalid version format: {}, using default", currentVersion);
+                return "1.0.0";
+            }
+
+            int major = Integer.parseInt(parts[0]);
+            int minor = Integer.parseInt(parts[1]);
+            int patch = Integer.parseInt(parts[2]);
+
+            patch++;
+
+            return major + "." + minor + "." + patch;
+        } catch (NumberFormatException e) {
+            log.warn("Invalid version format: {}, using default", currentVersion);
+            return "1.0.0";
+        }
+    }
+
+
+    private boolean isValidVersion(String version) {
+        if (version == null || version.trim().isEmpty()) {
+            return false;
+        }
+
+        String[] parts = version.split("\\.");
+        if (parts.length != 3) {
+            return false;
+        }
+
+        try {
+            Integer.parseInt(parts[0]);
+            Integer.parseInt(parts[1]); // minor
+            Integer.parseInt(parts[2]); // patch
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public Agreement getAgreementByType(AgreementType agreementType) {
@@ -119,20 +162,49 @@ public class AgreementService {
                 .toList();
     }
 
-    public Agreement updateAgreement(UUID agreementId, String version, String content) {
+    public Agreement updateAgreement(UUID agreementId, String content) {
         Agreement agreement = getAgreementById(agreementId);
-        
-        agreement.setVersion(version);
+
+        String newVersion = agreement.getVersion();
+        if (!agreement.getContent().equals(content)) {
+            newVersion = incrementVersion(agreement.getVersion());
+            log.info("Content changed for agreement {}, incrementing version from {} to {}",
+                    agreementId, agreement.getVersion(), newVersion);
+        }
+
+        agreement.setVersion(newVersion);
         agreement.setContent(content);
         agreement.setUpdatedDate(LocalDate.now());
-        
+
         Agreement updatedAgreement = agreementRepository.save(agreement);
-        log.info("Updated agreement with ID: {}, new version: {}", agreementId, version);
+        log.info("Updated agreement with ID: {}, new version: {}", agreementId, newVersion);
         return updatedAgreement;
     }
 
-    public Agreement updateAgreementByType(AgreementType agreementType, String version, String content) {
+
+    public Agreement updateAgreementWithVersion(UUID agreementId, String version, String content) {
+        Agreement agreement = getAgreementById(agreementId);
+
+        if (!isValidVersion(version)) {
+            throw new IllegalArgumentException("Invalid version format: " + version + ". Expected format: x.y.z");
+        }
+
+        agreement.setVersion(version);
+        agreement.setContent(content);
+        agreement.setUpdatedDate(LocalDate.now());
+
+        Agreement updatedAgreement = agreementRepository.save(agreement);
+        log.info("Updated agreement with ID: {}, manual version: {}", agreementId, version);
+        return updatedAgreement;
+    }
+
+    public Agreement updateAgreementByType(AgreementType agreementType, String content) {
         Agreement agreement = getAgreementByType(agreementType);
-        return updateAgreement(agreement.getAgreementId(), version, content);
+        return updateAgreement(agreement.getAgreementId(), content);
+    }
+
+    public Agreement updateAgreementByTypeWithVersion(AgreementType agreementType, String version, String content) {
+        Agreement agreement = getAgreementByType(agreementType);
+        return updateAgreementWithVersion(agreement.getAgreementId(), version, content);
     }
 }

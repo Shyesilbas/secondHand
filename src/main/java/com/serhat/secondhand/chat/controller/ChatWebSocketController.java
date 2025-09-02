@@ -16,9 +16,7 @@ public class ChatWebSocketController {
     
     private final ChatService chatService;
     
-    /**
-     * WebSocket üzerinden mesaj gönder
-     */
+
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(@Payload ChatMessageDto chatMessageDto) {
         log.info("Received WebSocket message - sender: {}, room: {}, content: {}", 
@@ -27,9 +25,7 @@ public class ChatWebSocketController {
         chatService.sendMessage(chatMessageDto);
     }
     
-    /**
-     * Kullanıcıyı chat room'a ekle
-     */
+
     @MessageMapping("/chat.joinRoom")
     public void joinRoom(@Payload ChatMessageDto chatMessageDto, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("chatRoomId", chatMessageDto.getChatRoomId());
@@ -38,9 +34,7 @@ public class ChatWebSocketController {
         log.info("User {} joined room: {}", chatMessageDto.getSenderId(), chatMessageDto.getChatRoomId());
     }
     
-    /**
-     * Kullanıcıyı chat room'dan çıkar
-     */
+
     @MessageMapping("/chat.leaveRoom")
     public void leaveRoom(@Payload ChatMessageDto chatMessageDto, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().remove("chatRoomId");
@@ -49,9 +43,7 @@ public class ChatWebSocketController {
         log.info("User {} left room: {}", chatMessageDto.getSenderId(), chatMessageDto.getChatRoomId());
     }
     
-    /**
-     * Mesajları okundu olarak işaretle
-     */
+
     @MessageMapping("/chat.markAsRead")
     public void markAsRead(@Payload ChatMessageDto chatMessageDto) {
         log.info("Marking messages as read via WebSocket - user: {}, room: {}", 

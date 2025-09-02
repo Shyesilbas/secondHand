@@ -1,11 +1,6 @@
 import { FilterConfig } from './FilterConfig';
 
-/**
- * filterConfigs - Kategori bazlı filtre yapılandırmaları
- * Her kategori için FilterConfig kullanarak filtre alanlarını tanımlar
- */
 
-// VEHICLE filtre yapılandırması
 export const createVehicleFilterConfig = () => {
   return new FilterConfig()
     .addEnumField('brands', 'Brands', 'carBrands', { gridSize: 'md:grid-cols-1' })
@@ -17,7 +12,6 @@ export const createVehicleFilterConfig = () => {
     .addEnumField('colors', 'Color', 'colors');
 };
 
-// ELECTRONICS filtre yapılandırması
 export const createElectronicsFilterConfig = () => {
   return new FilterConfig()
     .addNumericRangeField('year', 'Year', { min: 2000, max: new Date().getFullYear(), placeholder: '2020' })
@@ -25,7 +19,6 @@ export const createElectronicsFilterConfig = () => {
     .addEnumField('types', 'Type', 'electronicTypes');
 };
 
-// REAL_ESTATE filtre yapılandırması
 export const createRealEstateFilterConfig = () => {
   return new FilterConfig()
     .addNumericRangeField('squareMeters', 'Square Meters', { min: 0, placeholder: '100' })
@@ -34,7 +27,6 @@ export const createRealEstateFilterConfig = () => {
     .addNumericRangeField('floor', 'Floor', { min: 0, placeholder: '5' });
 };
 
-// CLOTHING filtre yapılandırması
 export const createClothingFilterConfig = () => {
   return new FilterConfig()
     .addEnumField('brands', 'Brand', 'clothingBrands')
@@ -44,7 +36,6 @@ export const createClothingFilterConfig = () => {
     .addDateRangeField('purchaseDate', 'Purchase Date');
 };
 
-// BOOKS filtre yapılandırması
 export const createBooksFilterConfig = () => {
   return new FilterConfig()
     .addEnumField('genres', 'Genre', 'bookGenres')
@@ -55,7 +46,6 @@ export const createBooksFilterConfig = () => {
     .addNumericRangeField('pageCount', 'Page Count', { min: 0, placeholder: '200' });
 };
 
-// SPORTS filtre yapılandırması
 export const createSportsFilterConfig = () => {
   return new FilterConfig()
     .addEnumField('disciplines', 'Discipline', 'sportDisciplines')
@@ -63,10 +53,7 @@ export const createSportsFilterConfig = () => {
     .addEnumField('conditions', 'Condition', 'sportConditions');
 };
 
-/**
- * filterConfigs - Tüm kategori filtre yapılandırmalarının hazır örnekleri
- * Bu objeler filtersRegistry.js'de kullanılır
- */
+
 export const filterConfigs = {
   VEHICLE: createVehicleFilterConfig(),
   ELECTRONICS: createElectronicsFilterConfig(),

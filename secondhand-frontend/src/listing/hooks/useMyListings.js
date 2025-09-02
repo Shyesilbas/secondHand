@@ -5,7 +5,6 @@ import useApi from '../../common/hooks/useApi.js';
 export const useMyListings = (statusFilter = null) => {
     const { data: allListings, isLoading, error, callApi } = useApi([]);
 
-    // Her zaman tüm verileri al
     useEffect(() => {
         const run = async () => {
             await callApi(listingService.getMyListings);
@@ -13,7 +12,6 @@ export const useMyListings = (statusFilter = null) => {
         run();
     }, []);
 
-    // Client-side filtreleme
     const filteredListings = useMemo(() => {
         if (!allListings) return [];
         if (!statusFilter) return allListings;

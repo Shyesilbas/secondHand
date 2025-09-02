@@ -24,9 +24,7 @@ public class ChatRestController {
     
     // ==================== CHAT ROOM ENDPOINTS ====================
     
-    /**
-     * Kullanıcının tüm chat room'larını getir
-     */
+
     @GetMapping("/rooms/user/{userId}")
     public ResponseEntity<List<ChatRoomDto>> getUserChatRooms(@PathVariable Long userId) {
         log.info("Getting chat rooms for user: {}", userId);
@@ -34,10 +32,7 @@ public class ChatRestController {
         log.info("Returning {} chat rooms for user {}", chatRooms.size(), userId);
         return ResponseEntity.ok(chatRooms);
     }
-    
-    /**
-     * İki kullanıcı arasında direct chat oluştur veya mevcut olanı getir
-     */
+
     @PostMapping("/rooms/direct")
     public ResponseEntity<ChatRoomDto> createOrGetDirectChat(
             @RequestParam Long userId1, 
@@ -46,10 +41,7 @@ public class ChatRestController {
         ChatRoomDto chatRoom = chatService.createOrGetDirectChat(userId1, userId2);
         return ResponseEntity.ok(chatRoom);
     }
-    
-    /**
-     * Listing ile ilgili chat oluştur veya mevcut olanı getir
-     */
+
     @PostMapping("/rooms/listing/{listingId}")
     public ResponseEntity<ChatRoomDto> createOrGetListingChat(
             @PathVariable String listingId, 
@@ -62,9 +54,7 @@ public class ChatRestController {
     
     // ==================== MESSAGE ENDPOINTS ====================
     
-    /**
-     * Mesaj gönder
-     */
+
     @PostMapping("/messages")
     public ResponseEntity<ChatMessageDto> sendMessage(@RequestBody ChatMessageDto messageDto) {
         log.info("Sending message - sender: {}, room: {}, content: {}", 
@@ -72,10 +62,7 @@ public class ChatRestController {
         ChatMessageDto sentMessage = chatService.sendMessage(messageDto);
         return ResponseEntity.ok(sentMessage);
     }
-    
-    /**
-     * Chat room'daki mesajları getir
-     */
+
     @GetMapping("/rooms/{chatRoomId}/messages")
     public ResponseEntity<Page<ChatMessageDto>> getChatMessages(
             @PathVariable Long chatRoomId,
@@ -90,10 +77,7 @@ public class ChatRestController {
                 messages.getContent().size(), chatRoomId, messages.getTotalElements());
         return ResponseEntity.ok(messages);
     }
-    
-    /**
-     * Mesajları okundu olarak işaretle
-     */
+
     @PutMapping("/rooms/{chatRoomId}/messages/read")
     public ResponseEntity<Void> markMessagesAsRead(
             @PathVariable Long chatRoomId, 
@@ -102,10 +86,7 @@ public class ChatRestController {
         chatService.markMessagesAsRead(chatRoomId, userId);
         return ResponseEntity.ok().build();
     }
-    
-    /**
-     * Chat room'daki okunmamış mesaj sayısını getir
-     */
+
     @GetMapping("/rooms/{chatRoomId}/messages/unread-count")
     public ResponseEntity<Long> getUnreadMessageCount(
             @PathVariable Long chatRoomId, 
@@ -114,10 +95,7 @@ public class ChatRestController {
         Long count = chatService.getUnreadMessageCount(chatRoomId, userId);
         return ResponseEntity.ok(count);
     }
-    
-    /**
-     * Kullanıcının tüm mesajlarını getir (tüm chat room'lardan)
-     */
+
     @GetMapping("/messages/user/{userId}")
     public ResponseEntity<Page<ChatMessageDto>> getAllUserMessages(
             @PathVariable Long userId,
@@ -132,20 +110,14 @@ public class ChatRestController {
                 messages.getContent().size(), userId, messages.getTotalElements());
         return ResponseEntity.ok(messages);
     }
-    
-    /**
-     * Kullanıcının toplam okunmamış mesaj sayısını getir
-     */
+
     @GetMapping("/messages/unread-count/user/{userId}")
     public ResponseEntity<Long> getTotalUnreadMessageCount(@PathVariable Long userId) {
         log.info("Getting total unread message count for user: {}", userId);
         Long count = chatService.getTotalUnreadMessageCount(userId);
         return ResponseEntity.ok(count);
     }
-    
-    /**
-     * Geçici: Mevcut listing chat room'larını düzelt
-     */
+
     @PostMapping("/fix-listing-chats")
     public ResponseEntity<String> fixListingChats() {
         log.info("Fixing listing chat rooms...");

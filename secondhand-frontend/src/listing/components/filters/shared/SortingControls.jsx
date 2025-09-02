@@ -25,8 +25,8 @@ const SortingControls = ({ filters, onChange, sortOptions = [] }) => (
           onChange={(e) => onChange('sortDirection', e.target.value)}
           className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
         >
-          <option value="DESC">Descending</option>
-          <option value="ASC">Ascending</option>
+          <option value="DESC">Desc</option>
+          <option value="ASC">Asc</option>
         </select>
       </div>
     </div>

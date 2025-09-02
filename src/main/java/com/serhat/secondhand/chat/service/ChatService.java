@@ -80,14 +80,12 @@ public class ChatService {
             return enrichChatRoomDtoForUser(existingRooms.get(0), userId);
         }
         
-        // Listing'i bul ve seller'ı al
         Listing listing = listingRepository.findById(UUID.fromString(listingId))
                 .orElseThrow(() -> new RuntimeException("Listing not found: " + listingId));
         
         Long sellerId = listing.getSeller().getId();
         log.info("Found listing seller: {}", sellerId);
         
-        // Yeni listing chat oluştur (hem current user hem de seller)
         ChatRoom newRoom = new ChatRoom();
         newRoom.setRoomName("Chat about: " + listingTitle);
         newRoom.setRoomType(ChatRoom.RoomType.LISTING);
@@ -122,26 +120,20 @@ public class ChatService {
         Message savedMessage = messageRepository.save(message);
         ChatMessageDto savedMessageDto = ChatMessageDto.fromEntity(savedMessage);
         
-        // Chat room'un son mesaj bilgilerini güncelle
         updateChatRoomLastMessage(messageDto.getChatRoomId(), savedMessageDto);
         
-        // WebSocket ile mesajı gönder
         sendMessageViaWebSocket(savedMessageDto);
         
         log.info("Message sent successfully - ID: {}", savedMessage.getId());
         return savedMessageDto;
     }
-    
-    /**
-     * Chat room'daki mesajları getir
-     */
+
     public Page<ChatMessageDto> getChatMessages(Long chatRoomId, Pageable pageable) {
         log.info("Getting messages for chat room: {}", chatRoomId);
         
         Page<Message> messages = messageRepository.findByChatRoomIdOrderByCreatedAtDesc(chatRoomId, pageable);
         log.info("Found {} messages for chat room {}", messages.getTotalElements(), chatRoomId);
         
-        // Debug için mesajları logla
         messages.getContent().forEach(message -> {
             log.info("Message - ID: {}, Content: {}, Sender: {}, Recipient: {}", 
                     message.getId(), message.getContent(), 
@@ -152,9 +144,7 @@ public class ChatService {
         return messages.map(ChatMessageDto::fromEntity);
     }
     
-    /**
-     * Mesajları okundu olarak işaretle
-     */
+
     @Transactional
     public void markMessagesAsRead(Long chatRoomId, Long userId) {
         log.info("Marking messages as read - room: {}, user: {}", chatRoomId, userId);
@@ -163,16 +153,12 @@ public class ChatService {
         log.info("Messages marked as read successfully");
     }
     
-    /**
-     * Chat room'daki okunmamış mesaj sayısını getir
-     */
+
     public Long getUnreadMessageCount(Long chatRoomId, Long userId) {
         return chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoomId, userId);
     }
     
-    /**
-     * Kullanıcının tüm mesajlarını getir (gönderdiği veya aldığı)
-     */
+
     public Page<ChatMessageDto> getAllUserMessages(Long userId, Pageable pageable) {
         log.info("Getting all messages for user: {}", userId);
         
@@ -181,42 +167,20 @@ public class ChatService {
         
         return messages.map(ChatMessageDto::fromEntity);
     }
-    
-    /**
-     * Kullanıcının toplam okunmamış mesaj sayısını getir
-     */
+
     public Long getTotalUnreadMessageCount(Long userId) {
         log.info("Getting total unread message count for user: {}", userId);
         return messageRepository.countTotalUnreadMessagesByUser(userId);
     }
-    
-    // ==================== YARDIMCI METODLAR ====================
-    
-    /**
-     * ChatRoomDto'yu zenginleştir (unread count, other participant name vb.)
-     */
-    private ChatRoomDto enrichChatRoomDto(ChatRoom chatRoom) {
-        ChatRoomDto dto = ChatRoomDto.fromEntity(chatRoom);
 
-        // Okunmamış mesaj sayısını hesapla (ilk participant için)
-        if (!chatRoom.getParticipantIds().isEmpty()) {
-            Long firstParticipant = chatRoom.getParticipantIds().get(0);
-            dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoom.getId(), firstParticipant).intValue());
-        }
-
-        return dto;
-    }
 
     private ChatRoomDto enrichChatRoomDtoForUser(ChatRoom chatRoom, Long currentUserId) {
         ChatRoomDto dto = ChatRoomDto.fromEntity(chatRoom);
 
-        // Okunmamış mesaj sayısını current user için hesapla
         dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoom.getId(), currentUserId).intValue());
 
-        // Diğer kullanıcı bilgilerini ekle
         enrichOtherParticipantInfo(dto, chatRoom, currentUserId);
 
-        // Son mesajı gönderen kişinin adını ekle
         if (chatRoom.getLastMessageSenderId() != null) {
             User lastMessageSender = userRepository.findById(chatRoom.getLastMessageSenderId()).orElse(null);
             if (lastMessageSender != null) {
@@ -228,9 +192,6 @@ public class ChatService {
     }
 
 
-    /**
-     * Chat room'daki diğer kullanıcının bilgilerini ekle
-     */
     private void enrichOtherParticipantInfo(ChatRoomDto dto, ChatRoom chatRoom, Long currentUserId) {
         if (chatRoom.getRoomType() == ChatRoom.RoomType.DIRECT) {
             if (chatRoom.getParticipantIds().size() >= 2) {
@@ -279,9 +240,6 @@ public class ChatService {
     }
 
 
-    /**
-     * Chat room'un son mesaj bilgilerini güncelle
-     */
     @Transactional
     public void updateChatRoomLastMessage(Long chatRoomId, ChatMessageDto messageDto) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
@@ -293,9 +251,7 @@ public class ChatService {
         }
     }
     
-    /**
-     * WebSocket ile mesaj gönder
-     */
+
     private void sendMessageViaWebSocket(ChatMessageDto messageDto) {
         String destination = "/topic/chat/" + messageDto.getChatRoomId();
         messagingTemplate.convertAndSend(destination, messageDto);
@@ -304,31 +260,25 @@ public class ChatService {
         log.info("Message details - ID: {}, Content: {}, Sender: {}, Room: {}", 
                 messageDto.getId(), messageDto.getContent(), messageDto.getSenderId(), messageDto.getChatRoomId());
     }
-    
-    /**
-     * Geçici: Mevcut listing chat room'larını düzelt
-     */
+
     @Transactional
     public void fixListingChatRooms() {
         log.info("Fixing listing chat rooms...");
         
-        // Tüm listing chat room'larını bul
         List<ChatRoom> listingRooms = chatRoomRepository.findAll().stream()
                 .filter(room -> room.getRoomType() == ChatRoom.RoomType.LISTING)
-                .collect(Collectors.toList());
+                .toList();
         
         log.info("Found {} listing chat rooms to fix", listingRooms.size());
         
         for (ChatRoom room : listingRooms) {
             try {
-                // Listing'i bul
                 Listing listing = listingRepository.findById(UUID.fromString(room.getListingId()))
                         .orElse(null);
                 
                 if (listing != null) {
                     Long sellerId = listing.getSeller().getId();
                     
-                    // Seller'ı participant listesine ekle (eğer yoksa)
                     if (!room.getParticipantIds().contains(sellerId)) {
                         List<Long> newParticipants = new ArrayList<>(room.getParticipantIds());
                         newParticipants.add(sellerId);

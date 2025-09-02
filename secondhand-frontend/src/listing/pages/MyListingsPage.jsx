@@ -6,7 +6,7 @@ import PageHeader from '../../listing/components/PageHeader.jsx';
 import ListingStats from '../../listing/components/ListingStats.jsx';
 
 const MyListingsPage = () => {
-    const [selectedStatus, setSelectedStatus] = useState(null); // null = tümü göster
+    const [selectedStatus, setSelectedStatus] = useState(null);
     const { allListings, listings, isLoading, error, refetch } = useMyListings(selectedStatus);
 
     const handleStatusClick = (status) => {

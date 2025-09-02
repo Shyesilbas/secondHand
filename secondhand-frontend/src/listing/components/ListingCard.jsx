@@ -3,7 +3,6 @@ import { Link} from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import { listingTypeRegistry } from './typeRegistry';
 import { useEnums } from '../../common/hooks/useEnums';
-import StatusBadge from '../../common/components/ui/StatusBadge';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';

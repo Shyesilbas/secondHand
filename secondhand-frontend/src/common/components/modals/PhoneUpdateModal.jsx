@@ -1,8 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../auth/AuthContext.jsx';
-import { ROUTES } from '../../constants/routes.js';
-import { useUpdatePhone } from '../../../user/hooks/useUpdatePhone.js';
 
 const PhoneUpdateModal = ({ isOpen, formData, handleChange, submit, closeModal, isUpdating }) => {
     if (!isOpen) return null;
