@@ -1,25 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { listingService } from '../services/listingService';
 import useApi from '../../common/hooks/useApi.js';
 
-export const useMyListings = (status = null) => {
-    const { data, isLoading, error, callApi } = useApi([]);
+export const useMyListings = (statusFilter = null) => {
+    const { data: allListings, isLoading, error, callApi } = useApi([]);
 
+    // Her zaman tüm verileri al
     useEffect(() => {
         const run = async () => {
-            if (status) {
-                await callApi(listingService.getMyListingsByStatus, status);
-            } else {
-                await callApi(listingService.getMyListings);
-            }
+            await callApi(listingService.getMyListings);
         };
         run();
-    }, [status]);
+    }, []);
+
+    // Client-side filtreleme
+    const filteredListings = useMemo(() => {
+        if (!allListings) return [];
+        if (!statusFilter) return allListings;
+        return allListings.filter(listing => listing.status === statusFilter);
+    }, [allListings, statusFilter]);
+
+    const refetch = () => callApi(listingService.getMyListings);
 
     return {
-        listings: data,
+        allListings,
+        listings: filteredListings,
         isLoading,
         error,
-        refetch: () => (status ? callApi(listingService.getMyListingsByStatus, status) : callApi(listingService.getMyListings)),
+        refetch,
     };
 };

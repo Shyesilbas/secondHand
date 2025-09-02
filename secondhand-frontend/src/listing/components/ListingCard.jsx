@@ -14,15 +14,6 @@ const ListingCard = ({ listing, onDeleted }) => {
     const formatPrice = (price, currency) => formatCurrency(price, currency);
     const formatDate = (dateString) => formatDateTime(dateString);
 
-
-
-    const getStatusBadge = (status) => (
-        <StatusBadge
-            status={status}
-            labels={{ ACTIVE: 'Active', INACTIVE: 'Inactive', SOLD: 'Sold', DRAFT: 'Draft', PENDING: 'Pending' }}
-        />
-    );
-
     return (
         <div className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden">
             <Link
@@ -45,7 +36,6 @@ const ListingCard = ({ listing, onDeleted }) => {
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2">
-                                    {getStatusBadge(listing.status)}
                                     <span className="text-xs text-slate-400">
                                         {formatDate(listing.createdAt)}
                                     </span>

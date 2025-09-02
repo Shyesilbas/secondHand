@@ -17,7 +17,7 @@ import DashboardPage from '../../user/DashboardPage.jsx';
 import ProfilePage from '../../user/ProfilePage.jsx';
 import ListingsPage from '../../listing/pages/ListingsPage.jsx';
 import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
-import InactiveListingsPage from '../../listing/pages/InactiveListingsPage.jsx';
+
 import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';
 import CreateListingPage from '../../listing/pages/CreateListingPage.jsx';
 import EditListingPage from '../../listing/pages/EditListingPage.jsx';
@@ -36,8 +36,7 @@ import ChatPage from '../../chat/ChatPage.jsx';
 // Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
-import SoldListingsPage from "../../listing/pages/SoldListingsPage.jsx";
-import DraftListingsPage from "../../listing/pages/DraftListingsPage.jsx";
+
 
 const AppRoutes = () => {
     const { isLoading } = useAuth();
@@ -132,9 +131,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
-        <Route path={ROUTES.MY_LISTINGS_INACTIVE} element={<InactiveListingsPage />} />
-        <Route path={ROUTES.MY_LISTINGS_SOLD} element={<SoldListingsPage />} />
-        <Route path={ROUTES.MY_LISTINGS_DRAFT} element={<DraftListingsPage />} />
+
         <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />
