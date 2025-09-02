@@ -130,37 +130,53 @@ const ListingDetailPage = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Title and Price */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{listing.title}</h1>
-                  <FavoriteStats
-                      listingId={listing.id}
-                      size="sm"
-                      showIcon={true}
-                      showText={true}
-                      className="text-gray-600"
-                  />
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-slate-900">
+            {/* Title and Description */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+              <div className="mb-6">
+                <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                  {listing.title}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                  <span className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {listing.district}, {listing.city}
+                  </span>
+
+                  <span className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                     {formatPrice(listing.price, listing.currency)}
-                  </div>
-                  <div className="flex items-center justify-end mt-2">
-                    {renderStatusBadge(listing.status)}
-                  </div>
+                  </span>
+
+                  <span className="flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {formatDate(listing.createdAt)}
+                  </span>
+                  {listing.listingNo && (
+                      <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
+                      #{listing.listingNo}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <div className="prose max-w-none">
-                <p className="text-gray-700 text-lg leading-relaxed">{listing.description}</p>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 text-base md:text-lg leading-relaxed font-normal">
+                  {listing.description}
+                </p>
               </div>
             </div>
 
             {/* Type-specific Details */}
             {(() => {
-              // type prop'u varsa onu kullan, yoksa listing.type'ı kullan
               const listingType = type || listing.type;
               const cfg = listingTypeRegistry[listingType];
               if (!cfg?.detailsComponent) return null;
@@ -168,16 +184,6 @@ const ListingDetailPage = ({
               return <Details listing={listing} />;
             })()}
 
-            {/* General Details */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Listing Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <DetailItem label="Created At" value={formatDate(listing.createdAt)} />
-                <DetailItem label="Last Update" value={formatDate(listing.updatedAt)} />
-                <DetailItem label="Province" value={`${listing.district}, ${listing.city}`} />
-                <DetailItem label="Listing Fee" value={listing.listingFeePaid ? 'Paid' : 'Unpaid'} />
-              </div>
-            </div>
           </div>
 
           {/* Sidebar */}
@@ -196,16 +202,16 @@ const ListingDetailPage = ({
                     {listing.sellerName} {listing.sellerSurname}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Seller
+                    Member since : {user.accountCreationDate}
                   </p>
                 </div>
               </div>
 
               {!isOwner && (
                   <div className="space-y-3">
-                    <ContactSellerButton 
-                      listing={listing}
-                      className="w-full py-3 px-4 text-base font-medium"
+                    <ContactSellerButton
+                        listing={listing}
+                        className="w-full py-3 px-4 text-base font-medium"
                     />
                   </div>
               )}
@@ -221,6 +227,13 @@ const ListingDetailPage = ({
                     <span className="text-gray-600">Views:</span>
                     <span className="font-medium">-</span>
                   </div>
+                  <FavoriteStats
+                      listingId={listing.id}
+                      size="sm"
+                      showIcon={true}
+                      showText={true}
+                      className="text-gray-600"
+                  />
                 </div>
               </div>
             </div>

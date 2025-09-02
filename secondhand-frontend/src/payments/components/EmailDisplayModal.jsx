@@ -63,7 +63,7 @@ const EmailDisplayModal = ({ emails, onClose }) => {
                                             onClick={() => copyToClipboard(email.content)}
                                             className="rounded-lg border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
                                         >
-                                            İçeriği Kopyala
+                                            Copy
                                         </button>
                                     </div>
                                 </div>

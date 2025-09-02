@@ -2,7 +2,7 @@ import React from 'react';
 import { EMAIL_TYPES, EMAIL_TYPE_LABELS } from '../emails.js';
 
 const EmailFilterTabs = ({ filterType, onFilterChange, onDeleteAll, hasEmails, isDeleting }) => {
-    const filterOptions = ['ALL', EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.WELCOME, EMAIL_TYPES.NOTIFICATION];
+    const filterOptions = [];
 
     return (
         <div className="flex items-center space-x-2">

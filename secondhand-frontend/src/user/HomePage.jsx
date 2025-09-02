@@ -49,23 +49,6 @@ const HomePage = () => {
                 </div>
             </div>
 
-            {/* Quick Stats Section */}
-            <div className="max-w-6xl mx-auto px-6 py-16">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {[
-                        { label: 'Active Listings', value: statistics?.activeListings || 0 },
-                        { label: 'Active Sellers', value: statistics?.activeSellerCount || 0 },
-                    ].map((stat, idx) => (
-                        <div key={idx} className="bg-white rounded-lg shadow-md p-6 text-center hover:scale-95 transform transition">
-                            <div className="text-2xl font-bold text-gray-900">
-                                {statsLoading ? '...' : stat.value}
-                            </div>
-                            <div className="mt-2 text-sm text-gray-500">{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Categories Section */}
             <div className="max-w-6xl mx-auto px-6 py-16">
                 <div className="flex items-center justify-between mb-8">

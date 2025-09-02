@@ -1,7 +1,5 @@
 import React from 'react';
 import { formatDateTime } from '../../common/formatters.js';
-import { EMAIL_TYPE_LABELS, EMAIL_TYPE_BADGE_COLORS } from '../emails.js';
-import { getEmailTypeIcon } from '../utils/emailTypeHelpers.jsx';
 
 const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -13,9 +11,6 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
             }`}
         >
             <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-1">
-                    {getEmailTypeIcon(email.emailType)}
-                </div>
                 <div 
                     className="flex-1 min-w-0 cursor-pointer"
                     onClick={() => onSelect(email)}
@@ -26,11 +21,6 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                     <p className="text-xs text-gray-500 mt-1">
                         {formatDate(email.sentAt)}
                     </p>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-2 ${
-                        EMAIL_TYPE_BADGE_COLORS[email.emailType] || 'bg-gray-100 text-gray-800'
-                    }`}>
-                        {EMAIL_TYPE_LABELS[email.emailType] || email.emailType}
-                    </span>
                 </div>
                 <div className="flex-shrink-0">
                     <button

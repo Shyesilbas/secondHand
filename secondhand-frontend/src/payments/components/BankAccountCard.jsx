@@ -23,12 +23,19 @@ const BankAccountCard = ({ account, onDelete, isDeleting }) => {
                         {isDeleting ? '...' : '🗑️'}
                     </button>
                 </div>
-
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Account Number</span>
+                        <span className="text-sm text-gray-600">Iban</span>
                         <span className="text-sm font-mono text-gray-900">
-                            **** **** **** {account.accountNumber?.slice(-4) || '****'}
+                            {account.IBAN}
+                        </span>
+                    </div>
+                </div>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Account Holder</span>
+                        <span className="text-sm font-mono text-gray-900">
+                       {account.holderName} {account.holderSurname}
                         </span>
                     </div>
                 </div>

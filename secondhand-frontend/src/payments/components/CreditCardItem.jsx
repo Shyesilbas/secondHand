@@ -2,29 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const CreditCardItem = ({ card, onDelete, isDeleting }) => {
-    const getCardTypeIcon = (cardType) => {
-        switch (cardType?.toLowerCase()) {
-            case 'visa':
-                return <span>Visa</span>;
-            case 'mastercard':
-                return <span>MasterCard</span>;
-            case 'amex':
-                return <span>AMEX</span>;
-            default:
-                return <span>Card</span>;
-        }
-    };
 
     return (
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-6 text-white relative overflow-hidden">
             <div className="relative">
                 <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center space-x-2">
-                        {getCardTypeIcon(card.cardType)}
-                        <span className="text-sm font-medium opacity-90">
-                            {card.cardType || 'Credit Card'}
-                        </span>
-                    </div>
                     <button
                         onClick={onDelete}
                         disabled={isDeleting}
@@ -37,15 +19,15 @@ const CreditCardItem = ({ card, onDelete, isDeleting }) => {
 
                 <div className="mb-6">
                     <p className="text-lg font-mono tracking-wider">
-                        {card.number || card.cardNumber || '**** **** **** ****'}
+                        {card.number || card.cardNumber || 'N/A'}
                     </p>
                 </div>
 
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <p className="text-xs opacity-80 uppercase tracking-wide">Card Holder</p>
+                        <p className="text-xs opacity-80 uppercase tracking-wide">Limit</p>
                         <p className="text-sm font-medium">
-                            {card.cardHolder || 'Card Holder'}
+                            {card.limit}
                         </p>
                     </div>
                     <div className="text-right">

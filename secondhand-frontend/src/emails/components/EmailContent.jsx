@@ -1,7 +1,5 @@
 import React from 'react';
 import { formatDateTime } from '../../common/formatters.js';
-import { EMAIL_TYPE_LABELS, EMAIL_TYPE_BADGE_COLORS } from '../emails.js';
-import { getEmailTypeIcon } from '../utils/emailTypeHelpers.jsx';
 
 const EmailContent = ({ email }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -30,7 +28,6 @@ const EmailContent = ({ email }) => {
             <div className="px-6 py-4 border-b border-gray-200">
                 <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                        {getEmailTypeIcon(email.emailType)}
                         <div>
                             <h2 className="text-xl font-semibold text-gray-900">
                                 {email.subject}
@@ -42,11 +39,6 @@ const EmailContent = ({ email }) => {
                             </div>
                         </div>
                     </div>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        EMAIL_TYPE_BADGE_COLORS[email.emailType] || 'bg-gray-100 text-gray-800'
-                    }`}>
-                        {EMAIL_TYPE_LABELS[email.emailType] || email.emailType}
-                    </span>
                 </div>
             </div>
 
