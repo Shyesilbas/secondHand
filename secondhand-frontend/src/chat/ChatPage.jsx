@@ -45,8 +45,8 @@ const ChatPage = () => {
     return (
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Mesajlar</h2>
-            <p className="text-gray-600">Mesajları görüntülemek için giriş yapın.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Messages</h2>
+            <p className="text-gray-600">Please Login to see your messages.</p>
           </div>
         </div>
     );
@@ -56,11 +56,11 @@ const ChatPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Mesajlar</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
             <div className="flex items-center space-x-2">
               <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
               <span className="text-sm text-gray-600">
-              {isConnected ? 'Çevrimiçi' : 'Çevrimdışı'}
+              {isConnected ? 'Online' : 'Off'}
             </span>
             </div>
           </div>
@@ -70,7 +70,7 @@ const ChatPage = () => {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm border">
                 <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">Sohbetler</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Chats</h2>
                 </div>
 
                 <div className="max-h-96 overflow-y-auto">
@@ -110,8 +110,8 @@ const ChatPage = () => {
               ) : (
                   <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-gray-500">
                     <ChatBubbleLeftRightIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p>Bir sohbet seçin</p>
-                    <p className="text-sm">Mesajlaşmaya başlamak için sol taraftan bir sohbet seçin</p>
+                    <p>Select a chat</p>
+                    <p className="text-sm">Select a chat from the panel</p>
                   </div>
               )}
             </div>

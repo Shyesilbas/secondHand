@@ -10,7 +10,6 @@ export const useChat = (userId) => {
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
     const [messages, setMessages] = useState([]);
     
-    // WebSocket hook'u
     const {
         isConnected,
         sendMessage: sendWebSocketMessage,
@@ -24,9 +23,6 @@ export const useChat = (userId) => {
         stompClient
     } = useWebSocket(user?.id);
 
-    // ==================== QUERIES ====================
-    
-    // Chat room'ları getir
     const {
         data: chatRooms = [],
         isLoading: isLoadingRooms,
@@ -39,10 +35,9 @@ export const useChat = (userId) => {
             return chatService.getUserChatRooms(userId);
         },
         enabled: !!userId,
-        refetchInterval: 30000 // 30 saniyede bir güncelle
+        refetchInterval: 30000 // refresh every 30 seconds
     });
 
-    // Seçili chat room'ın mesajlarını getir
     const {
         data: chatMessages,
         isLoading: isLoadingMessages,
@@ -55,12 +50,10 @@ export const useChat = (userId) => {
             return chatService.getChatMessages(selectedChatRoom.id);
         },
         enabled: !!selectedChatRoom?.id,
-        refetchInterval: 10000 // 10 saniyede bir güncelle
+        refetchInterval: 10000 // refresh every 10 seconds
     });
 
-    // ==================== MUTATIONS ====================
-    
-    // Mesaj gönderme mutation'ı
+
     const sendMessageMutation = useMutation({
         mutationFn: (messageData) => {
             console.log('Mutation function called with:', messageData);
@@ -68,14 +61,12 @@ export const useChat = (userId) => {
         },
         onSuccess: (data) => {
             console.log('Message sent successfully via HTTP:', data);
-            // Mesajı local state'e ekle (gönderen kullanıcı için)
             setMessages(prev => {
                 if (prev.some(msg => msg.id === data.id)) {
                     return prev;
                 }
                 return [...prev, data];
             });
-            // Mesajları güncelle
             queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
         },
@@ -85,7 +76,6 @@ export const useChat = (userId) => {
         }
     });
 
-    // Mesajları okundu olarak işaretleme mutation'ı
     const markAsReadMutation = useMutation({
         mutationFn: ({ chatRoomId, userId }) => 
             chatService.markMessagesAsRead(chatRoomId, userId),
@@ -95,14 +85,11 @@ export const useChat = (userId) => {
         }
     });
 
-    // ==================== ACTIONS ====================
-    
-    // Chat room seçme
+
     const selectChatRoom = useCallback((chatRoom) => {
         console.log('selectChatRoom called with:', chatRoom);
         
         if (selectedChatRoom?.id) {
-            // Önceki room'dan çık
             leaveRoom(selectedChatRoom.id, user?.id);
             unsubscribeFromChatRoom(selectedChatRoom.id);
         }
@@ -110,11 +97,9 @@ export const useChat = (userId) => {
         setSelectedChatRoom(chatRoom);
         
         if (chatRoom?.id) {
-            // Yeni room'a katıl
             joinRoom(chatRoom.id, user?.id);
             subscribeToChatRoom(chatRoom.id);
             
-            // Mesajları okundu olarak işaretle
             markAsReadMutation.mutate({
                 chatRoomId: chatRoom.id,
                 userId: user?.id
@@ -122,14 +107,12 @@ export const useChat = (userId) => {
         }
     }, [selectedChatRoom, user?.id, leaveRoom, joinRoom, subscribeToChatRoom, unsubscribeFromChatRoom, markAsReadMutation]);
 
-    // Mesaj gönderme
     const sendMessage = useCallback((content) => {
         if (!selectedChatRoom?.id || !user?.id) return;
 
         console.log('Selected chat room participants:', selectedChatRoom.participantIds);
         console.log('Current user ID:', user.id);
 
-        // Chat room'daki diğer kullanıcıyı bul (recipient)
         const otherParticipant = selectedChatRoom.participantIds.find(id => id !== user.id);
         if (!otherParticipant) {
             console.error('No other participant found in chat room');
@@ -150,7 +133,6 @@ export const useChat = (userId) => {
         sendMessageMutation.mutate(messageData);
     }, [selectedChatRoom?.id, user?.id, sendMessageMutation]);
 
-    // Direct chat oluşturma/getirme
     const createDirectChat = useCallback(async (otherUserId) => {
         try {
             const chatRoom = await chatService.createOrGetDirectChat(userId, otherUserId);
@@ -162,7 +144,6 @@ export const useChat = (userId) => {
         }
     }, [userId]);
 
-    // Listing chat oluşturma/getirme
     const createListingChat = useCallback(async (listingId, listingTitle) => {
         try {
             console.log('createListingChat called with:', listingId, listingTitle);
@@ -178,7 +159,6 @@ export const useChat = (userId) => {
 
     // ==================== EFFECTS ====================
     
-    // WebSocket'ten gelen mesajları dinle
     useEffect(() => {
         if (isConnected && selectedChatRoom?.id) {
             const handleNewMessage = (messageData) => {
@@ -186,7 +166,6 @@ export const useChat = (userId) => {
                 console.log('Current user ID:', user?.id);
                 console.log('Message sender ID:', messageData.senderId);
                 
-                // Mesaj gönderen kullanıcının kendi mesajını tekrar almaması için kontrol
                 if (messageData.senderId === user?.id) {
                     console.log('Skipping own message from WebSocket');
                     return;
@@ -200,31 +179,25 @@ export const useChat = (userId) => {
                 });
             };
 
-            // Callback'i ekle
             addMessageCallback(handleNewMessage);
 
             return () => {
-                // Callback'i kaldır
                 removeMessageCallback(handleNewMessage);
             };
         }
     }, [isConnected, selectedChatRoom?.id, user?.id, addMessageCallback, removeMessageCallback]);
 
-    // Chat messages değişikliklerini dinle
     useEffect(() => {
         console.log('chatMessages changed:', chatMessages);
         
         if (chatMessages?.content) {
-            // Page objesi geldiğinde content field'ından mesajları al
-            // Backend'ten DESC sırada geliyor, frontend'te ASC sırada göstermek için ters çevir
             const sortedMessages = [...chatMessages.content].reverse();
             console.log('Setting messages (sorted):', sortedMessages);
             setMessages(sortedMessages);
         }
     }, [chatMessages]);
 
-    // ==================== RETURN ====================
-    
+
     return {
         // State
         chatRooms: chatRooms || [],
