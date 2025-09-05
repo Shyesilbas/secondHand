@@ -7,40 +7,38 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
     const [paymentType, setPaymentType] = useState('CREDIT_CARD');
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-    // Modal step: REVIEW -> VERIFY
     const [modalStep, setModalStep] = useState('REVIEW');
     const [verificationCode, setVerificationCode] = useState('');
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [codeExpiryTime, setCodeExpiryTime] = useState(null);
     const [isResendingCode, setIsResendingCode] = useState(false);
-    const notification = useNotification();
+    const { showSuccess, showError, showInfo } = useNotification();
 
-    // Code expiry timer
     useEffect(() => {
         if (codeExpiryTime) {
             const timer = setInterval(() => {
                 const now = new Date().getTime();
                 const expiry = new Date(codeExpiryTime).getTime();
                 const timeLeft = expiry - now;
-                
+
                 if (timeLeft <= 0) {
                     setCodeExpiryTime(null);
                     clearInterval(timer);
                 }
             }, 1000);
-            
+
             return () => clearInterval(timer);
         }
     }, [codeExpiryTime]);
 
     const handlePayment = async () => {
         if (!selectedListing) {
-            notification.showError('Hata', 'Lütfen ödeme yapacağınız ilanı seçin.');
+            showError('Error', 'Please select a listing to pay for.');
             return;
         }
 
         if (!feeConfig) {
-            notification.showError('Hata', 'Ücret yapılandırması yüklenmedi. Lütfen sayfayı yenileyin.');
+            showError('Error', 'Fee configuration not loaded. Please refresh the page.');
             return;
         }
         setModalStep('REVIEW');
@@ -49,42 +47,37 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
     const confirmPayment = async () => {
         setIsProcessingPayment(true);
-        
+
         try {
             const paymentData = createListingFeePaymentRequest({
                 listingId: selectedListing.id,
                 paymentType: paymentType,
                 verificationCode: verificationCode,
             });
-            console.log('Sending payment request:', paymentData);
             await paymentService.createListingFeePayment(paymentData);
 
-            // Payment successful
-            notification.showSuccess('Başarılı', 'İlan ücreti ödemesi başarılı! İlanınız yayınlanacak.');
-            
-            // Reset state
+            showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
+
             setSelectedListing(null);
             setVerificationCode('');
             setCodeExpiryTime(null);
             setModalStep('REVIEW');
             setShowConfirmModal(false);
-            
-            // Call success callback
+
             if (onSuccess) {
                 onSuccess();
             }
-            
+
         } catch (err) {
-            console.log('Payment error:', err.response?.data);
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                notification.showInfo('Doğrulama Gerekli', 'E-postanıza gönderilen doğrulama kodunu giriniz.');
+                showInfo('Verification Required', 'Enter the verification code sent to your email.');
                 setModalStep('VERIFY');
-                // Set code expiry time (15 minutes) without auto-fetching emails
                 const expiryTime = new Date();
                 expiryTime.setMinutes(expiryTime.getMinutes() + 15);
                 setCodeExpiryTime(expiryTime);
+                if (onVerificationRequired) onVerificationRequired();
             } else {
-                notification.showError('Hata', err.response?.data?.message || 'İlan ücreti ödemesi başarısız. Lütfen daha sonra tekrar deneyin.');
+                showError('Error', err.response?.data?.message || 'Listing fee payment failed. Please try again later.');
             }
         } finally {
             setIsProcessingPayment(false);
@@ -93,7 +86,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
     const resendVerificationCode = async () => {
         if (!selectedListing) {
-            notification.showError('Hata', 'Lütfen önce bir ilan seçin.');
+            showError('Error', 'Please select a listing first.');
             return;
         }
 
@@ -102,17 +95,15 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
             const paymentData = createListingFeePaymentRequest({
                 listingId: selectedListing.id,
                 paymentType: paymentType,
-                verificationCode: '', // Empty code to request new one
+                verificationCode: '',
             });
-            
             await paymentService.createListingFeePayment(paymentData);
         } catch (err) {
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                notification.showSuccess('Yeni Kod Gönderildi', 'Yeni doğrulama kodu e-postanıza gönderildi.');
+                showSuccess('Success', 'A new verification code has been sent to your email.');
                 setVerificationCode('');
-                // Do not auto-fetch emails; user can open via modal action
             } else {
-                notification.showError('Hata', err.response?.data?.message || 'Yeni kod gönderilemedi.');
+                showError('Error', err.response?.data?.message || 'Failed to resend verification code.');
             }
         } finally {
             setIsResendingCode(false);

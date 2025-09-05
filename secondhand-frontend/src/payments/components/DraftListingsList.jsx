@@ -7,7 +7,7 @@ const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListi
 
     return (
         <div className="lg:col-span-2">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            <h2 className="text-xl font-semibold text-text-primary mb-6">
                 Draft Listings ({listings.length})
             </h2>
             
@@ -18,19 +18,19 @@ const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListi
                         className={`bg-white rounded-lg border p-6 cursor-pointer transition-all ${
                             selectedListing?.id === listing.id
                                 ? 'border-blue-500 ring-2 ring-blue-200'
-                                : 'border-gray-200 hover:border-gray-300'
+                                : 'border-sidebar-border hover:border-header-border'
                         }`}
                         onClick={() => onSelectListing(listing)}
                     >
                         <div className="flex items-start justify-between">
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                <h3 className="text-lg font-semibold text-text-primary mb-2">
                                     {listing.title}
                                 </h3>
-                                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                <p className="text-text-secondary text-sm mb-3 line-clamp-2">
                                     {listing.description}
                                 </p>
-                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <div className="flex items-center space-x-4 text-sm text-text-muted">
                                     <span>{formatPrice(listing.price, listing.currency)}</span>
                                     <span>•</span>
                                     <span>{listing.city}</span>
@@ -45,7 +45,7 @@ const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListi
                                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                                     selectedListing?.id === listing.id
                                         ? 'border-blue-500 bg-blue-500'
-                                        : 'border-gray-300'
+                                        : 'border-header-border'
                                 }`}>
                                     {selectedListing?.id === listing.id && (
                                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">

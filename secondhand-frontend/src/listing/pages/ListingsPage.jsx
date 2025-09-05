@@ -66,14 +66,14 @@ const ListingsPage = () => {
     const sidebarContent = (
         <div className="space-y-6">
             <div>
-                <h3 className="text-md font-semibold text-gray-900 mb-4">Categories</h3>
+                <h3 className="text-md font-semibold text-text-primary mb-4">Categories</h3>
                 <CategorySelector
                     selectedCategory={selectedCategory}
                     onCategoryChange={handleCategoryChange}
                 />
             </div>
             <div>
-                <h3 className="text-md font-semibold text-gray-900 mb-4">Advanced Filters</h3>
+                <h3 className="text-md font-semibold text-text-primary mb-4">Advanced Filters</h3>
                 <AdvancedFilters
                     filters={filters}
                     onFiltersChange={updateFilters}

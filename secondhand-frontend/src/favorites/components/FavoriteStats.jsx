@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { favoriteService } from '../services/favoriteService.js';
-import { FavoriteStatsDTO } from '../../common/index.js';
+import { FavoriteStatsDTO } from '../favorites.js';
 
 const FavoriteStats = ({ 
   listingId,
@@ -62,11 +62,11 @@ const FavoriteStats = ({
     return (
       <div className={`flex items-center gap-1 ${className}`}>
         {showIcon && (
-          <svg className={`${config.icon} animate-pulse text-gray-400`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${config.icon} animate-pulse text-text-muted`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         )}
-        {showText && <span className={`${config.text} text-gray-400`}>...</span>}
+        {showText && <span className={`${config.text} text-text-muted`}>...</span>}
       </div>
     );
   }
@@ -75,7 +75,7 @@ const FavoriteStats = ({
     <div className={`flex items-center gap-1 ${className}`}>
       {showIcon && (
         <svg 
-          className={`${config.icon} text-gray-500`} 
+          className={`${config.icon} text-text-muted`} 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -89,7 +89,7 @@ const FavoriteStats = ({
         </svg>
       )}
       {showText && (
-        <span className={`${config.text} text-gray-500`}>
+        <span className={`${config.text} text-text-muted`}>
           {favoriteCount} {favoriteCount === 1 ? 'Favorite' : 'Favorite'}
         </span>
       )}

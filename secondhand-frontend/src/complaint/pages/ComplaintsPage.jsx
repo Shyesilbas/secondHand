@@ -18,7 +18,7 @@ const ComplaintsPage = () => {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-white rounded-lg border border-gray-200 p-4">
+                        <div key={i} className="bg-white rounded-lg border border-sidebar-border p-4">
                             <div className="animate-pulse">
                                 <div className="flex items-center gap-2 mb-3">
                                     <div className="h-4 bg-gray-200 rounded w-20"></div>
@@ -47,11 +47,11 @@ const ComplaintsPage = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load complaints</h3>
-                    <p className="text-gray-600 mb-4">{error}</p>
+                    <h3 className="text-lg font-medium text-text-primary mb-2">Failed to load complaints</h3>
+                    <p className="text-text-secondary mb-4">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        className="bg-btn-primary text-white px-4 py-2 rounded-md hover:bg-btn-primary-hover transition-colors"
                     >
                         Retry
                     </button>
@@ -63,8 +63,8 @@ const ComplaintsPage = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Complaints</h1>
-                <p className="text-gray-600">Manage the complaints you have submitted here.</p>
+                <h1 className="text-3xl font-bold text-text-primary mb-2">My Complaints</h1>
+                <p className="text-text-secondary">Manage the complaints you have submitted here.</p>
             </div>
 
             {complaints && complaints.length > 0 ? (
@@ -79,12 +79,12 @@ const ComplaintsPage = () => {
             ) : (
                 <div className="text-center py-16">
                     <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-12 h-12 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h3 className="text-xl font-medium text-gray-900 mb-2">No complaints submitted yet</h3>
-                    <p className="text-gray-600 max-w-md mx-auto">
+                    <h3 className="text-xl font-medium text-text-primary mb-2">No complaints submitted yet</h3>
+                    <p className="text-text-secondary max-w-md mx-auto">
                         You can submit a complaint if you encounter inappropriate behavior.
                         All complaints will be reviewed and you will receive feedback.
                     </p>

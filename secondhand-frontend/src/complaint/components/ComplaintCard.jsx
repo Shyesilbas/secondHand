@@ -17,7 +17,7 @@ const ComplaintCard = ({ complaint }) => {
     const getReasonLabel = (reason) => COMPLAINT_REASONS[reason] || reason || 'UNKNOWN REASON';
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-lg border border-sidebar-border p-4 hover:shadow-md transition-shadow">
             <div className="flex flex-col gap-2 text-sm">
                 <div>
                     <strong>Complaint ID:</strong> {complaint.complaintId}

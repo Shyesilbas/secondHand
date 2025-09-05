@@ -15,7 +15,7 @@ const PaymentPanel = ({
     return (
         <div className="lg:col-span-1">
             <div className="bg-white rounded-lg border p-6 sticky top-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
+                <h3 className="text-xl font-semibold text-text-primary mb-6">
                     Payment Panel
                 </h3>
 
@@ -40,17 +40,17 @@ const PaymentPanel = ({
                             ) : (
                                 <>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Listing Fee:</span>
+                                        <span className="text-text-secondary">Listing Fee:</span>
                                         <span className="font-semibold">{formatPrice(feeConfig.creationFee)}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Tax ({feeConfig.taxPercentage}%):</span>
+                                        <span className="text-text-secondary">Tax ({feeConfig.taxPercentage}%):</span>
                                         <span className="font-semibold">{formatPrice(feeConfig.creationFee * feeConfig.taxPercentage / 100)}</span>
                                     </div>
                                     <hr />
                                     <div className="flex justify-between text-lg">
                                         <span className="font-semibold">Total:</span>
-                                        <span className="font-bold text-blue-600">
+                                        <span className="font-bold text-btn-primary">
                                             {formatPrice(feeConfig.totalCreationFee)}
                                         </span>
                                     </div>
@@ -59,42 +59,42 @@ const PaymentPanel = ({
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                            <label className="block text-sm font-medium text-text-secondary mb-3">
                                 Payment Type:
                             </label>
                             <div className="space-y-2">
-                                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <label className="flex items-center p-3 border border-header-border rounded-lg cursor-pointer hover:bg-app-bg">
                                     <input
                                         type="radio"
                                         name="paymentType"
                                         value="CREDIT_CARD"
                                         checked={paymentType === 'CREDIT_CARD'}
                                         onChange={(e) => onPaymentTypeChange(e.target.value)}
-                                        className="text-blue-600 focus:ring-blue-500"
+                                        className="text-btn-primary focus:ring-blue-500"
                                     />
                                     <div className="ml-3 flex items-center">
-                                        <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-5 h-5 text-btn-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                         </svg>
-                                        <span className="text-sm font-medium text-gray-900">
+                                        <span className="text-sm font-medium text-text-primary">
                                             Credit Card
                                         </span>
                                     </div>
                                 </label>
-                                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                <label className="flex items-center p-3 border border-header-border rounded-lg cursor-pointer hover:bg-app-bg">
                                     <input
                                         type="radio"
                                         name="paymentType"
                                         value="TRANSFER"
                                         checked={paymentType === 'TRANSFER'}
                                         onChange={(e) => onPaymentTypeChange(e.target.value)}
-                                        className="text-blue-600 focus:ring-blue-500"
+                                        className="text-btn-primary focus:ring-blue-500"
                                     />
                                     <div className="ml-3 flex items-center">
                                         <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
-                                        <span className="text-sm font-medium text-gray-900">
+                                        <span className="text-sm font-medium text-text-primary">
                                             Bank Wire
                                         </span>
                                     </div>
@@ -105,7 +105,7 @@ const PaymentPanel = ({
                         <button
                             onClick={onPayment}
                             disabled={isProcessingPayment}
-                            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                            className="w-full bg-btn-primary text-white py-3 px-4 rounded-lg hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                         >
                             {isProcessingPayment ? (
                                 <div className="flex items-center justify-center">
@@ -120,16 +120,16 @@ const PaymentPanel = ({
                             )}
                         </button>
 
-                        <p className="text-xs text-gray-500 mt-3 text-center">
+                        <p className="text-xs text-text-muted mt-3 text-center">
                            After successful payment, your listing will be published.
                         </p>
                     </>
                 ) : (
                     <div className="text-center py-8">
-                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-12 h-12 text-text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-text-muted text-sm">
                             Chose a listing to pay the listing fee.
                         </p>
                     </div>

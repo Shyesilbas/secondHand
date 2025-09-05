@@ -141,10 +141,10 @@ const ChangePasswordPage = () => {
             <div className="max-w-md w-full space-y-8">
                 {/* Header */}
                 <div className="text-center">
-                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+                    <h2 className="mt-6 text-3xl font-extrabold text-text-primary">
                         Change Password
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-text-secondary">
                         Please enter a strong password for your account.
                     </p>
                 </div>
@@ -198,8 +198,8 @@ const ChangePasswordPage = () => {
 
                         {/* Password Requirements */}
                         {formData.newPassword && (
-                            <div className="bg-gray-50 rounded-md p-3">
-                                <p className="text-sm font-medium text-gray-700 mb-2">Password Requirements:</p>
+                            <div className="bg-app-bg rounded-md p-3">
+                                <p className="text-sm font-medium text-text-secondary mb-2">Password Requirements:</p>
                                 <div className="space-y-1">
                                     <div className={`text-xs flex items-center ${passwordValidation.minLength ? 'text-green-600' : 'text-red-600'}`}>
                                         <span className="mr-2">{passwordValidation.minLength ? '✓' : '✗'}</span>
@@ -252,7 +252,7 @@ const ChangePasswordPage = () => {
                         <button
                             type="button"
                             onClick={() => navigate(ROUTES.PROFILE)}
-                            className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                            className="flex-1 py-2 px-4 border border-header-border rounded-md shadow-sm text-sm font-medium text-text-secondary bg-white hover:bg-app-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                         >
                             Cancel
                         </button>
@@ -261,7 +261,7 @@ const ChangePasswordPage = () => {
 
                 {/* Help Text */}
                 <div className="text-center">
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-muted">
                         If you forgot your password, you can{' '}
                         <button
                             onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}

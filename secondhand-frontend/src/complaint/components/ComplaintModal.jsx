@@ -83,16 +83,16 @@ const ComplaintModal = ({
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-xl font-semibold text-gray-900">
+                            <h3 className="text-xl font-semibold text-text-primary">
                                 Report User
                             </h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-text-secondary mt-1">
                                 You are reporting {targetUserName}
                             </p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-gray-600 p-1"
+                            className="text-text-muted hover:text-text-secondary p-1"
                             disabled={isLoading}
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,14 +104,14 @@ const ComplaintModal = ({
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Reason */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-text-secondary mb-2">
                                 Reason *
                             </label>
                             <select
                                 value={formData.reason}
                                 onChange={(e) => handleInputChange('reason', e.target.value)}
                                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                                    errors.reason ? 'border-red-500' : 'border-gray-300'
+                                    errors.reason ? 'border-red-500' : 'border-header-border'
                                 }`}
                                 disabled={isLoading}
                             >
@@ -127,7 +127,7 @@ const ComplaintModal = ({
 
                         {/* Description */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-text-secondary mb-2">
                                 Detailed Description *
                             </label>
                             <textarea
@@ -135,7 +135,7 @@ const ComplaintModal = ({
                                 onChange={(e) => handleInputChange('description', e.target.value)}
                                 rows={4}
                                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none ${
-                                    errors.description ? 'border-red-500' : 'border-gray-300'
+                                    errors.description ? 'border-red-500' : 'border-header-border'
                                 }`}
                                 placeholder="Please explain your complaint in detail..."
                                 disabled={isLoading}
@@ -145,11 +145,11 @@ const ComplaintModal = ({
                                 {errors.description ? (
                                     <p className="text-sm text-red-600">{errors.description}</p>
                                 ) : (
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-text-muted">
                                         A detailed explanation helps us resolve your complaint faster
                                     </p>
                                 )}
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-text-muted">
                                     {formData.description.length}/500
                                 </p>
                             </div>
@@ -172,7 +172,7 @@ const ComplaintModal = ({
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium disabled:opacity-50"
+                                className="px-4 py-2 text-text-secondary hover:text-gray-800 font-medium disabled:opacity-50"
                                 disabled={isLoading}
                             >
                                 Cancel

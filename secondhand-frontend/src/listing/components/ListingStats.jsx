@@ -40,12 +40,12 @@ const ListingStats = ({ listings, selectedStatus, onStatusClick }) => {
                         } ${
                             isSelected
                                 ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-200'
-                                : 'bg-white hover:bg-gray-50'
+                                : 'bg-white hover:bg-app-bg'
                         }`}
                         onClick={isClickable ? () => onStatusClick(stat.label.toUpperCase()) : undefined}
                     >
                         <div className="flex items-center justify-between">
-                            <span className={`text-xs ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-500'}`}>
+                            <span className={`text-xs ${isSelected ? 'text-blue-700 font-medium' : 'text-text-muted'}`}>
                                 {stat.label}
                             </span>
                             <span className={`text-sm font-semibold ${isSelected ? 'text-blue-700' : stat.color}`}>

@@ -3,15 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { paymentService } from './services/paymentService.js';
 import PaymentReceiptModal from '../common/components/modals/PaymentReceiptModal.jsx';
 import { formatCurrency, formatDateTime } from '../common/formatters.js';
-import { 
-    PAYMENT_TYPES, 
-    PAYMENT_TRANSACTION_TYPES, 
+import {
+    PAYMENT_TYPES,
     PAYMENT_DIRECTIONS,
-    PAYMENT_TYPE_LABELS, 
-    TRANSACTION_TYPE_LABELS, 
+    PAYMENT_TYPE_LABELS,
+    TRANSACTION_TYPE_LABELS,
     PAYMENT_DIRECTION_LABELS,
     PAYMENT_STATUS_BADGE_COLORS,
-    PAYMENT_DIRECTION_BADGE_COLORS 
+    PAYMENT_DIRECTION_BADGE_COLORS
 } from './payments.js';
 
 const PaymentsPage = () => {
@@ -81,13 +80,8 @@ const PaymentsPage = () => {
         }
     };
 
-    const getTransactionTypeLabel = (type) => {
-        return TRANSACTION_TYPE_LABELS[type] || type;
-    };
-
-    const getPaymentTypeLabel = (type) => {
-        return PAYMENT_TYPE_LABELS[type] || type;
-    };
+    const getTransactionTypeLabel = (type) => TRANSACTION_TYPE_LABELS[type] || type;
+    const getPaymentTypeLabel = (type) => PAYMENT_TYPE_LABELS[type] || type;
 
     const getDirectionIcon = (direction) => {
         if (direction === PAYMENT_DIRECTIONS.INCOMING) {
@@ -112,7 +106,7 @@ const PaymentsPage = () => {
                     <div className="h-8 bg-gray-200 rounded w-1/3"></div>
                     <div className="space-y-4">
                         {[...Array(5)].map((_, i) => (
-                            <div key={i} className="bg-white rounded-lg border p-6">
+                            <div key={i} className="bg-card-bg rounded-card shadow-card border p-6">
                                 <div className="h-6 bg-gray-200 rounded w-1/4 mb-2"></div>
                                 <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                                 <div className="h-4 bg-gray-200 rounded w-2/3"></div>
@@ -129,7 +123,7 @@ const PaymentsPage = () => {
             <div className="mb-8">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
+                    className="flex items-center text-text-secondary hover:text-text-primary transition-colors mb-4"
                 >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -137,10 +131,10 @@ const PaymentsPage = () => {
                     Back
                 </button>
 
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-text-primary">
                     Payment History
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="text-text-secondary mt-2">
                     View all your payment transactions
                 </p>
             </div>
@@ -152,31 +146,31 @@ const PaymentsPage = () => {
             )}
 
             {payments.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+                <div className="bg-card-bg rounded-card shadow-card border p-8 text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-lg font-medium text-text-primary mb-2">
                         No Payment Found
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-text-secondary mb-6">
                         You haven't made any payments yet.
                     </p>
                 </div>
             ) : (
                 <>
-                    <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                    <div className="bg-card-bg rounded-card shadow-card border overflow-hidden">
+                        <div className="px-6 py-4 border-b border-sidebar-border">
+                            <h3 className="text-lg font-semibold text-text-primary">
                                 Recent Transactions ({payments.length})
                             </h3>
                         </div>
 
                         <div className="divide-y divide-gray-200">
                             {payments.map((payment, index) => (
-                                <div key={payment.paymentId || index} className="p-6 hover:bg-gray-50 transition-colors">
+                                <div key={payment.paymentId || index} className="p-6 hover:bg-app-bg transition-colors">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4 flex-1">
                                             <div className={`p-3 rounded-lg ${
@@ -189,32 +183,32 @@ const PaymentsPage = () => {
 
                                             <div className="flex-1">
                                                 <div className="flex items-center space-x-2">
-                                                    <h4 className="text-lg font-semibold text-gray-900">
+                                                    <h4 className="text-lg font-semibold text-text-primary">
                                                         {getTransactionTypeLabel(payment.transactionType)}
                                                     </h4>
                                                     <div className="flex items-center space-x-1">
                                                         {getDirectionIcon(payment.paymentDirection)}
-                                                        <span className="text-xs text-gray-500">
+                                                        <span className="text-xs text-text-muted">
                                                             {PAYMENT_DIRECTION_LABELS[payment.paymentDirection]}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                                <p className="text-sm text-text-muted mt-1">
                                                     {getPaymentTypeLabel(payment.paymentType)} • {formatDate(payment.createdAt)}
                                                 </p>
                                                 {payment.listingId && (
-                                                    <p className="text-xs text-gray-400 mt-1">
+                                                    <p className="text-xs text-text-muted mt-1">
                                                         Listing : {payment.listingId}
                                                     </p>
                                                 )}
 
                                                 {payment.receiverName && payment.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING && (
-                                                    <p className="text-xs text-gray-500 mt-1">
+                                                    <p className="text-xs text-text-muted mt-1">
                                                         To: {payment.receiverName} {payment.receiverSurname}
                                                     </p>
                                                 )}
                                                 {payment.senderName && payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING && (
-                                                    <p className="text-xs text-gray-500 mt-1">
+                                                    <p className="text-xs text-text-muted mt-1">
                                                         From: {payment.senderName} {payment.senderSurname}
                                                     </p>
                                                 )}
@@ -227,7 +221,7 @@ const PaymentsPage = () => {
                                                     <span className={`text-lg font-bold ${
                                                         payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING
                                                             ? 'text-green-600'
-                                                            : 'text-gray-900'
+                                                            : 'text-text-primary'
                                                     }`}>
                                                         {payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '+' : '-'}
                                                         {formatCurrency(payment.amount)}
@@ -245,7 +239,7 @@ const PaymentsPage = () => {
 
                                             <button
                                                 onClick={() => showReceipt(payment)}
-                                                className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                                className="flex items-center px-3 py-2 text-sm font-medium text-btn-primary bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                                                 title="Show Receipt"
                                             >
                                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,40 +254,39 @@ const PaymentsPage = () => {
                         </div>
                     </div>
 
-                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="mt-6 flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                                 <button
                                     onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                                     disabled={currentPage === 0}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 text-sm font-medium text-text-secondary bg-card-bg border border-header-border rounded-lg hover:bg-app-bg disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Previous
                                 </button>
 
-                                <span className="text-sm text-gray-700">
+                                <span className="text-sm text-text-secondary">
                                     Page {currentPage + 1} of {totalPages}
                                 </span>
 
                                 <button
                                     onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                                     disabled={currentPage >= totalPages - 1}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-4 py-2 text-sm font-medium text-text-secondary bg-card-bg border border-header-border rounded-lg hover:bg-app-bg disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Next
                                 </button>
                             </div>
 
                             <div className="flex items-center space-x-4">
-                                <div className="text-sm text-gray-700">
+                                <div className="text-sm text-text-secondary">
                                     Showing {totalElements === 0 ? 0 : currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} results
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <label htmlFor="pageSize" className="text-sm text-gray-700">Per page:</label>
+                                    <label htmlFor="pageSize" className="text-sm text-text-secondary">Per page:</label>
                                     <select
                                         id="pageSize"
-                                        className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="px-2 py-1 text-sm border border-header-border rounded-md bg-card-bg focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         value={pageSize}
                                         onChange={(e) => { setCurrentPage(0); setPageSize(Number(e.target.value)); }}
                                     >
@@ -309,7 +302,6 @@ const PaymentsPage = () => {
                 </>
             )}
 
-            {/* Payment Receipt Modal */}
             <PaymentReceiptModal
                 isOpen={isReceiptModalOpen}
                 onClose={closeReceipt}

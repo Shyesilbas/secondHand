@@ -27,7 +27,7 @@ const ConfirmationModal = ({
             return (
                 <div className="flex items-center justify-center py-4">
                     <LoadingIndicator size="h-6 w-6" />
-                    <span className="ml-2 text-gray-600">Loading...</span>
+                    <span className="ml-2 text-text-secondary">Loading...</span>
                 </div>
             );
         }
@@ -38,22 +38,22 @@ const ConfirmationModal = ({
                 return (
                     <div className="space-y-3">
                         {creditCards.map((card, index) => (
-                            <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                            <div key={index} className="border rounded-lg p-3 bg-app-bg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">
+                                        <p className="font-medium text-text-primary">
                                             {card.number}
                                         </p>
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-sm text-text-secondary">
                                             {card.expiryMonth}/{card.expiryYear}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm font-medium text-gray-900">
+                                        <p className="text-sm font-medium text-text-primary">
                                             {formatCurrency(parseFloat(card.limit) - parseFloat(card.amount), 'TRY')}
                                         </p>
-                                        <p className="text-xs text-gray-500">Kullanılabilir Limit</p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-text-muted">Kullanılabilir Limit</p>
+                                        <p className="text-xs text-text-muted">
                                             Toplam: {formatCurrency(card.limit, 'TRY')} | Kullanılan: {formatCurrency(card.amount, 'TRY')}
                                         </p>
                                     </div>
@@ -64,11 +64,11 @@ const ConfirmationModal = ({
                 );
             } else {
                 return (
-                    <div className="text-center py-4 border border-dashed border-gray-300 rounded-lg">
-                        <p className="text-gray-500">Henüz kayıtlı kredi kartınız bulunmuyor.</p>
+                    <div className="text-center py-4 border border-dashed border-header-border rounded-lg">
+                        <p className="text-text-muted">Henüz kayıtlı kredi kartınız bulunmuyor.</p>
                         <button
                             onClick={() => onNavigateToPaymentMethods('CREDIT_CARD')}
-                            className="mt-2 text-blue-600 hover:text-blue-700 text-sm"
+                            className="mt-2 text-btn-primary hover:text-blue-700 text-sm"
                         >
                             Kredi Kartı Ekle
                         </button>
@@ -81,21 +81,21 @@ const ConfirmationModal = ({
                 return (
                     <div className="space-y-3">
                         {bankAccounts.map((account, index) => (
-                            <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                            <div key={index} className="border rounded-lg p-3 bg-app-bg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">
+                                        <p className="font-medium text-text-primary">
                                             {account.holderName} {account.holderSurname}
                                         </p>
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-sm text-text-secondary">
                                             {account.IBAN}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-sm font-medium text-gray-900">
+                                        <p className="text-sm font-medium text-text-primary">
                                             {formatCurrency(account.balance, 'TRY')}
                                         </p>
-                                        <p className="text-xs text-gray-500">Bakiye</p>
+                                        <p className="text-xs text-text-muted">Bakiye</p>
                                     </div>
                                 </div>
                             </div>
@@ -104,11 +104,11 @@ const ConfirmationModal = ({
                 );
             } else {
                 return (
-                    <div className="text-center py-4 border border-dashed border-gray-300 rounded-lg">
-                        <p className="text-gray-500">Henüz kayıtlı banka hesabınız bulunmuyor.</p>
+                    <div className="text-center py-4 border border-dashed border-header-border rounded-lg">
+                        <p className="text-text-muted">Henüz kayıtlı banka hesabınız bulunmuyor.</p>
                         <button
                             onClick={() => onNavigateToPaymentMethods('TRANSFER')}
-                            className="mt-2 text-blue-600 hover:text-blue-700 text-sm"
+                            className="mt-2 text-btn-primary hover:text-blue-700 text-sm"
                         >
                             Banka Hesabı Ekle
                         </button>
@@ -137,10 +137,10 @@ const ConfirmationModal = ({
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
                 <div className="px-6 py-5 border-b bg-white/60 backdrop-blur supports-[backdrop-filter]:bg-white/30">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-text-primary">
                             {step === 'REVIEW' ? 'Ödeme Onayı' : 'Doğrulama'}
                         </h3>
-                        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+                        <button onClick={onCancel} className="text-text-muted hover:text-text-secondary">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -167,7 +167,7 @@ const ConfirmationModal = ({
                         <>
                             {/* Payment Method Details */}
                             <div className="mb-6">
-                                <p className="text-sm font-medium text-gray-700 mb-3">Ödeme Yöntemi</p>
+                                <p className="text-sm font-medium text-text-secondary mb-3">Ödeme Yöntemi</p>
                                 {renderPaymentMethodDetails()}
                             </div>
                         </>
@@ -175,7 +175,7 @@ const ConfirmationModal = ({
                         <>
                             {/* Verification Step */}
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-gray-700">Doğrulama Kodu</label>
+                                <label className="block text-sm font-medium text-text-secondary">Doğrulama Kodu</label>
                                 <div className="flex items-center gap-3">
                                     <input
                                         type="text"
@@ -191,20 +191,20 @@ const ConfirmationModal = ({
                                     <button
                                         onClick={onResendCode}
                                         disabled={isResendingCode}
-                                        className="px-3 py-2 rounded-lg border text-sm hover:bg-gray-50 disabled:opacity-50"
+                                        className="px-3 py-2 rounded-lg border text-sm hover:bg-app-bg disabled:opacity-50"
                                     >
                                         {isResendingCode ? 'Gönderiliyor...' : 'Kodu Yenile'}
                                     </button>
                                 </div>
                                 {codeExpiryTime && (
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-text-muted">
                                         Kod süresi: {Math.max(0, Math.floor((new Date(codeExpiryTime).getTime() - new Date().getTime()) / 1000 / 60))} dk
                                     </div>
                                 )}
                                 <div>
                                     <button
                                         onClick={onShowEmails}
-                                        className="text-xs text-blue-600 hover:text-blue-700"
+                                        className="text-xs text-btn-primary hover:text-blue-700"
                                     >
                                         E-postaları göster
                                     </button>
@@ -214,13 +214,13 @@ const ConfirmationModal = ({
                     )}
                 </div>
 
-                <div className="px-6 py-4 border-t bg-gray-50 flex items-center gap-3">
-                    <button onClick={onCancel} className="px-4 py-2 rounded-lg border text-gray-700 hover:bg-white">İptal</button>
+                <div className="px-6 py-4 border-t bg-app-bg flex items-center gap-3">
+                    <button onClick={onCancel} className="px-4 py-2 rounded-lg border text-text-secondary hover:bg-white">İptal</button>
                     {step === 'REVIEW' ? (
                         <button
                             onClick={onConfirm}
                             disabled={!isPaymentMethodAvailable() || isProcessing}
-                            className="ml-auto px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                            className="ml-auto px-4 py-2 rounded-lg bg-btn-primary text-white hover:bg-btn-primary-hover disabled:opacity-50"
                         >
                             {isProcessing ? 'İşleniyor...' : 'Ödemeyi Başlat'}
                         </button>

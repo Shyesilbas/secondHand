@@ -6,7 +6,7 @@ import { ROUTES } from '../../../common/constants/routes.js';
 import ListingBasics from '../../../common/components/forms/ListingBasics.jsx';
 import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
 import LocationFields from '../../../common/components/forms/LocationFields.jsx';
-import { ElectronicCreateRequestDTO } from '../../../common/index.js';
+import { ElectronicCreateRequestDTO } from '../../electronics.js';
 import { useElectronic } from '../hooks/useElectronic.js';
 import ListingWizard from '../../../listing/components/ListingWizard.jsx';
 import electronicValidators from '../../electronicValidators.js';
@@ -131,7 +131,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                         </div>
                         <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
                         <div className="flex items-center gap-3">
-                          <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-4 w-4 text-blue-600 border-slate-300 rounded" />
+                          <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-4 w-4 text-btn-primary border-slate-300 rounded" />
                           <label htmlFor="warrantyProof" className="text-sm font-medium text-slate-700">Warranty Proof Available</label>
                         </div>
                       </div>

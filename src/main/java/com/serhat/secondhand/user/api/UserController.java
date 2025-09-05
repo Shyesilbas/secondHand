@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -70,6 +72,15 @@ public class UserController {
             Authentication authentication) {
         log.info("Updating phone for user: {}", authentication.getName());
         String response = userService.updatePhone(request, authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserDto>> searchUsers(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "10") int limit) {
+        log.info("Searching users with query: {} and limit: {}", query, limit);
+        List<UserDto> response = userService.searchUsers(query, limit);
         return ResponseEntity.ok(response);
     }
 }

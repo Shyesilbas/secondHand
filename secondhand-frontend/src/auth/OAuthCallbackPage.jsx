@@ -32,7 +32,7 @@ const OAuthCallbackPage = () => {
         <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
                 <LoadingIndicator />
-                <p className="text-gray-600">Signing you in...</p>
+                <p className="text-text-secondary">Signing you in...</p>
             </div>
         </div>
     );

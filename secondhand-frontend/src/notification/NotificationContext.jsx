@@ -25,7 +25,6 @@ export const NotificationProvider = ({ children }) => {
             size: 'md',
             ...notification
         };
-
         setNotifications(prev => [...prev, newNotification]);
         return id;
     }, []);
@@ -38,111 +37,60 @@ export const NotificationProvider = ({ children }) => {
         setNotifications([]);
     }, []);
 
-    // Convenience methods for different notification types
     const showSuccess = useCallback((title, message, options = {}) => {
-        return addNotification({
-            type: 'success',
-            title: title || 'Success',
-            message,
-            autoCloseDelay: 2000,
-            ...options
-        });
+        return addNotification({ type: 'success', title: title || 'Success', message, autoCloseDelay: 2000, ...options });
     }, [addNotification]);
 
     const showError = useCallback((title, message, options = {}) => {
-        return addNotification({
-            type: 'error',
-            title: title || 'Error',
-            message,
-            autoClose: false, // Errors should be manually dismissed
-            ...options
-        });
+        return addNotification({ type: 'error', title: title || 'Error', message, autoClose: false, ...options });
     }, [addNotification]);
 
     const showWarning = useCallback((title, message, options = {}) => {
-        return addNotification({
-            type: 'warning',
-            title: title || 'Warning',
-            message,
-            autoCloseDelay: 2000,
-            ...options
-        });
+        return addNotification({ type: 'warning', title: title || 'Warning', message, autoCloseDelay: 2000, ...options });
     }, [addNotification]);
 
     const showInfo = useCallback((title, message, options = {}) => {
-        return addNotification({
+        return addNotification({ type: 'info', title: title || 'Information', message, autoCloseDelay: 2000, ...options });
+    }, [addNotification]);
+
+    const showNotification = useCallback((notification) => {
+        const type = notification.type || 'info';
+        switch(type) {
+            case 'success':
+                return showSuccess(notification.title, notification.message, notification);
+            case 'error':
+                return showError(notification.title, notification.message, notification);
+            case 'warning':
+                return showWarning(notification.title, notification.message, notification);
+            case 'info':
+            default:
+                return showInfo(notification.title, notification.message, notification);
+        }
+    }, [showSuccess, showError, showWarning, showInfo]);
+
+    const showConfirmation = useCallback((title, message, onConfirm) => {
+        const id = addNotification({
             type: 'info',
-            title: title || 'Information',
-            message,
-            autoCloseDelay: 2000,
-            ...options
-        });
-    }, [addNotification]);
-
-    // Enhanced error handler with detailed error information
-    const showDetailedError = useCallback((errorData, options = {}) => {
-        const {
-            customTitle,
-            customMessage,
-            showDetails = true,
-            actions = []
-        } = options;
-
-        const title = customTitle || getErrorTitle(errorData);
-        const message = customMessage || errorData.message || 'Unknown error occurred. Please try again later.';
-        
-        const defaultActions = actions.length > 0 ? actions : [
-            {
-                label: 'Okay',
-                onClick: () => {},
-                primary: true
-            }
-        ];
-
-        return addNotification({
-            type: 'error',
             title,
-            message,
-            details: showDetails ? {
-                statusCode: errorData.statusCode,
-                originalMessage: errorData.originalMessage,
-                timestamp: errorData.timestamp,
-                type: errorData.type
-            } : null,
-            actions: defaultActions,
-            autoClose: false,
-            size: showDetails ? 'lg' : 'md'
-        });
-    }, [addNotification]);
-
-    // Confirmation dialog
-    const showConfirmation = useCallback((title, message, onConfirm, onCancel, options = {}) => {
-        const {
-            confirmText = 'Yes',
-            cancelText = 'No',
-            type = 'warning'
-        } = options;
-
-        return addNotification({
-            type,
-            title: title || 'Approve',
             message,
             autoClose: false,
             actions: [
                 {
-                    label: cancelText,
-                    onClick: onCancel,
-                    primary: false
+                    label: 'Cancel',
+                    primary: false,
                 },
                 {
-                    label: confirmText,
-                    onClick: onConfirm,
-                    primary: true
+                    label: 'Confirm',
+                    primary: true,
+                    onClick: () => {
+                        onConfirm?.();
+                        removeNotification(id);
+                    }
                 }
-            ],
-            ...options
+            ]
         });
-    }, [addNotification]);
+    }, [addNotification, removeNotification]);
+
 
     const value = {
         notifications,
@@ -153,14 +101,13 @@ export const NotificationProvider = ({ children }) => {
         showError,
         showWarning,
         showInfo,
-        showDetailedError,
+        showNotification,
         showConfirmation
     };
 
     return (
         <NotificationContext.Provider value={value}>
             {children}
-            {/* Render all active notifications */}
             {notifications.map(notification => (
                 <NotificationModal
                     key={notification.id}
@@ -170,24 +117,4 @@ export const NotificationProvider = ({ children }) => {
             ))}
         </NotificationContext.Provider>
     );
-};
-
-// Helper function to get error title based on error type
-const getErrorTitle = (errorData) => {
-    if (!errorData || !errorData.type) return 'Error';
-    
-    switch (errorData.type) {
-        case 'authentication':
-            return 'Authentication Error';
-        case 'authorization':
-            return 'Authorization Error';
-        case 'validation':
-            return 'Validation Error';
-        case 'network':
-            return 'Network Error';
-        case 'server':
-            return 'Server Error';
-        default:
-            return 'Error';
-    }
 };

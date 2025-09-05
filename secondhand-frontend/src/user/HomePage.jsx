@@ -10,7 +10,7 @@ const HomePage = () => {
     const { statistics, isLoading: statsLoading } = useListingStatistics();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-app-bg">
             {/* Hero Section */}
             <div className="bg-gradient-to-r from-gray-900 to-emerald-600 text-white">
                 <div className="max-w-6xl mx-auto px-6 py-24 text-center">
@@ -52,7 +52,7 @@ const HomePage = () => {
             {/* Categories Section */}
             <div className="max-w-6xl mx-auto px-6 py-16">
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-3xl font-bold text-gray-900">Browse by Category</h2>
+                    <h2 className="text-3xl font-bold text-text-primary">Browse by Category</h2>
                     <Link to={ROUTES.LISTINGS} className="text-emerald-700 hover:text-emerald-800 font-medium">See all →</Link>
                 </div>
                 <ListingCategories />

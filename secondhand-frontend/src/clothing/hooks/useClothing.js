@@ -1,91 +1,90 @@
-import { useState, useCallback } from 'react';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { clothingService } from '../services/clothingService.js';
+import {useCallback, useState} from 'react';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {clothingService} from '../services/clothingService.js';
 
 export const useClothing = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const notification = useNotification();
+    const { showSuccess, showError } = useNotification();
 
     const createClothingListing = useCallback(async (data) => {
         setIsLoading(true);
         setError(null);
         try {
             const result = await clothingService.createClothingListing(data);
+            showSuccess('Success', 'Clothing listing created successfully!');
             return result;
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to create clothing listing';
             setError(errorMessage);
+            showError('Error', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [showSuccess, showError]);
 
     const updateClothingListing = useCallback(async (id, data) => {
         setIsLoading(true);
         setError(null);
         try {
             const result = await clothingService.updateClothingListing(id, data);
-            notification.showSuccess('Success', 'Clothing listing updated successfully!');
+            showSuccess('Success', 'Clothing listing updated successfully!');
             return result;
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to update clothing listing';
             setError(errorMessage);
-            notification.showError('Error', errorMessage);
+            showError('Error', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, [notification]);
+    }, [showSuccess, showError]);
 
     const getClothingDetails = useCallback(async (id) => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await clothingService.getClothingDetails(id);
-            return result;
+            return await clothingService.getClothingDetails(id);
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to get clothing details';
             setError(errorMessage);
-            notification.showError('Error', errorMessage);
+            showError('Error', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, [notification]);
+    }, [showError]);
 
     const findByBrandAndClothingType = useCallback(async (brand, clothingType) => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await clothingService.findByBrandAndClothingType(brand, clothingType);
-            return result;
+            return await clothingService.findByBrandAndClothingType(brand, clothingType);
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to find clothing by brand and type';
             setError(errorMessage);
-            notification.showError('Error', errorMessage);
+            showError('Error', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, [notification]);
+    }, [showError]);
 
     const filterClothing = useCallback(async (filters) => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await clothingService.filterClothing(filters);
-            return result;
+            return await clothingService.filterClothing(filters);
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to filter clothing listings';
             setError(errorMessage);
-            notification.showError('Error', errorMessage);
+            showError('Error', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, [notification]);
+    }, [showError]);
 
     return {
         isLoading,

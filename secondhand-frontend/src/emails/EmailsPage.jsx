@@ -160,8 +160,8 @@ const EmailsPage = () => {
                     {/* Email List */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-                                <h3 className="font-semibold text-gray-900">
+                            <div className="px-4 py-3 border-b border-sidebar-border bg-app-bg">
+                                <h3 className="font-semibold text-text-primary">
                                     Emails ({filteredEmails.length})
                                 </h3>
                             </div>

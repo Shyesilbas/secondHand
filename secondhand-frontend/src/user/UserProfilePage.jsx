@@ -45,7 +45,7 @@ const UserProfilePage = () => {
     const formatDate = (dateString) => formatDateTime(dateString);
     const isOwnProfile = currentUser?.id === userId;
 
-    if (userLoading || !user) return <div className="text-center py-16 text-gray-400">Loading...</div>;
+    if (userLoading || !user) return <div className="text-center py-16 text-text-muted">Loading...</div>;
 
     if (userError || !user) {
         return (
@@ -54,7 +54,7 @@ const UserProfilePage = () => {
                     <p className="text-red-500 text-xl mb-4">{userError || 'User not found'}</p>
                     <button
                         onClick={() => navigate(-1)}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        className="bg-btn-primary text-white px-6 py-2 rounded-lg hover:bg-btn-primary-hover transition-colors"
                     >
                         Go Back
                     </button>
@@ -71,15 +71,15 @@ const UserProfilePage = () => {
                 <div>
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-2 md:mb-0"
+                        className="flex items-center text-text-muted hover:text-text-primary transition-colors mb-2 md:mb-0"
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                         Go Back
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-gray-500">(You)</span>}
+                    <h1 className="text-3xl font-bold text-text-primary">
+                        {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-text-muted">(You)</span>}
                     </h1>
                 </div>
 
@@ -99,7 +99,7 @@ const UserProfilePage = () => {
                                 sellerName: user.name,
                                 sellerSurname: user.surname
                             }}
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-text-secondary hover:text-text-primary"
                             isDirectChat={true}
                         />
 
@@ -110,23 +110,23 @@ const UserProfilePage = () => {
             {/* User Info Card */}
             <div className="bg-white rounded-2xl shadow-lg border p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <p className="text-sm font-semibold text-gray-500">Email</p>
-                    <p className="mt-1 text-gray-900">{user.email || 'Not provided'}</p>
+                    <p className="text-sm font-semibold text-text-muted">Email</p>
+                    <p className="mt-1 text-text-primary">{user.email || 'Not provided'}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-500">Phone</p>
-                    <p className="mt-1 text-gray-900">{user.phoneNumber || 'Not provided'}</p>
+                    <p className="text-sm font-semibold text-text-muted">Phone</p>
+                    <p className="mt-1 text-text-primary">{user.phoneNumber || 'Not provided'}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-500">Gender</p>
-                    <p className="mt-1 text-gray-900">{user.gender || 'Not provided'}</p>
+                    <p className="text-sm font-semibold text-text-muted">Gender</p>
+                    <p className="mt-1 text-text-primary">{user.gender || 'Not provided'}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-500">Birth Date</p>
-                    <p className="mt-1 text-gray-900">{user.birthdate || 'Not provided'}</p>
+                    <p className="text-sm font-semibold text-text-muted">Birth Date</p>
+                    <p className="mt-1 text-text-primary">{user.birthdate || 'Not provided'}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-500">Account Verified</p>
+                    <p className="text-sm font-semibold text-text-muted">Account Verified</p>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         user.accountVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
@@ -134,14 +134,14 @@ const UserProfilePage = () => {
                     </span>
                 </div>
                 <div className="md:col-span-2">
-                    <p className="text-sm font-semibold text-gray-500">Account Creation Date</p>
-                    <p className="mt-1 text-gray-900">{user.accountCreationDate}</p>
+                    <p className="text-sm font-semibold text-text-muted">Account Creation Date</p>
+                    <p className="mt-1 text-text-primary">{user.accountCreationDate}</p>
                 </div>
             </div>
 
             {/* Listings */}
             <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-gray-900">Listings ({listings.length})</h2>
+                <h2 className="text-2xl font-bold text-text-primary">Listings ({listings.length})</h2>
                 {listingsLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[...Array(6)].map((_, i) => (
@@ -151,7 +151,7 @@ const UserProfilePage = () => {
                 ) : listingsError ? (
                     <div className="text-center text-red-500">Failed to load listings.</div>
                 ) : listings.length === 0 ? (
-                    <div className="text-center text-gray-500">No listings available.</div>
+                    <div className="text-center text-text-muted">No listings available.</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {listings.map(listing => (
@@ -164,7 +164,7 @@ const UserProfilePage = () => {
                                     {listing.imageUrl ? (
                                         <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                     ) : (
-                                        <div className="flex items-center justify-center w-full h-full text-gray-400">
+                                        <div className="flex items-center justify-center w-full h-full text-text-muted">
                                             No Image
                                         </div>
                                     )}
@@ -177,9 +177,9 @@ const UserProfilePage = () => {
                                     </span>
                                 </div>
                                 <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 truncate">{listing.title}</h3>
+                                    <h3 className="text-lg font-semibold text-text-primary truncate">{listing.title}</h3>
                                     <p className="text-green-600 font-bold mt-1">{listing.price} {listing.currency}</p>
-                                    <p className="text-gray-500 text-sm mt-1">{formatDate(listing.createdAt)}</p>
+                                    <p className="text-text-muted text-sm mt-1">{formatDate(listing.createdAt)}</p>
                                 </div>
                             </Link>
                         ))}

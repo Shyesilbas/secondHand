@@ -122,14 +122,14 @@ const AccountVerificationPage = () => {
                 {/* Header */}
                 <div className="text-center">
                     <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-                        <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-6 w-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+                    <h2 className="mt-6 text-3xl font-extrabold text-text-primary">
                         Verify Your Account
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="mt-2 text-sm text-text-secondary">
                         {!codeSent 
                             ? 'Send a verification code to your email address to verify your account'
                             : `We've sent a 6-digit code to ${user?.email}`
@@ -160,10 +160,10 @@ const AccountVerificationPage = () => {
                     /* Send Code Section */
                     <div className="space-y-6">
                         <div className="text-center">
-                            <p className="text-sm text-gray-600 mb-4">
+                            <p className="text-sm text-text-secondary mb-4">
                                 Click the button below to send a verification code to your email address:
                             </p>
-                            <p className="text-lg font-medium text-gray-900 mb-6">
+                            <p className="text-lg font-medium text-text-primary mb-6">
                                 {user?.email}
                             </p>
                             <AuthButton
@@ -193,7 +193,7 @@ const AccountVerificationPage = () => {
                                 required
                             />
                             
-                            <div className="text-center text-sm text-gray-600">
+                            <div className="text-center text-sm text-text-secondary">
                                 <p>Didn't receive the code?</p>
                                 <button
                                     type="button"
@@ -201,8 +201,8 @@ const AccountVerificationPage = () => {
                                     disabled={countdown > 0 || isSendingCode}
                                     className={`mt-1 font-medium ${
                                         countdown > 0 || isSendingCode
-                                            ? 'text-gray-400 cursor-not-allowed'
-                                            : 'text-blue-600 hover:text-blue-500'
+                                            ? 'text-text-muted cursor-not-allowed'
+                                            : 'text-btn-primary hover:text-blue-500'
                                     }`}
                                 >
                                     {countdown > 0 
@@ -228,7 +228,7 @@ const AccountVerificationPage = () => {
                             <button
                                 type="button"
                                 onClick={() => navigate(ROUTES.PROFILE)}
-                                className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                                className="flex-1 py-2 px-4 border border-header-border rounded-md shadow-sm text-sm font-medium text-text-secondary bg-white hover:bg-app-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -238,7 +238,7 @@ const AccountVerificationPage = () => {
 
                 {/* Help Text */}
                 <div className="text-center">
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-text-muted">
                         The verification code will expire in 10 minutes. If you're having trouble,{' '}
                         <button
                             onClick={() => navigate(ROUTES.PROFILE)}

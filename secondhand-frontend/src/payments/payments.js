@@ -58,7 +58,7 @@ export const PAYMENT_STATUS_BADGE_COLORS = {
 
 export const PAYMENT_DIRECTION_BADGE_COLORS = {
     [PAYMENT_DIRECTIONS.INCOMING]: 'bg-green-100 text-green-600',
-    [PAYMENT_DIRECTIONS.OUTGOING]: 'bg-blue-100 text-blue-600'
+    [PAYMENT_DIRECTIONS.OUTGOING]: 'bg-blue-100 text-btn-primary'
 };
 
 export const ListingFeeConfigDTO = {

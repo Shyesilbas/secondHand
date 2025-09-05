@@ -13,7 +13,7 @@ const EmailDisplayModal = ({ emails, onClose }) => {
         } catch (e) { return String(date || ''); }
     };
 
-    const getTypeBadgeClass = (type) => typeBadgeStyles[type] || 'bg-gray-100 text-gray-700 ring-gray-200';
+    const getTypeBadgeClass = (type) => typeBadgeStyles[type] || 'bg-gray-100 text-text-secondary ring-gray-200';
 
     const copyToClipboard = async (text) => {
         try { await navigator.clipboard.writeText(text || ''); } catch {}
@@ -29,8 +29,8 @@ const EmailDisplayModal = ({ emails, onClose }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
             <div className="w-full max-w-3xl mx-4 overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/40">
-                    <h3 className="text-lg font-semibold text-gray-900">Email Geçmişi</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <h3 className="text-lg font-semibold text-text-primary">Email Geçmişi</h3>
+                    <button onClick={onClose} className="text-text-muted hover:text-text-secondary">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -48,9 +48,9 @@ const EmailDisplayModal = ({ emails, onClose }) => {
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ${getTypeBadgeClass(email.emailType)}`}>
                                                 {email.emailType}
                                             </span>
-                                            <span className="text-xs text-gray-500">{formatDate(email.createdAt || email.sentAt)}</span>
+                                            <span className="text-xs text-text-muted">{formatDate(email.createdAt || email.sentAt)}</span>
                                         </div>
-                                        <h4 className="mt-1 truncate text-sm font-semibold text-gray-900">{email.subject}</h4>
+                                        <h4 className="mt-1 truncate text-sm font-semibold text-text-primary">{email.subject}</h4>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {code && (
@@ -61,14 +61,14 @@ const EmailDisplayModal = ({ emails, onClose }) => {
                                         )}
                                         <button
                                             onClick={() => copyToClipboard(email.content)}
-                                            className="rounded-lg border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+                                            className="rounded-lg border px-2 py-1 text-xs text-text-secondary hover:bg-app-bg"
                                         >
                                             Copy
                                         </button>
                                     </div>
                                 </div>
                                 <div className="p-4">
-                                    <div className="rounded-lg bg-gray-50 p-3 text-sm font-mono text-gray-800 border" style={{ whiteSpace: 'pre-wrap' }}>
+                                    <div className="rounded-lg bg-app-bg p-3 text-sm font-mono text-gray-800 border" style={{ whiteSpace: 'pre-wrap' }}>
                                         {email.content}
                                     </div>
                                 </div>
