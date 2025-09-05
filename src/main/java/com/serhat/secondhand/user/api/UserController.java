@@ -46,6 +46,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        UserDto response = userService.getById(id);
+        return ResponseEntity.ok(response);
+
+    }
+
 
     @PutMapping("/email")
     public ResponseEntity<String> updateEmail(

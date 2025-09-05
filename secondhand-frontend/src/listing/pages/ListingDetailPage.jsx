@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
-import StatusBadge from '../../common/components/ui/StatusBadge.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
+import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const ListingDetailPage = ({
                              service = listingService,
@@ -46,7 +47,6 @@ const ListingDetailPage = ({
   const formatDate = (dateString) => formatDateTime(dateString);
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
-
 
   if (isLoading) {
     return (
@@ -135,13 +135,13 @@ const ListingDetailPage = ({
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {listing.district}, {listing.city}
-                  </span>
+                <span className="flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {listing.district}, {listing.city}
+                </span>
 
                   <span className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,18 +149,18 @@ const ListingDetailPage = ({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                     {formatPrice(listing.price, listing.currency)}
-                  </span>
+                </span>
 
                   <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                     {formatDate(listing.createdAt)}
-                  </span>
+                </span>
                   {listing.listingNo && (
                       <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
-                      #{listing.listingNo}
-                    </span>
+                    #{listing.listingNo}
+                  </span>
                   )}
                 </div>
               </div>
@@ -185,45 +185,57 @@ const ListingDetailPage = ({
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-4">
+            <div className="bg-white rounded-2xl shadow-lg border p-6 sticky top-4 space-y-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Seller Information</h3>
 
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg font-medium">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-slate-200 rounded-full flex items-center justify-center text-lg font-medium text-white">
                   {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
-                </span>
                 </div>
-                <div className="ml-4 flex-1">
-                  <p className="font-medium text-gray-900">
+                <div className="flex-1">
+                  <Link
+                      to={ROUTES.USER_PROFILE(listing.sellerId)}
+                      className="block font-semibold text-gray-900 text-lg hover:text-blue-600 transition-colors"
+                  >
                     {listing.sellerName} {listing.sellerSurname}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Member since : {user.accountCreationDate}
+                  </Link>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Member since: {user.accountCreationDate}
                   </p>
                 </div>
               </div>
 
               {!isOwner && (
-                  <div className="space-y-3">
+                  <div className="flex items-center gap-4 mt-3 text-gray-600">
                     <ContactSellerButton
                         listing={listing}
-                        className="w-full py-3 px-4 text-base font-medium"
+                        iconOnly={true}
+                        className="hover:text-blue-600 transition-colors"
+                        title="Contact Seller"
+                    />
+                    <ComplaintButton
+                        targetUserId={listing.sellerId}
+                        targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
+                        listingId={listing.id}
+                        iconOnly={true}
+                        className="hover:text-red-600 transition-colors"
+                        title="Report Seller"
                     />
                   </div>
               )}
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-medium text-gray-900 mb-3">Listing Stats</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Listing No:</span>
-                    <span className="font-medium">{listing.listingNo || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Views:</span>
-                    <span className="font-medium">-</span>
-                  </div>
+              <div className="pt-6 border-t border-gray-200 space-y-2">
+                <h4 className="font-medium text-gray-900 mb-2">Listing Stats</h4>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Listing No:</span>
+                  <span className="font-medium">{listing.listingNo || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Views:</span>
+                  <span className="font-medium">-</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600 items-center">
+                  <span>Favorites:</span>
                   <FavoriteStats
                       listingId={listing.id}
                       size="sm"

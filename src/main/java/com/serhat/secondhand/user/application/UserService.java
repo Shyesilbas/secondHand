@@ -172,6 +172,11 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
     }
 
+    public UserDto getById(Long id){
+        return userRepository.findById(id).map(userMapper::toDto)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

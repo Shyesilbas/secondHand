@@ -52,8 +52,7 @@ const FavoriteButton = ({
   const loadFavoriteStats = async () => {
     try {
       const response = await favoriteService.getFavoriteStats(listingId);
-      console.log('Initial stats loaded:', response); // Debug
-      
+
       // Use DTO structure to parse response safely
       const statsDto = {
         ...FavoriteStatsDTO,
@@ -64,14 +63,11 @@ const FavoriteButton = ({
       
       setIsFavorited(statsDto.isFavorited);
       setFavoriteCount(statsDto.favoriteCount);
-      console.log('Initial state set - isFavorited:', statsDto.isFavorited); // Debug
     } catch (error) {
-      console.error('Failed to load favorite stats:', error);
     }
   };
 
   const handleToggle = async (event) => {
-    // Prevent event bubbling to parent elements (like Link components)
     event.preventDefault();
     event.stopPropagation();
     
@@ -86,9 +82,6 @@ const FavoriteButton = ({
     try {
       const response = await favoriteService.toggleFavorite(listingId);
       
-      console.log('Toggle response:', response); // Debug
-      
-      // Use DTO structure to parse response safely
       const statsDto = {
         ...FavoriteStatsDTO,
         listingId: response.listingId,
@@ -98,19 +91,16 @@ const FavoriteButton = ({
       
       setIsFavorited(statsDto.isFavorited);
       setFavoriteCount(statsDto.favoriteCount);
-      console.log('State updated - isFavorited:', statsDto.isFavorited); // Debug
-      
+
       const message = statsDto.isFavorited ? 'Added to Favorites!' : 'Removed from Favorites!';
       notification.showSuccess('Success', message);
       
-      // Call parent callback if provided
       if (onToggle) {
         onToggle(response);
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update favorites';
       notification.showError('Error', message);
-      console.error('Error toggling favorite:', error);
     } finally {
       setIsLoading(false);
     }

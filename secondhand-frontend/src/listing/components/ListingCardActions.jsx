@@ -15,7 +15,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
   const handleEdit = (e) => {
     e.preventDefault();
-    navigate(ROUTES.EDIT_LISTING.replace(':id', listing.id));
+    navigate(ROUTES.EDIT_LISTING(listing.id));
   };
 
   const handleDeactivate = async (e) => {

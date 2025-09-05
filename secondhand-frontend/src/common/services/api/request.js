@@ -6,14 +6,10 @@ export const request = async (method, url, data, config = {}) => {
   try {
     const response = await apiClient({ method, url, data, ...config });
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
-      console.log(`[request] ${method.toUpperCase()} ${url} → ${response.status} in ${(performance.now() - start).toFixed(0)}ms`);
     }
     return response.data;
   } catch (error) {
     if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
-      console.error(`[request] ${method.toUpperCase()} ${url} failed`, error.response?.status, error.response?.data);
     }
     throw error;
   }

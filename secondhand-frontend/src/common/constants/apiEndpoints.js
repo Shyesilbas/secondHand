@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
         UPDATE_PHONE: '/v1/users/phone',
         VERIFY: '/v1/users/verification/verify',
         SEND_VERIFICATION: '/v1/users/verification/send',
+        BY_ID: (id) => `/v1/users/${id}`,
     },
     LISTINGS: {
         ALL: '/v1/listings/allListings',
@@ -31,8 +32,7 @@ export const API_ENDPOINTS = {
         ACTIVATE: (id) => `/v1/listings/${id}/reactivate`,
         DEACTIVATE: (id) => `/v1/listings/${id}/deactivate`,
         STATISTICS: '/v1/listings/statistics',
-        BY_TYPE_ACTIVE: (listingType) => `/v1/listings/type/${listingType}/active`,
-        BY_TYPE_ORDERED: (listingType) => `/v1/listings/type/${listingType}/ordered`,
+        BY_USER: (userId) => `/v1/listings/byUser/${userId}`,
         FILTER: '/v1/listings/filter',
     },
     PAYMENTS: {
@@ -48,6 +48,11 @@ export const API_ENDPOINTS = {
         DELETE: '/v1/credit-card',
         EXISTS: '/v1/credit-card/exists',
         AVAILABLE_CREDIT: '/v1/credit-card/available-credit',
+    },
+    COMPLAINTS: {
+        CREATE: '/v1/complaints/create',
+        MY_COMPLAINTS: '/v1/complaints/myComplaints',
+        ABOUT_ME: '/v1/complaints/aboutMe',
     },
     BANK_ACCOUNTS: {
         GET_ALL: '/v1/bank',
@@ -155,23 +160,19 @@ export const API_ENDPOINTS = {
         USER_STATUS_ALL: '/agreements/user/status',
         USER_STATUS_BY_TYPE: (agreementType) => `/agreements/user/status/${agreementType}`,
         ADMIN_ACCEPT_ALL: '/agreements/admin/accept-all-users',
-        // ADMIN_ACCEPT_USER is currently disabled in backend controller
     },
     CHAT: {
-        // Chat Room endpoints
         CREATE_ROOM: '/chat/rooms',
         USER_ROOMS: (userId) => `/chat/rooms/user/${userId}`,
         DIRECT_ROOM: '/chat/rooms/direct',
         LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
         CREATE_LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
         
-        // Message endpoints
         SEND_MESSAGE: '/chat/messages',
         ROOM_MESSAGES: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages`,
         MARK_READ: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/read`,
         UNREAD_COUNT: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/unread-count`,
         
-        // User messages endpoints
         ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
         TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,
     },
