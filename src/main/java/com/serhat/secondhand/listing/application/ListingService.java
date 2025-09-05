@@ -7,6 +7,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final VehicleListingFilterService vehicleListingFilterService;
     private final ElectronicListingFilterService electronicListingFilterService;
+    private final UserService userService;
 
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -65,6 +67,16 @@ public class ListingService {
                 .map(listingMapper::toDynamicDto)
                 .toList();
     }
+
+    public List<ListingDto> getListingsByUser(Long userId) {
+        User user = userService.findById(userId);
+        List<Listing> listings = listingRepository.findBySeller(user);
+        return listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+    }
+
+
     public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
         log.info("Getting listings for user: {} with status: {}", user.getEmail(), status);
         List<Listing> listings = listingRepository.findBySellerAndStatus(user, status);

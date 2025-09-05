@@ -4,51 +4,55 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useChat } from '../hooks/useChat.js';
 import ChatWindow from './ChatWindow.jsx';
 
-const ContactSellerButton = ({ listing, className = '' }) => {
+const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) => {
     const { user } = useAuth();
     const [isChatOpen, setIsChatOpen] = useState(false);
-    const { createListingChat, selectChatRoom, sendMessage, messages, isLoadingMessages, isConnected, selectedChatRoom } = useChat(user?.id);
+    const {
+        createListingChat,
+        createDirectChat,
+        selectChatRoom,
+        sendMessage,
+        messages,
+        isLoadingMessages,
+        isConnected,
+        selectedChatRoom
+    } = useChat(user?.id);
 
-    if (listing.userId === user?.id) {
+    const targetUserId = listing.userId || listing.sellerId;
+    if (targetUserId === user?.id) {
         return null;
     }
 
     const handleContactSeller = async () => {
         try {
-            console.log('Creating listing chat for:', listing.id, listing.title || listing.name);
-            const chatRoom = await createListingChat(
-                listing.id, 
-                listing.title || listing.name || 'Listing'
-            );
-            
-            console.log('Chat room created:', chatRoom);
-            
+            let chatRoom;
+            if (isDirectChat) {
+                chatRoom = await createDirectChat(targetUserId);
+            } else {
+                chatRoom = await createListingChat(
+                    listing.id,
+                    listing.title || listing.name || 'Listing'
+                );
+            }
             selectChatRoom(chatRoom);
             setIsChatOpen(true);
         } catch (error) {
-            console.error('Error creating listing chat:', error);
-            alert('An error occurred while creating the chat. Please try again later.');
+            alert('An error occurred while starting the chat. Please try again later.');
         }
-    };
-
-    const handleCloseChat = () => {
-        setIsChatOpen(false);
     };
 
     return (
         <>
-            <button
+            <ChatBubbleLeftRightIcon
                 onClick={handleContactSeller}
-                className={`inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${className}`}
-            >
-                <ChatBubbleLeftRightIcon className="w-4 h-4 mr-2" />
-                Contact
-            </button>
+                className={`w-6 h-6 cursor-pointer ${className}`}
+                title="Contact Seller"
+            />
 
             {isChatOpen && (
                 <ChatWindow
                     isOpen={isChatOpen}
-                    onClose={handleCloseChat}
+                    onClose={() => setIsChatOpen(false)}
                     selectedChatRoom={selectedChatRoom}
                     messages={messages}
                     onSendMessage={sendMessage}

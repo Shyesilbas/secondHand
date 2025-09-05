@@ -6,9 +6,7 @@ export const vehicleService = {
   // Create a new vehicle listing
   createVehicleListing: async (vehicleData) => {
     const createData = createVehicleCreateRequest(vehicleData);
-    // Debug: inspect payload
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
       console.log('[vehicleService.createVehicleListing] payload', createData);
     }
     return post(API_ENDPOINTS.VEHICLES.CREATE, createData);

@@ -27,6 +27,8 @@ export const listingService = {
 
   getListingStatistics: async () => get(API_ENDPOINTS.LISTINGS.STATISTICS),
 
+  getUserListings: async (userId) => get(API_ENDPOINTS.LISTINGS.BY_USER(userId)),
+
   deleteListing: async (id) => del(API_ENDPOINTS.LISTINGS.DELETE(id)),
 
 

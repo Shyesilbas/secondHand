@@ -3,20 +3,20 @@ import { PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { useChatWindow } from '../hooks/useChatWindow.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 
-const ChatWindow = ({ 
-    isOpen, 
-    onClose, 
-    selectedChatRoom, 
-    messages, 
-    onSendMessage, 
-    isLoadingMessages,
-    isConnected 
-}) => {
+const ChatWindow = ({
+                        isOpen,
+                        onClose,
+                        selectedChatRoom,
+                        messages,
+                        onSendMessage,
+                        isLoadingMessages,
+                        isConnected
+                    }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const {
@@ -30,9 +30,14 @@ const ChatWindow = ({
 
     const handleListingTitleClick = () => {
         if (selectedChatRoom?.listingId) {
-            // İlan detay sayfasına yönlendir
             navigate(`/listings/${selectedChatRoom.listingId}`);
-            // Chat'i kapat
+            onClose();
+        }
+    };
+
+    const handleUserClick = () => {
+        if (selectedChatRoom?.otherParticipantId) {
+            navigate(`/users/${selectedChatRoom.otherParticipantId}`);
             onClose();
         }
     };
@@ -43,15 +48,11 @@ const ChatWindow = ({
         if (selectedChatRoom?.otherParticipantName) {
             return selectedChatRoom.otherParticipantName;
         }
-
         if (selectedChatRoom?.roomType === 'LISTING') {
-            return 'Satıcı';
+            return 'Seller';
         }
-
         return selectedChatRoom?.roomName || 'Chat';
     };
-
-
 
     return (
         <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
@@ -60,14 +61,18 @@ const ChatWindow = ({
                 <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     <div>
-                        <h3 className="font-semibold text-sm">
+                        <button
+                            onClick={handleUserClick}
+                            className="font-semibold text-sm hover:underline"
+                            title="View user profile"
+                        >
                             {getHeaderName()}
-                        </h3>
+                        </button>
                         {selectedChatRoom?.listingTitle && (
                             <button
                                 onClick={handleListingTitleClick}
-                                className="text-xs opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-all"
-                                title="İlanı görüntüle"
+                                className="block text-xs opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-all"
+                                title="View listing"
                             >
                                 {selectedChatRoom.listingTitle}
                             </button>
@@ -92,7 +97,7 @@ const ChatWindow = ({
                         <LoadingIndicator size="h-8 w-8" />
                     </div>
                 ) : messages.length === 0 ? (
-                    <EmptyState title="Henüz mesaj yok" description="İlk mesajı siz gönderin!" />
+                    <EmptyState title="No messages yet" description="Send the first message!" />
                 ) : (
                     messages.map((message) => (
                         <MessageBubble
@@ -114,7 +119,7 @@ const ChatWindow = ({
                             value={messageText}
                             onChange={(e) => setMessageText(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder="Mesajınızı yazın..."
+                            placeholder="Type your message..."
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             rows="1"
                         />
@@ -150,7 +155,7 @@ const MessageBubble = ({ message, isOwnMessage }) => {
                 >
                     {formatDistanceToNow(new Date(message.createdAt), {
                         addSuffix: true,
-                        locale: tr
+                        locale: enUS
                     })}
                 </p>
             </div>

@@ -20,6 +20,7 @@ import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
 
 import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';
 import CreateListingPage from '../../listing/pages/CreateListingPage.jsx';
+import ComplaintsPage from '../../complaint/pages/ComplaintsPage.jsx';
 import EditListingPage from '../../listing/pages/EditListingPage.jsx';
 import FavoritesPage from '../../favorites/FavoritesPage';
 import PaymentsPage from '../../payments/PaymentsPage.jsx';
@@ -32,6 +33,7 @@ import OAuthErrorPage from '../../auth/OAuthErrorPage.jsx';
 import OAuthCompletePage from '../../auth/OAuthCompletePage.jsx';
 import AgreementsPage from '../../agreements/pages/AgreementsPage.jsx';
 import ChatPage from '../../chat/ChatPage.jsx';
+import UserProfilePage from '../../user/UserProfilePage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -39,7 +41,19 @@ import PublicRoute from './PublicRoute.jsx';
 
 
 const AppRoutes = () => {
-    const { isLoading } = useAuth();
+    let authContext;
+    try {
+        authContext = useAuth();
+    } catch (error) {
+        console.log('AuthContext not available yet, rendering loading state');
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    const { isLoading } = authContext;
 
     if (isLoading) {
         return (
@@ -115,7 +129,7 @@ const AppRoutes = () => {
             <Route element={<MainLayout />}>
                 <Route path={ROUTES.HOME} element={<HomePage />} />
                 <Route path={ROUTES.LISTINGS} element={<ListingsPage />} />
-                <Route path={ROUTES.LISTING_DETAIL} element={<ListingDetailPage />} />
+                <Route path={ROUTES.LISTING_DETAIL(':id')} element={<ListingDetailPage />} />
             </Route>
 
             {/* Protected Routes with Main Layout */}
@@ -131,6 +145,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
         <Route path={ROUTES.MY_LISTINGS} element={<MyListingsPage />} />
+        <Route path={ROUTES.COMPLAINTS} element={<ComplaintsPage />} />
 
         <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
@@ -139,7 +154,8 @@ const AppRoutes = () => {
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.CHAT} element={<ChatPage />} />
-        <Route path={ROUTES.EDIT_LISTING} element={<EditListingPage />} />
+        <Route path={ROUTES.USER_PROFILE(':userId')} element={<UserProfilePage />} />
+        <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
                   <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
                   <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />
                   <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />

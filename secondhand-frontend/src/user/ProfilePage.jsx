@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { usePhoneUpdate } from './hooks/usePhoneUpdate.js';
 import { ROUTES } from '../common/constants/routes.js';
 import { UpdatePhoneRequestDTO } from './users.js';
 import PhoneUpdateModal from '../common/components/modals/PhoneUpdateModal.jsx';
 import { formatDateTime } from '../common/formatters.js';
-import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -26,51 +25,35 @@ const ProfilePage = () => {
     const formatDate = (dateString) => formatDateTime(dateString);
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile</h1>
+        <div className="container mx-auto px-4 py-10">
+            <h1 className="text-3xl font-bold text-gray-900 mb-10">Profile</h1>
 
             {!user?.accountVerified && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-                    <div className="flex">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-yellow-800">Account Not Verified</h3>
-                            <div className="mt-2 text-sm text-yellow-700">
-                                <p>Please verify your email to access all features.</p>
-                            </div>
-                            <div className="mt-4">
-                                <button
-                                    onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
-                                    className="bg-yellow-50 px-2 py-1 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-100"
-                                >
-                                    Verify Account
-                                </button>
-                            </div>
-                        </div>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-8 flex items-start">
+                    <svg className="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <div className="ml-3">
+                        <h3 className="text-sm font-medium text-yellow-800">Account Not Verified</h3>
+                        <p className="mt-1 text-sm text-yellow-700">Please verify your email to access all features.</p>
+                        <button
+                            onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
+                            className="mt-3 bg-yellow-100 px-3 py-1 rounded-md text-sm font-medium text-yellow-800 hover:bg-yellow-200"
+                        >
+                            Verify Account
+                        </button>
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white rounded-lg shadow-md border p-6 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Name</label>
-                        <p className="mt-1 text-gray-900">{user?.name || 'Undefined'} {user?.surname || ''}</p>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">E-mail</label>
-                        <p className="mt-1 text-gray-900">{user?.email || 'Undefined'}</p>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <div className="mt-1 flex items-center justify-between">
-                            <p className="text-gray-900">{user?.phoneNumber || 'Undefined'}</p>
+                    <InfoField label="Name" value={`${user?.name || 'Undefined'} ${user?.surname || ''}`} />
+                    <InfoField label="E-mail" value={user?.email || 'Undefined'} />
+                    <InfoField
+                        label="Phone Number"
+                        value={user?.phoneNumber || 'Undefined'}
+                        action={
                             <button
                                 onClick={() => {
                                     setPhoneFormData({ ...UpdatePhoneRequestDTO, newPhone: user?.phoneNumber || '' });
@@ -83,69 +66,29 @@ const ProfilePage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                             </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Gender</label>
-                        <p className="mt-1 text-gray-900">{user?.gender || 'Undefined'}</p>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Birthdate</label>
-                        <p className="mt-1 text-gray-900">{user?.birthdate || 'Undefined'}</p>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Account Status</label>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            user?.accountStatus === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                                user?.accountStatus === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                        }`}>
-                            {user?.accountStatus || 'Undefined'}
-                        </span>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Account Verified</label>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            user?.accountVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                            {user?.accountVerified ? 'Verified' : 'Unverified'}
-                        </span>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Account Creation Date</label>
-                        <p className="mt-1 text-gray-900">{user?.accountCreationDate}</p>
-                    </div>
+                        }
+                    />
+                    <InfoField label="Gender" value={user?.gender || 'Undefined'} />
+                    <InfoField label="Birthdate" value={user?.birthdate || 'Undefined'} />
+                    <InfoBadge
+                        label="Account Status"
+                        value={user?.accountStatus || 'Undefined'}
+                        type={user?.accountStatus === 'ACTIVE' ? 'success' : user?.accountStatus === 'SUSPENDED' ? 'error' : 'warning'}
+                    />
+                    <InfoBadge
+                        label="Account Verified"
+                        value={user?.accountVerified ? 'Verified' : 'Unverified'}
+                        type={user?.accountVerified ? 'success' : 'error'}
+                    />
+                    <InfoField label="Account Creation Date" value={formatDate(user?.accountCreationDate)} />
                 </div>
-
-                {/* Action Buttons */}
-                {!user?.accountVerified && (
-                    <div className="mt-8 pt-6 border-t border-gray-200">
-                        <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                            Verify Account
-                        </button>
-                    </div>
-                )}
             </div>
 
-                    <Link
-                        to={ROUTES.AGREEMENTS_ALL}
-                        className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                    >
-                        <div className="flex items-center space-x-3">
-                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Agreements</span>
-                        </div>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
+            {/* Extra Links */}
+            <div className="space-y-3">
+                <ProfileLink to={ROUTES.AGREEMENTS_ALL} label="Agreements" iconPath="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <ProfileLink to={ROUTES.COMPLAINTS} label="Complaints" iconPath="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </div>
 
             {/* Phone Update Modal */}
             {showPhoneModal && (
@@ -161,5 +104,49 @@ const ProfilePage = () => {
         </div>
     );
 };
+
+const InfoField = ({ label, value, action }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <div className="mt-1 flex items-center justify-between">
+            <p className="text-gray-900">{value}</p>
+            {action}
+        </div>
+    </div>
+);
+
+const InfoBadge = ({ label, value, type }) => {
+    const colors =
+        type === 'success'
+            ? 'bg-green-100 text-green-800'
+            : type === 'error'
+                ? 'bg-red-100 text-red-800'
+                : 'bg-yellow-100 text-yellow-800';
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700">{label}</label>
+            <span className={`mt-1 inline-block px-2 py-1 text-xs font-medium rounded-full ${colors}`}>
+                {value}
+            </span>
+        </div>
+    );
+};
+
+const ProfileLink = ({ to, label, iconPath }) => (
+    <Link
+        to={to}
+        className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
+    >
+        <div className="flex items-center space-x-3">
+            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={iconPath} />
+            </svg>
+            <span>{label}</span>
+        </div>
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+    </Link>
+);
 
 export default ProfilePage;

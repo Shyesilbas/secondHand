@@ -8,7 +8,6 @@ const CreateListingPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { enums } = useEnums();
 
-    // URL'den type parametresini oku
     useEffect(() => {
         const typeFromUrl = searchParams.get('type');
         if (typeFromUrl && createFormRegistry[typeFromUrl]) {
@@ -22,7 +21,6 @@ const CreateListingPage = () => {
 
     const handleBackToSelection = () => {
         setSelectedType(null);
-        // URL'den type parametresini temizle
         if (searchParams.has('type')) {
             searchParams.delete('type');
             setSearchParams(searchParams);

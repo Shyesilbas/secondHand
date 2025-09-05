@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const initializeAuth = async () => {
+
             try {
                 if (!hasValidTokens()) {
                     setIsLoading(false);
@@ -37,6 +38,7 @@ export const AuthProvider = ({ children }) => {
                 const token = getToken();
                 const userData = getUser();
 
+
                 if (token && userData) {
                     setUserState(userData);
                     setIsAuthenticated(true);
@@ -44,11 +46,11 @@ export const AuthProvider = ({ children }) => {
                     try {
                         await authService.validateToken();
                     } catch (error) {
-                        // Token will be refreshed by interceptor
                     }
                 } else if (token) {
                     try {
                         const userProfile = await authService.getCurrentUser();
+
                         const userData = {
                             ...UserDTO,
                             ...userProfile

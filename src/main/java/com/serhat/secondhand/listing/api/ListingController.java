@@ -66,6 +66,11 @@ public class ListingController {
    public ResponseEntity<List<ListingDto>> getAllListings() {
         return ResponseEntity.ok(listingService.getAllListings());
    }
+
+   @GetMapping("/byUser/{id}")
+   public ResponseEntity<List<ListingDto>> getListingsByUser(@PathVariable Long id) {
+        return ResponseEntity.ok(listingService.getListingsByUser(id));
+   }
    
    @GetMapping("/type/{listingType}")
    @Operation(summary = "Get listings by type")
