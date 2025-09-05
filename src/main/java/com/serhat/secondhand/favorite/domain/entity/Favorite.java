@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favorite.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
@@ -37,6 +38,7 @@ public class Favorite {
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(pattern = "dd/mm/YYYY")
     private LocalDateTime createdAt;
     
     // Convenience constructor

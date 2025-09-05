@@ -12,8 +12,8 @@ const EmailFilterTabs = ({ filterType, onFilterChange, onDeleteAll, hasEmails, i
                     onClick={() => onFilterChange(type)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         filterType === type
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-btn-primary text-white'
+                            : 'bg-gray-100 text-text-secondary hover:bg-gray-200'
                     }`}
                 >
                     {type === 'ALL' ? 'All' : EMAIL_TYPE_LABELS[type]}

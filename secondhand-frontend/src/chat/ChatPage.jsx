@@ -45,8 +45,8 @@ const ChatPage = () => {
     return (
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Messages</h2>
-            <p className="text-gray-600">Please Login to see your messages.</p>
+            <h2 className="text-2xl font-bold text-text-primary mb-4">Messages</h2>
+            <p className="text-text-secondary">Please Login to see your messages.</p>
           </div>
         </div>
     );
@@ -56,10 +56,10 @@ const ChatPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
+            <h1 className="text-3xl font-bold text-text-primary">Messages</h1>
             <div className="flex items-center space-x-2">
               <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-text-secondary">
               {isConnected ? 'Online' : 'Off'}
             </span>
             </div>
@@ -69,8 +69,8 @@ const ChatPage = () => {
             {/* Chat Rooms List */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm border">
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">Chats</h2>
+                <div className="p-4 border-b border-sidebar-border">
+                  <h2 className="text-lg font-semibold text-text-primary">Chats</h2>
                 </div>
 
                 <div className="max-h-96 overflow-y-auto">
@@ -108,7 +108,7 @@ const ChatPage = () => {
                       isConnected={isConnected}
                   />
               ) : (
-                  <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-gray-500">
+                  <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-text-muted">
                     <ChatBubbleLeftRightIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p>Select a chat</p>
                     <p className="text-sm">Select a chat from the panel</p>
@@ -150,12 +150,12 @@ const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick }) => {
           containerClassName="p-4 border-b border-gray-100"
           title={room.listingTitle ? (
             <div className="flex flex-col">
-              <span className="text-gray-700">{room.otherParticipantName}</span>
+              <span className="text-text-secondary">{room.otherParticipantName}</span>
               <div className="flex items-center space-x-1">
                 <span>İlan:</span>
                 <button
                   onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
-                  className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors"
+                  className="text-btn-primary hover:text-blue-800 hover:underline cursor-pointer transition-colors"
                   title="İlanı görüntüle"
                 >
                   {room.listingTitle}

@@ -16,15 +16,15 @@ const ResetPasswordPage = () => {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+        <h2 className="text-3xl font-bold text-text-primary mb-2">
           Yeni Şifre Oluşturun
         </h2>
-        <p className="text-gray-600">
+        <p className="text-text-secondary">
           Hesabınız için güvenli bir şifre belirleyin
         </p>
       </div>
       <form className="space-y-6">
-        <p className="text-gray-500">Reset password sayfası yakında tamamlanacak...</p>
+        <p className="text-text-muted">Reset password sayfası yakında tamamlanacak...</p>
       </form>
     </div>
   );

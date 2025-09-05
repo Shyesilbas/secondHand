@@ -35,12 +35,12 @@ const CreateListingPage = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            <h1 className="text-3xl font-bold text-card-text-primary mb-8">
                 Publish Listing
             </h1>
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            <div className="bg-card-bg rounded-card shadow-card border border-card-border p-6">
+                <h2 className="text-xl font-semibold text-card-text-primary mb-6">
                     Select Listing Type
                 </h2>
 
@@ -49,17 +49,17 @@ const CreateListingPage = () => {
                         <button
                             key={type.value}
                             onClick={() => handleTypeSelect(type.value)}
-                            className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
+                            className="p-6 border-2 border-card-border rounded-card hover:border-card-border-hover hover:text primary transition-all duration-200 text-left group"
                         >
                             <div className="flex items-center space-x-4">
                                 <div className="text-3xl">
                                     {type.icon || '📦'}
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-700">
+                                    <h3 className="font-semibold text-card-text-primary group-hover:card-text primary">
                                         {type.label}
                                     </h3>
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-card-text-muted mt-1">
                                         {getTypeDescription(type.value)}
                                     </p>
                                 </div>
@@ -69,13 +69,13 @@ const CreateListingPage = () => {
                 </div>
 
                 {selectedType && !SelectedForm && (
-                    <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p className="text-yellow-800">
+                    <div className="mt-8 p-4 bg-warning-bg border border-warning-border rounded-lg">
+                        <p className="text-warning-text">
                             {selectedType} is not ready now.
                         </p>
                         <button
                             onClick={handleBackToSelection}
-                            className="mt-2 text-yellow-600 hover:text-yellow-800 underline"
+                            className="mt-2 text-warning-text hover:text-warning-text underline"
                         >
                             Go Back
                         </button>

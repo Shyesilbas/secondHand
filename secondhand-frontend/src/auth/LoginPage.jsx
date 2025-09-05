@@ -108,10 +108,10 @@ const LoginPage = () => {
         <div className="w-full max-w-md mx-auto">
             {/* Header */}
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                <h2 className="text-3xl font-bold text-text-primary mb-2">
                     Welcome
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-text-secondary">
                     Login to your account
                 </p>
             </div>
@@ -170,10 +170,10 @@ const LoginPage = () => {
                 {/* Divider */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300" />
+                        <div className="w-full border-t border-header-border" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or</span>
+                        <span className="px-2 bg-white text-text-muted">Or</span>
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@ const LoginPage = () => {
                 <div>
                     <a
                         href={`${API_BASE_URL}/auth/oauth2/google`}
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-header-border rounded-md shadow-sm text-sm font-medium text-text-secondary bg-white hover:bg-app-bg"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="h-5 w-5">
                             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12 c0-6.627,5.373-12,12-12c3.059,0,5.842,1.153,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24 s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -195,7 +195,7 @@ const LoginPage = () => {
 
                 {/* Register Link */}
                 <div className="text-center">
-                    <p className="text-gray-600">
+                    <p className="text-text-secondary">
                         No Account?{' '}
                         <Link
                             to={ROUTES.REGISTER}

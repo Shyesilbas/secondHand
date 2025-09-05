@@ -96,13 +96,13 @@ const NotificationModal = ({
                 return {
                     icon: InformationCircleIconSolid,
                     iconOutline: InformationCircleIcon,
-                    iconColor: 'text-blue-600',
+                    iconColor: 'text-btn-primary',
                     bgColor: 'bg-blue-50',
                     borderColor: 'border-blue-200',
                     titleColor: 'text-blue-900',
                     messageColor: 'text-blue-800',
-                    buttonBg: 'bg-blue-600 hover:bg-blue-700',
-                    accentColor: 'bg-blue-600'
+                    buttonBg: 'bg-btn-primary hover:bg-btn-primary-hover',
+                    accentColor: 'bg-btn-primary'
                 };
         }
     };
@@ -124,7 +124,7 @@ const NotificationModal = ({
     const config = getNotificationConfig();
     const IconComponent = config.icon;
 
-    const overlayClasses = `fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ${
+    const overlayClasses = `fixed inset-0 bg-app-bg0 bg-opacity-75 transition-opacity duration-300 ${
         isLeaving ? 'opacity-0' : 'opacity-100'
     }`;
 
@@ -146,7 +146,7 @@ const NotificationModal = ({
                         <div className="absolute right-0 top-0 pr-4 pt-4">
                             <button
                                 type="button"
-                                className="rounded-md bg-white text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="rounded-md bg-white text-text-muted hover:text-text-secondary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                 onClick={handleClose}
                             >
                                 <span className="sr-only">Close</span>
@@ -180,8 +180,8 @@ const NotificationModal = ({
                                         <summary className={`cursor-pointer text-sm font-medium ${config.titleColor} hover:underline`}>
                                             Show Details
                                         </summary>
-                                        <div className="mt-2 p-3 bg-white rounded-md border border-gray-200">
-                                            <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
+                                        <div className="mt-2 p-3 bg-white rounded-md border border-sidebar-border">
+                                            <pre className="text-xs text-text-secondary whitespace-pre-wrap font-mono">
                                                 {typeof details === 'object' ? JSON.stringify(details, null, 2) : details}
                                             </pre>
                                         </div>
@@ -193,7 +193,7 @@ const NotificationModal = ({
 
                     {/* Actions */}
                     {(actions.length > 0 || !autoClose) && (
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-3">
+                        <div className="bg-app-bg px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-3">
                             {actions.map((action, index) => (
                                 <button
                                     key={index}

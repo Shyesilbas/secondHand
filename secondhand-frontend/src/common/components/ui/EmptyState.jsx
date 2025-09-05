@@ -10,13 +10,13 @@ const EmptyState = ({
   children
 }) => {
   const iconWrapperClass = variant === 'blue'
-    ? 'bg-blue-100 text-blue-600'
+    ? 'bg-blue-100 text-btn-primary'
     : variant === 'green'
       ? 'bg-green-100 text-green-600'
-      : 'bg-gray-100 text-gray-400';
+      : 'bg-gray-100 text-text-muted';
 
   const buttonColor = (primaryAction?.variant || variant) === 'blue'
-    ? 'bg-blue-600 hover:bg-blue-700'
+    ? 'bg-btn-primary hover:bg-btn-primary-hover'
     : (primaryAction?.variant || variant) === 'green'
       ? 'bg-green-600 hover:bg-green-700'
       : 'bg-gray-800 hover:bg-gray-900';
@@ -32,8 +32,8 @@ const EmptyState = ({
           )}
         </div>
       )}
-      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-      {description && <p className="text-gray-600 mb-6">{description}</p>}
+      <h3 className="text-lg font-medium text-text-primary mb-2">{title}</h3>
+      {description && <p className="text-text-secondary mb-6">{description}</p>}
       {primaryAction && (
         <button
           onClick={primaryAction.onClick}

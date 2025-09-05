@@ -5,10 +5,10 @@ const PageHeader = ({ title, subtitle, onRefresh, createButtonText, createButton
     return (
         <div className="flex items-center justify-between mb-8">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-text-primary">
                     {title}
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="text-text-secondary mt-2">
                     {subtitle}
                 </p>
             </div>
@@ -16,7 +16,7 @@ const PageHeader = ({ title, subtitle, onRefresh, createButtonText, createButton
                 {onRefresh && (
                     <button
                         onClick={onRefresh}
-                        className="text-gray-600 hover:text-gray-900 transition-colors"
+                        className="text-text-secondary hover:text-text-primary transition-colors"
                         title="Refresh"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,7 +27,7 @@ const PageHeader = ({ title, subtitle, onRefresh, createButtonText, createButton
                 {createButtonText && createButtonRoute && (
                     <Link
                         to={createButtonRoute}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                        className="bg-btn-primary text-white px-4 py-2 rounded-lg hover:bg-btn-primary-hover transition-colors flex items-center space-x-2"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

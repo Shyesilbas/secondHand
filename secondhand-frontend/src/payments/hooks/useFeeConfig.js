@@ -13,10 +13,8 @@ export const useFeeConfig = () => {
             setIsLoading(true);
             setError(null);
             const config = await paymentService.getListingFeeConfig();
-            console.log('Fee config received:', config);
             setFeeConfig(config);
         } catch (err) {
-            console.error('Failed to fetch fee config:', err);
             const errorMessage = 'Fee config could not be fetched. Please try again later .';
             setError(errorMessage);
             notification.showError('Error', errorMessage);

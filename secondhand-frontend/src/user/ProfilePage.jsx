@@ -26,7 +26,7 @@ const ProfilePage = () => {
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-10">Profile</h1>
+            <h1 className="text-3xl font-bold text-text-primary mb-10">Profile</h1>
 
             {!user?.accountVerified && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-8 flex items-start">
@@ -59,7 +59,7 @@ const ProfilePage = () => {
                                     setPhoneFormData({ ...UpdatePhoneRequestDTO, newPhone: user?.phoneNumber || '' });
                                     setShowPhoneModal(true);
                                 }}
-                                className="ml-2 p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                className="ml-2 p-1 text-text-muted hover:text-btn-primary transition-colors"
                                 title="Update phone number"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@ const ProfilePage = () => {
                         value={user?.accountVerified ? 'Verified' : 'Unverified'}
                         type={user?.accountVerified ? 'success' : 'error'}
                     />
-                    <InfoField label="Account Creation Date" value={formatDate(user?.accountCreationDate)} />
+                    <InfoField label="Account Creation Date" value={user.accountCreationDate} />
                 </div>
             </div>
 
@@ -107,9 +107,9 @@ const ProfilePage = () => {
 
 const InfoField = ({ label, value, action }) => (
     <div>
-        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <label className="block text-sm font-medium text-text-secondary">{label}</label>
         <div className="mt-1 flex items-center justify-between">
-            <p className="text-gray-900">{value}</p>
+            <p className="text-text-primary">{value}</p>
             {action}
         </div>
     </div>
@@ -124,7 +124,7 @@ const InfoBadge = ({ label, value, type }) => {
                 : 'bg-yellow-100 text-yellow-800';
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700">{label}</label>
+            <label className="block text-sm font-medium text-text-secondary">{label}</label>
             <span className={`mt-1 inline-block px-2 py-1 text-xs font-medium rounded-full ${colors}`}>
                 {value}
             </span>
@@ -138,12 +138,12 @@ const ProfileLink = ({ to, label, iconPath }) => (
         className="flex items-center justify-between p-4 border rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors"
     >
         <div className="flex items-center space-x-3">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={iconPath} />
             </svg>
             <span>{label}</span>
         </div>
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
     </Link>

@@ -41,7 +41,7 @@ const ListingWizard = ({
                     <div className="flex items-center">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                           currentStep >= step.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-btn-primary border-blue-600 text-white'
                               : 'bg-white border-slate-300 text-slate-400'
                       }`}>
                         {currentStep > step.id ? (
@@ -60,7 +60,7 @@ const ListingWizard = ({
                       </div>
                     </div>
                     {index < steps.length - 1 && (
-                        <div className={`w-16 h-0.5 mx-4 ${currentStep > step.id ? 'bg-blue-600' : 'bg-slate-300'}`} />
+                        <div className={`w-16 h-0.5 mx-4 ${currentStep > step.id ? 'bg-btn-primary' : 'bg-slate-300'}`} />
                     )}
                   </div>
               ))}
@@ -87,7 +87,7 @@ const ListingWizard = ({
                     <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); onNext(); }}
-                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        className="flex items-center gap-2 px-6 py-3 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover transition-colors font-medium"
                     >
                       Next Step
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

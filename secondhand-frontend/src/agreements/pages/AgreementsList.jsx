@@ -51,9 +51,9 @@ const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter
     return (
         <div>
             <div className="flex space-x-2 mb-6">
-                <button onClick={() => setFilter('all')} className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}>All</button>
-                <button onClick={() => setFilter('pending')} className={`px-3 py-1 rounded ${filter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-700'}`}>Pending</button>
-                <button onClick={() => setFilter('accepted')} className={`px-3 py-1 rounded ${filter === 'accepted' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Accepted</button>
+                <button onClick={() => setFilter('all')} className={`px-3 py-1 rounded ${filter === 'all' ? 'bg-btn-primary text-white' : 'bg-gray-100 text-text-secondary'}`}>All</button>
+                <button onClick={() => setFilter('pending')} className={`px-3 py-1 rounded ${filter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-text-secondary'}`}>Pending</button>
+                <button onClick={() => setFilter('accepted')} className={`px-3 py-1 rounded ${filter === 'accepted' ? 'bg-green-600 text-white' : 'bg-gray-100 text-text-secondary'}`}>Accepted</button>
             </div>
 
             <div className="space-y-6">

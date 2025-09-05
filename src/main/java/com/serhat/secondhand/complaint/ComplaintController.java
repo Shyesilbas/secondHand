@@ -15,7 +15,7 @@ public class ComplaintController {
     private final ComplaintService complaintService;
 
     @PostMapping("/create")
-    public Complaint createComplaint(@RequestBody @Valid ComplaintRequest complaintRequest) {
+    public ComplaintDto createComplaint(@RequestBody @Valid ComplaintRequest complaintRequest) {
         return complaintService.createComplaint(complaintRequest);
     }
 

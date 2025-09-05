@@ -15,7 +15,7 @@ const AuthInput = ({
         <div className={`space-y-1 ${className}`}>
             <label
                 htmlFor={name}
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-text-secondary"
             >
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
@@ -33,7 +33,7 @@ const AuthInput = ({
           focus:border-transparent transition-colors duration-200
           ${error
                     ? 'border-red-300 bg-red-50 focus:ring-red-500'
-                    : 'border-gray-300 bg-white hover:border-gray-400'
+                    : 'border-header-border bg-white hover:border-gray-400'
                 }
         `}
             />

@@ -22,7 +22,7 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
         <div className={`relative ${className}`} ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center space-x-1 text-text-secondary hover:text-btn-primary transition-colors"
             >
                 <span>{trigger}</span>
                 <svg
@@ -36,7 +36,7 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-sidebar-border py-2 z-50">
                     {children}
                 </div>
             )}
@@ -49,7 +49,7 @@ const DropdownItem = ({ to, children, onClick, icon }) => {
         return (
             <Link
                 to={to}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                className="flex items-center px-4 py-2 text-sm text-text-secondary hover:bg-blue-50 hover:text-btn-primary transition-colors"
             >
                 {icon && <span className="mr-3">{icon}</span>}
                 {children}
@@ -60,7 +60,7 @@ const DropdownItem = ({ to, children, onClick, icon }) => {
     return (
         <button
             onClick={onClick}
-            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors text-left"
+            className="flex items-center w-full px-4 py-2 text-sm text-text-secondary hover:bg-blue-50 hover:text-btn-primary transition-colors text-left"
         >
             {icon && <span className="mr-3">{icon}</span>}
             {children}
@@ -69,7 +69,7 @@ const DropdownItem = ({ to, children, onClick, icon }) => {
 };
 
 const DropdownDivider = () => (
-    <div className="border-t border-gray-200 my-1" />
+    <div className="border-t border-sidebar-border my-1" />
 );
 
 export { DropdownMenu, DropdownItem, DropdownDivider };

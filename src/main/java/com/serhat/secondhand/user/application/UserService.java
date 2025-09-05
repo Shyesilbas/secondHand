@@ -19,6 +19,8 @@ import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -179,5 +181,19 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public List<UserDto> searchUsers(String query, int limit) {
+        log.info("Searching users with query: {} and limit: {}", query, limit);
+        
+        if (query == null || query.trim().length() < 2) {
+            return List.of();
+        }
+        
+        Pageable pageable = PageRequest.of(0, limit);
+        List<User> users = userRepository.searchUsers(query.trim(), pageable);
+        return users.stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 }

@@ -6,7 +6,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
 
     return (
         <div
-            className={`p-4 transition-colors hover:bg-gray-50 ${
+            className={`p-4 transition-colors hover:bg-app-bg ${
                 isSelected ? 'bg-blue-50 border-r-2 border-blue-500' : ''
             }`}
         >
@@ -15,10 +15,10 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                     className="flex-1 min-w-0 cursor-pointer"
                     onClick={() => onSelect(email)}
                 >
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-text-primary truncate">
                         {email.subject}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-text-muted mt-1">
                         {formatDate(email.sentAt)}
                     </p>
                 </div>
@@ -29,7 +29,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                             onDelete(email.id, email.subject);
                         }}
                         disabled={isDeleting}
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 text-text-muted hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete email"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

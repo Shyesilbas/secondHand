@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 
 const BankAccountCard = ({ account, onDelete, isDeleting }) => {
     return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-lg border border-sidebar-border shadow-sm hover:shadow-md transition-shadow">
             <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-text-primary">
                             {account.bankName || 'Bank Account'}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-text-muted">
                             {account.accountType || 'Checking Account'}
                         </p>
                     </div>
@@ -25,16 +25,16 @@ const BankAccountCard = ({ account, onDelete, isDeleting }) => {
                 </div>
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Iban</span>
-                        <span className="text-sm font-mono text-gray-900">
+                        <span className="text-sm text-text-secondary">Iban</span>
+                        <span className="text-sm font-mono text-text-primary">
                             {account.IBAN}
                         </span>
                     </div>
                 </div>
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Account Holder</span>
-                        <span className="text-sm font-mono text-gray-900">
+                        <span className="text-sm text-text-secondary">Account Holder</span>
+                        <span className="text-sm font-mono text-text-primary">
                        {account.holderName} {account.holderSurname}
                         </span>
                     </div>

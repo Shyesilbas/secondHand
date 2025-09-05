@@ -31,8 +31,8 @@ const MyListingsPage = () => {
 
             {!isLoading && allListings && (
                 <div className="text-center mb-4">
-                    <p className="text-gray-600 text-sm">
-                        You have <span className="font-semibold text-gray-900">{allListings.length}</span> total listings
+                    <p className="text-text-secondary text-sm">
+                        You have <span className="font-semibold text-text-primary">{allListings.length}</span> total listings
                     </p>
                 </div>
             )}

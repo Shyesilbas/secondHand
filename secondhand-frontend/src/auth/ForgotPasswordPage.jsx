@@ -56,15 +56,15 @@ const ForgotPasswordPage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Doğrulama Kodu Oluşturuldu</h2>
-        <p className="text-gray-600 mb-2">Dev ortamında olduğumuz için kodu burada gösteriyoruz.</p>
+        <h2 className="text-2xl font-bold text-text-primary mb-2">Doğrulama Kodu Oluşturuldu</h2>
+        <p className="text-text-secondary mb-2">Dev ortamında olduğumuz için kodu burada gösteriyoruz.</p>
         {verificationCode && (
-          <div className="mb-4 p-3 border rounded bg-gray-50">
-            <div className="text-sm text-gray-700">Doğrulama Kodu</div>
+          <div className="mb-4 p-3 border rounded bg-app-bg">
+            <div className="text-sm text-text-secondary">Doğrulama Kodu</div>
             <div className="text-xl font-mono tracking-widest">{verificationCode}</div>
           </div>
         )}
-        <p className="text-gray-600 mb-6">Aşağıdan yeni şifrenizi belirleyebilirsiniz.</p>
+        <p className="text-text-secondary mb-6">Aşağıdan yeni şifrenizi belirleyebilirsiniz.</p>
 
         <form
           onSubmit={async (e) => {
@@ -91,19 +91,19 @@ const ForgotPasswordPage = () => {
           className="space-y-4 text-left"
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700">E-posta</label>
+            <label className="block text-sm font-medium text-text-secondary">E-posta</label>
             <input className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.email} onChange={(e)=> setResetForm({...resetForm, email: e.target.value})}/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Doğrulama Kodu</label>
+            <label className="block text-sm font-medium text-text-secondary">Doğrulama Kodu</label>
             <input className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.verificationCode} onChange={(e)=> setResetForm({...resetForm, verificationCode: e.target.value})}/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Yeni Şifre</label>
+            <label className="block text-sm font-medium text-text-secondary">Yeni Şifre</label>
             <input type="password" className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.newPassword} onChange={(e)=> setResetForm({...resetForm, newPassword: e.target.value})}/>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Yeni Şifre (Tekrar)</label>
+            <label className="block text-sm font-medium text-text-secondary">Yeni Şifre (Tekrar)</label>
             <input type="password" className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.confirmPassword} onChange={(e)=> setResetForm({...resetForm, confirmPassword: e.target.value})}/>
           </div>
           <AuthButton type="submit" className="w-full">Yeni Şifreyi Kaydet</AuthButton>
@@ -122,10 +122,10 @@ const ForgotPasswordPage = () => {
     <div className="w-full max-w-md mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+        <h2 className="text-3xl font-bold text-text-primary mb-2">
           Şifrenizi mi unuttunuz?
         </h2>
-        <p className="text-gray-600">
+        <p className="text-text-secondary">
           E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.
         </p>
       </div>

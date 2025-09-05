@@ -26,7 +26,7 @@ public class ComplaintService {
 
 
     @Transactional
-    public Complaint createComplaint(ComplaintRequest complaintRequest) {
+    public ComplaintDto createComplaint(ComplaintRequest complaintRequest) {
         if (complaintRequest.complainerId() == null) {
             throw new IllegalArgumentException("NULL");
         }
@@ -56,7 +56,9 @@ public class ComplaintService {
                 .resolvedAt(null)
                 .build();
 
-        return complaintRepository.save(complaint);
+         complaintRepository.save(complaint);
+
+         return complaintMapper.mapComplaintToDto(complaint);
     }
 
 

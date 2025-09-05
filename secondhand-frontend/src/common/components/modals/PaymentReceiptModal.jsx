@@ -43,7 +43,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   };
 
   const isIncoming = payment.paymentDirection === 'INCOMING';
-  const amountColor = isIncoming ? 'text-emerald-600' : 'text-gray-900';
+  const amountColor = isIncoming ? 'text-emerald-600' : 'text-text-primary';
 
   return createPortal(
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:p-0 overflow-y-auto">
@@ -58,31 +58,31 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-6 pb-0 print:hidden">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-2xl flex items-center justify-center">
+              <div className="w-8 h-8 bg-btn-primary rounded-2xl flex items-center justify-center">
                 <span className="text-white text-sm font-bold">S</span>
               </div>
               <div>
-                <h2 className="font-semibold text-gray-900">Payment Receipt</h2>
-                <p className="text-xs text-gray-500">SecondHand</p>
+                <h2 className="font-semibold text-text-primary">Payment Receipt</h2>
+                <p className="text-xs text-text-muted">SecondHand</p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
               <button
                   onClick={handlePrint}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                  className="p-2 text-text-muted hover:text-text-secondary hover:bg-app-bg rounded-xl transition-colors"
               >
                 <PrinterIcon className="w-5 h-5" />
               </button>
               <button
                   onClick={handleShare}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                  className="p-2 text-text-muted hover:text-text-secondary hover:bg-app-bg rounded-xl transition-colors"
               >
                 <ShareIcon className="w-5 h-5" />
               </button>
               <button
                   onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                  className="p-2 text-text-muted hover:text-text-secondary hover:bg-app-bg rounded-xl transition-colors"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -93,7 +93,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
           <div className="p-6 space-y-8 max-h-[80vh] overflow-y-auto">
             {/* Amount */}
             <div className="text-center py-8">
-              <p className="text-sm text-gray-500 mb-2">Transaction Amount</p>
+              <p className="text-sm text-text-muted mb-2">Transaction Amount</p>
               <p className={`text-4xl font-bold ${amountColor}`}>
                 {isIncoming ? '+' : ''}{formatAmount(payment.amount)}
               </p>
@@ -101,7 +101,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
                   payment.isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
-                    payment.isSuccess ? 'bg-emerald-500' : 'bg-red-500'
+                    payment.isSuccess ? 'bg-emerald-500' : 'bg-alert-error'
                 }`} />
                 {payment.isSuccess ? 'Successful' : 'Failed'}
               </div>
@@ -111,48 +111,48 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500 mb-1">Receipt No</p>
-                  <p className="font-mono text-gray-900">{payment.paymentId}</p>
+                  <p className="text-text-muted mb-1">Receipt No</p>
+                  <p className="font-mono text-text-primary">{payment.paymentId}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 mb-1">Date</p>
-                  <p className="text-gray-900">{formatDate(payment.createdAt)}</p>
+                  <p className="text-text-muted mb-1">Date</p>
+                  <p className="text-text-primary">{formatDate(payment.createdAt)}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500 mb-1">Method</p>
-                  <p className="text-gray-900">{payment.paymentType}</p>
+                  <p className="text-text-muted mb-1">Method</p>
+                  <p className="text-text-primary">{payment.paymentType}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 mb-1">Type</p>
-                  <p className="text-gray-900">{payment.transactionType}</p>
+                  <p className="text-text-muted mb-1">Type</p>
+                  <p className="text-text-primary">{payment.transactionType}</p>
                 </div>
               </div>
               {payment.senderName && (
                   <div className="text-sm">
-                    <p className="text-gray-500 mb-1">From</p>
-                    <p className="text-gray-900">{payment.senderName} {payment.senderSurname || ''}</p>
+                    <p className="text-text-muted mb-1">From</p>
+                    <p className="text-text-primary">{payment.senderName} {payment.senderSurname || ''}</p>
                   </div>
               )}
               {payment.receiverName && (
                   <div className="text-sm">
-                    <p className="text-gray-500 mb-1">To</p>
-                    <p className="text-gray-900">{payment.receiverName} {payment.receiverSurname || ''}</p>
+                    <p className="text-text-muted mb-1">To</p>
+                    <p className="text-text-primary">{payment.receiverName} {payment.receiverSurname || ''}</p>
                   </div>
               )}
               {payment.listingId && (
                   <div className="text-sm">
-                    <p className="text-gray-500 mb-1">Listing ID</p>
-                    <p className="font-mono text-gray-900">{payment.listingId}</p>
+                    <p className="text-text-muted mb-1">Listing ID</p>
+                    <p className="font-mono text-text-primary">{payment.listingId}</p>
                   </div>
               )}
             </div>
 
             {/* Footer */}
             <div className="pt-6 border-t border-gray-100 text-center">
-              <p className="text-xs text-gray-400">Digital receipt • No signature required</p>
-              <p className="text-xs text-gray-400 mt-1">SecondHand © 2025</p>
+              <p className="text-xs text-text-muted">Digital receipt • No signature required</p>
+              <p className="text-xs text-text-muted mt-1">SecondHand © 2025</p>
             </div>
           </div>
 
@@ -160,13 +160,13 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
           <div className="flex gap-3 p-6 pt-0 print:hidden">
             <button
                 onClick={onClose}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-text-secondary bg-app-bg hover:bg-gray-100 rounded-2xl transition-colors"
             >
               Close
             </button>
             <button
                 onClick={handlePrint}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-2xl transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-btn-primary hover:bg-btn-primary-hover rounded-2xl transition-colors"
             >
               Print Receipt
             </button>

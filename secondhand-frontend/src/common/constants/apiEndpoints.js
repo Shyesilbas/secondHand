@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
         VERIFY: '/v1/users/verification/verify',
         SEND_VERIFICATION: '/v1/users/verification/send',
         BY_ID: (id) => `/v1/users/${id}`,
+        SEARCH: '/v1/users/search',
     },
     LISTINGS: {
         ALL: '/v1/listings/allListings',

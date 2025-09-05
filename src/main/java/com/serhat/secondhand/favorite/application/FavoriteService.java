@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,6 +58,7 @@ public class FavoriteService {
         Favorite favorite = Favorite.builder()
             .user(user)
             .listing(listing)
+                .createdAt(LocalDateTime.now())
             .build();
 
         if(favorite.getUser().getId().equals(listing.getSeller().getId())){

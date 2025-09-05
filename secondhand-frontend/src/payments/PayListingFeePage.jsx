@@ -61,10 +61,10 @@ const PayListingFeePage = () => {
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
                 <BackButton onClick={() => navigate(-1)} />
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-text-primary">
                     Listing Fee Payment
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="text-text-secondary mt-2">
                     You can pay the listing fee for your draft listings here.
                 </p>
             </div>

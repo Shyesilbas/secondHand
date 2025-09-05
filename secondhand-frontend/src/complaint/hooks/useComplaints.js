@@ -8,33 +8,27 @@ export const useComplaints = () => {
     const [error, setError] = useState(null);
     const { showNotification } = useNotification();
 
+    const notify = useCallback((type, title, message) => {
+        showNotification({ type, title, message });
+    }, [showNotification]);
+
     const handleCreateComplaint = useCallback(async (complaintData) => {
         setIsLoading(true);
         setError(null);
 
         try {
             const result = await createComplaint(complaintData);
-
-            showNotification({
-                type: 'success',
-                title: 'Complaint Submitted',
-                message: 'Your complaint has been submitted successfully.'
-            });
-
+            notify('success', 'Complaint Submitted', 'Your complaint has been submitted successfully.');
             return result;
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to submit complaint.';
             setError(errorMessage);
-            showNotification({
-                type: 'error',
-                title: 'Complaint Failed',
-                message: errorMessage
-            });
+            notify('error', 'Complaint Failed', errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
         }
-    }, [showNotification]);
+    }, [notify]);
 
     const handleGetUserComplaints = useCallback(async () => {
         setIsLoading(true);
@@ -47,16 +41,12 @@ export const useComplaints = () => {
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to load complaints.';
             setError(errorMessage);
-            showNotification({
-                type: 'error',
-                title: 'Load Failed',
-                message: errorMessage
-            });
+            notify('error', 'Load Failed', errorMessage);
             return [];
         } finally {
             setIsLoading(false);
         }
-    }, [showNotification]);
+    }, [notify]);
 
     const clearError = useCallback(() => setError(null), []);
 

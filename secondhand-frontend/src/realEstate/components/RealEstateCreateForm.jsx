@@ -77,7 +77,7 @@ const RealEstateCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                     name="furnished"
                     checked={Boolean(formData.furnished)}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 border-slate-300 rounded"
+                    className="h-4 w-4 text-btn-primary border-slate-300 rounded"
                 />
                 <label htmlFor="furnished" className="text-sm font-medium text-slate-700">Furnished</label>
               </div>
