@@ -3,14 +3,29 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.jsx';
-import {useNotification} from "../../../notification/NotificationContext.jsx";
+import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UserSearchBar from '../../../user/components/UserSearchBar.jsx';
+
+const icons = {
+    myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
+    newListing: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>,
+    allListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>,
+    favorites: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>,
+    emails: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.2a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+    chat: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>,
+    dashboard: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M13 5v6a2 2 0 002 2h6" /></svg>,
+    profile: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+    changePassword: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>,
+    logout: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>,
+    payListingFee: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+    paymentMethods: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
+    paymentHistory: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+};
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
     const notification = useNotification();
-
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -25,201 +40,86 @@ const Header = () => {
         );
     };
 
+    const linkClass = "text-text-secondary hover:text-btn-primary transition-colors flex items-center space-x-2";
+
+    const listingsMenu = [
+        { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: icons.myListings },
+        { to: ROUTES.CREATE_LISTING, label: 'New Listing', icon: icons.newListing },
+        { divider: true },
+        { to: ROUTES.LISTINGS, label: 'All Listings', icon: icons.allListings },
+    ];
+
+    const paymentMenu = [
+        { to: ROUTES.PAY_LISTING_FEE, label: 'Pay Listing Fee', icon: icons.payListingFee },
+        { divider: true },
+        { to: ROUTES.PAYMENT_METHODS, label: 'Payment Methods', icon: icons.paymentMethods },
+        { divider: true },
+        { to: ROUTES.PAYMENTS, label: 'Payment History', icon: icons.paymentHistory },
+    ];
+
+    const userLinks = [
+        { to: ROUTES.FAVORITES, label: 'Favorites', icon: icons.favorites },
+        { to: ROUTES.EMAILS, label: 'E-mails', icon: icons.emails },
+        { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat },
+    ];
+
+    const userMenuItems = [
+        { to: ROUTES.DASHBOARD, label: 'Dashboard', icon: icons.dashboard },
+        { to: ROUTES.PROFILE, label: 'Profile', icon: icons.profile },
+        { to: ROUTES.CHANGE_PASSWORD, label: 'Change Password', icon: icons.changePassword },
+        { divider: true },
+        { action: handleLogout, label: 'Logout', icon: icons.logout, isButton: true }
+    ];
 
     return (
         <header className="bg-header-bg shadow-sm border-b border-header-border">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <Link to={ROUTES.HOME} className="text-xl font-bold text-btn-primary">
-                        SecondHand
-                    </Link>
-
-                    {/* Arama Çubuğu - Sadece giriş yapmış kullanıcılar için */}
-                    {isAuthenticated && (
-                        <div className="flex-1 max-w-md mx-8">
-                            <UserSearchBar />
-                        </div>
-                    )}
+                    <Link to={ROUTES.HOME} className="text-xl font-bold text-btn-primary">SecondHand</Link>
+                    {isAuthenticated && <div className="flex-1 max-w-xs mx-4"><UserSearchBar /></div>}
 
                     <nav className="hidden md:flex space-x-8">
                         <DropdownMenu trigger="Listings">
-                            {isAuthenticated && (
-                                <>
-                                    <DropdownItem 
-                                        to={ROUTES.MY_LISTINGS}
-                                        icon={
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                            </svg>
-                                        }
-                                    >
-                                        My Listings
-                                    </DropdownItem>
-
-                                    <DropdownItem 
-                                        to={ROUTES.CREATE_LISTING}
-                                        icon={
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        }
-                                    >
-                                        New Listing
-                                    </DropdownItem>
-                                    <DropdownDivider />
-                                </>
+                            {listingsMenu.map((item, idx) =>
+                                item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
                             )}
-                            <DropdownItem 
-                                to={ROUTES.LISTINGS}
-                                icon={
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                    </svg>
-                                }
-                            >
-                                All Listings
-                            </DropdownItem>
                         </DropdownMenu>
-                        
+
                         {isAuthenticated && (
                             <DropdownMenu trigger="Payment">
-                                <DropdownItem 
-                                    to={ROUTES.PAY_LISTING_FEE}
-                                    icon={
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    }
-                                >
-                                    Pay Listing Fee
-                                </DropdownItem>
-                                <DropdownDivider />
-                                <DropdownItem
-                                    to={ROUTES.PAYMENT_METHODS}
-                                    icon={
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                        </svg>
-                                    }
-                                >
-                                    Payment Methods
-                                </DropdownItem>
-                                <DropdownDivider />
-                                <DropdownItem 
-                                    to={ROUTES.PAYMENTS}
-                                    icon={
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                                        </svg>
-                                    }
-                                >
-                                    Payment History
-                                </DropdownItem>
+                                {paymentMenu.map((item, idx) =>
+                                    item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                )}
                             </DropdownMenu>
                         )}
-                        
-                        {isAuthenticated && (
-                            <Link
-                                to={ROUTES.FAVORITES}
-                                className="text-text-secondary hover:text-btn-primary transition-colors flex items-center space-x-2"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                                <span>Favorites</span>
+
+                        {isAuthenticated && userLinks.map(link => (
+                            <Link key={link.to} to={link.to} className={linkClass}>
+                                <link.icon />
+                                <span>{link.label}</span>
                             </Link>
-                        )}
-                        
-                        {isAuthenticated && (
-                            <Link
-                                to={ROUTES.EMAILS}
-                                className="text-text-secondary hover:text-btn-primary transition-colors flex items-center space-x-2"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.2a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                <span>E-mails</span>
-                            </Link>
-                        )}
-                        
-                        {isAuthenticated && (
-                            <Link
-                                to={ROUTES.CHAT}
-                                className="text-text-secondary hover:text-btn-primary transition-colors flex items-center space-x-2"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                <span>Messages</span>
-                            </Link>
-                        )}
-                        
-                        {isAuthenticated && (
-                            <></>
-                        )}
+                        ))}
                     </nav>
 
-                    {/* User Menu */}
                     <div className="flex items-center space-x-4">
                         {isAuthenticated ? (
-                            <>
-                                <DropdownMenu trigger={`${user?.name || 'Profile'}`}>
-                                    <DropdownItem 
-                                        to={ROUTES.DASHBOARD}
-                                        icon={
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M13 5v6a2 2 0 002 2h6" />
-                                            </svg>
-                                        }
-                                    >
-                                        Dashboard
-                                    </DropdownItem>
-                                    <DropdownItem 
-                                        to={ROUTES.PROFILE}
-                                        icon={
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                        }
-                                    >
-                                        Profile
-                                    </DropdownItem>
-                                    <DropdownItem 
-                                        to={ROUTES.CHANGE_PASSWORD}
-                                        icon={
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        }
-                                    >
-                                        Change Password
-                                    </DropdownItem>
-                                    <DropdownDivider />
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                        <span>Logout</span>
-                                    </button>
-                                </DropdownMenu>
-                            </>
+                            <DropdownMenu trigger={`${user?.name || 'Profile'}`}>
+                                {userMenuItems.map((item, idx) =>
+                                    item.divider ? <DropdownDivider key={idx} /> :
+                                        item.isButton ? (
+                                            <button key={idx} onClick={item.action} className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
+                                                <item.icon />
+                                                <span>{item.label}</span>
+                                            </button>
+                                        ) : (
+                                            <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                        )
+                                )}
+                            </DropdownMenu>
                         ) : (
                             <>
-                                <Link
-                                    to={ROUTES.LOGIN}
-                                    className="text-text-secondary hover:text-btn-primary transition-colors"
-                                >
-                                    Login
-                                </Link>
-                                <Link
-                                    to={ROUTES.REGISTER}
-                                    className="bg-btn-primary text-white px-4 py-2 rounded-md hover:bg-btn-primary-hover transition-colors"
-                                >
-                                    Register
-                                </Link>
+                                <Link to={ROUTES.LOGIN} className="text-text-secondary hover:text-btn-primary transition-colors">Login</Link>
+                                <Link to={ROUTES.REGISTER} className="bg-btn-primary text-white px-4 py-2 rounded-md hover:bg-btn-primary-hover transition-colors">Register</Link>
                             </>
                         )}
                     </div>

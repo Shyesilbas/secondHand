@@ -19,7 +19,6 @@ const SidebarLayout = ({
 
     return (
         <div className="flex min-h-screen bg-app-bg">
-            {/* Desktop Sidebar */}
             <aside className={`hidden lg:flex lg:flex-col bg-sidebar-bg border-r border-sidebar-border shadow-sm sticky top-0 h-screen transition-all duration-300 ${
                 isSidebarCollapsed ? 'w-16' : sidebarWidth
             }`}>
