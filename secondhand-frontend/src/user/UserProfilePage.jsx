@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import ContactSellerButton from '../chat/components/ContactSellerButton.jsx';
@@ -7,6 +7,7 @@ import { useUserListings } from './hooks/useUserListings.js';
 import { ROUTES } from '../common/constants/routes.js';
 import { formatDateTime } from '../common/formatters.js';
 import ComplaintButton from '../complaint/components/ComplaintButton.jsx';
+
 
 const useUserProfile = (userId) => {
     const [user, setUser] = React.useState(null);
@@ -122,10 +123,6 @@ const UserProfilePage = () => {
                     <p className="mt-1 text-text-primary">{user.gender || 'Not provided'}</p>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-text-muted">Birth Date</p>
-                    <p className="mt-1 text-text-primary">{user.birthdate || 'Not provided'}</p>
-                </div>
-                <div>
                     <p className="text-sm font-semibold text-text-muted">Account Verified</p>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         user.accountVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -160,22 +157,6 @@ const UserProfilePage = () => {
                                 to={ROUTES.LISTING_DETAIL(listing.id)}
                                 className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
                             >
-                                <div className="aspect-video bg-gray-200 relative overflow-hidden">
-                                    {listing.imageUrl ? (
-                                        <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                    ) : (
-                                        <div className="flex items-center justify-center w-full h-full text-text-muted">
-                                            No Image
-                                        </div>
-                                    )}
-                                    <span className={`absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                                        listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                                            listing.status === 'SOLD' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                        {listing.status}
-                                    </span>
-                                </div>
                                 <div className="p-4">
                                     <h3 className="text-lg font-semibold text-text-primary truncate">{listing.title}</h3>
                                     <p className="text-green-600 font-bold mt-1">{listing.price} {listing.currency}</p>

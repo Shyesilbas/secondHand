@@ -10,17 +10,17 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
           disabled={page === 0}
           className="px-4 py-2 text-sm font-medium text-text-secondary bg-white border border-header-border rounded-md hover:bg-app-bg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Önceki
+          Previous
         </button>
         <span className="text-sm text-text-secondary">
-          Sayfa {page + 1} / {totalPages}
+          Page {page + 1} / {totalPages}
         </span>
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages - 1}
           className="px-4 py-2 text-sm font-medium text-text-secondary bg-white border border-header-border rounded-md hover:bg-app-bg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sonraki
+          Next
         </button>
       </div>
     </div>
