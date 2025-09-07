@@ -4,7 +4,6 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingF
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +37,6 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        // Query for results - Use VehicleListing directly since it extends Listing
         CriteriaQuery<VehicleListing> query = cb.createQuery(VehicleListing.class);
         Root<VehicleListing> root = query.from(VehicleListing.class);
 

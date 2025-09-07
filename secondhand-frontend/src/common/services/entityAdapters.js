@@ -51,6 +51,51 @@ export const createElectronicsServiceAdapter = (electronicService) => ({
 });
 
 /**
+ * Create Books Service Adapter
+ * Maps books service methods to generic interface
+ */
+export const createBooksServiceAdapter = (booksService) => ({
+  // CRUD operations
+  getEntityById: booksService.getBooksDetails,
+  createEntity: booksService.createBooksListing,
+  updateEntity: booksService.updateBooksListing,
+  deleteEntity: booksService.deleteBooksListing,
+  
+  // Search operations
+  filterEntities: booksService.filterBooks
+});
+
+/**
+ * Create Sports Service Adapter
+ * Maps sports service methods to generic interface
+ */
+export const createSportsServiceAdapter = (sportsService) => ({
+  // CRUD operations
+  getEntityById: sportsService.getSportsDetails,
+  createEntity: sportsService.createSportsListing,
+  updateEntity: sportsService.updateSportsListing,
+  deleteEntity: sportsService.deleteSportsListing,
+  
+  // Search operations
+  filterEntities: sportsService.filterSports
+});
+
+/**
+ * Create Clothing Service Adapter
+ * Maps clothing service methods to generic interface
+ */
+export const createClothingServiceAdapter = (clothingService) => ({
+  // CRUD operations
+  getEntityById: clothingService.getClothingDetails,
+  createEntity: clothingService.createClothingListing,
+  updateEntity: clothingService.updateClothingListing,
+  deleteEntity: clothingService.deleteClothingListing,
+  
+  // Search operations
+  filterEntities: clothingService.filterClothing
+});
+
+/**
  * Create Listing Service Adapter
  * Maps listing service methods to generic interface
  */

@@ -6,6 +6,7 @@ import { ROUTES } from '../common/constants/routes.js';
 import { UpdatePhoneRequestDTO } from './users.js';
 import PhoneUpdateModal from '../common/components/modals/PhoneUpdateModal.jsx';
 import { formatDateTime } from '../common/formatters.js';
+import AddressList from './components/AddressList.jsx';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -82,6 +83,7 @@ const ProfilePage = () => {
                     />
                     <InfoField label="Account Creation Date" value={user.accountCreationDate} />
                 </div>
+                <AddressList />
             </div>
 
             {/* Extra Links */}
@@ -131,7 +133,6 @@ const InfoBadge = ({ label, value, type }) => {
         </div>
     );
 };
-
 const ProfileLink = ({ to, label, iconPath }) => (
     <Link
         to={to}
@@ -150,3 +151,4 @@ const ProfileLink = ({ to, label, iconPath }) => (
 );
 
 export default ProfilePage;
+

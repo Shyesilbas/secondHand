@@ -1,36 +1,28 @@
-import { useCallback, useState } from 'react';
+import { useEntity } from '../../common/hooks/useEntity.js';
+import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
+import { createBooksServiceAdapter } from '../../common/services/entityAdapters.js';
 import { booksService } from '../services/booksService.js';
+import { BooksListingDTO } from '../books.js';
+import { useMemo } from 'react';
 
-export const useBooks = (id = null) => {
-  const [book, setBook] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+export const useBooks = (bookId = null) => {
+  const booksServiceAdapter = useMemo(() => createBooksServiceAdapter(booksService), []);
+  
+  const result = useEntity({
+    entityId: bookId,
+    service: booksServiceAdapter,
+    defaultData: BooksListingDTO,
+    entityName: 'Books'
+  });
 
-  const fetchBook = useCallback(async (bookId) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await booksService.getBooksDetails(bookId);
-      setBook(data);
-      return data;
-    } catch (err) {
-      setError(err?.response?.data?.message || 'Error fetching book listing');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const updateBook = useCallback(async (bookId, payload) => {
-    return booksService.updateBooksListing(bookId, payload);
-  }, []);
-
+  // Map entity to book for backward compatibility
   return {
-    book,
-    isLoading,
-    error,
-    fetchBook,
-    updateBook,
+    ...result,
+    book: result.entity,
+    fetchBook: result.fetchEntity,
+    createBook: result.createEntity,
+    updateBook: result.updateEntity,
+    deleteBook: result.deleteEntity
   };
 };
 

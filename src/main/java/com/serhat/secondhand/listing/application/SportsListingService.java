@@ -29,6 +29,7 @@ public class SportsListingService {
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final SportsListingFilterService sportsListingFilterService;
+    private final PriceHistoryService priceHistoryService;
 
     @Transactional
     public UUID createSportsListing(SportsCreateRequest request, User seller) {
@@ -52,6 +53,9 @@ public class SportsListingService {
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
+        var oldPrice = existing.getPrice();
+        var oldCurrency = existing.getCurrency();
+
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -62,7 +66,19 @@ public class SportsListingService {
         request.equipmentType().ifPresent(existing::setEquipmentType);
         request.condition().ifPresent(existing::setCondition);
 
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+            priceHistoryService.recordPriceChange(
+                    existing,
+                    oldPrice,
+                    existing.getPrice(),
+                    existing.getCurrency(),
+                    "Price updated via listing edit"
+            );
+        }
+
         sportsRepository.save(existing);
+
+
         log.info("Sports listing updated: {}", id);
     }
 

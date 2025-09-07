@@ -1,3 +1,24 @@
+export const SportsListingDTO = {
+    id: '',
+    listingNo: '',
+    title: '',
+    description: '',
+    price: 0,
+    currency: '',
+    status: '',
+    city: '',
+    district: '',
+    createdAt: '',
+    updatedAt: '',
+    sellerName: '',
+    sellerSurname: '',
+    sellerId: 0,
+    type: '',
+    discipline: '',
+    equipmentType: '',
+    condition: ''
+};
+
 export const createSportsCreateRequest = (data) => ({
   title: data.title,
   description: data.description,

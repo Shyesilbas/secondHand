@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useEnums } from '../../common/hooks/useEnums.js';
-import { createFormRegistry } from '../components/createFormRegistry.js';
+import { getListingConfig, getListingTypeOptions, createFormRegistry } from '../config/listingConfig.js';
 
 const CreateListingPage = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -27,7 +27,13 @@ const CreateListingPage = () => {
         }
     };
 
+    // Get listing type options from centralized config
+    const listingTypeOptions = useMemo(() => {
+        return getListingTypeOptions();
+    }, []);
+
     const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
+    const selectedConfig = selectedType ? getListingConfig(selectedType) : null;
 
     if (SelectedForm) {
         return <SelectedForm onBack={handleBackToSelection} />;
@@ -45,22 +51,22 @@ const CreateListingPage = () => {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {enums.listingTypes?.map((type) => (
+                    {listingTypeOptions.map((type) => (
                         <button
                             key={type.value}
                             onClick={() => handleTypeSelect(type.value)}
-                            className="p-6 border-2 border-card-border rounded-card hover:border-card-border-hover hover:text primary transition-all duration-200 text-left group"
+                            className="p-6 border-2 border-card-border rounded-card hover:border-card-border-hover hover:text-primary transition-all duration-200 text-left group"
                         >
                             <div className="flex items-center space-x-4">
                                 <div className="text-3xl">
                                     {type.icon || '📦'}
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-card-text-primary group-hover:card-text primary">
+                                    <h3 className="font-semibold text-card-text-primary group-hover:text-primary">
                                         {type.label}
                                     </h3>
                                     <p className="text-sm text-card-text-muted mt-1">
-                                        {getTypeDescription(type.value)}
+                                        {type.description}
                                     </p>
                                 </div>
                             </div>
@@ -71,7 +77,7 @@ const CreateListingPage = () => {
                 {selectedType && !SelectedForm && (
                     <div className="mt-8 p-4 bg-warning-bg border border-warning-border rounded-lg">
                         <p className="text-warning-text">
-                            {selectedType} is not ready now.
+                            {selectedConfig?.label || selectedType} is not ready yet.
                         </p>
                         <button
                             onClick={handleBackToSelection}
@@ -86,25 +92,6 @@ const CreateListingPage = () => {
     );
 };
 
-const getTypeDescription = (type) => {
-    switch (type) {
-        case 'VEHICLE':
-            return 'Vehicle, Motorcycle, Cycle eg..';
-        case 'ELECTRONICS':
-            return 'Mobile Phone, Laptop, TV eg...';
-        case 'REAL_ESTATE':
-            return 'House, Apartment, Land eg..';
-        case 'CLOTHING':
-            return 'Clothing and accessories eg..';
-        case 'BOOKS':
-            return 'Books, Magazines, Newspapers eg..';
-        case 'SPORTS':
-            return 'Sport equipment, accessories eg..';
-        case 'OTHER':
-            return 'Other categories eg..';
-        default:
-            return 'NULL';
-    }
-};
+// Removed getTypeDescription function as descriptions are now provided by the centralized config
 
 export default CreateListingPage;

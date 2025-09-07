@@ -177,4 +177,16 @@ export const API_ENDPOINTS = {
         ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
         TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,
     },
+    ADDRESS: {
+        ALL: '/addresses',
+        CREATE: '/addresses',
+        UPDATE: (id) => `/addresses/${id}`,
+        DELETE: (id) => `/addresses/${id}`,
+        SELECT_MAIN: (id) => `/addresses/${id}/main`,
+    },
+    PRICE_HISTORY: {
+        BY_LISTING: (listingId) => `/v1/price-history/listing/${listingId}`,
+        LATEST: (listingId) => `/v1/price-history/listing/${listingId}/latest`,
+        EXISTS: (listingId) => `/v1/price-history/listing/${listingId}/exists`,
+    },
 };
