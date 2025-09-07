@@ -33,6 +33,7 @@ public class RealEstateListingService {
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final RealEstateListingFilterService realEstateListingFilterService;
+    private final PriceHistoryService priceHistoryService;
 
     @Transactional
     public UUID createRealEstateListing(RealEstateCreateRequest request, User seller) {
@@ -56,6 +57,8 @@ public class RealEstateListingService {
                 ));
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        var oldPrice = existing.getPrice();
+        var oldCurrency = existing.getCurrency();
 
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
@@ -76,6 +79,17 @@ public class RealEstateListingService {
         request.furnished().ifPresent(existing::setFurnished);
 
         realEstateRepository.save(existing);
+
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+            priceHistoryService.recordPriceChange(
+                    existing,
+                    oldPrice,
+                    existing.getPrice(),
+                    existing.getCurrency(),
+                    "Price updated via listing edit"
+            );
+        }
+
         log.info("Real estate listing updated: {}", id);
     }
 

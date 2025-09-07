@@ -29,6 +29,7 @@ public class BooksListingService {
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final BooksListingFilterService booksListingFilterService;
+    private final PriceHistoryService priceHistoryService;
 
     @Transactional
     public UUID createBooksListing(BooksCreateRequest request, User seller) {
@@ -52,6 +53,9 @@ public class BooksListingService {
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
+        var oldPrice = existing.getPrice();
+        var oldCurrency = existing.getCurrency();
+
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -69,6 +73,17 @@ public class BooksListingService {
         request.isbn().ifPresent(existing::setIsbn);
 
         booksRepository.save(existing);
+
+
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+            priceHistoryService.recordPriceChange(
+                    existing,
+                    oldPrice,
+                    existing.getPrice(),
+                    existing.getCurrency(),
+                    "Price updated via listing edit"
+            );
+        }
         log.info("Books listing updated: {}", id);
     }
 

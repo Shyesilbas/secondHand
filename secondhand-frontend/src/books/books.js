@@ -1,3 +1,28 @@
+export const BooksListingDTO = {
+    id: '',
+    listingNo: '',
+    title: '',
+    description: '',
+    price: 0,
+    currency: '',
+    status: '',
+    city: '',
+    district: '',
+    createdAt: '',
+    updatedAt: '',
+    sellerName: '',
+    sellerSurname: '',
+    sellerId: 0,
+    type: '',
+    author: '',
+    genre: '',
+    publicationYear: '',
+    pageCount: 0,
+    language: '',
+    format: '',
+    condition: ''
+};
+
 export const createBooksCreateRequest = (data) => ({
   title: data.title,
   description: data.description,

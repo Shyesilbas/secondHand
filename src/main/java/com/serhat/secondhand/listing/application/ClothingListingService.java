@@ -32,6 +32,7 @@ public class ClothingListingService {
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
+    private final PriceHistoryService priceHistoryService;
     
     @Transactional
     public UUID createClothingListing(ClothingCreateRequest request, User seller) {
@@ -55,6 +56,9 @@ public class ClothingListingService {
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
+        var oldPrice = existing.getPrice();
+        var oldCurrency = existing.getCurrency();
+
         // Update base fields
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
@@ -71,6 +75,18 @@ public class ClothingListingService {
         request.condition().ifPresent(existing::setCondition);
 
         clothingRepository.save(existing);
+
+
+
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+            priceHistoryService.recordPriceChange(
+                    existing,
+                    oldPrice,
+                    existing.getPrice(),
+                    existing.getCurrency(),
+                    "Price updated via listing edit"
+            );
+        }
         log.info("Clothing listing updated: {}", id);
     }
     

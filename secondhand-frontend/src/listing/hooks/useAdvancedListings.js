@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { listingService } from '../services/listingService';
-import { useListingFilters } from './useListingFilters';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { listingService } from '../services/listingService.js';
+import { useListingFilters } from './useListingFilters.js';
 import { cleanObject } from '../../common/formatters.js';
+import { ERROR_MESSAGES } from '../types/index.js';
 
 export const useAdvancedListings = (initialFilters = {}, listingType = null) => {
   const [listings, setListings] = useState([]);
@@ -21,30 +22,39 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
     getActiveFilterCount
   } = useListingFilters(initialFilters, listingType);
 
-  const fetchListings = useCallback(async (newFilters = filters) => {
+  // Memoize cleaned filters to prevent unnecessary API calls
+  const cleanedFilters = useMemo(() => {
+    return cleanObject(filters);
+  }, [filters]);
+
+  const fetchListings = useCallback(async (newFilters = cleanedFilters) => {
     try {
       setIsLoading(true);
       setError(null);
       
-      // Clean filters - remove empty values using shared util
-      const cleanFilters = cleanObject(newFilters);
-      
       // Use smart filtering that automatically chooses the right endpoint
-      console.log('[useAdvancedListings] cleanFilters:', cleanFilters);
-      const response = await listingService.filterListings(cleanFilters);
-      console.log('[useAdvancedListings] response:', response);
+      const response = await listingService.filterListings(newFilters);
       
       setListings(response.content || []);
       setTotalPages(response.totalPages || 0);
       setTotalElements(response.totalElements || 0);
       setCurrentPage(response.number || 0);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error loading listings');
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          ERROR_MESSAGES.NETWORK_ERROR;
+      setError(errorMessage);
       console.error('Error fetching listings with filters:', err);
+      
+      // Reset listings on error
+      setListings([]);
+      setTotalPages(0);
+      setTotalElements(0);
+      setCurrentPage(0);
     } finally {
       setIsLoading(false);
     }
-  }, [filters]);
+  }, [cleanedFilters]);
 
   const handleUpdateFilters = useCallback((newFilters) => {
     updateFilters(newFilters);
@@ -62,10 +72,10 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
     fetchListings();
   }, [fetchListings]);
 
-  // Fetch listings when filters change
+  // Fetch listings when cleaned filters change
   useEffect(() => {
     fetchListings();
-  }, [filters]);
+  }, [fetchListings]);
 
   return {
     listings,

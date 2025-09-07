@@ -88,6 +88,16 @@ public class PaymentService {
             throw new BusinessException("Invalid or expired verification code", HttpStatus.BAD_REQUEST, "INVALID_VERIFICATION_CODE");
         }
 
+        PaymentRequest fullRequest = getPaymentRequest(listingFeePaymentRequest, fromUser, listing);
+
+        PaymentDto result = createPayment(fullRequest, authentication);
+        // Mark code as used
+        verificationService.findLatestActiveVerification(fromUser, CodeType.PAYMENT_VERIFICATION)
+                .ifPresent(verificationService::markVerificationAsUsed);
+        return result;
+    }
+
+    private PaymentRequest getPaymentRequest(ListingFeePaymentRequest listingFeePaymentRequest, User fromUser, Listing listing) {
         BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
 
@@ -102,12 +112,7 @@ public class PaymentService {
                 PaymentTransactionType.LISTING_CREATION,
                 PaymentDirection.OUTGOING
         );
-
-        PaymentDto result = createPayment(fullRequest, authentication);
-        // Mark code as used
-        verificationService.findLatestActiveVerification(fromUser, CodeType.PAYMENT_VERIFICATION)
-                .ifPresent(verificationService::markVerificationAsUsed);
-        return result;
+        return fullRequest;
     }
 
     @Transactional

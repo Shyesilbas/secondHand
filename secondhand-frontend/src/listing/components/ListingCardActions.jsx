@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../common/constants/routes';
+import { ROUTES } from '../../common/constants/routes.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { listingService } from '../services/listingService';
+import { listingService } from '../services/listingService.js';
 
 const ListingCardActions = ({ listing, onChanged }) => {
   const navigate = useNavigate();
@@ -15,11 +15,13 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
   const handleEdit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     navigate(ROUTES.EDIT_LISTING(listing.id));
   };
 
   const handleDeactivate = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     try {
       await listingService.deactivateListing(listing.id);
       onChanged && onChanged(listing.id);
@@ -30,6 +32,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
   const handleReactivate = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     try {
       await listingService.activateListing(listing.id);
       onChanged && onChanged(listing.id);
@@ -39,9 +42,9 @@ const ListingCardActions = ({ listing, onChanged }) => {
     }
   };
 
-
   const handleMarkAsSold = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     notification.showConfirmation(
         'Mark As Sold?',
         'Are you sure you want to mark this listing as sold? This action cannot be reverted.',
@@ -51,11 +54,12 @@ const ListingCardActions = ({ listing, onChanged }) => {
           notification.showSuccess('Successful', 'Listing Mark As Sold');
         },
         () => {}
-
-    )};
+    );
+  };
 
   const handleDelete = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     notification.showConfirmation(
       'Delete Listings',
       'Are you sure you want to delete this listing? This action cannot be reverted.',

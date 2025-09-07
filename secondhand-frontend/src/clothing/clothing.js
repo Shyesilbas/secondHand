@@ -29,6 +29,30 @@ export const createClothingUpdateRequest = (data) => ({
     condition: data.condition ? data.condition : undefined
 });
 
+export const ClothingListingDTO = {
+    id: '',
+    listingNo: '',
+    title: '',
+    description: '',
+    price: 0,
+    currency: '',
+    status: '',
+    listingFeePaid: false,
+    city: '',
+    district: '',
+    createdAt: '',
+    updatedAt: '',
+    sellerName: '',
+    sellerSurname: '',
+    sellerId: 0,
+    type: '',
+    brand: '',
+    clothingType: '',
+    color: '',
+    purchaseDate: '',
+    condition: ''
+};
+
 export const createClothingListingDto = (data) => ({
     id: data.id,
     listingNo: data.listingNo,

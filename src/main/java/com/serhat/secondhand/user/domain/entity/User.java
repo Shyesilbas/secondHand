@@ -117,6 +117,10 @@ public class User implements UserDetails {
     @Builder.Default
     private List<Payment> toPayments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
+
 
     @Override
     public boolean isAccountNonExpired() {

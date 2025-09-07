@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { listingService } from '../services/listingService.js';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import { useListingData } from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
@@ -14,23 +14,7 @@ import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 const ListingDetailPage = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
-  const [listing, setListing] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchListing = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const data = await listingService.getListingById(id);
-      setListing(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [id]);
-
-  useEffect(() => { if (id) fetchListing(); }, [id, fetchListing]);
+  const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
 
   if (isLoading) return <div className="p-8 text-center">Loading...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
