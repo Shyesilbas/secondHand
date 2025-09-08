@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
-import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
+import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStats.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
@@ -86,7 +86,7 @@ const ListingDetailPage = () => {
               <div className="flex justify-between text-sm text-card-text-secondary"><span>Views:</span><span className="font-medium">-</span></div>
               <div className="flex justify-between text-sm text-card-text-secondary items-center">
                 <span>Favorites:</span>
-                <FavoriteStats listingId={listing.id} size="sm" showIcon showText />
+                <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
               </div>
             </div>
           </div>

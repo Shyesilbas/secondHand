@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.domain.mapper;
 
+import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;

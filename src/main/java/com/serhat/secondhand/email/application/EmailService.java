@@ -9,10 +9,8 @@ import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +56,12 @@ public class EmailService {
     @Value("${app.email.paymentSuccess.content}")
     private String paymentSuccessContentTemplate;
 
+    @Value("${app.email.priceChange.subject}")
+    private String priceChangeSubject;
+
+    @Value("${app.email.priceChange.content}")
+    private String priceChangeContentTemplate;
+
     @Value("${app.email.paymentVerification.subject:SecondHand - Payment Verification}")
     private String paymentVerificationSubject;
 
@@ -97,6 +101,12 @@ public class EmailService {
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
         log.info("Payment verification email sent successfully with ID: {}", result.id());
         return result;
+    }
+
+    public EmailDto sendPriceChangeEmail(User user, String listingTitle, String oldPriceStr, String newPriceStr) {
+        String subject = priceChangeSubject;
+        String content = String.format(priceChangeContentTemplate, user.getName(), listingTitle, oldPriceStr, newPriceStr);
+        return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
     private EmailDto sendAndSaveEmail(User user, String subject, String content, EmailType emailType) {

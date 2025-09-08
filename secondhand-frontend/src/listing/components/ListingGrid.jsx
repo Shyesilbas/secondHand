@@ -1,5 +1,5 @@
 import React from 'react';
-import ListingCard from './ListingCard';
+import ListingCard from './ListingCard.jsx';
 
 const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
     if (isLoading) {
@@ -38,16 +38,9 @@ const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 className="text-lg font-medium text-text-primary mb-2">
-                    Listings did not load
-                </h3>
-                <p className="text-text-secondary mb-4">
-                    {error}
-                </p>
-                <button
-                    onClick={() => window.location.reload()}
-                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                >
+                <h3 className="text-lg font-medium text-text-primary mb-2">Listings did not load</h3>
+                <p className="text-text-secondary mb-4">{error}</p>
+                <button onClick={() => window.location.reload()} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
                     Try Again
                 </button>
             </div>
@@ -62,12 +55,8 @@ const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012 2v2M7 7h10" />
                     </svg>
                 </div>
-                <h3 className="text-lg font-medium text-text-primary mb-2">
-                    No listings yet
-                </h3>
-                <p className="text-text-secondary">
-                    No Listing found for the criteria.
-                </p>
+                <h3 className="text-lg font-medium text-text-primary mb-2">No listings yet</h3>
+                <p className="text-text-secondary">No Listing found for the criteria.</p>
             </div>
         );
     }

@@ -9,6 +9,9 @@ import {
 
 export const favoriteService = {
 
+  /**
+   * Toggle favorite status for a listing
+   */
   toggleFavorite: async (listingId) => {
     const requestData = createFavoriteRequest(listingId);
     return post(API_ENDPOINTS.FAVORITES.TOGGLE, requestData);
@@ -19,14 +22,6 @@ export const favoriteService = {
     return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES, { params: filterParams });
   },
 
-  getFavoriteStats: async (listingId) => {
-    return get(API_ENDPOINTS.FAVORITES.STATS(listingId));
-  },
-
-  getBulkFavoriteStats: async (listingIds) => {
-    const requestData = createBulkStatsRequest(listingIds);
-    return post(API_ENDPOINTS.FAVORITES.BULK_STATS, requestData);
-  },
 
   isFavorited: async (listingId) => {
     return get(API_ENDPOINTS.FAVORITES.CHECK(listingId));

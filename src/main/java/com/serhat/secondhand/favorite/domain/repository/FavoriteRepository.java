@@ -24,8 +24,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     /**
      * Find favorite by user and listing
      */
-    Optional<Favorite> findByUserAndListingId(User user, UUID listingId);
-    
+    @Query("SELECT f.user FROM Favorite f WHERE f.listing.id = :listingId")
+    List<User> findUsersByListingId(@Param("listingId") UUID listingId);
     /**
      * Get all favorites for a user
      */

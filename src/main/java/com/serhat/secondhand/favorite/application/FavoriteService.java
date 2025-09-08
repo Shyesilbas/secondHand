@@ -6,9 +6,7 @@ import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.entity.Favorite;
 import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
-import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +28,11 @@ import java.util.stream.Collectors;
 public class FavoriteService {
     
     private final FavoriteRepository favoriteRepository;
-    private final ListingService listingService;
+    private final ListingAccessService listingAccessService;
     private final FavoriteMapper favoriteMapper;
+    private final FavoriteStatsService favoriteStatsService;
     
-    /**
-     * Add a listing to user's favorites
-     */
+
     @Transactional
     public FavoriteDto addToFavorites(User user, UUID listingId) {
         log.info("Adding listing {} to favorites for user {}", listingId, user.getEmail());
@@ -45,16 +41,12 @@ public class FavoriteService {
             throw new BusinessException("Listing is already in favorites", HttpStatus.BAD_REQUEST, "ALREADY_FAVORITED");
         }
         
-        // Verify listing exists and is active
-        Listing listing = listingService.findById(listingId)
+        Listing listing = listingAccessService.findById(listingId)
             .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
-        if (!listing.getStatus().equals(ListingStatus.ACTIVE)) {
-            throw new BusinessException("Cannot favorite inactive listing", HttpStatus.BAD_REQUEST, "INACTIVE_LISTING");
-        }
+        listingAccessService.validateActive(listing);
 
         
-        // Create and save favorite
         Favorite favorite = Favorite.builder()
             .user(user)
             .listing(listing)
@@ -71,9 +63,7 @@ public class FavoriteService {
         return favoriteMapper.toDto(favorite);
     }
     
-    /**
-     * Remove a listing from user's favorites
-     */
+
     @Transactional
     public void removeFromFavorites(User user, UUID listingId) {
         log.info("Removing listing {} from favorites for user {}", listingId, user.getEmail());
@@ -87,9 +77,7 @@ public class FavoriteService {
         log.info("Successfully removed listing {} from favorites for user {}", listingId, user.getEmail());
     }
     
-    /**
-     * Toggle favorite status (add if not exists, remove if exists)
-     */
+
     @Transactional
     public FavoriteStatsDto toggleFavorite(User user, UUID listingId) {
         log.info("Toggling favorite status for listing {} and user {}", listingId, user.getEmail());
@@ -113,43 +101,14 @@ public class FavoriteService {
         return favorites.map(favoriteMapper::toDto);
     }
     
-    /**
-     * Get favorite statistics for a listing
-     */
+
     public FavoriteStatsDto getFavoriteStats(UUID listingId, String userEmail) {
-        long favoriteCount = favoriteRepository.countByListingId(listingId);
-        boolean isFavorited = userEmail != null && favoriteRepository.existsByUserEmailAndListingId(userEmail, listingId);
-        
-        return FavoriteStatsDto.builder()
-            .listingId(listingId)
-            .favoriteCount(favoriteCount)
-            .isFavorited(isFavorited)
-            .build();
+        return favoriteStatsService.getFavoriteStats(listingId, userEmail);
     }
     
 
     public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
-        log.info("Getting favorite stats for {} listings", listingIds.size());
-        
-        List<Object[]> countResults = favoriteRepository.countByListingIds(listingIds);
-        Map<UUID, Long> favoriteCounts = countResults.stream()
-            .collect(Collectors.toMap(
-                result -> (UUID) result[0], 
-                result -> (Long) result[1]
-            ));
-        
-        List<UUID> userFavoriteIds = userEmail != null ?
-            favoriteRepository.findListingIdsByUserEmail(userEmail) : List.of();
-        
-        return listingIds.stream()
-            .collect(Collectors.toMap(
-                listingId -> listingId,
-                listingId -> FavoriteStatsDto.builder()
-                    .listingId(listingId)
-                    .favoriteCount(favoriteCounts.getOrDefault(listingId, 0L))
-                    .isFavorited(userFavoriteIds.contains(listingId))
-                    .build()
-            ));
+        return favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
     }
     
 
@@ -163,18 +122,14 @@ public class FavoriteService {
     }
     
 
-    public List<Long> getUsersWhoFavorited(UUID listingId) {
-        return favoriteRepository.findUserIdsByListingId(listingId);
-    }
+
     
 
     public Page<Object[]> getTopFavoritedListings(Pageable pageable) {
         return favoriteRepository.findTopFavoritedListings(pageable);
     }
     
-    /**
-     * Get user's favorite listing IDs for quick lookup
-     */
+
     public List<UUID> getUserFavoriteIds(User user) {
         return favoriteRepository.findListingIdsByUser(user);
     }
