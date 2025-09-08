@@ -27,6 +27,8 @@ export const PaymentDto = (data) => ({
     transactionType: data.transactionType || PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
     paymentDirection: data.paymentDirection || PAYMENT_DIRECTIONS.OUTGOING,
     listingId: data.listingId || null,
+    listingTitle: data.listingTitle || null,
+    listingNo: data.listingNo || null,
     createdAt: data.createdAt || null,
     isSuccess: data.isSuccess || false
 });

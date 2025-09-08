@@ -57,6 +57,7 @@ public class BooksListingFilterServiceImpl implements BooksListingFilterService 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
         List<ListingDto> dtos = results.stream().map(listingMapper::toDynamicDto).toList();
+
         return new PageImpl<>(dtos, pageable, total);
     }
 
