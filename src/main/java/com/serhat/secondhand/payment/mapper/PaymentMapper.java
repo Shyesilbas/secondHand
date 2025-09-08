@@ -17,6 +17,8 @@ public interface PaymentMapper {
     @Mapping(target = "senderSurname", source = "fromUser.surname")
     @Mapping(target = "receiverName", expression = "java(payment.getToUser() != null ? payment.getToUser().getName() : \"SYSTEM\")")
     @Mapping(target = "receiverSurname", expression = "java(payment.getToUser() != null ? payment.getToUser().getSurname() : \"\")")
+    @Mapping(target = "listingTitle", ignore = true)
+    @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "createdAt", source = "processedAt")
     @Mapping(target = "isSuccess", source = "success")
     PaymentDto toDto(Payment payment);

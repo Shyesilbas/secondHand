@@ -19,6 +19,8 @@ public record PaymentDto(
         PaymentTransactionType transactionType,
         PaymentDirection paymentDirection,
         UUID listingId,
+        String listingTitle,
+        String listingNo,
         LocalDateTime createdAt,
         boolean isSuccess
 ) {

@@ -115,13 +115,13 @@ export const sportsFormConfig = {
   entityName: 'Sports',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', sportType: '', brand: '', model: '', condition: '', warranty: '',
+    title: '', description: '', price: '', currency: 'TRY', sportType: '', equipmentType: '', condition: '',
     city: '', district: '', address: '', latitude: '', longitude: ''
   },
   steps: [basicInfoStep, sportsDetailsStep, locationStep],
   fieldGroups: {
-    step1: ['title', 'description', 'price'],
-    step2: ['sportType', 'brand', 'model', 'condition', 'warranty'],
+    step1: ['title', 'description', 'price', 'currency'],
+    step2: ['sportType', 'equipmentType', 'condition'],
     step3: ['city', 'district', 'address', 'latitude', 'longitude']
   }
 };

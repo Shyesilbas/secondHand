@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -101,18 +102,17 @@ public class PaymentService {
         BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
 
-        PaymentRequest fullRequest = new PaymentRequest(
+        return new PaymentRequest(
                 fromUser.getId(),
                 null,
                 fromUser.getName(),
                 fromUser.getSurname(),
                 listing.getId(),
-                totalCreationFee, // Use total fee including tax
+                totalCreationFee,
                 listingFeePaymentRequest.paymentType(),
                 PaymentTransactionType.LISTING_CREATION,
                 PaymentDirection.OUTGOING
         );
-        return fullRequest;
     }
 
     @Transactional
@@ -203,7 +203,43 @@ public class PaymentService {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
-        return payments.map(paymentMapper::toDto);
+        return payments.map(this::mapPaymentToDtoWithListingInfo);
+    }
+    
+    private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment) {
+        PaymentDto baseDto = paymentMapper.toDto(payment);
+        
+        String listingTitle = null;
+        String listingNo = null;
+        
+        if (payment.getListingId() != null) {
+            try {
+                Optional<Listing> listing = listingService.findById(payment.getListingId());
+                if (listing.isPresent()) {
+                    listingTitle = listing.get().getTitle();
+                    listingNo = listing.get().getListingNo();
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch listing info for payment {}: {}", payment.getId(), e.getMessage());
+            }
+        }
+        
+        return new PaymentDto(
+            baseDto.paymentId(),
+            baseDto.senderName(),
+            baseDto.senderSurname(),
+            baseDto.receiverName(),
+            baseDto.receiverSurname(),
+            baseDto.amount(),
+            baseDto.paymentType(),
+            baseDto.transactionType(),
+            baseDto.paymentDirection(),
+            baseDto.listingId(),
+            listingTitle,
+            listingNo,
+            baseDto.createdAt(),
+            baseDto.isSuccess()
+        );
     }
 
     public Map<String, Object> getPaymentStatistics(Authentication authentication) {

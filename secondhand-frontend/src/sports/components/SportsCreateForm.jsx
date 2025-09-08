@@ -56,21 +56,12 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
               </div>
               <div>
                 <EnumDropdown
-                    label="Brand *"
-                    enumKey="sportBrands"
-                    value={formData.brand}
-                    onChange={(v) => handleDropdownChange('brand', v)}
+                    label="Equipment Type *"
+                    enumKey="sportEquipmentTypes"
+                    value={formData.equipmentType}
+                    onChange={(v) => handleDropdownChange('equipmentType', v)}
                 />
-                {errors.brand && <p className="mt-1 text-sm text-red-600">{errors.brand}</p>}
-              </div>
-              <div>
-                <EnumDropdown
-                    label="Model *"
-                    enumKey="sportModels"
-                    value={formData.model}
-                    onChange={(v) => handleDropdownChange('model', v)}
-                />
-                {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
+                {errors.equipmentType && <p className="mt-1 text-sm text-red-600">{errors.equipmentType}</p>}
               </div>
               <div>
                 <EnumDropdown

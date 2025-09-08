@@ -43,7 +43,15 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const handlePrint = () => window.print();
 
   const handleShare = async () => {
-    const receiptText = `SecondHand Payment Receipt\n\nReceipt: ${payment.paymentId}\nDate: ${formatDate(payment.createdAt)}\nAmount: ${formatAmount(payment.amount)}\nStatus: ${payment.isSuccess ? 'Successful' : 'Failed'}`;
+    let receiptText = `SecondHand Payment Receipt\n\nReceipt: ${payment.paymentId}\nDate: ${formatDate(payment.createdAt)}\nAmount: ${formatAmount(payment.amount)}\nStatus: ${payment.isSuccess ? 'Successful' : 'Failed'}`;
+    
+    if (payment.listingTitle) {
+      receiptText += `\nListing: ${payment.listingTitle}`;
+    }
+    if (payment.listingNo) {
+      receiptText += `\nListing No: ${payment.listingNo}`;
+    }
+    
     try {
       if (navigator.share) await navigator.share({ title: 'Payment Receipt', text: receiptText });
       else {
@@ -63,6 +71,8 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
     { label: 'Type', value: payment.transactionType },
     payment.senderName && { label: 'From', value: `${payment.senderName} ${payment.senderSurname || ''}` },
     payment.receiverName && { label: 'To', value: `${payment.receiverName} ${payment.receiverSurname || ''}` },
+    payment.listingTitle && { label: 'Listing', value: payment.listingTitle },
+    payment.listingNo && { label: 'Listing No', value: payment.listingNo, mono: true },
     payment.listingId && { label: 'Listing ID', value: payment.listingId, mono: true },
   ].filter(Boolean);
 
