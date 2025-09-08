@@ -66,22 +66,24 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                     </p>
 
                     <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-col">
                             <span className="text-2xl font-bold text-blue-600">
                                 {formatCurrency(listing.price, listing.currency)}
                             </span>
-                            <button onClick={handlePriceHistoryClick} className="text-gray-400 hover:text-blue-600 transition-colors p-1" title="View Price History" type="button">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                                </svg>
-                            </button>
+                            {listing.createdAt && (
+                                <span className="text-xs text-gray-400 mt-1">
+                                    Created At: {listing.createdAt}
+                                </span>
+                            )}
                         </div>
-                        <div className="flex items-center text-gray-500 text-sm">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {listing.city}, {listing.district}
+                        <div className="flex flex-col items-end text-gray-500 text-sm">
+                            <div>
+                                <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {listing.city}, {listing.district}
+                            </div>
                         </div>
                     </div>
                 </div>

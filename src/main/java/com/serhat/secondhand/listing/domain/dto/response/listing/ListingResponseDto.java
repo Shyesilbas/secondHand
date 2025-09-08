@@ -28,7 +28,7 @@ public class ListingResponseDto {
     private String sellerName;
     private String sellerSurname;
     private Long sellerId;
-    private String type; // VEHICLE, ELECTRONICS, etc.
+    private String type;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

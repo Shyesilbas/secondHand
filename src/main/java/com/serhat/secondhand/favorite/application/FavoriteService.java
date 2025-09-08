@@ -6,6 +6,7 @@ import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.entity.Favorite;
 import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -96,11 +97,44 @@ public class FavoriteService {
     public Page<FavoriteDto> getUserFavorites(User user, Pageable pageable) {
         String userEmail = user.getEmail();
         log.info("Getting favorites for user {} with pagination", userEmail);
-        
+
         Page<Favorite> favorites = favoriteRepository.findByUserOrderByCreatedAtDesc(user, pageable);
-        return favorites.map(favoriteMapper::toDto);
+
+        Page<FavoriteDto> favoriteDtos = favorites.map(favoriteMapper::toDto);
+
+        List<ListingDto> listings = favoriteDtos.stream()
+                .map(FavoriteDto::getListing)
+                .toList();
+
+        enrichWithFavoriteStats(listings, userEmail);
+
+        return favoriteDtos;
     }
-    
+
+
+    private void enrichWithFavoriteStats(List<ListingDto> dtos, String userEmail) {
+        if (dtos == null || dtos.isEmpty()) {
+            return;
+        }
+
+        List<UUID> listingIds = dtos.stream()
+                .map(ListingDto::getId)
+                .toList();
+
+        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
+
+        for (ListingDto dto : dtos) {
+            dto.setFavoriteStats(statsMap.getOrDefault(dto.getId(),
+                    FavoriteStatsDto.builder()
+                            .listingId(dto.getId())
+                            .favoriteCount(0L)
+                            .isFavorited(false)
+                            .build()
+            ));
+        }
+    }
+
+
 
     public FavoriteStatsDto getFavoriteStats(UUID listingId, String userEmail) {
         return favoriteStatsService.getFavoriteStats(listingId, userEmail);

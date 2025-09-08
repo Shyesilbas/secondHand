@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favorite.domain.dto;
 
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,6 @@ public class FavoriteDto {
     
     private Long id;
     private Long userId;
-    private ListingResponseDto listing;
+    private ListingDto listing;
     private LocalDateTime createdAt;
 }

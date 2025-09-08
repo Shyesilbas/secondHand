@@ -137,15 +137,10 @@ export const API_ENDPOINTS = {
     },
     FAVORITES: {
         ADD: '/favorites',
-        REMOVE: (listingId) => `/favorites/${listingId}`,
         TOGGLE: '/favorites/toggle',
         MY_FAVORITES: '/favorites',
-        STATS: (listingId) => `/favorites/stats/${listingId}`,
-        BULK_STATS: '/favorites/stats',
         CHECK: (listingId) => `/favorites/check/${listingId}`,
-        COUNT: (listingId) => `/favorites/count/${listingId}`,
-        IDS: '/favorites/ids',
-        TOP: '/favorites/top',
+
     },
     AGREEMENTS: {
         // Base: API_BASE_URL already includes /api

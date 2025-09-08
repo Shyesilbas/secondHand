@@ -1,4 +1,4 @@
-import { post } from '../../common/services/api/request.js';
+import {get, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { LISTING_TYPES, ERROR_MESSAGES } from '../types/index.js';
 
@@ -10,6 +10,8 @@ const withErrorHandling = async (operation, errorMessage) => {
     throw error;
   }
 };
+
+
 
 const createFilterPayload = (filters, listingType) => {
   const typeUpper = listingType.toUpperCase();
@@ -79,6 +81,14 @@ const createFilterPayload = (filters, listingType) => {
 };
 
 export const listingService = {
+
+  getMyListings: async () => {
+    return get(API_ENDPOINTS.LISTINGS.MY_LISTINGS);
+  },
+  getListingById: async (id) => {
+    return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
+  },
+
   filterListings: async (filters) => {
     const listingType = filters.listingType;
     if (!listingType || !Object.values(LISTING_TYPES).includes(listingType.toUpperCase())) {
