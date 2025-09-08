@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
-import FavoriteStats from '../../favorites/components/FavoriteStats.jsx';
+import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStats.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import PriceHistoryModal from './PriceHistoryModal.jsx';
 import usePriceHistory from '../hooks/usePriceHistory.js';
@@ -11,12 +11,12 @@ import { LISTING_STATUS } from '../types/index.js';
 
 const ListingCard = memo(({ listing, onDeleted }) => {
     const [showPriceHistory, setShowPriceHistory] = useState(false);
-    const { priceHistory, hasHistory, loading: historyLoading, fetchPriceHistory } = usePriceHistory(listing?.id);
+    const { priceHistory, fetchPriceHistory } = usePriceHistory(listing?.id);
 
     const handlePriceHistoryClick = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
-        fetchPriceHistory(); // fetch on demand
+        fetchPriceHistory();
         setShowPriceHistory(true);
     }, [fetchPriceHistory]);
 
@@ -24,36 +24,32 @@ const ListingCard = memo(({ listing, onDeleted }) => {
         setShowPriceHistory(false);
     }, []);
 
-    // Early return for invalid listing
-    if (!listing) {
-        return null;
-    }
+    if (!listing) return null;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
-            case LISTING_STATUS.ACTIVE:
-                return 'bg-green-100 text-green-800';
-            case LISTING_STATUS.SOLD:
-                return 'bg-red-100 text-red-800';
-            case LISTING_STATUS.INACTIVE:
-                return 'bg-yellow-100 text-yellow-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+            case LISTING_STATUS.ACTIVE: return 'bg-green-100 text-green-800';
+            case LISTING_STATUS.SOLD: return 'bg-red-100 text-red-800';
+            case LISTING_STATUS.INACTIVE: return 'bg-yellow-100 text-yellow-800';
+            default: return 'bg-gray-100 text-gray-800';
         }
     };
 
     return (
         <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
-
-            {/* Status + Favorite */}
             <div className="flex items-center justify-between px-4 pt-4">
                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
                     {listing.status}
                 </span>
-                <FavoriteButton listingId={listing.id} listing={listing} size="md" />
+                <FavoriteButton
+                    listingId={listing.id}
+                    listing={listing}
+                    initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
+                    initialCount={listing.favoriteStats?.favoriteCount ?? 0}
+                    size="md"
+                />
             </div>
 
-            {/* Content Section */}
             <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="block">
                 <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -69,18 +65,12 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                         {listing.description}
                     </p>
 
-                    {/* Price and Location */}
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
                             <span className="text-2xl font-bold text-blue-600">
                                 {formatCurrency(listing.price, listing.currency)}
                             </span>
-                            <button
-                                onClick={handlePriceHistoryClick}
-                                className="text-gray-400 hover:text-blue-600 transition-colors p-1"
-                                title="View Price History"
-                                type="button"
-                            >
+                            <button onClick={handlePriceHistoryClick} className="text-gray-400 hover:text-blue-600 transition-colors p-1" title="View Price History" type="button">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                                 </svg>
@@ -97,27 +87,21 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                 </div>
             </Link>
 
-            {/* Footer Section */}
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <span className="text-blue-600 font-medium text-sm">
-                                    {listing.sellerName?.[0]?.toUpperCase()}
-                                </span>
-                            </div>
-                            <span className="text-sm font-medium text-gray-700 truncate max-w-24">
-                                {listing.sellerName} {listing.sellerSurname}
-                            </span>
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-blue-600 font-medium text-sm">{listing.sellerName?.[0]?.toUpperCase()}</span>
                         </div>
-                        <FavoriteStats listingId={listing.id} size="sm" showIcon showText />
+                        <span className="text-sm font-medium text-gray-700 truncate max-w-24">
+                            {listing.sellerName} {listing.sellerSurname}
+                        </span>
                     </div>
-                    <ListingCardActions listing={listing} onChanged={onDeleted} />
+                    <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
                 </div>
+                <ListingCardActions listing={listing} onChanged={onDeleted} />
             </div>
 
-            {/* Price History Modal */}
             <PriceHistoryModal
                 isOpen={showPriceHistory}
                 onClose={handleClosePriceHistory}

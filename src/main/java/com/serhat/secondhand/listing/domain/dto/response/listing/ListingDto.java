@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.dto.response.listing;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
@@ -54,4 +55,6 @@ public abstract class ListingDto {
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") 
     private LocalDateTime updatedAt;
+    
+    private FavoriteStatsDto favoriteStats;
 }

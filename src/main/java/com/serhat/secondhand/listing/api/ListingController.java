@@ -28,15 +28,25 @@ import org.springframework.data.domain.Page;
 public class ListingController {
     
     private final ListingService listingService;
-    private final ListingMapper listingMapper;
-    
+
     @GetMapping("/{id}")
-    @Operation(summary = "Get listing by ID - Returns appropriate DTO based on listing type")
-    public ResponseEntity<ListingDto> getListingById(@PathVariable UUID id) {
-        return listingService.findById(id)
-                .map(listingMapper::toDynamicDto)
+    public ResponseEntity<ListingDto> getListingById(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+
+        String email = currentUser != null ? currentUser.getEmail() : null;
+
+        return listingService.findByIdAsDto(id, email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
+            @RequestBody ListingFilterDto filters,
+            @AuthenticationPrincipal User currentUser) {
+        Page<ListingDto> filteredListings = listingService.filterByCategory(filters, currentUser.getEmail());
+        return ResponseEntity.ok(filteredListings);
     }
 
     @GetMapping("/search/listing-no/{listingNo}")
@@ -92,16 +102,7 @@ public class ListingController {
         List<ListingDto> listings = listingService.getListingsByTypeOrderByDate(listingType);
         return ResponseEntity.ok(listings);
    }
-   
-   @PostMapping("/filter")
-   @Operation(summary = "Get listings with advanced filters", 
-              description = "Filter listings by multiple criteria including price, location, etc.")
-   public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
-           @RequestBody ListingFilterDto filters) {
-        log.info("Filtering listings with criteria: {}", filters);
-        Page<ListingDto> result = listingService.getListingsWithFilters(filters);
-        return ResponseEntity.ok(result);
-   }
+
 
     @GetMapping("/my-listings")
     @Operation(summary = "Get current user's all listings")

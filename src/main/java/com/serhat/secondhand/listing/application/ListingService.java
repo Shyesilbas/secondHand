@@ -1,6 +1,8 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.favorite.application.FavoriteStatsService;
+import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -12,16 +14,16 @@ import com.serhat.secondhand.user.domain.entity.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +34,26 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final VehicleListingFilterService vehicleListingFilterService;
     private final ElectronicListingFilterService electronicListingFilterService;
+    private final BooksListingFilterService bookListingFilterService;
+    private final ClothingListingFilterService clothingListingFilterService;
+    private final RealEstateListingFilterService realEstateListingFilterService;
+    private final SportsListingFilterService sportsListingFilterService;
     private final UserService userService;
+    private final FavoriteStatsService favoriteStatsService;
 
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }
+
+    public Optional<ListingDto> findByIdAsDto(UUID id, String userEmail) {
+        return listingRepository.findById(id)
+                .map(listing -> {
+                    ListingDto dto = listingMapper.toDynamicDto(listing);
+                    enrichWithFavoriteStats(dto, userEmail);
+                    return dto;
+                });
+    }
+
 
     public Optional<ListingDto> findByListingNo(String listingNo) {
         log.info("Searching for listing with listingNo: {}", listingNo);
@@ -53,7 +70,9 @@ public class ListingService {
         
         if (listing.isPresent()) {
             log.info("Found listing with listingNo: {} - ID: {}", cleanListingNo, listing.get().getId());
-            return Optional.of(listingMapper.toDynamicDto(listing.get()));
+            ListingDto dto = listingMapper.toDynamicDto(listing.get());
+            enrichWithFavoriteStats(dto, null);
+            return Optional.of(dto);
         } else {
             log.info("No listing found with listingNo: {}", cleanListingNo);
             return Optional.empty();
@@ -63,34 +82,115 @@ public class ListingService {
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
         List<Listing> listings = listingRepository.findBySellerOrderByCreatedAtDesc(user);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, user.getEmail());
+        return dtos;
     }
+    
+    /**
+     * Enriches a single listing DTO with favorite statistics
+     */
+    private void enrichWithFavoriteStats(ListingDto dto, String userEmail) {
+        if (dto != null && dto.getId() != null) {
+            FavoriteStatsDto stats = favoriteStatsService.getFavoriteStats(dto.getId(), userEmail);
+            dto.setFavoriteStats(stats);
+        }
+    }
+    
+    /**
+     * Enriches a list of listing DTOs with favorite statistics in a batch operation
+     */
+    private void enrichWithFavoriteStats(List<ListingDto> dtos, String userEmail) {
+        if (dtos == null || dtos.isEmpty()) {
+            return;
+        }
+        
+        List<UUID> listingIds = dtos.stream()
+                .map(ListingDto::getId)
+                .toList();
+                
+        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
+        
+        for (ListingDto dto : dtos) {
+            dto.setFavoriteStats(statsMap.getOrDefault(dto.getId(), 
+                FavoriteStatsDto.builder()
+                    .listingId(dto.getId())
+                    .favoriteCount(0L)
+                    .isFavorited(false)
+                    .build()
+            ));
+        }
+    }
+
+    public Page<ListingDto> filterByCategory(ListingFilterDto filters, String userEmail) {
+        Page<ListingDto> result;
+
+        if (filters instanceof VehicleListingFilterDto) {
+            log.info("Filtering vehicles");
+            result = vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) filters);
+        } else if (filters instanceof ElectronicListingFilterDto) {
+            log.info("Filtering electronics");
+            result = electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) filters);
+        } else if (filters instanceof BooksListingFilterDto) {
+            log.info("Filtering books");
+            result = bookListingFilterService.filterBooks((BooksListingFilterDto) filters);
+        } else if (filters instanceof ClothingListingFilterDto) {
+            log.info("Filtering clothing");
+            result = clothingListingFilterService.filterClothing((ClothingListingFilterDto) filters);
+        } else if (filters instanceof RealEstateFilterDto) {
+            log.info("Filtering real estate");
+            result = realEstateListingFilterService.filterRealEstates((RealEstateFilterDto) filters);
+        } else if (filters instanceof SportsListingFilterDto) {
+            log.info("Filtering sports");
+            result = sportsListingFilterService.filterSports((SportsListingFilterDto) filters);
+        } else {
+            log.info("Unknown filter type, returning empty page");
+            result = Page.empty();
+        }
+
+        List<ListingDto> dtos = result.getContent();
+        enrichWithFavoriteStats(dtos, userEmail);
+
+        return new PageImpl<>(dtos, result.getPageable(), result.getTotalElements());
+    }
+
+
 
     public List<ListingDto> getListingsByUser(Long userId) {
         User user = userService.findById(userId);
         List<Listing> listings = listingRepository.findBySeller(user);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, null);
+        return dtos;
     }
 
 
     public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
         log.info("Getting listings for user: {} with status: {}", user.getEmail(), status);
         List<Listing> listings = listingRepository.findBySellerAndStatus(user, status);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, user.getEmail());
+        return dtos;
     }
 
     public List<ListingDto> findByStatusAsDto(ListingStatus status) {
         log.info("Getting all listings with status: {}", status);
         List<Listing> listings = listingRepository.findByStatus(status);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, null);
+        return dtos;
     }
 
     public List<ListingDto> getAllListings() {
@@ -101,45 +201,36 @@ public class ListingService {
     public List<ListingDto> getListingsByType(ListingType listingType) {
         log.info("Getting all listings with type: {}", listingType);
         List<Listing> listings = listingRepository.findByListingType(listingType);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, null);
+        return dtos;
     }
     
     public List<ListingDto> getActiveListingsByType(ListingType listingType) {
         log.info("Getting active listings with type: {}", listingType);
         List<Listing> listings = listingRepository.findByListingTypeAndStatus(listingType, ListingStatus.ACTIVE);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
+        
+        enrichWithFavoriteStats(dtos, null);
+        return dtos;
     }
     
     public List<ListingDto> getListingsByTypeOrderByDate(ListingType listingType) {
         log.info("Getting listings with type: {} ordered by date", listingType);
         List<Listing> listings = listingRepository.findByListingTypeOrderByCreatedAtDesc(listingType);
-        return listings.stream()
+        List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
-    }
-    
-    public Page<ListingDto> getListingsWithFilters(ListingFilterDto filters) {
-        log.info("Getting listings with filters: {}", filters);
         
-        FilterHelper.initializeFilter(filters);
-        
-        // Use the actual type of the filter DTO to determine which service to use
-        if (filters instanceof VehicleListingFilterDto) {
-            log.info("Using vehicle filter service");
-            return vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) filters);
-        } else if (filters instanceof ElectronicListingFilterDto) {
-            log.info("Using electronics filter service");
-            return electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) filters);
-        } else {
-            // Use base filter service for general filtering
-            log.info("Using base filter service");
-            return Page.empty();
-        }
+        enrichWithFavoriteStats(dtos, null);
+        return dtos;
     }
+
 
     @Transactional
     public void publish(UUID listingId) {

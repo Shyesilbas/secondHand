@@ -1,11 +1,14 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.listing.domain.dto.PriceHistoryDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.PriceHistory;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.mapper.PriceHistoryMapper;
 import com.serhat.secondhand.listing.domain.repository.PriceHistoryRepository;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class PriceHistoryService {
 
     private final PriceHistoryRepository priceHistoryRepository;
     private final PriceHistoryMapper priceHistoryMapper;
+    private final EmailService emailService;
+    private final FavoriteRepository favoriteRepository;
 
     public List<PriceHistoryDto> getPriceHistoryByListingId(UUID listingId) {
         return priceHistoryRepository.findByListingIdOrderByChangeDateDesc(listingId)
@@ -41,7 +46,6 @@ public class PriceHistoryService {
     @Transactional
     public void recordPriceChange(Listing listing, BigDecimal oldPrice, BigDecimal newPrice, 
                                  Currency currency, String changeReason) {
-        // İlk fiyat kaydı ise (oldPrice null), sadece yeni fiyatı kaydet
         if (oldPrice == null) {
             PriceHistory initialPrice = PriceHistory.builder()
                     .listing(listing)
@@ -57,7 +61,6 @@ public class PriceHistoryService {
             return;
         }
 
-        // Fiyat değişikliği varsa kaydet
         if (oldPrice.compareTo(newPrice) != 0) {
             PriceHistory priceHistory = PriceHistory.builder()
                     .listing(listing)
@@ -69,6 +72,15 @@ public class PriceHistoryService {
                     .build();
             
             priceHistoryRepository.save(priceHistory);
+
+            List<User> users = favoriteRepository.findUsersByListingId(listing.getId());
+
+            for (User user : users) {
+                emailService.sendPriceChangeEmail(user,
+                        listing.getTitle(),
+                        oldPrice.toPlainString(),
+                        newPrice.toPlainString());
+            }
             log.info("Price change recorded for listing: {}, from: {} to: {}", 
                     listing.getId(), oldPrice, newPrice);
         }
