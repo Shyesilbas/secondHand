@@ -182,4 +182,17 @@ export const API_ENDPOINTS = {
         LATEST: (listingId) => `/v1/price-history/listing/${listingId}/latest`,
         EXISTS: (listingId) => `/v1/price-history/listing/${listingId}/exists`,
     },
+    AUDIT_LOGS: {
+        USER_BY_EMAIL: (userEmail) => `/admin/audit-logs/user/${userEmail}`,
+        USER_BY_ID: (userId) => `/admin/audit-logs/user/id/${userId}`,
+        BY_EVENT_TYPE: (eventType) => `/admin/audit-logs/event-type/${eventType}`,
+        BY_DATE_RANGE: '/admin/audit-logs/date-range',
+        FAILED_ATTEMPTS_BY_USER: (userEmail) => `/admin/audit-logs/failed-attempts/user/${userEmail}`,
+        FAILED_ATTEMPTS_BY_IP: (ipAddress) => `/admin/audit-logs/failed-attempts/ip/${ipAddress}`,
+    },
+    AUDIT_ENUMS: {
+        EVENT_TYPES: '/audit/enums/event-types',
+        EVENT_STATUSES: '/audit/enums/event-statuses',
+        ALL: '/audit/enums/all',
+    },
 };
