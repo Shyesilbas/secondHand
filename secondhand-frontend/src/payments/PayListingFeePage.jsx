@@ -73,11 +73,19 @@ const PayListingFeePage = () => {
 
             {draftListings.length === 0 ? (
                 <EmptyState
-                    icon="clipboard"
                     title="No Draft Listings"
-                    description="No draft listings found. You can create a new listing by clicking the button below."
-                    actionText="Create Listing"
-                    onAction={() => navigate('/listings/create')}
+                    description={
+                        <>
+                            No draft listings found. You can create a new listing by{' '}
+                            <button
+                                onClick={() => navigate('/listings/create')}
+                                className="text-blue-600 hover:text-blue-800 underline font-medium transition-colors"
+                            >
+                                clicking here
+                            </button>
+                            .
+                        </>
+                    }
                 />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

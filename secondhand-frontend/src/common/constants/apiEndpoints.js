@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
         RESET_PASSWORD: '/auth/password/reset',
         CHANGE_PASSWORD: '/auth/password/change',
         VALIDATE: '/auth/validate',
+        REVOKE_ALL_SESSIONS: '/auth/revoke-all-sessions',
     },
     USER: {
         ME: '/v1/users/me',

@@ -85,6 +85,9 @@ export const listingService = {
   getMyListings: async () => {
     return get(API_ENDPOINTS.LISTINGS.MY_LISTINGS);
   },
+  getMyListingsByStatus: async (status) => {
+    return get(`${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}`);
+  },
   getListingById: async (id) => {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
   },

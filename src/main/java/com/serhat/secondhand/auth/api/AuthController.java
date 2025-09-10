@@ -84,4 +84,20 @@ public class AuthController {
         LoginResponse response = authService.completeOAuthRegistration(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/revoke-all-sessions")
+    @Operation(summary = "Revoke all user sessions", description = "Invalidates all active sessions for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "All sessions revoked successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<Map<String, String>> revokeAllSessions(
+            Authentication authentication,
+            HttpServletRequest request) {
+        
+        log.info("Revoke all sessions request for user: {}", authentication.getName());
+        Map<String, String> response = authService.revokeAllSessions(authentication, request);
+        return ResponseEntity.ok(response);
+    }
 }

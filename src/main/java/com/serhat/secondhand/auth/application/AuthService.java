@@ -9,6 +9,7 @@ import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
+import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.email.application.EmailService;
@@ -53,11 +54,10 @@ public class AuthService {
     private final EmailService emailService;
     private final UserAgreementService userAgreementService;
     private final AgreementService agreementService;
+    private final AuditLogService auditLogService;
 
     public RegisterResponse register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
-
-
 
         userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
 
@@ -323,6 +323,47 @@ public class AuthService {
         );
 
         return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);
+    }
+
+    public Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request) {
+        String username = authentication.getName();
+        User user = userService.findByEmail(username);
+        
+        log.info("Revoking all sessions for user: {}", username);
+        
+        // Revoke all tokens for the user
+        tokenService.revokeAllUserTokens(user);
+        
+        // Log the revoke action for audit
+        String ipAddress = getClientIpAddress(request);
+        String userAgent = getClientUserAgent(request);
+        auditLogService.logLogout(username, user.getId(), ipAddress, userAgent);
+        
+        log.info("All sessions revoked successfully for user: {}", username);
+        
+        return Map.of(
+            "message", "All sessions have been revoked successfully",
+            "status", "success",
+            "revokedSessions", "all"
+        );
+    }
+
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+        
+        return request.getRemoteAddr();
+    }
+
+    private String getClientUserAgent(HttpServletRequest request) {
+        return request.getHeader("User-Agent");
     }
 
 }
