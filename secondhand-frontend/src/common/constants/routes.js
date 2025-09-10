@@ -31,4 +31,5 @@ export const ROUTES = {
     AGREEMENTS: '/agreements',
     AGREEMENTS_ALL: '/agreements/all',
     SECURITY: '/security',
+    SHOPPING_CART: '/cart',
 };
