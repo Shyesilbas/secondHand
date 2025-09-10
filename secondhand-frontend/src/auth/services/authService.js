@@ -44,4 +44,6 @@ export const authService = {
     },
 
     validateToken: async () => get(API_ENDPOINTS.AUTH.VALIDATE),
+
+    revokeAllSessions: async () => post(API_ENDPOINTS.AUTH.REVOKE_ALL_SESSIONS),
 };

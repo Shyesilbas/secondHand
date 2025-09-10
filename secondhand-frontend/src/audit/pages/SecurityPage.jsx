@@ -8,12 +8,16 @@ import {
     ComputerDesktopIcon,
     ArrowLeftIcon,
     FunnelIcon,
-    XMarkIcon
+    XMarkIcon,
+    NoSymbolIcon
 } from '@heroicons/react/24/outline';
 import { useAuditLogs } from '../hooks/useAuditLogs.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import { formatDateTime } from '../../common/formatters.js';
+import { ROUTES } from '../../common/constants/routes.js';
+import { authService } from '../../auth/services/authService.js';
+import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
 
 const SecurityPage = () => {
     const navigate = useNavigate();
@@ -24,6 +28,8 @@ const SecurityPage = () => {
         endDate: ''
     });
     const [showFilters, setShowFilters] = useState(false);
+    const [showRevokeModal, setShowRevokeModal] = useState(false);
+    const [isRevoking, setIsRevoking] = useState(false);
     
     const { 
         auditLogs, 
@@ -32,7 +38,9 @@ const SecurityPage = () => {
         error, 
         getEventTypeDisplay, 
         getEventStatusColor, 
-        getEventTypeIcon 
+        getEventTypeIcon,
+        getLastPasswordChangeDate,
+        getPasswordAgeStatus
     } = useAuditLogs(filters);
     
     const [selectedLog, setSelectedLog] = useState(null);
@@ -75,10 +83,27 @@ const SecurityPage = () => {
     };
 
     const hasActiveFilters = () => {
-        return filters.eventType !== 'ALL' || 
-               filters.eventStatus !== 'ALL' || 
-               filters.startDate || 
+        return filters.eventType !== 'ALL' ||
+               filters.eventStatus !== 'ALL' ||
+               filters.startDate ||
                filters.endDate;
+    };
+
+    const handleRevokeAllSessions = async () => {
+        setIsRevoking(true);
+        try {
+            await authService.revokeAllSessions();
+            setShowRevokeModal(false);
+            // Show success message and redirect to login
+            alert('All sessions have been revoked successfully. You will be redirected to login.');
+            // Redirect to login page
+            window.location.href = '/login';
+        } catch (error) {
+            console.error('Failed to revoke sessions:', error);
+            alert('Failed to revoke sessions. Please try again.');
+        } finally {
+            setIsRevoking(false);
+        }
     };
 
     if (isLoading) {
@@ -123,26 +148,73 @@ const SecurityPage = () => {
                         <p className="text-gray-600 mt-1">Monitor your account security and login activity</p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                    <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                            showFilters || hasActiveFilters() 
-                                ? 'bg-blue-100 text-blue-700' 
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                    >
-                        <FunnelIcon className="w-4 h-4" />
-                        <span>Filters</span>
-                        {hasActiveFilters() && (
-                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                                {[filters.eventType !== 'ALL', filters.eventStatus !== 'ALL', filters.startDate, filters.endDate].filter(Boolean).length}
+                            <div className="flex items-center space-x-3">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                                        showFilters || hasActiveFilters()
+                                            ? 'bg-blue-100 text-blue-700'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    <FunnelIcon className="w-4 h-4" />
+                                    <span>Filters</span>
+                                    {hasActiveFilters() && (
+                                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                                            {[filters.eventType !== 'ALL', filters.eventStatus !== 'ALL', filters.startDate, filters.endDate].filter(Boolean).length}
+                                        </span>
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => setShowRevokeModal(true)}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                                >
+                                    <NoSymbolIcon className="w-4 h-4" />
+                                    <span>Revoke All Sessions</span>
+                                </button>
+                                <div className="flex items-center space-x-2 bg-green-100 px-4 py-2 rounded-full">
+                                    <ShieldCheckIcon className="w-5 h-5 text-green-600" />
+                                    <span className="text-sm font-medium text-green-800">Account Secure</span>
+                                </div>
+                            </div>
+            </div>
+
+            {/* Security Recommendation */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                        <ShieldCheckIcon className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="text-sm font-medium text-blue-800 mb-1">Security Recommendation</h3>
+                        <p className="text-sm text-blue-700">
+                            For your security, we recommend changing your password at least every 6 months.{' '}
+                            <button
+                                onClick={() => navigate('/change-password')}
+                                className="text-blue-600 hover:text-blue-800 underline font-medium transition-colors"
+                            >
+                                Change your password
+                            </button>
+                        </p>
+                        
+                        {/* Password Age Info */}
+                        <p className="text-sm text-blue-700 mt-2">
+                            Your password was last changed{' '}
+                            <span className={`font-semibold ${
+                                getPasswordAgeStatus().color === 'green' ? 'text-green-600' :
+                                getPasswordAgeStatus().color === 'yellow' ? 'text-yellow-600' :
+                                getPasswordAgeStatus().color === 'orange' ? 'text-orange-600' :
+                                getPasswordAgeStatus().color === 'red' ? 'text-red-600' :
+                                'text-gray-600'
+                            }`}>
+                                {getPasswordAgeStatus().message}
                             </span>
-                        )}
-                    </button>
-                    <div className="flex items-center space-x-2 bg-green-100 px-4 py-2 rounded-full">
-                        <ShieldCheckIcon className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-medium text-green-800">Account Secure</span>
+                            {getLastPasswordChangeDate() && (
+                                <span className="text-blue-600 ml-1">
+                                    ({formatTime(getLastPasswordChangeDate())})
+                                </span>
+                            )}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -262,6 +334,7 @@ const SecurityPage = () => {
                         </div>
                     </div>
                 </div>
+
             </div>
 
             {/* Security Logs */}
@@ -402,6 +475,14 @@ const SecurityPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Revoke Sessions Modal */}
+            <RevokeSessionsModal
+                isOpen={showRevokeModal}
+                onClose={() => setShowRevokeModal(false)}
+                onConfirm={handleRevokeAllSessions}
+                isLoading={isRevoking}
+            />
         </div>
     );
 };
