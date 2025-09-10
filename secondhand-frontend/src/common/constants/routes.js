@@ -30,4 +30,5 @@ export const ROUTES = {
     CHAT: '/chat',
     AGREEMENTS: '/agreements',
     AGREEMENTS_ALL: '/agreements/all',
+    SECURITY: '/security',
 };

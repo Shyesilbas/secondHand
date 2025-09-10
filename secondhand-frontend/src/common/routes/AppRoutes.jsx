@@ -34,6 +34,7 @@ import OAuthCompletePage from '../../auth/OAuthCompletePage.jsx';
 import AgreementsPage from '../../agreements/pages/AgreementsPage.jsx';
 import ChatPage from '../../chat/ChatPage.jsx';
 import UserProfilePage from '../../user/UserProfilePage.jsx';
+import SecurityPage from '../../audit/pages/SecurityPage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -159,6 +160,7 @@ const AppRoutes = () => {
                   <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
                   <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />
                   <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
+                  <Route path={ROUTES.SECURITY} element={<SecurityPage />} />
             </Route>
 
             {/* Fallback */}
