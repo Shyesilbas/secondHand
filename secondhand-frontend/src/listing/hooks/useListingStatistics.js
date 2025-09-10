@@ -7,8 +7,7 @@ export const useListingStatistics = () => {
     const { data, isLoading, error, callApi } = useApi({ ...ListingStatisticsDTO });
 
     useEffect(() => {
-        callApi(listingService.getListingStatistics);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        useApi(listingService.getListingStatistics);
     }, []);
 
     return {

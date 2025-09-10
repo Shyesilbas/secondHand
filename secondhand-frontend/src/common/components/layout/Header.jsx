@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.jsx';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UserSearchBar from '../../../user/components/UserSearchBar.jsx';
+import { chatService } from '../../../chat/services/chatService.js';
 
 const icons = {
     myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -26,6 +27,26 @@ const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
     const notification = useNotification();
+    const [totalUnread, setTotalUnread] = useState(0);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const fetchUnread = async () => {
+            try {
+                const res = await chatService.getTotalUnreadMessageCount(user.id);
+                setTotalUnread(res || 0);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchUnread();
+    }, [isAuthenticated, user?.id]);
+
+    const handleChatClick = () => {
+        setTotalUnread(0);
+    };
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -60,7 +81,7 @@ const Header = () => {
     const userLinks = [
         { to: ROUTES.FAVORITES, label: 'Favorites', icon: icons.favorites },
         { to: ROUTES.EMAILS, label: 'E-mails', icon: icons.emails },
-        { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat },
+        { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat, onClick: handleChatClick },
     ];
 
     const userMenuItems = [
@@ -94,11 +115,20 @@ const Header = () => {
                         )}
 
                         {isAuthenticated && userLinks.map(link => (
-                            <Link key={link.to} to={link.to} className={linkClass}>
-                                <link.icon />
-                                <span>{link.label}</span>
+                            <Link key={link.to} to={link.to} onClick={link.onClick} className="relative flex items-center">
+                                <div className={linkClass}>
+                                    <link.icon />
+                                    <span>{link.label}</span>
+                                </div>
+
+                                {link.to === ROUTES.CHAT && totalUnread > 0 && (
+                                    <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow-lg animate-pulse">
+                {totalUnread > 99 ? '99+' : totalUnread}
+            </span>
+                                )}
                             </Link>
                         ))}
+
                     </nav>
 
                     <div className="flex items-center space-x-4">

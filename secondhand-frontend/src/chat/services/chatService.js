@@ -34,5 +34,10 @@ export const chatService = {
 
     getTotalUnreadMessageCount: async (userId) => {
         return request('GET', API_ENDPOINTS.CHAT.TOTAL_UNREAD_COUNT(userId));
+    },
+
+    getChatRoomUnreadCount: async (chatRoomId, userId) => {
+        return request('GET', API_ENDPOINTS.CHAT.UNREAD_COUNT(chatRoomId, userId));
     }
+
 };

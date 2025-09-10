@@ -1,13 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { useListingStatistics } from '../listing/hooks/useListingStatistics.js';
 import { ROUTES } from '../common/constants/routes.js';
 import ListingCategories from '../listing/components/ListingCategories.jsx';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
-    const { statistics, isLoading: statsLoading } = useListingStatistics();
 
     return (
         <div className="min-h-screen bg-app-bg">

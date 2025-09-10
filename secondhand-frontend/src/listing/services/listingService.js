@@ -1,6 +1,6 @@
-import {get, post } from '../../common/services/api/request.js';
+import {get, post, put, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { LISTING_TYPES, ERROR_MESSAGES } from '../types/index.js';
+import { LISTING_TYPES } from '../types/index.js';
 
 const withErrorHandling = async (operation, errorMessage) => {
   try {
@@ -87,6 +87,30 @@ export const listingService = {
   },
   getListingById: async (id) => {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
+  },
+  getListingByUserId: async (userId) => {
+    return get(API_ENDPOINTS.LISTINGS.BY_USER(userId));
+  },
+  getListingByNo: async (no) => {
+    return get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(no));
+  },
+  getCountsForTypes: async (listingType) => {
+    return get(API_ENDPOINTS.LISTINGS.COUNTS_FOR_TYPES(listingType));
+  },
+  deactivateListing: async (id) => {
+    return put(API_ENDPOINTS.LISTINGS.DEACTIVATE(id));
+  },
+  activateListing: async (id) => {
+    return put(API_ENDPOINTS.LISTINGS.ACTIVATE(id));
+  },
+  markListingSold: async (id) => {
+    return put(API_ENDPOINTS.LISTINGS.MARK_SOLD(id));
+  },
+  deleteListing: async (id) => {
+    return del(API_ENDPOINTS.LISTINGS.DELETE(id));
+  },
+  getListingStatistics: async (listingType) => {
+    return get(API_ENDPOINTS.LISTINGS.STATISTICS(listingType));
   },
 
   filterListings: async (filters) => {

@@ -24,7 +24,6 @@ export const API_ENDPOINTS = {
     LISTINGS: {
         ALL: '/v1/listings/allListings',
         MY_LISTINGS: '/v1/listings/my-listings',
-        BY_STATUS: (status) => `/v1/listings/my-listings/status/${status}`,
         BY_ID: (id) => `/v1/listings/${id}`,
         BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
         CREATE: '/v1/listings',
@@ -143,7 +142,6 @@ export const API_ENDPOINTS = {
 
     },
     AGREEMENTS: {
-        // Base: API_BASE_URL already includes /api
         INITIALIZE: '/agreements/initialize',
         ALL: '/agreements',
         REQUIRED: '/agreements/required',
@@ -167,7 +165,7 @@ export const API_ENDPOINTS = {
         SEND_MESSAGE: '/chat/messages',
         ROOM_MESSAGES: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages`,
         MARK_READ: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/read`,
-        UNREAD_COUNT: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/unread-count`,
+        UNREAD_COUNT: (chatRoomId, userId) => `/chat/rooms/${chatRoomId}/messages/unread-count?userId=${userId}`,
         
         ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
         TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,

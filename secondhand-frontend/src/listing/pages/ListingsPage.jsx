@@ -32,7 +32,6 @@ const ListingsPage = () => {
     } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
 
     const { getListingTypeLabel } = useEnums();
-    const notification = useNotification();
 
     useEffect(() => {
         if (initialListingType) {

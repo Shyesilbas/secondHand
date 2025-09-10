@@ -16,7 +16,6 @@ const ListingCategories = () => {
       const res = await listingService.getCountsForTypes(types).catch(() => ({}));
       setData(res || {});
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enums.listingTypes?.length]);
 
   if (isLoading) {
