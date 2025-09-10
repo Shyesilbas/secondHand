@@ -196,4 +196,13 @@ export const API_ENDPOINTS = {
         EVENT_STATUSES: '/audit/enums/event-statuses',
         ALL: '/audit/enums/all',
     },
+    CART: {
+        GET_ITEMS: '/v1/cart',
+        ADD_ITEM: '/v1/cart/add',
+        UPDATE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
+        REMOVE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
+        CLEAR_CART: '/v1/cart/clear',
+        GET_COUNT: '/v1/cart/count',
+        CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
+    },
 };

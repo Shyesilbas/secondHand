@@ -4,14 +4,17 @@ import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStats.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
+import AddToCartButton from '../../cart/components/AddToCartButton.jsx';
 import PriceHistoryModal from './PriceHistoryModal.jsx';
 import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 const ListingCard = memo(({ listing, onDeleted }) => {
     const [showPriceHistory, setShowPriceHistory] = useState(false);
     const { priceHistory, fetchPriceHistory } = usePriceHistory(listing?.id);
+    const { user } = useAuth();
 
     const handlePriceHistoryClick = useCallback((e) => {
         e.preventDefault();
@@ -34,6 +37,14 @@ const ListingCard = memo(({ listing, onDeleted }) => {
             default: return 'bg-gray-100 text-gray-800';
         }
     };
+
+    const canShowCartButton =
+        listing.sellerId &&
+        user?.id &&
+        listing.sellerId !== user.id &&
+        listing.status === 'ACTIVE' &&
+        !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
+
 
     return (
         <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
@@ -67,13 +78,30 @@ const ListingCard = memo(({ listing, onDeleted }) => {
 
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex flex-col">
-                            <span className="text-2xl font-bold text-blue-600">
-                                {formatCurrency(listing.price, listing.currency)}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-2xl font-bold text-blue-600">
+                                    {formatCurrency(listing.price, listing.currency)}
+                                </span>
+                                <button
+                                    onClick={handlePriceHistoryClick}
+                                    className="p-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                    title="View Price History"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         strokeWidth={1.5}
+                                         stroke="currentColor"
+                                         className="w-5 h-5">
+                                        <path strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
                             {listing.createdAt && (
                                 <span className="text-xs text-gray-400 mt-1">
-                                    Created At
-                                    : {listing.createdAt}
+                                    Created At: {listing.createdAt}
                                 </span>
                             )}
                         </div>
@@ -102,7 +130,10 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                     </div>
                     <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
                 </div>
-                <ListingCardActions listing={listing} onChanged={onDeleted} />
+                <div className="flex items-center space-x-2">
+                    {canShowCartButton && <AddToCartButton listing={listing} size="sm" />}
+                    <ListingCardActions listing={listing} onChanged={onDeleted} />
+                </div>
             </div>
 
             <PriceHistoryModal
