@@ -1,12 +1,10 @@
 package com.serhat.secondhand.order.entity;
 
+import com.serhat.secondhand.shipping.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.Address;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -77,6 +75,10 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 
+    @Enumerated(EnumType.STRING)
+    private ShippingStatus statusOfShipping;
+
+    @Getter
     public enum OrderStatus {
         PENDING("Pending"),
         CONFIRMED("Confirmed"),
@@ -92,11 +94,9 @@ public class Order {
             this.displayName = displayName;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 
+    @Getter
     public enum PaymentStatus {
         PENDING("Pending"),
         PAID("Paid"),
@@ -109,8 +109,5 @@ public class Order {
             this.displayName = displayName;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 }

@@ -13,6 +13,8 @@ import com.serhat.secondhand.payment.service.PaymentService;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.shipping.ShippingService;
+import com.serhat.secondhand.shipping.ShippingStatus;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.Address;
@@ -43,27 +45,23 @@ public class OrderService {
     private final PaymentService paymentService;
     private final com.serhat.secondhand.email.application.EmailService emailService;
     private final UserService userService;
+    private final ShippingService shippingService;
 
-    /**
-     * Create order from cart items and process payment
-     */
+
     public OrderDto checkout(User user, CheckoutRequest request) {
         log.info("Processing checkout for user: {}", user.getEmail());
 
-        // Get user's cart items
         List<Cart> cartItems = cartRepository.findByUserWithListing(user);
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
-        // Validate shipping address
         Address shippingAddress = addressService.getAddressById(request.getShippingAddressId());
 
         if (!shippingAddress.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Address does not belong to user");
         }
 
-        // Get billing address (optional)
         Address billingAddress = null;
         if (request.getBillingAddressId() != null) {
             billingAddress = addressService.getAddressById(request.getBillingAddressId());
@@ -73,15 +71,12 @@ public class OrderService {
             }
         }
 
-        // Calculate total amount
         BigDecimal totalAmount = cartItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Generate order number
         String orderNumber = generateOrderNumber();
 
-        // Create order
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .user(user)
@@ -90,6 +85,7 @@ public class OrderService {
                 .currency("TRY")
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
+                .statusOfShipping(ShippingStatus.PENDING)
                 .notes(request.getNotes())
                 .paymentStatus(Order.PaymentStatus.PENDING)
                 .build();
@@ -147,7 +143,6 @@ public class OrderService {
 
             boolean allPaid = results.stream().allMatch(com.serhat.secondhand.payment.dto.PaymentDto::isSuccess);
 
-            // Update order based on aggregate payment result
             savedOrder.setPaymentReference(results.get(0).paymentId().toString());
             savedOrder.setPaymentStatus(allPaid ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
             savedOrder.setStatus(allPaid ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
@@ -156,11 +151,9 @@ public class OrderService {
 
             if (allPaid) {
                 try {
-                    // Map to DTO and send order confirmation email
                     OrderDto orderDto = orderMapper.toDto(savedOrder);
                     emailService.sendOrderConfirmationEmail(user, orderDto);
                     
-                    // Send seller notification emails
                     sendSellerNotifications(orderDto);
                 } catch (Exception e) {
                     log.warn("Order confirmation email could not be sent for order {}: {}", orderNumber, e.getMessage());
@@ -168,7 +161,6 @@ public class OrderService {
             }
 
             if (allPaid) {
-                // Clear cart after successful payment(s)
                 cartRepository.deleteByUser(user);
                 log.info("Payment processed successfully for order: {} ({} sub-payments)", orderNumber, results.size());
             } else {
@@ -176,12 +168,12 @@ public class OrderService {
             }
 
         } catch (com.serhat.secondhand.core.exception.BusinessException e) {
-            // Handle business exceptions (like insufficient funds) without transaction rollback
+
             log.error("Payment failed for order: {} - {}", orderNumber, e.getMessage());
             savedOrder.setPaymentStatus(Order.PaymentStatus.FAILED);
             savedOrder.setStatus(Order.OrderStatus.CANCELLED);
             orderRepository.save(savedOrder);
-            throw e; // Re-throw the BusinessException so it can be handled by the global exception handler
+            throw e;
         } catch (Exception e) {
             log.error("Payment failed for order: {}", orderNumber, e);
             savedOrder.setPaymentStatus(Order.PaymentStatus.FAILED);
@@ -193,19 +185,19 @@ public class OrderService {
         return orderMapper.toDto(savedOrder);
     }
 
-    /**
-     * Get user's orders
-     */
+
     @Transactional(readOnly = true)
     public Page<OrderDto> getUserOrders(User user, Pageable pageable) {
         log.info("Getting orders for user: {}", user.getEmail());
         Page<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+
+        shippingService.updateShippingStatusesForOrders(orders.getContent());
+
         return orders.map(orderMapper::toDto);
     }
 
-    /**
-     * Get order by ID
-     */
+
+
     @Transactional(readOnly = true)
     public OrderDto getOrderById(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
@@ -215,12 +207,12 @@ public class OrderService {
             throw new RuntimeException("Order does not belong to user");
         }
 
+        shippingService.calculateShippingStatus(order);
+
         return orderMapper.toDto(order);
     }
 
-    /**
-     * Get order by order number
-     */
+
     @Transactional(readOnly = true)
     public OrderDto getOrderByOrderNumber(String orderNumber, User user) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
@@ -230,12 +222,12 @@ public class OrderService {
             throw new RuntimeException("Order does not belong to user");
         }
 
+        shippingService.calculateShippingStatus(order);
+
         return orderMapper.toDto(order);
     }
 
-    /**
-     * Cancel order
-     */
+
     public OrderDto cancelOrder(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));

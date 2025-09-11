@@ -139,7 +139,6 @@ public class PaymentService {
             throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
         }
 
-        // Validate payment type
         if (paymentRequest.paymentType() == null) {
             throw new BusinessException("Payment type is required", HttpStatus.BAD_REQUEST, "PAYMENT_TYPE_REQUIRED");
         }

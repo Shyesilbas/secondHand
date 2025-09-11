@@ -39,6 +39,7 @@ public class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .orderItems(orderItemsToDtoList(order.getOrderItems()))
+                .shippingStatus(order.getStatusOfShipping())
                 .build();
     }
 
