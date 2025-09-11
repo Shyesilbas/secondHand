@@ -22,6 +22,7 @@ import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import org.mapstruct.*;
+import org.hibernate.Hibernate;
 
 
 @Mapper(
@@ -107,26 +108,16 @@ public interface ListingMapper {
 
 
     default ListingDto toDynamicDto(Listing listing) {
-        if (listing instanceof VehicleListing) {
-            return toVehicleDto((VehicleListing) listing);
-        }
-        if(listing instanceof ElectronicListing) {
-            return toElectronicDto((ElectronicListing) listing);
-        }
-        if(listing instanceof RealEstateListing) {
-            return toRealEstateDto((RealEstateListing) listing);
-        }
-        if(listing instanceof ClothingListing) {
-            return toClothingDto((ClothingListing) listing);
-        }
-        if(listing instanceof BooksListing) {
-            return toBooksDto((BooksListing) listing);
-        }
-        if(listing instanceof SportsListing) {
-            return toSportsDto((SportsListing) listing);
-        }
-
-        throw new IllegalArgumentException("Unknown listing type: " + listing.getClass().getSimpleName());
+        Listing unproxied = (Listing) Hibernate.unproxy(listing);
+        return switch (unproxied.getListingType()) {
+            case VEHICLE -> toVehicleDto((VehicleListing) unproxied);
+            case ELECTRONICS -> toElectronicDto((ElectronicListing) unproxied);
+            case REAL_ESTATE -> toRealEstateDto((RealEstateListing) unproxied);
+            case CLOTHING -> toClothingDto((ClothingListing) unproxied);
+            case BOOKS -> toBooksDto((BooksListing) unproxied);
+            case SPORTS -> toSportsDto((SportsListing) unproxied);
+            default -> throw new IllegalArgumentException("Unknown listing type: " + unproxied.getListingType());
+        };
     }
     
     // no-op

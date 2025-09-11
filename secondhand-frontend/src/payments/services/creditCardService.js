@@ -1,13 +1,16 @@
-import { get, post, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { get, post, del } from '../../common/services/api/request.js';
 
 export const creditCardService = {
-  getAllCreditCards: async () => {
-    const data = await get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
-    return Array.isArray(data) ? data : [data].filter(Boolean);
+  getAll: async () => {
+    return get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
   },
 
-  createCreditCard: async () => post(API_ENDPOINTS.CREDIT_CARDS.CREATE),
+  createCreditCard: async (limit) => {
+    return post(API_ENDPOINTS.CREDIT_CARDS.CREATE, { limit });
+  },
 
-  deleteCreditCard: async () => del(API_ENDPOINTS.CREDIT_CARDS.DELETE),
+  deleteCreditCard: async () => {
+    return del(API_ENDPOINTS.CREDIT_CARDS.DELETE);
+  }
 };

@@ -17,6 +17,8 @@ public interface CreditCardMapper {
     @Mapping(target = "expiryYear", expression = "java(String.valueOf(card.getExpiryYear()))")
     @Mapping(target = "amount", expression = "java(card.getAmount().toString())")
     @Mapping(target = "limit", expression = "java(card.getLimit().toString())")
+    @Mapping(target = "totalSpent", expression = "java(card.getAmount().toString())")
+    @Mapping(target = "limitLeft", expression = "java(card.getLimit().subtract(card.getAmount()).toString())")
     CreditCardDto toDto(CreditCard card);
 
     @Named("mask")

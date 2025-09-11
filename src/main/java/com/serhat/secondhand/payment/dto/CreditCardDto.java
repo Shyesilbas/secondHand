@@ -6,6 +6,8 @@ public record CreditCardDto(
         String expiryMonth,
         String expiryYear,
         String amount,
-        String limit
+        String limit,
+        String totalSpent,
+        String limitLeft
 ) {
 }

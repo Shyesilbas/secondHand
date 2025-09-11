@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.order.dto.OrderDto;
+import com.serhat.secondhand.order.dto.OrderItemDto;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +70,12 @@ public class EmailService {
     @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for 15 minutes.}")
     private String paymentVerificationContentTemplate;
 
+    @Value("${app.email.orderConfirmation.subject:SecondHand - Order Confirmation}")
+    private String orderConfirmationSubject;
+
+    @Value("${app.email.saleNotification.subject:SecondHand - Your Item Has Been Sold!}")
+    private String saleNotificationSubject;
+
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {
         String subject = verificationSubject;
         String content = String.format(verificationContentTemplate, user.getName(), verificationCode);
@@ -101,6 +109,119 @@ public class EmailService {
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
         log.info("Payment verification email sent successfully with ID: {}", result.id());
         return result;
+    }
+
+    public EmailDto sendOrderConfirmationEmail(User user, OrderDto order) {
+        log.info("Sending order confirmation email to user: {} for order: {}", user.getEmail(), order.getOrderNumber());
+        String subject = orderConfirmationSubject;
+        String content = buildOrderConfirmationContent(user, order);
+        EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
+        log.info("Order confirmation email sent successfully with ID: {}", result.id());
+        return result;
+    }
+
+    private String buildOrderConfirmationContent(User user, OrderDto order) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hello ").append(user.getName()).append(",\n\n");
+        sb.append("Thank you for your purchase! Your order has been confirmed.\n\n");
+        sb.append("Order Number: ").append(order.getOrderNumber()).append('\n');
+        sb.append("Status: ").append(order.getStatus()).append('\n');
+        sb.append("Payment Status: ").append(order.getPaymentStatus()).append('\n');
+        sb.append("Total: ").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("\n");
+        if (order.getShippingAddress() != null) {
+            sb.append("\nShipping Address:\n");
+            sb.append(order.getShippingAddress().getAddressLine()).append('\n');
+            sb.append(order.getShippingAddress().getCity()).append(' ')
+              .append(order.getShippingAddress().getState()).append(' ')
+              .append(order.getShippingAddress().getPostalCode()).append('\n');
+            sb.append(order.getShippingAddress().getCountry()).append('\n');
+        }
+        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            sb.append("\nItems:\n");
+            order.getOrderItems().forEach(it -> {
+                String title = null;
+                try {
+                    var listingField = it.getClass().getDeclaredField("listing");
+                    listingField.setAccessible(true);
+                    Object listing = listingField.get(it);
+                    if (listing != null) {
+                        try {
+                            var getTitle = listing.getClass().getMethod("getTitle");
+                            Object val = getTitle.invoke(listing);
+                            title = val != null ? String.valueOf(val) : null;
+                        } catch (Exception ignored) {}
+                        if (title == null) {
+                            try {
+                                var getListingNo = listing.getClass().getMethod("getListingNo");
+                                Object val = getListingNo.invoke(listing);
+                                title = val != null ? String.valueOf(val) : null;
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                } catch (Exception ignored) {}
+                if (title == null) title = "Item";
+                sb.append("- ").append(title)
+                  .append(" x").append(it.getQuantity())
+                  .append(" — ").append(it.getTotalPrice()).append(' ').append(order.getCurrency())
+                  .append('\n');
+            });
+        }
+        if (order.getNotes() != null && !order.getNotes().isBlank()) {
+            sb.append("\nNotes: ").append(order.getNotes()).append('\n');
+        }
+        if (order.getPaymentReference() != null) {
+            sb.append("Payment Reference: ").append(order.getPaymentReference()).append('\n');
+        }
+        sb.append("\nBest regards,\nSecondHand Team\n");
+        return sb.toString();
+    }
+
+    public EmailDto sendSaleNotificationEmail(User seller, OrderDto order, List<OrderItemDto> sellerItems) {
+        log.info("Sending sale notification email to seller: {} for order: {}", seller.getEmail(), order.getOrderNumber());
+        String subject = saleNotificationSubject;
+        String content = buildSaleNotificationContent(seller, order, sellerItems);
+        EmailDto result = sendAndSaveEmail(seller, subject, content, EmailType.NOTIFICATION);
+        log.info("Sale notification email sent successfully with ID: {}", result.id());
+        return result;
+    }
+
+    private String buildSaleNotificationContent(User seller, OrderDto order, List<OrderItemDto> sellerItems) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hello ").append(seller.getName()).append(",\n\n");
+        sb.append("Great news! Your item(s) have been sold!\n\n");
+        sb.append("Order Number: ").append(order.getOrderNumber()).append('\n');
+        sb.append("Buyer: ").append(order.getUserId()).append('\n');
+        sb.append("Total Amount: ").append(sellerItems.stream()
+                .map(OrderItemDto::getTotalPrice)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add))
+                .append(' ').append(order.getCurrency()).append("\n\n");
+        
+        sb.append("Sold Items:\n");
+        sellerItems.forEach(item -> {
+            String title = "Item";
+            if (item.getListing() != null) {
+                title = item.getListing().getTitle() != null ? item.getListing().getTitle() : 
+                       (item.getListing().getListingNo() != null ? item.getListing().getListingNo() : "Item");
+            }
+            sb.append("- ").append(title)
+              .append(" x").append(item.getQuantity())
+              .append(" — ").append(item.getTotalPrice()).append(' ').append(order.getCurrency())
+              .append('\n');
+        });
+        
+        if (order.getShippingAddress() != null) {
+            sb.append("\nShipping Address:\n");
+            sb.append(order.getShippingAddress().getAddressLine()).append('\n');
+            sb.append(order.getShippingAddress().getCity()).append(' ')
+              .append(order.getShippingAddress().getState()).append(' ')
+              .append(order.getShippingAddress().getPostalCode()).append('\n');
+            sb.append(order.getShippingAddress().getCountry()).append('\n');
+        }
+        
+        sb.append("\nPlease prepare the item(s) for shipping and contact the buyer if needed.\n");
+        sb.append("Thank you for using SecondHand!\n\n");
+        sb.append("Best regards,\nSecondHand Team\n");
+        return sb.toString();
     }
 
     public EmailDto sendPriceChangeEmail(User user, String listingTitle, String oldPriceStr, String newPriceStr) {

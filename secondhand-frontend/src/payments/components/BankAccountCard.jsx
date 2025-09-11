@@ -30,6 +30,14 @@ const BankAccountCard = ({ account, onDelete, isDeleting }) => {
                             {account.IBAN}
                         </span>
                     </div>
+                    {typeof account.balance !== 'undefined' && (
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-text-secondary">Balance</span>
+                            <span className="text-sm font-mono text-text-primary">
+                                {account.balance}
+                            </span>
+                        </div>
+                    )}
                 </div>
                 <div className="space-y-3">
                     <div className="flex justify-between items-center">

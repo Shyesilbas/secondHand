@@ -4,16 +4,13 @@ import com.serhat.secondhand.user.domain.dto.AddressDto;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.AddressRepository;
-import com.serhat.secondhand.user.domain.repository.UserRepository;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,4 +78,8 @@ public class AddressService {
         addressRepository.save(address);
     }
 
+    public Address getAddressById(@NotNull(message = "Shipping address ID is required") Long shippingAddressId) {
+        return addressRepository.findById(shippingAddressId)
+                .orElseThrow(() -> new IllegalArgumentException("Shipping address not found"));
+    }
 }

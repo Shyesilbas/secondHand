@@ -19,7 +19,7 @@ const CreditCardItem = ({ card, onDelete, isDeleting }) => {
 
                 <div className="mb-6">
                     <p className="text-lg font-mono tracking-wider">
-                        {card.number || card.cardNumber || 'N/A'}
+                        {card.number || card.cardNumber || '**** **** **** ' + (card.last4 || 'XXXX')}
                     </p>
                 </div>
 
@@ -33,8 +33,19 @@ const CreditCardItem = ({ card, onDelete, isDeleting }) => {
                     <div className="text-right">
                         <p className="text-xs opacity-80 uppercase tracking-wide">Expires</p>
                         <p className="text-sm font-medium">
-                            {card.expiryMonth || 'MM'}/{card.expiryYear || 'YY'}
+                            {(card.expiryMonth || 'MM')}/{(card.expiryYear || 'YY')}
                         </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p className="text-xs opacity-80 uppercase tracking-wide">Total Spent</p>
+                        <p className="font-medium">{card.totalSpent || card.amount}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-xs opacity-80 uppercase tracking-wide">Limit Left</p>
+                        <p className="font-medium">{card.limitLeft}</p>
                     </div>
                 </div>
             </div>

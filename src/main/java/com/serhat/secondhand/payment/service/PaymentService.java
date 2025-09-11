@@ -34,8 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -133,7 +135,6 @@ public class PaymentService {
             throw new BusinessException("Payment amount must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
         }
 
-        // This check is tricky for listing fees where you pay "to the system" (represented as yourself)
         if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION && fromUser.getId().equals(toUser.getId())) {
             throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
         }
@@ -172,6 +173,27 @@ public class PaymentService {
         return paymentMapper.toDto(payment);
     }
 
+
+    @Transactional
+    public List<PaymentDto> createPurchasePayments(List<PaymentRequest> paymentRequests, Authentication authentication) {
+        if (paymentRequests == null || paymentRequests.isEmpty()) {
+            throw new BusinessException("No payments to process", HttpStatus.BAD_REQUEST, "EMPTY_PAYMENT_BATCH");
+        }
+
+        List<PaymentDto> results = new ArrayList<>();
+        for (PaymentRequest request : paymentRequests) {
+            if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
+                throw new BusinessException("Invalid transaction type in batch", HttpStatus.BAD_REQUEST, "INVALID_TXN_TYPE");
+            }
+            if (request.paymentDirection() != PaymentDirection.OUTGOING) {
+                throw new BusinessException("Invalid payment direction in batch", HttpStatus.BAD_REQUEST, "INVALID_DIRECTION");
+            }
+            PaymentDto result = createPayment(request, authentication);
+            results.add(result);
+        }
+        return results;
+    }
+
     private boolean processCreditCardPayment(User fromUser, User toUser, BigDecimal amount) {
         log.info("Processing credit card payment from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
         boolean paymentSuccessful = creditCardService.processPayment(fromUser, amount);
@@ -192,8 +214,9 @@ public class PaymentService {
             log.info("Bank transfer successful.");
             return true;
         } catch (BusinessException e) {
-            log.error("Error during bank transfer: {}", e.getMessage(), e);
-            return false;
+            log.error("Error during bank transfer: {}", e.getMessage());
+            // Re-throw the BusinessException so it can be handled by the global exception handler
+            throw e;
         }
     }
 

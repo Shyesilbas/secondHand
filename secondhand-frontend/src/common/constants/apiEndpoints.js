@@ -43,6 +43,12 @@ export const API_ENDPOINTS = {
         STATISTICS: '/v1/payments/statistics',
         LISTING_FEE_CONFIG: '/v1/payments/listing-fee-config',
     },
+    ORDERS: {
+        CHECKOUT: '/v1/orders/checkout',
+        MY_ORDERS: '/v1/orders',
+        BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`,
+        BY_ID: (id) => `/v1/orders/${id}`,
+    },
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',
         CREATE: '/v1/credit-card',
