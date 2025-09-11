@@ -71,6 +71,7 @@ const MyOrdersPage = () => {
               <div className="mt-2 text-sm">
                 <span className="text-text-secondary">Status:</span> <span className="font-medium">{o.status}</span>
                 <span className="ml-3 text-text-secondary">Payment:</span> <span className="font-medium">{o.paymentStatus}</span>
+                <span className="ml-3 text-text-secondary">Shipping:</span> <span className="font-medium">{o.shippingStatus}</span>
               </div>
             </div>
             <div className="text-right">
@@ -112,10 +113,17 @@ const MyOrdersPage = () => {
                   <p className="text-xs text-text-muted">Status</p>
                   <p className="font-semibold">{selectedOrder.status}</p>
                 </div>
+
                 <div className="p-4 bg-gray-50 rounded-xl">
                   <p className="text-xs text-text-muted">Payment Status</p>
                   <p className="font-semibold">{selectedOrder.paymentStatus}</p>
                 </div>
+
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <p className="text-xs text-text-muted">Shipping Status</p>
+                  <p className="font-semibold">{selectedOrder.shippingStatus}</p>
+                </div>
+
                 <div className="p-4 bg-gray-50 rounded-xl text-right md:text-left">
                   <p className="text-xs text-text-muted">Total</p>
                   <p className="font-semibold">{formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}</p>
