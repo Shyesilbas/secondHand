@@ -8,17 +8,23 @@ export const useCreditCard = () => {
     const [error, setError] = useState(null);
     const notification = useNotification();
 
-    // Fetch credit cards on mount
     useEffect(() => {
         fetchCreditCards();
     }, []);
+
+    const normalizeData = (data) => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data.content)) return data.content;
+        return [data];
+    };
 
     const fetchCreditCards = async () => {
         try {
             setIsLoading(true);
             setError(null);
-            const data = await creditCardService.getAllCreditCards();
-            setCreditCards(Array.isArray(data) ? data : []);
+            const data = await creditCardService.getAll();
+            setCreditCards(normalizeData(data));
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to fetch credit cards';
             setError(errorMessage);
@@ -28,18 +34,18 @@ export const useCreditCard = () => {
         }
     };
 
-    const createCreditCard = async () => {
+    const createCreditCard = async (limit) => {
         try {
             setIsLoading(true);
             setError(null);
-            const newCard = await creditCardService.createCreditCard();
-            setCreditCards(prev => [newCard, ...prev]);
+            const newCard = await creditCardService.createCreditCard(limit);
+            setCreditCards((prev) => [newCard, ...prev]);
             notification.showSuccess('Success', 'Credit card created successfully!');
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to create credit card';
             setError(errorMessage);
             notification.showError('Error', errorMessage);
-            throw err; // Re-throw to handle in component
+            throw err;
         } finally {
             setIsLoading(false);
         }
@@ -56,7 +62,7 @@ export const useCreditCard = () => {
             const errorMessage = err.response?.data?.message || 'Failed to delete credit card';
             setError(errorMessage);
             notification.showError('Error', errorMessage);
-            throw err; // Re-throw to handle in component
+            throw err;
         } finally {
             setIsLoading(false);
         }

@@ -32,4 +32,5 @@ export const ROUTES = {
     AGREEMENTS_ALL: '/agreements/all',
     SECURITY: '/security',
     SHOPPING_CART: '/cart',
+    MY_ORDERS: '/profile/orders',
 };
