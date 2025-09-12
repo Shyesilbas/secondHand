@@ -37,6 +37,7 @@ import UserProfilePage from '../../user/UserProfilePage.jsx';
 import SecurityPage from '../../audit/pages/SecurityPage.jsx';
 import ShoppingCartPage from '../../cart/pages/ShoppingCartPage.jsx';
 import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
+import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -157,8 +158,9 @@ const AppRoutes = () => {
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.CHAT} element={<ChatPage />} />
-        <Route path={ROUTES.USER_PROFILE(':userId')} element={<UserProfilePage />} />
-        <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
+                        <Route path={ROUTES.USER_PROFILE(':userId')} element={<UserProfilePage />} />
+                        <Route path={ROUTES.USER_REVIEWS(':userId')} element={<UserReviewsPage />} />
+                        <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
                   <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
                   <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />
                         <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />

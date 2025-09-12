@@ -211,4 +211,12 @@ export const API_ENDPOINTS = {
         GET_COUNT: '/v1/cart/count',
         CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
     },
+    REVIEWS: {
+        CREATE: '/api/reviews',
+        GET_FOR_USER: (userId) => `/reviews/user/${userId}`,
+        GET_BY_USER: (userId) => `/reviews/by-user/${userId}`,
+        GET_USER_STATS: (userId) => `/reviews/user/${userId}/stats`,
+        GET_FOR_ORDER_ITEMS: '/reviews/order-items',
+        GET_BY_ORDER_ITEM: (orderItemId) => `/reviews/order-item/${orderItemId}`,
+    },
 };
