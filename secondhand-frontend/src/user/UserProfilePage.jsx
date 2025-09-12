@@ -7,6 +7,7 @@ import { useUserListings } from './hooks/useUserListings.js';
 import { ROUTES } from '../common/constants/routes.js';
 import { formatDateTime } from '../common/formatters.js';
 import ComplaintButton from '../complaint/components/ComplaintButton.jsx';
+import { ReviewStats, ReviewsList, useReviews, useUserReviewStats } from '../reviews/index.js';
 
 
 const useUserProfile = (userId) => {
@@ -42,6 +43,8 @@ const UserProfilePage = () => {
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
     const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId);
+    const { reviews, loading: reviewsLoading, error: reviewsError, hasMore, loadMore } = useReviews(userId);
+    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId);
 
     const formatDate = (dateString) => formatDateTime(dateString);
     const isOwnProfile = currentUser?.id === userId;
@@ -135,6 +138,35 @@ const UserProfilePage = () => {
                     <p className="mt-1 text-text-primary">{user.accountCreationDate}</p>
                 </div>
             </div>
+
+            {/* Review Stats */}
+            <ReviewStats stats={reviewStats} loading={reviewStatsLoading} />
+
+            {/* Recent Reviews */}
+            {reviewStats && reviewStats.totalReviews > 0 && (
+                <div className="bg-white rounded-2xl shadow-lg border p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-text-primary">
+                            Recent Reviews ({reviewStats.totalReviews})
+                        </h2>
+                        <Link
+                            to={ROUTES.USER_REVIEWS(userId)}
+                            className="text-btn-primary hover:text-btn-primary-hover font-medium text-sm"
+                        >
+                            View All Reviews →
+                        </Link>
+                    </div>
+                    
+                    <ReviewsList
+                        reviews={reviews.slice(0, 5)} // Show only first 5 reviews
+                        loading={reviewsLoading}
+                        error={reviewsError}
+                        hasMore={false} // Don't show load more in preview
+                        onLoadMore={() => {}} // No-op for preview
+                        showLoadMore={false} // Hide load more button in preview
+                    />
+                </div>
+            )}
 
             {/* Listings */}
             <div className="space-y-4">

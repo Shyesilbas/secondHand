@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchUsers } from '../services/userSearchService.js';
 import UserSearchResults from './UserSearchResults.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const UserSearchBar = ({ className = "" }) => {
     const [query, setQuery] = useState('');
@@ -60,7 +61,7 @@ const UserSearchBar = ({ className = "" }) => {
         setResults([]);
         setIsVisible(false);
         setSelectedIndex(-1);
-        navigate(`/user/${user.id}`);
+        navigate(ROUTES.USER_PROFILE(user.id));
     };
 
     const handleKeyDown = (e) => {
