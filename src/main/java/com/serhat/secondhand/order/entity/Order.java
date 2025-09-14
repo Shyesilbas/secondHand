@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.entity;
 
-import com.serhat.secondhand.shipping.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.Address;
 import jakarta.persistence.*;
@@ -76,7 +76,8 @@ public class Order {
     private List<OrderItem> orderItems;
 
     @Enumerated(EnumType.STRING)
-    private ShippingStatus statusOfShipping;
+    @Column(name = "shipping_status")
+    private ShippingStatus shippingStatus;
 
     @Getter
     public enum OrderStatus {

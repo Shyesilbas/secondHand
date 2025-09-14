@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ReviewDto {
 
-    private Long id;
+    private Integer id;
     private Long reviewerId;
     private String reviewerName;
     private String reviewerSurname;

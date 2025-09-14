@@ -34,4 +34,6 @@ export const ROUTES = {
     SHOPPING_CART: '/cart',
     MY_ORDERS: '/profile/orders',
     USER_REVIEWS: (userId) => `/users/${userId}/reviews`,
+    REVIEWS_RECEIVED: (userId) => `/reviews/received/${userId}`,
+    REVIEWS_GIVEN: (userId) => `/reviews/given/${userId}`,
 };

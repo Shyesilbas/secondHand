@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     /**
      * Find review by reviewer and order item (to check if review already exists)
@@ -35,16 +35,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * Get review statistics for a user
      */
     @Query("SELECT " +
-           "COUNT(r) as totalReviews, " +
-           "AVG(CAST(r.rating AS double)) as averageRating, " +
-           "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END) as fiveStarReviews, " +
-           "SUM(CASE WHEN r.rating = 4 THEN 1 ELSE 0 END) as fourStarReviews, " +
-           "SUM(CASE WHEN r.rating = 3 THEN 1 ELSE 0 END) as threeStarReviews, " +
-           "SUM(CASE WHEN r.rating = 2 THEN 1 ELSE 0 END) as twoStarReviews, " +
-           "SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END) as oneStarReviews, " +
-           "SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) as zeroStarReviews " +
+            "COUNT(r), " +
+            "AVG(CAST(r.rating AS double)), " +
+            "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 4 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 3 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 2 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) " +
             "FROM Review r WHERE r.reviewedUser.id = :userId")
-    Object[] getUserReviewStats(@Param("userId") Long userId);
+    List<Object[]> getUserReviewStats(@Param("userId") Long userId);
+
 
     /**
      * Find reviews by order item IDs (to get reviews for multiple order items)

@@ -115,4 +115,9 @@ public class BankService {
         bankRepository.delete(bank);
         log.info("Bank account deleted for user: {}", user.getEmail());
     }
+
+    public Bank getBankByUserId(User user) {
+        return bankRepository.findByAccountHolder(user)
+                .orElseThrow(() -> new BusinessException("Bank account not found for user: " + user.getId(), HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
+    }
 }

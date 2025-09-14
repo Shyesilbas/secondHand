@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
@@ -14,7 +15,7 @@ import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.shipping.ShippingService;
-import com.serhat.secondhand.shipping.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.Address;
@@ -85,7 +86,7 @@ public class OrderService {
                 .currency("TRY")
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
-                .statusOfShipping(ShippingStatus.PENDING)
+                .shippingStatus(ShippingStatus.PENDING)
                 .notes(request.getNotes())
                 .paymentStatus(Order.PaymentStatus.PENDING)
                 .build();
@@ -167,7 +168,7 @@ public class OrderService {
                 log.warn("One or more sub-payments failed for order: {}", orderNumber);
             }
 
-        } catch (com.serhat.secondhand.core.exception.BusinessException e) {
+        } catch (BusinessException e) {
 
             log.error("Payment failed for order: {} - {}", orderNumber, e.getMessage());
             savedOrder.setPaymentStatus(Order.PaymentStatus.FAILED);

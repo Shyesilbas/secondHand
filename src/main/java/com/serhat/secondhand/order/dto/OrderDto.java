@@ -1,7 +1,7 @@
 package com.serhat.secondhand.order.dto;
 
 import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.shipping.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
