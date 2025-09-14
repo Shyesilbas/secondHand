@@ -17,9 +17,9 @@ const UserReviewsPage = () => {
 
     // Determine the page title based on the URL
     const getPageTitle = () => {
-        if (isReceivedReviews) return 'Aldığım Değerlendirmeler';
-        if (isGivenReviews) return 'Verdiğim Değerlendirmeler';
-        return 'Kullanıcı Değerlendirmeleri';
+        if (isReceivedReviews) return 'I received';
+        if (isGivenReviews) return 'My receives';
+        return 'Reviews';
     };
 
     return (
@@ -35,7 +35,7 @@ const UserReviewsPage = () => {
                 {/* Reviews List */}
                 <div className="lg:col-span-2">
                     <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                        Değerlendirmeler
+                        Reviews
                     </h2>
                     <ReviewsList
                         reviews={reviews}

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
@@ -51,6 +52,27 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
      * Find reviews by order item IDs (to get reviews for multiple order items)
      */
     List<Review> findByOrderItemIn(List<OrderItem> orderItems);
+
+    /**
+     * Find reviews for a specific listing (reviews about the listing, not the seller)
+     */
+    @Query("SELECT r FROM Review r WHERE r.orderItem.listing.id = :listingId ORDER BY r.createdAt DESC")
+    Page<Review> findByOrderItemListingIdOrderByCreatedAtDesc(@Param("listingId") UUID listingId, Pageable pageable);
+
+    /**
+     * Get review statistics for a specific listing
+     */
+    @Query("SELECT " +
+            "COUNT(r), " +
+            "AVG(CAST(r.rating AS double)), " +
+            "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 4 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 3 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 2 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) " +
+            "FROM Review r WHERE r.orderItem.listing.id = :listingId")
+    List<Object[]> getListingReviewStats(@Param("listingId") UUID listingId);
 
     /**
      * Check if user has already reviewed a specific order item

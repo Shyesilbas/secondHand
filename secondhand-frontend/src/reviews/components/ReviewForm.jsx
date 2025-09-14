@@ -11,7 +11,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
         e.preventDefault();
         
         if (rating === 0) {
-            setError('Lütfen bir puan verin');
+            setError('Please rate the product before submitting a review');
             return;
         }
 
@@ -27,7 +27,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
 
             onReviewCreated?.();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'Değerlendirme oluşturulurken bir hata oluştu');
+            setError(err.response?.data?.message || err.message || 'An error occurred.');
         } finally {
             setLoading(false);
         }
@@ -53,29 +53,29 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
     return (
         <div className="bg-white rounded-lg shadow-md border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Değerlendirme Yap
+                Make A Review
             </h3>
             
             <p className="text-sm text-gray-600 mb-4">
-                Ürün: <span className="font-medium">{listingTitle}</span>
+                Product: <span className="font-medium">{listingTitle}</span>
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Puan (0-5 yıldız)
+                        Rate (0-5 stars)
                     </label>
                     <div className="flex items-center space-x-1">
                         {renderStars(rating, setRating)}
                         <span className="ml-3 text-sm text-gray-600">
-                            {rating === 0 ? 'Puan verin' : `${rating}/5`}
+                            {rating === 0 ? 'Rate' : `${rating}/5`}
                         </span>
                     </div>
                 </div>
 
                 <div>
                     <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
-                        Yorum (İsteğe bağlı)
+                        Comment
                     </label>
                     <textarea
                         id="comment"
@@ -87,7 +87,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
                         placeholder="Ürün hakkında görüşlerinizi paylaşın..."
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        {comment.length}/1000 karakter
+                        {comment.length}/1000 Characters
                     </p>
                 </div>
 
@@ -103,14 +103,14 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
                         onClick={onCancel}
                         className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                     >
-                        İptal
+                        Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={loading || rating === 0}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        {loading ? 'Gönderiliyor...' : 'Değerlendirme Gönder'}
+                        {loading ? 'Sending...' : 'Send Review'}
                     </button>
                 </div>
             </form>

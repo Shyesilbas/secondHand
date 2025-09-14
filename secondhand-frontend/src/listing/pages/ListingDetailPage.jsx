@@ -7,6 +7,7 @@ import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStat
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
+import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
@@ -51,6 +52,9 @@ const ListingDetailPage = () => {
               return <Details listing={listing} />;
             })()}
           </div>
+
+          {/* Seller Reviews Section */}
+          <ListingReviewsSection listingId={listing.id} />
         </div>
 
         <div className="lg:col-span-1">

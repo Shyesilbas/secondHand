@@ -32,4 +32,14 @@ export const reviewService = {
     getReviewByOrderItem: async (orderItemId) => {
         return get(API_ENDPOINTS.REVIEWS.GET_BY_ORDER_ITEM(orderItemId));
     },
+
+    // Get reviews for a specific listing (reviews about the seller)
+    getReviewsForListing: async (listingId, page = 0, size = 10) => {
+        return get(`${API_ENDPOINTS.REVIEWS.GET_FOR_LISTING(listingId)}?page=${page}&size=${size}`);
+    },
+
+    // Get review stats for a specific listing
+    getListingReviewStats: async (listingId) => {
+        return get(API_ENDPOINTS.REVIEWS.GET_LISTING_REVIEW_STATS(listingId));
+    },
 };
