@@ -38,7 +38,7 @@ const ReviewStats = ({ stats, loading }) => {
     if (!stats) {
         return (
             <div className="bg-white rounded-lg shadow-md border p-6">
-                <p className="text-gray-500">Değerlendirme bilgisi bulunamadı.</p>
+                <p className="text-gray-500">No Review information found.</p>
             </div>
         );
     }
@@ -55,7 +55,7 @@ const ReviewStats = ({ stats, loading }) => {
     return (
         <div className="bg-white rounded-lg shadow-md border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Değerlendirme İstatistikleri
+                Review Stats
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -68,7 +68,7 @@ const ReviewStats = ({ stats, loading }) => {
                         {(stats.averageRating || 0).toFixed(1)}
                     </div>
                     <p className="text-sm text-gray-600">
-                        {stats.totalReviews || 0} değerlendirme
+                        {stats.totalReviews || 0} Reviews
                     </p>
                 </div>
 

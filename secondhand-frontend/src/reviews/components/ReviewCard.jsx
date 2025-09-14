@@ -54,7 +54,7 @@ const ReviewCard = ({ review }) => {
             
             <div className="border-t pt-3">
                 <p className="text-xs text-gray-500">
-                    Ürün: <span className="font-medium">{review.listingTitle}</span>
+                    Product: <span className="font-medium">{review.listingTitle}</span>
                     <span className="ml-2">({review.listingNo})</span>
                 </p>
             </div>

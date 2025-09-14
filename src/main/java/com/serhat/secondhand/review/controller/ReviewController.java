@@ -78,4 +78,19 @@ public class ReviewController {
                 .map(review -> ResponseEntity.ok(review))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/listing/{listingId}")
+    public ResponseEntity<Page<ReviewDto>> getReviewsForListing(
+            @PathVariable String listingId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        
+        Page<ReviewDto> reviews = reviewService.getReviewsForListing(listingId, pageable);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/listing/{listingId}/stats")
+    public ResponseEntity<UserReviewStatsDto> getListingReviewStats(@PathVariable String listingId) {
+        UserReviewStatsDto stats = reviewService.getListingReviewStats(listingId);
+        return ResponseEntity.ok(stats);
+    }
 }

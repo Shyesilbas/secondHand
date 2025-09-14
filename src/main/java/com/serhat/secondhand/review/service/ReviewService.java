@@ -11,6 +11,9 @@ import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ public class ReviewService {
     private final OrderItemRepository orderItemRepository;
     private final UserService userService;
     private final ReviewMapper reviewMapper;
+    private final ListingService listingService;
 
     public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewer.getId());
@@ -94,9 +100,9 @@ public class ReviewService {
         log.info("Getting review statistics for user: {}", userId);
         
         User user = userService.findById(userId);
-        Object[] stats = new List[]{reviewRepository.getUserReviewStats(userId)};
+        List<Object[]> statsList = reviewRepository.getUserReviewStats(userId);
         
-        if (stats == null || stats.length == 0) {
+        if (statsList == null || statsList.isEmpty()) {
             return UserReviewStatsDto.builder()
                     .userId(userId)
                     .userName(user.getName())
@@ -112,6 +118,8 @@ public class ReviewService {
                     .build();
         }
 
+        Object[] stats = statsList.get(0);
+        
         return UserReviewStatsDto.builder()
                 .userId(userId)
                 .userName(user.getName())
@@ -155,5 +163,65 @@ public class ReviewService {
         User reviewer = userService.findById(reviewerId);
         Optional<Review> review = reviewRepository.findByReviewerAndOrderItem(reviewer, orderItemOpt.get());
         return review.map(reviewMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewDto> getReviewsForListing(String listingId, Pageable pageable) {
+        log.info("Getting reviews for listing: {}", listingId);
+        
+        UUID uuid = UUID.fromString(listingId);
+        
+        // Get reviews specifically for this listing (from users who bought this item)
+        Page<Review> reviews = reviewRepository.findByOrderItemListingIdOrderByCreatedAtDesc(uuid, pageable);
+        
+        return reviews.map(reviewMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public UserReviewStatsDto getListingReviewStats(String listingId) {
+        log.info("Getting review stats for listing: {}", listingId);
+        
+        UUID uuid = UUID.fromString(listingId);
+        
+        // First check if listing exists
+        Optional<Listing> listing = listingService.findById(uuid);
+        if (listing.isEmpty()) {
+            throw new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND");
+        }
+        
+        // Get stats specifically for this listing
+        List<Object[]> statsList = reviewRepository.getListingReviewStats(uuid);
+        
+        if (statsList == null || statsList.isEmpty()) {
+            return UserReviewStatsDto.builder()
+                    .userId(listing.get().getSeller().getId())
+                    .userName(listing.get().getTitle()) // Use listing title instead of user name
+                    .userSurname("") // Empty for listing
+                    .totalReviews(0L)
+                    .averageRating(0.0)
+                    .fiveStarReviews(0L)
+                    .fourStarReviews(0L)
+                    .threeStarReviews(0L)
+                    .twoStarReviews(0L)
+                    .oneStarReviews(0L)
+                    .zeroStarReviews(0L)
+                    .build();
+        }
+
+        Object[] stats = statsList.get(0);
+        
+        return UserReviewStatsDto.builder()
+                .userId(listing.get().getSeller().getId())
+                .userName(listing.get().getTitle()) // Use listing title
+                .userSurname("") // Empty for listing
+                .totalReviews((Long) stats[0])
+                .averageRating(stats[1] != null ? (Double) stats[1] : 0.0)
+                .fiveStarReviews((Long) stats[2])
+                .fourStarReviews((Long) stats[3])
+                .threeStarReviews((Long) stats[4])
+                .twoStarReviews((Long) stats[5])
+                .oneStarReviews((Long) stats[6])
+                .zeroStarReviews((Long) stats[7])
+                .build();
     }
 }

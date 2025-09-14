@@ -218,6 +218,8 @@ export const API_ENDPOINTS = {
         GET_USER_STATS: (userId) => `/reviews/user/${userId}/stats`,
         GET_FOR_ORDER_ITEMS: '/reviews/order-items',
         GET_BY_ORDER_ITEM: (orderItemId) => `/reviews/order-item/${orderItemId}`,
+        GET_FOR_LISTING: (listingId) => `/reviews/listing/${listingId}`,
+        GET_LISTING_REVIEW_STATS: (listingId) => `/reviews/listing/${listingId}/stats`,
     },
     EWALLET: {
         CREATE: '/ewallet',

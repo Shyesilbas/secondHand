@@ -32,7 +32,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
             onReviewCreated?.();
             onClose();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'Değerlendirme oluşturulurken bir hata oluştu');
+            setError(err.response?.data?.message || err.message || 'An error occurred.');
         } finally {
             setLoading(false);
         }
@@ -77,7 +77,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b">
                     <h2 className="text-xl font-bold text-gray-900">
-                        Ürün Değerlendirmesi
+                        Product Review
                     </h2>
                     <button
                         onClick={onClose}
@@ -94,10 +94,10 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                     {/* Product Info */}
                     <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                         <h3 className="font-semibold text-gray-900 mb-1">
-                            {orderItem?.listing?.title || orderItem?.listing?.listingNo || 'Ürün'}
+                            {orderItem?.listing?.title || orderItem?.listing?.listingNo || 'Product'}
                         </h3>
                         <p className="text-sm text-gray-600">
-                            Sipariş No: #{orderItem?.orderId}
+                            Order No: #{orderItem?.orderId}
                         </p>
                     </div>
 
@@ -105,20 +105,20 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                         {/* Star Rating */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-3">
-                                Puanınız
+                                Your rate
                             </label>
                             <div className="flex items-center justify-center space-x-2 mb-2">
                                 {renderStars()}
                             </div>
                             <p className="text-center text-sm text-gray-600">
-                                {rating === 0 ? 'Puan vermek için yıldızlara tıklayın' : `${rating}/5 yıldız`}
+                                {rating === 0 ? 'Click the stars for rating' : `${rating}/5 stars`}
                             </p>
                         </div>
 
                         {/* Comment */}
                         <div>
                             <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
-                                Yorumunuz (İsteğe bağlı)
+                                Comment
                             </label>
                             <textarea
                                 id="comment"
@@ -127,10 +127,10 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                                 rows={4}
                                 maxLength={1000}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                placeholder="Ürün hakkında görüşlerinizi paylaşın..."
+                                placeholder="Share your thoughts about this product..."
                             />
                             <p className="text-xs text-gray-500 mt-1 text-right">
-                                {comment.length}/1000 karakter
+                                {comment.length}/1000 Characters
                             </p>
                         </div>
 
@@ -153,14 +153,14 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                                 onClick={onClose}
                                 className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                             >
-                                İptal
+                                Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
                                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                             >
-                                {loading ? 'Gönderiliyor...' : 'Değerlendirme Gönder'}
+                                {loading ? 'Send...' : 'Send Review'}
                             </button>
                         </div>
                     </form>
