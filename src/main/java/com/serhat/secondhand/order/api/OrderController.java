@@ -51,7 +51,7 @@ public class OrderController {
     })
     public ResponseEntity<Page<OrderDto>> getUserOrders(
             @AuthenticationPrincipal User currentUser,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 5) Pageable pageable) {
         log.info("API request to get orders for user: {}", currentUser.getEmail());
         Page<OrderDto> orders = orderService.getUserOrders(currentUser, pageable);
         return ResponseEntity.ok(orders);
