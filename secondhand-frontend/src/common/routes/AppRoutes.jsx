@@ -160,6 +160,8 @@ const AppRoutes = () => {
         <Route path={ROUTES.CHAT} element={<ChatPage />} />
                         <Route path={ROUTES.USER_PROFILE(':userId')} element={<UserProfilePage />} />
                         <Route path={ROUTES.USER_REVIEWS(':userId')} element={<UserReviewsPage />} />
+                        <Route path={ROUTES.REVIEWS_RECEIVED(':userId')} element={<UserReviewsPage />} />
+                        <Route path={ROUTES.REVIEWS_GIVEN(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
                   <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
                   <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />

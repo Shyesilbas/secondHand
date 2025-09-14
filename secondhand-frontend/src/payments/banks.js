@@ -1,5 +1,6 @@
 
 export const BankDto = (data) => ({
+    id: data.id || data.ID || null,
     IBAN: data.IBAN || '',
     balance: data.balance || 0,
     holderName: data.holderName || '',

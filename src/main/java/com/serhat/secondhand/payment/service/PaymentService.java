@@ -18,9 +18,12 @@ import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.ewallet.service.EWalletService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -34,10 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +53,10 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final IVerificationService verificationService;
     private final EmailService emailService;
+    
+    @Autowired
+    @Lazy
+    private EWalletService eWalletService;
 
     @Getter
     @Value("${app.listing.creation.fee}")
@@ -146,6 +150,7 @@ public class PaymentService {
         boolean paymentSuccessful = switch (paymentRequest.paymentType()) {
             case CREDIT_CARD -> processCreditCardPayment(fromUser, toUser, paymentRequest.amount());
             case TRANSFER -> processBankTransfer(fromUser, toUser, paymentRequest.amount());
+            case EWALLET -> processEWalletPayment(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId());
             default -> throw new BusinessException("Unsupported payment type", HttpStatus.BAD_REQUEST, "UNSUPPORTED_PAYMENT_TYPE");
         };
 
@@ -225,10 +230,10 @@ public class PaymentService {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
-        return payments.map(this::mapPaymentToDtoWithListingInfo);
+        return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, user));
     }
     
-    private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment) {
+    private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment, User currentUser) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
         
         String listingTitle = null;
@@ -246,6 +251,18 @@ public class PaymentService {
             }
         }
         
+        // Determine direction and transaction type from current user's perspective
+        PaymentDirection userDirection;
+        PaymentTransactionType userTransactionType;
+        
+        if (payment.getFromUser().getId().equals(currentUser.getId())) {
+            userDirection = PaymentDirection.OUTGOING; // User is the payer
+            userTransactionType = PaymentTransactionType.ITEM_PURCHASE;
+        } else {
+            userDirection = PaymentDirection.INCOMING; // User is the receiver
+            userTransactionType = PaymentTransactionType.ITEM_SALE;
+        }
+        
         return new PaymentDto(
             baseDto.paymentId(),
             baseDto.senderName(),
@@ -254,8 +271,8 @@ public class PaymentService {
             baseDto.receiverSurname(),
             baseDto.amount(),
             baseDto.paymentType(),
-            baseDto.transactionType(),
-            baseDto.paymentDirection(),
+            userTransactionType, // Use user-specific transaction type
+            userDirection, // Use user-specific direction
             baseDto.listingId(),
             listingTitle,
             listingNo,
@@ -283,6 +300,19 @@ public class PaymentService {
             "totalAmount", totalAmount
         );
     }
+
+    private boolean processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
+        log.info("Processing eWallet payment from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
+        try {
+            eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
+            log.info("eWallet payment successful.");
+            return true;
+        } catch (BusinessException e) {
+            log.error("Error during eWallet payment: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     public ListingFeeConfigDto getListingFeeConfig() {
         log.info("Getting listing fee configuration");

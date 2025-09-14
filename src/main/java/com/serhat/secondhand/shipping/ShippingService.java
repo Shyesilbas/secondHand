@@ -1,6 +1,7 @@
 package com.serhat.secondhand.shipping;
 
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,8 @@ public class ShippingService {
             newStatus = ShippingStatus.DELIVERED;
         }
 
-        if (order.getStatusOfShipping() != newStatus) {
-            order.setStatusOfShipping(newStatus);
+        if (order.getShippingStatus() != newStatus) {
+            order.setShippingStatus(newStatus);
             orderRepository.save(order);
             log.info("Shipping status updated for order {}: {}", order.getOrderNumber(), newStatus);
         }

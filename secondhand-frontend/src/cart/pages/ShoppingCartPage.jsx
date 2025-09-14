@@ -17,6 +17,7 @@ import { creditCardService } from '../../payments/services/creditCardService.js'
 import { orderService } from '../../order/services/orderService.js';
 import { bankService } from '../../payments/services/bankService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 
 const ShoppingCartPage = () => {
     const navigate = useNavigate();
@@ -45,6 +46,8 @@ const ShoppingCartPage = () => {
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
+
+    const { eWallet, checkBalance } = useEWallet();
 
     React.useEffect(() => {
         // load credit cards
@@ -115,8 +118,10 @@ const ShoppingCartPage = () => {
         if (selectedPaymentType === 'CREDIT_CARD' && !selectedCardNumber) return true;
         if (selectedPaymentType === 'TRANSFER' && (!Array.isArray(bankAccounts) || bankAccounts.length === 0)) return true;
         if (selectedPaymentType === 'TRANSFER' && !selectedBankAccountIban) return true;
+        if (selectedPaymentType === 'EWALLET' && !eWallet) return true;
+        if (selectedPaymentType === 'EWALLET' && eWallet && eWallet.balance < calculateTotal()) return true;
         return false;
-    }, [cartCount, selectedShippingAddressId, selectedPaymentType, cards, selectedCardNumber, bankAccounts, selectedBankAccountIban]);
+    }, [cartCount, selectedShippingAddressId, selectedPaymentType, cards, selectedCardNumber, bankAccounts, selectedBankAccountIban, eWallet]);
 
     if (isLoading) {
         return (
@@ -421,6 +426,18 @@ const ShoppingCartPage = () => {
                                             <input type="radio" name="paymentType" value="TRANSFER" checked={selectedPaymentType === 'TRANSFER'} onChange={(e) => setSelectedPaymentType(e.target.value)} />
                                             <span>Bank Transfer</span>
                                         </label>
+                                        <label className="flex items-center space-x-2">
+                                            <input type="radio" name="paymentType" value="EWALLET" checked={selectedPaymentType === 'EWALLET'} onChange={(e) => setSelectedPaymentType(e.target.value)} />
+                                            <span className="flex items-center">
+                                                <span className="mr-2">👛</span>
+                                                eWallet
+                                                {eWallet && (
+                                                    <span className="ml-2 text-sm text-gray-500">
+                                                        ({formatCurrency(eWallet.balance || 0)} available)
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </label>
                                     </div>
                                     {selectedPaymentType === 'CREDIT_CARD' && (
                                         <div className="mt-3">
@@ -481,6 +498,55 @@ const ShoppingCartPage = () => {
                                                             </label>
                                                         );
                                                     })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                    {selectedPaymentType === 'EWALLET' && (
+                                        <div className="mt-3">
+                                            {!eWallet ? (
+                                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                    <div className="text-sm text-yellow-800">
+                                                        <div className="font-medium mb-1">No eWallet Found</div>
+                                                        <div>You need to create an eWallet first. Go to Payment Methods to create one.</div>
+                                                        <button 
+                                                            onClick={() => navigate('/payment-methods')}
+                                                            className="mt-2 text-blue-600 hover:text-blue-800 underline"
+                                                        >
+                                                            Go to Payment Methods
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <div className="flex items-center">
+                                                            <span className="text-2xl mr-2">👛</span>
+                                                            <span className="font-medium text-purple-800">My eWallet</span>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-sm text-purple-600">Available Balance</div>
+                                                            <div className="text-lg font-bold text-purple-800">
+                                                                {formatCurrency(eWallet.balance || 0)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="text-sm text-purple-700">
+                                                        <div className="flex justify-between">
+                                                            <span>Order Total:</span>
+                                                            <span className="font-medium">{formatCurrency(calculateTotal())}</span>
+                                                        </div>
+                                                        {eWallet.balance >= calculateTotal() ? (
+                                                            <div className="mt-2 text-green-700 font-medium">
+                                                                ✓ Sufficient balance available
+                                                            </div>
+                                                        ) : (
+                                                            <div className="mt-2 text-red-700 font-medium">
+                                                                ⚠ Insufficient balance. Please deposit {formatCurrency(calculateTotal() - eWallet.balance)} more.
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>

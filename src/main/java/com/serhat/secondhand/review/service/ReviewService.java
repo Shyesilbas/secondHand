@@ -1,8 +1,8 @@
 package com.serhat.secondhand.review.service;
 
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderItemRepository;
-import com.serhat.secondhand.shipping.ShippingStatus;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.UserReviewStatsDto;
@@ -44,7 +44,7 @@ public class ReviewService {
         }
 
         // Check if order is delivered
-        if (orderItem.getOrder().getStatusOfShipping() != ShippingStatus.DELIVERED) {
+        if (orderItem.getOrder().getShippingStatus() != ShippingStatus.DELIVERED) {
             throw new RuntimeException("Can only review delivered orders");
         }
 
@@ -94,7 +94,7 @@ public class ReviewService {
         log.info("Getting review statistics for user: {}", userId);
         
         User user = userService.findById(userId);
-        Object[] stats = reviewRepository.getUserReviewStats(userId);
+        Object[] stats = new List[]{reviewRepository.getUserReviewStats(userId)};
         
         if (stats == null || stats.length == 0) {
             return UserReviewStatsDto.builder()

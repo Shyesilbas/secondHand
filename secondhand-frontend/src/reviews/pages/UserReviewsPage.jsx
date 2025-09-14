@@ -1,15 +1,30 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { ReviewStats, ReviewsList, useReviews, useUserReviewStats } from '../index.js';
+import { useParams, useLocation } from 'react-router-dom';
+import { ReviewStats, ReviewsList, useReviews, useReviewsByUser, useUserReviewStats } from '../index.js';
 
 const UserReviewsPage = () => {
     const { userId } = useParams();
-    const { reviews, loading, error, hasMore, loadMore } = useReviews(userId);
+    const location = useLocation();
+    
+    // Determine which API to use based on the URL path
+    const isReceivedReviews = location.pathname.includes('/reviews/received/');
+    const isGivenReviews = location.pathname.includes('/reviews/given/');
+    
+    // Use different hooks based on the URL
+    const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
+    const { reviews, loading, error, hasMore, loadMore } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
+
+    // Determine the page title based on the URL
+    const getPageTitle = () => {
+        if (isReceivedReviews) return 'Aldığım Değerlendirmeler';
+        if (isGivenReviews) return 'Verdiğim Değerlendirmeler';
+        return 'Kullanıcı Değerlendirmeleri';
+    };
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Kullanıcı Değerlendirmeleri</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">{getPageTitle()}</h1>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Review Stats */}

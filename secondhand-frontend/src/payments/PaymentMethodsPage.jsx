@@ -4,6 +4,7 @@ import { bankService } from './services/bankService.js';
 import { useNotification } from '../notification/NotificationContext.jsx';
 import { BankDto } from './banks.js';
 import { useCreditCard } from './hooks/useCreditCard.js';
+import { useEWallet } from '../ewallet/hooks/useEWallet.js';
 import EmptyState from '../common/components/ui/EmptyState.jsx';
 import BankAccountCard from './components/BankAccountCard.jsx';
 import CreditCardItem from './components/CreditCardItem.jsx';
@@ -19,6 +20,10 @@ const PaymentMethodsPage = () => {
     const [isCreatingBank, setIsCreatingBank] = useState(false);
     const [showCreditCardModal, setShowCreditCardModal] = useState(false);
     const [creditCardLimit, setCreditCardLimit] = useState('');
+    const [showEWalletModal, setShowEWalletModal] = useState(false);
+    const [ewalletAction, setEWalletAction] = useState(''); // 'deposit', 'withdraw', 'updateLimit'
+    const [ewalletAmount, setEWalletAmount] = useState('');
+    const [selectedBankId, setSelectedBankId] = useState(null);
 
     const {
         creditCards,
@@ -27,6 +32,17 @@ const PaymentMethodsPage = () => {
         createCreditCard,
         deleteCreditCard,
     } = useCreditCard();
+
+    const {
+        eWallet,
+        loading: ewalletLoading,
+        error: ewalletError,
+        createEWallet,
+        updateLimits,
+        deposit,
+        withdraw,
+        refreshWallet
+    } = useEWallet();
 
     const bankAccounts = Array.isArray(rawBankAccounts)
         ? rawBankAccounts.map(BankDto)
@@ -122,12 +138,63 @@ const PaymentMethodsPage = () => {
         );
     };
 
-    const isLoading = activeTab === 'bank-accounts' ? bankLoading : cardsLoading;
-    const error = activeTab === 'bank-accounts' ? bankError : cardsError;
+    const isLoading = activeTab === 'bank-accounts' ? bankLoading : 
+                      activeTab === 'credit-cards' ? cardsLoading : ewalletLoading;
+    const error = activeTab === 'bank-accounts' ? bankError : 
+                  activeTab === 'credit-cards' ? cardsError : ewalletError;
+
+    const handleEWalletAction = async () => {
+        if (!ewalletAmount || isNaN(parseFloat(ewalletAmount))) {
+            notification.showError('Error', 'Please enter a valid amount');
+            return;
+        }
+
+        // For deposit and withdraw, check if bank account is selected
+        if ((ewalletAction === 'deposit' || ewalletAction === 'withdraw') && !selectedBankId) {
+            notification.showError('Error', 'Please select a bank account');
+            return;
+        }
+
+        try {
+            const amount = parseFloat(ewalletAmount);
+            console.log('EWallet action:', ewalletAction, 'Amount:', amount, 'BankId:', selectedBankId, 'Type:', typeof selectedBankId);
+            
+            switch (ewalletAction) {
+                case 'deposit':
+                    await deposit(amount, selectedBankId);
+                    break;
+                case 'withdraw':
+                    await withdraw(amount, selectedBankId);
+                    break;
+                case 'updateLimit':
+                    await updateLimits(amount);
+                    break;
+                default:
+                    notification.showError('Error', 'Invalid action');
+                    return;
+            }
+            
+            setShowEWalletModal(false);
+            setEWalletAmount('');
+            setEWalletAction('');
+            setSelectedBankId(null);
+        } catch (error) {
+            // Error is already handled in the hook
+        }
+    };
+
+    const handleCreateEWallet = async () => {
+        try {
+            await createEWallet();
+        } catch (error) {
+            // Error is already handled in the hook
+        }
+    };
 
     const tabs = [
         { id: 'bank-accounts', label: 'Bank Accounts', icon: '🏦', color: 'green' },
-        { id: 'credit-cards', label: 'Credit Cards', icon: '💳', color: 'blue' }
+        { id: 'credit-cards', label: 'Credit Cards', icon: '💳', color: 'blue' },
+        { id: 'ewallet', label: 'eWallet', icon: '👛', color: 'purple' }
     ];
 
     return (
@@ -299,6 +366,105 @@ const PaymentMethodsPage = () => {
                             )}
                         </div>
                     )}
+
+                    {activeTab === 'ewallet' && (
+                        <div>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold text-text-primary">
+                                    eWallet
+                                </h2>
+                                {eWallet && (
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => {
+                                                setEWalletAction('deposit');
+                                                if (bankAccounts.length > 0) {
+                                                    console.log('Setting first bank ID:', bankAccounts[0].id);
+                                                    setSelectedBankId(bankAccounts[0].id);
+                                                }
+                                                setShowEWalletModal(true);
+                                            }}
+                                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                                        >
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            Deposit
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setEWalletAction('withdraw');
+                                                if (bankAccounts.length > 0) {
+                                                    console.log('Setting first bank ID:', bankAccounts[0].id);
+                                                    setSelectedBankId(bankAccounts[0].id);
+                                                }
+                                                setShowEWalletModal(true);
+                                            }}
+                                            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center"
+                                        >
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4M12 6l-6 6 6 6" />
+                                            </svg>
+                                            Withdraw
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setEWalletAction('updateLimit');
+                                                setShowEWalletModal(true);
+                                            }}
+                                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+                                        >
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Update Limit
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {!eWallet ? (
+                                <EmptyState
+                                    title="No eWallet Found"
+                                    description="You don't have an eWallet yet. Create one to start using digital payments."
+                                    variant="purple"
+                                    primaryAction={{
+                                        label: ewalletLoading ? 'Creating...' : 'Create eWallet',
+                                        onClick: handleCreateEWallet,
+                                        disabled: ewalletLoading,
+                                        variant: 'purple'
+                                    }}
+                                />
+                            ) : (
+                                <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-2xl font-bold">My eWallet</h3>
+                                        <div className="text-purple-200">👛</div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <p className="text-purple-200 text-sm mb-1">Current Balance</p>
+                                            <p className="text-3xl font-bold">{eWallet.balance?.toFixed(2) || '0.00'} TL</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <p className="text-purple-200 text-sm mb-1">Wallet Limit</p>
+                                            <p className="text-xl font-semibold">{eWallet.limit?.toFixed(2) || 'No limit'} TL</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-4 pt-4 border-t border-purple-400">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-purple-200">Available to spend</span>
+                                            <span className="font-semibold">{eWallet.balance?.toFixed(2) || '0.00'} TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </>
             )}
 
@@ -346,6 +512,142 @@ const PaymentMethodsPage = () => {
                                     className="flex-1 bg-btn-primary text-white px-4 py-2 rounded-lg hover:bg-btn-primary-hover transition-colors disabled:opacity-50"
                                 >
                                     {cardsLoading ? 'Creating...' : 'Create Card'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showEWalletModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    {ewalletAction === 'deposit' && 'Deposit Money'}
+                                    {ewalletAction === 'withdraw' && 'Withdraw Money'}
+                                    {ewalletAction === 'updateLimit' && 'Update Wallet Limit'}
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowEWalletModal(false);
+                                        setEWalletAmount('');
+                                        setEWalletAction('');
+                                        setSelectedBankId(null);
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    {ewalletAction === 'deposit' && 'Deposit Amount (TRY)'}
+                                    {ewalletAction === 'withdraw' && 'Withdrawal Amount (TRY)'}
+                                    {ewalletAction === 'updateLimit' && 'New Limit (TRY)'}
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    placeholder={
+                                        ewalletAction === 'deposit' ? 'Enter amount to deposit' :
+                                        ewalletAction === 'withdraw' ? 'Enter amount to withdraw' :
+                                        'Enter new limit'
+                                    }
+                                    value={ewalletAmount}
+                                    onChange={(e) => setEWalletAmount(e.target.value)}
+                                />
+                                {ewalletAction === 'withdraw' && eWallet && (
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Available balance: {eWallet.balance?.toFixed(2) || '0.00'} TL
+                                    </p>
+                                )}
+                            </div>
+
+                            {(ewalletAction === 'deposit' || ewalletAction === 'withdraw') && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Select Bank Account
+                                    </label>
+                                    {bankAccounts.length === 0 ? (
+                                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <p className="text-sm text-yellow-800">
+                                                No bank account found. Please create a bank account first.
+                                            </p>
+                                            <button 
+                                                onClick={() => {
+                                                    setShowEWalletModal(false);
+                                                    setActiveTab('bank-accounts');
+                                                }}
+                                                className="mt-2 text-blue-600 hover:text-blue-800 underline text-sm"
+                                            >
+                                                Go to Bank Accounts
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {bankAccounts.map((bank, index) => {
+                                                console.log('Bank account:', bank, 'Selected ID:', selectedBankId);
+                                                return (
+                                                <label key={bank.id || index} className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                                                    <input
+                                                        type="radio"
+                                                        name="bankAccount"
+                                                        value={bank.id}
+                                                        checked={selectedBankId == bank.id}
+                                                        onChange={(e) => {
+                                                            console.log('Bank selected:', e.target.value);
+                                                            setSelectedBankId(e.target.value);
+                                                        }}
+                                                        className="mr-3"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-gray-900">
+                                                            {bank.holderName} {bank.holderSurname}
+                                                        </div>
+                                                        <div className="text-sm text-gray-500">
+                                                            IBAN: {bank.IBAN}
+                                                        </div>
+                                                        {bank.balance !== undefined && (
+                                                            <div className="text-sm text-gray-500">
+                                                                Balance: {bank.balance} TL
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </label>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={() => {
+                                        setShowEWalletModal(false);
+                                        setEWalletAmount('');
+                                        setEWalletAction('');
+                                        setSelectedBankId(null);
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleEWalletAction}
+                                    disabled={ewalletLoading}
+                                    className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                >
+                                    {ewalletLoading ? 'Processing...' : 
+                                     ewalletAction === 'deposit' ? 'Deposit' :
+                                     ewalletAction === 'withdraw' ? 'Withdraw' : 'Update'}
                                 </button>
                             </div>
                         </div>

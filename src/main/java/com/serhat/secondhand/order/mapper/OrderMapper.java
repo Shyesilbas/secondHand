@@ -39,7 +39,7 @@ public class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .orderItems(orderItemsToDtoList(order.getOrderItems()))
-                .shippingStatus(order.getStatusOfShipping())
+                .shippingStatus(order.getShippingStatus())
                 .build();
     }
 
@@ -78,6 +78,7 @@ public class OrderMapper {
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())
+                .shippingStatus(orderItem.getOrder().getShippingStatus())
                 .build();
     }
 }

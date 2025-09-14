@@ -212,11 +212,20 @@ export const API_ENDPOINTS = {
         CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
     },
     REVIEWS: {
-        CREATE: '/api/reviews',
+        CREATE: '/reviews',
         GET_FOR_USER: (userId) => `/reviews/user/${userId}`,
         GET_BY_USER: (userId) => `/reviews/by-user/${userId}`,
         GET_USER_STATS: (userId) => `/reviews/user/${userId}/stats`,
         GET_FOR_ORDER_ITEMS: '/reviews/order-items',
         GET_BY_ORDER_ITEM: (orderItemId) => `/reviews/order-item/${orderItemId}`,
+    },
+    EWALLET: {
+        CREATE: '/ewallet',
+        GET: '/ewallet',
+        UPDATE_LIMITS: '/ewallet/limits',
+        DEPOSIT: '/ewallet/deposit',
+        WITHDRAW: '/ewallet/withdraw',
+        TRANSACTIONS: '/ewallet/transactions',
+        CHECK_BALANCE: '/ewallet/balance/check',
     },
 };
