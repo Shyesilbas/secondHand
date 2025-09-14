@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStats.jsx';
+import ListingReviewStats from '../../reviews/components/ListingReviewStats.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import AddToCartButton from '../../cart/components/AddToCartButton.jsx';
 import PriceHistoryModal from './PriceHistoryModal.jsx';
@@ -129,6 +130,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                         </span>
                     </div>
                     <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
+                    <ListingReviewStats listingId={listing.id} size="sm" showIcon showText />
                 </div>
                 <div className="flex items-center space-x-2">
                     {canShowCartButton && <AddToCartButton listing={listing} size="sm" />}
