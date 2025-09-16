@@ -46,8 +46,7 @@ public class ShippingService {
     }
 
 
-    public List<Order> updateShippingStatusesForOrders(List<Order> orders) {
+    public void updateShippingStatusesForOrders(List<Order> orders) {
         orders.forEach(this::calculateShippingStatus);
-        return orders;
     }
 }
