@@ -8,7 +8,7 @@ export const UserDTO = {
   gender: '',
   accountStatus: '',
   accountVerified: false,
-  createdAt: '',
+  accountCreationDate: '',
   updatedAt: '',
 };
 

@@ -46,7 +46,7 @@ const UserSearchBar = ({ className = "" }) => {
     }, []);
 
     const debouncedSearch = useCallback(
-        debounce(performSearch, 300),
+        debounce(performSearch, 600),
         [performSearch, debounce]
     );
 

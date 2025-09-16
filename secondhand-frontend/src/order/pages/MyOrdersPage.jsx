@@ -425,7 +425,7 @@ const MyOrdersPage = () => {
                               <div className="flex items-center gap-4">
                                 <p className="font-semibold text-gray-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</p>
                                 <ReviewButton
-                                    orderItem={item}
+                                    orderItem={{ ...item, shippingStatus: selectedOrder.shippingStatus }}
                                     onReviewCreated={() => {}}
                                 />
                               </div>
