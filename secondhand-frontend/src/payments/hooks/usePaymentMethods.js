@@ -9,18 +9,25 @@ export const usePaymentMethods = () => {
     const [isLoading, setIsLoading] = useState(false);
     const notification = useNotification();
 
+    const normalizeData = (data) => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data.content)) return data.content;
+        return [data];
+    };
+
     const fetchPaymentMethods = async () => {
         try {
             setIsLoading(true);
             const [cardsData, banksData] = await Promise.all([
-                creditCardService.getAllCreditCards(),
+                creditCardService.getAll(),
                 bankService.getBankAccount()
             ]);
-            setCreditCards(cardsData);
+            setCreditCards(normalizeData(cardsData));
             setBankAccounts(banksData);
         } catch (err) {
             console.error('Failed to fetch payment methods:', err);
-            notification.showError('Error', 'Ödeme yöntemleri yüklenemedi.');
+            notification.showError('Error', 'Payment methods could not be fetched. Please try again later.');
         } finally {
             setIsLoading(false);
         }

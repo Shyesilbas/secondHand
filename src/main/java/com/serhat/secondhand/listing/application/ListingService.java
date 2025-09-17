@@ -276,6 +276,8 @@ public class ListingService {
         listingRepository.save(listing);
         log.info("Listing deactivated: {}", listingId);
     }
+
+
     
     public void validateOwnership(UUID listingId, User currentUser) {
         Listing listing = findById(listingId)

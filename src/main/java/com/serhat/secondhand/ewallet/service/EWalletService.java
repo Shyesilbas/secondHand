@@ -36,11 +36,11 @@ public class EWalletService {
     private final UserService userService;
     private final BankService bankService;
     private final PaymentRepository paymentRepository;
-    
+
 
     public EWalletDto createEWallet(Long userId) {
         User user = userService.findById(userId);
-        
+
         if (eWalletRepository.existsByUser(user)) {
             throw new BusinessException("User already has an eWallet", HttpStatus.CONFLICT, "EWALLET_EXISTS");
         }
@@ -61,7 +61,7 @@ public class EWalletService {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user)
                 .orElseThrow(() -> new BusinessException("eWallet not found for user", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
-        
+
         return mapToDto(eWallet);
     }
 
@@ -76,9 +76,9 @@ public class EWalletService {
         }
 
         // Get specific bank account by ID
-        Bank bank = bankService.findByUser(user).orElseThrow(() -> 
+        Bank bank = bankService.findByUser(user).orElseThrow(() ->
             new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
-        
+
         if (!bank.getId().equals(request.getBankId())) {
             throw new BusinessException("Invalid bank account selected. Expected: " + bank.getId() + ", Got: " + request.getBankId(), HttpStatus.BAD_REQUEST, "INVALID_BANK_ACCOUNT");
         }
@@ -100,7 +100,7 @@ public class EWalletService {
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
-        
+
         paymentRepository.save(payment);
 
         log.info("eWallet deposit successful for user: {} amount: {}", user.getEmail(), request.getAmount());
@@ -121,9 +121,9 @@ public class EWalletService {
         }
 
         // Get specific bank account by ID
-        Bank bank = bankService.findByUser(user).orElseThrow(() -> 
+        Bank bank = bankService.findByUser(user).orElseThrow(() ->
             new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
-        
+
         if (!bank.getId().equals(request.getBankId())) {
             throw new BusinessException("Invalid bank account selected. Expected: " + bank.getId() + ", Got: " + request.getBankId(), HttpStatus.BAD_REQUEST, "INVALID_BANK_ACCOUNT");
         }
@@ -145,7 +145,7 @@ public class EWalletService {
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
-        
+
         paymentRepository.save(payment);
 
         log.info("eWallet withdrawal successful for user: {} amount: {}", user.getEmail(), request.getAmount());
@@ -171,20 +171,23 @@ public class EWalletService {
     public boolean hasSufficientBalance(Long userId, BigDecimal amount) {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user).orElse(null);
-        
+
         if (eWallet == null) {
             return false;
         }
-        
+
         return eWallet.getBalance().compareTo(amount) >= 0;
     }
 
 
     @Transactional
     public void processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
-        log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}", 
-                fromUser.getEmail(), toUser.getEmail(), amount, listingId);
-        
+        log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",
+                fromUser != null ? fromUser.getEmail() : "SYSTEM",
+                toUser != null ? toUser.getEmail() : "SYSTEM",
+                amount != null ? amount : BigDecimal.ZERO,
+                listingId != null ? listingId : "N/A");
+
         EWallet fromWallet = eWalletRepository.findByUser(fromUser)
                 .orElseThrow(() -> new BusinessException("eWallet not found for payer", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
 
@@ -194,29 +197,35 @@ public class EWalletService {
             throw new BusinessException("Insufficient balance in eWallet", HttpStatus.BAD_REQUEST, "INSUFFICIENT_BALANCE");
         }
 
-        // Deduct from payer's wallet
         fromWallet.setBalance(fromWallet.getBalance().subtract(amount));
         eWalletRepository.save(fromWallet);
         log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
 
-        // Credit to seller's wallet (create if not exists)
-        EWallet toWallet = eWalletRepository.findByUser(toUser).orElse(null);
-        if (toWallet == null) {
-            log.info("Creating new wallet for seller: {}", toUser.getEmail());
-            toWallet = EWallet.builder()
-                    .user(toUser)
-                    .balance(amount)
-                    .walletLimit(new BigDecimal("10000.00"))
-                    .build();
+        if (toUser != null) {
+            EWallet toWallet = eWalletRepository.findByUser(toUser).orElse(null);
+            if (toWallet == null) {
+                log.info("Creating new wallet for seller: {}", toUser.getEmail());
+                toWallet = EWallet.builder()
+                        .user(toUser)
+                        .balance(amount)
+                        .walletLimit(new BigDecimal("10000.00"))
+                        .build();
+            } else {
+                log.info("Found seller wallet with balance: {}", toWallet.getBalance());
+                toWallet.setBalance(toWallet.getBalance().add(amount));
+            }
+            eWalletRepository.save(toWallet);
+            log.info("Credited {} to seller wallet. New balance: {}", amount, toWallet.getBalance());
         } else {
-            log.info("Found seller wallet with balance: {}", toWallet.getBalance());
-            toWallet.setBalance(toWallet.getBalance().add(amount));
+            log.info("No recipient wallet, skipping credit step.");
         }
-        eWalletRepository.save(toWallet);
-        log.info("Credited {} to seller wallet. New balance: {}", amount, toWallet.getBalance());
 
-        log.info("eWallet payment completed successfully: {} -> {} amount: {}", fromUser.getEmail(), toUser.getEmail(), amount);
+        log.info("eWallet payment completed successfully: {} -> {} amount: {}",
+                fromUser != null ? fromUser.getEmail() : "SYSTEM",
+                toUser != null ? toUser.getEmail() : "SYSTEM",
+                amount != null ? amount : BigDecimal.ZERO);
     }
+
 
     private EWalletDto mapToDto(EWallet eWallet) {
         return new EWalletDto(eWallet.getUser().getId(), eWallet.getBalance(), eWallet.getWalletLimit());

@@ -230,4 +230,11 @@ export const API_ENDPOINTS = {
         TRANSACTIONS: '/ewallet/transactions',
         CHECK_BALANCE: '/ewallet/balance/check',
     },
+    SHOWCASES: {
+        CREATE: '/showcases',
+        ACTIVE: '/showcases/active',
+        MY_SHOWCASES: '/showcases/my',
+        EXTEND: (id) => `/showcases/${id}/extend`,
+        CANCEL: (id) => `/showcases/${id}/cancel`,
+    },
 };
