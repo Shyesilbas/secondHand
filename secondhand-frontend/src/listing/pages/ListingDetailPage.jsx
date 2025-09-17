@@ -8,20 +8,24 @@ import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
+import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
+  const { showcases } = useShowcase();
 
   if (isLoading) return <div className="p-8 text-center">Loading...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!listing) return null;
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
+  const isInShowcase = Array.isArray(showcases) && showcases.some(s => (s.listing?.id || s.listingId) === listing.id);
 
   return (
       <div className="container mx-auto px-4 py-8 grid lg:grid-cols-3 gap-8">
@@ -41,6 +45,11 @@ const ListingDetailPage = () => {
               <span className="font-semibold text-highlight">{formatCurrency(listing.price, listing.currency)}</span>
               <span>{formatDateTime(listing.createdAt)}</span>
               {listing.listingNo && <span className="bg-gray-100 text-card-text-secondary px-2 py-1 rounded-full text-xs">#{listing.listingNo}</span>}
+              {isInShowcase && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700">
+                  ⭐ In Showcase
+                </span>
+              )}
             </div>
 
             <p className="text-card-text-secondary text-base leading-relaxed">{listing.description}</p>
@@ -81,6 +90,12 @@ const ListingDetailPage = () => {
                       listingId={listing.id}
                       iconOnly
                   />
+                </div>
+            )}
+
+            {isOwner && !isInShowcase && (
+                <div className="mt-4">
+                  <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
                 </div>
             )}
 

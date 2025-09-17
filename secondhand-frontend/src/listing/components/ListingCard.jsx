@@ -11,11 +11,13 @@ import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
 const ListingCard = memo(({ listing, onDeleted }) => {
     const [showPriceHistory, setShowPriceHistory] = useState(false);
     const { priceHistory, fetchPriceHistory } = usePriceHistory(listing?.id);
     const { user } = useAuth();
+    const { showcases } = useShowcase();
 
     const handlePriceHistoryClick = useCallback((e) => {
         e.preventDefault();
@@ -46,13 +48,22 @@ const ListingCard = memo(({ listing, onDeleted }) => {
         listing.status === 'ACTIVE' &&
         !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
 
+    const isInShowcase = Array.isArray(showcases) && showcases.some(s => (s.listing?.id || s.listingId) === listing.id);
+
 
     return (
         <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
             <div className="flex items-center justify-between px-4 pt-4">
-                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
-                    {listing.status}
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
+                        {listing.status}
+                    </span>
+                    {isInShowcase && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 font-medium">
+                            ⭐ Bu listing showcase'de!
+                        </span>
+                    )}
+                </div>
                 <FavoriteButton
                     listingId={listing.id}
                     listing={listing}

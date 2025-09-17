@@ -127,19 +127,37 @@ public class PaymentService {
 
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = null;
-        if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION) {
-            toUser = userService.findById(paymentRequest.toUserId());
-        }
 
-        if (toUser == null && paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION) {
-            throw new BusinessException("Recipient user must not be null for this transaction type", HttpStatus.BAD_REQUEST, "NULL_RECIPIENT");
+        if (paymentRequest.transactionType() == PaymentTransactionType.LISTING_CREATION) {
+            if (paymentRequest.toUserId() == null) {
+                throw new BusinessException(
+                        "Recipient user must not be null for listing creation",
+                        HttpStatus.BAD_REQUEST,
+                        "NULL_RECIPIENT"
+                );
+            }
+            toUser = userService.findById(paymentRequest.toUserId());
+        } else if (paymentRequest.transactionType() == PaymentTransactionType.SHOWCASE_PAYMENT) {
+
+            toUser = null;
+        } else {
+            if (paymentRequest.toUserId() == null) {
+                throw new BusinessException(
+                        "Recipient user must not be null for this transaction type",
+                        HttpStatus.BAD_REQUEST,
+                        "NULL_RECIPIENT"
+                );
+            }
+            toUser = userService.findById(paymentRequest.toUserId());
         }
 
         if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("Payment amount must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
         }
 
-        if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION && fromUser.getId().equals(toUser.getId())) {
+        if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION
+                && paymentRequest.transactionType() != PaymentTransactionType.SHOWCASE_PAYMENT
+                && fromUser.getId().equals(toUser.getId())) {
             throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
         }
 
@@ -168,7 +186,7 @@ public class PaymentService {
 
         payment = paymentRepository.save(payment);
         log.info("Payment {} created with ID: {}", paymentSuccessful ? "successfully" : "unsuccessfully", payment.getId());
-        
+
         if (paymentSuccessful) {
             eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
             log.info("Published PaymentCompletedEvent for payment ID: {}", payment.getId());

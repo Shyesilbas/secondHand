@@ -133,7 +133,7 @@ const UserSearchBar = ({ className = "" }) => {
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     onFocus={() => query.length >= 2 && setIsVisible(true)}
-                    placeholder="Kullanıcı ara..."
+                    placeholder="Search User..."
                     className="block w-full pl-10 pr-3 py-2 border border-sidebar-border rounded-md leading-5 bg-white text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-btn-primary sm:text-sm"
                 />
                 {query && (

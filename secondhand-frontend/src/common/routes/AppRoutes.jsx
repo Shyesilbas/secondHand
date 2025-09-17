@@ -38,6 +38,7 @@ import SecurityPage from '../../audit/pages/SecurityPage.jsx';
 import ShoppingCartPage from '../../cart/pages/ShoppingCartPage.jsx';
 import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
+import MyShowcasesPage from '../../showcase/pages/MyShowcasesPage.jsx';
 
 // Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
@@ -169,6 +170,7 @@ const AppRoutes = () => {
                         <Route path={ROUTES.MY_ORDERS} element={<MyOrdersPage />} />
                         <Route path={ROUTES.SECURITY} element={<SecurityPage />} />
                         <Route path={ROUTES.SHOPPING_CART} element={<ShoppingCartPage />} />
+                        <Route path={ROUTES.MY_SHOWCASES} element={<MyShowcasesPage />} />
             </Route>
 
             {/* Fallback */}
