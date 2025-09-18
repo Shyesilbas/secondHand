@@ -70,3 +70,36 @@ export const cleanObject = (obj) => {
   }, {});
 };
 
+// Generic enum label resolver — useEnums-free version for non-React contexts
+export const resolveEnumLabel = (enums, enumKey, value, fallback = null) => {
+  if (!value) return fallback ?? '';
+  const list = enums?.[enumKey] || [];
+  const found = list.find((o) => o?.value === value);
+  return found?.label || fallback || value;
+};
+
+// Title-case a backend enum code like "IN_TRANSIT" -> "In Transit"
+export const titleCaseEnumCode = (code) => {
+  if (!code) return '';
+  const lower = String(code).replaceAll('_', ' ').toLowerCase();
+  return lower.replace(/\b\w/g, (m) => m.toUpperCase());
+};
+
+// Replace raw enum codes within HTML/text content using enums maps; falls back to title-casing
+export const replaceEnumCodesInHtml = (html, enums = {}, keys = []) => {
+  if (!html) return '';
+  let result = String(html);
+  const targetKeys = keys.length ? keys : ['shippingStatuses', 'paymentTypes', 'emailTypes'];
+  targetKeys.forEach((key) => {
+    const list = enums?.[key] || [];
+    list.forEach(({ value, label }) => {
+      if (!value) return;
+      const pattern = new RegExp(`\\b${value}\\b`, 'g');
+      result = result.replace(pattern, label || titleCaseEnumCode(value));
+    });
+  });
+  // Generic fallback for ALL_CAPS tokens up to 3 words with underscores
+  result = result.replace(/\b[A-Z]+(?:_[A-Z]+)*\b/g, (m) => titleCaseEnumCode(m));
+  return result;
+};
+

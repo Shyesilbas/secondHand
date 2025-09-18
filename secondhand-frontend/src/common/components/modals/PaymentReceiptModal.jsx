@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { XMarkIcon, PrinterIcon, ShareIcon } from '@heroicons/react/24/outline';
-import { formatCurrency, formatDateTime } from '../../formatters.js';
+import { formatCurrency, formatDateTime, resolveEnumLabel, replaceEnumCodesInHtml } from '../../formatters.js';
+import { useEnums } from '../../hooks/useEnums.js';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 
 const useModalBodyOverflow = (isOpen) => {
@@ -33,6 +34,7 @@ const PaymentStatusBadge = ({ isSuccess }) => {
 
 const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const notification = useNotification();
+  const { enums } = useEnums();
   useModalBodyOverflow(isOpen);
 
   if (!isOpen || !payment) return null;
@@ -67,8 +69,8 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
   const paymentFields = [
     { label: 'Receipt No', value: payment.paymentId, mono: true },
     { label: 'Date', value: formatDate(payment.createdAt) },
-    { label: 'Method', value: payment.paymentType },
-    { label: 'Type', value: payment.transactionType },
+    { label: 'Method', value: resolveEnumLabel(enums, 'paymentTypes', payment.paymentType) },
+    { label: 'Type', value: replaceEnumCodesInHtml(payment.transactionType, enums, ['paymentTypes']) },
     payment.senderName && { label: 'From', value: `${payment.senderName} ${payment.senderSurname || ''}` },
     payment.receiverName && { label: 'To', value: `${payment.receiverName} ${payment.receiverSurname || ''}` },
     payment.listingTitle && { label: 'Listing', value: payment.listingTitle },

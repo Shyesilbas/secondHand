@@ -60,7 +60,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                     </span>
                     {isInShowcase && (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 font-medium">
-                            ⭐ Bu listing showcase'de!
+                            ⭐ This Listing is in Showcase!
                         </span>
                     )}
                 </div>

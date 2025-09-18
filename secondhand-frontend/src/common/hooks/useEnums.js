@@ -28,7 +28,10 @@ export const useEnums = () => {
     bookConditions: [],
     sportDisciplines: [],
     sportEquipmentTypes: [],
-    sportConditions: []
+    sportConditions: [],
+    paymentTypes: [],
+    shippingStatuses: [],
+    emailTypes: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,7 +77,10 @@ export const useEnums = () => {
           bookConditions,
           sportDisciplines,
           sportEquipmentTypes,
-          sportConditions
+          sportConditions,
+          paymentTypes,
+          shippingStatuses,
+          emailTypes
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -100,7 +106,10 @@ export const useEnums = () => {
           enumService.getBookConditions(),
           enumService.getSportDisciplines(),
           enumService.getSportEquipmentTypes(),
-          enumService.getSportConditions()
+          enumService.getSportConditions(),
+          enumService.getPaymentTypes(),
+          enumService.getShippingStatuses(),
+          enumService.getEmailTypes()
         ]);
 
         const fetchedEnums = {
@@ -128,7 +137,10 @@ export const useEnums = () => {
           bookConditions,
           sportDisciplines,
           sportEquipmentTypes,
-          sportConditions
+          sportConditions,
+          paymentTypes,
+          shippingStatuses,
+          emailTypes
         };
 
         setEnums(fetchedEnums);

@@ -1,6 +1,9 @@
 package com.serhat.secondhand.core.api;
 
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
@@ -28,6 +31,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/enums")
@@ -261,6 +265,48 @@ public class EnumController {
         return ResponseEntity.ok(ownerTypes);
     }
 
+    @GetMapping("/payment-types")
+    @Operation(summary = "Get all payment types")
+    public ResponseEntity<List<Map<String, Object>>> getPaymentTypes() {
+        List<Map<String, Object>> types = Arrays.stream(PaymentType.values())
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", type.name());
+                    map.put("label", getPaymentTypeLabel(type));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
+    }
+
+    @GetMapping("/shipping-statuses")
+    @Operation(summary = "Get all shipping statuses")
+    public ResponseEntity<List<Map<String, Object>>> getShippingStatuses() {
+        List<Map<String, Object>> list = Arrays.stream(ShippingStatus.values())
+                .map(status -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", status.name());
+                    map.put("label", getShippingStatusLabel(status));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/email-types")
+    @Operation(summary = "Get all email types")
+    public ResponseEntity<List<Map<String, Object>>> getEmailTypes() {
+        List<Map<String, Object>> list = Arrays.stream(EmailType.values())
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", type.name());
+                    map.put("label", getEmailTypeLabel(type));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
     @GetMapping("/clothing-brands")
     @Operation(summary = "Get all clothing brands")
     public ResponseEntity<List<Map<String, Object>>> getClothingBrands() {
@@ -310,7 +356,7 @@ public class EnumController {
                 .map(genre -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", genre.name());
-                    map.put("label", genre.name());
+                    map.put("label", getBookGenreLabel(genre));
                     return map;
                 })
                 .toList();
@@ -324,7 +370,7 @@ public class EnumController {
                 .map(lang -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", lang.name());
-                    map.put("label", lang.name());
+                    map.put("label", getBookLanguageLabel(lang));
                     return map;
                 })
                 .toList();
@@ -338,7 +384,7 @@ public class EnumController {
                 .map(fmt -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", fmt.name());
-                    map.put("label", fmt.name());
+                    map.put("label", getBookFormatLabel(fmt));
                     return map;
                 })
                 .toList();
@@ -352,7 +398,7 @@ public class EnumController {
                 .map(cond -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", cond.name());
-                    map.put("label", cond.name());
+                    map.put("label", getBookConditionLabel(cond));
                     return map;
                 })
                 .toList();
@@ -366,7 +412,7 @@ public class EnumController {
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", v.name());
-                    map.put("label", v.name());
+                    map.put("label", getSportDisciplineLabel(v));
                     return map;
                 })
                 .toList();
@@ -380,7 +426,7 @@ public class EnumController {
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", v.name());
-                    map.put("label", v.name());
+                    map.put("label", getSportEquipmentTypeLabel(v));
                     return map;
                 })
                 .toList();
@@ -394,7 +440,7 @@ public class EnumController {
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", v.name());
-                    map.put("label", v.name());
+                    map.put("label", getSportConditionLabel(v));
                     return map;
                 })
                 .toList();
@@ -697,6 +743,71 @@ public class EnumController {
             case WORN -> "Worn";
             case DAMAGED -> "Damaged";
         };
+    }
+
+    private String getPaymentTypeLabel(PaymentType type) {
+        return switch (type) {
+            case CREDIT_CARD -> "Credit Card";
+            case TRANSFER -> "Bank Transfer";
+            case EWALLET -> "E-Wallet";
+        };
+    }
+
+    private String getShippingStatusLabel(ShippingStatus status) {
+        return switch (status) {
+            case PENDING -> "Pending";
+            case IN_TRANSIT -> "In Transit";
+            case DELIVERED -> "Delivered";
+            case CANCELLED -> "Cancelled";
+        };
+    }
+
+    private String getEmailTypeLabel(EmailType type) {
+        return toTitleCase(type.name());
+    }
+
+    // Book labels
+    private String getBookGenreLabel(BookGenre genre) {
+        return toTitleCase(genre.name());
+    }
+
+    private String getBookLanguageLabel(BookLanguage language) {
+        return toTitleCase(language.name());
+    }
+
+    private String getBookFormatLabel(BookFormat format) {
+        return toTitleCase(format.name());
+    }
+
+    private String getBookConditionLabel(BookCondition condition) {
+        return toTitleCase(condition.name());
+    }
+
+    // generic formatter for ENUM_NAME -> "Enum Name"
+    private String toTitleCase(String enumName) {
+        String lower = enumName.replace('_', ' ').toLowerCase(Locale.ROOT);
+        String[] parts = lower.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (parts[i].isEmpty()) continue;
+            sb.append(Character.toUpperCase(parts[i].charAt(0)));
+            if (parts[i].length() > 1) sb.append(parts[i].substring(1));
+            if (i < parts.length - 1) sb.append(' ');
+        }
+        return sb.toString();
+    }
+
+    // Sports labels
+    private String getSportDisciplineLabel(SportDiscipline discipline) {
+        return toTitleCase(discipline.name());
+    }
+
+    private String getSportEquipmentTypeLabel(SportEquipmentType equipmentType) {
+        return toTitleCase(equipmentType.name());
+    }
+
+    private String getSportConditionLabel(SportCondition condition) {
+        return toTitleCase(condition.name());
     }
 
     private String getGenderLabel(Gender gender) {
