@@ -54,4 +54,9 @@ export const enumService = {
   getSportDisciplines: async () => get(API_ENDPOINTS.ENUMS.SPORT_DISCIPLINES),
   getSportEquipmentTypes: async () => get(API_ENDPOINTS.ENUMS.SPORT_EQUIPMENT_TYPES),
   getSportConditions: async () => get(API_ENDPOINTS.ENUMS.SPORT_CONDITIONS),
+
+  // Payments / Orders / Emails
+  getPaymentTypes: async () => get(API_ENDPOINTS.ENUMS.PAYMENT_TYPES),
+  getShippingStatuses: async () => get(API_ENDPOINTS.ENUMS.SHIPPING_STATUSES),
+  getEmailTypes: async () => get(API_ENDPOINTS.ENUMS.EMAIL_TYPES),
 };

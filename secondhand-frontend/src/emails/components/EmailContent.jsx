@@ -1,8 +1,11 @@
 import React from 'react';
-import { formatDateTime } from '../../common/formatters.js';
+import { formatDateTime, replaceEnumCodesInHtml } from '../../common/formatters.js';
+import { useEnums } from '../../common/hooks/useEnums.js';
 
 const EmailContent = ({ email }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
+
+    const { enums } = useEnums();
 
     if (!email) {
         return (
@@ -48,7 +51,7 @@ const EmailContent = ({ email }) => {
                     <div 
                         className="text-text-secondary leading-relaxed"
                         dangerouslySetInnerHTML={{ 
-                            __html: email.content.replace(/\n/g, '<br/>') 
+                            __html: replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>') 
                         }}
                     />
                 </div>

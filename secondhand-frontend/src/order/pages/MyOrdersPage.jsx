@@ -4,10 +4,12 @@ import { paymentService } from '../../payments/services/paymentService.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import { ReviewButton } from '../../reviews/index.js';
-import { formatDateTime, formatCurrency } from '../../common/formatters.js';
+import { formatDateTime, formatCurrency, resolveEnumLabel } from '../../common/formatters.js';
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { useOrders } from '../hooks/useOrders.js';
 
 const MyOrdersPage = () => {
+  const { enums } = useEnums();
   const {
     orders,
     loading,
@@ -209,7 +211,7 @@ const MyOrdersPage = () => {
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">#{order.orderNumber}</h3>
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                        {order.status}
+                        {resolveEnumLabel(enums, 'listingStatuses', order.status)}
                       </span>
                         </div>
                         <p className="text-sm text-gray-500">{formatDateTime(order.createdAt)}</p>
@@ -231,13 +233,13 @@ const MyOrdersPage = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">Payment:</span>
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.paymentStatus)}`}>
-                      {order.paymentStatus}
+                      {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
                     </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500">Shipping:</span>
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.shippingStatus)}`}>
-                      {order.shippingStatus}
+                      {resolveEnumLabel(enums, 'shippingStatuses', order.shippingStatus)}
                     </span>
                       </div>
                       {getEstimatedDeliveryTime(order.createdAt, order.shippingStatus) && (

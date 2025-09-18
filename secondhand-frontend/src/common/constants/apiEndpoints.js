@@ -100,6 +100,9 @@ export const API_ENDPOINTS = {
         SPORT_DISCIPLINES: '/v1/enums/sport-disciplines',
         SPORT_EQUIPMENT_TYPES: '/v1/enums/sport-equipment-types',
         SPORT_CONDITIONS: '/v1/enums/sport-conditions',
+        PAYMENT_TYPES: '/v1/enums/payment-types',
+        SHIPPING_STATUSES: '/v1/enums/shipping-statuses',
+        EMAIL_TYPES: '/v1/enums/email-types',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
