@@ -2,6 +2,7 @@ package com.serhat.secondhand.ewallet.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.dto.DepositRequest;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.ewallet.dto.EWalletDto;
 import com.serhat.secondhand.ewallet.dto.UpdateLimitRequest;
 import com.serhat.secondhand.ewallet.dto.WithdrawRequest;
@@ -18,7 +19,6 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class EWalletService {
         User user = userService.findById(userId);
 
         if (eWalletRepository.existsByUser(user)) {
-            throw new BusinessException("User already has an eWallet", HttpStatus.CONFLICT, "EWALLET_EXISTS");
+            throw new BusinessException(PaymentErrorCodes.EWALLET_EXISTS);
         }
 
         EWallet eWallet = EWallet.builder()
@@ -60,7 +60,7 @@ public class EWalletService {
     public EWalletDto getEWalletByUserId(Long userId) {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException("eWallet not found for user", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
 
         return mapToDto(eWallet);
     }
@@ -69,18 +69,18 @@ public class EWalletService {
     public void deposit(Long userId, DepositRequest request, Authentication authentication) {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException("eWallet not found for user", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
 
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Deposit amount must be positive", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
 
         // Get specific bank account by ID
         Bank bank = bankService.findByUser(user).orElseThrow(() ->
-            new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
+            new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
 
         if (!bank.getId().equals(request.getBankId())) {
-            throw new BusinessException("Invalid bank account selected. Expected: " + bank.getId() + ", Got: " + request.getBankId(), HttpStatus.BAD_REQUEST, "INVALID_BANK_ACCOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
         }
 
         bankService.debit(user, request.getAmount());
@@ -110,22 +110,22 @@ public class EWalletService {
     public void withdraw(Long userId, WithdrawRequest request, Authentication authentication) {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException("eWallet not found for user", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
 
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Withdrawal amount must be positive", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
 
         if (eWallet.getBalance().compareTo(request.getAmount()) < 0) {
-            throw new BusinessException("Insufficient balance in eWallet", HttpStatus.BAD_REQUEST, "INSUFFICIENT_BALANCE");
+            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
         }
 
         // Get specific bank account by ID
         Bank bank = bankService.findByUser(user).orElseThrow(() ->
-            new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
+            new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
 
         if (!bank.getId().equals(request.getBankId())) {
-            throw new BusinessException("Invalid bank account selected. Expected: " + bank.getId() + ", Got: " + request.getBankId(), HttpStatus.BAD_REQUEST, "INVALID_BANK_ACCOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
         }
 
         eWallet.setBalance(eWallet.getBalance().subtract(request.getAmount()));
@@ -155,10 +155,10 @@ public class EWalletService {
     public EWalletDto updateLimits(Long userId, UpdateLimitRequest request) {
         User user = userService.findById(userId);
         EWallet eWallet = eWalletRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException("eWallet not found for user", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
 
         if (request.getNewLimit().compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessException("Wallet limit cannot be negative", HttpStatus.BAD_REQUEST, "INVALID_LIMIT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_WALLET_LIMIT);
         }
 
         eWallet.setWalletLimit(request.getNewLimit());
@@ -189,12 +189,12 @@ public class EWalletService {
                 listingId != null ? listingId : "N/A");
 
         EWallet fromWallet = eWalletRepository.findByUser(fromUser)
-                .orElseThrow(() -> new BusinessException("eWallet not found for payer", HttpStatus.NOT_FOUND, "EWALLET_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
 
         log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
 
         if (fromWallet.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException("Insufficient balance in eWallet", HttpStatus.BAD_REQUEST, "INSUFFICIENT_BALANCE");
+            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
         }
 
         fromWallet.setBalance(fromWallet.getBalance().subtract(amount));

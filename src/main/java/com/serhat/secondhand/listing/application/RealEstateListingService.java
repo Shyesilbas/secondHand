@@ -3,14 +3,10 @@ package com.serhat.secondhand.listing.application;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.RealEstateFilterDto;
-import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
-import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
-import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepository;
@@ -37,10 +33,13 @@ public class RealEstateListingService {
 
     @Transactional
     public UUID createRealEstateListing(RealEstateCreateRequest request, User seller) {
-        com.serhat.secondhand.listing.domain.entity.RealEstateListing realEstateListing = listingMapper.toRealEstateEntity(request);
+
+        RealEstateListing realEstateListing = listingMapper.toRealEstateEntity(request);
         realEstateListing.setSeller(seller);
-       RealEstateListing saved =  realEstateRepository.save(realEstateListing);
+
+        RealEstateListing saved =  realEstateRepository.save(realEstateListing);
         log.info("Real estate listing created: {}", realEstateListing.getId());
+
         return saved.getId();
 
     }
@@ -100,7 +99,7 @@ public class RealEstateListingService {
 
     public RealEstateListingDto getRealEstateDetails(UUID id) {
         RealEstateListing realEstateListing = realEstateRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("electronic listing not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Real Estate listing not found"));
         return listingMapper.toRealEstateDto(realEstateListing);
     }
 

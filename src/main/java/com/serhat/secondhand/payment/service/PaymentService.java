@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.verification.CodeType;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.listing.application.ListingService;
@@ -29,7 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +69,7 @@ public class PaymentService {
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(listingFeePaymentRequest.listingId())
-                .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.LISTING_NOT_FOUND));
 
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
 
@@ -82,13 +82,13 @@ public class PaymentService {
             // Log the verification code for development purposes
             log.info("Payment verification code generated for user {}: {}", fromUser.getEmail(), code);
             
-            throw new BusinessException("Verification code required. Code sent via email.", HttpStatus.PRECONDITION_REQUIRED, "PAYMENT_VERIFICATION_REQUIRED");
+            throw new BusinessException(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
         }
 
         // Validate provided verification code
         boolean valid = verificationService.validateVerificationCode(fromUser, listingFeePaymentRequest.verificationCode(), CodeType.PAYMENT_VERIFICATION);
         if (!valid) {
-            throw new BusinessException("Invalid or expired verification code", HttpStatus.BAD_REQUEST, "INVALID_VERIFICATION_CODE");
+            throw new BusinessException(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
         }
 
         PaymentRequest fullRequest = getPaymentRequest(listingFeePaymentRequest, fromUser, listing);
@@ -158,16 +158,16 @@ public class PaymentService {
     @Transactional
     public List<PaymentDto> createPurchasePayments(List<PaymentRequest> paymentRequests, Authentication authentication) {
         if (paymentRequests == null || paymentRequests.isEmpty()) {
-            throw new BusinessException("No payments to process", HttpStatus.BAD_REQUEST, "EMPTY_PAYMENT_BATCH");
+            throw new BusinessException(PaymentErrorCodes.EMPTY_PAYMENT_BATCH);
         }
 
         List<PaymentDto> results = new ArrayList<>();
         for (PaymentRequest request : paymentRequests) {
             if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
-                throw new BusinessException("Invalid transaction type in batch", HttpStatus.BAD_REQUEST, "INVALID_TXN_TYPE");
+                throw new BusinessException(PaymentErrorCodes.INVALID_TXN_TYPE);
             }
             if (request.paymentDirection() != PaymentDirection.OUTGOING) {
-                throw new BusinessException("Invalid payment direction in batch", HttpStatus.BAD_REQUEST, "INVALID_DIRECTION");
+                throw new BusinessException(PaymentErrorCodes.INVALID_DIRECTION);
             }
             PaymentDto result = createPayment(request, authentication);
             results.add(result);

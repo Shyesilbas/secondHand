@@ -2,11 +2,11 @@ package com.serhat.secondhand.favorite.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +37,7 @@ public class ListingAccessService {
      */
     public void validateActive(Listing listing) {
         if (listing == null || !listing.getStatus().equals(ListingStatus.ACTIVE)) {
-            throw new BusinessException("Cannot favorite inactive listing", HttpStatus.BAD_REQUEST, "INACTIVE_LISTING");
+            throw new BusinessException(FavoriteErrorCodes.INACTIVE_LISTING);
         }
     }
 }

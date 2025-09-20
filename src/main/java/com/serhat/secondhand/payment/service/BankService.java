@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.BankDto;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.helper.IbanGenerator;
@@ -10,7 +11,6 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +41,7 @@ public class BankService {
         User user = userService.getAuthenticatedUser(authentication);
 
         if (bankRepository.existsByAccountHolder(user)) {
-            throw new BusinessException("User already has a bank account", HttpStatus.CONFLICT, "BANK_ACCOUNT_EXISTS");
+            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_EXISTS);
         }
 
         Bank bank = Bank.builder()
@@ -63,7 +63,7 @@ public class BankService {
     
     public Bank findByUserMandatory(User user) {
         return findByUser(user)
-            .orElseThrow(() -> new BusinessException("User does not have a bank account", HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
+            .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
     }
 
     public void credit(User user, BigDecimal amount) {
@@ -79,11 +79,11 @@ public class BankService {
 
     public void debit(User user, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Debit amount must be positive.", HttpStatus.BAD_REQUEST, "INVALID_DEBIT_AMOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_DEBIT_AMOUNT);
         }
         Bank bank = findByUserMandatory(user);
         if (bank.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException("Insufficient funds.", HttpStatus.BAD_REQUEST, "INSUFFICIENT_FUNDS");
+            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS);
         }
         bank.setBalance(bank.getBalance().subtract(amount));
         bankRepository.save(bank);
@@ -118,6 +118,6 @@ public class BankService {
 
     public Bank getBankByUserId(User user) {
         return bankRepository.findByAccountHolder(user)
-                .orElseThrow(() -> new BusinessException("Bank account not found for user: " + user.getId(), HttpStatus.NOT_FOUND, "BANK_ACCOUNT_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
     }
 }

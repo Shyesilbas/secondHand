@@ -2,6 +2,8 @@ package com.serhat.secondhand.complaint;
 
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.complaint.util.ComplaintErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +30,10 @@ public class ComplaintService {
     @Transactional
     public ComplaintDto createComplaint(ComplaintRequest complaintRequest) {
         if (complaintRequest.complainerId() == null) {
-            throw new IllegalArgumentException("NULL");
+            throw new BusinessException(ComplaintErrorCodes.COMPLAINER_ID_NULL);
         }
         if (complaintRequest.complainedUserId() == null) {
-            throw new IllegalArgumentException("NULL");
+            throw new BusinessException(ComplaintErrorCodes.COMPLAINED_USER_ID_NULL);
         }
 
         User complainer = userService.findById(complaintRequest.complainerId());
@@ -66,7 +68,7 @@ public class ComplaintService {
     @Transactional
     public Complaint updateComplaintStatus(String complaintId, ComplaintStatus newStatus, String adminNotes, User admin) {
         Complaint complaint = complaintRepository.findById(complaintId)
-                .orElseThrow(() -> new RuntimeException("Complaint not found: " + complaintId));
+                .orElseThrow(() -> new BusinessException(ComplaintErrorCodes.COMPLAINT_NOT_FOUND));
 
         complaint.setStatus(newStatus);
         complaint.setResolvedBy(admin);
@@ -125,11 +127,11 @@ public class ComplaintService {
 
     private void validateComplaint(User complainer, User complainedUser) {
         if (complainer.getId().equals(complainedUser.getId())) {
-            throw new IllegalArgumentException("Users cannot complain about themselves");
+            throw new BusinessException(ComplaintErrorCodes.CANNOT_COMPLAIN_ABOUT_SELF);
         }
 
         if (complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser)) {
-            throw new IllegalArgumentException("You have already submitted a complaint about this user");
+            throw new BusinessException(ComplaintErrorCodes.COMPLAINT_ALREADY_EXISTS);
         }
     }
 }

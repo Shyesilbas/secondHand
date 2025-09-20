@@ -2,6 +2,8 @@ package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import com.serhat.secondhand.user.domain.entity.Address;
+import com.serhat.secondhand.user.util.AddressErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.AddressRepository;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
@@ -27,7 +29,7 @@ public class AddressService {
 
     public AddressDto addAddress(User user, AddressDto addressDto) {
         if (addressRepository.countByUser(user) >= 3) {
-            throw new IllegalStateException("A user can have at most 3 addresses.");
+            throw new BusinessException(AddressErrorCodes.MAX_ADDRESSES_EXCEEDED);
         }
         Address address = addressMapper.toEntity(addressDto);
         address.setUser(user);
@@ -39,9 +41,9 @@ public class AddressService {
 
     public AddressDto updateAddress(Long addressId, AddressDto updatedAddressDto, User user) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+                .orElseThrow(() -> new BusinessException(AddressErrorCodes.ADDRESS_NOT_FOUND));
         if (!address.getUser().getId().equals(user.getId())) {
-            throw new SecurityException("Unauthorized");
+            throw new BusinessException(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
         }
         address.setAddressLine(updatedAddressDto.getAddressLine());
         address.setCity(updatedAddressDto.getCity());
@@ -57,9 +59,9 @@ public class AddressService {
 
     public void deleteAddress(Long addressId, User user) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+                .orElseThrow(() -> new BusinessException(AddressErrorCodes.ADDRESS_NOT_FOUND));
         if (!address.getUser().getId().equals(user.getId())) {
-            throw new SecurityException("Unauthorized");
+            throw new BusinessException(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
         }
         addressRepository.delete(address);
     }
@@ -80,6 +82,6 @@ public class AddressService {
 
     public Address getAddressById(@NotNull(message = "Shipping address ID is required") Long shippingAddressId) {
         return addressRepository.findById(shippingAddressId)
-                .orElseThrow(() -> new IllegalArgumentException("Shipping address not found"));
+                .orElseThrow(() -> new BusinessException(AddressErrorCodes.SHIPPING_ADDRESS_NOT_FOUND));
     }
 }
