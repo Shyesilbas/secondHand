@@ -1,6 +1,7 @@
 package com.serhat.secondhand.agreements.controller;
 
 import com.serhat.secondhand.agreements.entity.Agreement;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.dto.AgreementDto;
 import com.serhat.secondhand.agreements.dto.UserAgreementDto;
@@ -52,9 +53,13 @@ public class AgreementController {
     }
 
     @GetMapping("/required")
-    @Operation(summary = "Get required agreements for registration", description = "Retrieves agreements required during user registration")
-    public ResponseEntity<List<AgreementDto>> getRequiredAgreements() {
-        var agreements = agreementService.getRequiredAgreements();
+    @Operation(summary = "Get required agreements for a group", description = "Retrieves agreements required for a specific group (e.g. registration, payment, etc.)")
+    public ResponseEntity<List<AgreementDto>> getRequiredAgreements(
+            @RequestParam(value = "agreementGroup") AgreementGroup agreementGroup) {
+        if (agreementGroup == null) {
+            throw new IllegalArgumentException("agreementGroup parametresi zorunludur!");
+        }
+        var agreements = agreementService.getRequiredAgreements(agreementGroup);
         var agreementDtos = agreementMapper.toDtoList(agreements);
         return ResponseEntity.ok(agreementDtos);
     }
@@ -123,13 +128,6 @@ public class AgreementController {
     public ResponseEntity<List<UserAgreementDto>> getUserAgreements(@AuthenticationPrincipal User user) {
         var userAgreements = userAgreementService.getUserAgreements(user);
         return ResponseEntity.ok(userAgreements);
-    }
-
-    @GetMapping("/user/status")
-    @Operation(summary = "Check user registration agreement status", description = "Checks if user has accepted all required agreements for registration")
-    public ResponseEntity<Boolean> hasAcceptedAllRegistrationAgreements(@AuthenticationPrincipal User user) {
-        var hasAccepted = userAgreementService.hasAcceptedAllRegistrationAgreements(user);
-        return ResponseEntity.ok(hasAccepted);
     }
 
     @GetMapping("/user/status/{agreementType}")

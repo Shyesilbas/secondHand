@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -53,4 +55,8 @@ public class RegisterRequest {
 
     @NotNull(message = "Agreement acceptance is required")
     private Boolean agreementsAccepted;
+
+    @NotNull(message = "Accepted agreement IDs are required")
+    private List<UUID> acceptedAgreementIds;
+    
 } 

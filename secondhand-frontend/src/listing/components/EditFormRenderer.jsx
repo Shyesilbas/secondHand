@@ -1,13 +1,7 @@
 import React from 'react';
 import { listingTypeRegistry } from './typeRegistry.js';
 
-/**
- * Renders the appropriate edit form component for a listing type
- * @param {Object} listing - The listing data to edit
- * @param {string} type - The listing type (VEHICLE, ELECTRONICS, etc.)
- * @param {Function} handleUpdate - Callback function for form submission
- * @returns {React.Component} The edit form component or error message
- */
+
 export const renderEditForm = (listing, type, handleUpdate) => {
     // Validate required parameters
     if (!listing) {

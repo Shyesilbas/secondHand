@@ -19,8 +19,8 @@ class AgreementService {
     return get(API_ENDPOINTS.AGREEMENTS.ALL);
   }
 
-  async getRequiredAgreements() {
-    return get(API_ENDPOINTS.AGREEMENTS.REQUIRED);
+  async getRequiredAgreementsForRegister() {
+    return get(`${API_ENDPOINTS.AGREEMENTS.REQUIRED}?agreementGroup=REGISTER`);
   }
 
   async acceptAgreement(acceptRequest) {

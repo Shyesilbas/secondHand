@@ -3,12 +3,15 @@ package com.serhat.secondhand.agreements.service;
 import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.entity.Agreement;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.util.AgreementErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +31,7 @@ public class AgreementService {
     private String privacyPolicyContent;
 
     private final AgreementRepository agreementRepository;
+    private final AgreementVersionHelper agreementVersionHelper;
 
     public List<Agreement> createAgreements() {
         log.info("Creating agreements for all types if they don't exist");
@@ -85,97 +89,42 @@ public class AgreementService {
         Optional<Agreement> existingAgreement = agreementRepository.findAll().stream()
                 .filter(agreement -> agreement.getAgreementType() == agreementType)
                 .findFirst();
-
         if (existingAgreement.isPresent()) {
-            return incrementVersion(existingAgreement.get().getVersion());
+            return agreementVersionHelper.incrementVersion(existingAgreement.get().getVersion());
         }
-
         return "1.0.0";
-    }
-
-
-    private String incrementVersion(String currentVersion) {
-        if (currentVersion == null || currentVersion.trim().isEmpty()) {
-            return "1.0.0";
-        }
-
-        try {
-            String[] parts = currentVersion.split("\\.");
-            if (parts.length != 3) {
-                log.warn("Invalid version format: {}, using default", currentVersion);
-                return "1.0.0";
-            }
-
-            int major = Integer.parseInt(parts[0]);
-            int minor = Integer.parseInt(parts[1]);
-            int patch = Integer.parseInt(parts[2]);
-
-            patch++;
-
-            return major + "." + minor + "." + patch;
-        } catch (NumberFormatException e) {
-            log.warn("Invalid version format: {}, using default", currentVersion);
-            return "1.0.0";
-        }
-    }
-
-
-    private boolean isValidVersion(String version) {
-        if (version == null || version.trim().isEmpty()) {
-            return false;
-        }
-
-        String[] parts = version.split("\\.");
-        if (parts.length != 3) {
-            return false;
-        }
-
-        try {
-            Integer.parseInt(parts[0]);
-            Integer.parseInt(parts[1]); // minor
-            Integer.parseInt(parts[2]); // patch
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     public Agreement getAgreementByType(AgreementType agreementType) {
         return agreementRepository.findAll().stream()
                 .filter(agreement -> agreement.getAgreementType() == agreementType)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Agreement not found for type: " + agreementType));
+                .orElseThrow(() -> new RuntimeException(AgreementErrorCodes.AGREEMENT_NOT_FOUND.getMessage()));
     }
 
     public Agreement getAgreementById(UUID agreementId) {
         return agreementRepository.findById(agreementId)
-                .orElseThrow(() -> new RuntimeException("Agreement not found with ID: " + agreementId));
+                .orElseThrow(() -> new RuntimeException(AgreementErrorCodes.AGREEMENT_NOT_FOUND.getMessage()));
     }
 
     public List<Agreement> getAllAgreements() {
         return agreementRepository.findAll();
     }
 
-    public List<Agreement> getRequiredAgreements() {
+    public List<Agreement> getRequiredAgreements(AgreementGroup group) {
+        AgreementType[] requiredTypes = group.getRequiredTypes();
         return agreementRepository.findAll().stream()
-                .filter(agreement -> agreement.getAgreementType().isRequiredForRegistration())
+                .filter(agreement -> Arrays.asList(requiredTypes).contains(agreement.getAgreementType()))
                 .toList();
     }
 
     public Agreement updateAgreement(UUID agreementId, String content) {
         Agreement agreement = getAgreementById(agreementId);
-
         String newVersion = agreement.getVersion();
-        if (!agreement.getContent().equals(content)) {
-            newVersion = incrementVersion(agreement.getVersion());
-            log.info("Content changed for agreement {}, incrementing version from {} to {}",
-                    agreementId, agreement.getVersion(), newVersion);
-        }
-
+        newVersion = agreementVersionHelper.handleContentChange(agreement.getContent(), content, agreement.getVersion());
         agreement.setVersion(newVersion);
         agreement.setContent(content);
         agreement.setUpdatedDate(LocalDate.now());
-
         Agreement updatedAgreement = agreementRepository.save(agreement);
         log.info("Updated agreement with ID: {}, new version: {}", agreementId, newVersion);
         return updatedAgreement;
@@ -184,15 +133,12 @@ public class AgreementService {
 
     public Agreement updateAgreementWithVersion(UUID agreementId, String version, String content) {
         Agreement agreement = getAgreementById(agreementId);
-
-        if (!isValidVersion(version)) {
-            throw new IllegalArgumentException("Invalid version format: " + version + ". Expected format: x.y.z");
+        if (!agreementVersionHelper.isValidVersion(version)) {
+            throw new IllegalArgumentException(AgreementErrorCodes.INVALID_VERSION.getMessage());
         }
-
         agreement.setVersion(version);
         agreement.setContent(content);
         agreement.setUpdatedDate(LocalDate.now());
-
         Agreement updatedAgreement = agreementRepository.save(agreement);
         log.info("Updated agreement with ID: {}, manual version: {}", agreementId, version);
         return updatedAgreement;

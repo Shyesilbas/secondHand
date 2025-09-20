@@ -18,12 +18,11 @@ import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.payment.util.PaymentProcessingHelper;
+import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -46,17 +45,11 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final UserService userService;
-    private final BankService bankService;
-    private final CreditCardService creditCardService;
     private final ListingService listingService;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
     private final IVerificationService verificationService;
     private final EmailService emailService;
-    
-    @Autowired
-    @Lazy
-    private EWalletService eWalletService;
 
     @Getter
     @Value("${app.listing.creation.fee}")
@@ -69,6 +62,9 @@ public class PaymentService {
     @Getter
     @Value("${app.listing.fee.tax}")
     private BigDecimal listingFeeTax;
+
+    private final PaymentProcessingHelper paymentProcessingHelper;
+    private final PaymentValidationHelper paymentValidationHelper;
 
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
@@ -128,49 +124,12 @@ public class PaymentService {
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = null;
 
-        if (paymentRequest.transactionType() == PaymentTransactionType.LISTING_CREATION) {
-            if (paymentRequest.toUserId() == null) {
-                throw new BusinessException(
-                        "Recipient user must not be null for listing creation",
-                        HttpStatus.BAD_REQUEST,
-                        "NULL_RECIPIENT"
-                );
-            }
-            toUser = userService.findById(paymentRequest.toUserId());
-        } else if (paymentRequest.transactionType() == PaymentTransactionType.SHOWCASE_PAYMENT) {
+        toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
+        paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
 
-            toUser = null;
-        } else {
-            if (paymentRequest.toUserId() == null) {
-                throw new BusinessException(
-                        "Recipient user must not be null for this transaction type",
-                        HttpStatus.BAD_REQUEST,
-                        "NULL_RECIPIENT"
-                );
-            }
-            toUser = userService.findById(paymentRequest.toUserId());
-        }
-
-        if (paymentRequest.amount() == null || paymentRequest.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Payment amount must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
-        }
-
-        if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION
-                && paymentRequest.transactionType() != PaymentTransactionType.SHOWCASE_PAYMENT
-                && fromUser.getId().equals(toUser.getId())) {
-            throw new BusinessException("Cannot make payment to yourself", HttpStatus.BAD_REQUEST, "SELF_PAYMENT");
-        }
-
-        if (paymentRequest.paymentType() == null) {
-            throw new BusinessException("Payment type is required", HttpStatus.BAD_REQUEST, "PAYMENT_TYPE_REQUIRED");
-        }
-
-        boolean paymentSuccessful = switch (paymentRequest.paymentType()) {
-            case CREDIT_CARD -> processCreditCardPayment(fromUser, toUser, paymentRequest.amount());
-            case TRANSFER -> processBankTransfer(fromUser, toUser, paymentRequest.amount());
-            case EWALLET -> processEWalletPayment(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId());
-            default -> throw new BusinessException("Unsupported payment type", HttpStatus.BAD_REQUEST, "UNSUPPORTED_PAYMENT_TYPE");
-        };
+        boolean paymentSuccessful = paymentProcessingHelper.processPayment(
+                paymentRequest.paymentType(), fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId()
+        );
 
         Payment payment = Payment.builder()
                 .fromUser(fromUser)
@@ -215,41 +174,6 @@ public class PaymentService {
         }
         return results;
     }
-
-    private boolean processCreditCardPayment(User fromUser, User toUser, BigDecimal amount) {
-        log.info("Processing credit card payment from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
-        boolean paymentSuccessful = creditCardService.processPayment(fromUser, amount);
-        if (paymentSuccessful && toUser != null && !fromUser.getId().equals(toUser.getId())) {
-            bankService.credit(toUser, amount);
-            log.info("Credited {} to recipient's bank account.", amount);
-        }
-        return paymentSuccessful;
-    }
-
-    private boolean processBankTransfer(User fromUser, User toUser, BigDecimal amount) {
-        log.info("Processing bank transfer from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
-        try {
-            bankService.debit(fromUser, amount);
-            if (toUser != null && !fromUser.getId().equals(toUser.getId())) {
-                bankService.credit(toUser, amount);
-            }
-            log.info("Bank transfer successful.");
-            return true;
-        } catch (BusinessException e) {
-            log.error("Error during bank transfer: {}", e.getMessage());
-            // Re-throw the BusinessException so it can be handled by the global exception handler
-            throw e;
-        }
-    }
-
-    public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size) {
-        User user = userService.getAuthenticatedUser(authentication);
-        Sort sort = Sort.by(Sort.Direction.DESC, "processedAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        
-        Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
-        return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, user));
-    }
     
     private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment, User currentUser) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
@@ -289,14 +213,23 @@ public class PaymentService {
             baseDto.receiverSurname(),
             baseDto.amount(),
             baseDto.paymentType(),
-            userTransactionType, // Use user-specific transaction type
-            userDirection, // Use user-specific direction
+            userTransactionType,
+            userDirection,
             baseDto.listingId(),
             listingTitle,
             listingNo,
             baseDto.createdAt(),
             baseDto.isSuccess()
         );
+    }
+
+    public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Sort sort = Sort.by(Sort.Direction.DESC, "processedAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
+        return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, user));
     }
 
     public Map<String, Object> getPaymentStatistics(Authentication authentication) {
@@ -318,19 +251,6 @@ public class PaymentService {
             "totalAmount", totalAmount
         );
     }
-
-    private boolean processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
-        log.info("Processing eWallet payment from user: {} to user: {}", fromUser.getEmail(), toUser != null ? toUser.getEmail() : "SYSTEM");
-        try {
-            eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
-            log.info("eWallet payment successful.");
-            return true;
-        } catch (BusinessException e) {
-            log.error("Error during eWallet payment: {}", e.getMessage());
-            throw e;
-        }
-    }
-
 
     public ListingFeeConfigDto getListingFeeConfig() {
         log.info("Getting listing fee configuration");
