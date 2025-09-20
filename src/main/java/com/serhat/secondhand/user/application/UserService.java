@@ -2,8 +2,8 @@ package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
+import com.serhat.secondhand.user.util.UserErrorCodes;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.EmailService;
@@ -13,7 +13,6 @@ import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.domain.exception.EmailExistsException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class UserService {
         }
         String email = authentication.getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
     }
 
     public void save(User user) {
@@ -59,7 +57,7 @@ public class UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
     }
 
     public Optional<User> findOptionalByEmail(String email) {
@@ -83,11 +81,11 @@ public class UserService {
         String requestedPhone = updatePhoneRequest.newPhoneNumber();
 
         if (currentPhone.equals(requestedPhone)) {
-            throw new BusinessException("New phone number cannot be the same as the old one.", HttpStatus.BAD_REQUEST, "PHONE_UNCHANGED");
+            throw new BusinessException(UserErrorCodes.PHONE_NUMBER_UNCHANGED);
         }
 
         if (userRepository.existsByPhoneNumber(requestedPhone)) {
-            throw new BusinessException("Phone number is already in use.", HttpStatus.CONFLICT, "PHONE_IN_USE");
+            throw new BusinessException(UserErrorCodes.PHONE_NUMBER_ALREADY_IN_USE);
         }
 
         user.setPhoneNumber(requestedPhone);
@@ -101,7 +99,7 @@ public class UserService {
         User user = getAuthenticatedUser(authentication);
 
         if (user.isAccountVerified()) {
-            throw new BusinessException("Your account is already verified.", HttpStatus.BAD_REQUEST, "ALREADY_VERIFIED");
+            throw new BusinessException(UserErrorCodes.ACCOUNT_ALREADY_VERIFIED);
         }
 
         String code = verificationService.generateCode();
@@ -119,8 +117,7 @@ public class UserService {
         var verificationOpt = verificationService.findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);
 
         if (verificationOpt.isEmpty()) {
-            throw new VerificationCodeMismatchException("No active verification code found. Please request a new code.",
-                    HttpStatus.BAD_REQUEST.toString());
+            throw new BusinessException(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
         }
 
         var verification = verificationOpt.get();
@@ -135,8 +132,10 @@ public class UserService {
                 update(user);
                 throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
             }
-            throw new VerificationCodeMismatchException("Incorrect verification code. Attempts left: " + verificationAttemptLeft,
-                    HttpStatus.BAD_REQUEST.toString());
+            throw new BusinessException(
+                    String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), verificationAttemptLeft),
+                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getHttpStatus(), 
+                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
         }
 
         verificationService.markVerificationAsUsed(verification);
@@ -152,11 +151,11 @@ public class UserService {
         String requestedEmail = updateEmailRequest.newEmail();
 
         if (currentEmail.equals(requestedEmail)) {
-            throw new BusinessException("New email cannot be the same as the old one.", HttpStatus.BAD_REQUEST, "EMAIL_UNCHANGED");
+            throw new BusinessException(UserErrorCodes.EMAIL_UNCHANGED);
         }
 
         if (userRepository.existsByEmail(requestedEmail)) {
-            throw new EmailExistsException("The email is already in use.");
+            throw new BusinessException(UserErrorCodes.EMAIL_ALREADY_IN_USE);
         }
 
         user.setEmail(requestedEmail);
@@ -171,12 +170,12 @@ public class UserService {
     }
 
     public User findById(Long id){
-        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_ID));
     }
 
     public UserDto getById(Long id){
         return userRepository.findById(id).map(userMapper::toDto)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_ID));
     }
 
     public List<User> getAllUsers() {

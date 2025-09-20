@@ -2,6 +2,8 @@ package com.serhat.secondhand.chat.service;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
+import com.serhat.secondhand.chat.util.ChatErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.chat.entity.ChatRoom;
 import com.serhat.secondhand.chat.entity.Message;
 import com.serhat.secondhand.chat.repository.ChatRoomRepository;
@@ -18,7 +20,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class ChatService {
         }
         
         Listing listing = listingRepository.findById(UUID.fromString(listingId))
-                .orElseThrow(() -> new RuntimeException("Listing not found: " + listingId));
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.LISTING_NOT_FOUND));
         
         Long sellerId = listing.getSeller().getId();
         log.info("Found listing seller: {}", sellerId);
@@ -105,9 +106,9 @@ public class ChatService {
                 messageDto.getSenderId(), messageDto.getRecipientId(), messageDto.getChatRoomId(), messageDto.getContent());
         
         User sender = userRepository.findById(messageDto.getSenderId())
-                .orElseThrow(() -> new RuntimeException("Sender user not found"));
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.SENDER_USER_NOT_FOUND));
         User recipient = userRepository.findById(messageDto.getRecipientId())
-                .orElseThrow(() -> new RuntimeException("Recipient user not found"));
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.RECIPIENT_USER_NOT_FOUND));
         
         Message message = new Message();
         message.setContent(messageDto.getContent());

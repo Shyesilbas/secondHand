@@ -2,6 +2,7 @@ package com.serhat.secondhand.favorite.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteDto;
+import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.entity.Favorite;
 import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +39,11 @@ public class FavoriteService {
         log.info("Adding listing {} to favorites for user {}", listingId, user.getEmail());
         
         if (favoriteRepository.existsByUserAndListingId(user, listingId)) {
-            throw new BusinessException("Listing is already in favorites", HttpStatus.BAD_REQUEST, "ALREADY_FAVORITED");
+            throw new BusinessException(FavoriteErrorCodes.ALREADY_FAVORITED);
         }
         
         Listing listing = listingAccessService.findById(listingId)
-            .orElseThrow(() -> new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+            .orElseThrow(() -> new BusinessException(FavoriteErrorCodes.LISTING_NOT_FOUND));
 
         listingAccessService.validateActive(listing);
 
@@ -55,7 +55,7 @@ public class FavoriteService {
             .build();
 
         if(favorite.getUser().getId().equals(listing.getSeller().getId())){
-            throw new BusinessException("Cannot favorite own listing", HttpStatus.BAD_REQUEST, "OWN_LISTING");
+            throw new BusinessException(FavoriteErrorCodes.OWN_LISTING);
         }
         
         favorite = favoriteRepository.save(favorite);
@@ -70,7 +70,7 @@ public class FavoriteService {
         log.info("Removing listing {} from favorites for user {}", listingId, user.getEmail());
         
         if (!favoriteRepository.existsByUserAndListingId(user, listingId)) {
-            throw new BusinessException("Listing is not in favorites", HttpStatus.BAD_REQUEST, "NOT_FAVORITED");
+            throw new BusinessException(FavoriteErrorCodes.NOT_FAVORITED);
         }
         
         favoriteRepository.deleteByUserAndListingId(user, listingId);

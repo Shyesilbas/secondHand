@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.CreditCardDto;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
@@ -10,7 +11,6 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +35,10 @@ public class CreditCardService {
         User user = userService.getAuthenticatedUser(authentication);
 
         if (creditCardRepository.existsByCardHolder(user)) {
-            throw new BusinessException("User already has a credit card", HttpStatus.CONFLICT, "CREDIT_CARD_EXISTS");
+            throw new BusinessException(PaymentErrorCodes.CREDIT_CARD_EXISTS);
         }
         if (creditCardRequest.limit() == null || creditCardRequest.limit().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Credit limit must be greater than zero", HttpStatus.BAD_REQUEST, "INVALID_LIMIT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_CREDIT_LIMIT);
         }
 
         CreditCard creditCard = CreditCard.builder()
@@ -68,7 +68,7 @@ public class CreditCardService {
         CreditCard card = findByUserMandatory(user);
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Invalid payment amount", HttpStatus.BAD_REQUEST, "INVALID_AMOUNT");
+            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
         
         BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
@@ -103,7 +103,7 @@ public class CreditCardService {
 
     public CreditCard findByUserMandatory(User user) {
         return findByUser(user)
-                .orElseThrow(() -> new BusinessException("User does not have a credit card", HttpStatus.NOT_FOUND, "CREDIT_CARD_NOT_FOUND"));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND));
     }
     
     public Map<String, Object> checkCreditCardExists(Authentication authentication) {

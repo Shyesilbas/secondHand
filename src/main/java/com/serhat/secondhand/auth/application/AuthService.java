@@ -2,6 +2,8 @@ package com.serhat.secondhand.auth.application;
 
 import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
+import com.serhat.secondhand.auth.util.AuthErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
@@ -64,7 +66,7 @@ public class AuthService {
         userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
 
         if (!request.getAgreementsAccepted()) {
-            throw new IllegalArgumentException("All required agreements must be accepted for registration");
+            throw new BusinessException(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
         User user = userMapper.toEntity(request, passwordEncoder);
@@ -75,11 +77,11 @@ public class AuthService {
         Set<UUID> requiredIds = requiredAgreements.stream().map(Agreement::getAgreementId).collect(Collectors.toSet());
         Set<UUID> acceptedIds = new HashSet<>(request.getAcceptedAgreementIds());
         if (!acceptedIds.containsAll(requiredIds)) {
-            throw new IllegalArgumentException("All required agreements must be accepted for registration");
+            throw new BusinessException(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
         for (UUID agreementId : acceptedIds) {
-            userAgreementService.acceptAgreement(user, com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest.builder()
+            userAgreementService.acceptAgreement(user,AcceptAgreementRequest.builder()
                 .agreementId(agreementId)
                 .isAcceptedTheLastVersion(true)
                 .build());

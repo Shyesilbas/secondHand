@@ -3,12 +3,14 @@ package com.serhat.secondhand.order.service;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.service.PaymentService;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
@@ -32,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import com.serhat.secondhand.order.util.OrderErrorCodes;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +48,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final AddressService addressService;
     private final PaymentService paymentService;
-    private final com.serhat.secondhand.email.application.EmailService emailService;
+    private final EmailService emailService;
     private final UserService userService;
     private final ShippingService shippingService;
 
@@ -54,23 +58,15 @@ public class OrderService {
 
         List<Cart> cartItems = cartRepository.findByUserWithListing(user);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BusinessException(OrderErrorCodes.CART_EMPTY);
         }
 
         Address shippingAddress = addressService.getAddressById(request.getShippingAddressId());
+        Address billingAddress = request.getBillingAddressId() != null
+                ? addressService.getAddressById(request.getBillingAddressId())
+                : null;
 
-        if (!shippingAddress.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Address does not belong to user");
-        }
-
-        Address billingAddress = null;
-        if (request.getBillingAddressId() != null) {
-            billingAddress = addressService.getAddressById(request.getBillingAddressId());
-
-            if (!billingAddress.getUser().getId().equals(user.getId())) {
-                throw new RuntimeException("Billing address does not belong to user");
-            }
-        }
+        validateAddresses(user, shippingAddress, billingAddress);
 
         BigDecimal totalAmount = cartItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
@@ -91,85 +87,35 @@ public class OrderService {
                 .paymentStatus(Order.PaymentStatus.PENDING)
                 .build();
 
-        java.util.List<OrderItem> orderItems = new java.util.ArrayList<>(
-                cartItems.stream()
-                        .map(cart -> OrderItem.builder()
-                                .order(order)
-                                .listing(cart.getListing())
-                                .quantity(cart.getQuantity())
-                                .unitPrice(cart.getListing().getPrice())
-                                .totalPrice(cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
-                                .currency("TRY")
-                                .notes(cart.getNotes())
-                                .build())
-                        .toList()
-        );
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(cart -> OrderItem.builder()
+                        .order(order)
+                        .listing(cart.getListing())
+                        .quantity(cart.getQuantity())
+                        .unitPrice(cart.getListing().getPrice())
+                        .totalPrice(cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
+                        .currency("TRY")
+                        .notes(cart.getNotes())
+                        .build())
+                .toList();
 
         order.setOrderItems(orderItems);
         Order savedOrder = orderRepository.save(order);
-
         log.info("Order created with ID: {} and order number: {}", savedOrder.getId(), orderNumber);
 
+        List<PaymentDto> results;
+        boolean allPaid;
+
         try {
-            // Group cart items by seller and create per-seller payment requests
-            var paymentsBySeller = cartItems.stream()
-                    .collect(java.util.stream.Collectors.groupingBy(ci -> ci.getListing().getSeller().getId()));
-
-            java.util.List<PaymentRequest> paymentRequests = new java.util.ArrayList<>();
-            for (var entry : paymentsBySeller.entrySet()) {
-                Long sellerId = entry.getKey();
-                var items = entry.getValue();
-                BigDecimal sellerTotal = items.stream()
-                        .map(ci -> ci.getListing().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                String sellerName = items.get(0).getListing().getSeller().getName();
-                String sellerSurname = items.get(0).getListing().getSeller().getSurname();
-
-                paymentRequests.add(PaymentRequest.builder()
-                        .fromUserId(user.getId())
-                        .toUserId(sellerId)
-                        .receiverName(sellerName)
-                        .receiverSurname(sellerSurname)
-                        .listingId(null)
-                        .amount(sellerTotal)
-                        .paymentType(request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD)
-                        .transactionType(PaymentTransactionType.ITEM_PURCHASE)
-                        .paymentDirection(PaymentDirection.OUTGOING)
-                        .build());
-            }
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            var results = paymentService.createPurchasePayments(paymentRequests, authentication);
-
-            boolean allPaid = results.stream().allMatch(com.serhat.secondhand.payment.dto.PaymentDto::isSuccess);
+            results = processPayments(user, cartItems, request, savedOrder);
+            allPaid = results.stream().allMatch(PaymentDto::isSuccess);
 
             savedOrder.setPaymentReference(results.get(0).paymentId().toString());
             savedOrder.setPaymentStatus(allPaid ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
             savedOrder.setStatus(allPaid ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
-            
+
             orderRepository.save(savedOrder);
-
-            if (allPaid) {
-                try {
-                    OrderDto orderDto = orderMapper.toDto(savedOrder);
-                    emailService.sendOrderConfirmationEmail(user, orderDto);
-                    
-                    sendSellerNotifications(orderDto);
-                } catch (Exception e) {
-                    log.warn("Order confirmation email could not be sent for order {}: {}", orderNumber, e.getMessage());
-                }
-            }
-
-            if (allPaid) {
-                cartRepository.deleteByUser(user);
-                log.info("Payment processed successfully for order: {} ({} sub-payments)", orderNumber, results.size());
-            } else {
-                log.warn("One or more sub-payments failed for order: {}", orderNumber);
-            }
-
         } catch (BusinessException e) {
-
             log.error("Payment failed for order: {} - {}", orderNumber, e.getMessage());
             savedOrder.setPaymentStatus(Order.PaymentStatus.FAILED);
             savedOrder.setStatus(Order.OrderStatus.CANCELLED);
@@ -183,8 +129,18 @@ public class OrderService {
             throw new RuntimeException("Payment processing failed: " + e.getMessage());
         }
 
+        sendNotifications(user, savedOrder, allPaid);
+
+        if (allPaid) {
+            cartRepository.deleteByUser(user);
+            log.info("Payment processed successfully for order: {} ({} sub-payments)", orderNumber, results.size());
+        } else {
+            log.warn("One or more sub-payments failed for order: {}", orderNumber);
+        }
+
         return orderMapper.toDto(savedOrder);
     }
+
 
 
     @Transactional(readOnly = true)
@@ -202,10 +158,10 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderDto getOrderById(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Order does not belong to user");
+            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
 
         shippingService.calculateShippingStatus(order);
@@ -217,10 +173,10 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderDto getOrderByOrderNumber(String orderNumber, User user) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Order does not belong to user");
+            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
 
         shippingService.calculateShippingStatus(order);
@@ -231,14 +187,13 @@ public class OrderService {
 
     public OrderDto cancelOrder(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Order does not belong to user");
+            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
-
         if (order.getStatus() != Order.OrderStatus.PENDING && order.getStatus() != Order.OrderStatus.CONFIRMED) {
-            throw new RuntimeException("Order cannot be cancelled");
+            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
         }
 
         order.setStatus(Order.OrderStatus.CANCELLED);
@@ -249,6 +204,55 @@ public class OrderService {
         return orderMapper.toDto(savedOrder);
     }
 
+    private void validateAddresses(User user, Address shippingAddress, Address billingAddress) {
+        if (!shippingAddress.getUser().getId().equals(user.getId())) {
+            throw new BusinessException(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
+        }
+        if (billingAddress != null && !billingAddress.getUser().getId().equals(user.getId())) {
+            throw new BusinessException(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
+        }
+    }
+
+    private List<PaymentDto> processPayments(User user, List<Cart> cartItems, CheckoutRequest request, Order order) {
+        var paymentsBySeller = cartItems.stream()
+                .collect(Collectors.groupingBy(ci -> ci.getListing().getSeller().getId()));
+        List<PaymentRequest> paymentRequests = new java.util.ArrayList<>();
+        for (var entry : paymentsBySeller.entrySet()) {
+            Long sellerId = entry.getKey();
+            var items = entry.getValue();
+            BigDecimal sellerTotal = items.stream()
+                    .map(ci -> ci.getListing().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            String sellerName = items.get(0).getListing().getSeller().getName();
+            String sellerSurname = items.get(0).getListing().getSeller().getSurname();
+            paymentRequests.add(PaymentRequest.builder()
+                    .fromUserId(user.getId())
+                    .toUserId(sellerId)
+                    .receiverName(sellerName)
+                    .receiverSurname(sellerSurname)
+                    .listingId(null)
+                    .amount(sellerTotal)
+                    .paymentType(request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD)
+                    .transactionType(PaymentTransactionType.ITEM_PURCHASE)
+                    .paymentDirection(PaymentDirection.OUTGOING)
+                    .build());
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return paymentService.createPurchasePayments(paymentRequests, authentication);
+    }
+
+    private void sendNotifications(User user, Order savedOrder, boolean allPaid) {
+        if (allPaid) {
+            try {
+                OrderDto orderDto = orderMapper.toDto(savedOrder);
+                emailService.sendOrderConfirmationEmail(user, orderDto);
+                sendSellerNotifications(orderDto);
+            } catch (Exception e) {
+                log.warn("Order confirmation email could not be sent for order {}: {}", savedOrder.getOrderNumber(), e.getMessage());
+            }
+        }
+    }
+
     private void sendSellerNotifications(OrderDto orderDto) {
         if (orderDto.getOrderItems() == null || orderDto.getOrderItems().isEmpty()) {
             return;
@@ -257,7 +261,7 @@ public class OrderService {
         // Group order items by seller
         var itemsBySeller = orderDto.getOrderItems().stream()
                 .filter(item -> item.getListing() != null && item.getListing().getSellerId() != null)
-                .collect(java.util.stream.Collectors.groupingBy(item -> item.getListing().getSellerId()));
+                .collect(Collectors.groupingBy(item -> item.getListing().getSellerId()));
         
         // Send notification to each seller
         for (var entry : itemsBySeller.entrySet()) {
