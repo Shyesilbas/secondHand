@@ -170,7 +170,7 @@ const ProfilePage = () => {
                                 <InfoField label="Birth Date" value={user?.birthdate} />
                                 <InfoField
                                     label="Member Since"
-                                    value={formatDate(user?.accountCreationDate)}
+                                    value={user?.accountCreationDate}
                                 />
                             </div>
                         </div>

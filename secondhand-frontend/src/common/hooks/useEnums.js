@@ -31,7 +31,8 @@ export const useEnums = () => {
     sportConditions: [],
     paymentTypes: [],
     shippingStatuses: [],
-    emailTypes: []
+    emailTypes: [],
+    genders: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -80,7 +81,8 @@ export const useEnums = () => {
           sportConditions,
           paymentTypes,
           shippingStatuses,
-          emailTypes
+          emailTypes,
+          genders
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -109,7 +111,8 @@ export const useEnums = () => {
           enumService.getSportConditions(),
           enumService.getPaymentTypes(),
           enumService.getShippingStatuses(),
-          enumService.getEmailTypes()
+          enumService.getEmailTypes(),
+          enumService.getGenders(),
         ]);
 
         const fetchedEnums = {
@@ -140,7 +143,8 @@ export const useEnums = () => {
           sportConditions,
           paymentTypes,
           shippingStatuses,
-          emailTypes
+          emailTypes,
+          genders,
         };
 
         setEnums(fetchedEnums);
@@ -194,6 +198,7 @@ export const useEnums = () => {
   };
 
   // Function to force refresh enums from API
+
   const refreshEnums = async () => {
     clearEnumCache();
     setIsLoading(true);

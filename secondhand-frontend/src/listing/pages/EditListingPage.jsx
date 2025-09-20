@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
+import { electronicService } from '../../electronics/electronics/services/electronicService.js';
+import { vehicleService } from '../../vehicle/services/vehicleService.js';
+import { realEstateService } from '../../realEstate/services/realEstateService.js';
+import { clothingService } from '../../clothing/services/clothingService.js';
+import { booksService } from '../../books/services/booksService.js';
+import { sportsService } from '../../sports/services/sportsService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import { LISTING_TYPES } from '../types/index.js';
 
 const PageLoader = () => (
     <div className="min-h-screen bg-app-bg py-8">
@@ -94,10 +101,58 @@ const useOwnershipRedirect = (listing, isOwner, notification, navigate) => {
     }, [listing, isOwner, navigate, notification]);
 };
 
+// Service configuration mapping for different listing types
+const getServiceConfig = (listingType) => {
+    switch (listingType) {
+        case LISTING_TYPES.ELECTRONICS:
+            return {
+                service: electronicService,
+                serviceMethod: 'getElectronicById',
+                updateMethod: 'updateElectronicListing'
+            };
+        case LISTING_TYPES.VEHICLE:
+            return {
+                service: vehicleService,
+                serviceMethod: 'getVehicleById',
+                updateMethod: 'updateVehicleListing'
+            };
+        case LISTING_TYPES.REAL_ESTATE:
+            return {
+                service: realEstateService,
+                serviceMethod: 'getRealEstateById',
+                updateMethod: 'updateRealEstateListing'
+            };
+        case LISTING_TYPES.CLOTHING:
+            return {
+                service: clothingService,
+                serviceMethod: 'getClothingDetails',
+                updateMethod: 'updateClothingListing'
+            };
+        case LISTING_TYPES.BOOKS:
+            return {
+                service: booksService,
+                serviceMethod: 'getBooksDetails',
+                updateMethod: 'updateBooksListing'
+            };
+        case LISTING_TYPES.SPORTS:
+            return {
+                service: sportsService,
+                serviceMethod: 'getSportsDetails',
+                updateMethod: 'updateSportsListing'
+            };
+        default:
+            return {
+                service: listingService,
+                serviceMethod: 'getListingById',
+                updateMethod: 'updateListing'
+            };
+    }
+};
+
 const EditListingPage = ({
-                             service = listingService,
-                             serviceMethod = 'getListingById',
-                             updateMethod = 'updateListing',
+                             service = null,
+                             serviceMethod = null,
+                             updateMethod = null,
                              type = null,
                              entityName = 'listing',
                              entityNameCapitalized = 'Listing'
@@ -107,18 +162,43 @@ const EditListingPage = ({
     const { user, isAuthenticated } = useAuth();
     const notification = useNotification();
 
+    // Fetch the listing using the generic listing service
     const fetchFunc = useMemo(() => {
-        return () => service[serviceMethod](id);
-    }, [service, serviceMethod, id]);
+        return () => listingService.getListingById(id);
+    }, [id]);
 
     const { data: listing, setData: setListing, isLoading, error } = useFetchData(fetchFunc);
 
+    // Determine the correct service configuration based on listing type
+    const serviceConfig = useMemo(() => {
+        if (listing?.type) {
+            console.log('EditListingPage: Listing type detected:', listing.type);
+            const config = getServiceConfig(listing.type);
+            console.log('EditListingPage: Service config:', config);
+            return config;
+        }
+        // Fallback to provided props or defaults
+        console.log('EditListingPage: Using fallback service config');
+        return {
+            service: service || listingService,
+            serviceMethod: serviceMethod || 'getListingById',
+            updateMethod: updateMethod || 'updateListing'
+        };
+    }, [listing?.type, service, serviceMethod, updateMethod]);
+
     const handleUpdate = async (updatedData) => {
         try {
-            await service[updateMethod](id, updatedData);
+            console.log('EditListingPage: Updating listing with:', {
+                id,
+                service: serviceConfig.service,
+                updateMethod: serviceConfig.updateMethod,
+                updatedData
+            });
+            await serviceConfig.service[serviceConfig.updateMethod](id, updatedData);
             notification.showSuccess('Success', `${entityNameCapitalized} updated successfully`);
             navigate(ROUTES.MY_LISTINGS);
         } catch (err) {
+            console.error('EditListingPage: Update failed:', err);
             notification.showError('Error', `Failed to update ${entityName}: ${err.response?.data?.message || err.message}`);
             throw err;
         }

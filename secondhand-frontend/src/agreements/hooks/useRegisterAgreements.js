@@ -14,7 +14,7 @@ export const useRegisterAgreements = () => {
   const loadRequiredAgreements = useCallback(async () => {
     try {
       setAgreementsLoading(true);
-      const requiredAgreements = await agreementService.getRequiredAgreements();
+      const requiredAgreements = await agreementService.getRequiredAgreementsForRegister();
       setAgreements(requiredAgreements);
     } catch (error) {
       // eslint-disable-next-line no-console

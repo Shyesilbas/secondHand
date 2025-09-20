@@ -1,35 +1,23 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {RegisterRequestDTO} from '../auth.js';
-import {enumService} from '../../common/services/enumService.js';
 import {authService} from '../services/authService.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useRegisterAgreements} from '../../agreements/hooks/useRegisterAgreements.js';
 import {validateRegisterForm} from '../registerValidator.js';
+import {useGenderEnum} from '../../common/hooks/useGenderEnum.js';
 
 export const useRegisterForm = () => {
   const [formData, setFormData] = useState({ ...RegisterRequestDTO, confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [genderOptions, setGenderOptions] = useState([]);
 
   const navigate = useNavigate();
   const notification = useNotification();
 
   const agreementsApi = useRegisterAgreements();
-
-  useEffect(() => {
-    const loadGenders = async () => {
-      try {
-        const genders = await enumService.getGenders();
-        setGenderOptions(Array.isArray(genders) ? genders : []);
-      } catch {
-        setGenderOptions([]);
-      }
-    };
-    loadGenders();
-  }, []);
+  const { genders: genderOptions, isLoading: gendersLoading } = useGenderEnum();
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -54,7 +42,8 @@ export const useRegisterForm = () => {
         password: formData.password,
         gender: formData.gender,
         phoneNumber: formData.phone?.replace(/\s/g, '') || '',
-        agreementsAccepted: agreementsApi.acceptedAgreements.size === agreementsApi.agreements.length
+        agreementsAccepted: agreementsApi.acceptedAgreements.size === agreementsApi.agreements.length,
+        acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
       };
       const response = await authService.register(registerData);
 
@@ -80,11 +69,12 @@ export const useRegisterForm = () => {
     setErrors,
     isLoading,
     genderOptions,
+    gendersLoading,
     handleChange,
     validateForm,
     submit,
     ...agreementsApi
-  }), [formData, errors, isLoading, genderOptions, handleChange, validateForm, submit, agreementsApi]);
+  }), [formData, errors, isLoading, genderOptions, gendersLoading, handleChange, validateForm, submit, agreementsApi]);
 };
 
 export default useRegisterForm;

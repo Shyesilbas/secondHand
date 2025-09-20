@@ -16,6 +16,7 @@ const RegisterPage = () => {
         errors,
         isLoading,
         genderOptions,
+        gendersLoading,
         handleChange,
         submit,
         agreements,
@@ -49,7 +50,14 @@ const RegisterPage = () => {
                 <AuthInput label="E-posta Adresi" type="email" name="email" value={formData.email} onChange={handleChange} error={errors.email} required />
                 <AuthInput label="Telefon Numarası" type="tel" name="phone" value={formData.phone} onChange={handleChange} error={errors.phone} required />
 
-                <SelectField
+                {/* Gender select loading */}
+                {gendersLoading ? (
+                  <div className="flex justify-center items-center py-4">
+                    <LoadingIndicator size="h-6 w-6" />
+                    <span className="ml-2 text-text-secondary">Loading Genders...</span>
+                  </div>
+                ) : (
+                  <SelectField
                     label="Gender"
                     name="gender"
                     value={formData.gender}
@@ -58,7 +66,8 @@ const RegisterPage = () => {
                     placeholder="Select Gender..."
                     error={errors.gender}
                     required
-                />
+                  />
+                )}
 
                 <PasswordInput label="Şifre" name="password" value={formData.password} onChange={handleChange} error={errors.password} required />
 

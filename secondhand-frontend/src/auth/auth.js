@@ -28,6 +28,7 @@ export const RegisterRequestDTO = {
   gender: '',
   birthdate: '',
   agreementsAccepted: false,
+  acceptedAgreementIds: [],
 };
 
 // Register Response DTO
@@ -93,6 +94,9 @@ export const createRegisterRequest = (data) => {
     gender: data.gender || '',
     birthdate: data.birthdate || '',
     agreementsAccepted: data.agreementsAccepted || false,
+    acceptedAgreementIds: Array.isArray(data.acceptedAgreementIds)
+      ? data.acceptedAgreementIds
+      : Array.from(data.acceptedAgreementIds || []),
   };
 };
 
