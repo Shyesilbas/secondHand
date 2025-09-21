@@ -34,6 +34,7 @@ const VehicleDetails = ({ listing }) => {
         <DetailItem label="Seat Count" value={getEnumLabel('seatCounts', listing.seatCount)} />
         <DetailItem label="Horse Power" value={listing.horsePower ? `${listing.horsePower} HP` : '-'} />
         <DetailItem label="Fuel Consumption" value={listing.fuelConsumption ? `${listing.fuelConsumption} L/100km` : '-'} />
+        <DetailItem label="Open To Swap" value={listing.swap ? 'Yes' : 'No'} />
       </div>
     </div>
   );

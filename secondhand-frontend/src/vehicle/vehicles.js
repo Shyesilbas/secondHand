@@ -30,6 +30,7 @@ export const VehicleCreateRequestDTO = {
   horsePower: 0,
   kilometersPerLiter: 0,
   fuelType: '',
+  swap: false,
 };
 
 
@@ -53,6 +54,7 @@ export const VehicleListingDTO = {
   horsePower: 0,
   kilometersPerLiter: 0,
   fuelType: '',
+  swap: false,
 };
 
 // Vehicle Search Filters DTO
@@ -112,6 +114,7 @@ export const createVehicleCreateRequest = (data) => {
     horsePower: parseInt(data.horsePower) || 0,
     kilometersPerLiter: parseInt(data.kilometersPerLiter) || 0,
     fuelType: data.fuelType || '',
+    swap: Boolean(data.swap),
   };
 };
 
@@ -138,6 +141,7 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.horsePower !== undefined && data.horsePower !== '') updateData.horsePower = parseInt(data.horsePower);
   if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter);
   if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
+  if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
   
   return updateData;
 };

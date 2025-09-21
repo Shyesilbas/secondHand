@@ -25,5 +25,6 @@ public record VehicleUpdateRequest(
     Optional<Integer> fuelConsumption,
     Optional<Integer> horsePower,
     Optional<Integer> kilometersPerLiter,
-    Optional<FuelType> fuelType
+    Optional<FuelType> fuelType,
+    Optional<Boolean> swap
 ) {} 

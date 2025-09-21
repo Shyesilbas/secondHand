@@ -6,7 +6,8 @@ const FilterStatus = ({
   getListingTypeLabel, 
   onResetFilters,
   hasActiveFilters,
-  getActiveFilterCount 
+  getActiveFilterCount,
+  updateFilters
 }) => {
     const getSortLabel = (sortBy) => {
         switch (sortBy) {
@@ -73,8 +74,38 @@ const FilterStatus = ({
                     </div>
                 )}
             </div>
-            <div className="text-sm text-slate-500">
-                {getSortLabel(filters.sortBy)}
+            <div className="flex items-center gap-3">
+                <span className="text-sm text-slate-500">
+                    {getSortLabel(filters.sortBy)}
+                </span>
+                <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                    <button
+                        onClick={() => updateFilters({ sortBy: 'createdAt', sortDirection: 'DESC' })}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
+                            filters.sortBy === 'createdAt' 
+                                ? 'text-white bg-gray-900' 
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                        }`}
+                    >
+                        Date
+                        {filters.sortBy === 'createdAt' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => updateFilters({ sortBy: 'price', sortDirection: 'DESC' })}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
+                            filters.sortBy === 'price' 
+                                ? 'text-white bg-gray-900' 
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                        }`}
+                    >
+                        Price
+                        {filters.sortBy === 'price' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
+                        )}
+                    </button>
+                </div>
             </div>
         </div>
     );
