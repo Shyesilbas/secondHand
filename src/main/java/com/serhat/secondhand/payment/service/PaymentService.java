@@ -19,8 +19,9 @@ import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.payment.util.PaymentProcessingHelper;
 import com.serhat.secondhand.payment.util.PaymentValidationHelper;
+import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
+import com.serhat.secondhand.payment.entity.PaymentResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -50,6 +50,7 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final IVerificationService verificationService;
     private final EmailService emailService;
+    private final PaymentStrategyFactory paymentStrategyFactory;
 
     @Getter
     @Value("${app.listing.creation.fee}")
@@ -63,7 +64,6 @@ public class PaymentService {
     @Value("${app.listing.fee.tax}")
     private BigDecimal listingFeeTax;
 
-    private final PaymentProcessingHelper paymentProcessingHelper;
     private final PaymentValidationHelper paymentValidationHelper;
 
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
@@ -123,13 +123,12 @@ public class PaymentService {
 
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = null;
-
         toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
         paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
 
-        boolean paymentSuccessful = paymentProcessingHelper.processPayment(
-                paymentRequest.paymentType(), fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId()
-        );
+
+        var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
+        PaymentResult paymentResult = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
 
         Payment payment = Payment.builder()
                 .fromUser(fromUser)
@@ -139,14 +138,14 @@ public class PaymentService {
                 .transactionType(paymentRequest.transactionType())
                 .paymentDirection(paymentRequest.paymentDirection())
                 .listingId(paymentRequest.listingId())
-                .processedAt(LocalDateTime.now())
-                .isSuccess(paymentSuccessful)
+                .processedAt(paymentResult.processedAt())
+                .isSuccess(paymentResult.success())
                 .build();
 
         payment = paymentRepository.save(payment);
-        log.info("Payment {} created with ID: {}", paymentSuccessful ? "successfully" : "unsuccessfully", payment.getId());
+        log.info("Payment {} created with ID: {}", paymentResult.success() ? "successfully" : "unsuccessfully", payment.getId());
 
-        if (paymentSuccessful) {
+        if (paymentResult.success()) {
             eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
             log.info("Published PaymentCompletedEvent for payment ID: {}", payment.getId());
         }

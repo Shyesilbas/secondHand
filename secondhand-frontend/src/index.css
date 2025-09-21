@@ -16,6 +16,20 @@
   overflow: hidden;
 }
 
+.select__control {
+  @apply border border-gray-300 rounded-xl px-2 py-1 shadow-sm;
+}
+.select__menu {
+  @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+}
+.select__option {
+  @apply px-3 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer;
+}
+.select__multi-value {
+  @apply bg-gray-100 rounded-md px-2 py-1 text-sm;
+}
+
+
 ::-webkit-scrollbar {
   width: 6px;
 }

@@ -79,6 +79,7 @@ public class VehicleListingService {
         request.horsePower().ifPresent(existing::setHorsePower);
         request.kilometersPerLiter().ifPresent(existing::setKilometersPerLiter);
         request.fuelType().ifPresent(existing::setFuelType);
+        request.swap().ifPresent(existing::setSwap);
 
         vehicleRepository.save(existing);
 

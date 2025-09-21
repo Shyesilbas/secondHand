@@ -52,100 +52,95 @@ const ListingCard = memo(({ listing, onDeleted }) => {
 
 
     return (
-        <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
-            <div className="flex items-center justify-between px-4 pt-4">
-                <div className="flex items-center gap-2">
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
-                        {listing.status}
-                    </span>
-                    {isInShowcase && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 font-medium">
-                            ⭐ This Listing is in Showcase!
+        <div className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
+            {/* Header with badges */}
+            <div className="relative p-4 pb-3">
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(listing.status)}`}>
+                            {listing.status}
                         </span>
-                    )}
+                        {isInShowcase && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700 font-medium">
+                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                Featured
+                            </span>
+                        )}
+                    </div>
+                    <FavoriteButton
+                        listingId={listing.id}
+                        listing={listing}
+                        initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
+                        initialCount={listing.favoriteStats?.favoriteCount ?? 0}
+                        size="md"
+                    />
                 </div>
-                <FavoriteButton
-                    listingId={listing.id}
-                    listing={listing}
-                    initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
-                    initialCount={listing.favoriteStats?.favoriteCount ?? 0}
-                    size="md"
-                />
-            </div>
 
-            <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="block">
-                <div className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="block">
+                    <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors leading-tight">
                             {listing.title}
                         </h3>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">
-                            #{listing.listingNo}
-                        </span>
+                        {listing.listingNo && (
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-lg whitespace-nowrap ml-3 flex-shrink-0">
+                                #{listing.listingNo}
+                            </span>
+                        )}
                     </div>
 
-                    <p className="text-gray-600 text-sm line-clamp-2 mb-3 leading-relaxed">
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">
                         {listing.description}
                     </p>
 
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <span className="text-2xl font-bold text-blue-600">
-                                    {formatCurrency(listing.price, listing.currency)}
-                                </span>
-                                <button
-                                    onClick={handlePriceHistoryClick}
-                                    className="p-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-                                    title="View Price History"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                         fill="none"
-                                         viewBox="0 0 24 24"
-                                         strokeWidth={1.5}
-                                         stroke="currentColor"
-                                         className="w-5 h-5">
-                                        <path strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            {listing.createdAt && (
-                                <span className="text-xs text-gray-400 mt-1">
-                                    Created At: {listing.createdAt}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex flex-col items-end text-gray-500 text-sm">
-                            <div>
-                                <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    {/* Price and Location */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-gray-900">
+                                {formatCurrency(listing.price, listing.currency)}
+                            </span>
+                            <button
+                                onClick={handlePriceHistoryClick}
+                                className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                                title="View Price History"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {listing.city}, {listing.district}
-                            </div>
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-500 text-sm">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="truncate max-w-32">{listing.district}, {listing.city}</span>
                         </div>
                     </div>
-                </div>
-            </Link>
+                </Link>
+            </div>
 
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-blue-600 font-medium text-sm">{listing.sellerName?.[0]?.toUpperCase()}</span>
+            {/* Footer */}
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span className="text-gray-700 font-medium text-sm">{listing.sellerName?.[0]?.toUpperCase()}</span>
+                            </div>
+                            <span className="text-sm font-medium text-gray-700 truncate max-w-24">
+                                {listing.sellerName} {listing.sellerSurname}
+                            </span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 truncate max-w-24">
-                            {listing.sellerName} {listing.sellerSurname}
-                        </span>
+                        <div className="flex items-center gap-3">
+                            <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
+                            <ListingReviewStats listingId={listing.id} size="sm" showIcon showText />
+                        </div>
                     </div>
-                    <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
-                    <ListingReviewStats listingId={listing.id} size="sm" showIcon showText />
-                </div>
-                <div className="flex items-center space-x-2">
-                    {canShowCartButton && <AddToCartButton listing={listing} size="sm" />}
-                    <ListingCardActions listing={listing} onChanged={onDeleted} />
+                    <div className="flex items-center gap-2">
+                        {canShowCartButton && <AddToCartButton listing={listing} size="sm" />}
+                        <ListingCardActions listing={listing} onChanged={onDeleted} />
+                    </div>
                 </div>
             </div>
 

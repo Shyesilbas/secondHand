@@ -84,6 +84,23 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <input type="number" name="fuelConsumption" value={formData.fuelConsumption} onChange={handleInputChange} placeholder="Fuel Consumption (L/100km)" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
                   <input type="number" name="kilometersPerLiter" value={formData.kilometersPerLiter} onChange={handleInputChange} placeholder="Kilometers/Liter" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
                 </div>
+                
+                {/* Swap Option */}
+                <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="checkbox" 
+                      name="swap" 
+                      checked={formData.swap} 
+                      onChange={handleInputChange}
+                      className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                    />
+                    <div>
+                      <label className="text-sm font-medium text-emerald-800">Open to Swap</label>
+                      <p className="text-xs text-emerald-600">Check this if you're open to exchanging your vehicle with another one</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
         );

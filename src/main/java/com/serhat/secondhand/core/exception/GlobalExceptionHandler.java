@@ -42,7 +42,6 @@ public class GlobalExceptionHandler {
                 request.getRequestURI(),
                 validationErrors
         );
-
         log.warn("Validation error: {}", validationErrors);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

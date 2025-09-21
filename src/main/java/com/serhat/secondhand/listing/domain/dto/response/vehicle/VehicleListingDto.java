@@ -33,4 +33,5 @@ public class VehicleListingDto extends ListingDto {
     private Integer horsePower;
     private Integer kilometersPerLiter;
     private FuelType fuelType;
+    private Boolean swap;
 }

@@ -34,6 +34,4 @@ public class ErrorResponse {
     private List<String> errors;
     
     private String debugMessage;
-    
-
 }

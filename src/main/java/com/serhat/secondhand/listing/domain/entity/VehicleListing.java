@@ -52,4 +52,6 @@ public class VehicleListing extends Listing {
 
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
+
+    private boolean swap;
 }
