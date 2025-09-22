@@ -124,4 +124,24 @@ public class ChatRestController {
         chatService.fixListingChatRooms();
         return ResponseEntity.ok("Listing chat rooms fixed");
     }
+    
+    // ==================== DELETE ENDPOINTS ====================
+    
+    @DeleteMapping("/rooms/{chatRoomId}")
+    public ResponseEntity<Void> deleteConversation(
+            @PathVariable Long chatRoomId,
+            @RequestParam Long userId) {
+        log.info("Deleting conversation - roomId: {}, userId: {}", chatRoomId, userId);
+        chatService.deleteConversation(chatRoomId, userId);
+        return ResponseEntity.ok().build();
+    }
+    
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<Void> deleteMessage(
+            @PathVariable Long messageId,
+            @RequestParam Long userId) {
+        log.info("Deleting message - messageId: {}, userId: {}", messageId, userId);
+        chatService.deleteMessage(messageId, userId);
+        return ResponseEntity.ok().build();
+    }
 }

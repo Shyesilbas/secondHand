@@ -38,14 +38,14 @@ public class OrderCreationService {
         validateCartItems(cartItems);
         Address shippingAddress = resolveShippingAddress(request, user);
         Address billingAddress = resolveBillingAddress(request, user);
-        
+
         validateAddresses(user, shippingAddress, billingAddress);
 
         BigDecimal totalAmount = calculateTotalAmount(cartItems);
         String orderNumber = generateOrderNumber();
-        List<OrderItem> orderItems = createOrderItems(cartItems);
-
+        
         Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes());
+        List<OrderItem> orderItems = createOrderItems(cartItems, order);
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
@@ -107,17 +107,18 @@ public class OrderCreationService {
     /**
      * Creates order items from cart items
      */
-    private List<OrderItem> createOrderItems(List<Cart> cartItems) {
+    private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order) {
         return cartItems.stream()
-                .map(this::createOrderItem)
+                .map(cart -> createOrderItem(cart, order))
                 .collect(Collectors.toList());
     }
 
     /**
      * Creates a single order item from cart item
      */
-    private OrderItem createOrderItem(Cart cart) {
+    private OrderItem createOrderItem(Cart cart, Order order) {
         return OrderItem.builder()
+                .order(order)
                 .listing(cart.getListing())
                 .quantity(cart.getQuantity())
                 .unitPrice(cart.getListing().getPrice())

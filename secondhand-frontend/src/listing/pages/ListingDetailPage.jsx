@@ -131,7 +131,9 @@ const ListingDetailPage = () => {
               })()}
 
               {/* Reviews Section */}
-              <ListingReviewsSection listingId={listing.id} />
+              {!['VEHICLE', 'REAL_ESTATE'].includes(listing.type) && (
+                <ListingReviewsSection listingId={listing.id} />
+              )}
             </div>
 
             {/* Right Column - Sidebar */}

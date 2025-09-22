@@ -1,5 +1,5 @@
-import React from 'react';
-import { PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
+import { PaperAirplaneIcon, XMarkIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -7,6 +7,8 @@ import { enUS } from 'date-fns/locale';
 import { useChatWindow } from '../hooks/useChatWindow.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import { chatService } from '../services/chatService.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const ChatWindow = ({
                         isOpen,
@@ -14,11 +16,16 @@ const ChatWindow = ({
                         selectedChatRoom,
                         messages,
                         onSendMessage,
+                        onDeleteMessage,
+                        onDeleteConversation,
                         isLoadingMessages,
-                        isConnected
+                        isConnected,
+                        onConversationDeleted
                     }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const notification = useNotification();
+    const [showOptions, setShowOptions] = useState(false);
     const {
         messageText,
         setMessageText,
@@ -41,6 +48,37 @@ const ChatWindow = ({
             onClose();
         }
     };
+
+    const handleDeleteConversation = () => {
+        notification.showConfirmation(
+            'Delete Conversation',
+            'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
+            () => {
+                onDeleteConversation?.(selectedChatRoom.id);
+                onConversationDeleted?.(selectedChatRoom.id);
+                onClose();
+                notification.showSuccess('Success', 'Conversation deleted successfully.');
+            }
+        );
+        setShowOptions(false);
+    };
+
+    const handleDeleteMessage = (messageId) => {
+        onDeleteMessage?.(messageId);
+        notification.showSuccess('Success', 'Message deleted successfully.');
+    };
+
+    // Auto-mark messages as read when chat window is visible and has messages
+    useEffect(() => {
+        if (isOpen && selectedChatRoom?.id && messages.length > 0 && user?.id) {
+            const timer = setTimeout(() => {
+                chatService.markMessagesAsRead(selectedChatRoom.id, user.id)
+                    .catch(error => console.error('Error marking messages as read:', error));
+            }, 1000); // Mark as read after 1 second of viewing
+
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, selectedChatRoom?.id, messages.length, user?.id]);
 
     if (!isOpen) return null;
 
@@ -82,12 +120,34 @@ const ChatWindow = ({
                         </p>
                     </div>
                 </div>
-                <button
-                    onClick={onClose}
-                    className="text-white hover:text-gray-200 transition-colors"
-                >
-                    <XMarkIcon className="w-5 h-5" />
-                </button>
+                <div className="flex items-center space-x-2">
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowOptions(!showOptions)}
+                            className="text-white hover:text-gray-200 transition-colors p-1"
+                            title="Options"
+                        >
+                            <EllipsisVerticalIcon className="w-5 h-5" />
+                        </button>
+                        {showOptions && (
+                            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[150px]">
+                                <button
+                                    onClick={handleDeleteConversation}
+                                    className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <TrashIcon className="w-4 h-4" />
+                                    <span>Delete Chat</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-white hover:text-gray-200 transition-colors"
+                    >
+                        <XMarkIcon className="w-5 h-5" />
+                    </button>
+                </div>
             </div>
 
             {/* Messages */}
@@ -104,6 +164,7 @@ const ChatWindow = ({
                             key={message.id}
                             message={message}
                             isOwnMessage={message.senderId === user?.id}
+                            onDeleteMessage={handleDeleteMessage}
                         />
                     ))
                 )}
@@ -137,15 +198,23 @@ const ChatWindow = ({
     );
 };
 
-const MessageBubble = ({ message, isOwnMessage }) => {
+const MessageBubble = ({ message, isOwnMessage, onDeleteMessage }) => {
+    const [showDeleteButton, setShowDeleteButton] = useState(false);
+
+    const handleDeleteClick = () => {
+        onDeleteMessage(message.id);
+    };
+
     return (
         <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
             <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative group ${
                     isOwnMessage
                         ? 'bg-blue-500 text-white rounded-br-none'
                         : 'bg-white text-gray-800 rounded-bl-none border border-sidebar-border'
                 }`}
+                onMouseEnter={() => setShowDeleteButton(true)}
+                onMouseLeave={() => setShowDeleteButton(false)}
             >
                 <p className="text-sm break-words">{message.content}</p>
                 <p
@@ -158,6 +227,15 @@ const MessageBubble = ({ message, isOwnMessage }) => {
                         locale: enUS
                     })}
                 </p>
+                {isOwnMessage && showDeleteButton && (
+                    <button
+                        onClick={handleDeleteClick}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                        title="Delete message"
+                    >
+                        <TrashIcon className="w-3 h-3" />
+                    </button>
+                )}
             </div>
         </div>
     );
