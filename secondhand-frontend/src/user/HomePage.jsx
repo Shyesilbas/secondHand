@@ -4,17 +4,13 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import { ROUTES } from '../common/constants/routes.js';
 import ListingCategories from '../listing/components/ListingCategories.jsx';
 import ShowcaseSection from '../showcase/ShowcaseSection.jsx';
-import { useShowcase } from '../showcase/hooks/useShowcase.js';
+import { useShowcaseQuery } from '../showcase/hooks/useShowcaseQuery.js';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
-    const { showcases, loading: showcaseLoading, fetchShowcases } = useShowcase();
+    const { showcases, loading: showcaseLoading } = useShowcaseQuery();
 
-    React.useEffect(() => {
-        const handler = () => fetchShowcases();
-        window.addEventListener('showcases:refresh', handler);
-        return () => window.removeEventListener('showcases:refresh', handler);
-    }, [fetchShowcases]);
+    // Removed manual event listener - React Query handles cache invalidation automatically
 
     return (
         <div className="min-h-screen bg-app-bg">

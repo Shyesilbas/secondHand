@@ -9,7 +9,8 @@ import EmptyState from '../common/components/ui/EmptyState.jsx';
 import AvatarMessageItem from '../common/components/ui/AvatarMessageItem.jsx';
 import { chatService } from "./services/chatService.js";
 import { useNotification } from '../notification/NotificationContext.jsx';
-import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRoomUnreadCount } from './hooks/useUnreadCount.js';
 
 const ChatPage = () => {
   const { user } = useAuth();
@@ -166,16 +167,7 @@ const ChatPage = () => {
 
 const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId, onDeleteConversation }) => {
   const [showOptions, setShowOptions] = useState(false);
-
-  // Use React Query for real-time unread count updates
-  const { data: unreadCount = 0 } = useQuery({
-    queryKey: ['unreadCount', room.id, userId],
-    queryFn: () => chatService.getChatRoomUnreadCount(room.id, userId),
-    enabled: !!userId && !!room.id,
-    refetchInterval: 15000, // Increased to 15 seconds from 5 seconds
-    staleTime: 5000, // Data is fresh for 5 seconds
-    refetchOnWindowFocus: false // Don't refetch when window gains focus
-  });
+  const { unreadCount } = useRoomUnreadCount(room.id);
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();

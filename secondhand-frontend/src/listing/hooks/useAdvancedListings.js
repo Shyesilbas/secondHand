@@ -75,7 +75,7 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
   // Fetch listings when cleaned filters change
   useEffect(() => {
     fetchListings();
-  }, [fetchListings]);
+  }, [cleanedFilters]); // Fixed: Use cleanedFilters instead of fetchListings to prevent infinite loop
 
   return {
     listings,
