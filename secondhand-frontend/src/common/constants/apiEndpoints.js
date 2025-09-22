@@ -179,6 +179,9 @@ export const API_ENDPOINTS = {
         
         ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
         TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,
+        
+        DELETE_CONVERSATION: (chatRoomId) => `/chat/rooms/${chatRoomId}`,
+        DELETE_MESSAGE: (messageId) => `/chat/messages/${messageId}`,
     },
     ADDRESS: {
         ALL: '/addresses',

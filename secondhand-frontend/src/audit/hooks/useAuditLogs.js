@@ -16,7 +16,10 @@ export const useAuditLogs = (filters = {}) => {
         queryKey: ['auditLogs', user?.email],
         queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email),
         enabled: !!user?.email,
-        refetchInterval: 30000 // Refetch every 30 seconds
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        refetchOnWindowFocus: false, // Don't refetch when window gains focus
+        refetchOnMount: true, // Only refetch when component mounts
+        // Removed refetchInterval to stop automatic polling
     });
 
     // Get audit enums

@@ -35,4 +35,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // Kullanıcının toplam okunmamış mesaj sayısını getir
     @Query("SELECT COUNT(m) FROM Message m WHERE m.recipient.id = :userId AND m.isRead = false")
     Long countTotalUnreadMessagesByUser(@Param("userId") Long userId);
+    
+    // Chat room'daki tüm mesajları sil
+    @Modifying
+    @Query("DELETE FROM Message m WHERE m.chatRoomId = :chatRoomId")
+    void deleteByChatRoomId(@Param("chatRoomId") Long chatRoomId);
+    
+    // Chat room'daki en son mesajı getir (silme işlemi sonrası güncelleme için)
+    @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC")
+    java.util.Optional<Message> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId") Long chatRoomId);
 }

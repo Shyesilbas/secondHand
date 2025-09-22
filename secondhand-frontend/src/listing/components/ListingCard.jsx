@@ -134,7 +134,9 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                         </div>
                         <div className="flex items-center gap-3">
                             <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
-                            <ListingReviewStats listingId={listing.id} size="sm" showIcon showText />
+                            {!['VEHICLE', 'REAL_ESTATE'].includes(listing.type) && (
+                                <ListingReviewStats listingId={listing.id} size="sm" showIcon showText />
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">

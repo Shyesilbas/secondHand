@@ -38,6 +38,14 @@ export const chatService = {
 
     getChatRoomUnreadCount: async (chatRoomId, userId) => {
         return request('GET', API_ENDPOINTS.CHAT.UNREAD_COUNT(chatRoomId, userId));
+    },
+
+    deleteConversation: async (chatRoomId, userId) => {
+        return requestWithParams('DELETE', API_ENDPOINTS.CHAT.DELETE_CONVERSATION(chatRoomId), { userId });
+    },
+
+    deleteMessage: async (messageId, userId) => {
+        return requestWithParams('DELETE', API_ENDPOINTS.CHAT.DELETE_MESSAGE(messageId), { userId });
     }
 
 };

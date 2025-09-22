@@ -3,15 +3,18 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import { useChat } from './hooks/useChat.js';
 import ChatWindow from './components/ChatWindow.jsx';
 import { useNavigate } from 'react-router-dom';
-import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+import { ChatBubbleLeftRightIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/react/24/outline';
 import LoadingIndicator from '../common/components/ui/LoadingIndicator.jsx';
 import EmptyState from '../common/components/ui/EmptyState.jsx';
 import AvatarMessageItem from '../common/components/ui/AvatarMessageItem.jsx';
 import { chatService } from "./services/chatService.js";
+import { useNotification } from '../notification/NotificationContext.jsx';
+import { useQuery } from '@tanstack/react-query';
 
 const ChatPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const notification = useNotification();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const {
     chatRooms,
@@ -21,7 +24,10 @@ const ChatPage = () => {
     isLoadingRooms,
     selectChatRoom,
     sendMessage,
-    isLoadingMessages
+    isLoadingMessages,
+    deleteMessage,
+    deleteConversation,
+    isDeletingConversation
   } = useChat(user?.id);
 
   const handleChatRoomSelect = (chatRoom) => {
@@ -38,6 +44,21 @@ const ChatPage = () => {
     if (listingId) {
       navigate(`/listings/${listingId}`);
     }
+  };
+
+  const handleDeleteConversation = (roomId) => {
+    notification.showConfirmation(
+      'Delete Conversation',
+      'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
+      () => {
+        // Close chat if the deleted room was selected
+        if (selectedChatRoom?.id === roomId) {
+          setIsChatOpen(false);
+        }
+        deleteConversation(roomId);
+        notification.showSuccess('Success', 'Conversation deleted successfully.');
+      }
+    );
   };
 
   if (!user) {
@@ -99,6 +120,7 @@ const ChatPage = () => {
                               isSelected={selectedChatRoom?.id === room.id}
                               onClick={() => handleChatRoomSelect(room)}
                               onListingClick={handleListingClick}
+                              onDeleteConversation={handleDeleteConversation}
                           />
                       ))
                   )}
@@ -110,15 +132,20 @@ const ChatPage = () => {
             {/* Chat Window */}
             <div className="lg:col-span-8">
               {selectedChatRoom ? (
-                  <ChatWindow
-                      isOpen={isChatOpen}
-                      onClose={handleCloseChat}
-                      selectedChatRoom={selectedChatRoom}
-                      messages={messages}
-                      onSendMessage={sendMessage}
-                      isLoadingMessages={isLoadingMessages}
-                      isConnected={isConnected}
-                  />
+                      <ChatWindow
+                          isOpen={isChatOpen}
+                          onClose={handleCloseChat}
+                          selectedChatRoom={selectedChatRoom}
+                          messages={messages}
+                          onSendMessage={sendMessage}
+                          onDeleteMessage={deleteMessage}
+                          onDeleteConversation={deleteConversation}
+                          isLoadingMessages={isLoadingMessages}
+                          isConnected={isConnected}
+                          onConversationDeleted={() => {
+                            setIsChatOpen(false);
+                          }}
+                      />
               ) : (
                   <div className="bg-white rounded-2xl shadow-xl border border-gray-100 h-full flex items-center justify-center">
                     <div className="text-center">
@@ -137,21 +164,24 @@ const ChatPage = () => {
   );
 };
 
-const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId }) => {
-  const [unreadCount, setUnreadCount] = useState(0);
+const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId, onDeleteConversation }) => {
+  const [showOptions, setShowOptions] = useState(false);
 
-  useEffect(() => {
-    const fetchUnread = async () => {
-      try {
-        if (!userId) return;
-        const res = await chatService.getChatRoomUnreadCount(room.id, userId);
-        setUnreadCount(res || 0);
-      } catch (err) {
-        console.error('Unread count fetch error', err);
-      }
-    };
-    fetchUnread();
-  }, [room.id, userId]);
+  // Use React Query for real-time unread count updates
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['unreadCount', room.id, userId],
+    queryFn: () => chatService.getChatRoomUnreadCount(room.id, userId),
+    enabled: !!userId && !!room.id,
+    refetchInterval: 15000, // Increased to 15 seconds from 5 seconds
+    staleTime: 5000, // Data is fresh for 5 seconds
+    refetchOnWindowFocus: false // Don't refetch when window gains focus
+  });
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
+    onDeleteConversation(room.id);
+    setShowOptions(false);
+  };
 
   const getRoomTitle = () => {
     if (room.otherParticipantName) return room.otherParticipantName;
@@ -162,7 +192,7 @@ const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId })
   const getRoomSubtitle = () => {
     if (room.roomType === 'LISTING' && room.otherParticipantName)
       return `Seller: ${room.otherParticipantName}`;
-    if (room.roomType === 'DIRECT' && room.otherParticipantName) return 'Message';
+    if (room.roomType === 'DIRECT' && room.otherParticipantName) return 'Direct Message';
     return room.roomName;
   };
 
@@ -174,35 +204,62 @@ const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId })
   };
 
   return (
-      <div onClick={onClick} className={`relative cursor-pointer ${isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}>
+      <div className={`relative cursor-pointer ${isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}>
         <div className="flex justify-between items-center">
-          <AvatarMessageItem
-              containerClassName="p-4 border-b border-gray-100 flex-1"
-              title={
-                room.listingTitle ? (
-                    <div className="flex flex-col">
-                      <span className="text-text-secondary">{room.otherParticipantName}</span>
-                      <div className="flex items-center space-x-1">
-                        <span>İlan:</span>
-                        <button
-                            onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
-                            className="text-btn-primary hover:text-blue-800 hover:underline cursor-pointer transition-colors"
-                            title="İlanı görüntüle"
-                        >
-                          {room.listingTitle}
-                        </button>
+          <div onClick={onClick} className="flex-1">
+            <AvatarMessageItem
+                containerClassName="p-4 border-b border-gray-100"
+                title={
+                  room.listingTitle ? (
+                      <div className="flex flex-col">
+                        <span className="text-text-secondary">{room.otherParticipantName}</span>
+                        <div className="flex items-center space-x-1">
+                          <span>Listing:</span>
+                          <button
+                              onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
+                              className="text-btn-primary hover:text-blue-800 hover:underline cursor-pointer transition-colors"
+                              title="View listing"
+                          >
+                            {room.listingTitle}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                ) : (
-                    getRoomTitle()
-                )
-              }
-              subtitle={room.lastMessage ? `${getLastMessageSenderName()}: ${room.lastMessage}` : getRoomSubtitle()}
-              createdAt={room.lastMessageTime}
-          />
+                  ) : (
+                      getRoomTitle()
+                  )
+                }
+                subtitle={room.lastMessage ? `${getLastMessageSenderName()}: ${room.lastMessage}` : getRoomSubtitle()}
+                createdAt={room.lastMessageTime}
+            />
+          </div>
+
+          <div className="relative p-4">
+            <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowOptions(!showOptions);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                title="Options"
+            >
+              <EllipsisVerticalIcon className="w-4 h-4" />
+            </button>
+            
+            {showOptions && (
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                  <button
+                      onClick={handleDeleteClick}
+                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                    <span>Delete Chat</span>
+                  </button>
+                </div>
+            )}
+          </div>
 
           {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow-lg animate-pulse">
+              <span className="absolute top-2 right-12 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow-lg animate-pulse">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
           )}
