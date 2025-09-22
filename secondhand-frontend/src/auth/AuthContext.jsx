@@ -6,7 +6,8 @@ import {
     clearTokens,
     setUser,
     setTokens,
-    hasValidTokens
+    hasValidTokens,
+    isCookieBasedAuth
 } from '../common/services/storage/tokenStorage.js';
 import { authService } from './services/authService.js';
 import { UserDTO } from '../common/index.js';
@@ -28,42 +29,77 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const initializeAuth = async () => {
-
             try {
-                if (!hasValidTokens()) {
-                    setIsLoading(false);
-                    return;
-                }
-
-                const token = getToken();
                 const userData = getUser();
+                const isCookieAuth = isCookieBasedAuth();
 
+                console.debug('Auth initialization - isCookieAuth:', isCookieAuth, 'hasUserData:', !!userData);
 
-                if (token && userData) {
+                // If we have cached user data, use it temporarily
+                if (userData) {
                     setUserState(userData);
                     setIsAuthenticated(true);
+                }
 
+                // For cookie-based auth, try to validate session with server
+                if (isCookieAuth) {
+                    try {
+                        console.debug('Attempting cookie-based validation...');
+                        // First try to validate current session
+                        const validationResult = await authService.validateToken();
+                        
+                        if (validationResult.valid) {
+                            console.debug('Session is valid');
+                            // If no cached user data, fetch current user
+                            if (!userData) {
+                                const userProfile = await authService.getCurrentUser();
+                                const newUserData = {
+                                    ...UserDTO,
+                                    ...userProfile
+                                };
+                                setUser(newUserData);
+                                setUserState(newUserData);
+                                setIsAuthenticated(true);
+                            }
+                        } else {
+                            console.debug('Session validation failed:', validationResult);
+                            throw new Error('Session invalid');
+                        }
+                    } catch (error) {
+                        console.debug('Cookie-based validation failed:', error.message);
+                        // Clear any cached user data
+                        setUserState(null);
+                        setIsAuthenticated(false);
+                        clearTokens();
+                    }
+                } else if (hasValidTokens()) {
+                    // Token-based auth fallback
                     try {
                         await authService.validateToken();
+                        if (!userData) {
+                            const userProfile = await authService.getCurrentUser();
+                            const newUserData = {
+                                ...UserDTO,
+                                ...userProfile
+                            };
+                            setUser(newUserData);
+                            setUserState(newUserData);
+                            setIsAuthenticated(true);
+                        }
                     } catch (error) {
-                    }
-                } else if (token) {
-                    try {
-                        const userProfile = await authService.getCurrentUser();
-
-                        const userData = {
-                            ...UserDTO,
-                            ...userProfile
-                        };
-                        setUser(userData);
-                        setUserState(userData);
-                        setIsAuthenticated(true);
-                    } catch (error) {
+                        console.debug('Token validation failed, user not authenticated');
                         await logout();
                     }
+                } else {
+                    // No valid authentication method
+                    console.debug('No valid authentication found');
+                    setUserState(null);
+                    setIsAuthenticated(false);
                 }
             } catch (error) {
-                await logout();
+                console.error('Auth initialization error:', error);
+                setUserState(null);
+                setIsAuthenticated(false);
             } finally {
                 setIsLoading(false);
             }
@@ -73,11 +109,15 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (loginResponse) => {
-        const { accessToken, refreshToken, userId, email } = loginResponse;
+        // With cookie-based auth, tokens are set by server as HttpOnly cookies
+        // loginResponse now contains { userId, email, message, success } without tokens
+        const { userId, email } = loginResponse;
 
-        setTokens(accessToken, refreshToken);
+        // setTokens is now a no-op for cookie-based auth but kept for compatibility
+        setTokens(null, null);
 
         try {
+            // Fetch complete user profile
             const userProfile = await authService.getCurrentUser();
 
             const userData = {
@@ -122,14 +162,13 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            const token = getToken();
-            if (token) {
-                await authService.logout();
-            }
+            // Always call server logout to clear HttpOnly cookies
+            await authService.logout();
         } catch (error) {
-            // Continue with local logout
+            // Continue with local logout even if server call fails
+            console.debug('Server logout failed, continuing with local logout');
         } finally {
-            clearTokens();
+            clearTokens(); // Clear any client-side references
             setUserState(null);
             setIsAuthenticated(false);
         }
@@ -142,7 +181,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     const handleTokenRefresh = (newAccessToken, newRefreshToken) => {
+        // With cookie-based auth, tokens are managed by server
+        // This function is kept for compatibility but doesn't store tokens
         setTokens(newAccessToken, newRefreshToken);
+        console.debug('Token refresh handled via server cookies');
     };
 
     const handleTokenRefreshFailure = () => {

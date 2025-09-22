@@ -27,7 +27,7 @@ export const authService = {
 
     logout: async () => post(API_ENDPOINTS.AUTH.LOGOUT),
 
-    refreshToken: async (refreshToken) => post(API_ENDPOINTS.AUTH.REFRESH, { refreshToken }),
+    refreshToken: async () => post(API_ENDPOINTS.AUTH.REFRESH, {}),
 
     forgotPassword: async (email) => {
         const forgotPasswordData = createForgotPasswordRequest({ email });
