@@ -139,12 +139,12 @@ const ListingCardActions = ({ listing, onChanged }) => {
         <button
           onClick={handleDelete}
           className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-xs"
-          title="Sil"
+          title="Delete"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
           </svg>
-          <span>Sil</span>
+          <span>Delete</span>
         </button>
 
         {listing.status !== 'SOLD' && (
