@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chatService.js';
 import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import { UNREAD_COUNT_KEYS } from './useUnreadCount.js';
 
 export const useChat = (userId) => {
     const { user } = useAuth();
@@ -31,9 +32,12 @@ export const useChat = (userId) => {
         queryKey: ['chatRooms', userId],
         queryFn: () => chatService.getUserChatRooms(userId),
         enabled: !!userId,
-        staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
-        refetchInterval: 60000, // Reduced to 1 minute instead of 30 seconds
-        refetchOnWindowFocus: false
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        cacheTime: 10 * 60 * 1000, // Cache for 10 minutes
+        refetchInterval: 5 * 60 * 1000, // Reduced to 5 minutes - WebSocket handles real-time
+        refetchOnWindowFocus: false,
+        refetchOnMount: false, // Don't refetch on every mount
+        refetchIntervalInBackground: false, // Don't poll in background
     });
 
     const {
@@ -45,9 +49,11 @@ export const useChat = (userId) => {
         queryKey: ['chatMessages', selectedChatRoom?.id],
         queryFn: () => chatService.getChatMessages(selectedChatRoom.id),
         enabled: !!selectedChatRoom?.id,
-        staleTime: 30 * 1000, // Data is fresh for 30 seconds
-        refetchInterval: 30000, // Increased to 30 seconds from 10 seconds
-        refetchOnWindowFocus: false
+        staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
+        cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+        refetchInterval: false, // Disable polling - WebSocket handles real-time messages
+        refetchOnWindowFocus: false,
+        refetchOnMount: false, // Don't refetch on every mount
     });
 
     const sendMessageMutation = useMutation({
@@ -59,14 +65,26 @@ export const useChat = (userId) => {
             });
             queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
+            // Invalidate both total and room unread counts
+            queryClient.invalidateQueries({ 
+                queryKey: UNREAD_COUNT_KEYS.all, 
+                refetchType: 'none' // Don't refetch immediately, just mark as stale
+            });
         }
     });
 
     const markAsReadMutation = useMutation({
         mutationFn: ({ chatRoomId, userId }) => chatService.markMessagesAsRead(chatRoomId, userId),
-        onSuccess: () => {
+        onSuccess: (_, { chatRoomId, userId }) => {
             queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
+            // Immediately update unread counts
+            queryClient.setQueryData(UNREAD_COUNT_KEYS.room(chatRoomId, userId), 0);
+            // Also invalidate total unread count to refresh header
+            queryClient.invalidateQueries({ 
+                queryKey: UNREAD_COUNT_KEYS.total(userId),
+                refetchType: 'none'
+            });
         }
     });
 

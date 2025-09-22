@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useAdvancedListings } from '../hooks/useAdvancedListings.js';
+import { useAdvancedListingsQuery } from '../hooks/useAdvancedListingsQuery.js';
 import ListingGrid from '../components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import { useEnums } from '../../common/hooks/useEnums.js';
@@ -28,7 +28,7 @@ const ListingsPage = () => {
         updateFilters,
         updatePage,
         resetFilters
-    } = useAdvancedListings(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
+    } = useAdvancedListingsQuery(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
 
     const { getListingTypeLabel } = useEnums();
 

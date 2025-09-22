@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.jsx';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UserSearchBar from '../../../user/components/UserSearchBar.jsx';
-import { chatService } from '../../../chat/services/chatService.js';
+import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
 import { useCart } from '../../../cart/hooks/useCart.js';
 
 const icons = {
@@ -29,23 +29,9 @@ const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
     const notification = useNotification();
+    const location = useLocation();
     const { cartCount } = useCart();
-    const [totalUnread, setTotalUnread] = useState(0);
-
-    useEffect(() => {
-        if (!isAuthenticated) return;
-
-        const fetchUnread = async () => {
-            try {
-                const res = await chatService.getTotalUnreadMessageCount(user.id);
-                setTotalUnread(res || 0);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        fetchUnread();
-    }, [isAuthenticated, user?.id]);
+    const { totalUnread, setTotalUnread } = useTotalUnreadCount({ enabled: location.pathname !== ROUTES.HOME });
 
     const handleChatClick = () => {
         setTotalUnread(0);

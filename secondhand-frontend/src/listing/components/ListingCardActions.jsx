@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useShowcase } from '../../showcase/hooks/useShowcase.js';
+import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
 import { listingService } from '../services/listingService.js';
 import ShowcaseModal from '../../showcase/components/ShowcaseModal.jsx';
 import ReactDOM from 'react-dom';
@@ -13,12 +13,12 @@ const ListingCardActions = ({ listing, onChanged }) => {
   const { user } = useAuth();
   const notification = useNotification();
   const [isShowcaseModalOpen, setIsShowcaseModalOpen] = useState(false);
-  const { showcases } = useShowcase();
+  const { isInShowcase } = useShowcaseQuery();
 
   const isOwner = user?.id === listing?.sellerId;
   if (!isOwner) return null;
 
-  const isInShowcase = Array.isArray(showcases) && showcases.some(s => (s.listing?.id || s.listingId) === listing.id);
+  const listingInShowcase = isInShowcase(listing.id);
 
   const handleEdit = (e) => {
     e.preventDefault();
@@ -160,7 +160,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
           </button>
         )}
 
-        {listing.status === 'ACTIVE' && !isInShowcase && (
+        {listing.status === 'ACTIVE' && !listingInShowcase && (
           <button
             onClick={handleShowcase}
             className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs"

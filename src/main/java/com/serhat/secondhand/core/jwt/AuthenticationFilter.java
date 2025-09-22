@@ -37,6 +37,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             "/api/auth/register",
             "/api/auth/refresh",  // Add refresh endpoint
             "/api/auth/debug/cookies", // Debug endpoint for cookie testing
+            "/api/test/rate-limit", // Rate limit testing endpoints
             "/swagger-ui",
             "/api-docs",
             "/v3/api-docs",

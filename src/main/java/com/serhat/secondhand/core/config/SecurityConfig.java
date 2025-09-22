@@ -198,7 +198,11 @@ public class SecurityConfig {
         // Exposed headers
         configuration.setExposedHeaders(Arrays.asList(
                 "Authorization",
-                "X-Total-Count"
+                "X-Total-Count",
+                "X-RateLimit-Limit",
+                "X-RateLimit-Remaining", 
+                "X-RateLimit-Reset",
+                "Retry-After"
         ));
 
         // Max age for preflight requests
