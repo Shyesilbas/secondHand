@@ -31,14 +31,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsServiceImpl userDetailsService;
     private final CookieUtils cookieUtils;
 
-    // Public endpoints that should not be filtered
-    private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
+        private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/auth/login",
             "/api/auth/register",
-            "/api/auth/refresh",  // Add refresh endpoint
-            "/api/auth/debug/cookies", // Debug endpoint for cookie testing
-            "/api/test/rate-limit", // Rate limit testing endpoints
-            "/swagger-ui",
+            "/api/auth/refresh",              "/api/auth/debug/cookies",             "/api/test/rate-limit",             "/swagger-ui",
             "/api-docs",
             "/v3/api-docs",
             "/swagger-resources",
@@ -65,15 +61,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             String jwt = null;
             String userEmail = null;
 
-            // Try to get token from Authorization header first (for API clients)
-            final String authHeader = request.getHeader("Authorization");
+                        final String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 jwt = authHeader.substring(7);
                 userEmail = jwtUtils.extractUsername(jwt);
                 log.debug("Token extracted from Authorization header");
             } 
-            // If no Authorization header, try to get token from cookies (for web clients)
-            else {
+                        else {
                 jwt = cookieUtils.getAccessTokenFromCookies(request).orElse(null);
                 if (jwt != null) {
                     userEmail = jwtUtils.extractUsername(jwt);
@@ -81,8 +75,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            // If no token found, continue without authentication
-            if (jwt == null || userEmail == null) {
+                        if (jwt == null || userEmail == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -90,14 +83,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 TokenStatus status = tokenService.getTokenStatus(jwt).orElse(TokenStatus.REVOKED);
 
-                // First check JWT expiry
-                if (!jwtUtils.isTokenValid(jwt, userDetailsService.loadUserByUsername(userEmail))) {
+                                if (!jwtUtils.isTokenValid(jwt, userDetailsService.loadUserByUsername(userEmail))) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
                     return;
                 }
 
-                // Then DB status
-                if (status != TokenStatus.ACTIVE) {
+                                if (status != TokenStatus.ACTIVE) {
                     sendTokenError(response, request, status);
                     return;
                 }

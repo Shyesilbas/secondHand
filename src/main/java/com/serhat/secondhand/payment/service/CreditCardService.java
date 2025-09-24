@@ -47,8 +47,7 @@ public class CreditCardService {
                 .cvv(CreditCardHelper.generateCvv())
                 .expiryMonth(CreditCardHelper.generateExpiryMonth())
                 .expiryYear(CreditCardHelper.generateExpiryYear())
-                .amount(BigDecimal.ZERO) // Initial amount is zero
-                .limit(creditCardRequest.limit())
+                .amount(BigDecimal.ZERO)                 .limit(creditCardRequest.limit())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -135,5 +134,4 @@ public class CreditCardService {
         log.info("Credit card deleted for user: {}", user.getEmail());
     }
 
-    // mapping handled by CreditCardMapper
-}
+    }

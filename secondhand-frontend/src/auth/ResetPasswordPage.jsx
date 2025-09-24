@@ -9,9 +9,7 @@ const ResetPasswordPage = () => {
 
   const [formData, setFormData] = useState({
     ...ResetPasswordRequestDTO,
-    token: token || '', // Initialize with token from URL
-    confirmPassword: '' // Additional field for frontend validation
-  });
+    token: token || '',     confirmPassword: ''   });
 
   return (
     <div className="w-full max-w-md mx-auto">

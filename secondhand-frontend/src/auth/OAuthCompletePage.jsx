@@ -13,8 +13,7 @@ const OAuthCompletePage = () => {
     const [form, setForm] = useState({
         phone: '',
         gender: '',
-        birthdate: '', // dd/MM/yyyy
-    });
+        birthdate: '',     });
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -45,9 +44,7 @@ const OAuthCompletePage = () => {
 
         setSubmitting(true);
         try {
-            // Register with collected fields
-            // Complete OAuth registration without password
-            const registerPayload = {
+                                    const registerPayload = {
                 name: baseInfo.name,
                 surname: baseInfo.surname,
                 email: baseInfo.email,

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class ForgotPasswordResponse {
     private String message;
     private String status;
-    private String verificationCode; // Present only when generated (dev use)
-}
+    private String verificationCode; }
 
 

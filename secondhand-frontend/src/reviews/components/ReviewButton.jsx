@@ -13,8 +13,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
                 const review = await reviewService.getReviewByOrderItem(orderItem.id);
                 setExistingReview(review);
             } catch (error) {
-                // No existing review found
-                setExistingReview(null);
+                                setExistingReview(null);
             }
         };
 
@@ -25,8 +24,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
 
     const canReview = orderItem?.shippingStatus === 'DELIVERED';
     
-    // Debug log to help troubleshoot
-    console.log('ReviewButton Debug:', {
+        console.log('ReviewButton Debug:', {
         orderItemId: orderItem?.id,
         shippingStatus: orderItem?.shippingStatus,
         canReview
@@ -49,8 +47,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
 
     const handleReviewCreated = () => {
         onReviewCreated?.();
-        // Refresh the existing review check
-        setLoading(true);
+                setLoading(true);
         reviewService.getReviewByOrderItem(orderItem.id)
             .then(setExistingReview)
             .finally(() => setLoading(false));

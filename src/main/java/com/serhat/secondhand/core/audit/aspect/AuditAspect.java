@@ -32,22 +32,19 @@ public class AuditAspect {
         String errorMessage = null;
 
         try {
-            // Extract user email from LoginRequest
-            if (args.length > 0 && args[0] != null) {
+                        if (args.length > 0 && args[0] != null) {
                 Object loginRequest = args[0];
                 userEmail = (String) loginRequest.getClass().getMethod("email").invoke(loginRequest);
             }
 
-            // Get request information
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 ipAddress = auditLogService.getClientIpAddress(request);
                 userAgent = auditLogService.getClientUserAgent(request);
             }
 
-            // Execute the login method
-            Object result = joinPoint.proceed();
+                        Object result = joinPoint.proceed();
             success = true;
             
             log.info("Login successful for user: {} from IP: {}", userEmail, ipAddress);
@@ -59,8 +56,7 @@ public class AuditAspect {
             log.warn("Login failed for user: {} from IP: {} - Error: {}", userEmail, ipAddress, errorMessage);
             throw e;
         } finally {
-            // Log the audit event asynchronously
-            auditLogService.logLogin(userEmail, ipAddress, userAgent, success, errorMessage);
+                        auditLogService.logLogin(userEmail, ipAddress, userAgent, success, errorMessage);
         }
     }
 
@@ -72,27 +68,21 @@ public class AuditAspect {
         String userAgent = "unknown";
 
         try {
-            // Get authentication information
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 userEmail = authentication.getName();
-                // Try to get user ID from authentication details
-                if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-                    // You might need to cast to your custom UserDetails implementation
-                    // userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
-                }
+                                if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+                                                        }
             }
 
-            // Get request information
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 ipAddress = auditLogService.getClientIpAddress(request);
                 userAgent = auditLogService.getClientUserAgent(request);
             }
 
-            // Execute the logout method
-            Object result = joinPoint.proceed();
+                        Object result = joinPoint.proceed();
             
             log.info("Logout successful for user: {} from IP: {}", userEmail, ipAddress);
             return result;
@@ -101,8 +91,7 @@ public class AuditAspect {
             log.error("Logout failed for user: {} from IP: {} - Error: {}", userEmail, ipAddress, e.getMessage());
             throw e;
         } finally {
-            // Log the audit event asynchronously
-            auditLogService.logLogout(userEmail, userId, ipAddress, userAgent);
+                        auditLogService.logLogout(userEmail, userId, ipAddress, userAgent);
         }
     }
 
@@ -116,27 +105,21 @@ public class AuditAspect {
         String errorMessage = null;
 
         try {
-            // Get authentication information
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 userEmail = authentication.getName();
-                // Try to get user ID from authentication details
-                if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-                    // You might need to cast to your custom UserDetails implementation
-                    // userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
-                }
+                                if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+                                                        }
             }
 
-            // Get request information
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 ipAddress = auditLogService.getClientIpAddress(request);
                 userAgent = auditLogService.getClientUserAgent(request);
             }
 
-            // Execute the change password method
-            Object result = joinPoint.proceed();
+                        Object result = joinPoint.proceed();
             success = true;
             
             log.info("Password change successful for user: {} from IP: {}", userEmail, ipAddress);
@@ -148,8 +131,7 @@ public class AuditAspect {
             log.warn("Password change failed for user: {} from IP: {} - Error: {}", userEmail, ipAddress, errorMessage);
             throw e;
         } finally {
-            // Log the audit event asynchronously
-            auditLogService.logPasswordChange(userEmail, userId, ipAddress, userAgent, success, errorMessage);
+                        auditLogService.logPasswordChange(userEmail, userId, ipAddress, userAgent, success, errorMessage);
         }
     }
 }

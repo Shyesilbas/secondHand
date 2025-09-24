@@ -87,11 +87,9 @@ public class AgreementController {
             @Valid @RequestBody UpdateAgreementRequest request) {
         Agreement agreement;
         if (request.getVersion() != null && !request.getVersion().trim().isEmpty()) {
-            // Manuel versiyon belirtildi
-            agreement = agreementService.updateAgreementWithVersion(agreementId, request.getVersion(), request.getContent());
+                        agreement = agreementService.updateAgreementWithVersion(agreementId, request.getVersion(), request.getContent());
         } else {
-            // Otomatik versiyonlama
-            agreement = agreementService.updateAgreement(agreementId, request.getContent());
+                        agreement = agreementService.updateAgreement(agreementId, request.getContent());
         }
         var agreementDto = agreementMapper.toDto(agreement);
         return ResponseEntity.ok(agreementDto);
@@ -104,11 +102,9 @@ public class AgreementController {
             @Valid @RequestBody UpdateAgreementRequest request) {
         Agreement agreement;
         if (request.getVersion() != null && !request.getVersion().trim().isEmpty()) {
-            // Manuel versiyon belirtildi
-            agreement = agreementService.updateAgreementByTypeWithVersion(agreementType, request.getVersion(), request.getContent());
+                        agreement = agreementService.updateAgreementByTypeWithVersion(agreementType, request.getVersion(), request.getContent());
         } else {
-            // Otomatik versiyonlama
-            agreement = agreementService.updateAgreementByType(agreementType, request.getContent());
+                        agreement = agreementService.updateAgreementByType(agreementType, request.getContent());
         }
         var agreementDto = agreementMapper.toDto(agreement);
         return ResponseEntity.ok(agreementDto);
@@ -147,15 +143,4 @@ public class AgreementController {
         return ResponseEntity.ok("Successfully accepted required agreements for all users");
     }
 
-    /*
-    @PostMapping("/admin/accept-user/{userId}")
-    @Operation(summary = "Accept agreements for specific user", description = "Admin endpoint to accept required agreements for a specific user")
-    public ResponseEntity<String> acceptAgreementsForUser(@PathVariable Long userId) {
-        log.info("Admin requested to accept agreements for user ID: {}", userId);
-        var user = userService.findById(userId);
-        userAgreementService.acceptRequiredAgreementsForUser(user);
-        return ResponseEntity.ok("Successfully accepted required agreements for user: " + user.getEmail());
     }
-
-     */
-}

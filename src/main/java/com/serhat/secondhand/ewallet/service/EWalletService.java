@@ -48,8 +48,7 @@ public class EWalletService {
         EWallet eWallet = EWallet.builder()
                 .user(user)
                 .balance(BigDecimal.ZERO)
-                .walletLimit(new BigDecimal("10000.00")) // Default limit
-                .build();
+                .walletLimit(new BigDecimal("10000.00"))                 .build();
 
         eWallet = eWalletRepository.save(eWallet);
         log.info("eWallet created for user: {} with ID: {}", user.getEmail(), eWallet.getId());
@@ -75,8 +74,7 @@ public class EWalletService {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
 
-        // Get specific bank account by ID
-        Bank bank = bankService.findByUser(user).orElseThrow(() ->
+                Bank bank = bankService.findByUser(user).orElseThrow(() ->
             new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
 
         if (!bank.getId().equals(request.getBankId())) {
@@ -88,8 +86,7 @@ public class EWalletService {
         eWallet.setBalance(eWallet.getBalance().add(request.getAmount()));
         eWalletRepository.save(eWallet);
 
-        // Create payment record for tracking - direct save to avoid circular call
-        Payment payment = Payment.builder()
+                Payment payment = Payment.builder()
                 .fromUser(user)
                 .toUser(null)
                 .amount(request.getAmount())
@@ -120,8 +117,7 @@ public class EWalletService {
             throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
         }
 
-        // Get specific bank account by ID
-        Bank bank = bankService.findByUser(user).orElseThrow(() ->
+                Bank bank = bankService.findByUser(user).orElseThrow(() ->
             new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
 
         if (!bank.getId().equals(request.getBankId())) {
@@ -133,8 +129,7 @@ public class EWalletService {
 
         bankService.credit(user, request.getAmount());
 
-        // Create payment record for tracking - direct save to avoid circular call
-        Payment payment = Payment.builder()
+                Payment payment = Payment.builder()
                 .fromUser(user)
                 .toUser(null)
                 .amount(request.getAmount())

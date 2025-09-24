@@ -2,10 +2,6 @@ import { get, post, put } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { AGREEMENT_TYPES } from '../agreements.js';
 
-/**
- * Agreement Service
- * Handles all agreement-related API calls
- */
 class AgreementService {
   normalizeUserAgreement(raw) {
     return {

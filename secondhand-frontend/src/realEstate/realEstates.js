@@ -1,21 +1,15 @@
 import { ListingDTO } from '../listing/listings.js';
 
-/**
- * Real Estate Related DTOs
- */
 
-// Real Estate Create Request DTO
 export const RealEstateCreateRequestDTO = {
-  // Basic Info
-  title: '',
+    title: '',
   description: '',
   price: 0,
   currency: 'TRY',
   city: '',
   district: '',
   
-  // Real Estate Specs
-  adType: '',
+    adType: '',
   realEstateType: '',
   heatingType: '',
   ownerType: '',
@@ -27,11 +21,9 @@ export const RealEstateCreateRequestDTO = {
   furnished: false,
 };
 
-// Real Estate Response DTO
 export const RealEstateListingDTO = {
   ...ListingDTO,
-  // Real Estate Specific Info
-  adType: '',
+    adType: '',
   realEstateType: '',
   heatingType: '',
   ownerType: '',
@@ -43,7 +35,6 @@ export const RealEstateListingDTO = {
   furnished: false,
 };
 
-// Real Estate Search Filters DTO
 export const RealEstateSearchFiltersDTO = {
   listingType: 'REAL_ESTATE',
   status: 'ACTIVE',
@@ -53,8 +44,7 @@ export const RealEstateSearchFiltersDTO = {
   maxPrice: 0,
   currency: 'TRY',
   
-  // Real estate specific filters
-  adType: '',
+    adType: '',
   realEstateTypes: [],
   heatingTypes: [],
   ownerType: '',
@@ -69,27 +59,23 @@ export const RealEstateSearchFiltersDTO = {
   maxBuildingAge: 0,
   furnished: false,
   
-  // Sorting
-  sortBy: 'createdAt',
+    sortBy: 'createdAt',
   sortDirection: 'DESC',
   
-  // Pagination
-  page: 0,
+    page: 0,
   size: 20,
 };
 
 export const createRealEstateCreateRequest = (data) => {
   return {
-    // Basic Info
-    title: (data.title || '').trim(),
+        title: (data.title || '').trim(),
     description: (data.description || '').trim(),
     price: parseFloat(data.price) || 0,
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
     
-    // Real Estate Specs
-    adType: data.adType || '',
+        adType: data.adType || '',
     realEstateType: data.realEstateType || '',
     heatingType: data.heatingType || '',
     ownerType: data.ownerType || '',
@@ -105,8 +91,7 @@ export const createRealEstateCreateRequest = (data) => {
 export const createRealEstateUpdateRequest = (data) => {
   const updateData = {};
   
-  // Only include fields that are provided and not empty
-  if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
+    if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
   if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
   if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;

@@ -30,34 +30,18 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     
     List<Listing> findBySellerAndStatus(User seller, ListingStatus status);
     
-    /**
-     * Find listing by listing number
-     */
-    Optional<Listing> findByListingNo(String listingNo);
+        Optional<Listing> findByListingNo(String listingNo);
     
-    // Statistics queries
-    
-    /**
-     * Get total count of all listings
-     */
-    @Query("SELECT COUNT(l) FROM Listing l")
+        
+        @Query("SELECT COUNT(l) FROM Listing l")
     long getTotalListingCount();
     
-    /**
-     * Get total count of active listings
-     */
-    @Query("SELECT COUNT(l) FROM Listing l WHERE l.status = :status")
+        @Query("SELECT COUNT(l) FROM Listing l WHERE l.status = :status")
     long getListingCountByStatus(ListingStatus status);
     
-    /**
-     * Get count of unique users who have active listings
-     */
-    @Query("SELECT COUNT(DISTINCT l.seller) FROM Listing l WHERE l.status = :status")
+        @Query("SELECT COUNT(DISTINCT l.seller) FROM Listing l WHERE l.status = :status")
     long getActiveSellerCount(ListingStatus status);
     
-    /**
-     * Get count of unique cities that have active listings
-     */
-    @Query("SELECT COUNT(DISTINCT l.city) FROM Listing l WHERE l.status = :status AND l.city IS NOT NULL")
+        @Query("SELECT COUNT(DISTINCT l.city) FROM Listing l WHERE l.status = :status AND l.city IS NOT NULL")
     long getActiveCityCount(ListingStatus status);
 }

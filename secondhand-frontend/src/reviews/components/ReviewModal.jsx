@@ -7,8 +7,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Reset form when modal opens/closes
-    React.useEffect(() => {
+        React.useEffect(() => {
         if (isOpen) {
             setRating(0);
             setComment('');
@@ -39,8 +38,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
     };
 
     const handleStarClick = (starIndex) => {
-        // If clicking the same star that's already selected, deselect it (set to 0)
-        if (rating === starIndex) {
+                if (rating === starIndex) {
             setRating(0);
         } else {
             setRating(starIndex);

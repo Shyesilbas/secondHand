@@ -15,16 +15,14 @@ export const useClothing = (clothingId = null) => {
     entityName: 'Clothing'
   });
 
-  // Map entity to clothing for backward compatibility
-  return {
+    return {
     ...result,
     clothing: result.entity,
     fetchClothing: result.fetchEntity,
     createClothing: result.createEntity,
     updateClothing: result.updateEntity,
     deleteClothing: result.deleteEntity,
-    // Legacy methods for backward compatibility
-    createClothingListing: result.createEntity,
+        createClothingListing: result.createEntity,
     updateClothingListing: result.updateEntity
   };
 };

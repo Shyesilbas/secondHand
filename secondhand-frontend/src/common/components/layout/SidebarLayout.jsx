@@ -6,9 +6,7 @@ const SidebarLayout = ({
                            sidebarTitle = "Filters",
                            sidebarWidth = "w-80"
                        }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Desktop sidebar
-
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
@@ -195,7 +193,6 @@ const SidebarLayout = ({
     );
 };
 
-// Enhanced Filter Components for better spacing
 export const FilterSection = ({ title, children, collapsible = false }) => {
     const [isExpanded, setIsExpanded] = useState(true);
 

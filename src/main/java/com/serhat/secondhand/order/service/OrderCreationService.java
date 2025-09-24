@@ -29,10 +29,7 @@ public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final AddressService addressService;
 
-    /**
-     * Creates a new order from cart items and checkout request
-     */
-    public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request) {
+        public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request) {
         log.info("Creating order for user: {}", user.getEmail());
 
         validateCartItems(cartItems);
@@ -54,36 +51,24 @@ public class OrderCreationService {
         return savedOrder;
     }
 
-    /**
-     * Validates that cart items exist and are valid
-     */
-    private void validateCartItems(List<Cart> cartItems) {
+        private void validateCartItems(List<Cart> cartItems) {
         if (cartItems == null || cartItems.isEmpty()) {
             throw new BusinessException(OrderErrorCodes.CART_EMPTY);
         }
         log.debug("Validated {} cart items", cartItems.size());
     }
 
-    /**
-     * Resolves shipping address from request
-     */
-    private Address resolveShippingAddress(CheckoutRequest request, User user) {
+        private Address resolveShippingAddress(CheckoutRequest request, User user) {
         return addressService.getAddressById(request.getShippingAddressId());
     }
 
-    /**
-     * Resolves billing address from request (optional)
-     */
-    private Address resolveBillingAddress(CheckoutRequest request, User user) {
+        private Address resolveBillingAddress(CheckoutRequest request, User user) {
         return request.getBillingAddressId() != null 
             ? addressService.getAddressById(request.getBillingAddressId())
             : null;
     }
 
-    /**
-     * Validates that addresses belong to the user
-     */
-    private void validateAddresses(User user, Address shippingAddress, Address billingAddress) {
+        private void validateAddresses(User user, Address shippingAddress, Address billingAddress) {
         if (!shippingAddress.getUser().getId().equals(user.getId())) {
             throw new BusinessException(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
         }
@@ -95,28 +80,19 @@ public class OrderCreationService {
         log.debug("Validated addresses for user: {}", user.getEmail());
     }
 
-    /**
-     * Calculates total amount from cart items
-     */
-    private BigDecimal calculateTotalAmount(List<Cart> cartItems) {
+        private BigDecimal calculateTotalAmount(List<Cart> cartItems) {
         return cartItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    /**
-     * Creates order items from cart items
-     */
-    private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order) {
+        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order) {
         return cartItems.stream()
                 .map(cart -> createOrderItem(cart, order))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Creates a single order item from cart item
-     */
-    private OrderItem createOrderItem(Cart cart, Order order) {
+        private OrderItem createOrderItem(Cart cart, Order order) {
         return OrderItem.builder()
                 .order(order)
                 .listing(cart.getListing())
@@ -128,10 +104,7 @@ public class OrderCreationService {
                 .build();
     }
 
-    /**
-     * Builds the order entity
-     */
-    private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
+        private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
                            BigDecimal totalAmount, String orderNumber, String notes) {
         return Order.builder()
                 .orderNumber(orderNumber)
@@ -147,10 +120,7 @@ public class OrderCreationService {
                 .build();
     }
 
-    /**
-     * Generates unique order number
-     */
-    private String generateOrderNumber() {
+        private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

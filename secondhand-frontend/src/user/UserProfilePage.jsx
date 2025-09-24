@@ -158,13 +158,9 @@ const UserProfilePage = () => {
                     </div>
                     
                     <ReviewsList
-                        reviews={reviews.slice(0, 5)} // Show only first 5 reviews
-                        loading={reviewsLoading}
+                        reviews={reviews.slice(0, 5)}                         loading={reviewsLoading}
                         error={reviewsError}
-                        hasMore={false} // Don't show load more in preview
-                        onLoadMore={() => {}} // No-op for preview
-                        showLoadMore={false} // Hide load more button in preview
-                    />
+                        hasMore={false}                         onLoadMore={() => {}}                         showLoadMore={false}                     />
                 </div>
             )}
 

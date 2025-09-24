@@ -16,39 +16,29 @@ export const useAuditLogs = (filters = {}) => {
         queryKey: ['auditLogs', user?.email],
         queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email),
         enabled: !!user?.email,
-        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
-        refetchOnWindowFocus: false, // Don't refetch when window gains focus
-        refetchOnMount: true, // Only refetch when component mounts
-        // Removed refetchInterval to stop automatic polling
-    });
+        staleTime: 5 * 60 * 1000,         refetchOnWindowFocus: false,         refetchOnMount: true,             });
 
-    // Get audit enums
-    const {
+        const {
         data: auditEnums = { eventTypes: [], eventStatuses: [] },
         isLoading: isLoadingEnums
     } = useQuery({
         queryKey: ['auditEnums'],
         queryFn: () => auditLogService.getAllEnums(),
-        staleTime: 5 * 60 * 1000 // 5 minutes
-    });
+        staleTime: 5 * 60 * 1000     });
 
-    // Filter logs based on filters
-    useEffect(() => {
+        useEffect(() => {
         if (auditLogs && auditLogs.length > 0) {
             let filtered = auditLogs;
 
-            // Filter by event type
-            if (filters.eventType && filters.eventType !== 'ALL') {
+                        if (filters.eventType && filters.eventType !== 'ALL') {
                 filtered = filtered.filter(log => log.eventType === filters.eventType);
             }
 
-            // Filter by event status
-            if (filters.eventStatus && filters.eventStatus !== 'ALL') {
+                        if (filters.eventStatus && filters.eventStatus !== 'ALL') {
                 filtered = filtered.filter(log => log.eventStatus === filters.eventStatus);
             }
 
-            // Filter by date range
-            if (filters.startDate && filters.endDate) {
+                        if (filters.startDate && filters.endDate) {
                 filtered = filtered.filter(log => {
                     const logDate = new Date(log.createdAt);
                     return logDate >= filters.startDate && logDate <= filters.endDate;
@@ -103,8 +93,7 @@ export const useAuditLogs = (filters = {}) => {
         
         if (passwordChangeLogs.length === 0) return null;
         
-        // Sort by date and get the most recent one
-        const sortedLogs = passwordChangeLogs.sort((a, b) => 
+                const sortedLogs = passwordChangeLogs.sort((a, b) => 
             new Date(b.createdAt) - new Date(a.createdAt)
         );
         

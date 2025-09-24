@@ -33,8 +33,7 @@ const ShoppingCartPage = () => {
         }, 0);
     };
 
-    // Checkout logic
-    const checkout = useCheckout(cartCount, calculateTotal, clearCart);
+        const checkout = useCheckout(cartCount, calculateTotal, clearCart);
 
     const handleQuantityChange = (listingId, newQuantity) => {
         if (newQuantity < 1) return;

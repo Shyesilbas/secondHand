@@ -2,7 +2,6 @@ import React from 'react';
 import { useEnums } from '../../hooks/useEnums.js';
 import SearchableDropdown from './SearchableDropdown.jsx';
 
-// enumKey values: 'carBrands', 'fuelTypes', 'colors', 'doors', 'currencies', 'gearTypes', 'seatCounts', 'listingTypes', 'listingStatuses', 'electronicTypes', 'electronicBrands'
 const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searchPlaceholder = '', multiple = false, className = '' }) => {
   const { enums } = useEnums();
   const options = enums?.[enumKey] || [];

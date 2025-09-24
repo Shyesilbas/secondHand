@@ -1,17 +1,14 @@
 import { ListingDTO } from '../listing/listings.js';
 
-// Electronics Create Request DTO
 export const ElectronicCreateRequestDTO = {
-  // Basic Info
-  title: '',
+    title: '',
   description: '',
   price: 0,
   currency: 'TRY',
   city: '',
   district: '',
 
-  // Electronics specific
-  electronicType: '',
+    electronicType: '',
   electronicBrand: '',
   model: '',
   origin: '',
@@ -20,11 +17,9 @@ export const ElectronicCreateRequestDTO = {
   color: '',
 };
 
-// Electronics Response DTO (subset + base Listing fields come from backend)
 export const ElectronicListingDTO = {
   ...ListingDTO,
-  // Electronics fields
-  electronicType: '',
+    electronicType: '',
   electronicBrand: '',
   model: '',
   origin: '',
@@ -42,19 +37,16 @@ export const ElectronicSearchFiltersDTO = {
   maxPrice: 0,
   currency: 'TRY',
 
-  // Electronics specific filters
-  electronicTypes: [],
+    electronicTypes: [],
   electronicBrands: [],
   minYear: 0,
   maxYear: 0,
   colors: [],
 
-  // Sorting
-  sortBy: 'createdAt',
+    sortBy: 'createdAt',
   sortDirection: 'DESC',
 
-  // Pagination
-  page: 0,
+    page: 0,
   size: 20,
 };
 

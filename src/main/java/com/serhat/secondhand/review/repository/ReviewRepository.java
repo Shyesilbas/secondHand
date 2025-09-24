@@ -17,25 +17,13 @@ import java.util.UUID;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-    /**
-     * Find review by reviewer and order item (to check if review already exists)
-     */
-    Optional<Review> findByReviewerAndOrderItem(User reviewer, OrderItem orderItem);
+        Optional<Review> findByReviewerAndOrderItem(User reviewer, OrderItem orderItem);
 
-    /**
-     * Find all reviews for a specific user (reviews received by the user)
-     */
-    Page<Review> findByReviewedUserOrderByCreatedAtDesc(User reviewedUser, Pageable pageable);
+        Page<Review> findByReviewedUserOrderByCreatedAtDesc(User reviewedUser, Pageable pageable);
 
-    /**
-     * Find all reviews written by a specific user
-     */
-    Page<Review> findByReviewerOrderByCreatedAtDesc(User reviewer, Pageable pageable);
+        Page<Review> findByReviewerOrderByCreatedAtDesc(User reviewer, Pageable pageable);
 
-    /**
-     * Get review statistics for a user
-     */
-    @Query("SELECT " +
+        @Query("SELECT " +
             "COUNT(r), " +
             "AVG(CAST(r.rating AS double)), " +
             "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END), " +
@@ -48,21 +36,12 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Object[]> getUserReviewStats(@Param("userId") Long userId);
 
 
-    /**
-     * Find reviews by order item IDs (to get reviews for multiple order items)
-     */
-    List<Review> findByOrderItemIn(List<OrderItem> orderItems);
+        List<Review> findByOrderItemIn(List<OrderItem> orderItems);
 
-    /**
-     * Find reviews for a specific listing (reviews about the listing, not the seller)
-     */
-    @Query("SELECT r FROM Review r WHERE r.orderItem.listing.id = :listingId ORDER BY r.createdAt DESC")
+        @Query("SELECT r FROM Review r WHERE r.orderItem.listing.id = :listingId ORDER BY r.createdAt DESC")
     Page<Review> findByOrderItemListingIdOrderByCreatedAtDesc(@Param("listingId") UUID listingId, Pageable pageable);
 
-    /**
-     * Get review statistics for a specific listing
-     */
-    @Query("SELECT " +
+        @Query("SELECT " +
             "COUNT(r), " +
             "AVG(CAST(r.rating AS double)), " +
             "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END), " +
@@ -74,8 +53,5 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
             "FROM Review r WHERE r.orderItem.listing.id = :listingId")
     List<Object[]> getListingReviewStats(@Param("listingId") UUID listingId);
 
-    /**
-     * Check if user has already reviewed a specific order item
-     */
-    boolean existsByReviewerAndOrderItem(User reviewer, OrderItem orderItem);
+        boolean existsByReviewerAndOrderItem(User reviewer, OrderItem orderItem);
 }

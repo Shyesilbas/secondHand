@@ -13,26 +13,21 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const { addresses } = useAddresses();
     const { eWallet } = useEWallet();
 
-    // Checkout modal state
-    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+        const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [step, setStep] = useState(1);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-    // Address state
-    const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
+        const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
     const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
 
-    // Payment state
-    const [selectedPaymentType, setSelectedPaymentType] = useState('CREDIT_CARD');
+        const [selectedPaymentType, setSelectedPaymentType] = useState('CREDIT_CARD');
     const [cards, setCards] = useState([]);
     const [selectedCardNumber, setSelectedCardNumber] = useState(null);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
 
-    // Load payment methods
-    useEffect(() => {
-        // Load credit cards
-        creditCardService
+        useEffect(() => {
+                creditCardService
             .getAll()
             .then((data) => {
                 let normalized = [];
@@ -50,8 +45,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 setCards([]);
             });
 
-        // Load bank accounts
-        bankService
+                bankService
             .getBankAccount()
             .then((data) => {
                 const normalized = Array.isArray(data) 
@@ -62,8 +56,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             .catch(() => setBankAccounts([]));
     }, []);
 
-    // Auto-select payment methods when available
-    useEffect(() => {
+        useEffect(() => {
         if (selectedPaymentType === 'TRANSFER' && 
             Array.isArray(bankAccounts) && 
             bankAccounts.length > 0 && 
@@ -80,8 +73,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         }
     }, [selectedPaymentType, bankAccounts, selectedBankAccountIban, cards, selectedCardNumber]);
 
-    // Calculate if proceed is disabled
-    const proceedDisabled = useMemo(() => {
+        const proceedDisabled = useMemo(() => {
         if (cartCount === 0) return true;
         if (!selectedShippingAddressId) return true;
         if (selectedPaymentType === 'CREDIT_CARD' && (!Array.isArray(cards) || cards.length === 0)) return true;
@@ -106,8 +98,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
             navigate('/profile/orders');
         } catch (e) {
-            // Extract error message from different possible response structures
-            let errorMessage = 'Checkout failed';
+                        let errorMessage = 'Checkout failed';
             
             if (e?.response?.data?.message) {
                 errorMessage = e.response.data.message;
@@ -135,23 +126,20 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     };
 
     return {
-        // Modal state
-        showCheckoutModal,
+                showCheckoutModal,
         step,
         setStep,
         isCheckingOut,
         openCheckoutModal,
         closeCheckoutModal,
 
-        // Address state
-        addresses,
+                addresses,
         selectedShippingAddressId,
         setSelectedShippingAddressId,
         selectedBillingAddressId,
         setSelectedBillingAddressId,
 
-        // Payment state
-        selectedPaymentType,
+                selectedPaymentType,
         setSelectedPaymentType,
         cards,
         selectedCardNumber,
@@ -161,8 +149,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setSelectedBankAccountIban,
         eWallet,
 
-        // Actions
-        handleCheckout,
+                handleCheckout,
         proceedDisabled
     };
 };

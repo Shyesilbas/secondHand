@@ -1,8 +1,4 @@
-/**
- * Central type definitions and constants for the listing package
- */
 
-// Listing Types
 export const LISTING_TYPES = {
   VEHICLE: 'VEHICLE',
   ELECTRONICS: 'ELECTRONICS', 
@@ -12,7 +8,6 @@ export const LISTING_TYPES = {
   SPORTS: 'SPORTS',
 };
 
-// Listing Statuses
 export const LISTING_STATUS = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE', 
@@ -21,14 +16,12 @@ export const LISTING_STATUS = {
   DRAFT: 'DRAFT',
 };
 
-// Currency Types
 export const CURRENCY_TYPES = {
   TRY: 'TRY',
   USD: 'USD',
   EUR: 'EUR',
 };
 
-// Sort Options
 export const SORT_DIRECTIONS = {
   ASC: 'ASC',
   DESC: 'DESC',
@@ -44,11 +37,9 @@ export const SORT_FIELDS = {
   BRAND: 'brand',
 };
 
-// Default pagination
 export const DEFAULT_PAGE_SIZE = 20;
 export const DEFAULT_PAGE = 0;
 
-// Base listing DTO shape
 export const createBaseListingDTO = () => ({
   id: '',
   listingNo: '',
@@ -67,7 +58,6 @@ export const createBaseListingDTO = () => ({
   updatedAt: '',
 });
 
-// Base filter DTO shape
 export const createBaseFilterDTO = (listingType = null) => ({
   type: listingType,
   listingType: listingType,
@@ -83,7 +73,6 @@ export const createBaseFilterDTO = (listingType = null) => ({
   size: DEFAULT_PAGE_SIZE,
 });
 
-// Validation utilities
 export const isValidListingType = (type) => {
   return Object.values(LISTING_TYPES).includes(type);
 };
@@ -96,7 +85,6 @@ export const isValidCurrency = (currency) => {
   return Object.values(CURRENCY_TYPES).includes(currency);
 };
 
-// Error messages
 export const ERROR_MESSAGES = {
   LISTING_NOT_FOUND: 'Listing not found',
   INVALID_LISTING_TYPE: 'Invalid listing type',
@@ -106,7 +94,6 @@ export const ERROR_MESSAGES = {
   FORM_VALIDATION_ERROR: 'Please check the form fields',
 };
 
-// Success messages  
 export const SUCCESS_MESSAGES = {
   LISTING_CREATED: 'Listing created successfully',
   LISTING_UPDATED: 'Listing updated successfully',

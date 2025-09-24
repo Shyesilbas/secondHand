@@ -41,8 +41,7 @@ public class Favorite {
     @JsonFormat(pattern = "dd/mm/YYYY")
     private LocalDateTime createdAt;
     
-    // Convenience constructor
-    public Favorite(User user, Listing listing) {
+        public Favorite(User user, Listing listing) {
         this.user = user;
         this.listing = listing;
     }

@@ -1,14 +1,9 @@
-/**
- * Authentication Related DTOs
- */
 
-// Login Request DTO
 export const LoginRequestDTO = {
   email: '',
   password: '',
 };
 
-// Login Response DTO
 export const LoginResponseDTO = {
   message: '',
   success: false,
@@ -18,7 +13,6 @@ export const LoginResponseDTO = {
   refreshToken: '',
 };
 
-// Register Request DTO
 export const RegisterRequestDTO = {
   name: '',
   surname: '',
@@ -31,7 +25,6 @@ export const RegisterRequestDTO = {
   acceptedAgreementIds: [],
 };
 
-// Register Response DTO
 export const RegisterResponseDTO = {
   welcomeMessage: '',
   importantMessage: '',
@@ -42,36 +35,27 @@ export const RegisterResponseDTO = {
   surname: '',
 };
 
-// Forgot Password Request DTO
 export const ForgotPasswordRequestDTO = {
   email: '',
 };
 
-// Reset Password Request DTO
 export const ResetPasswordRequestDTO = {
   token: '',
   newPassword: '',
 };
 
-// Change Password Request DTO
 export const ChangePasswordRequestDTO = {
   currentPassword: '',
   newPassword: '',
   confirmPassword: '',
 };
 
-// Token Validation Result DTO
 export const TokenValidationResultDTO = {
   valid: false,
   user: null,
   message: '',
 };
 
-/**
- * Create Login Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createLoginRequest = (data) => {
   return {
     email: data.email?.trim().toLowerCase() || '',
@@ -79,11 +63,6 @@ export const createLoginRequest = (data) => {
   };
 };
 
-/**
- * Create Register Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createRegisterRequest = (data) => {
   return {
     name: data.name?.trim() || '',
@@ -100,11 +79,6 @@ export const createRegisterRequest = (data) => {
   };
 };
 
-/**
- * Create Change Password Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createChangePasswordRequest = (data) => {
   return {
     currentPassword: data.currentPassword || '',
@@ -113,22 +87,12 @@ export const createChangePasswordRequest = (data) => {
   };
 };
 
-/**
- * Create Forgot Password Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createForgotPasswordRequest = (data) => {
   return {
     email: data.email?.trim().toLowerCase() || '',
   };
 };
 
-/**
- * Create Reset Password Request DTO with validation
- * @param {Object} data - Form data
- * @returns {Object} - Validated DTO
- */
 export const createResetPasswordRequest = (data) => {
   return {
     token: data.token || '',

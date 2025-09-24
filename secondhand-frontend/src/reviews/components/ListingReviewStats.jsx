@@ -14,8 +14,7 @@ const ListingReviewStats = ({ listingId, size = 'sm', showIcon = true, showText 
   }
 
   if (error || !stats || stats.totalReviews === 0) {
-    return null; // Don't show anything if no reviews
-  }
+    return null;   }
 
   const sizeConfig = {
     sm: { 

@@ -11,33 +11,24 @@ public final class CreditCardHelper {
     private static final Pattern CARD_NUMBER_PATTERN = Pattern.compile("^\\d{16}$");
     private static final Pattern CVV_PATTERN = Pattern.compile("^\\d{3,4}$");
     
-    // Private constructor to prevent instantiation
-    private CreditCardHelper() {
+        private CreditCardHelper() {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    /**
-     * Generates a valid 16-digit credit card number using Luhn algorithm
-     */
-    public static String generateCardNumber() {
+        public static String generateCardNumber() {
         StringBuilder cardNumber = new StringBuilder();
         
-        // Generate first 15 digits
-        for (int i = 0; i < 15; i++) {
+                for (int i = 0; i < 15; i++) {
             cardNumber.append(SECURE_RANDOM.nextInt(10));
         }
         
-        // Calculate and append check digit using Luhn algorithm
-        int checkDigit = calculateLuhnCheckDigit(cardNumber.toString());
+                int checkDigit = calculateLuhnCheckDigit(cardNumber.toString());
         cardNumber.append(checkDigit);
         
         return cardNumber.toString();
     }
 
-    /**
-     * Generates a 3-digit CVV
-     */
-    public static String generateCvv() {
+        public static String generateCvv() {
         StringBuilder cvv = new StringBuilder();
         for (int i = 0; i < 3; i++) {
             cvv.append(SECURE_RANDOM.nextInt(10));
@@ -45,42 +36,28 @@ public final class CreditCardHelper {
         return cvv.toString();
     }
 
-    /**
-     * Generates expiry month (current month)
-     */
-    public static int generateExpiryMonth() {
+        public static int generateExpiryMonth() {
         return LocalDate.now().getMonthValue();
     }
 
-    /**
-     * Generates expiry year (current year + 5)
-     */
-    public static int generateExpiryYear() {
+        public static int generateExpiryYear() {
         return LocalDate.now().getYear() + 5;
     }
 
-    /**
-     * Validates credit card number (16 digits)
-     */
-    public static boolean isValidCardNumber(String cardNumber) {
+        public static boolean isValidCardNumber(String cardNumber) {
         if (cardNumber == null || cardNumber.isEmpty()) {
             return false;
         }
         
-        // Remove spaces and dashes
-        String cleanedNumber = cardNumber.replaceAll("[\\s-]", "");
+                String cleanedNumber = cardNumber.replaceAll("[\\s-]", "");
         
         return CARD_NUMBER_PATTERN.matcher(cleanedNumber).matches() && 
                passesLuhnCheck(cleanedNumber);
     }
 
-    /**
-     * Calculates Luhn check digit for a partial card number
-     */
-    private static int calculateLuhnCheckDigit(String partialNumber) {
+        private static int calculateLuhnCheckDigit(String partialNumber) {
         int sum = 0;
-        boolean alternate = true; // Start with true because we're calculating for the last digit
-        
+        boolean alternate = true;         
         for (int i = partialNumber.length() - 1; i >= 0; i--) {
             int digit = Character.getNumericValue(partialNumber.charAt(i));
             
@@ -98,20 +75,14 @@ public final class CreditCardHelper {
         return (10 - (sum % 10)) % 10;
     }
 
-    /**
-     * Validates CVV (3 or 4 digits)
-     */
-    public static boolean isValidCvv(String cvv) {
+        public static boolean isValidCvv(String cvv) {
         if (cvv == null || cvv.isEmpty()) {
             return false;
         }
         return CVV_PATTERN.matcher(cvv).matches();
     }
 
-    /**
-     * Validates expiry date (month and year)
-     */
-    public static boolean isValidExpiryDate(int month, int year) {
+        public static boolean isValidExpiryDate(int month, int year) {
         if (month < 1 || month > 12) {
             return false;
         }
@@ -124,10 +95,7 @@ public final class CreditCardHelper {
         return expiryDate.isAfter(currentDate);
     }
 
-    /**
-     * Validates if amount is available within credit limit
-     */
-    public static boolean hasAvailableCredit(BigDecimal currentAmount, BigDecimal creditLimit, BigDecimal transactionAmount) {
+        public static boolean hasAvailableCredit(BigDecimal currentAmount, BigDecimal creditLimit, BigDecimal transactionAmount) {
         if (currentAmount == null || creditLimit == null || transactionAmount == null) {
             return false;
         }
@@ -136,10 +104,7 @@ public final class CreditCardHelper {
         return availableCredit.compareTo(transactionAmount) >= 0;
     }
 
-    /**
-     * Masks credit card number for security (shows only last 4 digits)
-     */
-    public static String maskCardNumber(String cardNumber) {
+        public static String maskCardNumber(String cardNumber) {
         if (cardNumber == null || cardNumber.length() < 4) {
             return "****";
         }
@@ -152,10 +117,7 @@ public final class CreditCardHelper {
         return "****";
     }
 
-    /**
-     * Formats card number with spaces (XXXX XXXX XXXX XXXX)
-     */
-    public static String formatCardNumber(String cardNumber) {
+        public static String formatCardNumber(String cardNumber) {
         if (cardNumber == null) {
             return null;
         }
@@ -171,10 +133,7 @@ public final class CreditCardHelper {
         return cleanedNumber;
     }
 
-    /**
-     * Luhn algorithm for credit card validation
-     */
-    private static boolean passesLuhnCheck(String cardNumber) {
+        private static boolean passesLuhnCheck(String cardNumber) {
         int sum = 0;
         boolean alternate = false;
         
@@ -195,10 +154,7 @@ public final class CreditCardHelper {
         return sum % 10 == 0;
     }
 
-    /**
-     * Determines card type based on card number
-     */
-    public static String getCardType(String cardNumber) {
+        public static String getCardType(String cardNumber) {
         if (cardNumber == null || cardNumber.isEmpty()) {
             return "UNKNOWN";
         }

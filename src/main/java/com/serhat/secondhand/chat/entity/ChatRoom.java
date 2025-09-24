@@ -29,8 +29,7 @@ public class ChatRoom {
     private RoomType roomType;
     
     @Column(name = "listing_id")
-    private String listingId; // Eğer listing ile ilgili bir chat ise
-    
+    private String listingId;     
     @ElementCollection
     @CollectionTable(name = "chat_room_participants", 
                      joinColumns = @JoinColumn(name = "chat_room_id"))
@@ -55,7 +54,5 @@ public class ChatRoom {
     private LocalDateTime updatedAt;
     
     public enum RoomType {
-        DIRECT,     // İki kişi arası
-        LISTING     // Listing ile ilgili chat
-    }
+        DIRECT,             LISTING         }
 }

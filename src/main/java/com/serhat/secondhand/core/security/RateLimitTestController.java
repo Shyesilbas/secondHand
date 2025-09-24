@@ -9,10 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Test controller for rate limiting functionality
- * Only available when rate limiting is enabled
- */
 @RestController
 @RequestMapping("/api/test/rate-limit")
 @ConditionalOnProperty(name = "app.rate-limit.enabled", havingValue = "true")

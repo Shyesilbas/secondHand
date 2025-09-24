@@ -73,20 +73,17 @@ public class PaymentService {
 
         listingService.validateOwnership(listingFeePaymentRequest.listingId(), fromUser);
 
-        // If verificationCode is not provided, generate and send, and ask client to submit code
-        if (listingFeePaymentRequest.verificationCode() == null || listingFeePaymentRequest.verificationCode().isBlank()) {
+                if (listingFeePaymentRequest.verificationCode() == null || listingFeePaymentRequest.verificationCode().isBlank()) {
             String code = verificationService.generateCode();
             verificationService.generateVerification(fromUser, code, CodeType.PAYMENT_VERIFICATION);
             emailService.sendPaymentVerificationEmail(fromUser, code);
             
-            // Log the verification code for development purposes
-            log.info("Payment verification code generated for user {}: {}", fromUser.getEmail(), code);
+                        log.info("Payment verification code generated for user {}: {}", fromUser.getEmail(), code);
             
             throw new BusinessException(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
         }
 
-        // Validate provided verification code
-        boolean valid = verificationService.validateVerificationCode(fromUser, listingFeePaymentRequest.verificationCode(), CodeType.PAYMENT_VERIFICATION);
+                boolean valid = verificationService.validateVerificationCode(fromUser, listingFeePaymentRequest.verificationCode(), CodeType.PAYMENT_VERIFICATION);
         if (!valid) {
             throw new BusinessException(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
         }
@@ -94,8 +91,7 @@ public class PaymentService {
         PaymentRequest fullRequest = getPaymentRequest(listingFeePaymentRequest, fromUser, listing);
 
         PaymentDto result = createPayment(fullRequest, authentication);
-        // Mark code as used
-        verificationService.findLatestActiveVerification(fromUser, CodeType.PAYMENT_VERIFICATION)
+                verificationService.findLatestActiveVerification(fromUser, CodeType.PAYMENT_VERIFICATION)
                 .ifPresent(verificationService::markVerificationAsUsed);
         return result;
     }
@@ -192,16 +188,13 @@ public class PaymentService {
             }
         }
         
-        // Determine direction and transaction type from current user's perspective
-        PaymentDirection userDirection;
+                PaymentDirection userDirection;
         PaymentTransactionType userTransactionType;
         
         if (payment.getFromUser().getId().equals(currentUser.getId())) {
-            userDirection = PaymentDirection.OUTGOING; // User is the payer
-            userTransactionType = PaymentTransactionType.ITEM_PURCHASE;
+            userDirection = PaymentDirection.OUTGOING;             userTransactionType = PaymentTransactionType.ITEM_PURCHASE;
         } else {
-            userDirection = PaymentDirection.INCOMING; // User is the receiver
-            userTransactionType = PaymentTransactionType.ITEM_SALE;
+            userDirection = PaymentDirection.INCOMING;             userTransactionType = PaymentTransactionType.ITEM_SALE;
         }
         
         return new PaymentDto(

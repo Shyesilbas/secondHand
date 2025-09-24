@@ -120,5 +120,4 @@ public interface ListingMapper {
         };
     }
     
-    // no-op
-}
+    }

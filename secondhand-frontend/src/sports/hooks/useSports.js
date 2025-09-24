@@ -15,8 +15,7 @@ export const useSports = (sportsId = null) => {
     entityName: 'Sports'
   });
 
-  // Map entity to sports for backward compatibility
-  return {
+    return {
     ...result,
     sports: result.entity,
     fetchSports: result.fetchEntity,

@@ -17,8 +17,7 @@ export const useRegisterAgreements = () => {
       const requiredAgreements = await agreementService.getRequiredAgreementsForRegister();
       setAgreements(requiredAgreements);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error loading agreements:', error);
+            console.error('Error loading agreements:', error);
       notification.showError('Error', 'Error occurred while listing agreements..');
     } finally {
       setAgreementsLoading(false);

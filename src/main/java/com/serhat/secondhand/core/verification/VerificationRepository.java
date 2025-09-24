@@ -20,8 +20,7 @@ public interface VerificationRepository extends JpaRepository<Verification, UUID
     @Query("SELECT v FROM Verification v WHERE v.user = :user AND v.codeType = :codeType AND v.code = :code AND v.isVerified = false AND v.codeExpiresAt > :currentTime")
     Optional<Verification> findActiveVerificationByUserCodeTypeAndCode(@Param("user") User user, @Param("codeType") CodeType codeType, @Param("code") String code, @Param("currentTime") LocalDateTime currentTime);
 
-    // Derived queries to avoid non-unique result issues
-    Optional<Verification> findTopByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfterOrderByCreatedAtDesc(User user, CodeType codeType, LocalDateTime currentTime);
+        Optional<Verification> findTopByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfterOrderByCreatedAtDesc(User user, CodeType codeType, LocalDateTime currentTime);
 
     List<Verification> findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(User user, CodeType codeType, LocalDateTime currentTime);
 }

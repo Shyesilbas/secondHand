@@ -12,36 +12,28 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     
-    // Chat room'daki mesajları getir (en yeni önce)
-    Page<Message> findByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable);
+        Page<Message> findByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable);
     
-    // Chat room'daki mesajları getir (en eski önce)
-    Page<Message> findByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId, Pageable pageable);
+        Page<Message> findByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId, Pageable pageable);
     
-    // Kullanıcının okunmamış mesajlarını okundu olarak işaretle
-    @Modifying
+        @Modifying
     @Query("UPDATE Message m SET m.isRead = true WHERE m.chatRoomId = :chatRoomId AND m.recipient.id = :userId AND m.isRead = false")
     void markMessagesAsRead(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
     
-    // Chat room'daki son mesajı getir
-    @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC LIMIT 1")
+        @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC LIMIT 1")
     Message findLastMessageByChatRoomId(@Param("chatRoomId") Long chatRoomId);
     
-    // Kullanıcının tüm mesajlarını getir (gönderdiği veya aldığı)
-    @Query("SELECT m FROM Message m WHERE m.sender.id = :userId OR m.recipient.id = :userId " +
+        @Query("SELECT m FROM Message m WHERE m.sender.id = :userId OR m.recipient.id = :userId " +
            "ORDER BY m.createdAt DESC")
     Page<Message> findBySenderIdOrRecipientIdOrderByCreatedAtDesc(@Param("userId") Long userId, Pageable pageable);
     
-    // Kullanıcının toplam okunmamış mesaj sayısını getir
-    @Query("SELECT COUNT(m) FROM Message m WHERE m.recipient.id = :userId AND m.isRead = false")
+        @Query("SELECT COUNT(m) FROM Message m WHERE m.recipient.id = :userId AND m.isRead = false")
     Long countTotalUnreadMessagesByUser(@Param("userId") Long userId);
     
-    // Chat room'daki tüm mesajları sil
-    @Modifying
+        @Modifying
     @Query("DELETE FROM Message m WHERE m.chatRoomId = :chatRoomId")
     void deleteByChatRoomId(@Param("chatRoomId") Long chatRoomId);
     
-    // Chat room'daki en son mesajı getir (silme işlemi sonrası güncelleme için)
-    @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC")
+        @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC")
     java.util.Optional<Message> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId") Long chatRoomId);
 }

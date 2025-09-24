@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-/**
- * DTO for listing fee configuration
- */
 @Data
 @Builder
 @NoArgsConstructor

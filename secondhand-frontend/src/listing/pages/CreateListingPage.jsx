@@ -27,8 +27,7 @@ const CreateListingPage = () => {
         }
     };
 
-    // Get listing type options from centralized config
-    const listingTypeOptions = useMemo(() => {
+        const listingTypeOptions = useMemo(() => {
         return getListingTypeOptions();
     }, []);
 
@@ -92,6 +91,5 @@ const CreateListingPage = () => {
     );
 };
 
-// Removed getTypeDescription function as descriptions are now provided by the centralized config
 
 export default CreateListingPage;

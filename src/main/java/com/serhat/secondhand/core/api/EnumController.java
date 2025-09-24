@@ -447,8 +447,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    // Label helper methods
-    private String getListingTypeLabel(ListingType type) {
+        private String getListingTypeLabel(ListingType type) {
         return switch (type) {
             case VEHICLE -> "Vehicle";
             case ELECTRONICS -> "Electronics";
@@ -766,8 +765,7 @@ public class EnumController {
         return toTitleCase(type.name());
     }
 
-    // Book labels
-    private String getBookGenreLabel(BookGenre genre) {
+        private String getBookGenreLabel(BookGenre genre) {
         return toTitleCase(genre.name());
     }
 
@@ -783,8 +781,7 @@ public class EnumController {
         return toTitleCase(condition.name());
     }
 
-    // generic formatter for ENUM_NAME -> "Enum Name"
-    private String toTitleCase(String enumName) {
+        private String toTitleCase(String enumName) {
         String lower = enumName.replace('_', ' ').toLowerCase(Locale.ROOT);
         String[] parts = lower.split(" ");
         StringBuilder sb = new StringBuilder();
@@ -797,8 +794,7 @@ public class EnumController {
         return sb.toString();
     }
 
-    // Sports labels
-    private String getSportDisciplineLabel(SportDiscipline discipline) {
+        private String getSportDisciplineLabel(SportDiscipline discipline) {
         return toTitleCase(discipline.name());
     }
 

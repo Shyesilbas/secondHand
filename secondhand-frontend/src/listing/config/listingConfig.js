@@ -1,10 +1,6 @@
-/**
- * Centralized configuration for listing types and their properties
- */
 
 import { LISTING_TYPES } from '../types/index.js';
 
-// Import detail components
 import VehicleDetails from '../components/details/VehicleDetails.jsx';
 import ElectronicsDetails from '../components/details/ElectronicsDetails.jsx';
 import RealEstateDetails from '../components/details/RealEstateDetails.jsx';
@@ -12,7 +8,6 @@ import ClothingDetails from '../components/details/ClothingDetails.jsx';
 import BooksDetails from '../components/details/BooksDetails.jsx';
 import SportsDetails from '../components/details/SportsDetails.jsx';
 
-// Import create form components
 import VehicleCreateForm from '../../vehicle/components/VehicleCreateForm.jsx';
 import ElectronicCreateForm from '../../electronics/electronics/components/ElectronicCreateForm.jsx';
 import RealEstateCreateForm from '../../realEstate/components/RealEstateCreateForm.jsx';
@@ -20,7 +15,6 @@ import ClothingCreateForm from '../../clothing/components/ClothingCreateForm.jsx
 import BooksCreateForm from '../../books/components/BooksCreateForm.jsx';
 import SportsCreateForm from '../../sports/components/SportsCreateForm.jsx';
 
-// Import filter configurations
 import {
   createVehicleFilterConfig,
   createElectronicsFilterConfig,
@@ -31,26 +25,18 @@ import {
 } from '../components/filters/filterConfigs.js';
 import FilterRenderer from '../components/filters/FilterRenderer.jsx';
 
-/**
- * Comprehensive listing type configuration
- * Each type includes all necessary components and metadata
- */
 export const listingTypeConfig = {
   [LISTING_TYPES.VEHICLE]: {
-    // Display properties
-    label: 'Vehicle',
+        label: 'Vehicle',
     icon: '🚗',
     description: 'Cars, motorcycles, bicycles and other vehicles',
     
-    // Components
-    detailsComponent: VehicleDetails,
+        detailsComponent: VehicleDetails,
     createComponent: VehicleCreateForm,
     
-    // Filter configuration
-    filterConfig: createVehicleFilterConfig(),
+        filterConfig: createVehicleFilterConfig(),
     
-    // Sort options specific to this type
-    sortOptions: [
+        sortOptions: [
       { value: 'year', label: 'Year' },
       { value: 'mileage', label: 'Mileage' },
       { value: 'brand', label: 'Brand' },
@@ -58,8 +44,7 @@ export const listingTypeConfig = {
       { value: 'createdAt', label: 'Date Added' }
     ],
     
-    // Compact badge configuration for card displays
-    compactBadges: (listing) => [
+        compactBadges: (listing) => [
       { label: listing.brand, icon: '🚗', show: !!listing.brand },
       { label: listing.year, icon: '📅', show: !!listing.year },
       { 
@@ -70,8 +55,7 @@ export const listingTypeConfig = {
       { label: listing.fuelType, icon: '⛽', show: !!listing.fuelType },
     ].filter(badge => badge.show),
     
-    // Default values for filters
-    defaultFilters: {
+        defaultFilters: {
       minYear: 1980,
       maxYear: new Date().getFullYear(),
     }
@@ -248,9 +232,6 @@ export const listingTypeConfig = {
   }
 };
 
-/**
- * Helper functions to work with listing configuration
- */
 
 export const getListingConfig = (listingType) => {
   return listingTypeConfig[listingType] || null;
@@ -273,14 +254,12 @@ export const isValidListingType = (listingType) => {
   return listingType && listingTypeConfig.hasOwnProperty(listingType);
 };
 
-// Backward compatibility exports
 export const listingTypeRegistry = Object.fromEntries(
   Object.entries(listingTypeConfig).map(([type, config]) => [
     type,
     {
       detailsComponent: config.detailsComponent,
-      editComponent: config.createComponent, // For edit forms, we use the same component
-      compactBadges: config.compactBadges
+      editComponent: config.createComponent,       compactBadges: config.compactBadges
     }
   ])
 );

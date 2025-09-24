@@ -17,20 +17,16 @@ export const useListingReviews = (listingId) => {
       try {
         console.log('Fetching reviews for listing:', listingId);
         
-        // Fetch reviews first
-        const reviewsResponse = await reviewService.getReviewsForListing(listingId);
+                const reviewsResponse = await reviewService.getReviewsForListing(listingId);
         console.log('Reviews response:', reviewsResponse);
         
-        // reviewsResponse is already the data (response.data from request.js)
-        setReviews(reviewsResponse.content || []);
+                setReviews(reviewsResponse.content || []);
         
-        // Then fetch stats
-        try {
+                try {
           const statsResponse = await reviewService.getListingReviewStats(listingId);
           console.log('Stats response:', statsResponse);
           
-          // statsResponse is already the data (response.data from request.js)
-          setStats(statsResponse);
+                    setStats(statsResponse);
         } catch (statsError) {
           console.warn('Failed to fetch stats, continuing with reviews only:', statsError);
           setStats(null);

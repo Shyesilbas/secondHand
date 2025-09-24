@@ -53,8 +53,7 @@ public class ChatService {
     public ChatRoomDto createOrGetDirectChat(Long userId1, Long userId2) {
         log.info("Creating or getting direct chat between users: {} and {}", userId1, userId2);
         
-        // Validate users exist
-        validateUsersExist(userId1, userId2);
+                validateUsersExist(userId1, userId2);
         
         Optional<ChatRoom> existingRoom = chatRoomRepository.findDirectChatRoom(userId1, userId2);
         if (existingRoom.isPresent()) {
@@ -69,18 +68,12 @@ public class ChatService {
         return enrichChatRoomDtoForUser(savedRoom, userId1);
     }
     
-    /**
-     * Validates that both users exist
-     */
-    private void validateUsersExist(Long userId1, Long userId2) {
+        private void validateUsersExist(Long userId1, Long userId2) {
         findUserById(userId1, ChatErrorCodes.SENDER_USER_NOT_FOUND);
         findUserById(userId2, ChatErrorCodes.RECIPIENT_USER_NOT_FOUND);
     }
     
-    /**
-     * Creates a new direct chat room
-     */
-    private ChatRoom createDirectChatRoom(Long userId1, Long userId2) {
+        private ChatRoom createDirectChatRoom(Long userId1, Long userId2) {
         ChatRoom newRoom = new ChatRoom();
         newRoom.setRoomName("Direct Chat");
         newRoom.setRoomType(ChatRoom.RoomType.DIRECT);
@@ -123,11 +116,9 @@ public class ChatService {
         log.info("Sending message - sender: {}, recipient: {}, room: {}, content: {}", 
                 messageDto.getSenderId(), messageDto.getRecipientId(), messageDto.getChatRoomId(), messageDto.getContent());
         
-        // Validate message content
-        validateMessageContent(messageDto.getContent());
+                validateMessageContent(messageDto.getContent());
         
-        // Validate chat room exists and user has access
-        validateChatRoomAccess(messageDto.getChatRoomId(), messageDto.getSenderId());
+                validateChatRoomAccess(messageDto.getChatRoomId(), messageDto.getSenderId());
         
         User sender = findUserById(messageDto.getSenderId(), ChatErrorCodes.SENDER_USER_NOT_FOUND);
         User recipient = findUserById(messageDto.getRecipientId(), ChatErrorCodes.RECIPIENT_USER_NOT_FOUND);
@@ -143,22 +134,15 @@ public class ChatService {
         return savedMessageDto;
     }
     
-    /**
-     * Validates message content
-     */
-    private void validateMessageContent(String content) {
+        private void validateMessageContent(String content) {
         if (content == null || content.trim().isEmpty()) {
             throw new BusinessException(ChatErrorCodes.INVALID_MESSAGE_CONTENT);
         }
-        if (content.length() > 1000) { // Max message length
-            throw new BusinessException(ChatErrorCodes.MESSAGE_TOO_LONG);
+        if (content.length() > 1000) {             throw new BusinessException(ChatErrorCodes.MESSAGE_TOO_LONG);
         }
     }
     
-    /**
-     * Validates that the chat room exists and user has access to it
-     */
-    private void validateChatRoomAccess(Long chatRoomId, Long userId) {
+        private void validateChatRoomAccess(Long chatRoomId, Long userId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
         
@@ -167,18 +151,12 @@ public class ChatService {
         }
     }
     
-    /**
-     * Helper method to find user by ID with custom error
-     */
-    private User findUserById(Long userId, ChatErrorCodes errorCode) {
+        private User findUserById(Long userId, ChatErrorCodes errorCode) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(errorCode));
     }
     
-    /**
-     * Builds a Message entity from DTO
-     */
-    private Message buildMessage(ChatMessageDto messageDto, User sender, User recipient) {
+        private Message buildMessage(ChatMessageDto messageDto, User sender, User recipient) {
         Message message = new Message();
         message.setContent(messageDto.getContent().trim());
         message.setSender(sender);
@@ -277,8 +255,7 @@ public class ChatService {
 
                     Long sellerId = listing.getSeller().getId();
                     if (currentUserId.equals(sellerId)) {
-                        // Login user seller → otherParticipant = buyer
-                        Long buyerId = chatRoom.getParticipantIds().stream()
+                                                Long buyerId = chatRoom.getParticipantIds().stream()
                                 .filter(id -> !id.equals(sellerId))
                                 .findFirst()
                                 .orElse(null);
@@ -290,8 +267,7 @@ public class ChatService {
                             }
                         }
                     } else {
-                        // Login user buyer → otherParticipant = seller
-                        User seller = listing.getSeller();
+                                                User seller = listing.getSeller();
                         dto.setOtherParticipantId(seller.getId());
                         dto.setOtherParticipantName(seller.getName() + " " + seller.getSurname());
                     }
@@ -322,61 +298,44 @@ public class ChatService {
                 messageDto.getId(), messageDto.getContent(), messageDto.getSenderId(), messageDto.getChatRoomId());
     }
 
-    /**
-     * Deletes an entire conversation (chat room) and all its messages
-     * Only allows deletion if the user is a participant of the room
-     */
-    @Transactional
+        @Transactional
     public void deleteConversation(Long chatRoomId, Long userId) {
         log.info("Deleting conversation - roomId: {}, userId: {}", chatRoomId, userId);
         
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
         
-        // Check if user is a participant
-        if (!chatRoom.getParticipantIds().contains(userId)) {
+                if (!chatRoom.getParticipantIds().contains(userId)) {
             throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
         }
         
-        // Delete all messages in the chat room first
-        messageRepository.deleteByChatRoomId(chatRoomId);
+                messageRepository.deleteByChatRoomId(chatRoomId);
         log.info("Deleted all messages for chat room: {}", chatRoomId);
         
-        // Delete the chat room
-        chatRoomRepository.delete(chatRoom);
+                chatRoomRepository.delete(chatRoom);
         log.info("Deleted chat room: {}", chatRoomId);
     }
     
-    /**
-     * Deletes a specific message
-     * Only allows deletion if the user is the sender of the message
-     */
-    @Transactional
+        @Transactional
     public void deleteMessage(Long messageId, Long userId) {
         log.info("Deleting message - messageId: {}, userId: {}", messageId, userId);
         
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCodes.MESSAGE_NOT_FOUND));
         
-        // Check if user is the sender
-        if (!message.getSender().getId().equals(userId)) {
+                if (!message.getSender().getId().equals(userId)) {
             throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
         }
         
         Long chatRoomId = message.getChatRoomId();
         
-        // Delete the message
-        messageRepository.delete(message);
+                messageRepository.delete(message);
         log.info("Deleted message: {}", messageId);
         
-        // Update chat room's last message if this was the last message
-        updateChatRoomLastMessageAfterDeletion(chatRoomId);
+                updateChatRoomLastMessageAfterDeletion(chatRoomId);
     }
     
-    /**
-     * Updates chat room's last message information after a message deletion
-     */
-    private void updateChatRoomLastMessageAfterDeletion(Long chatRoomId) {
+        private void updateChatRoomLastMessageAfterDeletion(Long chatRoomId) {
         Optional<Message> lastMessage = messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(chatRoomId);
         
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
@@ -387,8 +346,7 @@ public class ChatService {
                 chatRoom.setLastMessageTime(msg.getCreatedAt());
                 chatRoom.setLastMessageSenderId(msg.getSender().getId());
             } else {
-                // No messages left in the chat room
-                chatRoom.setLastMessage(null);
+                                chatRoom.setLastMessage(null);
                 chatRoom.setLastMessageTime(null);
                 chatRoom.setLastMessageSenderId(null);
             }

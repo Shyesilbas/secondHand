@@ -12,10 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service responsible for order-related notifications
- * Follows Single Responsibility Principle
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,10 +21,7 @@ public class OrderNotificationService {
     private final OrderMapper orderMapper;
     private final UserService userService;
 
-    /**
-     * Sends notifications for completed order
-     */
-    public void sendOrderNotifications(User user, com.serhat.secondhand.order.entity.Order order, boolean paymentSuccessful) {
+        public void sendOrderNotifications(User user, com.serhat.secondhand.order.entity.Order order, boolean paymentSuccessful) {
         if (!paymentSuccessful) {
             log.info("Skipping notifications for failed order: {}", order.getOrderNumber());
             return;
@@ -42,14 +35,10 @@ public class OrderNotificationService {
             log.info("Successfully sent notifications for order: {}", order.getOrderNumber());
         } catch (Exception e) {
             log.error("Failed to send notifications for order {}: {}", order.getOrderNumber(), e.getMessage());
-            // Don't throw exception - notifications should not fail the order process
-        }
+                    }
     }
 
-    /**
-     * Sends confirmation email to customer
-     */
-    private void sendCustomerNotification(User customer, OrderDto orderDto) {
+        private void sendCustomerNotification(User customer, OrderDto orderDto) {
         try {
             emailService.sendOrderConfirmationEmail(customer, orderDto);
             log.info("Order confirmation email sent to customer: {}", customer.getEmail());
@@ -58,10 +47,7 @@ public class OrderNotificationService {
         }
     }
 
-    /**
-     * Sends sale notification emails to sellers
-     */
-    private void sendSellerNotifications(OrderDto orderDto) {
+        private void sendSellerNotifications(OrderDto orderDto) {
         if (orderDto.getOrderItems() == null || orderDto.getOrderItems().isEmpty()) {
             log.warn("No order items found for seller notifications in order: {}", orderDto.getOrderNumber());
             return;
@@ -77,10 +63,7 @@ public class OrderNotificationService {
         }
     }
 
-    /**
-     * Groups order items by seller ID
-     */
-    private java.util.Map<Long, List<com.serhat.secondhand.order.dto.OrderItemDto>> groupOrderItemsBySeller(
+        private java.util.Map<Long, List<com.serhat.secondhand.order.dto.OrderItemDto>> groupOrderItemsBySeller(
             List<com.serhat.secondhand.order.dto.OrderItemDto> orderItems) {
         
         return orderItems.stream()
@@ -88,10 +71,7 @@ public class OrderNotificationService {
                 .collect(Collectors.groupingBy(item -> item.getListing().getSellerId()));
     }
 
-    /**
-     * Sends notification to a specific seller
-     */
-    private void sendSellerNotification(Long sellerId, OrderDto orderDto, 
+        private void sendSellerNotification(Long sellerId, OrderDto orderDto, 
                                       List<com.serhat.secondhand.order.dto.OrderItemDto> sellerItems) {
         try {
             User seller = userService.findById(sellerId);
@@ -105,15 +85,9 @@ public class OrderNotificationService {
         }
     }
 
-    /**
-     * Sends order cancellation notification
-     */
-    public void sendOrderCancellationNotification(User user, com.serhat.secondhand.order.entity.Order order) {
+        public void sendOrderCancellationNotification(User user, com.serhat.secondhand.order.entity.Order order) {
         try {
-            // Add cancellation email method to EmailService if needed
-            // OrderDto orderDto = orderMapper.toDto(order);
-            // emailService.sendOrderCancellationEmail(user, orderDto);
-            
+                                                
             log.info("Order cancellation notification sent for order: {}", order.getOrderNumber());
         } catch (Exception e) {
             log.warn("Failed to send cancellation notification for order {}: {}", 
@@ -121,15 +95,9 @@ public class OrderNotificationService {
         }
     }
 
-    /**
-     * Sends order status update notification
-     */
-    public void sendOrderStatusUpdateNotification(User user, com.serhat.secondhand.order.entity.Order order) {
+        public void sendOrderStatusUpdateNotification(User user, com.serhat.secondhand.order.entity.Order order) {
         try {
-            // Add status update email method to EmailService if needed
-            // OrderDto orderDto = orderMapper.toDto(order);
-            // emailService.sendOrderStatusUpdateEmail(user, orderDto);
-            
+                                                
             log.info("Order status update notification sent for order: {}", order.getOrderNumber());
         } catch (Exception e) {
             log.warn("Failed to send status update notification for order {}: {}", 

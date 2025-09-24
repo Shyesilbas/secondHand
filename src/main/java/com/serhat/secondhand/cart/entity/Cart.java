@@ -49,8 +49,7 @@ public class Cart {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Unique constraint to prevent duplicate listings in the same user's cart
-    @Table(uniqueConstraints = {
+        @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "listing_id"})
     })
     public static class CartTable {

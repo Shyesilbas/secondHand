@@ -32,13 +32,8 @@ export const useChat = (userId) => {
         queryKey: ['chatRooms', userId],
         queryFn: () => chatService.getUserChatRooms(userId),
         enabled: !!userId,
-        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
-        cacheTime: 10 * 60 * 1000, // Cache for 10 minutes
-        refetchInterval: 5 * 60 * 1000, // Reduced to 5 minutes - WebSocket handles real-time
-        refetchOnWindowFocus: false,
-        refetchOnMount: false, // Don't refetch on every mount
-        refetchIntervalInBackground: false, // Don't poll in background
-    });
+        staleTime: 5 * 60 * 1000,         cacheTime: 10 * 60 * 1000,         refetchInterval: 5 * 60 * 1000,         refetchOnWindowFocus: false,
+        refetchOnMount: false,         refetchIntervalInBackground: false,     });
 
     const {
         data: chatMessages,
@@ -49,12 +44,8 @@ export const useChat = (userId) => {
         queryKey: ['chatMessages', selectedChatRoom?.id],
         queryFn: () => chatService.getChatMessages(selectedChatRoom.id),
         enabled: !!selectedChatRoom?.id,
-        staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
-        cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
-        refetchInterval: false, // Disable polling - WebSocket handles real-time messages
-        refetchOnWindowFocus: false,
-        refetchOnMount: false, // Don't refetch on every mount
-    });
+        staleTime: 2 * 60 * 1000,         cacheTime: 5 * 60 * 1000,         refetchInterval: false,         refetchOnWindowFocus: false,
+        refetchOnMount: false,     });
 
     const sendMessageMutation = useMutation({
         mutationFn: (messageData) => chatService.sendMessage(messageData),
@@ -65,11 +56,9 @@ export const useChat = (userId) => {
             });
             queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
-            // Invalidate both total and room unread counts
-            queryClient.invalidateQueries({ 
+                        queryClient.invalidateQueries({
                 queryKey: UNREAD_COUNT_KEYS.all, 
-                refetchType: 'none' // Don't refetch immediately, just mark as stale
-            });
+                refetchType: 'none'             });
         }
     });
 
@@ -78,10 +67,8 @@ export const useChat = (userId) => {
         onSuccess: (_, { chatRoomId, userId }) => {
             queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
-            // Immediately update unread counts
-            queryClient.setQueryData(UNREAD_COUNT_KEYS.room(chatRoomId, userId), 0);
-            // Also invalidate total unread count to refresh header
-            queryClient.invalidateQueries({ 
+                        queryClient.setQueryData(UNREAD_COUNT_KEYS.room(chatRoomId, userId), 0);
+                        queryClient.invalidateQueries({
                 queryKey: UNREAD_COUNT_KEYS.total(userId),
                 refetchType: 'none'
             });
@@ -91,10 +78,8 @@ export const useChat = (userId) => {
     const deleteMessageMutation = useMutation({
         mutationFn: ({ messageId, userId }) => chatService.deleteMessage(messageId, userId),
         onSuccess: (_, { messageId }) => {
-            // Remove message from local state immediately
-            setMessages(prev => prev.filter(msg => msg.id !== messageId));
-            // Invalidate queries to refresh data
-            queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
+                        setMessages(prev => prev.filter(msg => msg.id !== messageId));
+                        queryClient.invalidateQueries(['chatMessages', selectedChatRoom?.id]);
             queryClient.invalidateQueries(['chatRooms', userId]);
         }
     });
@@ -102,11 +87,9 @@ export const useChat = (userId) => {
     const deleteConversationMutation = useMutation({
         mutationFn: ({ chatRoomId, userId }) => chatService.deleteConversation(chatRoomId, userId),
         onSuccess: () => {
-            // Clear selected chat room and messages
-            setSelectedChatRoom(null);
+                        setSelectedChatRoom(null);
             setMessages([]);
-            // Invalidate queries to refresh data
-            queryClient.invalidateQueries(['chatRooms', userId]);
+                        queryClient.invalidateQueries(['chatRooms', userId]);
         }
     });
 
@@ -121,11 +104,9 @@ export const useChat = (userId) => {
         if (chatRoom?.id) {
             joinRoom(chatRoom.id, user?.id);
             subscribeToChatRoom(chatRoom.id);
-            // Mark messages as read immediately when selecting a chat room
-            setTimeout(() => {
+                        setTimeout(() => {
                 markAsReadMutation.mutate({ chatRoomId: chatRoom.id, userId: user?.id });
-            }, 500); // Small delay to ensure messages are loaded
-        }
+            }, 500);         }
     }, [selectedChatRoom, user?.id, leaveRoom, joinRoom, subscribeToChatRoom, unsubscribeFromChatRoom, markAsReadMutation]);
 
     const sendMessage = useCallback((content) => {

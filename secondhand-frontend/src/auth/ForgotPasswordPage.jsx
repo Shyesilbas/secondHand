@@ -36,8 +36,7 @@ const ForgotPasswordPage = () => {
 
     try {
       const res = await authService.forgotPassword(formData.email);
-      // In dev, backend sends verificationCode for display
-      if (res?.verificationCode) setVerificationCode(res.verificationCode);
+            if (res?.verificationCode) setVerificationCode(res.verificationCode);
       setResetForm(prev => ({ ...prev, email: formData.email, verificationCode: res?.verificationCode || '' }));
       setSuccess(true);
     } catch (error) {

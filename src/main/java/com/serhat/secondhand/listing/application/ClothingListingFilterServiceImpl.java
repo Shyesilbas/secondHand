@@ -39,8 +39,7 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        // Query for results - Use ClothingListing directly since it extends Listing
-        CriteriaQuery<ClothingListing> query = cb.createQuery(ClothingListing.class);
+                CriteriaQuery<ClothingListing> query = cb.createQuery(ClothingListing.class);
         Root<ClothingListing> root = query.from(ClothingListing.class);
 
         List<Predicate> predicates = buildPredicates(cb, root, filters);
@@ -60,8 +59,7 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
             log.info("First clothing listing: {}", results.get(0));
         }
 
-        // Count query for total
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<ClothingListing> countRoot = countQuery.from(ClothingListing.class);
 
         List<Predicate> countPredicates = buildPredicates(cb, countRoot, filters);
@@ -71,8 +69,7 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        // Convert to DTOs
-        List<ListingDto> dtos = results.stream()
+                List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
@@ -83,11 +80,9 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
                                             ClothingListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
 
-        // Add base predicates from helper
-        predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
+                predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
 
-        // Clothing-specific filters - directly accessible since root is ClothingListing
-        if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
+                if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
             predicates.add(root.get("brand").in(filters.getBrands()));
         }
 
@@ -103,8 +98,7 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
             predicates.add(root.get("condition").in(filters.getConditions()));
         }
 
-        // Purchase date range
-        if (filters.getMinPurchaseDate() != null) {
+                if (filters.getMinPurchaseDate() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("purchaseDate"), filters.getMinPurchaseDate()));
         }
 
@@ -135,8 +129,7 @@ public class ClothingListingFilterServiceImpl implements ClothingListingFilterSe
 
             orders.add(isDesc ? cb.desc(sortExpression) : cb.asc(sortExpression));
         } else {
-            // Default sorting by creation date descending
-            orders.add(cb.desc(root.get("createdAt")));
+                        orders.add(cb.desc(root.get("createdAt")));
         }
 
         return orders;

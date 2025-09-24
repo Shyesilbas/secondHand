@@ -26,6 +26,5 @@ public class OrderItemDto {
     private String notes;
     private LocalDateTime createdAt;
     
-    // Add order information for frontend access
-    private ShippingStatus shippingStatus;
+        private ShippingStatus shippingStatus;
 }

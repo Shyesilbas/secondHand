@@ -40,7 +40,6 @@ import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
 import MyShowcasesPage from '../../showcase/pages/MyShowcasesPage.jsx';
 
-// Route Guards
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
 

@@ -279,8 +279,7 @@ public class AuthService {
             return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
         }
 
-        // Yeni kullanıcı (social login)
-        User user = User.builder()
+                User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
                 .email(request.getEmail())
@@ -326,11 +325,9 @@ public class AuthService {
         
         log.info("Revoking all sessions for user: {}", username);
         
-        // Revoke all tokens for the user
-        tokenService.revokeAllUserTokens(user);
+                tokenService.revokeAllUserTokens(user);
         
-        // Log the revoke action for audit
-        String ipAddress = getClientIpAddress(request);
+                String ipAddress = getClientIpAddress(request);
         String userAgent = getClientUserAgent(request);
         auditLogService.logLogout(username, user.getId(), ipAddress, userAgent);
         

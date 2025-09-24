@@ -37,20 +37,15 @@ public class OrderService {
     public OrderDto checkout(User user, CheckoutRequest request) {
         log.info("Processing checkout for user: {}", user.getEmail());
 
-        // Step 1: Get cart items
-        var cartItems = cartRepository.findByUserWithListing(user);
+                var cartItems = cartRepository.findByUserWithListing(user);
         
-        // Step 2: Create order
-        Order order = orderCreationService.createOrder(user, cartItems, request);
+                Order order = orderCreationService.createOrder(user, cartItems, request);
         
-        // Step 3: Process payments
-        var paymentResult = orderPaymentService.processOrderPayments(user, cartItems, request, order);
+                var paymentResult = orderPaymentService.processOrderPayments(user, cartItems, request, order);
         
-        // Step 4: Send notifications
-        orderNotificationService.sendOrderNotifications(user, order, paymentResult.allSuccessful());
+                orderNotificationService.sendOrderNotifications(user, order, paymentResult.allSuccessful());
         
-        // Step 5: Clean up cart if successful
-        if (paymentResult.allSuccessful()) {
+                if (paymentResult.allSuccessful()) {
             cartRepository.deleteByUser(user);
             log.info("Checkout completed successfully for order: {} with {} payments", 
                     order.getOrderNumber(), paymentResult.paymentResults().size());
@@ -61,10 +56,7 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
-    /**
-     * Gets paginated orders for a user with shipping status updates
-     */
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
     public Page<OrderDto> getUserOrders(User user, Pageable pageable) {
         log.info("Getting orders for user: {}", user.getEmail());
         
@@ -74,10 +66,7 @@ public class OrderService {
         return orders.map(orderMapper::toDto);
     }
 
-    /**
-     * Gets a specific order by ID with authorization check
-     */
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
     public OrderDto getOrderById(Long orderId, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
         shippingService.calculateShippingStatus(order);
@@ -85,10 +74,7 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
-    /**
-     * Gets a specific order by order number with authorization check
-     */
-    @Transactional(readOnly = true)
+        @Transactional(readOnly = true)
     public OrderDto getOrderByOrderNumber(String orderNumber, User user) {
         Order order = findOrderByNumberAndValidateOwnership(orderNumber, user);
         shippingService.calculateShippingStatus(order);
@@ -96,10 +82,7 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
-    /**
-     * Cancels an order with business rule validation
-     */
-    public OrderDto cancelOrder(Long orderId, User user) {
+        public OrderDto cancelOrder(Long orderId, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
         
         validateOrderCanBeCancelled(order);
@@ -107,17 +90,13 @@ public class OrderService {
         order.setStatus(Order.OrderStatus.CANCELLED);
         Order savedOrder = orderRepository.save(order);
         
-        // Send cancellation notification
-        orderNotificationService.sendOrderCancellationNotification(user, savedOrder);
+                orderNotificationService.sendOrderCancellationNotification(user, savedOrder);
         
         log.info("Order cancelled: {}", order.getOrderNumber());
         return orderMapper.toDto(savedOrder);
     }
 
-    /**
-     * Finds order by ID and validates user ownership
-     */
-    private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
+        private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
@@ -128,10 +107,7 @@ public class OrderService {
         return order;
     }
 
-    /**
-     * Finds order by number and validates user ownership
-     */
-    private Order findOrderByNumberAndValidateOwnership(String orderNumber, User user) {
+        private Order findOrderByNumberAndValidateOwnership(String orderNumber, User user) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
@@ -142,10 +118,7 @@ public class OrderService {
         return order;
     }
 
-    /**
-     * Validates if order can be cancelled based on business rules
-     */
-    private void validateOrderCanBeCancelled(Order order) {
+        private void validateOrderCanBeCancelled(Order order) {
         if (order.getStatus() != Order.OrderStatus.PENDING && order.getStatus() != Order.OrderStatus.CONFIRMED) {
             throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
         }

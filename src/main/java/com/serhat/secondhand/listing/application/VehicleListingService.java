@@ -55,8 +55,7 @@ public class VehicleListingService {
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
-        // Store old price for price history tracking
-        var oldPrice = existing.getPrice();
+                var oldPrice = existing.getPrice();
         var oldCurrency = existing.getCurrency();
 
         request.title().ifPresent(existing::setTitle);
@@ -83,8 +82,7 @@ public class VehicleListingService {
 
         vehicleRepository.save(existing);
 
-        // Record price change if price was updated
-        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+                if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                 existing, 
                 oldPrice, 

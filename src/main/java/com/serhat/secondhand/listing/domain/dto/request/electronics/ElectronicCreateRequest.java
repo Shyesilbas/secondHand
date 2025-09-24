@@ -21,6 +21,5 @@ public record ElectronicCreateRequest (
         boolean warrantyProof,
         int year,
         Color color
-        // todo createRequest should be extended by ListingRequest( not created yet)
-){
+        ){
 }

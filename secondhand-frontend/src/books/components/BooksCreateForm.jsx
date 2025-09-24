@@ -33,15 +33,13 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
 
   const renderStep = (stepId) => {
     if (stepId === 1) {
-      // Step 1: Basic info
-      return (
+            return (
           <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
       );
     }
 
     if (stepId === 2) {
-      // Step 2: Book details
-      const fields = formConfig.fieldGroups.step2;
+            const fields = formConfig.fieldGroups.step2;
       return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {fields.map((field) => {
@@ -80,8 +78,7 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
     }
 
     if (stepId === 3) {
-      // Step 3: Location
-      return <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />;
+            return <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />;
     }
 
     return null;

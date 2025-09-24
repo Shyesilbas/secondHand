@@ -25,8 +25,7 @@ export const useFormSubmission = (config) => {
     if (!validateAll(formData)) {
       notification.showError('Missing Information', 'Please fill in all required fields. Location information is especially required!');
 
-      // Navigate to first step with errors
-      const errorFields = Object.keys(errors);
+            const errorFields = Object.keys(errors);
       if (errorFields.some(field => ['title', 'description', 'price'].includes(field))) {
         goToStep(1);
       } else if (errorFields.some(field => ['brand', 'model', 'year', 'fuelType', 'adType', 'realEstateType', 'heatingType', 'ownerType', 'squareMeters', 'roomCount'].includes(field))) {

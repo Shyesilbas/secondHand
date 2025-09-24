@@ -20,8 +20,7 @@ const FilterStatus = ({
         }
     };
 
-    // Use provided functions or fallback to local implementation
-    const checkActiveFilters = hasActiveFilters || (() => {
+        const checkActiveFilters = hasActiveFilters || (() => {
         return filters.minPrice || filters.maxPrice || filters.city || filters.district ||
             (filters.brands && filters.brands.length > 0) ||
             (filters.fuelTypes && filters.fuelTypes.length > 0) ||

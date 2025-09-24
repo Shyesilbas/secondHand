@@ -13,8 +13,7 @@ export const authService = {
         return post(API_ENDPOINTS.AUTH.LOGIN, loginData);
     },
 
-    // Get current user profile
-    getCurrentUser: async () => get(API_ENDPOINTS.USER.ME),
+        getCurrentUser: async () => get(API_ENDPOINTS.USER.ME),
 
     register: async (userData) => {
         const registerData = createRegisterRequest(userData);

@@ -56,8 +56,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
-                .id(UUID.randomUUID().toString()) // Add JTI for token blacklisting
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .id(UUID.randomUUID().toString())                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();

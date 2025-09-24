@@ -17,8 +17,7 @@ const ShowcaseSection = ({ showcases }) => {
         ));
         if (missingIds.length === 0) return;
         setLoadingIds(prev => Array.from(new Set([...prev, ...missingIds])));
-        // Fetch sequentially to keep it simple and avoid rate issues
-        (async () => {
+                (async () => {
             const updates = {};
             for (const id of missingIds) {
                 try {

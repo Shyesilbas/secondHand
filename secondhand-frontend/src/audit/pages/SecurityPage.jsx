@@ -52,8 +52,7 @@ const SecurityPage = () => {
     const getBrowserInfo = (userAgent) => {
         if (!userAgent) return 'Unknown Browser';
         
-        // Simple browser detection
-        if (userAgent.includes('Chrome')) return 'Chrome';
+                if (userAgent.includes('Chrome')) return 'Chrome';
         if (userAgent.includes('Firefox')) return 'Firefox';
         if (userAgent.includes('Safari')) return 'Safari';
         if (userAgent.includes('Edge')) return 'Edge';
@@ -61,9 +60,7 @@ const SecurityPage = () => {
     };
 
     const getLocationFromIP = (ipAddress) => {
-        // In a real application, you might want to use a geolocation service
-        // For now, we'll just show the IP address
-        return ipAddress || 'Unknown Location';
+                        return ipAddress || 'Unknown Location';
     };
 
     const handleFilterChange = (filterType, value) => {
@@ -94,10 +91,8 @@ const SecurityPage = () => {
         try {
             await authService.revokeAllSessions();
             setShowRevokeModal(false);
-            // Show success message and redirect to login
-            alert('All sessions have been revoked successfully. You will be redirected to login.');
-            // Redirect to login page
-            window.location.href = '/login';
+                        alert('All sessions have been revoked successfully. You will be redirected to login.');
+                        window.location.href = '/login';
         } catch (error) {
             console.error('Failed to revoke sessions:', error);
             alert('Failed to revoke sessions. Please try again.');

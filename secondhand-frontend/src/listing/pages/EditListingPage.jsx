@@ -101,7 +101,6 @@ const useOwnershipRedirect = (listing, isOwner, notification, navigate) => {
     }, [listing, isOwner, navigate, notification]);
 };
 
-// Service configuration mapping for different listing types
 const getServiceConfig = (listingType) => {
     switch (listingType) {
         case LISTING_TYPES.ELECTRONICS:
@@ -162,23 +161,20 @@ const EditListingPage = ({
     const { user, isAuthenticated } = useAuth();
     const notification = useNotification();
 
-    // Fetch the listing using the generic listing service
-    const fetchFunc = useMemo(() => {
+        const fetchFunc = useMemo(() => {
         return () => listingService.getListingById(id);
     }, [id]);
 
     const { data: listing, setData: setListing, isLoading, error } = useFetchData(fetchFunc);
 
-    // Determine the correct service configuration based on listing type
-    const serviceConfig = useMemo(() => {
+        const serviceConfig = useMemo(() => {
         if (listing?.type) {
             console.log('EditListingPage: Listing type detected:', listing.type);
             const config = getServiceConfig(listing.type);
             console.log('EditListingPage: Service config:', config);
             return config;
         }
-        // Fallback to provided props or defaults
-        console.log('EditListingPage: Using fallback service config');
+                console.log('EditListingPage: Using fallback service config');
         return {
             service: service || listingService,
             serviceMethod: serviceMethod || 'getListingById',

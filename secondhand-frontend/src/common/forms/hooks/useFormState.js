@@ -1,14 +1,5 @@
 import { useState, useCallback } from 'react';
 
-/**
- * Generic Form State Hook for multi-step forms
- * @param {Object} config - Form configuration
- * @param {Object} config.initialData - Initial form data
- * @param {number} config.totalSteps - Total number of steps
- * @param {Function} config.validateStep - Step validation function
- * @param {Function} config.validateAll - All steps validation function
- * @returns {Object} - Form state and operations
- */
 export const useFormState = (config) => {
   const { 
     initialData, 
@@ -28,8 +19,7 @@ export const useFormState = (config) => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
-    if (errors[name]) {
+        if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
@@ -43,8 +33,7 @@ export const useFormState = (config) => {
       [name]: value
     }));
     
-    // Clear error when user starts typing
-    if (errors[name]) {
+        if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
@@ -107,16 +96,14 @@ export const useFormState = (config) => {
   const isLastStep = currentStep === totalSteps;
 
   return {
-    // State
-    currentStep,
+        currentStep,
     formData,
     errors,
     isFirstStep,
     isLastStep,
     totalSteps,
     
-    // Actions
-    handleInputChange,
+        handleInputChange,
     handleDropdownChange,
     nextStep,
     prevStep,
@@ -127,8 +114,7 @@ export const useFormState = (config) => {
     setErrors: setFormErrors,
     clearErrors,
     
-    // Validation
-    validateCurrentStep,
+        validateCurrentStep,
     validateAllSteps
   };
 };

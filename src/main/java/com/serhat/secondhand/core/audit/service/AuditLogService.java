@@ -104,8 +104,7 @@ public class AuditLogService {
         return userAgent != null ? userAgent.substring(0, Math.min(userAgent.length(), 1000)) : "Unknown";
     }
 
-    // Query methods for security analysis
-    public Long countFailedLoginAttemptsByUser(String userEmail, LocalDateTime since) {
+        public Long countFailedLoginAttemptsByUser(String userEmail, LocalDateTime since) {
         return auditLogRepository.countFailedAttemptsByUserAndTypeSince(userEmail, AuditLog.AuditEventType.LOGIN_FAILURE, since);
     }
 

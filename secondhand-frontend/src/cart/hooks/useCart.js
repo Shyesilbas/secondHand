@@ -7,8 +7,7 @@ export const useCart = () => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
 
-    // Get cart items
-    const {
+        const {
         data: cartItems = [],
         isLoading: isLoadingItems,
         error: itemsError,
@@ -17,11 +16,9 @@ export const useCart = () => {
         queryKey: ['cartItems', user?.id],
         queryFn: () => cartService.getCartItems(),
         enabled: !!user,
-        staleTime: 5 * 60 * 1000, // 5 minutes
-    });
+        staleTime: 5 * 60 * 1000,     });
 
-    // Get cart count
-    const {
+        const {
         data: cartCount = { count: 0 },
         isLoading: isLoadingCount,
         refetch: refetchCount
@@ -29,11 +26,9 @@ export const useCart = () => {
         queryKey: ['cartCount', user?.id],
         queryFn: () => cartService.getCartItemCount(),
         enabled: !!user,
-        staleTime: 2 * 60 * 1000, // 2 minutes
-    });
+        staleTime: 2 * 60 * 1000,     });
 
-    // Add to cart mutation
-    const addToCartMutation = useMutation({
+        const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => 
             cartService.addToCart(listingId, quantity, notes),
         onSuccess: () => {
@@ -45,8 +40,7 @@ export const useCart = () => {
         }
     });
 
-    // Update cart item mutation
-    const updateCartItemMutation = useMutation({
+        const updateCartItemMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => 
             cartService.updateCartItem(listingId, quantity, notes),
         onSuccess: () => {
@@ -58,8 +52,7 @@ export const useCart = () => {
         }
     });
 
-    // Remove from cart mutation
-    const removeFromCartMutation = useMutation({
+        const removeFromCartMutation = useMutation({
         mutationFn: (listingId) => cartService.removeFromCart(listingId),
         onSuccess: () => {
             queryClient.invalidateQueries(['cartItems']);
@@ -70,8 +63,7 @@ export const useCart = () => {
         }
     });
 
-    // Clear cart mutation
-    const clearCartMutation = useMutation({
+        const clearCartMutation = useMutation({
         mutationFn: () => cartService.clearCart(),
         onSuccess: () => {
             queryClient.invalidateQueries(['cartItems']);
@@ -82,16 +74,14 @@ export const useCart = () => {
         }
     });
 
-    // Check if item is in cart
-    const checkInCartMutation = useMutation({
+        const checkInCartMutation = useMutation({
         mutationFn: (listingId) => cartService.isInCart(listingId),
         onError: (error) => {
             console.error('Failed to check cart status:', error);
         }
     });
 
-    // Helper functions
-    const addToCart = (listingId, quantity = 1, notes = '') => {
+        const addToCart = (listingId, quantity = 1, notes = '') => {
         addToCartMutation.mutate({ listingId, quantity, notes });
     };
 
@@ -112,38 +102,31 @@ export const useCart = () => {
     };
 
     return {
-        // Data
-        cartItems,
+                cartItems,
         cartCount: cartCount.count,
         
-        // Loading states
-        isLoading: isLoadingItems || isLoadingCount,
+                isLoading: isLoadingItems || isLoadingCount,
         isLoadingItems,
         isLoadingCount,
         
-        // Error states
-        error: itemsError,
+                error: itemsError,
         
-        // Mutations
-        addToCart,
+                addToCart,
         updateCartItem,
         removeFromCart,
         clearCart,
         checkInCart,
         
-        // Mutation states
-        isAddingToCart: addToCartMutation.isPending,
+                isAddingToCart: addToCartMutation.isPending,
         isUpdatingCart: updateCartItemMutation.isPending,
         isRemovingFromCart: removeFromCartMutation.isPending,
         isClearingCart: clearCartMutation.isPending,
         isCheckingCart: checkInCartMutation.isPending,
         
-        // Refetch functions
-        refetchItems,
+                refetchItems,
         refetchCount,
         
-        // Mutation errors
-        addToCartError: addToCartMutation.error,
+                addToCartError: addToCartMutation.error,
         updateCartError: updateCartItemMutation.error,
         removeFromCartError: removeFromCartMutation.error,
         clearCartError: clearCartMutation.error,

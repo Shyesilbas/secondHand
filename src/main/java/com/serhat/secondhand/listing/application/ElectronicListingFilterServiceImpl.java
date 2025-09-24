@@ -39,8 +39,7 @@ public class ElectronicListingFilterServiceImpl implements ElectronicListingFilt
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        // Query for results - Use ElectronicListing directly since it extends Listing
-        CriteriaQuery<ElectronicListing> query = cb.createQuery(ElectronicListing.class);
+                CriteriaQuery<ElectronicListing> query = cb.createQuery(ElectronicListing.class);
         Root<ElectronicListing> root = query.from(ElectronicListing.class);
 
         List<Predicate> predicates = buildPredicates(cb, root, filters);
@@ -55,8 +54,7 @@ public class ElectronicListingFilterServiceImpl implements ElectronicListingFilt
 
         List<ElectronicListing> results = typedQuery.getResultList();
 
-        // Count query for total
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<ElectronicListing> countRoot = countQuery.from(ElectronicListing.class);
 
         List<Predicate> countPredicates = buildPredicates(cb, countRoot, filters);
@@ -66,8 +64,7 @@ public class ElectronicListingFilterServiceImpl implements ElectronicListingFilt
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        // Convert to DTOs
-        List<ListingDto> dtos = results.stream()
+                List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
@@ -81,11 +78,9 @@ public class ElectronicListingFilterServiceImpl implements ElectronicListingFilt
 
         predicates.add(cb.equal(root.get("listingType"), ListingType.ELECTRONICS));
 
-        // Add base predicates from helper
-        predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
+                predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
 
-        // Electronics-specific filters - directly accessible since root is ElectronicListing
-        if (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) {
+                if (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) {
             predicates.add(root.get("electronicType").in(filters.getElectronicTypes()));
         }
 
@@ -97,8 +92,7 @@ public class ElectronicListingFilterServiceImpl implements ElectronicListingFilt
             predicates.add(root.get("color").in(filters.getColors()));
         }
 
-        // Year range for electronics
-        if (filters.getMinYear() != null) {
+                if (filters.getMinYear() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("year"), filters.getMinYear()));
         }
 

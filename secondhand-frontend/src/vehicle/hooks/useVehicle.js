@@ -15,8 +15,7 @@ export const useVehicle = (vehicleId = null) => {
     entityName: 'Vehicle'
   });
 
-  // Map entity to vehicle for backward compatibility
-  return {
+    return {
     ...result,
     vehicle: result.entity,
     fetchVehicle: result.fetchEntity,
@@ -26,7 +25,6 @@ export const useVehicle = (vehicleId = null) => {
   };
 };
 
-// Hook for vehicle search operations
 export const useVehicleSearch = () => {
   const vehicleServiceAdapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
   
@@ -36,15 +34,13 @@ export const useVehicleSearch = () => {
     defaultData: []
   });
 
-  // Map entities to vehicles for backward compatibility
-  return {
+    return {
     ...result,
     vehicles: result.entities,
     searchByBrandAndModel: result.searchByCriteria
   };
 };
 
-// Hook for car brands
 export const useCarBrands = () => {
   const [brands, setBrands] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

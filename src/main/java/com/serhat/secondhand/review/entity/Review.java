@@ -37,8 +37,7 @@ public class Review {
     private OrderItem orderItem;
 
     @Column(name = "rating", nullable = false)
-    private Integer rating; // 0-5 stars
-
+    private Integer rating; 
     @Column(name = "comment", length = 1000)
     private String comment;
 

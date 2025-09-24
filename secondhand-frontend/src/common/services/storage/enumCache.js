@@ -1,11 +1,6 @@
-/**
- * Enum Cache Service
- * Manages caching of enum values in localStorage for performance optimization
- */
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.9'; // Increment this when backend enum structure changes
-const REQUIRED_ENUM_KEYS = [
+const ENUM_CACHE_VERSION = '1.9'; const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
   'carBrands',
@@ -15,40 +10,28 @@ const REQUIRED_ENUM_KEYS = [
   'currencies',
   'gearTypes',
   'seatCounts',
-  // Newly added keys for electronics
-  'electronicTypes',
+    'electronicTypes',
   'electronicBrands',
-  // Newly added keys for real estate
-  'realEstateTypes',
+    'realEstateTypes',
   'realEstateAdTypes',
   'heatingTypes',
   'ownerTypes',
-  // Clothing
-  'clothingBrands',
+    'clothingBrands',
   'clothingTypes',
   'clothingConditions',
-  // Books
-  'bookGenres',
+    'bookGenres',
   'bookLanguages',
   'bookFormats',
   'bookConditions',
-  // Sports
-  'sportDisciplines',
+    'sportDisciplines',
   'sportEquipmentTypes',
   'sportConditions',
-  // Payments / Orders / Emails
-  'paymentTypes',
+    'paymentTypes',
   'shippingStatuses',
   'emailTypes',
-  // Users
-  'genders',
+    'genders',
 ];
-const CACHE_EXPIRY_HOURS = 24; // Cache expires after 24 hours
-
-/**
- * Get cached enums from localStorage
- * @returns {Object|null} Cached enums or null if not found/expired
- */
+const CACHE_EXPIRY_HOURS = 24;
 export const getCachedEnums = () => {
     try {
         const cached = localStorage.getItem(ENUM_CACHE_KEY);
@@ -56,23 +39,20 @@ export const getCachedEnums = () => {
 
         const { data, timestamp, version } = JSON.parse(cached);
         
-        // Check version compatibility
-        if (version !== ENUM_CACHE_VERSION) {
+                if (version !== ENUM_CACHE_VERSION) {
             console.log('Enum cache version mismatch, clearing cache');
             clearEnumCache();
             return null;
         }
 
-        // Schema/key presence check
-        const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
+                const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
         if (missingKeys.length > 0) {
             console.log('Enum cache missing keys', missingKeys, '— clearing cache');
             clearEnumCache();
             return null;
         }
 
-        // Check expiry
-        const now = Date.now();
+                const now = Date.now();
         const expiryTime = timestamp + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
         
         if (now > expiryTime) {

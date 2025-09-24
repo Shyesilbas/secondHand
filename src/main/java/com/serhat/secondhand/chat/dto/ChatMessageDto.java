@@ -28,8 +28,7 @@ public class ChatMessageDto {
         dto.setId(message.getId());
         dto.setContent(message.getContent());
         
-        // Debug log
-        System.out.println("Converting message to DTO - ID: " + message.getId() + ", Content: " + message.getContent());
+                System.out.println("Converting message to DTO - ID: " + message.getId() + ", Content: " + message.getContent());
         
         if (message.getSender() != null) {
             dto.setSenderId(message.getSender().getId());

@@ -6,19 +6,16 @@ import {
 
 export const userService = {
 
-    // Get user by ID
-    getUserById: async (userId) => {
+        getUserById: async (userId) => {
         return get(API_ENDPOINTS.USER.BY_ID(userId));
     },
 
-    // Update phone number
-    updatePhone: async (phoneData) => {
+        updatePhone: async (phoneData) => {
         const updatePhoneData = createUpdatePhoneRequest(phoneData);
         return put(API_ENDPOINTS.USER.UPDATE_PHONE, updatePhoneData);
     },
 
-    // Address operations
-    getAddresses: async () => {
+        getAddresses: async () => {
         return get(API_ENDPOINTS.ADDRESS.ALL);
     },
     addAddress: async (address) => {

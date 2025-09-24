@@ -39,21 +39,17 @@ public class BaseListingFilterServiceImpl implements BaseListingFilterService {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        // Basic filters
-        if (filters.getListingType() != null) {
+                if (filters.getListingType() != null) {
             predicates.add(cb.equal(listing.get("listingType"), filters.getListingType()));
         }
 
-        // Add base predicates from helper
-        predicates.addAll(FilterHelper.buildBasePredicates(cb, listing, filters));
+                predicates.addAll(FilterHelper.buildBasePredicates(cb, listing, filters));
 
-        // Apply all predicates
-        if (!predicates.isEmpty()) {
+                if (!predicates.isEmpty()) {
             query.where(predicates.toArray(new Predicate[0]));
         }
 
-        // Sorting
-        if (filters.getSortBy() != null && !filters.getSortBy().trim().isEmpty()) {
+                if (filters.getSortBy() != null && !filters.getSortBy().trim().isEmpty()) {
             String sortBy = filters.getSortBy();
             boolean isDesc = "DESC".equalsIgnoreCase(filters.getSortDirection());
 
@@ -70,30 +66,25 @@ public class BaseListingFilterServiceImpl implements BaseListingFilterService {
                 query.orderBy(cb.asc(sortExpression));
             }
         } else {
-            // Default sorting by creation date descending
-            query.orderBy(cb.desc(listing.get("createdAt")));
+                        query.orderBy(cb.desc(listing.get("createdAt")));
         }
 
-        // Execute query
-        List<Listing> results = entityManager.createQuery(query)
+                List<Listing> results = entityManager.createQuery(query)
                 .setFirstResult((int) pageable.getOffset())
                 .setMaxResults(pageable.getPageSize())
                 .getResultList();
 
-        // Count query for pagination
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Listing> countRoot = countQuery.from(Listing.class);
         countQuery.select(cb.count(countRoot));
 
-        // Apply same predicates to count query
-        if (!predicates.isEmpty()) {
+                if (!predicates.isEmpty()) {
             countQuery.where(predicates.toArray(new Predicate[0]));
         }
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        // Convert to DTOs
-        List<ListingDto> dtos = results.stream()
+                List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
