@@ -9,8 +9,7 @@ export const useEWallet = () => {
     const [error, setError] = useState(null);
     const { showNotification } = useNotification();
 
-    // Get eWallet information
-    const fetchEWallet = async () => {
+        const fetchEWallet = async () => {
         setLoading(true);
         setError(null);
         try {
@@ -18,8 +17,7 @@ export const useEWallet = () => {
             setEWallet(walletData);
         } catch (err) {
             if (err.response?.status === 404) {
-                // eWallet doesn't exist, user needs to create one
-                setEWallet(null);
+                                setEWallet(null);
             } else {
                 setError(err.message || 'Failed to fetch eWallet');
                 showNotification('Failed to fetch eWallet information', 'error');
@@ -29,8 +27,7 @@ export const useEWallet = () => {
         }
     };
 
-    // Create eWallet
-    const createEWallet = async () => {
+        const createEWallet = async () => {
         setLoading(true);
         setError(null);
         try {
@@ -48,8 +45,7 @@ export const useEWallet = () => {
         }
     };
 
-    // Update eWallet limits
-    const updateLimits = async (newLimit) => {
+        const updateLimits = async (newLimit) => {
         setLoading(true);
         setError(null);
         try {
@@ -67,14 +63,12 @@ export const useEWallet = () => {
         }
     };
 
-    // Deposit money
-    const deposit = async (amount, bankId) => {
+        const deposit = async (amount, bankId) => {
         setLoading(true);
         setError(null);
         try {
             const transaction = await ewalletService.deposit(amount, bankId);
-            // Refresh wallet data
-            await fetchEWallet();
+                        await fetchEWallet();
             showNotification(`Successfully deposited ${amount} TL`, 'success');
             return transaction;
         } catch (err) {
@@ -87,14 +81,12 @@ export const useEWallet = () => {
         }
     };
 
-    // Withdraw money
-    const withdraw = async (amount, bankId) => {
+        const withdraw = async (amount, bankId) => {
         setLoading(true);
         setError(null);
         try {
             const transaction = await ewalletService.withdraw(amount, bankId);
-            // Refresh wallet data
-            await fetchEWallet();
+                        await fetchEWallet();
             showNotification(`Successfully withdrew ${amount} TL`, 'success');
             return transaction;
         } catch (err) {
@@ -107,8 +99,7 @@ export const useEWallet = () => {
         }
     };
 
-    // Get transactions
-    const fetchTransactions = async (page = 0, size = 10) => {
+        const fetchTransactions = async (page = 0, size = 10) => {
         setLoading(true);
         setError(null);
         try {
@@ -125,8 +116,7 @@ export const useEWallet = () => {
         }
     };
 
-    // Check balance
-    const checkBalance = async (amount) => {
+        const checkBalance = async (amount) => {
         try {
             return await ewalletService.checkBalance(amount);
         } catch (err) {
@@ -135,8 +125,7 @@ export const useEWallet = () => {
         }
     };
 
-    // Initialize on mount
-    useEffect(() => {
+        useEffect(() => {
         fetchEWallet();
     }, []);
 

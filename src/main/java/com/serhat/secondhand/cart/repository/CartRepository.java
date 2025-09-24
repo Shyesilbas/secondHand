@@ -15,50 +15,26 @@ import java.util.Optional;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    /**
-     * Find all cart items for a specific user
-     */
-    List<Cart> findByUserOrderByCreatedAtDesc(User user);
+        List<Cart> findByUserOrderByCreatedAtDesc(User user);
 
-    /**
-     * Find all cart items for a specific user with listing details
-     */
-    @Query("SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user = :user ORDER BY c.createdAt DESC")
+        @Query("SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user = :user ORDER BY c.createdAt DESC")
     List<Cart> findByUserWithListing(@Param("user") User user);
 
-    /**
-     * Find a specific cart item by user and listing
-     */
-    Optional<Cart> findByUserAndListing(User user, Listing listing);
+        Optional<Cart> findByUserAndListing(User user, Listing listing);
 
-    /**
-     * Check if a listing exists in user's cart
-     */
-    boolean existsByUserAndListing(User user, Listing listing);
+        boolean existsByUserAndListing(User user, Listing listing);
 
-    /**
-     * Count total items in user's cart
-     */
-    long countByUser(User user);
+        long countByUser(User user);
 
-    /**
-     * Delete all items from user's cart
-     */
-    @Modifying
+        @Modifying
     @Query("DELETE FROM Cart c WHERE c.user = :user")
     void deleteByUser(@Param("user") User user);
 
-    /**
-     * Delete a specific item from user's cart
-     */
-    @Modifying
+        @Modifying
     @Query("DELETE FROM Cart c WHERE c.user = :user AND c.listing = :listing")
     void deleteByUserAndListing(@Param("user") User user, @Param("listing") Listing listing);
 
-    /**
-     * Update quantity of a cart item
-     */
-    @Modifying
+        @Modifying
     @Query("UPDATE Cart c SET c.quantity = :quantity WHERE c.user = :user AND c.listing = :listing")
     void updateQuantityByUserAndListing(@Param("user") User user, @Param("listing") Listing listing, @Param("quantity") Integer quantity);
 }

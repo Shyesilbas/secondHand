@@ -44,8 +44,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
       await listingService.activateListing(listing.id);
       onChanged && onChanged(listing.id);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Reactivate failed', err);
+            console.error('Reactivate failed', err);
     }
   };
 
@@ -91,8 +90,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
     notification.showSuccess('Successful', 'Listing added to showcase successfully!');
   };
 
-  // Hide edit for SOLD listings
-  const canEdit = listing.status !== 'SOLD';
+    const canEdit = listing.status !== 'SOLD';
 
   return (
     <>

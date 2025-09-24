@@ -27,8 +27,7 @@ const CreditCardsSection = () => {
             setShowCreateModal(false);
             setCreditCardLimit('');
         } catch {
-            // error handled in hook
-        }
+                    }
     };
 
     const handleDeleteCreditCard = async () => {

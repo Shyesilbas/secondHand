@@ -12,10 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Service responsible for favorite statistics only
- * This avoids circular dependency between ListingService and FavoriteService
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,10 +20,7 @@ public class FavoriteStatsService {
     
     private final FavoriteRepository favoriteRepository;
     
-    /**
-     * Get favorite statistics for a single listing
-     */
-    public FavoriteStatsDto getFavoriteStats(UUID listingId, String userEmail) {
+        public FavoriteStatsDto getFavoriteStats(UUID listingId, String userEmail) {
         long favoriteCount = favoriteRepository.countByListingId(listingId);
         boolean isFavorited = userEmail != null && favoriteRepository.existsByUserEmailAndListingId(userEmail, listingId);
         
@@ -38,10 +31,7 @@ public class FavoriteStatsService {
             .build();
     }
     
-    /**
-     * Get favorite statistics for multiple listings in a batch operation
-     */
-    public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
+        public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
         log.info("Getting favorite stats for {} listings", listingIds.size());
         
         List<Object[]> countResults = favoriteRepository.countByListingIds(listingIds);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext.jsx';
-// Removed inline EmptyState usage; handled inside section components
 import BankAccountsSection from './components/BankAccountsSection.jsx';
 import CreditCardsSection from './components/CreditCardsSection.jsx';
 import EWalletSection from './components/EWalletSection.jsx';
@@ -11,8 +10,7 @@ const PaymentMethodsPage = () => {
     const notification = useNotification();
     const [activeTab, setActiveTab] = useState('bank-accounts');
 
-    // All data/state for sections are now owned by their components
-    const isLoading = false;
+        const isLoading = false;
     const error = null;
 
     const tabs = [

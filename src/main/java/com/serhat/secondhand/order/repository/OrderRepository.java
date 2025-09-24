@@ -16,49 +16,22 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    /**
-     * Find all orders for a specific user
-     */
-    Page<Order> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
+        Page<Order> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 
-    /**
-     * Find all orders for a specific user with order items
-     */
-    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user = :user ORDER BY o.createdAt DESC")
+        @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user = :user ORDER BY o.createdAt DESC")
     List<Order> findByUserWithOrderItems(@Param("user") User user);
 
-    /**
-     * Find order by order number
-     */
-    Optional<Order> findByOrderNumber(String orderNumber);
+        Optional<Order> findByOrderNumber(String orderNumber);
 
-    /**
-     * Find orders by status
-     */
-    List<Order> findByStatusOrderByCreatedAtDesc(Order.OrderStatus status);
+        List<Order> findByStatusOrderByCreatedAtDesc(Order.OrderStatus status);
 
-    /**
-     * Find orders by payment status
-     */
-    List<Order> findByPaymentStatusOrderByCreatedAtDesc(Order.PaymentStatus paymentStatus);
+        List<Order> findByPaymentStatusOrderByCreatedAtDesc(Order.PaymentStatus paymentStatus);
 
-    /**
-     * Count orders by user
-     */
-    long countByUser(User user);
+        long countByUser(User user);
 
-    /**
-     * Find orders created between dates
-     */
-    List<Order> findByCreatedAtBetweenOrderByCreatedAtDesc(LocalDateTime startDate, LocalDateTime endDate);
+        List<Order> findByCreatedAtBetweenOrderByCreatedAtDesc(LocalDateTime startDate, LocalDateTime endDate);
 
-    /**
-     * Find orders by user and status
-     */
-    List<Order> findByUserAndStatusOrderByCreatedAtDesc(User user, Order.OrderStatus status);
+        List<Order> findByUserAndStatusOrderByCreatedAtDesc(User user, Order.OrderStatus status);
 
-    /**
-     * Find orders by payment reference
-     */
-    Optional<Order> findByPaymentReference(String paymentReference);
+        Optional<Order> findByPaymentReference(String paymentReference);
 }

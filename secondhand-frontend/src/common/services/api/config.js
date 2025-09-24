@@ -7,8 +7,7 @@ const apiClient = axios.create({
         'Content-Type': 'application/json',
     },
     timeout: 10000,
-    withCredentials: true, // Include cookies in all requests
-});
+    withCredentials: true, });
 
 export default apiClient;
 export { API_BASE_URL };

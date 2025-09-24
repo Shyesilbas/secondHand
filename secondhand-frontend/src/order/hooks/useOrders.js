@@ -22,8 +22,7 @@ export const useOrders = (initialPage = 0, initialSize = 10) => {
     try {
       const response = await orderService.myOrders(page, size);
       
-      // Handle different response structures
-      const data = response.data || response;
+            const data = response.data || response;
       
       setOrders(data.content || []);
       setPagination({
@@ -59,8 +58,7 @@ export const useOrders = (initialPage = 0, initialSize = 10) => {
     fetchOrders();
   }, []);
 
-  // Return search result if available, otherwise return paginated orders
-  const displayOrders = searchResult ? [searchResult] : orders;
+    const displayOrders = searchResult ? [searchResult] : orders;
 
   return {
     orders: displayOrders,

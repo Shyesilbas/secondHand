@@ -52,8 +52,7 @@ const ChatPage = () => {
       'Delete Conversation',
       'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
       () => {
-        // Close chat if the deleted room was selected
-        if (selectedChatRoom?.id === roomId) {
+                if (selectedChatRoom?.id === roomId) {
           setIsChatOpen(false);
         }
         deleteConversation(roomId);

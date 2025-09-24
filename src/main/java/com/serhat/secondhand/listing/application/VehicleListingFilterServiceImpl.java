@@ -52,8 +52,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         List<VehicleListing> results = typedQuery.getResultList();
 
-        // Count query for total
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<VehicleListing> countRoot = countQuery.from(VehicleListing.class);
 
         List<Predicate> countPredicates = buildPredicates(cb, countRoot, filters);
@@ -63,8 +62,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        // Convert to DTOs
-        List<ListingDto> dtos = results.stream()
+                List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
@@ -78,11 +76,9 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         predicates.add(cb.equal(root.get("listingType"), ListingType.VEHICLE));
 
-        // Add base predicates from helper
-        predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
+                predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
 
-        // Vehicle-specific filters - directly accessible since root is VehicleListing
-        if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
+                if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
             predicates.add(root.get("brand").in(filters.getBrands()));
         }
 
@@ -106,8 +102,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
             predicates.add(cb.equal(root.get("doors"), filters.getDoors()));
         }
 
-        // Year range for vehicles
-        if (filters.getMinYear() != null) {
+                if (filters.getMinYear() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("year"), filters.getMinYear()));
         }
 
@@ -115,8 +110,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
             predicates.add(cb.lessThanOrEqualTo(root.get("year"), filters.getMaxYear()));
         }
 
-        // Mileage filter
-        if (filters.getMaxMileage() != null) {
+                if (filters.getMaxMileage() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("mileage"), filters.getMaxMileage()));
         }
 
@@ -146,8 +140,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
             orders.add(isDesc ? cb.desc(sortExpression) : cb.asc(sortExpression));
         } else {
-            // Default sorting by creation date descending
-            orders.add(cb.desc(root.get("createdAt")));
+                        orders.add(cb.desc(root.get("createdAt")));
         }
 
         return orders;

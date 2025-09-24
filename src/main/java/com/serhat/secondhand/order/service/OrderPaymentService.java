@@ -61,10 +61,7 @@ public class OrderPaymentService {
         }
     }
 
-    /**
-     * Creates payment requests grouped by seller
-     */
-    private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request) {
+        private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request) {
         var paymentsBySeller = groupCartItemsBySeller(cartItems);
         List<PaymentRequest> paymentRequests = new ArrayList<>();
 
@@ -80,18 +77,12 @@ public class OrderPaymentService {
         return paymentRequests;
     }
 
-    /**
-     * Groups cart items by seller ID
-     */
-    private Map<Long, List<Cart>> groupCartItemsBySeller(List<Cart> cartItems) {
+        private Map<Long, List<Cart>> groupCartItemsBySeller(List<Cart> cartItems) {
         return cartItems.stream()
                 .collect(Collectors.groupingBy(cart -> cart.getListing().getSeller().getId()));
     }
 
-    /**
-     * Creates a payment request for a specific seller
-     */
-    private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, CheckoutRequest request) {
+        private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, CheckoutRequest request) {
         BigDecimal sellerTotal = calculateSellerTotal(sellerItems);
         var sellerInfo = getSellerInfo(sellerItems);
 
@@ -108,34 +99,22 @@ public class OrderPaymentService {
                 .build();
     }
 
-    /**
-     * Calculates total amount for a seller's items
-     */
-    private BigDecimal calculateSellerTotal(List<Cart> sellerItems) {
+        private BigDecimal calculateSellerTotal(List<Cart> sellerItems) {
         return sellerItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    /**
-     * Extracts seller information from cart items
-     */
-    private SellerInfo getSellerInfo(List<Cart> sellerItems) {
+        private SellerInfo getSellerInfo(List<Cart> sellerItems) {
         var seller = sellerItems.get(0).getListing().getSeller();
         return new SellerInfo(seller.getName(), seller.getSurname());
     }
 
-    /**
-     * Resolves payment type from request
-     */
-    private PaymentType resolvePaymentType(CheckoutRequest request) {
+        private PaymentType resolvePaymentType(CheckoutRequest request) {
         return request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
     }
 
-    /**
-     * Updates order payment status based on payment results
-     */
-    private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful) {
+        private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful) {
         order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         order.setPaymentStatus(allSuccessful ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
         order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);

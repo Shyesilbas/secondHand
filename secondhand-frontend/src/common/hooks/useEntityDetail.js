@@ -1,15 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
 
-/**
- * Generic Entity Detail Hook for detail page operations
- * @param {Object} config - Detail configuration
- * @param {string} config.entityId - Entity ID
- * @param {Object} config.service - Service object with getEntityById method
- * @param {string} config.entityName - Human readable entity name for error messages
- * @param {string} config.ownerField - Field name to check ownership (default: 'sellerId')
- * @returns {Object} - Detail state and operations
- */
 export const useEntityDetail = (config) => {
   const { entityId, service, entityName = 'Entity', ownerField = 'sellerId' } = config;
   const { user, isAuthenticated } = useAuth();
@@ -47,8 +38,7 @@ export const useEntityDetail = (config) => {
     setIsLoading(true);
   }, []);
 
-  // Check if current user is the owner
-  const isOwner = useMemo(() => {
+    const isOwner = useMemo(() => {
     return isAuthenticated && user?.id === entity?.[ownerField];
   }, [isAuthenticated, user?.id, entity, ownerField]);
 

@@ -34,7 +34,6 @@ const usePriceHistory = (listingId) => {
     }
   }, [listingId]);
 
-  // Removed auto-fetch on mount/useEffect
 
   return {
     priceHistory,
@@ -42,8 +41,7 @@ const usePriceHistory = (listingId) => {
     hasHistory,
     loading,
     error,
-    fetchPriceHistory, // renamed from refetch for clarity
-  };
+    fetchPriceHistory,   };
 };
 
 export default usePriceHistory;

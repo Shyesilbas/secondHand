@@ -22,8 +22,7 @@ public class ChatRestController {
     
     private final ChatService chatService;
     
-    // ==================== CHAT ROOM ENDPOINTS ====================
-    
+
 
     @GetMapping("/rooms/user/{userId}")
     public ResponseEntity<List<ChatRoomDto>> getUserChatRooms(@PathVariable Long userId) {
@@ -52,8 +51,7 @@ public class ChatRestController {
         return ResponseEntity.ok(chatRoom);
     }
     
-    // ==================== MESSAGE ENDPOINTS ====================
-    
+
 
     @PostMapping("/messages")
     public ResponseEntity<ChatMessageDto> sendMessage(@RequestBody ChatMessageDto messageDto) {
@@ -125,8 +123,7 @@ public class ChatRestController {
         return ResponseEntity.ok("Listing chat rooms fixed");
     }
     
-    // ==================== DELETE ENDPOINTS ====================
-    
+
     @DeleteMapping("/rooms/{chatRoomId}")
     public ResponseEntity<Void> deleteConversation(
             @PathVariable Long chatRoomId,

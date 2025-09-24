@@ -6,7 +6,6 @@ import { NotificationProvider } from './notification/NotificationContext.jsx';
 import AppRoutes from './common/routes/AppRoutes';
 import './common/services/api/interceptors';
 
-// Create a client
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {

@@ -3,8 +3,7 @@ import { listingTypeRegistry } from './typeRegistry.js';
 
 
 export const renderEditForm = (listing, type, handleUpdate) => {
-    // Validate required parameters
-    if (!listing) {
+        if (!listing) {
         return (
             <div className="text-red-500 p-4 bg-red-50 rounded-lg border border-red-200">
                 Error: Listing data is required

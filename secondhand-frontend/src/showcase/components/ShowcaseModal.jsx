@@ -22,8 +22,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             refetch();
             refreshWallet();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen]);
+            }, [isOpen]);
 
     useEffect(() => {
         if (paymentType === 'CREDIT_CARD' && paymentMethods.creditCards.length > 0) {
@@ -63,8 +62,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         try {
             await showcaseService.createShowcase(listingId, days, paymentType, selectedCardNumber, selectedBankAccountIban);
             setSuccess(true);
-            // Dispatch global event to refresh showcases on pages listening
-            try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
+                        try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
             onSuccess?.();
             setTimeout(() => {
                 setSuccess(false);

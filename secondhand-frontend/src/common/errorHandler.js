@@ -1,8 +1,4 @@
-/**
- * Modern error handling utilities for the application
- */
 
-// Error types for better categorization
 export const ERROR_TYPES = {
     VALIDATION: 'validation',
     AUTHENTICATION: 'authentication',
@@ -12,7 +8,6 @@ export const ERROR_TYPES = {
     UNKNOWN: 'unknown'
 };
 
-// Error severity levels
 export const ERROR_SEVERITY = {
     LOW: 'low',
     MEDIUM: 'medium',
@@ -20,11 +15,6 @@ export const ERROR_SEVERITY = {
     CRITICAL: 'critical'
 };
 
-/**
- * Parse error response and extract relevant information
- * @param {Error} error - The error object from axios or other sources
- * @returns {Object} Parsed error information
- */
 export const parseError = (error) => {
     const defaultError = {
         type: ERROR_TYPES.UNKNOWN,
@@ -38,8 +28,7 @@ export const parseError = (error) => {
 
     if (!error) return defaultError;
 
-    // Handle network errors
-    if (error.code === 'NETWORK_ERROR' || !error.response) {
+        if (error.code === 'NETWORK_ERROR' || !error.response) {
         return {
             ...defaultError,
             type: ERROR_TYPES.NETWORK,
@@ -60,8 +49,7 @@ export const parseError = (error) => {
         details: errorData
     };
 
-    // Parse based on status code
-    switch (statusCode) {
+        switch (statusCode) {
         case 400:
             parsedError = {
                 ...parsedError,
@@ -138,9 +126,6 @@ export const parseError = (error) => {
     return parsedError;
 };
 
-/**
- * Get user-friendly authentication error message
- */
 const getAuthenticationErrorMessage = (errorData) => {
     const message = errorData?.message?.toLowerCase() || '';
     
@@ -169,9 +154,6 @@ const getAuthenticationErrorMessage = (errorData) => {
     return errorData?.message || 'Error occurred while authenticating. Please try again later';
 };
 
-/**
- * Get user-friendly authorization error message
- */
 const getAuthorizationErrorMessage = (errorData) => {
     const message = errorData?.message?.toLowerCase() || '';
     
@@ -184,9 +166,6 @@ const getAuthorizationErrorMessage = (errorData) => {
     return errorData?.message || 'Access rejected.';
 };
 
-/**
- * Get user-friendly validation error message
- */
 const getValidationErrorMessage = (errorData) => {
     if (errorData?.errors && Array.isArray(errorData.errors)) {
         return errorData.errors.map(err => err.message || err).join(', ');
@@ -199,8 +178,7 @@ const getValidationErrorMessage = (errorData) => {
 
     const message = errorData?.message || '';
     
-    // Common validation messages
-    if (message.includes('email already exists')) {
+        if (message.includes('email already exists')) {
         return 'E-mail is in use';
     }
     
@@ -215,12 +193,6 @@ const getValidationErrorMessage = (errorData) => {
     return message || 'Error in form fields. Please check and try again.';
 };
 
-/**
- * Create a standardized error notification
- * @param {Error} error - The original error
- * @param {Function} showError - Error notification function (can be toast or modal)
- * @param {Object} options - Additional options
- */
 export const handleError = (error, showError, options = {}) => {
     const parsedError = parseError(error);
     
@@ -229,26 +201,22 @@ export const handleError = (error, showError, options = {}) => {
         customTitle = null,
         customMessage = null,
         showDetailedError = true,
-        useModal = false, // Set to true to use modal notifications
-        actions = []
+        useModal = false,         actions = []
     } = options;
 
     const messageToShow = customMessage || 
                          (showOriginalMessage ? parsedError.originalMessage : parsedError.message);
 
-    // Log error for debugging in development
-    if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development') {
         console.group('🚨 Error Details');
         console.error('Parsed Error:', parsedError);
         console.error('Original Error:', error);
         console.groupEnd();
     }
 
-    // Use enhanced modal notification if available and requested
-    if (useModal && typeof showError === 'function') {
+        if (useModal && typeof showError === 'function') {
         try {
-            // Try to use showDetailedError method (for modal notifications)
-            if (showError.showDetailedError) {
+                        if (showError.showDetailedError) {
                 showError.showDetailedError(parsedError, {
                     customTitle,
                     customMessage: messageToShow,
@@ -256,27 +224,18 @@ export const handleError = (error, showError, options = {}) => {
                     actions
                 });
             } else {
-                // Fallback to regular error method
-                showError(customTitle || getErrorTitle(parsedError), messageToShow);
+                                showError(customTitle || getErrorTitle(parsedError), messageToShow);
             }
         } catch (e) {
-            // Final fallback - avoid blocking alerts
-            console.error('Error notification failed:', e, messageToShow);
+                        console.error('Error notification failed:', e, messageToShow);
         }
     } else {
-        // Use traditional toast or simple error notification
-        showError(messageToShow);
+                showError(messageToShow);
     }
 
     return parsedError;
 };
 
-/**
- * Enhanced error handler specifically for modal notifications
- * @param {Error} error - The original error
- * @param {Object} notificationContext - The notification context with methods
- * @param {Object} options - Additional options
- */
 export const handleErrorWithModal = (error, notificationContext, options = {}) => {
     const parsedError = parseError(error);
     
@@ -287,8 +246,7 @@ export const handleErrorWithModal = (error, notificationContext, options = {}) =
         actions = []
     } = options;
 
-    // Log error for debugging in development
-    if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development') {
         console.group('🚨 Error Details');
         console.error('Parsed Error:', parsedError);
         console.error('Original Error:', error);
@@ -308,7 +266,6 @@ export const handleErrorWithModal = (error, notificationContext, options = {}) =
     return parsedError;
 };
 
-// Helper function to get error title
 const getErrorTitle = (errorData) => {
     if (!errorData || !errorData.type) return 'Error';
     
@@ -328,11 +285,6 @@ const getErrorTitle = (errorData) => {
     }
 };
 
-/**
- * Check if error should trigger logout (for expired sessions, etc.)
- * @param {Object} parsedError - Parsed error object
- * @returns {boolean}
- */
 export const shouldTriggerLogout = (parsedError) => {
     if (parsedError.type !== ERROR_TYPES.AUTHENTICATION) {
         return false;
@@ -340,14 +292,12 @@ export const shouldTriggerLogout = (parsedError) => {
 
     const message = parsedError.originalMessage?.toLowerCase() || '';
     
-    // Don't trigger logout for login attempts with bad credentials
-    if (message.includes('invalid email or password') ||
+        if (message.includes('invalid email or password') ||
         message.includes('bad credentials')) {
         return false;
     }
 
-    // Trigger logout for expired tokens, invalid sessions, etc.
-    return message.includes('token expired') ||
+        return message.includes('token expired') ||
            message.includes('invalid token') ||
            message.includes('session expired') ||
            message.includes('unauthorized access');

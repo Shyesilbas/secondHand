@@ -55,8 +55,7 @@ public class ElectronicListingService {
 
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
-        // Store old price for price history tracking
-        var oldPrice = existing.getPrice();
+                var oldPrice = existing.getPrice();
 
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
@@ -75,8 +74,7 @@ public class ElectronicListingService {
 
         repository.save(existing);
 
-        // Record price change if price was updated
-        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+                if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                 existing, 
                 oldPrice, 

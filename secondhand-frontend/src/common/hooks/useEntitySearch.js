@@ -1,13 +1,5 @@
 import { useState, useCallback } from 'react';
 
-/**
- * Generic Entity Search Hook for search and filter operations
- * @param {Object} config - Search configuration
- * @param {Object} config.service - Service object with search methods
- * @param {string} config.entityName - Human readable entity name for error messages
- * @param {Array} config.defaultData - Default data array
- * @returns {Object} - Search state and operations
- */
 export const useEntitySearch = (config) => {
   const { service, entityName = 'Entity', defaultData = [] } = config;
   
@@ -35,8 +27,7 @@ export const useEntitySearch = (config) => {
       setError(null);
       const response = await service.filterEntities(filters);
       
-      // Handle both paginated and non-paginated responses
-      const content = response.content || response;
+            const content = response.content || response;
       const paginationData = response.content ? {
         totalElements: response.totalElements || 0,
         totalPages: response.totalPages || 0,

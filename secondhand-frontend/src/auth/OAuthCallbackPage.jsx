@@ -23,8 +23,7 @@ const OAuthCallbackPage = () => {
                 }
             })();
         } else {
-            // If the backend redirected for completion, route could already be /auth/complete
-            navigate(ROUTES.AUTH_COMPLETE + window.location.search, { replace: true });
+                        navigate(ROUTES.AUTH_COMPLETE + window.location.search, { replace: true });
         }
     }, [params, navigate, loginWithTokens]);
 

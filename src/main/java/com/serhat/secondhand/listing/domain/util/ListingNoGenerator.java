@@ -2,9 +2,6 @@ package com.serhat.secondhand.listing.domain.util;
 
 import java.security.SecureRandom;
 
-/**
- * Utility class for generating unique listing numbers
- */
 public class ListingNoGenerator {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

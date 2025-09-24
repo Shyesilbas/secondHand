@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { XMarkIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid, ExclamationTriangleIcon as ExclamationTriangleIconSolid, InformationCircleIcon as InformationCircleIconSolid, XCircleIcon as XCircleIconSolid } from '@heroicons/react/24/solid';
 
-/**
- * Modern modal-based notification component
- */
 const NotificationModal = ({ 
     isOpen, 
     onClose, 
@@ -16,8 +13,7 @@ const NotificationModal = ({
     autoClose = true,
     autoCloseDelay = 5000,
     showCloseButton = true,
-    size = 'md' // 'sm', 'md', 'lg', 'xl'
-}) => {
+    size = 'md' }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isLeaving, setIsLeaving] = useState(false);
 
@@ -26,8 +22,7 @@ const NotificationModal = ({
             setIsVisible(true);
             setIsLeaving(false);
             
-            // Auto close if enabled
-            if (autoClose && autoCloseDelay > 0) {
+                        if (autoClose && autoCloseDelay > 0) {
                 const timer = setTimeout(() => {
                     handleClose();
                 }, autoCloseDelay);
@@ -240,7 +235,6 @@ const NotificationModal = ({
     );
 };
 
-// Add CSS animation for progress bar
 const style = document.createElement('style');
 style.textContent = `
     @keyframes shrink {

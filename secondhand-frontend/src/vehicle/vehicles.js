@@ -1,21 +1,15 @@
 import { ListingDTO } from '../listing/listings.js';
 
-/**
- * Vehicle Related DTOs
- */
 
-// Vehicle Create Request DTO
 export const VehicleCreateRequestDTO = {
-  // Basic Info
-  title: '',
+    title: '',
   description: '',
   price: 0,
   currency: 'TRY',
   city: '',
   district: '',
   
-  // Vehicle Specs
-  brand: '',
+    brand: '',
   model: '',
   year: 0,
   mileage: 0,
@@ -35,11 +29,9 @@ export const VehicleCreateRequestDTO = {
 
 
 
-// Vehicle Response DTO
 export const VehicleListingDTO = {
   ...ListingDTO,
-  // Vehicle Specific Info
-  brand: '',
+    brand: '',
   model: '',
   year: 0,
   mileage: 0,
@@ -57,7 +49,6 @@ export const VehicleListingDTO = {
   swap: false,
 };
 
-// Vehicle Search Filters DTO
 export const VehicleSearchFiltersDTO = {
   listingType: 'VEHICLE',
   status: 'ACTIVE',
@@ -67,8 +58,7 @@ export const VehicleSearchFiltersDTO = {
   maxPrice: 0,
   currency: 'TRY',
   
-  // Vehicle specific filters
-  brands: [],
+    brands: [],
   minYear: 0,
   maxYear: 0,
   maxMileage: 0,
@@ -78,28 +68,24 @@ export const VehicleSearchFiltersDTO = {
   gearTypes: [],
   seatCounts: [],
   
-  // Sorting
-  sortBy: 'createdAt',
+    sortBy: 'createdAt',
   sortDirection: 'DESC',
   
-  // Pagination
-  page: 0,
+    page: 0,
   size: 20,
 };
 
 
 export const createVehicleCreateRequest = (data) => {
   return {
-    // Basic Info
-    title: (data.title || '').trim(),
+        title: (data.title || '').trim(),
     description: (data.description || '').trim(),
     price: parseFloat(data.price) || 0,
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
     
-    // Vehicle Specs
-    brand: data.brand || '',
+        brand: data.brand || '',
     model: (data.model || '').trim(),
     year: parseInt(data.year) || 0,
     mileage: parseInt(data.mileage) || 0,
@@ -121,8 +107,7 @@ export const createVehicleCreateRequest = (data) => {
 export const createVehicleUpdateRequest = (data) => {
   const updateData = {};
   
-  // Only include fields that are provided and not empty
-  if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
+    if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
   if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
   if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;

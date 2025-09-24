@@ -21,9 +21,7 @@ public class VerificationService implements IVerificationService {
 
    @Override
     public String generateCode() {
-        int min = (int) Math.pow(10, CODE_LENGTH - 1); // 100000
-        int max = (int) Math.pow(10, CODE_LENGTH) - 1; // 999999
-        int code = secureRandom.nextInt((max - min) + 1) + min;
+        int min = (int) Math.pow(10, CODE_LENGTH - 1);         int max = (int) Math.pow(10, CODE_LENGTH) - 1;         int code = secureRandom.nextInt((max - min) + 1) + min;
         return String.valueOf(code);
     }
 

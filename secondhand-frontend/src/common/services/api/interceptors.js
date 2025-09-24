@@ -21,7 +21,6 @@ const showTokenExpiredMessage = () => {
     console.error('Session Expired. Please Login again.');
 };
 
-// AuthContext ref
 let authContextRef = null;
 export const setAuthContextRef = (authContext) => {
     authContextRef = authContext;
@@ -29,16 +28,13 @@ export const setAuthContextRef = (authContext) => {
 
 apiClient.interceptors.request.use(
     (config) => {
-        // With cookie-based auth, only add Authorization header if we're not using cookies
-        // This allows backward compatibility with token-based clients
-        if (!isCookieBasedAuth()) {
+                        if (!isCookieBasedAuth()) {
             const token = getToken();
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
         }
-        // For cookie-based auth, credentials are automatically sent with cookies
-        config.withCredentials = true;
+                config.withCredentials = true;
         return config;
     },
     (error) => Promise.reject(error)
@@ -49,8 +45,7 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Auth endpoint'leri skip et
-        const AUTH = API_ENDPOINTS.AUTH;
+                const AUTH = API_ENDPOINTS.AUTH;
         const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
             .some(path => originalRequest.url?.includes(path));
 
@@ -58,11 +53,9 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // 401/403 için token refresh
-        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+                if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             
-            // Don't try to refresh for validation endpoint failures (infinite loop prevention)
-            if (originalRequest.url?.includes('/validate')) {
+                        if (originalRequest.url?.includes('/validate')) {
                 console.debug('Validation endpoint failed, not attempting refresh');
                 return Promise.reject(error);
             }
@@ -84,34 +77,26 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                // For cookie-based auth, refresh token is handled automatically via cookies
-                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-                    {}, // Empty body since refresh token is in HttpOnly cookie
-                    {
+                                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+                    {},                     {
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        withCredentials: true, // Include cookies
-                        timeout: 10000
+                        withCredentials: true,                         timeout: 10000
                     }
                 );
 
-                // For cookie-based auth, new tokens are set in cookies by server
-                // For backward compatibility, check if tokens are in response
-                const newAccessToken = response.data.accessToken;
+                                                const newAccessToken = response.data.accessToken;
                 const newRefreshToken = response.data.refreshToken;
 
                 if (newAccessToken && newRefreshToken) {
-                    // Non-cookie mode: store tokens
-                    setTokens(newAccessToken, newRefreshToken);
+                                        setTokens(newAccessToken, newRefreshToken);
                     processQueue(null, newAccessToken);
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 } else {
-                    // Cookie mode: tokens are already set by server
-                    processQueue(null, 'cookie-based');
-                    // Remove Authorization header for cookie-based requests
-                    delete originalRequest.headers.Authorization;
+                                        processQueue(null, 'cookie-based');
+                                        delete originalRequest.headers.Authorization;
                 }
 
                 if (authContextRef?.handleTokenRefresh) {

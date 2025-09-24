@@ -19,20 +19,17 @@ export const validateRegisterForm = (formData, acceptedAgreements, agreements) =
     errors.email = 'Please enter a valid email address';
   }
 
-  // Phone validation
-  if (!formData.phone?.trim()) {
+    if (!formData.phone?.trim()) {
     errors.phone = 'Phone number is required';
   } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ''))) {
     errors.phone = 'Please enter a valid phone number';
   }
 
-  // Gender validation
-  if (!formData.gender) {
+    if (!formData.gender) {
     errors.gender = 'Gender is required';
   }
 
-  // Password validation
-  if (!formData.password) {
+    if (!formData.password) {
     errors.password = 'Password is required';
   } else if (formData.password.length < 8) {
     errors.password = 'Password must be at least 8 characters';
@@ -40,13 +37,11 @@ export const validateRegisterForm = (formData, acceptedAgreements, agreements) =
     errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
   }
 
-  // Confirm password validation
-  if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
     errors.confirmPassword = 'Passwords do not match';
   }
 
-  // Agreements validation
-  if (acceptedAgreements.size !== agreements.length) {
+    if (acceptedAgreements.size !== agreements.length) {
     errors.agreements = 'You must accept all agreements to register';
   }
 

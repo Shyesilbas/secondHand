@@ -15,8 +15,7 @@ export const useElectronic = (electronicId = null) => {
     entityName: 'Electronic'
   });
 
-  // Map entity to electronic for backward compatibility
-  return {
+    return {
     ...result,
     electronic: result.entity,
     fetchElectronic: result.fetchEntity,
@@ -26,7 +25,6 @@ export const useElectronic = (electronicId = null) => {
   };
 };
 
-// Hook for electronic search operations
 export const useElectronicSearch = () => {
   const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
   
@@ -36,8 +34,7 @@ export const useElectronicSearch = () => {
     defaultData: []
   });
 
-  // Map entities to electronics for backward compatibility
-  return {
+    return {
     ...result,
     electronics: result.entities,
     searchByType: result.searchByCriteria

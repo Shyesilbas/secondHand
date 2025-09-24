@@ -39,8 +39,7 @@ public class RealEstateListingServiceImpl implements RealEstateListingFilterServ
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        // Query for results - Use VehicleListing directly since it extends Listing
-        CriteriaQuery<RealEstateListing> query = cb.createQuery(RealEstateListing.class);
+                CriteriaQuery<RealEstateListing> query = cb.createQuery(RealEstateListing.class);
         Root<RealEstateListing> root = query.from(RealEstateListing.class);
 
         List<Predicate> predicates = buildPredicates(cb, root, filters);
@@ -55,8 +54,7 @@ public class RealEstateListingServiceImpl implements RealEstateListingFilterServ
 
         List<RealEstateListing> results = typedQuery.getResultList();
 
-        // Count query for total
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<RealEstateListing> countRoot = countQuery.from(RealEstateListing.class);
 
         List<Predicate> countPredicates = buildPredicates(cb, countRoot, filters);
@@ -66,8 +64,7 @@ public class RealEstateListingServiceImpl implements RealEstateListingFilterServ
 
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
-        // Convert to DTOs
-        List<ListingDto> dtos = results.stream()
+                List<ListingDto> dtos = results.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();
 
@@ -78,71 +75,59 @@ public class RealEstateListingServiceImpl implements RealEstateListingFilterServ
                                             RealEstateFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
 
-        // Sadece emlak ilanlarını getir
-        predicates.add(cb.equal(root.get("listingType"), ListingType.REAL_ESTATE));
+                predicates.add(cb.equal(root.get("listingType"), ListingType.REAL_ESTATE));
 
-        // Ortak filtreler (fiyat, şehir, district vs.)
-        predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
+                predicates.addAll(FilterHelper.buildBasePredicates(cb, root, filters));
 
-        // Isınma türü
-        if (filters.getHeatingTypes() != null && !filters.getHeatingTypes().isEmpty()) {
+                if (filters.getHeatingTypes() != null && !filters.getHeatingTypes().isEmpty()) {
             predicates.add(root.get("heatingType").in(filters.getHeatingTypes()));
         }
 
-        // Emlak tipi (daire, villa, arsa vs.)
-        if (filters.getRealEstateTypes() != null && !filters.getRealEstateTypes().isEmpty()) {
+                if (filters.getRealEstateTypes() != null && !filters.getRealEstateTypes().isEmpty()) {
             predicates.add(root.get("realEstateType").in(filters.getRealEstateTypes()));
         }
 
-        // Kat bilgisi
-        if (filters.getFloor() != null) {
+                if (filters.getFloor() != null) {
             predicates.add(cb.equal(root.get("floor"), filters.getFloor()));
         }
 
-        // İlan tipi (kiralık/satılık)
-        if (filters.getAdType() != null) {
+                if (filters.getAdType() != null) {
             predicates.add(cb.equal(root.get("adType"), filters.getAdType()));
         }
 
-        // Sahibinden / emlakçıdan
-        if (filters.getOwnerType() != null) {
+                if (filters.getOwnerType() != null) {
             predicates.add(cb.equal(root.get("ownerType"), filters.getOwnerType()));
         }
 
-        // Metrekare aralığı
-        if (filters.getMinSquareMeters() != null) {
+                if (filters.getMinSquareMeters() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("squareMeters"), filters.getMinSquareMeters()));
         }
         if (filters.getMaxSquareMeters() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("squareMeters"), filters.getMaxSquareMeters()));
         }
 
-        // Oda sayısı aralığı
-        if (filters.getMinRoomCount() != null) {
+                if (filters.getMinRoomCount() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("roomCount"), filters.getMinRoomCount()));
         }
         if (filters.getMaxRoomCount() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("roomCount"), filters.getMaxRoomCount()));
         }
 
-        // Banyo sayısı aralığı
-        if (filters.getMinBathroomCount() != null) {
+                if (filters.getMinBathroomCount() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("bathroomCount"), filters.getMinBathroomCount()));
         }
         if (filters.getMaxBathroomCount() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("bathroomCount"), filters.getMaxBathroomCount()));
         }
 
-        // Bina yaşı aralığı
-        if (filters.getMinBuildingAge() != null) {
+                if (filters.getMinBuildingAge() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("buildingAge"), filters.getMinBuildingAge()));
         }
         if (filters.getMaxBuildingAge() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("buildingAge"), filters.getMaxBuildingAge()));
         }
 
-        // Eşyalı mı?
-        if (filters.isFurnished()) {
+                if (filters.isFurnished()) {
             predicates.add(cb.equal(root.get("furnished"), true));
         }
 
@@ -164,13 +149,11 @@ public class RealEstateListingServiceImpl implements RealEstateListingFilterServ
                 case "squaremeters", "square_meters" -> root.get("squareMeters");
                 case "roomcount", "room_count" -> root.get("roomCount");
                 case "buildingage", "building_age" -> root.get("buildingAge");
-                default -> root.get("createdAt"); // default fallback
-            };
+                default -> root.get("createdAt");             };
 
             orders.add(isDesc ? cb.desc(sortExpression) : cb.asc(sortExpression));
         } else {
-            // Varsayılan sıralama: en yeni ilan en üstte
-            orders.add(cb.desc(root.get("createdAt")));
+                        orders.add(cb.desc(root.get("createdAt")));
         }
 
         return orders;

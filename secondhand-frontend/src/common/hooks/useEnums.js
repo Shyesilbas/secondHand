@@ -43,16 +43,14 @@ export const useEnums = () => {
         setIsLoading(true);
         setError(null);
         
-        // Try to get cached enums first
-        const cachedEnums = getCachedEnums();
+                const cachedEnums = getCachedEnums();
         if (cachedEnums) {
           setEnums(cachedEnums);
           setIsLoading(false);
           return;
         }
         
-        // If no cache, fetch from API
-        console.log('Fetching enums from API...');
+                console.log('Fetching enums from API...');
         const [
           listingTypes,
           listingStatuses,
@@ -148,8 +146,7 @@ export const useEnums = () => {
         };
 
         setEnums(fetchedEnums);
-        // Cache the fetched enums
-        setCachedEnums(fetchedEnums);
+                setCachedEnums(fetchedEnums);
       } catch (err) {
         setError(err.response?.data?.message || 'An error occurred while fetching enums.');
         console.error('Error fetching enums:', err);
@@ -161,8 +158,7 @@ export const useEnums = () => {
     fetchAllEnums();
   }, []);
 
-  // Helper functions to get labels by value
-  const getListingTypeLabel = (value) => {
+    const getListingTypeLabel = (value) => {
     const type = enums.listingTypes.find(t => t.value === value);
     return type?.label || value;
   };
@@ -197,7 +193,6 @@ export const useEnums = () => {
     return currency?.symbol || value;
   };
 
-  // Function to force refresh enums from API
 
   const refreshEnums = async () => {
     clearEnumCache();

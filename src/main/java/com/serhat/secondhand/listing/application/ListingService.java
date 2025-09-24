@@ -111,10 +111,7 @@ public class ListingService {
         return new PageImpl<>(dtos, result.getPageable(), result.getTotalElements());
     }
 
-    /**
-     * Generic method to fetch listings, map to DTOs, and enrich with favorite stats
-     */
-    private List<ListingDto> getListingsGeneric(List<Listing> listings, String userEmail) {
+        private List<ListingDto> getListingsGeneric(List<Listing> listings, String userEmail) {
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .toList();

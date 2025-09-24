@@ -1,14 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * Generic Entity Hook for CRUD operations
- * @param {Object} config - Entity configuration
- * @param {string} config.entityId - Entity ID
- * @param {Object} config.service - Service object with CRUD methods
- * @param {Object} config.defaultData - Default data for entity
- * @param {string} config.entityName - Human readable entity name for error messages
- * @returns {Object} - Entity state and operations
- */
 export const useEntity = (config) => {
   const { entityId = null, service, defaultData = null, entityName = 'Entity' } = config;
   
@@ -65,11 +56,9 @@ export const useEntity = (config) => {
       setError(null);
       const response = await service.updateEntity(id, entityData);
       
-      // Optimistic update: merge changes locally to avoid full page refresh
-      setEntity(prev => ({ ...prev, ...(entityData || {}) }));
+            setEntity(prev => ({ ...prev, ...(entityData || {}) }));
       
-      // Also refetch in background to stay consistent with backend
-      fetchEntity(id);
+            fetchEntity(id);
       
       return response;
     } catch (err) {

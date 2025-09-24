@@ -12,8 +12,7 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Use the new filter management hook
-  const {
+    const {
     filters,
     updateFilters,
     updatePage,
@@ -22,8 +21,7 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
     getActiveFilterCount
   } = useListingFilters(initialFilters, listingType);
 
-  // Memoize cleaned filters to prevent unnecessary API calls
-  const cleanedFilters = useMemo(() => {
+    const cleanedFilters = useMemo(() => {
     return cleanObject(filters);
   }, [filters]);
 
@@ -32,8 +30,7 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
       setIsLoading(true);
       setError(null);
       
-      // Use smart filtering that automatically chooses the right endpoint
-      const response = await listingService.filterListings(newFilters);
+            const response = await listingService.filterListings(newFilters);
       
       setListings(response.content || []);
       setTotalPages(response.totalPages || 0);
@@ -46,8 +43,7 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
       setError(errorMessage);
       console.error('Error fetching listings with filters:', err);
       
-      // Reset listings on error
-      setListings([]);
+            setListings([]);
       setTotalPages(0);
       setTotalElements(0);
       setCurrentPage(0);
@@ -72,11 +68,9 @@ export const useAdvancedListings = (initialFilters = {}, listingType = null) => 
     fetchListings();
   }, [fetchListings]);
 
-  // Fetch listings when cleaned filters change
-  useEffect(() => {
+    useEffect(() => {
     fetchListings();
-  }, [cleanedFilters]); // Fixed: Use cleanedFilters instead of fetchListings to prevent infinite loop
-
+  }, [cleanedFilters]);
   return {
     listings,
     totalPages,

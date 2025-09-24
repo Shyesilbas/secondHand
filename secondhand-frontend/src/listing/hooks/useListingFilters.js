@@ -16,8 +16,7 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
     if (listingType) {
       baseFilters.listingType = listingType;
       
-      // Use specific DTOs for better type safety
-      if (listingType === 'VEHICLE') {
+            if (listingType === 'VEHICLE') {
         return { ...VehicleListingFilterDTO, ...initialFilters };
       } else if (listingType === 'ELECTRONICS') {
         return { ...ElectronicListingFilterDTO, ...initialFilters };
@@ -31,8 +30,7 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
         return { ...SportsListingFilterDTO, ...initialFilters };
       }
       else {
-        // For other categories, return empty result
-        return { 
+                return { 
           type: listingType,
           listingType: listingType,
           status: 'ACTIVE',

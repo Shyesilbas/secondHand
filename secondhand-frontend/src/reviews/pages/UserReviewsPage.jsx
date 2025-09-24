@@ -6,17 +6,14 @@ const UserReviewsPage = () => {
     const { userId } = useParams();
     const location = useLocation();
     
-    // Determine which API to use based on the URL path
-    const isReceivedReviews = location.pathname.includes('/reviews/received/');
+        const isReceivedReviews = location.pathname.includes('/reviews/received/');
     const isGivenReviews = location.pathname.includes('/reviews/given/');
     
-    // Use different hooks based on the URL
-    const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
+        const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
     const { reviews, loading, error, hasMore, loadMore } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 
-    // Determine the page title based on the URL
-    const getPageTitle = () => {
+        const getPageTitle = () => {
         if (isReceivedReviews) return 'I received';
         if (isGivenReviews) return 'My receives';
         return 'Reviews';

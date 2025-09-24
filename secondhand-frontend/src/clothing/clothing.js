@@ -1,6 +1,5 @@
 
 
-// DTO Types
 export const createClothingCreateRequest = (data) => ({
     title: data.title,
     description: data.description,
@@ -70,8 +69,7 @@ export const createClothingListingDto = (data) => ({
     sellerSurname: data.sellerSurname,
     sellerId: data.sellerId,
     type: data.type,
-    // Clothing specific fields
-    brand: data.brand,
+        brand: data.brand,
     clothingType: data.clothingType,
     color: data.color,
     purchaseDate: data.purchaseDate,
@@ -88,19 +86,16 @@ export const createClothingFilterRequest = (data) => ({
     maxPrice: parseFloat(data.maxPrice) || null,
     currency: data.currency || 'TRY',
     
-    // Clothing specific filters
-    brands: Array.isArray(data.brands) ? data.brands : [],
+        brands: Array.isArray(data.brands) ? data.brands : [],
     types: Array.isArray(data.types) ? data.types : [],
     colors: Array.isArray(data.colors) ? data.colors : [],
     conditions: Array.isArray(data.conditions) ? data.conditions : [],
     minPurchaseDate: data.minPurchaseDate || null,
     maxPurchaseDate: data.maxPurchaseDate || null,
     
-    // Sorting
-    sortBy: data.sortBy || 'createdAt',
+        sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
     
-    // Pagination
-    page: parseInt(data.page) || 0,
+        page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
 });

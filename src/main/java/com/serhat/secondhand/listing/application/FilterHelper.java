@@ -11,9 +11,6 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Utility class for common filter operations
- */
 public class FilterHelper {
 
 
@@ -34,29 +31,25 @@ public class FilterHelper {
     public static List<Predicate> buildBasePredicates(CriteriaBuilder cb, Root<?> root, ListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
 
-        // Status filter
-        if (filters.getStatus() != null) {
+                if (filters.getStatus() != null) {
             predicates.add(cb.equal(root.get("status"), filters.getStatus()));
         }
 
-        // City filter
-        if (filters.getCity() != null && !filters.getCity().trim().isEmpty()) {
+                if (filters.getCity() != null && !filters.getCity().trim().isEmpty()) {
             predicates.add(cb.like(
                 cb.lower(root.get("city")),
                 "%" + filters.getCity().toLowerCase() + "%"
             ));
         }
 
-        // District filter
-        if (filters.getDistrict() != null && !filters.getDistrict().trim().isEmpty()) {
+                if (filters.getDistrict() != null && !filters.getDistrict().trim().isEmpty()) {
             predicates.add(cb.like(
                 cb.lower(root.get("district")),
                 "%" + filters.getDistrict().toLowerCase() + "%"
             ));
         }
 
-        // Price range filters
-        if (filters.getMinPrice() != null) {
+                if (filters.getMinPrice() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filters.getMinPrice()));
         }
 
@@ -64,8 +57,7 @@ public class FilterHelper {
             predicates.add(cb.lessThanOrEqualTo(root.get("price"), filters.getMaxPrice()));
         }
 
-        // Currency filter
-        if (filters.getCurrency() != null) {
+                if (filters.getCurrency() != null) {
             predicates.add(cb.equal(root.get("currency"), filters.getCurrency()));
         }
 

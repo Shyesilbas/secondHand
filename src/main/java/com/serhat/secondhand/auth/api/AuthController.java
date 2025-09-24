@@ -48,12 +48,10 @@ public class AuthController {
         log.info("Login request for email: {}", request.email());
         LoginResponse response = authService.login(request);
         
-        // Set secure cookies for tokens
-        cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
+                cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
         cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());
         
-        // Return response without tokens (they're in cookies now)
-        Map<String, Object> responseMap = Map.of(
+                Map<String, Object> responseMap = Map.of(
             "message", response.getMessage(),
             "userId", response.getUserId(),
             "email", response.getEmail(),
@@ -80,8 +78,7 @@ public class AuthController {
         log.info("Logout request for user: {}", authentication.getName());
         Map<String, String> response = authService.logout(authentication, request);
         
-        // Clear authentication cookies
-        cookieUtils.clearAuthCookies(httpResponse);
+                cookieUtils.clearAuthCookies(httpResponse);
         
         log.info("Logout successful for user: {}, cookies cleared", authentication.getName());
         return ResponseEntity.ok(response);
@@ -93,18 +90,15 @@ public class AuthController {
             HttpServletResponse httpResponse) {
         log.info("Token refresh request");
         
-        // Get refresh token from cookie
-        String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
+                String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found in cookies"));
         
         LoginResponse response = authService.refreshToken(refreshToken);
         
-        // Set new tokens in cookies
-        cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
+                cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
         cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());
         
-        // Return response without tokens
-        Map<String, Object> responseMap = Map.of(
+                Map<String, Object> responseMap = Map.of(
             "message", response.getMessage(),
             "userId", response.getUserId(),
             "email", response.getEmail(),
@@ -139,12 +133,10 @@ public class AuthController {
         log.info("Completing OAuth registration for email: {}", request.getEmail());
         LoginResponse response = authService.completeOAuthRegistration(request);
         
-        // Set secure cookies for tokens
-        cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
+                cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
         cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());
         
-        // Return response without tokens
-        Map<String, Object> responseMap = Map.of(
+                Map<String, Object> responseMap = Map.of(
             "message", response.getMessage(),
             "userId", response.getUserId(),
             "email", response.getEmail(),
@@ -161,22 +153,19 @@ public class AuthController {
         
         Map<String, Object> debugInfo = new java.util.HashMap<>();
         
-        // Check for access token
-        var accessToken = cookieUtils.getAccessTokenFromCookies(request);
+                var accessToken = cookieUtils.getAccessTokenFromCookies(request);
         debugInfo.put("hasAccessToken", accessToken.isPresent());
         if (accessToken.isPresent()) {
             debugInfo.put("accessTokenLength", accessToken.get().length());
         }
         
-        // Check for refresh token
-        var refreshToken = cookieUtils.getRefreshTokenFromCookies(request);
+                var refreshToken = cookieUtils.getRefreshTokenFromCookies(request);
         debugInfo.put("hasRefreshToken", refreshToken.isPresent());
         if (refreshToken.isPresent()) {
             debugInfo.put("refreshTokenLength", refreshToken.get().length());
         }
         
-        // All cookies
-        if (request.getCookies() != null) {
+                if (request.getCookies() != null) {
             debugInfo.put("totalCookies", request.getCookies().length);
             java.util.List<String> cookieNames = java.util.Arrays.stream(request.getCookies())
                     .map(jakarta.servlet.http.Cookie::getName)
@@ -205,8 +194,7 @@ public class AuthController {
         log.info("Revoke all sessions request for user: {}", authentication.getName());
         Map<String, String> response = authService.revokeAllSessions(authentication, request);
         
-        // Clear authentication cookies
-        cookieUtils.clearAuthCookies(httpResponse);
+                cookieUtils.clearAuthCookies(httpResponse);
         
         log.info("All sessions revoked for user: {}, cookies cleared", authentication.getName());
         return ResponseEntity.ok(response);

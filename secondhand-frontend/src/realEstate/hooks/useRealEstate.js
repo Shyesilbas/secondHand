@@ -25,7 +25,6 @@ export const useRealEstate = (realEstateId = null) => {
   };
 };
 
-// Hook for real estate search operations
 export const useRealEstateSearch = () => {
   const realEstateServiceAdapter = useMemo(() => createRealEstateServiceAdapter(realEstateService), []);
   
@@ -35,8 +34,7 @@ export const useRealEstateSearch = () => {
     defaultData: []
   });
 
-  // Map entities to realEstates for backward compatibility
-  return {
+    return {
     ...result,
     realEstates: result.entities
   };

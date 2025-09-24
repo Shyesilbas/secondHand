@@ -26,8 +26,7 @@ export const createSportsCreateRequest = (data) => ({
   currency: data.currency || 'TRY',
   city: data.city,
   district: data.district,
-  discipline: data.sportType, // Map sportType to discipline
-  equipmentType: data.equipmentType,
+  discipline: data.sportType,   equipmentType: data.equipmentType,
   condition: data.condition,
 });
 
@@ -38,8 +37,7 @@ export const createSportsUpdateRequest = (data) => ({
   currency: data.currency ?? undefined,
   city: data.city ?? undefined,
   district: data.district ?? undefined,
-  discipline: data.sportType ?? undefined, // Map sportType to discipline
-  equipmentType: data.equipmentType ?? undefined,
+  discipline: data.sportType ?? undefined,   equipmentType: data.equipmentType ?? undefined,
   condition: data.condition ?? undefined,
 });
 

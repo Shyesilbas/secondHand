@@ -41,29 +41,24 @@ public class ReviewService {
     public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewer.getId());
 
-        // Validate order item exists and belongs to user
-        OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
+                OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
                 .orElseThrow(() -> new RuntimeException("Order item not found"));
 
         if (!orderItem.getOrder().getUser().getId().equals(reviewer.getId())) {
             throw new RuntimeException("Order item does not belong to user");
         }
 
-        // Check if order is delivered
-        if (orderItem.getOrder().getShippingStatus() != ShippingStatus.DELIVERED) {
+                if (orderItem.getOrder().getShippingStatus() != ShippingStatus.DELIVERED) {
             throw new RuntimeException("Can only review delivered orders");
         }
 
-        // Check if review already exists
-        if (reviewRepository.existsByReviewerAndOrderItem(reviewer, orderItem)) {
+                if (reviewRepository.existsByReviewerAndOrderItem(reviewer, orderItem)) {
             throw new RuntimeException("Review already exists for this order item");
         }
 
-        // Get the seller (reviewed user)
-        User reviewedUser = orderItem.getListing().getSeller();
+                User reviewedUser = orderItem.getListing().getSeller();
 
-        // Create review
-        Review review = Review.builder()
+                Review review = Review.builder()
                 .reviewer(reviewer)
                 .reviewedUser(reviewedUser)
                 .orderItem(orderItem)
@@ -171,8 +166,7 @@ public class ReviewService {
         
         UUID uuid = UUID.fromString(listingId);
         
-        // Get reviews specifically for this listing (from users who bought this item)
-        Page<Review> reviews = reviewRepository.findByOrderItemListingIdOrderByCreatedAtDesc(uuid, pageable);
+                Page<Review> reviews = reviewRepository.findByOrderItemListingIdOrderByCreatedAtDesc(uuid, pageable);
         
         return reviews.map(reviewMapper::toDto);
     }
@@ -183,21 +177,17 @@ public class ReviewService {
         
         UUID uuid = UUID.fromString(listingId);
         
-        // First check if listing exists
-        Optional<Listing> listing = listingService.findById(uuid);
+                Optional<Listing> listing = listingService.findById(uuid);
         if (listing.isEmpty()) {
             throw new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND");
         }
         
-        // Get stats specifically for this listing
-        List<Object[]> statsList = reviewRepository.getListingReviewStats(uuid);
+                List<Object[]> statsList = reviewRepository.getListingReviewStats(uuid);
         
         if (statsList == null || statsList.isEmpty()) {
             return UserReviewStatsDto.builder()
                     .userId(listing.get().getSeller().getId())
-                    .userName(listing.get().getTitle()) // Use listing title instead of user name
-                    .userSurname("") // Empty for listing
-                    .totalReviews(0L)
+                    .userName(listing.get().getTitle())                     .userSurname("")                     .totalReviews(0L)
                     .averageRating(0.0)
                     .fiveStarReviews(0L)
                     .fourStarReviews(0L)
@@ -212,9 +202,7 @@ public class ReviewService {
         
         return UserReviewStatsDto.builder()
                 .userId(listing.get().getSeller().getId())
-                .userName(listing.get().getTitle()) // Use listing title
-                .userSurname("") // Empty for listing
-                .totalReviews((Long) stats[0])
+                .userName(listing.get().getTitle())                 .userSurname("")                 .totalReviews((Long) stats[0])
                 .averageRating(stats[1] != null ? (Double) stats[1] : 0.0)
                 .fiveStarReviews((Long) stats[2])
                 .fourStarReviews((Long) stats[3])

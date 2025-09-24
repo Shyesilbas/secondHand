@@ -6,8 +6,7 @@ export const useFetchData = (fetchFunction) => {
     const [error, setError] = useState(null);
 
     const fetchData = useCallback(async () => {
-        // We shouldn't try to fetch if there is no function
-        if (!fetchFunction) {
+                if (!fetchFunction) {
             setIsLoading(false);
             return;
         }

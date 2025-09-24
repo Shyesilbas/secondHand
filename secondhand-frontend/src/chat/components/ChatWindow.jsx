@@ -68,14 +68,12 @@ const ChatWindow = ({
         notification.showSuccess('Success', 'Message deleted successfully.');
     };
 
-    // Auto-mark messages as read when chat window is visible and has messages
-    useEffect(() => {
+        useEffect(() => {
         if (isOpen && selectedChatRoom?.id && messages.length > 0 && user?.id) {
             const timer = setTimeout(() => {
                 chatService.markMessagesAsRead(selectedChatRoom.id, user.id)
                     .catch(error => console.error('Error marking messages as read:', error));
-            }, 1000); // Mark as read after 1 second of viewing
-
+            }, 1000); 
             return () => clearTimeout(timer);
         }
     }, [isOpen, selectedChatRoom?.id, messages.length, user?.id]);

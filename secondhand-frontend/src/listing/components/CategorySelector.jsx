@@ -18,15 +18,13 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
         );
     }
 
-    // Prepare options for dropdown with icons
-    const categoryOptions = enums.listingTypes.map((type) => ({
+        const categoryOptions = enums.listingTypes.map((type) => ({
         value: type.value,
         label: `${type.icon || '📦'} ${type.label}`
     }));
 
     const handleCategoryChange = (values) => {
-        // Since this is single selection, take the first value
-        const selectedValue = values.length > 0 ? values[0] : null;
+                const selectedValue = values.length > 0 ? values[0] : null;
         onCategoryChange(selectedValue);
     };
 

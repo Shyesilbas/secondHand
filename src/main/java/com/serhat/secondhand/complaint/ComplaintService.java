@@ -64,8 +64,7 @@ public class ComplaintService {
     }
 
 
-    // Admin
-    @Transactional
+        @Transactional
     public Complaint updateComplaintStatus(String complaintId, ComplaintStatus newStatus, String adminNotes, User admin) {
         Complaint complaint = complaintRepository.findById(complaintId)
                 .orElseThrow(() -> new BusinessException(ComplaintErrorCodes.COMPLAINT_NOT_FOUND));

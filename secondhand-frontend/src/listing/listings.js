@@ -11,8 +11,7 @@ export const ListingDTO = {
   sellerName: '',
   sellerSurname: '',
   sellerId: 0,
-  type: '', // VEHICLE, ELECTRONICS, etc.
-  createdAt: '',
+  type: '',   createdAt: '',
   updatedAt: '',
 };
 
@@ -88,7 +87,6 @@ export const ListingFilterDTO = {
   size: 20,
 };
 
-// Vehicle-specific filter DTO
 export const VehicleListingFilterDTO = {
   type: 'VEHICLE',
   listingType: 'VEHICLE',
@@ -99,8 +97,7 @@ export const VehicleListingFilterDTO = {
   maxPrice: 0,
   currency: '',
   
-  // Vehicle-specific filters
-  brands: [],
+    brands: [],
   minYear: 0,
   maxYear: 0,
   maxMileage: 0,
@@ -117,7 +114,6 @@ export const VehicleListingFilterDTO = {
   size: 20,
 };
 
-// Electronics-specific filter DTO
 export const ElectronicListingFilterDTO = {
   type: 'ELECTRONICS',
   listingType: 'ELECTRONICS',
@@ -128,8 +124,7 @@ export const ElectronicListingFilterDTO = {
   maxPrice: 0,
   currency: '',
   
-  // Electronics-specific filters
-  electronicTypes: [],
+    electronicTypes: [],
   electronicBrands: [],
   minYear: 0,
   maxYear: 0,
@@ -142,7 +137,6 @@ export const ElectronicListingFilterDTO = {
   size: 20,
 };
 
-// Real Estate-specific filter DTO
 export const RealEstateListingFilterDTO = {
   type: 'REAL_ESTATE',
   listingType: 'REAL_ESTATE',
@@ -153,8 +147,7 @@ export const RealEstateListingFilterDTO = {
   maxPrice: 0,
   currency: '',
   
-  // Real Estate-specific filters
-  adType: '',
+    adType: '',
   realEstateTypes: [],
   heatingTypes: [],
   ownerType: '',
@@ -176,7 +169,6 @@ export const RealEstateListingFilterDTO = {
   size: 20,
 };
 
-// Clothing-specific filter DTO
 export const ClothingListingFilterDTO = {
   type: 'CLOTHING',
   listingType: 'CLOTHING',
@@ -187,8 +179,7 @@ export const ClothingListingFilterDTO = {
   maxPrice: 0,
   currency: '',
   
-  // Clothing-specific filters
-  brands: [],
+    brands: [],
   types: [],
   colors: [],
   conditions: [],
@@ -202,7 +193,6 @@ export const ClothingListingFilterDTO = {
   size: 20,
 };
 
-// Listing Statistics DTO
 export const ListingStatisticsDTO = {
   totalListings: 0,
   activeListings: 0,
@@ -210,7 +200,6 @@ export const ListingStatisticsDTO = {
   activeCityCount: 0,
 };
 
-// Listing Response DTO (for general listings)
 export const ListingResponseDTO = {
   id: '',
   listingNo: '',
@@ -224,16 +213,10 @@ export const ListingResponseDTO = {
   sellerName: '',
   sellerSurname: '',
   sellerId: 0,
-  type: '', // VEHICLE, ELECTRONICS, etc.
-  createdAt: '',
+  type: '',   createdAt: '',
   updatedAt: '',
 };
 
-/**
- * Create Vehicle Filter Request DTO with validation
- * @param {Object} data - Filter data
- * @returns {Object} - Validated Vehicle Filter DTO
- */
 export const createVehicleFilterRequest = (data) => {
   const payload = {
     type: 'VEHICLE',
@@ -243,8 +226,7 @@ export const createVehicleFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    // Vehicle specific filters
-    brands: Array.isArray(data.brands) ? data.brands : [],
+        brands: Array.isArray(data.brands) ? data.brands : [],
     minYear: parseInt(data.minYear) || null,
     maxYear: parseInt(data.maxYear) || null,
     maxMileage: parseInt(data.maxMileage) || null,
@@ -253,22 +235,15 @@ export const createVehicleFilterRequest = (data) => {
     doors: data.doors || null,
     gearTypes: Array.isArray(data.gearTypes) ? data.gearTypes : [],
     seatCounts: Array.isArray(data.seatCounts) ? data.seatCounts : [],
-    // Sorting
-    sortBy: data.sortBy || 'createdAt',
+        sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    // Pagination
-    page: parseInt(data.page) || 0,
+        page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
   if (data.currency) payload.currency = data.currency;
   return payload;
 };
 
-/**
- * Create Electronics Filter Request DTO with validation
- * @param {Object} data - Filter data
- * @returns {Object} - Validated Electronics Filter DTO
- */
 export const createElectronicsFilterRequest = (data) => {
   const payload = {
     type: 'ELECTRONICS',
@@ -278,28 +253,20 @@ export const createElectronicsFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    // Electronics specific filters
-    electronicTypes: Array.isArray(data.electronicTypes) ? data.electronicTypes : [],
+        electronicTypes: Array.isArray(data.electronicTypes) ? data.electronicTypes : [],
     electronicBrands: Array.isArray(data.electronicBrands) ? data.electronicBrands : [],
     minYear: parseInt(data.minYear) || null,
     maxYear: parseInt(data.maxYear) || null,
     colors: Array.isArray(data.colors) ? data.colors : [],
-    // Sorting
-    sortBy: data.sortBy || 'createdAt',
+        sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    // Pagination
-    page: parseInt(data.page) || 0,
+        page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
   if (data.currency) payload.currency = data.currency;
   return payload;
 };
 
-/**
- * Create Real Estate Filter Request DTO with validation
- * @param {Object} data - Filter data
- * @returns {Object} - Validated Real Estate Filter DTO
- */
 export const createRealEstateFilterRequest = (data) => {
   const payload = {
     type: 'REAL_ESTATE',
@@ -309,8 +276,7 @@ export const createRealEstateFilterRequest = (data) => {
     district: data.district?.trim() || '',
     minPrice: parseFloat(data.minPrice) || null,
     maxPrice: parseFloat(data.maxPrice) || null,
-    // Real Estate specific filters
-    adType: data.adType || null,
+        adType: data.adType || null,
     realEstateTypes: Array.isArray(data.realEstateTypes) ? data.realEstateTypes : [],
     heatingTypes: Array.isArray(data.heatingTypes) ? data.heatingTypes : [],
     ownerType: data.ownerType || null,
@@ -324,11 +290,9 @@ export const createRealEstateFilterRequest = (data) => {
     minBuildingAge: parseInt(data.minBuildingAge) || null,
     maxBuildingAge: parseInt(data.maxBuildingAge) || null,
     furnished: Boolean(data.furnished),
-    // Sorting
-    sortBy: data.sortBy || 'createdAt',
+        sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
-    // Pagination
-    page: parseInt(data.page) || 0,
+        page: parseInt(data.page) || 0,
     size: parseInt(data.size) || 20,
   };
   if (data.currency) payload.currency = data.currency;

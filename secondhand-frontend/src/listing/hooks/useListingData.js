@@ -2,12 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { listingService } from '../services/listingService.js';
 import { ERROR_MESSAGES } from '../types/index.js';
 
-/**
- * Custom hook for fetching listing data with loading states and error handling
- * @param {string|number} listingId - The listing ID to fetch
- * @param {boolean} autoFetch - Whether to auto-fetch on mount (default: true)
- * @returns {Object} - { listing, isLoading, error, refetch }
- */
 export const useListingData = (listingId, autoFetch = true) => {
   const [listing, setListing] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,12 +55,6 @@ export const useListingData = (listingId, autoFetch = true) => {
   };
 };
 
-/**
- * Custom hook for fetching multiple listings with pagination
- * @param {Function} fetchFunction - The function to fetch listings 
- * @param {Object} initialFilters - Initial filter values
- * @returns {Object} - { listings, totalPages, totalElements, currentPage, isLoading, error, refetch }
- */
 export const useListingsData = (fetchFunction, initialFilters = {}) => {
   const [listings, setListings] = useState([]);
   const [totalPages, setTotalPages] = useState(0);

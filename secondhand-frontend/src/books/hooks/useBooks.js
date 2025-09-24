@@ -15,8 +15,7 @@ export const useBooks = (bookId = null) => {
     entityName: 'Books'
   });
 
-  // Map entity to book for backward compatibility
-  return {
+    return {
     ...result,
     book: result.entity,
     fetchBook: result.fetchEntity,

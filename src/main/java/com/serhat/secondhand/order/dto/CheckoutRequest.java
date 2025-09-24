@@ -16,10 +16,8 @@ public class CheckoutRequest {
     @NotNull(message = "Shipping address ID is required")
     private Long shippingAddressId;
 
-    private Long billingAddressId; // Optional, if not provided, use shipping address
-
+    private Long billingAddressId; 
     private String notes;
 
-    // Optional: defaults to CREDIT_CARD if not provided
-    private PaymentType paymentType;
+        private PaymentType paymentType;
 }
