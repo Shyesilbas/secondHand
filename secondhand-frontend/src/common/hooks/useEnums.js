@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { enumService } from '../services/enumService.js';
-import { getCachedEnums, setCachedEnums, clearEnumCache } from '../services/storage/enumCache.js';
+import { getCachedEnums, setCachedEnums, clearEnumCache, forceClearEnumCache } from '../services/storage/enumCache.js';
 
 export const useEnums = () => {
   const [enums, setEnums] = useState({
@@ -33,6 +33,8 @@ export const useEnums = () => {
     shippingStatuses: [],
     emailTypes: [],
     genders: [],
+    auditEventTypes: [],
+    auditEventStatuses: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,9 +47,14 @@ export const useEnums = () => {
         
                 const cachedEnums = getCachedEnums();
         if (cachedEnums) {
-          setEnums(cachedEnums);
-          setIsLoading(false);
-          return;
+          if (!cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses) {
+            console.log('Cached enums missing audit enums, clearing cache and refetching...');
+            forceClearEnumCache();
+          } else {
+            setEnums(cachedEnums);
+            setIsLoading(false);
+            return;
+          }
         }
         
                 console.log('Fetching enums from API...');
@@ -80,7 +87,9 @@ export const useEnums = () => {
           paymentTypes,
           shippingStatuses,
           emailTypes,
-          genders
+          genders,
+          auditEventTypes,
+          auditEventStatuses
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -111,6 +120,8 @@ export const useEnums = () => {
           enumService.getShippingStatuses(),
           enumService.getEmailTypes(),
           enumService.getGenders(),
+          enumService.getAuditEventTypes(),
+          enumService.getAuditEventStatuses(),
         ]);
 
         const fetchedEnums = {
@@ -143,6 +154,8 @@ export const useEnums = () => {
           shippingStatuses,
           emailTypes,
           genders,
+          auditEventTypes,
+          auditEventStatuses,
         };
 
         setEnums(fetchedEnums);
@@ -219,7 +232,20 @@ export const useEnums = () => {
         ownerTypes,
         clothingBrands,
         clothingTypes,
-        clothingConditions
+        clothingConditions,
+        bookGenres,
+        bookLanguages,
+        bookFormats,
+        bookConditions,
+        sportDisciplines,
+        sportEquipmentTypes,
+        sportConditions,
+        paymentTypes,
+        shippingStatuses,
+        emailTypes,
+        genders,
+        auditEventTypes,
+        auditEventStatuses
       ] = await Promise.all([
         enumService.getListingTypes(),
         enumService.getListingStatuses(),
@@ -238,7 +264,20 @@ export const useEnums = () => {
         enumService.getOwnerTypes(),
         enumService.getClothingBrands(),
         enumService.getClothingTypes(),
-        enumService.getClothingConditions()
+        enumService.getClothingConditions(),
+        enumService.getBookGenres(),
+        enumService.getBookLanguages(),
+        enumService.getBookFormats(),
+        enumService.getBookConditions(),
+        enumService.getSportDisciplines(),
+        enumService.getSportEquipmentTypes(),
+        enumService.getSportConditions(),
+        enumService.getPaymentTypes(),
+        enumService.getShippingStatuses(),
+        enumService.getEmailTypes(),
+        enumService.getGenders(),
+        enumService.getAuditEventTypes(),
+        enumService.getAuditEventStatuses()
       ]);
 
       const freshEnums = {
@@ -259,7 +298,20 @@ export const useEnums = () => {
         ownerTypes,
         clothingBrands,
         clothingTypes,
-        clothingConditions
+        clothingConditions,
+        bookGenres,
+        bookLanguages,
+        bookFormats,
+        bookConditions,
+        sportDisciplines,
+        sportEquipmentTypes,
+        sportConditions,
+        paymentTypes,
+        shippingStatuses,
+        emailTypes,
+        genders,
+        auditEventTypes,
+        auditEventStatuses
       };
 
       setEnums(freshEnums);

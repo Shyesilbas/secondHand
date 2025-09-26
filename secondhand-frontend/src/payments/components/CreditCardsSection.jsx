@@ -3,6 +3,7 @@ import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import CreditCardItem from './CreditCardItem.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useCreditCard } from '../hooks/useCreditCard.js';
+import { formatCurrency } from '../../common/formatters.js';
 
 const CreditCardsSection = () => {
     const notification = useNotification();
@@ -111,7 +112,7 @@ const CreditCardsSection = () => {
 
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Credit Limit (TRY)
+                                    Credit Limit
                                 </label>
                                 <input
                                     type="number"
@@ -122,6 +123,11 @@ const CreditCardsSection = () => {
                                     value={creditCardLimit}
                                     onChange={(e) => setCreditCardLimit(e.target.value)}
                                 />
+                                {creditCardLimit && !isNaN(parseFloat(creditCardLimit)) && (
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Preview: {formatCurrency(parseFloat(creditCardLimit))}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex space-x-3">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDateTime, replaceEnumCodesInHtml } from '../../common/formatters.js';
+import { formatDateTime, replaceEnumCodesInHtml, formatPricesInHtml } from '../../common/formatters.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 
 const EmailContent = ({ email }) => {
@@ -51,7 +51,10 @@ const EmailContent = ({ email }) => {
                     <div 
                         className="text-text-secondary leading-relaxed"
                         dangerouslySetInnerHTML={{ 
-                            __html: replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>') 
+                            __html: formatPricesInHtml(
+                                replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>'),
+                                'TRY'
+                            )
                         }}
                     />
                 </div>

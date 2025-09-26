@@ -3,6 +3,7 @@ import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import { bankService } from '../services/bankService.js';
+import { formatCurrency } from '../../common/formatters.js';
 
 const EWalletSection = () => {
     const notification = useNotification();
@@ -125,13 +126,13 @@ const EWalletSection = () => {
                         <div className="bg-gray-50 rounded-lg p-4">
                             <p className="text-sm text-gray-500">Current Balance</p>
                             <p className="text-2xl font-bold text-gray-900">
-                                {eWallet.balance?.toFixed(2) || '0.00'} TL
+                                {formatCurrency(eWallet.balance || 0)}
                             </p>
                         </div>
                         <div className="bg-gray-50 rounded-lg p-4">
                             <p className="text-sm text-gray-500">Wallet Limit</p>
                             <p className="text-lg font-semibold text-gray-900">
-                                {eWallet.limit ? `${eWallet.limit.toFixed(2)} TL` : 'No limit'}
+                                {eWallet.limit ? formatCurrency(eWallet.limit) : 'No limit'}
                             </p>
                         </div>
                     </div>

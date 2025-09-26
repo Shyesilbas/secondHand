@@ -12,11 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/audit-logs")
@@ -29,18 +27,22 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping("/user/{userEmail}")
-    @Operation(summary = "Get audit logs by user email", description = "Retrieve all audit logs for a specific user")
-    public ResponseEntity<List<AuditLog>> getAuditLogsByUserEmail(@PathVariable String userEmail) {
-        log.info("Fetching audit logs for user: {}", userEmail);
-        List<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userEmail);
+    @Operation(summary = "Get audit logs by user email", description = "Retrieve paginated audit logs for a specific user")
+    public ResponseEntity<Page<AuditLog>> getAuditLogsByUserEmail(
+            @PathVariable String userEmail,
+            @PageableDefault(size = 20) Pageable pageable) {
+        log.info("Fetching audit logs for user: {} with pagination", userEmail);
+        Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userEmail, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
     @GetMapping("/user/id/{userId}")
-    @Operation(summary = "Get audit logs by user ID", description = "Retrieve all audit logs for a specific user ID")
-    public ResponseEntity<List<AuditLog>> getAuditLogsByUserId(@PathVariable Long userId) {
-        log.info("Fetching audit logs for user ID: {}", userId);
-        List<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userId);
+    @Operation(summary = "Get audit logs by user ID", description = "Retrieve paginated audit logs for a specific user ID")
+    public ResponseEntity<Page<AuditLog>> getAuditLogsByUserId(
+            @PathVariable Long userId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        log.info("Fetching audit logs for user ID: {} with pagination", userId);
+        Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userId, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 

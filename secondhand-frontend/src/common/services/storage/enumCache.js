@@ -1,6 +1,6 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '1.9'; const REQUIRED_ENUM_KEYS = [
+const ENUM_CACHE_VERSION = '2.0'; const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
   'carBrands',
@@ -30,6 +30,8 @@ const ENUM_CACHE_VERSION = '1.9'; const REQUIRED_ENUM_KEYS = [
   'shippingStatuses',
   'emailTypes',
     'genders',
+  'auditEventTypes',
+  'auditEventStatuses',
 ];
 const CACHE_EXPIRY_HOURS = 24;
 export const getCachedEnums = () => {
@@ -92,5 +94,14 @@ export const clearEnumCache = () => {
         console.log('Enum cache cleared');
     } catch (error) {
         console.error('Error clearing enum cache:', error);
+    }
+};
+
+export const forceClearEnumCache = () => {
+    try {
+        localStorage.removeItem(ENUM_CACHE_KEY);
+        console.log('Enum cache force cleared - will refetch all enums including audit enums');
+    } catch (error) {
+        console.error('Error force clearing enum cache:', error);
     }
 };

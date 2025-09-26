@@ -35,7 +35,7 @@ const ClothingCreateForm = ({ onBack, initialData = null, isEdit = false, onUpda
   const renderStep = (stepId) => {
     switch (stepId) {
       case 1:
-        return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />;
+        return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />;
       case 2:
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

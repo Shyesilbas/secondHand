@@ -120,6 +120,14 @@ public class AuditLogService {
         return auditLogRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    public Page<AuditLog> getUserAuditLogs(String userEmail, Pageable pageable) {
+        return auditLogRepository.findByUserEmailOrderByCreatedAtDesc(userEmail, pageable);
+    }
+
+    public Page<AuditLog> getUserAuditLogs(Long userId, Pageable pageable) {
+        return auditLogRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+    }
+
     public Page<AuditLog> getAuditLogsByEventType(AuditLog.AuditEventType eventType, Pageable pageable) {
         return auditLogRepository.findByEventTypeOrderByCreatedAtDesc(eventType, pageable);
     }

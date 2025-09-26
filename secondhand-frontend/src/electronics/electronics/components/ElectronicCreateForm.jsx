@@ -101,7 +101,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                           <p className="text-sm text-slate-600">{steps[0].description}</p>
                         </div>
                       </div>
-                      <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
+                      <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
                     </div>
                 )}
 

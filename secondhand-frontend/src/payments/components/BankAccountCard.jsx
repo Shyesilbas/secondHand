@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { formatCurrency } from '../../common/formatters.js';
 
 const BankAccountCard = ({ account, onDelete, isDeleting }) => {
     return (
@@ -34,7 +35,7 @@ const BankAccountCard = ({ account, onDelete, isDeleting }) => {
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-text-secondary">Balance</span>
                             <span className="text-sm font-mono text-text-primary">
-                                {account.balance}
+                                {formatCurrency(account.balance)}
                             </span>
                         </div>
                     )}

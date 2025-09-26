@@ -49,7 +49,7 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                     <p className="text-sm text-slate-600">{vehicleFormConfig.steps[0].description}</p>
                   </div>
                 </div>
-                <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
+                <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
               </div>
             </div>
         );

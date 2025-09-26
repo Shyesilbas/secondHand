@@ -2,43 +2,64 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { auditLogService } from '../services/auditLogService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import { useEnums } from '../../common/hooks/useEnums.js';
 
-export const useAuditLogs = (filters = {}) => {
+export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
     const { user } = useAuth();
+    const { enums, isLoading: isLoadingEnums } = useEnums();
     const [filteredLogs, setFilteredLogs] = useState([]);
+    const [pagination, setPagination] = useState({
+        totalPages: 0,
+        totalElements: 0,
+        currentPage: page,
+        pageSize: size
+    });
 
     const {
-        data: auditLogs = [],
+        data: auditLogsResponse,
         isLoading,
         error,
         refetch
     } = useQuery({
-        queryKey: ['auditLogs', user?.email],
-        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email),
+        queryKey: ['auditLogs', user?.email, page, size],
+        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email, page, size),
         enabled: !!user?.email,
-        staleTime: 5 * 60 * 1000,         refetchOnWindowFocus: false,         refetchOnMount: true,             });
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true,
+    });
 
-        const {
-        data: auditEnums = { eventTypes: [], eventStatuses: [] },
-        isLoading: isLoadingEnums
-    } = useQuery({
-        queryKey: ['auditEnums'],
-        queryFn: () => auditLogService.getAllEnums(),
-        staleTime: 5 * 60 * 1000     });
+    const auditLogs = auditLogsResponse?.content || [];
 
-        useEffect(() => {
+    const auditEnums = {
+        eventTypes: enums.auditEventTypes || [],
+        eventStatuses: enums.auditEventStatuses || []
+    };
+
+    useEffect(() => {
+        if (auditLogsResponse) {
+            setPagination({
+                totalPages: auditLogsResponse.totalPages || 0,
+                totalElements: auditLogsResponse.totalElements || 0,
+                currentPage: auditLogsResponse.number || 0,
+                pageSize: auditLogsResponse.size || size
+            });
+        }
+    }, [auditLogsResponse, size]);
+
+    useEffect(() => {
         if (auditLogs && auditLogs.length > 0) {
             let filtered = auditLogs;
 
-                        if (filters.eventType && filters.eventType !== 'ALL') {
+            if (filters.eventType && filters.eventType !== 'ALL') {
                 filtered = filtered.filter(log => log.eventType === filters.eventType);
             }
 
-                        if (filters.eventStatus && filters.eventStatus !== 'ALL') {
+            if (filters.eventStatus && filters.eventStatus !== 'ALL') {
                 filtered = filtered.filter(log => log.eventStatus === filters.eventStatus);
             }
 
-                        if (filters.startDate && filters.endDate) {
+            if (filters.startDate && filters.endDate) {
                 filtered = filtered.filter(log => {
                     const logDate = new Date(log.createdAt);
                     return logDate >= filters.startDate && logDate <= filters.endDate;
@@ -130,6 +151,7 @@ export const useAuditLogs = (filters = {}) => {
     return {
         auditLogs: filteredLogs,
         auditEnums,
+        pagination,
         isLoading: isLoading || isLoadingEnums,
         error,
         refetch,

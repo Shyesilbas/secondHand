@@ -52,4 +52,7 @@ export const enumService = {
     getPaymentTypes: async () => get(API_ENDPOINTS.ENUMS.PAYMENT_TYPES),
   getShippingStatuses: async () => get(API_ENDPOINTS.ENUMS.SHIPPING_STATUSES),
   getEmailTypes: async () => get(API_ENDPOINTS.ENUMS.EMAIL_TYPES),
+
+  getAuditEventTypes: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_TYPES),
+  getAuditEventStatuses: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_STATUSES),
 };

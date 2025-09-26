@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
         SEND_VERIFICATION: '/v1/users/verification/send',
         BY_ID: (id) => `/v1/users/${id}`,
         SEARCH: '/v1/users/search',
+        AUDIT_LOGS: '/v1/users/audit-logs',
     },
     LISTINGS: {
         ALL: '/v1/listings/allListings',
@@ -103,6 +104,8 @@ export const API_ENDPOINTS = {
         PAYMENT_TYPES: '/v1/enums/payment-types',
         SHIPPING_STATUSES: '/v1/enums/shipping-statuses',
         EMAIL_TYPES: '/v1/enums/email-types',
+        AUDIT_EVENT_TYPES: '/v1/enums/audit-event-types',
+        AUDIT_EVENT_STATUSES: '/v1/enums/audit-event-statuses',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
