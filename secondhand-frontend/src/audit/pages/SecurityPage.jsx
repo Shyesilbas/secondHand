@@ -30,10 +30,13 @@ const SecurityPage = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [showRevokeModal, setShowRevokeModal] = useState(false);
     const [isRevoking, setIsRevoking] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     
     const { 
         auditLogs, 
         auditEnums, 
+        pagination,
         isLoading, 
         error, 
         getEventTypeDisplay, 
@@ -41,7 +44,7 @@ const SecurityPage = () => {
         getEventTypeIcon,
         getLastPasswordChangeDate,
         getPasswordAgeStatus
-    } = useAuditLogs(filters);
+    } = useAuditLogs(filters, currentPage, pageSize);
     
     const [selectedLog, setSelectedLog] = useState(null);
 
@@ -396,6 +399,53 @@ const SecurityPage = () => {
                         ))
                     )}
                 </div>
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                                disabled={currentPage === 0}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+
+                            <span className="text-sm text-gray-700">
+                                Page {currentPage + 1} of {pagination.totalPages}
+                            </span>
+
+                            <button
+                                onClick={() => setCurrentPage(Math.min(pagination.totalPages - 1, currentPage + 1))}
+                                disabled={currentPage >= pagination.totalPages - 1}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                            <div className="text-sm text-gray-700">
+                                Showing {pagination.totalElements === 0 ? 0 : currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, pagination.totalElements)} of {pagination.totalElements} results
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <label htmlFor="pageSize" className="text-sm text-gray-700">Per page:</label>
+                                <select
+                                    id="pageSize"
+                                    className="px-2 py-1 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    value={pageSize}
+                                    onChange={(e) => { setCurrentPage(0); setPageSize(Number(e.target.value)); }}
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Log Detail Modal */}

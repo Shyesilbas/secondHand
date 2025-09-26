@@ -4,6 +4,7 @@ import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
@@ -812,5 +813,33 @@ public class EnumController {
             case FEMALE -> "Female";
             case PREFER_NOT_TO_SAY -> "Prefer not to say";
         };
+    }
+
+    @GetMapping("/audit-event-types")
+    @Operation(summary = "Get audit event types", description = "Returns all available audit event types with display names")
+    public ResponseEntity<List<Map<String, Object>>> getAuditEventTypes() {
+        List<Map<String, Object>> eventTypes = Arrays.stream(AuditLog.AuditEventType.values())
+                .map(eventType -> {
+                    Map<String, Object> typeMap = new LinkedHashMap<>();
+                    typeMap.put("value", eventType.name());
+                    typeMap.put("label", eventType.getDisplayName());
+                    return typeMap;
+                })
+                .toList();
+        return ResponseEntity.ok(eventTypes);
+    }
+
+    @GetMapping("/audit-event-statuses")
+    @Operation(summary = "Get audit event statuses", description = "Returns all available audit event statuses with display names")
+    public ResponseEntity<List<Map<String, Object>>> getAuditEventStatuses() {
+        List<Map<String, Object>> eventStatuses = Arrays.stream(AuditLog.AuditEventStatus.values())
+                .map(eventStatus -> {
+                    Map<String, Object> statusMap = new LinkedHashMap<>();
+                    statusMap.put("value", eventStatus.name());
+                    statusMap.put("label", eventStatus.getDisplayName());
+                    return statusMap;
+                })
+                .toList();
+        return ResponseEntity.ok(eventStatuses);
     }
 }

@@ -12,7 +12,6 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.PaymentService;
 import com.serhat.secondhand.user.domain.entity.User;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

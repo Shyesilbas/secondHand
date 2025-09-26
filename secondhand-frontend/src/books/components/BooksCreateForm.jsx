@@ -34,7 +34,7 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
   const renderStep = (stepId) => {
     if (stepId === 1) {
             return (
-          <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} />
+          <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
       );
     }
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { showcaseService } from '../services/showcaseService.js';
-import { usePaymentMethods } from '../../payments/hooks/usePaymentMethods.js';
-import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
+import React, {useEffect, useState} from 'react';
+import {showcaseService} from '../services/showcaseService.js';
+import {usePaymentMethods} from '../../payments/hooks/usePaymentMethods.js';
+import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
 import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
 
 const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSuccess }) => {
@@ -38,9 +38,9 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                    <h2 className="text-xl font-bold text-red-600 mb-4">Hata</h2>
-                    <p>İlan bilgisi bulunamadı. Lütfen sayfayı yenileyin veya tekrar deneyin.</p>
-                    <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Kapat</button>
+                    <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
+                    <p>Listing Information Not Found.</p>
+                    <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
                 </div>
             </div>
         );
@@ -54,7 +54,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
     const handlePayment = async () => {
         if (!listingId) {
-            setError('İlan bilgisi bulunamadı. Lütfen tekrar deneyin.');
+            setError('Listing Information not found. Please Try Again');
             return;
         }
         setLoading(true);
@@ -80,8 +80,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             case 1:
                 return (
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 text-center">Showcase Süresi</h3>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Kaç gün boyunca öne çıkarmak istiyorsun?</label>
+                        <h3 className="text-lg font-semibold mb-4 text-center">Showcase Duration</h3>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">For how many day(s)?</label>
                         <input
                             type="number"
                             min="1"
@@ -91,9 +91,9 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             required
                         />
-                        <p className="text-xs text-gray-500 mt-1">Minimum 1, maksimum 30 gün. Günlük ücret: <span className="font-semibold">10₺</span></p>
+                        <p className="text-xs text-gray-500 mt-1">Minimum 1, maximum 30 days. Per Day: <span className="font-semibold">10₺</span></p>
                         <div className="flex justify-between mt-4 p-3 bg-gray-50 rounded">
-                            <span className="font-medium">Toplam Tutar:</span>
+                            <span className="font-medium">Total:</span>
                             <span className="text-lg font-bold text-emerald-600">{totalCost}₺</span>
                         </div>
                     </div>
@@ -116,31 +116,31 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             case 3:
                 return (
                     <div>
-                        <h3 className="text-lg font-semibold mb-4 text-center">Özet</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center">Summary</h3>
                         <div className="space-y-2 mb-4">
                             <div className="flex justify-between">
-                                <span className="font-medium">İlan:</span>
+                                <span className="font-medium">Listing:</span>
                                 <span>{listingTitle}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="font-medium">Başlangıç:</span>
+                                <span className="font-medium">Starts At:</span>
                                 <span>{startDate}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="font-medium">Bitiş:</span>
+                                <span className="font-medium">Ends At:</span>
                                 <span>{endDate}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="font-medium">Gün:</span>
+                                <span className="font-medium">Day:</span>
                                 <span>{days}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="font-medium">Ödeme Yöntemi:</span>
-                                <span>{paymentType === 'CREDIT_CARD' ? 'Kredi Kartı' : paymentType === 'TRANSFER' ? 'Banka Transferi' : 'eWallet'}</span>
+                                <span className="font-medium">Payment Method:</span>
+                                <span>{paymentType === 'CREDIT_CARD' ? 'Credit Card' : paymentType === 'TRANSFER' ? 'Bank Wire' : 'eWallet'}</span>
                             </div>
                         </div>
                         <div className="flex justify-between p-3 bg-gray-50 rounded mb-2">
-                            <span className="font-bold text-lg">Toplam Tutar:</span>
+                            <span className="font-bold text-lg">Total:</span>
                             <span className="text-xl font-bold text-emerald-600">{totalCost}₺</span>
                         </div>
                         {error && <div className="mb-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
@@ -149,9 +149,9 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                             onClick={handlePayment}
                             disabled={loading}
                         >
-                            {loading ? 'İşlem yapılıyor...' : 'Ödemeyi Tamamla'}
+                            {loading ? 'Processing...' : 'Finish Payment'}
                         </button>
-                        {success && <div className="mt-3 text-green-700 text-center font-semibold">Başarıyla vitrine eklendi!</div>}
+                        {success && <div className="mt-3 text-green-700 text-center font-semibold">Successfully added to showcase!</div>}
                     </div>
                 );
             default:
@@ -189,7 +189,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         onClick={() => step > 1 ? setStep(step - 1) : onClose}
                         disabled={loading}
                     >
-                        {step > 1 ? 'Geri' : 'İptal'}
+                        {step > 1 ? 'Back' : 'Cancel'}
                     </button>
                     {step < 3 && (
                         <button
@@ -206,7 +206,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                                 loading
                             }
                         >
-                            İleri
+                            Continue
                         </button>
                     )}
                 </div>

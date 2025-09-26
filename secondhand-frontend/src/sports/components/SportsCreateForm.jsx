@@ -40,6 +40,7 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
                 errors={errors}
                 onInputChange={handleInputChange}
                 enums={enums}
+                isEdit={isEdit}
             />
         );
       case 2:

@@ -3,23 +3,76 @@ export const formatCurrency = (value, currency = 'TRY', options = {}) => {
 
   if (numValue === null || numValue === undefined || isNaN(numValue)) {
     console.warn('Invalid value for currency formatting:', value);
-    return '0.00 ₺';
+    return '₺0,00';
   }
 
-  const symbols = {
-    'TRY': '₺',
-    'USD': '$',
-    'EUR': '€'
+  const currencyConfig = {
+    'TRY': {
+      symbol: '₺',
+      locale: 'tr-TR',
+      position: 'before'
+    },
+    'USD': {
+      symbol: '$',
+      locale: 'en-US',
+      position: 'before'
+    },
+    'EUR': {
+      symbol: '€',
+      locale: 'de-DE',
+      position: 'after'
+    }
   };
 
-  const symbol = symbols[currency] || currency;
-
-  const formatted = numValue.toLocaleString('tr-TR', {
+  const config = currencyConfig[currency] || currencyConfig['TRY'];
+  
+  const formatted = numValue.toLocaleString(config.locale, {
     minimumFractionDigits: options.minimumFractionDigits || 2,
-    maximumFractionDigits: options.maximumFractionDigits || 2
+    maximumFractionDigits: options.maximumFractionDigits || 2,
+    style: 'decimal'
   });
 
-  return `${formatted} ${symbol}`;
+  if (config.position === 'before') {
+    return `${config.symbol}${formatted}`;
+  } else {
+    return `${formatted} ${config.symbol}`;
+  }
+};
+
+export const formatCurrencyCompact = (value, currency = 'TRY') => {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+
+  if (numValue === null || numValue === undefined || isNaN(numValue)) {
+    return '₺0';
+  }
+
+  const currencyConfig = {
+    'TRY': { symbol: '₺', locale: 'tr-TR' },
+    'USD': { symbol: '$', locale: 'en-US' },
+    'EUR': { symbol: '€', locale: 'de-DE' }
+  };
+
+  const config = currencyConfig[currency] || currencyConfig['TRY'];
+  
+  if (numValue >= 1000000) {
+    const formatted = (numValue / 1000000).toLocaleString(config.locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1
+    });
+    return `${config.symbol}${formatted}M`;
+  } else if (numValue >= 1000) {
+    const formatted = (numValue / 1000).toLocaleString(config.locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1
+    });
+    return `${config.symbol}${formatted}K`;
+  } else {
+    const formatted = numValue.toLocaleString(config.locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+    return `${config.symbol}${formatted}`;
+  }
 };
 
 export const formatDateTime = (dateString) => {
@@ -92,7 +145,56 @@ export const replaceEnumCodesInHtml = (html, enums = {}, keys = []) => {
       result = result.replace(pattern, label || titleCaseEnumCode(value));
     });
   });
-    result = result.replace(/\b[A-Z]+(?:_[A-Z]+)*\b/g, (m) => titleCaseEnumCode(m));
+  result = result.replace(/\b[A-Z]+(?:_[A-Z]+)*\b/g, (m) => titleCaseEnumCode(m));
+  return result;
+};
+
+export const formatPricesInHtml = (html, currency = 'TRY') => {
+  if (!html) return '';
+  let result = String(html);
+  
+  const pricePatterns = [
+    // Pattern for explicit prices with currency: "15000.00 TRY", "15000 TRY", "15000.00 USD", etc.
+    /(\d+(?:\.\d{2})?)\s*(TRY|USD|EUR)\b/g,
+    // Pattern for prices in parentheses with currency: "(15000.00 TRY)", "(15000 USD)", etc.
+    /\((\d+(?:\.\d{2})?)\s*(TRY|USD|EUR)\)/g,
+    // Pattern for prices with currency symbols: "₺15000.00", "$15000", "€15000.00"
+    /([₺$€])\s*(\d+(?:\.\d{2})?)/g,
+    // Pattern for prices with "price", "cost", "amount" keywords nearby
+    /(?:price|cost|amount|total|fee|charge|payment):\s*(\d+(?:\.\d{2})?)/gi,
+    // Pattern for prices with "TL", "lira" keywords
+    /(\d+(?:\.\d{2})?)\s*(?:TL|lira)\b/gi
+  ];
+  
+  pricePatterns.forEach((pattern, index) => {
+    result = result.replace(pattern, (match, amount, curr) => {
+      const numericAmount = parseFloat(amount);
+      if (isNaN(numericAmount)) return match;
+      
+      let actualCurrency = currency;
+      let formattedPrice;
+      
+      if (index === 0 || index === 1) {
+        // Explicit currency patterns
+        actualCurrency = curr || currency;
+        formattedPrice = formatCurrency(numericAmount, actualCurrency);
+        if (index === 1) {
+          return `(${formattedPrice})`;
+        }
+      } else if (index === 2) {
+        // Currency symbol patterns
+        const symbolMap = { '₺': 'TRY', '$': 'USD', '€': 'EUR' };
+        actualCurrency = symbolMap[amount] || currency;
+        formattedPrice = formatCurrency(numericAmount, actualCurrency);
+      } else {
+        // Keyword patterns - use default currency
+        formattedPrice = formatCurrency(numericAmount, currency);
+      }
+      
+      return formattedPrice;
+    });
+  });
+  
   return result;
 };
 

@@ -18,6 +18,10 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     List<AuditLog> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    Page<AuditLog> findByUserEmailOrderByCreatedAtDesc(String userEmail, Pageable pageable);
+
+    Page<AuditLog> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
     Page<AuditLog> findByEventTypeOrderByCreatedAtDesc(AuditLog.AuditEventType eventType, Pageable pageable);
 
     Page<AuditLog> findByEventStatusOrderByCreatedAtDesc(AuditLog.AuditEventStatus eventStatus, Pageable pageable);

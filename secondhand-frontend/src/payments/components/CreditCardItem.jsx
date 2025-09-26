@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { formatCurrency } from '../../common/formatters.js';
 
 const CreditCardItem = ({ card, onDelete, isDeleting }) => {
 
@@ -27,7 +28,7 @@ const CreditCardItem = ({ card, onDelete, isDeleting }) => {
                     <div>
                         <p className="text-xs opacity-80 uppercase tracking-wide">Limit</p>
                         <p className="text-sm font-medium">
-                            {card.limit}
+                            {formatCurrency(card.limit)}
                         </p>
                     </div>
                     <div className="text-right">
@@ -41,11 +42,11 @@ const CreditCardItem = ({ card, onDelete, isDeleting }) => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <p className="text-xs opacity-80 uppercase tracking-wide">Total Spent</p>
-                        <p className="font-medium">{card.totalSpent || card.amount}</p>
+                        <p className="font-medium">{formatCurrency(card.totalSpent || card.amount)}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-xs opacity-80 uppercase tracking-wide">Limit Left</p>
-                        <p className="font-medium">{card.limitLeft}</p>
+                        <p className="font-medium">{formatCurrency(card.limitLeft)}</p>
                     </div>
                 </div>
             </div>
