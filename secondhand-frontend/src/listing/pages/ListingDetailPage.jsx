@@ -159,15 +159,13 @@ const ListingDetailPage = () => {
 
                   {!isOwner && (
                     <div className="mt-6 space-y-3">
-                      <ContactSellerButton listing={listing} />
-                      <div className="flex gap-2">
-                        <ComplaintButton
-                          targetUserId={listing.sellerId}
-                          targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
-                          listingId={listing.id}
-                          className="flex-1"
-                        />
-                      </div>
+                      <ContactSellerButton listing={listing} className="w-full" />
+                      <ComplaintButton
+                        targetUserId={listing.sellerId}
+                        targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
+                        listingId={listing.id}
+                        className="w-full"
+                      />
                     </div>
                   )}
 

@@ -43,11 +43,14 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
 
     return (
         <>
-            <ChatBubbleLeftRightIcon
+            <button
                 onClick={handleContactSeller}
-                className={`w-6 h-6 cursor-pointer ${className}`}
+                className={`inline-flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors ${className}`}
                 title="Contact Seller"
-            />
+            >
+                <ChatBubbleLeftRightIcon className="w-4 h-4" />
+                Contact Seller
+            </button>
 
             {isChatOpen && (
                 <ChatWindow

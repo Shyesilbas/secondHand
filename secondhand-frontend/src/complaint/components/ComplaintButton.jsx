@@ -30,11 +30,14 @@ const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, 
 
     return (
         <>
-            <ExclamationTriangleIcon
+            <button
                 onClick={() => setShowModal(true)}
-                className={`w-6 h-6 cursor-pointer ${className}`}
+                className={`inline-flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm ${className}`}
                 title={`Report ${targetUserName}`}
-            />
+            >
+                <ExclamationTriangleIcon className="w-4 h-4" />
+                Report
+            </button>
 
             <ComplaintModal
                 isOpen={showModal}

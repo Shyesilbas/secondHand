@@ -5,10 +5,15 @@ import ContactSellerButton from '../chat/components/ContactSellerButton.jsx';
 import { userService } from './services/userService.js';
 import { useUserListings } from './hooks/useUserListings.js';
 import { ROUTES } from '../common/constants/routes.js';
-import { formatDateTime } from '../common/formatters.js';
+import { formatDateTime, formatCurrency } from '../common/formatters.js';
 import ComplaintButton from '../complaint/components/ComplaintButton.jsx';
-import { ReviewStats, ReviewsList, useReviews, useUserReviewStats } from '../reviews/index.js';
+import { ReviewStats, ReviewsList, useReviews, useReviewsByUser, useUserReviewStats } from '../reviews/index.js';
 
+const TABS = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'listings', label: 'Listings' },
+    { key: 'reviews', label: 'Reviews' },
+];
 
 const useUserProfile = (userId) => {
     const [user, setUser] = React.useState(null);
@@ -40,10 +45,12 @@ const UserProfilePage = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
+    const [activeTab, setActiveTab] = useState('overview');
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
     const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId);
-    const { reviews, loading: reviewsLoading, error: reviewsError, hasMore, loadMore } = useReviews(userId);
+    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, hasMore, loadMore } = useReviews(userId);
+    const { reviews: givenReviews, loading: givenReviewsLoading, error: givenReviewsError } = useReviewsByUser(userId);
     const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId);
 
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -68,132 +75,258 @@ const UserProfilePage = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 space-y-8">
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-6xl mx-auto p-6 space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-2"
+                        >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Go Back
+                        </button>
+                        <h1 className="text-2xl font-semibold text-gray-900">
+                            {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-gray-500">(You)</span>}
+                        </h1>
+                        <p className="text-sm text-gray-600 mt-1">
+                            {isOwnProfile ? 'Your profile information and activity' : 'User profile and listings'}
+                        </p>
+                    </div>
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center text-text-muted hover:text-text-primary transition-colors mb-2 md:mb-0"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Go Back
-                    </button>
-                    <h1 className="text-3xl font-bold text-text-primary">
-                        {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-text-muted">(You)</span>}
-                    </h1>
+                    {!isOwnProfile && (
+                        <div className="flex gap-3">
+                            <ContactSellerButton
+                                listing={{
+                                    id: `user-chat-${userId}`,
+                                    title: `Chat with ${user.name} ${user.surname}`,
+                                    sellerId: userId,
+                                    sellerName: user.name,
+                                    sellerSurname: user.surname
+                                }}
+                                isDirectChat={true}
+                            />
+                            <ComplaintButton
+                                targetUserId={userId}
+                                targetUserName={`${user.name} ${user.surname}`}
+                                targetUser={user}
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {!isOwnProfile && (
-                    <div className="flex flex-wrap gap-2 md:gap-3">
-                        <ComplaintButton
-                            targetUserId={userId}
-                            targetUserName={`${user.name} ${user.surname}`}
-                            targetUser={user}
-                            size="sm"
-                        />
-                        <ContactSellerButton
-                            listing={{
-                                id: `user-chat-${userId}`,
-                                title: `Chat with ${user.name} ${user.surname}`,
-                                sellerId: userId,
-                                sellerName: user.name,
-                                sellerSurname: user.surname
-                            }}
-                            className="text-text-secondary hover:text-text-primary"
-                            isDirectChat={true}
-                        />
+                {/* Tabs */}
+                <div className="flex space-x-4 border-b border-gray-200 mb-6">
+                    {TABS.map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                                activeTab === tab.key
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
+                {/* Tab Content */}
+                {activeTab === 'overview' && (
+                    <div className="space-y-6">
+                        {/* User Info Section */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-6 border-b border-gray-200">
+                                <h2 className="text-lg font-medium text-gray-900">Personal Information</h2>
+                                <p className="text-sm text-gray-600 mt-1">Basic account details and contact information</p>
+                            </div>
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InfoField label="Email Address" value={user.email || 'Not provided'} />
+                                    <InfoField label="Phone Number" value={user.phoneNumber || 'Not provided'} />
+                                    <InfoField label="Gender" value={user.gender || 'Not specified'} />
+                                    <InfoField 
+                                        label="Account Status" 
+                                        value={user.accountVerified ? 'Verified' : 'Not Verified'}
+                                        isVerified={user.accountVerified}
+                                    />
+                                    <InfoField label="Member Since" value={user.accountCreationDate} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Compact Review Stats */}
+                        {reviewStats && reviewStats.totalReviews > 0 && (
+                            <div className="bg-white border border-gray-200 rounded-lg">
+                                <div className="p-6 border-b border-gray-200">
+                                    <h2 className="text-lg font-medium text-gray-900">Review Summary</h2>
+                                </div>
+                                <div className="p-6">
+                                    <CompactReviewStats stats={reviewStats} loading={reviewStatsLoading} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'listings' && (
+                    <div className="bg-white border border-gray-200 rounded-lg">
+                        <div className="p-6 border-b border-gray-200">
+                            <h2 className="text-lg font-medium text-gray-900">Listings ({listings.length})</h2>
+                            <p className="text-sm text-gray-600 mt-1">All listings by this user</p>
+                        </div>
+                        <div className="p-6">
+                            {listingsLoading ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {[...Array(6)].map((_, i) => (
+                                        <div key={i} className="bg-gray-100 animate-pulse h-64 rounded-lg"></div>
+                                    ))}
+                                </div>
+                            ) : listingsError ? (
+                                <div className="text-center text-red-500 py-8">Failed to load listings.</div>
+                            ) : listings.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8">No listings available.</div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {listings.map(listing => (
+                                        <Link
+                                            key={listing.id}
+                                            to={ROUTES.LISTING_DETAIL(listing.id)}
+                                            className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                                        >
+                                            <div className="p-4">
+                                                <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                                                    {listing.title}
+                                                </h3>
+                                                <p className="text-green-600 font-bold mt-2 text-lg">
+                                                    {formatCurrency(listing.price, listing.currency)}
+                                                </p>
+                                                <div className="flex items-center justify-between mt-3 text-sm text-gray-500">
+                                                    <span>{listing.type}</span>
+                                                    <span>{formatDate(listing.createdAt)}</span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'reviews' && (
+                    <div className="space-y-6">
+                        {/* Reviews Received */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-6 border-b border-gray-200">
+                                <h2 className="text-lg font-medium text-gray-900">Reviews Received</h2>
+                                <p className="text-sm text-gray-600 mt-1">Reviews this user has received from others</p>
+                            </div>
+                            <div className="p-6">
+                                {reviewStats && reviewStats.totalReviews > 0 ? (
+                                    <ReviewsList
+                                        reviews={receivedReviews}
+                                        loading={receivedReviewsLoading}
+                                        error={receivedReviewsError}
+                                        hasMore={hasMore}
+                                        onLoadMore={loadMore}
+                                    />
+                                ) : (
+                                    <div className="text-center text-gray-500 py-8">No reviews received yet.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Reviews Given */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-6 border-b border-gray-200">
+                                <h2 className="text-lg font-medium text-gray-900">Reviews Given</h2>
+                                <p className="text-sm text-gray-600 mt-1">Reviews this user has given to others</p>
+                            </div>
+                            <div className="p-6">
+                                {givenReviews && givenReviews.length > 0 ? (
+                                    <ReviewsList
+                                        reviews={givenReviews}
+                                        loading={givenReviewsLoading}
+                                        error={givenReviewsError}
+                                        hasMore={false}
+                                        onLoadMore={() => {}}
+                                    />
+                                ) : (
+                                    <div className="text-center text-gray-500 py-8">No reviews given yet.</div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
+        </div>
+    );
+};
 
-            {/* User Info Card */}
-            <div className="bg-white rounded-2xl shadow-lg border p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p className="text-sm font-semibold text-text-muted">Email</p>
-                    <p className="mt-1 text-text-primary">{user.email || 'Not provided'}</p>
+const InfoField = ({ label, value, isVerified }) => (
+    <div className="space-y-1">
+        <label className="text-sm font-medium text-gray-700">{label}</label>
+        {isVerified !== undefined ? (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                isVerified
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+                {value}
+            </span>
+        ) : (
+            <p className="text-gray-900">{value}</p>
+        )}
+    </div>
+);
+
+const CompactReviewStats = ({ stats, loading }) => {
+    const renderStars = (rating) => {
+        return Array.from({ length: 5 }, (_, index) => (
+            <svg
+                key={index}
+                className={`w-4 h-4 ${index < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+            >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+        ));
+    };
+
+    if (loading) {
+        return (
+            <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                <div className="space-y-3">
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/3"></div>
                 </div>
-                <div>
-                    <p className="text-sm font-semibold text-text-muted">Phone</p>
-                    <p className="mt-1 text-text-primary">{user.phoneNumber || 'Not provided'}</p>
-                </div>
-                <div>
-                    <p className="text-sm font-semibold text-text-muted">Gender</p>
-                    <p className="mt-1 text-text-primary">{user.gender || 'Not provided'}</p>
-                </div>
-                <div>
-                    <p className="text-sm font-semibold text-text-muted">Account Verified</p>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        user.accountVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                        {user.accountVerified ? 'Verified' : 'Not Verified'}
+            </div>
+        );
+    }
+
+    if (!stats) {
+        return <p className="text-gray-500">No review information found.</p>;
+    }
+
+    return (
+        <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                    {renderStars(Math.round(stats.averageRating || 0))}
+                    <span className="text-lg font-semibold text-gray-900">
+                        {(stats.averageRating || 0).toFixed(1)}
                     </span>
                 </div>
-                <div className="md:col-span-2">
-                    <p className="text-sm font-semibold text-text-muted">Account Creation Date</p>
-                    <p className="mt-1 text-text-primary">{user.accountCreationDate}</p>
-                </div>
-            </div>
-
-            {/* Review Stats */}
-            <ReviewStats stats={reviewStats} loading={reviewStatsLoading} />
-
-            {/* Recent Reviews */}
-            {reviewStats && reviewStats.totalReviews > 0 && (
-                <div className="bg-white rounded-2xl shadow-lg border p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-text-primary">
-                            Recent Reviews ({reviewStats.totalReviews})
-                        </h2>
-                        <Link
-                            to={ROUTES.USER_REVIEWS(userId)}
-                            className="text-btn-primary hover:text-btn-primary-hover font-medium text-sm"
-                        >
-                            View All Reviews →
-                        </Link>
-                    </div>
-                    
-                    <ReviewsList
-                        reviews={reviews.slice(0, 5)}                         loading={reviewsLoading}
-                        error={reviewsError}
-                        hasMore={false}                         onLoadMore={() => {}}                         showLoadMore={false}                     />
-                </div>
-            )}
-
-            {/* Listings */}
-            <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-text-primary">Listings ({listings.length})</h2>
-                {listingsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} className="bg-gray-100 animate-pulse h-60 rounded-xl"></div>
-                        ))}
-                    </div>
-                ) : listingsError ? (
-                    <div className="text-center text-red-500">Failed to load listings.</div>
-                ) : listings.length === 0 ? (
-                    <div className="text-center text-text-muted">No listings available.</div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {listings.map(listing => (
-                            <Link
-                                key={listing.id}
-                                to={ROUTES.LISTING_DETAIL(listing.id)}
-                                className="group bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                            >
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-text-primary truncate">{listing.title}</h3>
-                                    <p className="text-green-600 font-bold mt-1">{listing.price} {listing.currency}</p>
-                                    <p className="text-text-muted text-sm mt-1">{formatDate(listing.createdAt)}</p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
+                <span className="text-sm text-gray-600">
+                    {stats.totalReviews || 0} reviews
+                </span>
             </div>
         </div>
     );
