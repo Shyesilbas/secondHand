@@ -28,6 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -41,6 +42,73 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
+    // Public API endpoint groups
+    private static final List<String> AUTH_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh",
+            "/api/auth/oauth2/google",
+            "/api/auth/oauth2/complete",
+            "/oauth2/**",
+            "/login/oauth2/**",
+            "/api/auth/password/forgot",
+            "/api/auth/password/reset"
+    );
+
+    private static final List<String> LISTING_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/v1/listings/status/{status}",
+            "/api/v1/listings/{id}",
+            "/api/v1/listings/allListings",
+            "/api/v1/listings/filter",
+            "/api/v1/listings/search/listing-no/{listingNo}",
+            "/api/v1/listings/byUser/{id}",
+            "/api/v1/listings/type/{listingType}",
+            "/api/v1/listings/type/{listingType}/active",
+            "/api/v1/listings/type/{listingType}/ordered"
+    );
+
+    private static final List<String> CATEGORY_LISTING_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/v1/books/{id}",
+            "/api/v1/books/filter",
+            "/api/v1/realEstates/{id}",
+            "/api/v1/realEstates/filter",
+            "/api/v1/vehicles/{id}",
+            "/api/v1/vehicles/filter",
+            "/api/v1/clothing/{id}",
+            "/api/v1/clothing/filter",
+            "/api/v1/electronics/{id}",
+            "/api/v1/electronics/filter",
+            "/api/v1/sports/{id}",
+            "/api/v1/sports/filter"
+    );
+
+    private static final List<String> SHOWCASE_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/showcases/active"
+    );
+
+    private static final List<String> AGREEMENT_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/agreements/**"
+    );
+
+    private static final List<String> PAYMENT_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/v1/payments/listing-fee-config"
+    );
+
+    private static final List<String> ENUM_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/v1/enums/**"
+    );
+
+    private static final List<String> DOCUMENTATION_ENDPOINTS = Arrays.asList(
+            "/swagger-ui/**",
+            "/api-docs/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**"
+    );
+
+    private static final List<String> WEBSOCKET_ENDPOINTS = Arrays.asList(
+            "/ws/**"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -53,29 +121,32 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/refresh",
-                                "/api/auth/oauth2/google",
-                                "/api/auth/oauth2/complete",
-                                "/oauth2/**",
-                                "/login/oauth2/**",
-                                "/api/auth/password/forgot",
-                                "/api/auth/password/reset",
-                                "/swagger-ui/**",
-                                "/api/v1/enums/genders",
-                                "/api-docs/**",
-                                "/api/v1/listings/status/{status}",
-                                "/api/v1/listings/{id}",
-                                "/api/v1/listings/allListings",
-                                "/api/agreements/**",
-                                "/swagger-ui.html",
-                                "/api/v1/payments/listing-fee-config",
-                                "/v3/api-docs/**",
-                                "/ws/**"
-                        ).permitAll()
+                        // Authentication & Authorization endpoints
+                        .requestMatchers(AUTH_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public listing endpoints
+                        .requestMatchers(LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public category-specific listing endpoints
+                        .requestMatchers(CATEGORY_LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public showcase endpoints
+                        .requestMatchers(SHOWCASE_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public agreement endpoints
+                        .requestMatchers(AGREEMENT_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public payment configuration endpoints
+                        .requestMatchers(PAYMENT_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Public enum endpoints
+                        .requestMatchers(ENUM_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Documentation endpoints
+                        .requestMatchers(DOCUMENTATION_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // WebSocket endpoints
+                        .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )

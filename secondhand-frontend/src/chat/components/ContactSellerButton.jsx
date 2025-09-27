@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useChat } from '../hooks/useChat.js';
 import ChatWindow from './ChatWindow.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) => {
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const notification = useNotification();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const notificationShown = useRef(false);
     const {
         createListingChat,
         createDirectChat,
@@ -24,6 +31,40 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
     }
 
     const handleContactSeller = async () => {
+        if (!isAuthenticated) {
+            if (!notificationShown.current) {
+                notificationShown.current = true;
+                notification.addNotification({
+                    type: 'info',
+                    title: 'Authentication Required',
+                    message: 'Please Log In',
+                    autoClose: false,
+                    showCloseButton: false,
+                    actions: [
+                        {
+                            label: 'Cancel',
+                            primary: false,
+                            onClick: () => {
+                                notificationShown.current = false;
+                            }
+                        },
+                        {
+                            label: 'OK',
+                            primary: true,
+                            onClick: () => {
+                                navigate(ROUTES.LOGIN, { 
+                                    state: { from: location },
+                                    replace: true 
+                                });
+                                notificationShown.current = false;
+                            }
+                        }
+                    ]
+                });
+            }
+            return;
+        }
+
         try {
             let chatRoom;
             if (isDirectChat) {

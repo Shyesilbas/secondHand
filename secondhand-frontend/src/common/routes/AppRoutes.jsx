@@ -1,7 +1,7 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { ROUTES } from '../constants/routes.js';
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {ROUTES} from '../constants/routes.js';
 
 import MainLayout from '../components/layout/MainLayout.jsx';
 import AuthLayout from '../components/layout/AuthLayout.jsx';
@@ -163,8 +163,6 @@ const AppRoutes = () => {
                         <Route path={ROUTES.REVIEWS_RECEIVED(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.REVIEWS_GIVEN(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
-                  <Route path={ROUTES.CREATE_REAL_ESTATE} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=REAL_ESTATE`} replace />} />
-                  <Route path={ROUTES.CREATE_CLOTHING} element={<Navigate to={`${ROUTES.CREATE_LISTING}?type=CLOTHING`} replace />} />
                         <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
                         <Route path={ROUTES.MY_ORDERS} element={<MyOrdersPage />} />
                         <Route path={ROUTES.SECURITY} element={<SecurityPage />} />

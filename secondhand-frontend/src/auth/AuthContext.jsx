@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
                         clearTokens();
                     }
                 } else if (hasValidTokens()) {
-                                        try {
+                    try {
                         await authService.validateToken();
                         if (!userData) {
                             const userProfile = await authService.getCurrentUser();
@@ -82,7 +82,9 @@ export const AuthProvider = ({ children }) => {
                         }
                     } catch (error) {
                         console.debug('Token validation failed, user not authenticated');
-                        await logout();
+                        clearTokens();
+                        setUserState(null);
+                        setIsAuthenticated(false);
                     }
                 } else {
                                         console.debug('No valid authentication found');
