@@ -1,7 +1,8 @@
 
 export const PAYMENT_TYPES = {
     CREDIT_CARD: 'CREDIT_CARD',
-    TRANSFER: 'TRANSFER'
+    TRANSFER: 'TRANSFER',
+    EWALLET: 'EWALLET'
 };
 
 export const PAYMENT_TRANSACTION_TYPES = {
@@ -42,7 +43,8 @@ export const PaymentDto = (data) => ({
 
 export const PAYMENT_TYPE_LABELS = {
     [PAYMENT_TYPES.CREDIT_CARD]: 'Credit Card',
-    [PAYMENT_TYPES.TRANSFER]: 'Bank Transfer'
+    [PAYMENT_TYPES.TRANSFER]: 'Bank Transfer',
+    [PAYMENT_TYPES.EWALLET]: 'E-Wallet'
 };
 
 

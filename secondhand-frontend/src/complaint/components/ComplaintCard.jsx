@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComplaintReason } from '../types/complaintTypes.js';
+import {ComplaintReason} from '../types/complaintTypes.js';
 
 const COMPLAINT_REASONS = {
     [ComplaintReason.INAPPROPRIATE_CONTENT]: 'Inappropriate Content',
@@ -23,10 +23,10 @@ const ComplaintCard = ({ complaint }) => {
                     <strong>Complaint ID:</strong> {complaint.complaintId}
                 </div>
                 <div>
-                    <strong>Complainer ID:</strong> {complaint.complainerId}
+                    <strong>Complainer:</strong> {complaint.complainerId}
                 </div>
                 <div>
-                    <strong>Complained User ID:</strong> {complaint.complainedUserId}
+                    <strong>Complained User :</strong> {complaint.complainedUserId}
                 </div>
                 <div>
                     <strong>Listing ID:</strong> {complaint.listingId || 'N/A'}

@@ -13,14 +13,14 @@ import java.math.BigDecimal;
 @Component
 public class PaymentValidationHelper {
     public User resolveToUser(PaymentRequest paymentRequest, UserService userService) {
-        if (paymentRequest.transactionType() == PaymentTransactionType.LISTING_CREATION ||
-            paymentRequest.transactionType() == PaymentTransactionType.ITEM_PURCHASE ||
+        if (paymentRequest.transactionType() == PaymentTransactionType.ITEM_PURCHASE ||
             paymentRequest.transactionType() == PaymentTransactionType.ITEM_SALE) {
             if (paymentRequest.toUserId() == null) {
                 throw new BusinessException(PaymentErrorCodes.NULL_RECIPIENT.getMessage(), HttpStatus.BAD_REQUEST, PaymentErrorCodes.NULL_RECIPIENT.getCode());
             }
             return userService.findById(paymentRequest.toUserId());
         }
+        // For LISTING_CREATION, toUserId can be null as it's a system payment
         return null;
     }
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, {createContext, useCallback, useContext, useState} from 'react';
 import NotificationModal from './NotificationModal.jsx';
 
 const NotificationContext = createContext();
@@ -20,7 +20,7 @@ export const NotificationProvider = ({ children }) => {
             id,
             isOpen: true,
             autoClose: true,
-            autoCloseDelay: 2000,
+            autoCloseDelay: 5000,
             showCloseButton: true,
             size: 'md',
             ...notification
