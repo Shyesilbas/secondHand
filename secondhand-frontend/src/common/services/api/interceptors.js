@@ -55,8 +55,8 @@ apiClient.interceptors.response.use(
 
                 if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             
-                        if (originalRequest.url?.includes('/validate')) {
-                console.debug('Validation endpoint failed, not attempting refresh');
+            if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
+                console.debug('Public endpoint failed, not attempting refresh');
                 return Promise.reject(error);
             }
 
@@ -113,9 +113,6 @@ apiClient.interceptors.response.use(
                 } else {
                     showTokenExpiredMessage();
                     clearTokens();
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                    }, 1000);
                 }
 
                 return Promise.reject(refreshError);

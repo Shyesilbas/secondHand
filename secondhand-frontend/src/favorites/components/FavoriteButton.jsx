@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { favoriteService } from '../services/favoriteService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../favorites.js';
+import { ROUTES } from '../../common/constants/routes.js';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const FavoriteButton = ({
                           listingId,
@@ -17,7 +19,10 @@ const FavoriteButton = ({
                         }) => {
 
   const { isAuthenticated, user } = useAuth();
-  const { showSuccess, showError, showWarning } = useNotification();
+  const { showSuccess, showError, showWarning, addNotification } = useNotification();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const notificationShown = useRef(false);
   const [isFavorited, setIsFavorited] = useState(
       listing?.favoriteStats?.isFavorited ?? listing?.favoriteStats?.favorited ?? initialIsFavorited
   );
@@ -37,14 +42,43 @@ const FavoriteButton = ({
   const isCurrentUserSeller = user && actualSellerId &&
       (user.id === actualSellerId || user.id === String(actualSellerId) || String(user.id) === String(actualSellerId));
 
-  if (!isAuthenticated || isCurrentUserSeller) return null;
+  if (isCurrentUserSeller) return null;
 
   const handleToggle = async (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     if (!isAuthenticated) {
-      showWarning('Authentication required', 'Login to add favorite listings');
+      if (!notificationShown.current) {
+        notificationShown.current = true;
+        addNotification({
+          type: 'info',
+          title: 'Authentication Required',
+          message: 'Please Log In',
+          autoClose: false,
+          showCloseButton: false,
+          actions: [
+            {
+              label: 'Cancel',
+              primary: false,
+              onClick: () => {
+                notificationShown.current = false;
+              }
+            },
+            {
+              label: 'OK',
+              primary: true,
+              onClick: () => {
+                navigate(ROUTES.LOGIN, { 
+                  state: { from: location },
+                  replace: true 
+                });
+                notificationShown.current = false;
+              }
+            }
+          ]
+        });
+      }
       return;
     }
 

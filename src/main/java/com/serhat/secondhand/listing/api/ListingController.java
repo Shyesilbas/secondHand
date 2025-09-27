@@ -45,7 +45,8 @@ public class ListingController {
     public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
             @RequestBody ListingFilterDto filters,
             @AuthenticationPrincipal User currentUser) {
-        Page<ListingDto> filteredListings = listingService.filterByCategory(filters, currentUser.getEmail());
+        String userEmail = currentUser != null ? currentUser.getEmail() : null;
+        Page<ListingDto> filteredListings = listingService.filterByCategory(filters, userEmail);
         return ResponseEntity.ok(filteredListings);
     }
 

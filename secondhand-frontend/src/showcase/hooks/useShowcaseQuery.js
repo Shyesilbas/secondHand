@@ -17,7 +17,11 @@ export const useShowcaseQuery = () => {
         queryKey: SHOWCASE_KEYS.active(),
         queryFn: showcaseService.getActiveShowcases,
         staleTime: 5 * 60 * 1000,         cacheTime: 10 * 60 * 1000,         refetchOnWindowFocus: false,
-        refetchOnMount: false,         retry: 2,         retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),     });
+        refetchOnMount: false,         retry: 1,         retryDelay: 1000,
+        onError: (error) => {
+            console.debug('Showcase fetch failed (this is normal for unauthenticated users):', error.message);
+        }
+    });
 
     return {
         showcases,

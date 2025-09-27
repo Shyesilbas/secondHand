@@ -8,9 +8,7 @@ import { useShowcaseQuery } from '../showcase/hooks/useShowcaseQuery.js';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
-    const { showcases, loading: showcaseLoading } = useShowcaseQuery();
-
-    // Removed manual event listener - React Query handles cache invalidation automatically
+    const { showcases, loading: showcaseLoading, error: showcaseError } = useShowcaseQuery();
 
     return (
         <div className="min-h-screen bg-app-bg">

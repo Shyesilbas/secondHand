@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -110,14 +109,6 @@ public class AuditLogService {
 
     public Long countFailedLoginAttemptsByIp(String ipAddress, LocalDateTime since) {
         return auditLogRepository.countFailedAttemptsByIpAndTypeSince(ipAddress, AuditLog.AuditEventType.LOGIN_FAILURE, since);
-    }
-
-    public List<AuditLog> getUserAuditLogs(String userEmail) {
-        return auditLogRepository.findByUserEmailOrderByCreatedAtDesc(userEmail);
-    }
-
-    public List<AuditLog> getUserAuditLogs(Long userId) {
-        return auditLogRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public Page<AuditLog> getUserAuditLogs(String userEmail, Pageable pageable) {

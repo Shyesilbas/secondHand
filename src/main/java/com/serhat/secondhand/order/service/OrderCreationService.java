@@ -5,11 +5,12 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.order.util.OrderErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -114,7 +115,7 @@ public class OrderCreationService {
                 .currency("TRY")
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
-                .shippingStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.PENDING)
+                .shippingStatus(ShippingStatus.PENDING)
                 .notes(notes)
                 .paymentStatus(Order.PaymentStatus.PENDING)
                 .build();
