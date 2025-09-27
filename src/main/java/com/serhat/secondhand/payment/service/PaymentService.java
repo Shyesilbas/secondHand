@@ -102,9 +102,9 @@ public class PaymentService {
 
         return new PaymentRequest(
                 fromUser.getId(),
-                null,
-                fromUser.getName(),
-                fromUser.getSurname(),
+                null, // System payment - no recipient user
+                "System",
+                "Payment",
                 listing.getId(),
                 totalCreationFee,
                 listingFeePaymentRequest.paymentType(),
@@ -191,10 +191,21 @@ public class PaymentService {
                 PaymentDirection userDirection;
         PaymentTransactionType userTransactionType;
         
-        if (payment.getFromUser().getId().equals(currentUser.getId())) {
-            userDirection = PaymentDirection.OUTGOING;             userTransactionType = PaymentTransactionType.ITEM_PURCHASE;
+        // Preserve original transaction type for system payments like LISTING_CREATION
+        if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION ||
+            payment.getTransactionType() == PaymentTransactionType.SHOWCASE_PAYMENT) {
+            userDirection = payment.getFromUser().getId().equals(currentUser.getId()) 
+                ? PaymentDirection.OUTGOING : PaymentDirection.INCOMING;
+            userTransactionType = payment.getTransactionType();
         } else {
-            userDirection = PaymentDirection.INCOMING;             userTransactionType = PaymentTransactionType.ITEM_SALE;
+            // For user-to-user transactions, map based on user perspective
+            if (payment.getFromUser().getId().equals(currentUser.getId())) {
+                userDirection = PaymentDirection.OUTGOING;
+                userTransactionType = PaymentTransactionType.ITEM_PURCHASE;
+            } else {
+                userDirection = PaymentDirection.INCOMING;
+                userTransactionType = PaymentTransactionType.ITEM_SALE;
+            }
         }
         
         return new PaymentDto(

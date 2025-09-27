@@ -9,6 +9,7 @@ const ComplaintModal = ({
                             targetUserName,
                             targetUserId,
                             listingId,
+                            listingTitle,
                             isLoading
                         }) => {
     const [formData, setFormData] = useState({
@@ -84,10 +85,14 @@ const ComplaintModal = ({
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h3 className="text-xl font-semibold text-text-primary">
-                                Report User
+                                {listingId ? 'Report Listing' : 'Report User'}
                             </h3>
                             <p className="text-sm text-text-secondary mt-1">
-                                You are reporting {targetUserName}
+                                {listingId && listingTitle ? (
+                                    <>You are reporting "<span className="font-medium">{listingTitle}</span>"</>
+                                ) : (
+                                    <>You are reporting {targetUserName}</>
+                                )}
                             </p>
                         </div>
                         <button

@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { createComplaint, getMyComplaints } from '../service/complaintService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import {useCallback, useState} from 'react';
+import {createComplaint, getMyComplaints} from '../service/complaintService.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 export const useComplaints = () => {
     const [complaints, setComplaints] = useState([]);
@@ -18,7 +18,8 @@ export const useComplaints = () => {
 
         try {
             const result = await createComplaint(complaintData);
-            notify('success', 'Complaint Submitted', 'Your complaint has been submitted successfully.');
+            notify('success', 'Complaint Submitted', 'Your complaint has been submitted successfully.' +
+                ' You can Follow your complaints from Profile -> Quick Actions -> Support & Complaints');
             return result;
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to submit complaint.';

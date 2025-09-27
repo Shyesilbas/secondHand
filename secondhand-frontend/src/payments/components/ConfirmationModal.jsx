@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 
 const ConfirmationModal = ({
     selectedListing,
@@ -21,6 +22,7 @@ const ConfirmationModal = ({
     isResendingCode = false
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const { eWallet } = useEWallet();
 
     const renderPaymentMethodDetails = () => {
         if (isLoadingPaymentMethods) {
@@ -115,6 +117,54 @@ const ConfirmationModal = ({
                     </div>
                 );
             }
+        } else if (paymentType === 'EWALLET') {
+            if (eWallet) {
+                const hasSufficientBalance = eWallet.balance >= feeConfig?.totalCreationFee;
+                return (
+                    <div className="space-y-3">
+                        <div className={`border rounded-lg p-4 ${hasSufficientBalance ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${hasSufficientBalance ? 'bg-green-100' : 'bg-red-100'}`}>
+                                        <svg className={`w-6 h-6 ${hasSufficientBalance ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-gray-900">eWallet</p>
+                                        <p className="text-sm text-gray-600">Digital Wallet</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-lg font-semibold text-gray-900">
+                                        {formatPrice(eWallet.balance, 'TRY')}
+                                    </p>
+                                    <p className={`text-sm ${hasSufficientBalance ? 'text-green-600' : 'text-red-600'}`}>
+                                        {hasSufficientBalance ? 'Sufficient Balance' : 'Insufficient Balance'}
+                                    </p>
+                                </div>
+                            </div>
+                            {!hasSufficientBalance && (
+                                <div className="mt-3 p-2 bg-red-100 rounded border border-red-200">
+                                    <p className="text-sm text-red-800">
+                                        You need {formatPrice(feeConfig?.totalCreationFee - eWallet.balance, 'TRY')} more to complete this payment.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            } else {
+                return (
+                    <div className="text-center py-4 border border-dashed border-header-border rounded-lg">
+                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                        <p className="text-text-muted mb-2">eWallet not found</p>
+                        <p className="text-sm text-text-muted">You need to create an eWallet first to use this payment method.</p>
+                    </div>
+                );
+            }
         }
 
         return null;
@@ -127,6 +177,8 @@ const ConfirmationModal = ({
             return paymentMethods.creditCards.length > 0;
         } else if (paymentType === 'TRANSFER') {
             return paymentMethods.bankAccounts.length > 0;
+        } else if (paymentType === 'EWALLET') {
+            return eWallet && eWallet.balance >= feeConfig?.totalCreationFee;
         }
         
         return false;

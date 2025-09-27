@@ -4,7 +4,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useComplaints } from '../hooks/useComplaints.js';
 import ComplaintModal from './ComplaintModal.jsx';
 
-const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, className = "" }) => {
+const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, listingTitle, className = "" }) => {
     const [showModal, setShowModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user: currentUser } = useAuth();
@@ -44,6 +44,9 @@ const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, 
                 onClose={() => setShowModal(false)}
                 onSubmit={handleComplaint}
                 targetUserName={targetUserName}
+                targetUserId={targetUserId}
+                listingId={listingId}
+                listingTitle={listingTitle}
                 isLoading={isSubmitting}
             />
         </>

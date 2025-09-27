@@ -164,6 +164,7 @@ const ListingDetailPage = () => {
                         targetUserId={listing.sellerId}
                         targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
                         listingId={listing.id}
+                        listingTitle={listing.title}
                         className="w-full"
                       />
                     </div>
