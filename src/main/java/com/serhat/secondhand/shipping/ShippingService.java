@@ -3,8 +3,10 @@ package com.serhat.secondhand.shipping;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,6 +20,14 @@ public class ShippingService {
 
     private final OrderRepository orderRepository;
 
+    @Getter
+    @Value("${app.shipping.pickup.duration.hours}")
+    private Integer pickupDurationHours;
+
+    @Getter
+    @Value("${app.shipping.delivery.duration.hours}")
+    private Integer deliveryDurationHours;
+
 
     public ShippingStatus calculateShippingStatus(Order order) {
         if (order.getCreatedAt() == null) {
@@ -28,9 +38,9 @@ public class ShippingService {
         Duration duration = Duration.between(order.getCreatedAt(), now);
 
         ShippingStatus newStatus;
-        if (duration.toHours() < 3) {
+        if (duration.toHours() < pickupDurationHours) {
             newStatus = ShippingStatus.PENDING;
-        } else if (duration.toHours() < 24) {
+        } else if (duration.toHours() < deliveryDurationHours) {
             newStatus = ShippingStatus.IN_TRANSIT;
         } else {
             newStatus = ShippingStatus.DELIVERED;
@@ -49,4 +59,5 @@ public class ShippingService {
     public void updateShippingStatusesForOrders(List<Order> orders) {
         orders.forEach(this::calculateShippingStatus);
     }
+
 }

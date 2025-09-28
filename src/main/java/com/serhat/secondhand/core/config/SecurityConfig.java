@@ -1,6 +1,7 @@
 package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,7 +25,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -83,7 +82,8 @@ public class SecurityConfig {
     );
 
     private static final List<String> SHOWCASE_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/showcases/active"
+            "/api/showcases/active",
+            "api/showcases/pricing-config"
     );
 
     private static final List<String> AGREEMENT_PUBLIC_ENDPOINTS = Arrays.asList(

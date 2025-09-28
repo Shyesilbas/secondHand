@@ -245,5 +245,6 @@ export const API_ENDPOINTS = {
         MY_SHOWCASES: '/showcases/my',
         EXTEND: (id) => `/showcases/${id}/extend`,
         CANCEL: (id) => `/showcases/${id}/cancel`,
+        PRICING_CONFIG: '/showcases/pricing-config',
     },
 };

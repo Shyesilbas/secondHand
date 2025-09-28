@@ -40,6 +40,8 @@ public class OrderMapper {
                 .updatedAt(order.getUpdatedAt())
                 .orderItems(orderItemsToDtoList(order.getOrderItems()))
                 .shippingStatus(order.getShippingStatus())
+                .estimatedTransitDate(order.getEstimatedTransitDate())
+                .estimatedDeliveryDate(order.getEstimatedDeliveryDate())
                 .build();
     }
 

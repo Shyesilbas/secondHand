@@ -79,6 +79,12 @@ public class Order {
     @Column(name = "shipping_status")
     private ShippingStatus shippingStatus;
 
+    @Column(name = "estimated_transit_date")
+    private LocalDateTime estimatedTransitDate;
+
+    @Column(name = "estimated_delivery_date")
+    private LocalDateTime estimatedDeliveryDate;
+
     @Getter
     public enum OrderStatus {
         PENDING("Pending"),
