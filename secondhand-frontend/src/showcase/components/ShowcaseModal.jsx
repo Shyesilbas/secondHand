@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {showcaseService} from '../services/showcaseService.js';
+import {useShowcasePricing} from '../hooks/useShowcasePricing.js';
 import {usePaymentMethods} from '../../payments/hooks/usePaymentMethods.js';
 import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
 import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
@@ -16,6 +17,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
     const { paymentMethods, isLoading: isPaymentLoading, refetch } = usePaymentMethods();
     const { eWallet, loading: isEWalletLoading, refreshWallet } = useEWallet();
+    const { pricingConfig: showcasePricing, isLoading: isPricingLoading } = useShowcasePricing();
 
     useEffect(() => {
         if (isOpen) {
@@ -49,8 +51,23 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const today = new Date();
     const startDate = today.toLocaleDateString('tr-TR');
     const endDate = new Date(today.getTime() + (days - 1) * 24 * 60 * 60 * 1000).toLocaleDateString('tr-TR');
-    const totalCost = days * 10;
-    const calculateTotal = () => totalCost;
+    
+    const calculateTotal = () => {
+        if (!showcasePricing) return 0;
+        return showcasePricing.totalDailyCost * days;
+    };
+    
+    const calculateSubtotal = () => {
+        if (!showcasePricing) return 0;
+        return showcasePricing.dailyCost * days;
+    };
+    
+    const calculateTax = () => {
+        if (!showcasePricing) return 0;
+        return (showcasePricing.totalDailyCost - showcasePricing.dailyCost) * days;
+    };
+    
+    const totalCost = calculateTotal();
 
     const handlePayment = async () => {
         if (!listingId) {
@@ -91,11 +108,36 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             required
                         />
-                        <p className="text-xs text-gray-500 mt-1">Minimum 1, maximum 30 days. Per Day: <span className="font-semibold">10₺</span></p>
-                        <div className="flex justify-between mt-4 p-3 bg-gray-50 rounded">
-                            <span className="font-medium">Total:</span>
-                            <span className="text-lg font-bold text-emerald-600">{totalCost}₺</span>
-                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Minimum 1, maximum 30 days. 
+                            {showcasePricing ? (
+                                <>Per Day: <span className="font-semibold">{showcasePricing.dailyCost}₺</span></>
+                            ) : (
+                                <>Per Day: <span className="font-semibold">10₺</span></>
+                            )}
+                        </p>
+                        {showcasePricing && (
+                            <div className="mt-4 p-3 bg-gray-50 rounded space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span>Subtotal ({days} days):</span>
+                                    <span>{calculateSubtotal().toFixed(2)}₺</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span>Tax ({showcasePricing.taxPercentage}%):</span>
+                                    <span>{calculateTax().toFixed(2)}₺</span>
+                                </div>
+                                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                                    <span>Total:</span>
+                                    <span className="text-emerald-600">{totalCost.toFixed(2)}₺</span>
+                                </div>
+                            </div>
+                        )}
+                        {!showcasePricing && (
+                            <div className="flex justify-between mt-4 p-3 bg-gray-50 rounded">
+                                <span className="font-medium">Total:</span>
+                                <span className="text-lg font-bold text-emerald-600">{totalCost}₺</span>
+                            </div>
+                        )}
                     </div>
                 );
             case 2:
@@ -139,10 +181,27 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                                 <span>{paymentType === 'CREDIT_CARD' ? 'Credit Card' : paymentType === 'TRANSFER' ? 'Bank Wire' : 'eWallet'}</span>
                             </div>
                         </div>
-                        <div className="flex justify-between p-3 bg-gray-50 rounded mb-2">
-                            <span className="font-bold text-lg">Total:</span>
-                            <span className="text-xl font-bold text-emerald-600">{totalCost}₺</span>
-                        </div>
+                        {showcasePricing ? (
+                            <div className="p-3 bg-gray-50 rounded mb-2 space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span>Subtotal ({days} days):</span>
+                                    <span>{calculateSubtotal().toFixed(2)}₺</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span>Tax ({showcasePricing.taxPercentage}%):</span>
+                                    <span>{calculateTax().toFixed(2)}₺</span>
+                                </div>
+                                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                                    <span>Total:</span>
+                                    <span className="text-emerald-600">{totalCost.toFixed(2)}₺</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex justify-between p-3 bg-gray-50 rounded mb-2">
+                                <span className="font-bold text-lg">Total:</span>
+                                <span className="text-xl font-bold text-emerald-600">{totalCost}₺</span>
+                            </div>
+                        )}
                         {error && <div className="mb-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
                         <button
                             className="w-full py-2 mt-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"

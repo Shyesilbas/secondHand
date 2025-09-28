@@ -2,16 +2,19 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
 import {usePricing} from '../../../payments/hooks/usePricing.js';
+import {useShowcasePricing} from '../../../showcase/hooks/useShowcasePricing.js';
 import {useAgreements} from '../../../agreements/hooks/useAgreements.js';
 import {formatCurrency} from '../../formatters.js';
 import {ROUTES} from '../../constants/routes.js';
 
 const Footer = () => {
     const { feeConfig, isLoading } = usePricing();
+    const { pricingConfig: showcasePricing, isLoading: showcasePricingLoading } = useShowcasePricing();
     const { agreements, isLoading: agreementsLoading } = useAgreements();
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [showPricing, setShowPricing] = useState(false);
+    const [showReportIssues, setShowReportIssues] = useState(false);
 
     return (
         <footer className="bg-gray-800 text-white py-8">
@@ -35,25 +38,39 @@ const Footer = () => {
                             onClick={() => setShowPricing(!showPricing)}
                             className="text-sm text-gray-300 hover:text-white transition-colors mb-2 block"
                         >
-                            {showPricing ? 'Hide' : 'Show'} Listing Fees →
+                            {showPricing ? 'Hide' : 'Show'} Pricing →
                         </button>
                         {showPricing && (
                             <div className="text-sm text-gray-300 space-y-1">
-                                {isLoading ? (
+                                {isLoading || showcasePricingLoading ? (
                                     <div className="animate-pulse">
+                                        <div className="h-4 bg-gray-600 rounded mb-2"></div>
                                         <div className="h-4 bg-gray-600 rounded mb-2"></div>
                                         <div className="h-4 bg-gray-600 rounded mb-2"></div>
                                         <div className="h-4 bg-gray-600 rounded"></div>
                                     </div>
-                                ) : feeConfig ? (
-                                    <>
-                                        <div>• Listing Creation: {formatCurrency(feeConfig.creationFee, 'TRY')}</div>
-                                        <div>• Promotion Fee: {formatCurrency(feeConfig.promotionFee, 'TRY')}</div>
-                                        <div>• Tax ({feeConfig.taxPercentage}%): {formatCurrency(feeConfig.totalCreationFee - feeConfig.creationFee, 'TRY')}</div>
-                                        <div className="font-semibold text-white mt-2">• Total: {formatCurrency(feeConfig.totalCreationFee, 'TRY')}</div>
-                                    </>
                                 ) : (
-                                    <div>Fee information unavailable</div>
+                                    <>
+                                        <div className="font-semibold text-white mb-2">Listing Fee:</div>
+                                        {feeConfig && (
+                                            <>
+                                                <div>• Creation: {formatCurrency(feeConfig.creationFee, 'TRY')}</div>
+                                                <div>• Tax ({feeConfig.taxPercentage}%): {formatCurrency(feeConfig.totalCreationFee - feeConfig.creationFee, 'TRY')}</div>
+                                                <div className="font-semibold text-white">• Total: {formatCurrency(feeConfig.totalCreationFee, 'TRY')}</div>
+                                            </>
+                                        )}
+                                        <div className="font-semibold text-white mt-3 mb-2">Showcase:</div>
+                                        {showcasePricing && (
+                                            <>
+                                                <div>• Daily Cost: {formatCurrency(showcasePricing.dailyCost, 'TRY')}</div>
+                                                <div>• Tax ({showcasePricing.taxPercentage}%): {formatCurrency(showcasePricing.totalDailyCost - showcasePricing.dailyCost, 'TRY')}</div>
+                                                <div className="font-semibold text-white">• Total per Day: {formatCurrency(showcasePricing.totalDailyCost, 'TRY')}</div>
+                                            </>
+                                        )}
+                                        {(!feeConfig && !showcasePricing) && (
+                                            <div>Pricing information unavailable</div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         )}
@@ -66,8 +83,20 @@ const Footer = () => {
                             <li>• Help Center</li>
                             <li>• Contact Us</li>
                             <li>• Safety Tips</li>
-                            <li>• Report Issues</li>
+                            <li>
+                                <button
+                                    onClick={() => setShowReportIssues(!showReportIssues)}
+                                    className="text-sm text-gray-300 hover:text-white transition-colors"
+                                >
+                                    {showReportIssues ? 'Hide' : 'Show'} Report Issues →
+                                </button>
+                            </li>
                         </ul>
+                        {showReportIssues && (
+                            <div className="mt-3 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                                <p>To report an issue, go to the listing or person's page you want to report, click the Report button, and create your complaint by filling in the necessary information.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Legal */}

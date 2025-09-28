@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.dto;
+package com.serhat.secondhand.showcase.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,13 +11,11 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListingFeeConfigDto {
+public class ShowcasePricingDto {
     
-
-    private BigDecimal creationFee;
+    private BigDecimal dailyCost;
     
-
     private BigDecimal taxPercentage;
-
-    private BigDecimal totalCreationFee;
+    
+    private BigDecimal totalDailyCost;
 }

@@ -77,7 +77,6 @@ export const PAYMENT_DIRECTION_BADGE_COLORS = {
 
 export const ListingFeeConfigDTO = {
     creationFee: undefined,
-    promotionFee: undefined,
     taxPercentage: undefined,
     currency: undefined,
 };

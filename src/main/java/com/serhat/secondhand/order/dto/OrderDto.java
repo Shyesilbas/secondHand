@@ -33,4 +33,6 @@ public class OrderDto {
     private LocalDateTime updatedAt;
     private List<OrderItemDto> orderItems;
     private ShippingStatus shippingStatus;
+    private LocalDateTime estimatedTransitDate;
+    private LocalDateTime estimatedDeliveryDate;
 }

@@ -56,9 +56,6 @@ public class PaymentService {
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
 
-    @Getter
-    @Value("${app.listing.promotion.fee}")
-    private BigDecimal listingPromotionFee;
 
     @Getter
     @Value("${app.listing.fee.tax}")
@@ -265,7 +262,6 @@ public class PaymentService {
 
         return ListingFeeConfigDto.builder()
                 .creationFee(listingCreationFee)
-                .promotionFee(listingPromotionFee)
                 .taxPercentage(listingFeeTax)
                 .totalCreationFee(totalCreationFee)
                 .build();

@@ -3,6 +3,7 @@ package com.serhat.secondhand.showcase;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
+import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -57,5 +58,11 @@ public class ShowcaseController {
         
         showcaseService.cancelShowcase(id);
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/pricing-config")
+    public ResponseEntity<ShowcasePricingDto> getShowcasePricingConfig() {
+        ShowcasePricingDto config = showcaseService.getShowcasePricingConfig();
+        return ResponseEntity.ok(config);
     }
 }

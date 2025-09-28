@@ -8,6 +8,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.shipping.ShippingService;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ public class OrderCreationService {
 
     private final OrderRepository orderRepository;
     private final AddressService addressService;
+    private final ShippingService shippingService;
 
         public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request) {
         log.info("Creating order for user: {}", user.getEmail());
@@ -107,6 +110,10 @@ public class OrderCreationService {
 
         private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
                            BigDecimal totalAmount, String orderNumber, String notes) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime estimatedTransitDate = now.plusHours(shippingService.getPickupDurationHours());
+        LocalDateTime estimatedDeliveryDate = now.plusHours(shippingService.getDeliveryDurationHours());
+        
         return Order.builder()
                 .orderNumber(orderNumber)
                 .user(user)
@@ -116,6 +123,8 @@ public class OrderCreationService {
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
                 .shippingStatus(ShippingStatus.PENDING)
+                .estimatedTransitDate(estimatedTransitDate)
+                .estimatedDeliveryDate(estimatedDeliveryDate)
                 .notes(notes)
                 .paymentStatus(Order.PaymentStatus.PENDING)
                 .build();

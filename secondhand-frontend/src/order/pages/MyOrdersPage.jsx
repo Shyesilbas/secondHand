@@ -87,24 +87,28 @@ const MyOrdersPage = () => {
     }
   };
 
-  const getEstimatedDeliveryTime = (createdAt, shippingStatus) => {
-    if (shippingStatus === 'DELIVERED' || shippingStatus === 'CANCELLED') {
+  const getEstimatedDeliveryTime = (order) => {
+    if (order.shippingStatus === 'DELIVERED' || order.shippingStatus === 'CANCELLED') {
       return null;
     }
 
-    const orderDate = new Date(createdAt);
-    const now = new Date();
-    const hoursPassed = (now - orderDate) / (1000 * 60 * 60);
+    if (order.estimatedTransitDate && order.estimatedDeliveryDate) {
+      const now = new Date();
+      const transitDate = new Date(order.estimatedTransitDate);
+      const deliveryDate = new Date(order.estimatedDeliveryDate);
 
-    if (hoursPassed < 3) {
-      const remainingHours = Math.ceil(3 - hoursPassed);
-      return `Est. delivery in ${remainingHours}h`;
-    } else if (hoursPassed < 24) {
-      const remainingHours = Math.ceil(24 - hoursPassed);
-      return `Est. delivery in ${remainingHours}h`;
-    } else {
-      return 'Est. delivery: Soon';
+      if (now < transitDate) {
+        const hoursUntilTransit = Math.ceil((transitDate - now) / (1000 * 60 * 60));
+        return `Est. in transit in ${hoursUntilTransit}h`;
+      } else if (now < deliveryDate) {
+        const hoursUntilDelivery = Math.ceil((deliveryDate - now) / (1000 * 60 * 60));
+        return `Est. delivery in ${hoursUntilDelivery}h`;
+      } else {
+        return 'Est. delivery: Soon';
+      }
     }
+
+    return null;
   };
 
   const getStatusColor = (status) => {
@@ -242,12 +246,12 @@ const MyOrdersPage = () => {
                       {resolveEnumLabel(enums, 'shippingStatuses', order.shippingStatus)}
                     </span>
                       </div>
-                      {getEstimatedDeliveryTime(order.createdAt, order.shippingStatus) && (
+                      {getEstimatedDeliveryTime(order) && (
                           <div className="text-xs text-gray-600 flex items-center gap-1">
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                             </svg>
-                            {getEstimatedDeliveryTime(order.createdAt, order.shippingStatus)}
+                            {getEstimatedDeliveryTime(order)}
                           </div>
                       )}
                     </div>
@@ -366,7 +370,7 @@ const MyOrdersPage = () => {
                   </div>
 
                   {/* Delivery Info */}
-                  {getEstimatedDeliveryTime(selectedOrder.createdAt, selectedOrder.shippingStatus) && (
+                  {getEstimatedDeliveryTime(selectedOrder) && (
                       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                         <div className="flex items-center">
                           <svg className="w-5 h-5 text-amber-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -374,7 +378,24 @@ const MyOrdersPage = () => {
                           </svg>
                           <div>
                             <p className="text-sm font-medium text-amber-800">Delivery Update</p>
-                            <p className="text-xs text-amber-700 mt-1">{getEstimatedDeliveryTime(selectedOrder.createdAt, selectedOrder.shippingStatus)}</p>
+                            <p className="text-xs text-amber-700 mt-1">{getEstimatedDeliveryTime(selectedOrder)}</p>
+                          </div>
+                        </div>
+                      </div>
+                  )}
+
+                  {/* Detailed Shipping Timeline */}
+                  {selectedOrder.estimatedTransitDate && selectedOrder.estimatedDeliveryDate && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 className="text-sm font-medium text-blue-800 mb-3">Shipping Timeline</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-blue-700">Estimated In Transit:</span>
+                            <span className="font-medium text-blue-900">{formatDateTime(selectedOrder.estimatedTransitDate)}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-blue-700">Estimated Delivery:</span>
+                            <span className="font-medium text-blue-900">{formatDateTime(selectedOrder.estimatedDeliveryDate)}</span>
                           </div>
                         </div>
                       </div>

@@ -54,5 +54,12 @@ export const showcaseService = {
       () => post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),
       'Error cancelling showcase'
     );
+  },
+
+  getPricingConfig: async () => {
+    return withErrorHandling(
+      () => get(API_ENDPOINTS.SHOWCASES.PRICING_CONFIG),
+      'Error fetching showcase pricing config'
+    );
   }
 };

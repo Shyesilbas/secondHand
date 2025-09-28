@@ -10,7 +10,11 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.payment.service.PaymentService;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
+import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ShowcaseService {
     
     private final ShowcaseRepository showcaseRepository;
@@ -31,7 +36,13 @@ public class ShowcaseService {
     private final PaymentService paymentService;
     private final UserService userService;
 
-    private static final BigDecimal DAILY_COST = new BigDecimal("10.00");
+    @Getter
+    @Value("${app.showcase.daily.cost}")
+    private BigDecimal showcaseDailyCost;
+
+    @Getter
+    @Value("${app.showcase.fee.tax}")
+    private BigDecimal showcaseFeeTax;
     
     public Showcase createShowcase(ShowcasePaymentRequest request, Authentication authentication) {
         if (request.days() <= 0 || request.days() > 30) {
@@ -43,7 +54,11 @@ public class ShowcaseService {
         Listing listing = listingService.findById(request.listingId())
                 .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
         
-        BigDecimal totalCost = DAILY_COST.multiply(new BigDecimal(request.days()));
+        BigDecimal dailyCostWithTax = showcaseDailyCost
+                .multiply(showcaseFeeTax)
+                .divide(BigDecimal.valueOf(100))
+                .add(showcaseDailyCost);
+        BigDecimal totalCost = dailyCostWithTax.multiply(new BigDecimal(request.days()));
         
         PaymentRequest paymentRequest = new PaymentRequest(
                 user.getId(),
@@ -71,7 +86,7 @@ public class ShowcaseService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .totalCost(totalCost)
-                .dailyCost(DAILY_COST)
+                .dailyCost(showcaseDailyCost)
                 .status(ShowcaseStatus.ACTIVE)
                 .build());
 
@@ -103,7 +118,11 @@ public class ShowcaseService {
         }
         
         showcase.setEndDate(showcase.getEndDate().plusDays(additionalDays));
-        showcase.setTotalCost(showcase.getTotalCost().add(DAILY_COST.multiply(new BigDecimal(additionalDays))));
+        BigDecimal dailyCostWithTax = showcaseDailyCost
+                .multiply(showcaseFeeTax)
+                .divide(BigDecimal.valueOf(100))
+                .add(showcaseDailyCost);
+        showcase.setTotalCost(showcase.getTotalCost().add(dailyCostWithTax.multiply(new BigDecimal(additionalDays))));
         
         showcaseRepository.save(showcase);
     }
@@ -125,5 +144,20 @@ public class ShowcaseService {
             showcase.setStatus(ShowcaseStatus.EXPIRED);
             showcaseRepository.save(showcase);
         });
+    }
+    
+    public ShowcasePricingDto getShowcasePricingConfig() {
+        log.info("Getting showcase pricing configuration");
+
+        BigDecimal dailyCostTax = showcaseDailyCost
+                .multiply(showcaseFeeTax)
+                .divide(BigDecimal.valueOf(100));
+        BigDecimal totalDailyCost = showcaseDailyCost.add(dailyCostTax);
+
+        return ShowcasePricingDto.builder()
+                .dailyCost(showcaseDailyCost)
+                .taxPercentage(showcaseFeeTax)
+                .totalDailyCost(totalDailyCost)
+                .build();
     }
 }
