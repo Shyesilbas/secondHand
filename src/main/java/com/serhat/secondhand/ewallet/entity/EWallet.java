@@ -33,6 +33,9 @@ public class EWallet {
     @Column(precision = 19, scale = 2)
     private BigDecimal walletLimit;
 
+    @Column(precision = 19, scale = 2)
+    private BigDecimal spendingWarningLimit;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

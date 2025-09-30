@@ -2,11 +2,9 @@ package com.serhat.secondhand.ewallet.controller;
 
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.service.EWalletService;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -20,59 +18,60 @@ public class EWalletController {
     private final EWalletService eWalletService;
 
     @PostMapping
-    public ResponseEntity<EWalletDto> createEWallet(Authentication authentication) {
+    public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {
         log.info("Creating eWallet for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        EWalletDto eWallet = eWalletService.createEWallet(user.getId());
+        EWalletDto eWallet = eWalletService.createEWallet(request);
         return ResponseEntity.ok(eWallet);
     }
 
     @GetMapping
-    public ResponseEntity<EWalletDto> getEWallet(Authentication authentication) {
+    public ResponseEntity<EWalletDto> getEWallet() {
         log.info("Getting eWallet for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        EWalletDto eWallet = eWalletService.getEWalletByUserId(user.getId());
+        EWalletDto eWallet = eWalletService.getEWalletByUserId();
         return ResponseEntity.ok(eWallet);
+    }
+
+    @PutMapping("/update/spendingWarning")
+    public void updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
+        eWalletService.updateSpendingWarningLimit(newSpendingWarning);
+    }
+
+    @DeleteMapping("/update/spendingWarning")
+    public void removeSpendingWarning(){
+        eWalletService.removeSpendingWarningLimit();
     }
 
     @PutMapping("/limits")
     public ResponseEntity<EWalletDto> updateLimits(
-            Authentication authentication,
             @RequestBody UpdateLimitRequest request) {
         log.info("Updating limits for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        EWalletDto eWallet = eWalletService.updateLimits(user.getId(), request);
+        EWalletDto eWallet = eWalletService.updateLimits(request);
         return ResponseEntity.ok(eWallet);
     }
 
     @PostMapping("/deposit")
     public ResponseEntity<String> deposit(
-            Authentication authentication,
             @RequestBody DepositRequest request) {
-        log.info("Processing deposit for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        eWalletService.deposit(user.getId(), request, authentication);
+
+        eWalletService.deposit(request);
+
         return ResponseEntity.ok("Deposit successful");
     }
 
     @PostMapping("/withdraw")
     public ResponseEntity<String> withdraw(
-            Authentication authentication,
             @RequestBody WithdrawRequest request) {
         log.info("Processing withdrawal for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        eWalletService.withdraw(user.getId(), request, authentication);
+        eWalletService.withdraw( request);
         return ResponseEntity.ok("Withdrawal successful");
     }
 
 
     @GetMapping("/balance/check")
     public ResponseEntity<Boolean> checkBalance(
-            Authentication authentication,
             @RequestParam BigDecimal amount) {
         log.info("Checking balance for authenticated user");
-        User user = (User) authentication.getPrincipal();
-        boolean hasBalance = eWalletService.hasSufficientBalance(user.getId(), amount);
+        boolean hasBalance = eWalletService.hasSufficientBalance(amount);
         return ResponseEntity.ok(hasBalance);
     }
 }

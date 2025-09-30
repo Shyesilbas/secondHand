@@ -27,11 +27,15 @@ export const useEWallet = () => {
         }
     };
 
-        const createEWallet = async () => {
+        const createEWallet = async (options = {}) => {
         setLoading(true);
         setError(null);
         try {
-            const walletData = await ewalletService.createEWallet();
+            const payload = {
+                limit: options.limit ?? 1000,
+                spendingWarningLimit: options.spendingWarningLimit ?? 200
+            };
+            const walletData = await ewalletService.createEWallet(payload);
             setEWallet(walletData);
             showNotification('eWallet created successfully', 'success');
             return walletData;
@@ -49,12 +53,46 @@ export const useEWallet = () => {
         setLoading(true);
         setError(null);
         try {
-            const updatedWallet = await ewalletService.updateLimits(newLimit);
-            setEWallet(updatedWallet);
-            showNotification('eWallet limit updated successfully', 'success');
-            return updatedWallet;
+            const updated = await ewalletService.updateLimits(newLimit);
+            setEWallet(updated);
+            showNotification('Limit updated successfully', 'success');
+            return updated;
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to update limit';
+            setError(errorMessage);
+            showNotification(errorMessage, 'error');
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateSpendingWarningLimit = async (newLimit) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await ewalletService.updateSpendingWarningLimit(newLimit);
+            await fetchEWallet();
+            showNotification('Spending warning limit updated', 'success');
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to update spending warning limit';
+            setError(errorMessage);
+            showNotification(errorMessage, 'error');
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const removeSpendingWarningLimit = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await ewalletService.removeSpendingWarningLimit();
+            await fetchEWallet();
+            showNotification('Spending warning limit removed', 'success');
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to remove spending warning limit';
             setError(errorMessage);
             showNotification(errorMessage, 'error');
             throw err;
@@ -67,10 +105,9 @@ export const useEWallet = () => {
         setLoading(true);
         setError(null);
         try {
-            const transaction = await ewalletService.deposit(amount, bankId);
-                        await fetchEWallet();
-            showNotification(`Successfully deposited ${amount} TL`, 'success');
-            return transaction;
+            await ewalletService.deposit(amount, bankId);
+            showNotification('Deposit successful', 'success');
+            await fetchEWallet();
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to deposit';
             setError(errorMessage);
@@ -85,10 +122,9 @@ export const useEWallet = () => {
         setLoading(true);
         setError(null);
         try {
-            const transaction = await ewalletService.withdraw(amount, bankId);
-                        await fetchEWallet();
-            showNotification(`Successfully withdrew ${amount} TL`, 'success');
-            return transaction;
+            await ewalletService.withdraw(amount, bankId);
+            showNotification('Withdrawal successful', 'success');
+            await fetchEWallet();
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to withdraw';
             setError(errorMessage);
@@ -136,6 +172,8 @@ export const useEWallet = () => {
         error,
         createEWallet,
         updateLimits,
+        updateSpendingWarningLimit,
+        removeSpendingWarningLimit,
         deposit,
         withdraw,
         fetchTransactions,

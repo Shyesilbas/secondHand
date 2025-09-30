@@ -24,7 +24,7 @@ public class EWalletPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return eWalletService.hasSufficientBalance(fromUser.getId(), amount);
+        return eWalletService.hasSufficientBalance(amount);
     }
 
     @Override

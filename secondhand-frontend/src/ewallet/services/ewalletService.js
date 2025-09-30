@@ -1,9 +1,9 @@
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { get, post, put } from '../../common/services/api/request.js';
+import { get, post, put, del } from '../../common/services/api/request.js';
 
 export const ewalletService = {
-        createEWallet: async () => {
-        return post(API_ENDPOINTS.EWALLET.CREATE);
+        createEWallet: async (request) => {
+        return post(API_ENDPOINTS.EWALLET.CREATE, request);
     },
 
         getEWallet: async () => {
@@ -12,6 +12,14 @@ export const ewalletService = {
 
         updateLimits: async (newLimit) => {
         return put(API_ENDPOINTS.EWALLET.UPDATE_LIMITS, { newLimit });
+    },
+
+    updateSpendingWarningLimit: async (newLimit) => {
+        return put(API_ENDPOINTS.EWALLET.UPDATE_SPENDING_WARNING, newLimit);
+    },
+
+    removeSpendingWarningLimit: async () => {
+        return del(API_ENDPOINTS.EWALLET.REMOVE_SPENDING_WARNING);
     },
 
         deposit: async (amount, bankId) => {
