@@ -162,6 +162,8 @@ const ShoppingCartPage = () => {
                 onCheckout={checkout.handleCheckout}
                 proceedDisabled={checkout.proceedDisabled}
                 isCheckingOut={checkout.isCheckingOut}
+                showEWalletWarning={checkout.showEWalletWarning}
+                onConfirmEWalletWarning={checkout.confirmEWalletWarningAndCheckout}
             />
 
             {/* Clear Cart Modal */}

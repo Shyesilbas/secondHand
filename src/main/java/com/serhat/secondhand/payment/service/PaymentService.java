@@ -10,10 +10,7 @@ import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentResult;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.payment.entity.*;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
@@ -260,6 +257,30 @@ public class PaymentService {
             "failedPayments", totalPayments - successfulPayments,
             "successRate", totalPayments > 0 ? (double) successfulPayments / totalPayments * 100 : 0,
             "totalAmount", totalAmount
+        );
+    }
+
+    public Map<String, Object> getPaymentStatistics(Authentication authentication, PaymentType filterType) {
+        User user = userService.getAuthenticatedUser(authentication);
+        var payments = paymentRepository.findByFromUserOrToUser(user, user);
+
+        if (filterType != null) {
+            payments = payments.stream().filter(p -> p.getPaymentType() == filterType).toList();
+        }
+
+        long totalPayments = payments.size();
+        long successfulPayments = payments.stream().filter(Payment::isSuccess).count();
+        BigDecimal totalAmount = payments.stream()
+                .filter(Payment::isSuccess)
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return Map.of(
+                "totalPayments", totalPayments,
+                "successfulPayments", successfulPayments,
+                "failedPayments", totalPayments - successfulPayments,
+                "successRate", totalPayments > 0 ? (double) successfulPayments / totalPayments * 100 : 0,
+                "totalAmount", totalAmount
         );
     }
 

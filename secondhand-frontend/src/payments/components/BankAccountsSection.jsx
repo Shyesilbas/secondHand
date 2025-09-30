@@ -4,6 +4,8 @@ import BankAccountCard from './BankAccountCard.jsx';
 import { bankService } from '../services/bankService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { BankDto } from '../banks.js';
+import { paymentService } from '../services/paymentService.js';
+import { formatCurrency } from '../../common/formatters.js';
 
 const BankAccountsSection = () => {
     const notification = useNotification();
@@ -12,6 +14,7 @@ const BankAccountsSection = () => {
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
     const [isCreating, setIsCreating] = React.useState(false);
+    const [totalSpent, setTotalSpent] = React.useState(null);
 
     const bankAccounts = Array.isArray(rawBankAccounts)
         ? rawBankAccounts.map(BankDto)
@@ -33,6 +36,11 @@ const BankAccountsSection = () => {
 
     React.useEffect(() => {
         fetchBankAccounts();
+        paymentService.getStatistics('TRANSFER').then((stats) => {
+            if (stats && typeof stats.totalAmount !== 'undefined') {
+                setTotalSpent(stats.totalAmount);
+            }
+        }).catch(() => {});
     }, [fetchBankAccounts]);
 
     const handleError = (err, defaultMessage) => {
@@ -84,9 +92,17 @@ const BankAccountsSection = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-text-primary">
-                    Bank Accounts ({bankAccounts.length})
-                </h2>
+                <div>
+                    <h2 className="text-xl font-semibold text-text-primary">
+                        Bank Accounts ({bankAccounts.length})
+                    </h2>
+                    {totalSpent != null && (
+                        <div className="mt-2 text-sm text-text-secondary">
+                            Total Spent (Bank Transfer):
+                            <span className="ml-2 font-medium text-text-primary">{formatCurrency(totalSpent)}</span>
+                        </div>
+                    )}
+                </div>
                 <button
                     onClick={handleCreateBankAccount}
                     className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50"

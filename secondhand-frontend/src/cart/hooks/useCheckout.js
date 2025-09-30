@@ -13,21 +13,23 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const { addresses } = useAddresses();
     const { eWallet } = useEWallet();
 
-        const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [step, setStep] = useState(1);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-        const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
+    const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
     const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
 
-        const [selectedPaymentType, setSelectedPaymentType] = useState('CREDIT_CARD');
+    const [selectedPaymentType, setSelectedPaymentType] = useState('CREDIT_CARD');
     const [cards, setCards] = useState([]);
     const [selectedCardNumber, setSelectedCardNumber] = useState(null);
     const [bankAccounts, setBankAccounts] = useState([]);
     const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
 
-        useEffect(() => {
-                creditCardService
+    const [showEWalletWarning, setShowEWalletWarning] = useState(false);
+
+    useEffect(() => {
+        creditCardService
             .getAll()
             .then((data) => {
                 let normalized = [];
@@ -45,35 +47,35 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 setCards([]);
             });
 
-                bankService
+        bankService
             .getBankAccount()
             .then((data) => {
-                const normalized = Array.isArray(data) 
-                    ? data 
+                const normalized = Array.isArray(data)
+                    ? data
                     : (data && Array.isArray(data.content) ? data.content : []);
                 setBankAccounts(normalized);
             })
             .catch(() => setBankAccounts([]));
     }, []);
 
-        useEffect(() => {
-        if (selectedPaymentType === 'TRANSFER' && 
-            Array.isArray(bankAccounts) && 
-            bankAccounts.length > 0 && 
+    useEffect(() => {
+        if (selectedPaymentType === 'TRANSFER' &&
+            Array.isArray(bankAccounts) &&
+            bankAccounts.length > 0 &&
             !selectedBankAccountIban) {
             setSelectedBankAccountIban(bankAccounts[0].IBAN || null);
         }
         
-        if (selectedPaymentType === 'CREDIT_CARD' && 
-            Array.isArray(cards) && 
-            cards.length > 0 && 
+        if (selectedPaymentType === 'CREDIT_CARD' &&
+            Array.isArray(cards) &&
+            cards.length > 0 &&
             !selectedCardNumber) {
             const number = cards[0].number || cards[0].cardNumber || null;
             setSelectedCardNumber(number);
         }
     }, [selectedPaymentType, bankAccounts, selectedBankAccountIban, cards, selectedCardNumber]);
 
-        const proceedDisabled = useMemo(() => {
+    const proceedDisabled = useMemo(() => {
         if (cartCount === 0) return true;
         if (!selectedShippingAddressId) return true;
         if (selectedPaymentType === 'CREDIT_CARD' && (!Array.isArray(cards) || cards.length === 0)) return true;
@@ -88,6 +90,14 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const handleCheckout = async () => {
         setIsCheckingOut(true);
         try {
+            if (selectedPaymentType === 'EWALLET' && eWallet && eWallet.spendingWarningLimit) {
+                const projectedSpent = calculateTotal();
+                if (projectedSpent >= eWallet.spendingWarningLimit) {
+                    setShowEWalletWarning(true);
+                    setIsCheckingOut(false);
+                    return;
+                }
+            }
             await orderService.checkout({
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
@@ -98,7 +108,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
             navigate('/profile/orders');
         } catch (e) {
-                        let errorMessage = 'Checkout failed';
+            let errorMessage = 'Checkout failed';
             
             if (e?.response?.data?.message) {
                 errorMessage = e.response.data.message;
@@ -125,21 +135,51 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setShowCheckoutModal(false);
     };
 
+    const confirmEWalletWarningAndCheckout = async () => {
+        setShowEWalletWarning(false);
+        setIsCheckingOut(true);
+        try {
+            await orderService.checkout({
+                shippingAddressId: selectedShippingAddressId,
+                billingAddressId: selectedBillingAddressId,
+                notes: '',
+                paymentType: selectedPaymentType
+            });
+            clearCart();
+            showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
+            navigate('/profile/orders');
+        } catch (e) {
+            let errorMessage = 'Checkout failed';
+            if (e?.response?.data?.message) {
+                errorMessage = e.response.data.message;
+            } else if (e?.response?.data?.error) {
+                errorMessage = e.response.data.error;
+            } else if (e?.response?.data) {
+                errorMessage = typeof e.response.data === 'string' ? e.response.data : JSON.stringify(e.response.data);
+            } else if (e?.message) {
+                errorMessage = e.message;
+            }
+            showError('Checkout Failed', errorMessage);
+        } finally {
+            setIsCheckingOut(false);
+        }
+    };
+
     return {
-                showCheckoutModal,
+        showCheckoutModal,
         step,
         setStep,
         isCheckingOut,
         openCheckoutModal,
         closeCheckoutModal,
 
-                addresses,
+        addresses,
         selectedShippingAddressId,
         setSelectedShippingAddressId,
         selectedBillingAddressId,
         setSelectedBillingAddressId,
 
-                selectedPaymentType,
+        selectedPaymentType,
         setSelectedPaymentType,
         cards,
         selectedCardNumber,
@@ -149,7 +189,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setSelectedBankAccountIban,
         eWallet,
 
-                handleCheckout,
-        proceedDisabled
+        handleCheckout,
+        proceedDisabled,
+        showEWalletWarning,
+        setShowEWalletWarning,
+        confirmEWalletWarningAndCheckout
     };
 };

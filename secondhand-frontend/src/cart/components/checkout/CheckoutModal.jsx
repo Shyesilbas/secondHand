@@ -28,7 +28,9 @@ const CheckoutModal = ({
     eWallet,
     onCheckout,
     proceedDisabled,
-    isCheckingOut
+    isCheckingOut,
+    showEWalletWarning,
+    onConfirmEWalletWarning
 }) => {
     if (!isOpen) return null;
 
@@ -121,13 +123,29 @@ const CheckoutModal = ({
                             Next
                         </button>
                     ) : (
-                        <button 
-                            className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" 
-                            onClick={onCheckout} 
-                            disabled={proceedDisabled || isCheckingOut}
-                        >
-                            {isCheckingOut ? 'Placing…' : 'Place Order'}
-                        </button>
+                        <>
+                            <button 
+                                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" 
+                                onClick={onCheckout} 
+                                disabled={proceedDisabled || isCheckingOut}
+                            >
+                                {isCheckingOut ? 'Placing…' : 'Place Order'}
+                            </button>
+                            {showEWalletWarning && (
+                                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                                        <h4 className="text-lg font-semibold text-gray-900 mb-2">Spending Warning</h4>
+                                        <p className="text-sm text-gray-600 mb-4">
+                                            Your eWallet spending warning limit has been reached or exceeded with this purchase. Do you want to proceed?
+                                        </p>
+                                        <div className="flex justify-end gap-2">
+                                            <button className="px-4 py-2 border rounded" onClick={onClose}>Cancel</button>
+                                            <button className="px-4 py-2 bg-blue-600 text-white rounded" onClick={onConfirmEWalletWarning}>Proceed</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

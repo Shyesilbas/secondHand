@@ -30,7 +30,8 @@ public enum PaymentErrorCodes implements ErrorCode {
     INSUFFICIENT_EWALLET_BALANCE("INSUFFICIENT_EWALLET_BALANCE", "Insufficient balance in eWallet", HttpStatus.BAD_REQUEST),
     INVALID_WALLET_LIMIT("INVALID_WALLET_LIMIT", "Wallet limit cannot be negative", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_NOT_EMPTY("BANK_ACCOUNT_NOT_EMPTY", "Bank account must be empty before deleting." , HttpStatus.BAD_REQUEST ),
-    INVALID_CREDIT_AMOUNT("INVALID_CREDIT_AMOUNT", "Credit amount must be greater than zero" , HttpStatus.BAD_REQUEST ),;
+    INVALID_CREDIT_AMOUNT("INVALID_CREDIT_AMOUNT", "Credit amount must be greater than zero" , HttpStatus.BAD_REQUEST ),
+    WALLET_LIMIT_EXCEEDED("WALLET_LIMIT_EXCEEDED","Your balance will exceed your limit after this operation." , HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
