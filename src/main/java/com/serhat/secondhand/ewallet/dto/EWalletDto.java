@@ -6,13 +6,15 @@ public class EWalletDto {
     private Long userId;
     private BigDecimal balance;
     private BigDecimal limit;
+    private BigDecimal spendingWarningLimit;
 
     public EWalletDto() {}
 
-    public EWalletDto(Long userId, BigDecimal balance, BigDecimal limit) {
+    public EWalletDto(Long userId, BigDecimal balance, BigDecimal limit, BigDecimal spendingWarningLimit) {
         this.userId = userId;
         this.balance = balance;
         this.limit = limit;
+        this.spendingWarningLimit = spendingWarningLimit;
     }
 
     public Long getUserId() {
@@ -37,5 +39,13 @@ public class EWalletDto {
 
     public void setLimit(BigDecimal limit) {
         this.limit = limit;
+    }
+
+    public BigDecimal getSpendingWarningLimit() {
+        return spendingWarningLimit;
+    }
+
+    public void setSpendingWarningLimit(BigDecimal spendingWarningLimit) {
+        this.spendingWarningLimit = spendingWarningLimit;
     }
 }

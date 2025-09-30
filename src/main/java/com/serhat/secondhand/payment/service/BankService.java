@@ -2,11 +2,11 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.BankDto;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.entity.Bank;
-import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.helper.IbanGenerator;
+import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.repo.BankRepository;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,10 +31,10 @@ public class BankService {
     private final UserService userService;
     private final BankMapper bankMapper;
 
+
     public BankDto getBankInfo(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         Bank bank = findByUserMandatory(user);
-
         return bankMapper.toDto(bank);
     }
 
@@ -57,19 +58,52 @@ public class BankService {
         return bankMapper.toDto(bank);
     }
 
+    public Map<String, Object> checkBankAccountExists(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Optional<Bank> bankOpt = findByUser(user);
+        return Map.of(
+                "hasBankAccount", bankOpt.isPresent(),
+                "iban", Objects.requireNonNull(bankOpt.map(Bank::getIBAN).orElse(null))
+        );
+    }
+
+    public Map<String, Object> getBankBalance(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        Bank bank = findByUserMandatory(user);
+        return Map.of(
+                "balance", bank.getBalance(),
+                "iban", bank.getIBAN(),
+                "currency", "TRY"
+        );
+    }
+
+    public void deleteBankAccount(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+
+        Bank bank = findByUserMandatory(user);
+
+        if (bank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
+            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_EMPTY);
+        }
+
+        bankRepository.delete(bank);
+        log.info("Bank account deleted for user: {}", user.getEmail());
+    }
+
+
+
     public Optional<Bank> findByUser(User user) {
         return bankRepository.findByAccountHolder(user);
     }
-    
+
     public Bank findByUserMandatory(User user) {
         return findByUser(user)
-            .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
     }
 
     public void credit(User user, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            log.warn("Credit amount must be positive. User: {}, Amount: {}", user.getEmail(), amount);
-            return;
+            throw new BusinessException(PaymentErrorCodes.INVALID_CREDIT_AMOUNT);
         }
         Bank bank = findByUserMandatory(user);
         bank.setBalance(bank.getBalance().add(amount));
@@ -90,34 +124,5 @@ public class BankService {
         log.info("Debited {} from user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
     }
 
-    public Map<String, Object> checkBankAccountExists(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        Optional<Bank> bankOpt = findByUser(user);
-        return Map.of(
-                "hasBankAccount", bankOpt.isPresent(),
-                "iban", bankOpt.map(Bank::getIBAN).orElse(null)
-        );
-    }
 
-    public Map<String, Object> getBankBalance(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        Bank bank = findByUserMandatory(user);
-        return Map.of(
-                "balance", bank.getBalance(),
-                "iban", bank.getIBAN(),
-                "currency", "TRY"
-        );
-    }
-
-    public void deleteBankAccount(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        Bank bank = findByUserMandatory(user);
-        bankRepository.delete(bank);
-        log.info("Bank account deleted for user: {}", user.getEmail());
-    }
-
-    public Bank getBankByUserId(User user) {
-        return bankRepository.findByAccountHolder(user)
-                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
-    }
 }

@@ -2,7 +2,6 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.verification.CodeType;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.listing.application.ListingService;
@@ -10,18 +9,19 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
-import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
+import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
+import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
+import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.payment.util.PaymentValidationHelper;
-import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
-import com.serhat.secondhand.payment.entity.PaymentResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +67,7 @@ public class PaymentService {
 
     private final PaymentValidationHelper paymentValidationHelper;
 
+    @Transactional
     public PaymentDto createListingFeePayment(ListingFeePaymentRequest listingFeePaymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(listingFeePaymentRequest.listingId())
@@ -94,7 +99,9 @@ public class PaymentService {
     }
 
     private PaymentRequest getPaymentRequest(ListingFeePaymentRequest listingFeePaymentRequest, User fromUser, Listing listing) {
-        BigDecimal creationFeeTax = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100));
+        BigDecimal creationFeeTax =
+                listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
 
         return new PaymentRequest(
@@ -115,12 +122,16 @@ public class PaymentService {
         log.info("Creating payment for listing: {} with amount: {}", paymentRequest.listingId(), paymentRequest.amount());
 
         User fromUser = userService.getAuthenticatedUser(authentication);
-        User toUser = null;
+        User toUser;
         toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
         paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
 
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
+
+        if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
+            throw new BusinessException(PaymentErrorCodes.UNSUPPORTED_PAYMENT_TYPE);
+        }
         PaymentResult paymentResult = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
 
         Payment payment = Payment.builder()
@@ -257,7 +268,7 @@ public class PaymentService {
 
         BigDecimal creationFeeTax = listingCreationFee
                 .multiply(listingFeeTax)
-                .divide(BigDecimal.valueOf(100));
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal totalCreationFee = listingCreationFee.add(creationFeeTax);
 
         return ListingFeeConfigDto.builder()

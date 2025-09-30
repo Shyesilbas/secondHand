@@ -234,6 +234,8 @@ export const API_ENDPOINTS = {
         CREATE: '/ewallet',
         GET: '/ewallet',
         UPDATE_LIMITS: '/ewallet/limits',
+        UPDATE_SPENDING_WARNING: '/ewallet/update/spendingWarning',
+        REMOVE_SPENDING_WARNING: '/ewallet/update/spendingWarning',
         DEPOSIT: '/ewallet/deposit',
         WITHDRAW: '/ewallet/withdraw',
         TRANSACTIONS: '/ewallet/transactions',

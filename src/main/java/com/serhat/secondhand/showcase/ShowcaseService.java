@@ -1,16 +1,18 @@
 package com.serhat.secondhand.showcase;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.showcase.dto.ShowcaseDto;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
+import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -46,17 +49,17 @@ public class ShowcaseService {
     
     public Showcase createShowcase(ShowcasePaymentRequest request, Authentication authentication) {
         if (request.days() <= 0 || request.days() > 30) {
-            throw new IllegalArgumentException("Showcase duration must be between 1 and 30 days");
+            throw new BusinessException(ShowcaseErrorCodes.INVALID_DAYS_COUNT);
         }
         User user = userService.getAuthenticatedUser(authentication);
 
 
         Listing listing = listingService.findById(request.listingId())
-                .orElseThrow(() -> new IllegalArgumentException("Listing not found"));
+                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
         
         BigDecimal dailyCostWithTax = showcaseDailyCost
                 .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
                 .add(showcaseDailyCost);
         BigDecimal totalCost = dailyCostWithTax.multiply(new BigDecimal(request.days()));
         
@@ -71,8 +74,6 @@ public class ShowcaseService {
                 PaymentTransactionType.SHOWCASE_PAYMENT,
                 PaymentDirection.OUTGOING
         );
-
-        System.out.println("ShowcasePaymentRequest: " + request);
 
         paymentService.createPayment(paymentRequest, authentication);
         
@@ -111,16 +112,16 @@ public class ShowcaseService {
     
     public void extendShowcase(UUID showcaseId, int additionalDays) {
         Showcase showcase = showcaseRepository.findById(showcaseId)
-                .orElseThrow(() -> new RuntimeException("Showcase not found"));
+                .orElseThrow(() -> new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
         
         if (showcase.getStatus() != ShowcaseStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot extend inactive showcase");
+            throw new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_ACTIVE);
         }
         
         showcase.setEndDate(showcase.getEndDate().plusDays(additionalDays));
         BigDecimal dailyCostWithTax = showcaseDailyCost
                 .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
                 .add(showcaseDailyCost);
         showcase.setTotalCost(showcase.getTotalCost().add(dailyCostWithTax.multiply(new BigDecimal(additionalDays))));
         
@@ -129,7 +130,7 @@ public class ShowcaseService {
     
     public void cancelShowcase(UUID showcaseId) {
         Showcase showcase = showcaseRepository.findById(showcaseId)
-                .orElseThrow(() -> new RuntimeException("Showcase not found"));
+                .orElseThrow(() -> new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
         
         showcase.setStatus(ShowcaseStatus.CANCELLED);
         showcaseRepository.save(showcase);
@@ -151,7 +152,8 @@ public class ShowcaseService {
 
         BigDecimal dailyCostTax = showcaseDailyCost
                 .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100));
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
         BigDecimal totalDailyCost = showcaseDailyCost.add(dailyCostTax);
 
         return ShowcasePricingDto.builder()
