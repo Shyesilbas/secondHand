@@ -29,11 +29,12 @@ export const showcaseService = {
     );
   },
 
-  createShowcase: async (listingId, days, paymentType) => {
+  createShowcase: async (listingId, days, paymentType, verificationCode) => {
     const payload = {
       listingId,
       days,
-      paymentType
+      paymentType,
+      verificationCode
     };
     
     return withErrorHandling(

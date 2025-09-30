@@ -6,6 +6,10 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.serhat.secondhand.core.verification.CodeType;
+import com.serhat.secondhand.core.verification.IVerificationService;
+import com.serhat.secondhand.core.verification.dto.VerificationSummaryDto;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,6 +28,7 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final IVerificationService verificationService;
 
     @PostMapping("/pay")
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
@@ -31,6 +36,16 @@ public class PaymentController {
         PaymentDto paymentDto = paymentService.createPayment(paymentRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
     }
+
+    @PostMapping("/initiate-verification")
+    public ResponseEntity<Void> initiatePaymentVerification(@RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request, Authentication authentication) {
+        paymentService.initiatePaymentVerification(authentication, request);
+        return ResponseEntity.ok().build();
+    }
+
+    
+
+    
 
     @PostMapping("/listings/pay-fee")
     public ResponseEntity<PaymentDto> payListingCreationFee(

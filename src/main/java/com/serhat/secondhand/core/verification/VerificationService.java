@@ -3,10 +3,12 @@ package com.serhat.secondhand.core.verification;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,9 +21,14 @@ public class VerificationService implements IVerificationService {
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
 
+    @Value("${app.verification.code.expiry.minutes:3}")
+    private int verificationExpiryMinutes;
+
    @Override
     public String generateCode() {
-        int min = (int) Math.pow(10, CODE_LENGTH - 1);         int max = (int) Math.pow(10, CODE_LENGTH) - 1;         int code = secureRandom.nextInt((max - min) + 1) + min;
+        int min = (int) Math.pow(10, CODE_LENGTH - 1);
+        int max = (int) Math.pow(10, CODE_LENGTH) - 1;
+        int code = secureRandom.nextInt((max - min) + 1) + min;
         return String.valueOf(code);
     }
 
@@ -35,7 +42,7 @@ public class VerificationService implements IVerificationService {
         verification.setCode(code);
         verification.setCodeType(codeType);
         verification.setCreatedAt(LocalDateTime.now());
-        verification.setCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+        verification.setCodeExpiresAt(LocalDateTime.now().plusMinutes(verificationExpiryMinutes));
         verification.setVerificationAttemptLeft(3);
         verification.setVerified(false);
         verificationRepository.save(verification);
@@ -45,6 +52,11 @@ public class VerificationService implements IVerificationService {
     @Override
     public Optional<Verification> findLatestActiveVerification(User user, CodeType codeType) {
         return verificationRepository.findTopByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfterOrderByCreatedAtDesc(user, codeType, LocalDateTime.now());
+    }
+
+    @Override
+    public List<Verification> findAllActiveVerifications(User user, CodeType codeType) {
+        return verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user, codeType, LocalDateTime.now());
     }
     
     @Override

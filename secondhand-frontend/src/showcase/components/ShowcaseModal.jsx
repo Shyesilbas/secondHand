@@ -4,6 +4,8 @@ import {useShowcasePricing} from '../hooks/useShowcasePricing.js';
 import {usePaymentMethods} from '../../payments/hooks/usePaymentMethods.js';
 import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
 import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
+import { orderService } from '../../order/services/orderService.js';
+import { useEmails } from '../../payments/hooks/useEmails.js';
 
 const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSuccess }) => {
     const [step, setStep] = useState(1);
@@ -14,6 +16,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [verificationCode, setVerificationCode] = useState('');
+    const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
 
     const { paymentMethods, isLoading: isPaymentLoading, refetch } = usePaymentMethods();
     const { eWallet, loading: isEWalletLoading, refreshWallet } = useEWallet();
@@ -77,7 +81,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         setLoading(true);
         setError(null);
         try {
-            await showcaseService.createShowcase(listingId, days, paymentType, selectedCardNumber, selectedBankAccountIban);
+            await showcaseService.createShowcase(listingId, days, paymentType, verificationCode);
             setSuccess(true);
                         try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
             onSuccess?.();
@@ -87,6 +91,25 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             }, 1500);
         } catch (err) {
             setError(err.message || 'Payment failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const proceedToPayment = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await orderService.initiatePaymentVerification({
+                transactionType: 'SHOWCASE_PAYMENT',
+                listingId,
+                days,
+                amount: totalCost
+            });
+            await fetchEmails();
+            setStep(4);
+        } catch (err) {
+            setError(err?.response?.data?.message || err?.message || 'Failed to send verification code');
         } finally {
             setLoading(false);
         }
@@ -205,11 +228,57 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         {error && <div className="mb-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
                         <button
                             className="w-full py-2 mt-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
-                            onClick={handlePayment}
+                            onClick={proceedToPayment}
                             disabled={loading}
                         >
-                            {loading ? 'Processing...' : 'Finish Payment'}
+                            {loading ? 'Sending Code…' : 'Proceed to Payment'}
                         </button>
+                    </div>
+                );
+            case 4:
+                return (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-4 text-center">Verification</h3>
+                        <div className="mb-3">
+                            <label className="block text-sm text-gray-700 mb-1">Verification Code</label>
+                            <input
+                                type="text"
+                                value={verificationCode}
+                                onChange={e => setVerificationCode(e.target.value)}
+                                placeholder="Enter the code sent to your email"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <button
+                                className="w-full py-2 bg-emerald-600 text-white rounded disabled:opacity-50"
+                                onClick={handlePayment}
+                                disabled={loading || !verificationCode}
+                            >
+                                {loading ? 'Processing…' : 'Finish Payment'}
+                            </button>
+                        </div>
+                        <div className="mt-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <h5 className="text-sm font-medium text-gray-700">Emails</h5>
+                                <button className="text-emerald-600 text-sm underline" onClick={fetchEmails}>Refresh</button>
+                            </div>
+                            <div className="max-h-48 overflow-auto border rounded p-2 bg-gray-50">
+                                {isEmailsLoading ? (
+                                    <div className="text-sm text-gray-500">Loading emails…</div>
+                                ) : (emails && emails.length > 0 ? (
+                                    emails.map((e, idx) => (
+                                        <div key={idx} className="mb-2 p-2 bg-white rounded border">
+                                            <div className="text-xs text-gray-500">{e.sentAt || e.createdAt}</div>
+                                            <div className="text-sm font-medium">{e.subject || 'Verification Code'}</div>
+                                            <div className="text-sm whitespace-pre-wrap">{e.body || e.content}</div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-gray-500">No emails found.</div>
+                                ))}
+                            </div>
+                        </div>
                         {success && <div className="mt-3 text-green-700 text-center font-semibold">Successfully added to showcase!</div>}
                     </div>
                 );

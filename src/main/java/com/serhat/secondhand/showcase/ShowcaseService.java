@@ -72,7 +72,8 @@ public class ShowcaseService {
                 totalCost,
                 request.paymentType(),
                 PaymentTransactionType.SHOWCASE_PAYMENT,
-                PaymentDirection.OUTGOING
+                PaymentDirection.OUTGOING,
+                request.verificationCode()
         );
 
         paymentService.createPayment(paymentRequest, authentication);

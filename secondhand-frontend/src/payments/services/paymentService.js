@@ -34,6 +34,8 @@ export const paymentService = {
             return get(`${API_ENDPOINTS.PAYMENTS.STATISTICS}?paymentType=${encodeURIComponent(paymentType)}`);
         }
         return get(API_ENDPOINTS.PAYMENTS.STATISTICS);
-    }
+    },
+
+  
 
 };

@@ -6,6 +6,7 @@ import { orderService } from '../../order/services/orderService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import useAddresses from '../../user/hooks/useAddresses.js';
+import { useEmails } from '../../payments/hooks/useEmails.js';
 
 export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const navigate = useNavigate();
@@ -27,6 +28,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
 
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
+    const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
+    const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
 
     useEffect(() => {
         creditCardService
@@ -98,12 +101,15 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                     return;
                 }
             }
-            await orderService.checkout({
+            const payload = {
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
                 notes: '',
-                paymentType: selectedPaymentType
-            });
+                paymentType: selectedPaymentType,
+                paymentVerificationCode: paymentVerificationCode?.trim() || null
+            };
+            console.debug('Checkout payload:', payload);
+            await orderService.checkout(payload);
             clearCart();
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
             navigate('/profile/orders');
@@ -135,16 +141,44 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setShowCheckoutModal(false);
     };
 
+    const sendVerificationCode = async () => {
+        setIsCheckingOut(true);
+        try {
+            await orderService.initiatePaymentVerification?.({
+                transactionType: 'ITEM_PURCHASE'
+            });
+            showSuccess('Verification Code Sent', 'Please check your email for the code.');
+            try { await fetchEmails(); } catch {}
+        } catch (e) {
+            let errorMessage = 'Failed to send verification code';
+            if (e?.response?.data?.message) {
+                errorMessage = e.response.data.message;
+            } else if (e?.response?.data?.error) {
+                errorMessage = e.response.data.error;
+            } else if (e?.response?.data) {
+                errorMessage = typeof e.response.data === 'string' ? e.response.data : JSON.stringify(e.response.data);
+            } else if (e?.message) {
+                errorMessage = e.message;
+            }
+            showError('Verification Failed', errorMessage);
+        } finally {
+            setIsCheckingOut(false);
+        }
+    };
+
     const confirmEWalletWarningAndCheckout = async () => {
         setShowEWalletWarning(false);
         setIsCheckingOut(true);
         try {
-            await orderService.checkout({
+            const payload = {
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
                 notes: '',
-                paymentType: selectedPaymentType
-            });
+                paymentType: selectedPaymentType,
+                paymentVerificationCode: paymentVerificationCode?.trim() || null
+            };
+            console.debug('Checkout payload (confirm):', payload);
+            await orderService.checkout(payload);
             clearCart();
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
             navigate('/profile/orders');
@@ -188,11 +222,17 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         selectedBankAccountIban,
         setSelectedBankAccountIban,
         eWallet,
+        paymentVerificationCode,
+        setPaymentVerificationCode,
 
         handleCheckout,
         proceedDisabled,
         showEWalletWarning,
         setShowEWalletWarning,
-        confirmEWalletWarningAndCheckout
+        confirmEWalletWarningAndCheckout,
+        sendVerificationCode,
+        emails,
+        isEmailsLoading,
+        fetchEmails
     };
 };

@@ -159,6 +159,12 @@ const ShoppingCartPage = () => {
                 selectedBankAccountIban={checkout.selectedBankAccountIban}
                 setSelectedBankAccountIban={checkout.setSelectedBankAccountIban}
                 eWallet={checkout.eWallet}
+                paymentVerificationCode={checkout.paymentVerificationCode}
+                setPaymentVerificationCode={checkout.setPaymentVerificationCode}
+                sendVerificationCode={checkout.sendVerificationCode}
+                emails={checkout.emails}
+                isEmailsLoading={checkout.isEmailsLoading}
+                fetchEmails={checkout.fetchEmails}
                 onCheckout={checkout.handleCheckout}
                 proceedDisabled={checkout.proceedDisabled}
                 isCheckingOut={checkout.isCheckingOut}

@@ -10,14 +10,15 @@ import java.util.UUID;
 
 @Builder
 public record PaymentRequest(
-    Long fromUserId,
-    Long toUserId,
-    String receiverName,
-    String receiverSurname,
-    UUID listingId,
-    BigDecimal amount,
-    PaymentType paymentType,
-    PaymentTransactionType transactionType,
-    PaymentDirection paymentDirection
+        Long fromUserId,
+        Long toUserId,
+        String receiverName,
+        String receiverSurname,
+        UUID listingId,
+        BigDecimal amount,
+        PaymentType paymentType,
+        PaymentTransactionType transactionType,
+        PaymentDirection paymentDirection,
+        String verificationCode
 ) {
 }
