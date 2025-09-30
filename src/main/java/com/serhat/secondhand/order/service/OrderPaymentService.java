@@ -42,6 +42,7 @@ public class OrderPaymentService {
 
         try {
             List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request);
+            log.info("Checkout received verificationCode: {}", request.getPaymentVerificationCode());
             List<PaymentDto> paymentResults = paymentService.createPurchasePayments(paymentRequests, getAuthentication());
             
             boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
@@ -81,7 +82,7 @@ public class OrderPaymentService {
                 .collect(Collectors.groupingBy(cart -> cart.getListing().getSeller().getId()));
     }
 
-        private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, CheckoutRequest request) {
+    private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, CheckoutRequest request) {
         BigDecimal sellerTotal = calculateSellerTotal(sellerItems);
         var sellerInfo = getSellerInfo(sellerItems);
 
@@ -95,8 +96,10 @@ public class OrderPaymentService {
                 .paymentType(resolvePaymentType(request))
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
                 .paymentDirection(PaymentDirection.OUTGOING)
+                .verificationCode(request.getPaymentVerificationCode())
                 .build();
     }
+
 
         private BigDecimal calculateSellerTotal(List<Cart> sellerItems) {
         return sellerItems.stream()

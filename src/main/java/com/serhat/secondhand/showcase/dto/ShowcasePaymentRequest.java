@@ -8,6 +8,8 @@ import java.util.UUID;
 public record ShowcasePaymentRequest(
         UUID listingId,
         int days,
-        PaymentType paymentType
+        PaymentType paymentType,
+         String verificationCode
+
 ) {
 }

@@ -5,6 +5,9 @@ export const orderService = {
   checkout: async (payload) => {
     return post(API_ENDPOINTS.ORDERS.CHECKOUT, payload);
   },
+  initiatePaymentVerification: async (payload) => {
+    return post(API_ENDPOINTS.PAYMENTS.INITIATE_VERIFICATION, payload);
+  },
   myOrders: async (page = 0, size = 10) => {
     return get(`${API_ENDPOINTS.ORDERS.MY_ORDERS}?page=${page}&size=${size}`);
   },

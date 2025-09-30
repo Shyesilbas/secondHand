@@ -19,5 +19,6 @@ public class CheckoutRequest {
     private Long billingAddressId; 
     private String notes;
 
-        private PaymentType paymentType;
+    private PaymentType paymentType;
+    private String paymentVerificationCode;
 }

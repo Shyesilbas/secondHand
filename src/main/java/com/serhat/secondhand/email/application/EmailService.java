@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -67,8 +68,10 @@ public class EmailService {
     @Value("${app.email.paymentVerification.subject:SecondHand - Payment Verification}")
     private String paymentVerificationSubject;
 
-    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for 15 minutes.}")
+    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for %d minutes.}")
     private String paymentVerificationContentTemplate;
+    @Value("${app.verification.code.expiry.minutes:3}")
+    private int verificationExpiryMinutes;
 
     @Value("${app.email.orderConfirmation.subject:SecondHand - Order Confirmation}")
     private String orderConfirmationSubject;
@@ -100,14 +103,26 @@ public class EmailService {
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EmailDto sendPaymentVerificationEmail(User user, String code) {
         log.info("Sending payment verification email to user: {} with code: {}", user.getEmail(), code);
         String subject = paymentVerificationSubject;
-        String content = String.format(paymentVerificationContentTemplate, user.getName(), code);
+        String content = String.format(paymentVerificationContentTemplate, user.getName(), code, verificationExpiryMinutes);
         log.info("Payment verification email subject: {}", subject);
         log.info("Payment verification email content: {}", content);
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
         log.info("Payment verification email sent successfully with ID: {}", result.id());
+        return result;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public EmailDto sendPaymentVerificationEmail(User user, String code, String extraDetails) {
+        log.info("Sending payment verification email with details to user: {}", user.getEmail());
+        String subject = paymentVerificationSubject;
+        String base = String.format(paymentVerificationContentTemplate, user.getName(), code, verificationExpiryMinutes);
+        String content = base + (extraDetails != null ? ("\n" + extraDetails) : "");
+        EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
+        log.info("Payment verification email (with details) sent successfully with ID: {}", result.id());
         return result;
     }
 

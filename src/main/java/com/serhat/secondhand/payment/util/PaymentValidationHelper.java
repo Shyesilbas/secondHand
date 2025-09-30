@@ -20,7 +20,6 @@ public class PaymentValidationHelper {
             }
             return userService.findById(paymentRequest.toUserId());
         }
-        // For LISTING_CREATION, toUserId can be null as it's a system payment
         return null;
     }
 

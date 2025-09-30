@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
         MY_PAYMENTS: '/v1/payments/my-payments',
         STATISTICS: '/v1/payments/statistics',
         LISTING_FEE_CONFIG: '/v1/payments/listing-fee-config',
+        INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
     },
     ORDERS: {
         CHECKOUT: '/v1/orders/checkout',
