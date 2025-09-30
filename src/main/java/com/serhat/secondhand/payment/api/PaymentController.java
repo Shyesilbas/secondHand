@@ -54,9 +54,13 @@ public class PaymentController {
 
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getPaymentStatistics(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getPaymentStatistics(Authentication authentication,
+                                                                    @RequestParam(name = "paymentType", required = false) String paymentType) {
         log.info("Getting payment statistics for user: {}", authentication.getName());
-        Map<String, Object> statistics = paymentService.getPaymentStatistics(authentication);
+        if (paymentType == null || paymentType.isBlank()) {
+            return ResponseEntity.ok(paymentService.getPaymentStatistics(authentication));
+        }
+        Map<String, Object> statistics = paymentService.getPaymentStatistics(authentication, com.serhat.secondhand.payment.entity.PaymentType.valueOf(paymentType));
         return ResponseEntity.ok(statistics);
     }
 

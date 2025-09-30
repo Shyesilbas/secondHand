@@ -27,6 +27,13 @@ export const paymentService = {
         const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
         console.log('Fee config response:', response);
         return response;
+    },
+
+    getStatistics: async (paymentType) => {
+        if (paymentType) {
+            return get(`${API_ENDPOINTS.PAYMENTS.STATISTICS}?paymentType=${encodeURIComponent(paymentType)}`);
+        }
+        return get(API_ENDPOINTS.PAYMENTS.STATISTICS);
     }
 
 };

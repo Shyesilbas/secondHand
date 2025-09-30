@@ -84,6 +84,7 @@ public class EWalletService {
         User user = getCurrentUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
+
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
@@ -93,6 +94,13 @@ public class EWalletService {
 
         if (!bank.getId().equals(request.getBankId())) {
             throw new BusinessException(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
+        }
+
+        BigDecimal walletLimit = eWallet.getWalletLimit();
+        BigDecimal balanceAfterUpdate = eWallet.getBalance().add(request.getAmount());
+
+        if(balanceAfterUpdate.compareTo(walletLimit)>0){
+            throw new BusinessException(PaymentErrorCodes.WALLET_LIMIT_EXCEEDED);
         }
 
         bankService.debit(user, request.getAmount());

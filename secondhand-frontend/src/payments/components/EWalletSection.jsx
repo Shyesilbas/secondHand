@@ -1,9 +1,10 @@
 import React from 'react';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
-import { bankService } from '../services/bankService.js';
-import { formatCurrency } from '../../common/formatters.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {paymentService} from '../services/paymentService.js';
+import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
+import {bankService} from '../services/bankService.js';
+import {formatCurrency} from '../../common/formatters.js';
 
 const EWalletSection = () => {
     const notification = useNotification();
@@ -17,6 +18,7 @@ const EWalletSection = () => {
     const [showCreateModal, setShowCreateModal] = React.useState(false);
     const [createLimit, setCreateLimit] = React.useState('1000');
     const [createSpendingWarningLimit, setCreateSpendingWarningLimit] = React.useState('200');
+    const [totalSpent, setTotalSpent] = React.useState(null);
 
     const fetchBankAccounts = React.useCallback(async () => {
         try {
@@ -30,6 +32,11 @@ const EWalletSection = () => {
 
     React.useEffect(() => {
         fetchBankAccounts();
+        paymentService.getStatistics('EWALLET').then((stats) => {
+            if (stats && typeof stats.totalAmount !== 'undefined') {
+                setTotalSpent(stats.totalAmount);
+            }
+        }).catch(() => {});
     }, [fetchBankAccounts]);
 
     const openModal = (nextAction) => {
@@ -170,6 +177,17 @@ const EWalletSection = () => {
                             <p className="mt-2 text-lg font-medium text-gray-900">
                                 {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not set'}
                             </p>
+                            <div className="mt-3 border-t pt-3">
+                                <p className="text-xs uppercase tracking-wide text-gray-500">Total Spent</p>
+                                <p className="mt-1 text-sm font-medium text-gray-900">
+                                    {totalSpent != null ? formatCurrency(totalSpent) : '—'}
+                                </p>
+                                <p className="mt-1 text-sm font-medium text-gray-900">
+                                    ({eWallet.spendingWarningLimit && totalSpent != null
+                                        ? `${((totalSpent / eWallet.spendingWarningLimit) * 100).toFixed(2)}%`
+                                        : '—'})
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
