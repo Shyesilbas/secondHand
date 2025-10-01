@@ -7,6 +7,7 @@ import ListingReviewStats from '../../reviews/components/ListingReviewStats.jsx'
 import ListingCardActions from './ListingCardActions.jsx';
 import AddToCartButton from '../../cart/components/AddToCartButton.jsx';
 import PriceHistoryModal from './PriceHistoryModal.jsx';
+import ExchangeRateModal from './ExchangeRateModal.jsx';
 import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
@@ -16,6 +17,7 @@ import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 const ListingCard = memo(({ listing, onDeleted }) => {
     const [showPriceHistory, setShowPriceHistory] = useState(false);
     const { priceHistory, fetchPriceHistory } = usePriceHistory(listing?.id);
+    const [showExchange, setShowExchange] = useState(false);
     const { user } = useAuth();
     const { showcases } = useShowcase();
 
@@ -109,6 +111,15 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </button>
+                            <button
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowExchange(true); }}
+                                className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                                title="View Exchange Rates"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 10a4 4 0 004 4h6a3 3 0 100-6H9a3 3 0 110-6h6" />
+                                </svg>
+                            </button>
                         </div>
                         <div className="flex items-center gap-1 text-gray-500 text-sm">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -151,6 +162,13 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                 onClose={handleClosePriceHistory}
                 priceHistory={priceHistory}
                 listingTitle={listing.title}
+            />
+
+            <ExchangeRateModal
+                isOpen={showExchange}
+                onClose={() => setShowExchange(false)}
+                price={listing.price}
+                currency={listing.currency}
             />
         </div>
     );

@@ -250,4 +250,7 @@ export const API_ENDPOINTS = {
         CANCEL: (id) => `/showcases/${id}/cancel`,
         PRICING_CONFIG: '/showcases/pricing-config',
     },
+    EXCHANGE: {
+        RATE: (from, to) => `/v1/exchange/${from}/${to}`,
+    },
 };
