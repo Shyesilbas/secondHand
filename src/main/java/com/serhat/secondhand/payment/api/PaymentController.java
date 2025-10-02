@@ -1,15 +1,12 @@
 package com.serhat.secondhand.payment.api;
 
+import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.serhat.secondhand.core.verification.CodeType;
-import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.core.verification.dto.VerificationSummaryDto;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,9 +40,6 @@ public class PaymentController {
         return ResponseEntity.ok().build();
     }
 
-    
-
-    
 
     @PostMapping("/listings/pay-fee")
     public ResponseEntity<PaymentDto> payListingCreationFee(

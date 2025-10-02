@@ -6,12 +6,12 @@ const ExchangeRateModal = ({ isOpen, onClose, price, currency }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [selected, setSelected] = useState('USD');
-    const [rate, setRate] = useState(null);
+    const [rates, setRates] = useState({});
 
     const defaultTarget = useMemo(() => (currency === 'USD' ? 'EUR' : 'USD'), [currency]);
     React.useEffect(() => {
         setSelected(defaultTarget);
-        setRate(null);
+        setRates({});
         setError('');
         setLoading(false);
     }, [isOpen, defaultTarget]);
@@ -21,7 +21,7 @@ const ExchangeRateModal = ({ isOpen, onClose, price, currency }) => {
         setLoading(true);
         try {
             const data = await fetchExchangeRate(currency, selected);
-            setRate(data.rate);
+            setRates(prev => ({ ...prev, [selected]: data.rate }));
         } catch (e) {
             setError('Failed to fetch exchange rates');
         } finally {
@@ -31,7 +31,7 @@ const ExchangeRateModal = ({ isOpen, onClose, price, currency }) => {
 
     if (!isOpen) return null;
 
-    const convertedValue = rate ? (price * rate).toFixed(2) : null;
+    const convertedValue = rates[selected] != null ? (price * rates[selected]).toFixed(2) : null;
 
     const modalContent = (
         <div
@@ -64,7 +64,7 @@ const ExchangeRateModal = ({ isOpen, onClose, price, currency }) => {
                         {['USD', 'EUR'].map(opt => (
                             <button
                                 key={opt}
-                                onClick={() => setSelected(opt)}
+                                onClick={() => { setSelected(opt); setError(''); }}
                                 className={`${selected === opt ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'} px-4 py-2 text-sm`}
                                 disabled={currency === opt}
                                 title={currency === opt ? 'Same as listing currency' : ''}

@@ -6,8 +6,7 @@ import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStat
 import ListingReviewStats from '../../reviews/components/ListingReviewStats.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import AddToCartButton from '../../cart/components/AddToCartButton.jsx';
-import PriceHistoryModal from './PriceHistoryModal.jsx';
-import ExchangeRateModal from './ExchangeRateModal.jsx';
+import ListingInfoModal from './ListingInfoModal.jsx';
 import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
@@ -15,22 +14,12 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
 const ListingCard = memo(({ listing, onDeleted }) => {
-    const [showPriceHistory, setShowPriceHistory] = useState(false);
-    const { priceHistory, fetchPriceHistory } = usePriceHistory(listing?.id);
-    const [showExchange, setShowExchange] = useState(false);
+    const { priceHistory } = usePriceHistory(listing?.id);
+    const [showInfo, setShowInfo] = useState(false);
     const { user } = useAuth();
     const { showcases } = useShowcase();
 
-    const handlePriceHistoryClick = useCallback((e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        fetchPriceHistory();
-        setShowPriceHistory(true);
-    }, [fetchPriceHistory]);
-
-    const handleClosePriceHistory = useCallback(() => {
-        setShowPriceHistory(false);
-    }, []);
+    
 
     if (!listing) return null;
 
@@ -103,21 +92,12 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                                 {formatCurrency(listing.price, listing.currency)}
                             </span>
                             <button
-                                onClick={handlePriceHistoryClick}
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowInfo(true); }}
                                 className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
-                                title="View Price History"
+                                title="Info"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </button>
-                            <button
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowExchange(true); }}
-                                className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
-                                title="View Exchange Rates"
-                            >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 10a4 4 0 004 4h6a3 3 0 100-6H9a3 3 0 110-6h6" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                                 </svg>
                             </button>
                         </div>
@@ -157,16 +137,11 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                 </div>
             </div>
 
-            <PriceHistoryModal
-                isOpen={showPriceHistory}
-                onClose={handleClosePriceHistory}
-                priceHistory={priceHistory}
+            <ListingInfoModal
+                isOpen={showInfo}
+                onClose={() => setShowInfo(false)}
+                listingId={listing.id}
                 listingTitle={listing.title}
-            />
-
-            <ExchangeRateModal
-                isOpen={showExchange}
-                onClose={() => setShowExchange(false)}
                 price={listing.price}
                 currency={listing.currency}
             />

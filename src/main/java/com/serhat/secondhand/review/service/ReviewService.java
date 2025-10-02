@@ -14,6 +14,7 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.shipping.ShippingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class ReviewService {
     private final UserService userService;
     private final ReviewMapper reviewMapper;
     private final ListingService listingService;
+    private final ShippingService shippingService;
 
     public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewer.getId());
@@ -48,7 +50,8 @@ public class ReviewService {
             throw new RuntimeException("Order item does not belong to user");
         }
 
-                if (orderItem.getOrder().getShippingStatus() != ShippingStatus.DELIVERED) {
+        ShippingStatus currentStatus = shippingService.calculateShippingStatus(orderItem.getOrder());
+        if (currentStatus != ShippingStatus.DELIVERED) {
             throw new RuntimeException("Can only review delivered orders");
         }
 

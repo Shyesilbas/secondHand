@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
+import { orderService } from '../../order/services/orderService.js';
 import { createListingFeePaymentRequest } from '../payments.js';
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess, onVerificationRequired }) => {
@@ -14,21 +15,28 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     const [isResendingCode, setIsResendingCode] = useState(false);
     const { showSuccess, showError, showInfo } = useNotification();
 
+    const [countdown, setCountdown] = useState(null);
+
     useEffect(() => {
-        if (codeExpiryTime) {
-            const timer = setInterval(() => {
-                const now = new Date().getTime();
-                const expiry = new Date(codeExpiryTime).getTime();
-                const timeLeft = expiry - now;
-
-                if (timeLeft <= 0) {
-                    setCodeExpiryTime(null);
-                    clearInterval(timer);
-                }
-            }, 1000);
-
-            return () => clearInterval(timer);
+        if (!codeExpiryTime) {
+            setCountdown(null);
+            return;
         }
+        const tick = () => {
+            const now = Date.now();
+            const expiry = new Date(codeExpiryTime).getTime();
+            const msLeft = Math.max(0, expiry - now);
+            const totalSeconds = Math.floor(msLeft / 1000);
+            const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const ss = String(totalSeconds % 60).padStart(2, '0');
+            setCountdown(`${mm}:${ss}`);
+            if (msLeft === 0) {
+                setCodeExpiryTime(null);
+            }
+        };
+        tick();
+        const timer = setInterval(tick, 1000);
+        return () => clearInterval(timer);
     }, [codeExpiryTime]);
 
     const handlePayment = async () => {
@@ -70,12 +78,21 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
         } catch (err) {
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                showInfo('Verification Required', 'Enter the verification code sent to your email.');
-                setModalStep('VERIFY');
-                const expiryTime = new Date();
-                expiryTime.setMinutes(expiryTime.getMinutes() + 15);
-                setCodeExpiryTime(expiryTime);
-                if (onVerificationRequired) onVerificationRequired();
+                try {
+                    await orderService.initiatePaymentVerification({
+                        transactionType: 'LISTING_CREATION',
+                        listingId: selectedListing?.id,
+                        amount: feeConfig?.totalCreationFee
+                    });
+                    showInfo('Verification Required', 'Enter the verification code sent to your email.');
+                    setModalStep('VERIFY');
+                    const expiryTime = new Date();
+                    expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+                    setCodeExpiryTime(expiryTime);
+                    if (onVerificationRequired) onVerificationRequired();
+                } catch (e) {
+                    showError('Error', e?.response?.data?.message || 'Failed to send verification code.');
+                }
             } else {
                 showError('Error', err.response?.data?.message || 'Listing fee payment failed. Please try again later.');
             }
@@ -102,6 +119,9 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
             if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
                 showSuccess('Success', 'A new verification code has been sent to your email.');
                 setVerificationCode('');
+                const expiryTime = new Date();
+                expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+                setCodeExpiryTime(expiryTime);
             } else {
                 showError('Error', err.response?.data?.message || 'Failed to resend verification code.');
             }
@@ -120,6 +140,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         verificationCode,
         setVerificationCode,
         codeExpiryTime,
+        countdown,
         isResendingCode,
         showConfirmModal,
         setShowConfirmModal,

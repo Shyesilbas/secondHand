@@ -6,6 +6,7 @@ import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.Provider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserService userService;
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
+    private final CookieUtils cookieUtils;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -68,15 +70,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                         LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
                         oldRefreshToken.orElse(null));
 
-                LoginResponse loginResponse = new LoginResponse(
-                        "OAuth2 login successful",
-                        user.getId(),
-                        user.getEmail(),
-                        accessToken,
-                        refreshToken
-                );
-
-                handleSuccessResponse(response, loginResponse);
+                handleSuccessResponse(request, response, accessToken, refreshToken);
             } else {
                 // New user: do NOT create yet. Redirect to frontend to complete required fields.
                 String redirectUrl = String.format(
@@ -101,12 +95,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
     }
 
-    private void handleSuccessResponse(HttpServletResponse response, LoginResponse loginResponse) throws IOException {
-        String redirectUrl = String.format("http://localhost:5173/auth/callback?token=%s&refresh=%s",
-                loginResponse.getAccessToken(), loginResponse.getRefreshToken());
-        response.sendRedirect(redirectUrl);
-
-
+    private void handleSuccessResponse(HttpServletRequest request, HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        cookieUtils.setAccessTokenCookie(response, accessToken);
+        cookieUtils.setRefreshTokenCookie(response, refreshToken);
+        response.sendRedirect("http://localhost:5173/");
     }
 
     private void handleErrorResponse(HttpServletResponse response, String message) throws IOException {

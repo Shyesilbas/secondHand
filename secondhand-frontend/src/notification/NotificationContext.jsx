@@ -20,7 +20,7 @@ export const NotificationProvider = ({ children }) => {
             id,
             isOpen: true,
             autoClose: true,
-            autoCloseDelay: 5000,
+            autoCloseDelay: 9000,
             showCloseButton: true,
             size: 'md',
             ...notification
