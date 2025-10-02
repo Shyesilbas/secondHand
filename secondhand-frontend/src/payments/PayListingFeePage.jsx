@@ -31,6 +31,7 @@ const PayListingFeePage = () => {
         verificationCode,
         setVerificationCode,
         codeExpiryTime,
+        countdown,
         isResendingCode,
         handlePayment,
         confirmPayment,
@@ -128,6 +129,7 @@ const PayListingFeePage = () => {
                     verificationCode={verificationCode}
                     onChangeVerificationCode={setVerificationCode}
                     codeExpiryTime={codeExpiryTime}
+                    countdown={countdown}
                     onShowEmails={fetchEmails}
                     onResendCode={resendVerificationCode}
                     isResendingCode={isResendingCode}

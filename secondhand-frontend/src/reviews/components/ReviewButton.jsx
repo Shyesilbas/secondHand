@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { reviewService } from '../services/reviewService.js';
+import React, {useState} from 'react';
+import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
 
 const ReviewButton = ({ orderItem, onReviewCreated }) => {
@@ -39,7 +39,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
             <div className="text-sm">
                 <div className="flex items-center space-x-1 text-green-600">
                     <span className="text-lg">⭐</span>
-                    <span>Değerlendirildi ({existingReview.rating}/5)</span>
+                    <span>Reviewed! ({existingReview.rating}/5)</span>
                 </div>
             </div>
         );
@@ -60,7 +60,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
                 disabled={loading}
                 className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-                {loading ? 'Kontrol ediliyor...' : 'Değerlendir'}
+                {loading ? 'Checking...' : 'Review'}
             </button>
             
             <ReviewModal

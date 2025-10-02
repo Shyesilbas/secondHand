@@ -1,6 +1,6 @@
 import React from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import { ReviewStats, ReviewsList, useReviews, useReviewsByUser, useUserReviewStats } from '../index.js';
+import {useLocation, useParams} from 'react-router-dom';
+import {ReviewsList, ReviewStats, useReviews, useReviewsByUser, useUserReviewStats} from '../index.js';
 
 const UserReviewsPage = () => {
     const { userId } = useParams();
@@ -14,8 +14,8 @@ const UserReviewsPage = () => {
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 
         const getPageTitle = () => {
-        if (isReceivedReviews) return 'I received';
-        if (isGivenReviews) return 'My receives';
+        if (isReceivedReviews) return 'Reviews Received';
+        if (isGivenReviews) return 'Given Reviews';
         return 'Reviews';
     };
 

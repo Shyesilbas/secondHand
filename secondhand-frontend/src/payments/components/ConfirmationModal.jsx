@@ -19,7 +19,8 @@ const ConfirmationModal = ({
     codeExpiryTime,
     onShowEmails,
     onResendCode,
-    isResendingCode = false
+    isResendingCode = false,
+    countdown
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const { eWallet } = useEWallet();
@@ -250,7 +251,7 @@ const ConfirmationModal = ({
                                 </div>
                                 {codeExpiryTime && (
                                     <div className="text-xs text-text-muted">
-                                        Kod süresi: {Math.max(0, Math.floor((new Date(codeExpiryTime).getTime() - new Date().getTime()) / 1000 / 60))} dk
+                                        Expires in: {countdown || ''}
                                     </div>
                                 )}
                                 <div>

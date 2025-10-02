@@ -301,9 +301,14 @@ public class PaymentService {
         PaymentDirection direction;
         PaymentTransactionType transactionType;
 
+        boolean isEwalletFlow = payment.getTransactionType() == PaymentTransactionType.EWALLET_DEPOSIT
+                || payment.getTransactionType() == PaymentTransactionType.EWALLET_WITHDRAWAL
+                || payment.getTransactionType() == PaymentTransactionType.EWALLET_PAYMENT_RECEIVED;
+
         if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION ||
-                payment.getTransactionType() == PaymentTransactionType.SHOWCASE_PAYMENT) {
-            direction = payment.getFromUser().getId().equals(currentUser.getId()) ? PaymentDirection.OUTGOING : PaymentDirection.INCOMING;
+                payment.getTransactionType() == PaymentTransactionType.SHOWCASE_PAYMENT ||
+                isEwalletFlow) {
+            direction = payment.getPaymentDirection();
             transactionType = payment.getTransactionType();
         } else {
             if (payment.getFromUser().getId().equals(currentUser.getId())) {
