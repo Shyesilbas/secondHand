@@ -44,7 +44,14 @@ export const useAdvancedListingsQuery = (initialFilters = {}) => {
         const listings = queryData?.content || [];
     const totalPages = queryData?.totalPages || 0;
     const totalElements = queryData?.totalElements || 0;
-    const currentPage = queryData?.number || 0;
+    
+    // Try multiple possible field names for current page with safe fallback
+    const currentPage = Number(queryData?.number ?? 
+                       queryData?.pageable?.pageNumber ?? 
+                       queryData?.page ?? 
+                       filters?.page ?? 
+                       0) || 0;
+    
     const error = queryError?.message || null;
 
         const handleUpdateFilters = (newFilters) => {

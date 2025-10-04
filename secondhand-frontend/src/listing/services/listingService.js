@@ -125,7 +125,7 @@ export const listingService = {
         totalPages: 0,
         totalElements: 0,
         number: 0,
-        size: filters.size || 20,
+        size: filters.size || 10,
         first: true,
         last: true,
         empty: true

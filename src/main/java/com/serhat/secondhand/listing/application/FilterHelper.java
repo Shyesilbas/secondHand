@@ -19,7 +19,7 @@ public class FilterHelper {
             filters.setPage(0);
         }
         if (filters.getSize() == null) {
-            filters.setSize(20);
+            filters.setSize(10);
         }
         if (filters.getStatus() == null) {
             filters.setStatus(ListingStatus.ACTIVE);

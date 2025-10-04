@@ -35,7 +35,7 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
           listingType: listingType,
           status: 'ACTIVE',
           page: 0,
-          size: 20,
+          size: 10,
           ...initialFilters 
         };
       }

@@ -107,6 +107,8 @@ export const API_ENDPOINTS = {
         EMAIL_TYPES: '/v1/enums/email-types',
         AUDIT_EVENT_TYPES: '/v1/enums/audit-event-types',
         AUDIT_EVENT_STATUSES: '/v1/enums/audit-event-statuses',
+        LISTING_FEE_CONFIG: '/v1/enums/listing-fee-config',
+        SHOWCASE_PRICING_CONFIG: '/v1/enums/showcase-pricing-config',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',

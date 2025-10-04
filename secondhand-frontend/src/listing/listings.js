@@ -36,7 +36,7 @@ export const BooksListingFilterDTO = {
   sortBy: 'createdAt',
   sortDirection: 'DESC',
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const SportsListingFilterDTO = {
@@ -54,7 +54,7 @@ export const SportsListingFilterDTO = {
   sortBy: 'createdAt',
   sortDirection: 'DESC',
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const ListingFilterDTO = {
@@ -84,7 +84,7 @@ export const ListingFilterDTO = {
   sortDirection: 'DESC',
   
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const VehicleListingFilterDTO = {
@@ -111,7 +111,7 @@ export const VehicleListingFilterDTO = {
   sortDirection: 'DESC',
   
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const ElectronicListingFilterDTO = {
@@ -134,7 +134,7 @@ export const ElectronicListingFilterDTO = {
   sortDirection: 'DESC',
   
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const RealEstateListingFilterDTO = {
@@ -166,7 +166,7 @@ export const RealEstateListingFilterDTO = {
   sortDirection: 'DESC',
   
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const ClothingListingFilterDTO = {
@@ -190,7 +190,7 @@ export const ClothingListingFilterDTO = {
   sortDirection: 'DESC',
   
   page: 0,
-  size: 20,
+  size: 10,
 };
 
 export const ListingStatisticsDTO = {

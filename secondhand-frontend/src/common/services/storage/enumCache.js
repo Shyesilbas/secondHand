@@ -1,6 +1,6 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '2.0'; const REQUIRED_ENUM_KEYS = [
+const ENUM_CACHE_VERSION = '2.2'; const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
   'carBrands',
@@ -32,6 +32,8 @@ const ENUM_CACHE_VERSION = '2.0'; const REQUIRED_ENUM_KEYS = [
     'genders',
   'auditEventTypes',
   'auditEventStatuses',
+  'listingFeeConfig',
+  'showcasePricingConfig',
 ];
 const CACHE_EXPIRY_HOURS = 24;
 export const getCachedEnums = () => {
@@ -39,28 +41,48 @@ export const getCachedEnums = () => {
         const cached = localStorage.getItem(ENUM_CACHE_KEY);
         if (!cached) return null;
 
-        const { data, timestamp, version } = JSON.parse(cached);
+        const { data, timestamp, version, pricingCacheVersions } = JSON.parse(cached);
         
-                if (version !== ENUM_CACHE_VERSION) {
+        if (version !== ENUM_CACHE_VERSION) {
             console.log('Enum cache version mismatch, clearing cache');
             clearEnumCache();
             return null;
         }
 
-                const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
+        const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
         if (missingKeys.length > 0) {
             console.log('Enum cache missing keys', missingKeys, '— clearing cache');
             clearEnumCache();
             return null;
         }
 
-                const now = Date.now();
+        const now = Date.now();
         const expiryTime = timestamp + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
         
         if (now > expiryTime) {
             console.log('Enum cache expired, clearing cache');
             clearEnumCache();
             return null;
+        }
+
+        // Check if pricing config cache versions have changed
+        if (pricingCacheVersions) {
+            const currentListingFeeVersion = data.listingFeeConfig?.cacheVersion;
+            const currentShowcaseVersion = data.showcasePricingConfig?.cacheVersion;
+            
+            if (currentListingFeeVersion && pricingCacheVersions.listingFeeConfig && 
+                currentListingFeeVersion !== pricingCacheVersions.listingFeeConfig) {
+                console.log('Listing fee config cache version changed, clearing cache');
+                clearEnumCache();
+                return null;
+            }
+            
+            if (currentShowcaseVersion && pricingCacheVersions.showcasePricingConfig && 
+                currentShowcaseVersion !== pricingCacheVersions.showcasePricingConfig) {
+                console.log('Showcase pricing config cache version changed, clearing cache');
+                clearEnumCache();
+                return null;
+            }
         }
 
         console.log('Using cached enums from localStorage');
@@ -75,10 +97,17 @@ export const getCachedEnums = () => {
 
 export const setCachedEnums = (enums) => {
     try {
+        // Extract pricing cache versions for future comparison
+        const pricingCacheVersions = {
+            listingFeeConfig: enums.listingFeeConfig?.cacheVersion,
+            showcasePricingConfig: enums.showcasePricingConfig?.cacheVersion
+        };
+        
         const cacheData = {
             data: enums,
             timestamp: Date.now(),
-            version: ENUM_CACHE_VERSION
+            version: ENUM_CACHE_VERSION,
+            pricingCacheVersions
         };
         
         localStorage.setItem(ENUM_CACHE_KEY, JSON.stringify(cacheData));

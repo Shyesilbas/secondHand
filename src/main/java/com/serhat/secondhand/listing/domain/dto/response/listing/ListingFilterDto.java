@@ -40,5 +40,5 @@ public abstract class ListingFilterDto {
     private String sortDirection = "DESC";
 
     private Integer page = 0;
-    private Integer size = 20;
+    private Integer size = 10;
 }

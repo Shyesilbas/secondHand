@@ -55,4 +55,7 @@ export const enumService = {
 
   getAuditEventTypes: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_TYPES),
   getAuditEventStatuses: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_STATUSES),
+
+  getListingFeeConfig: async () => get(API_ENDPOINTS.ENUMS.LISTING_FEE_CONFIG),
+  getShowcasePricingConfig: async () => get(API_ENDPOINTS.ENUMS.SHOWCASE_PRICING_CONFIG),
 };

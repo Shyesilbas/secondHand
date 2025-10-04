@@ -1,20 +1,22 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
-import {usePricing} from '../../../payments/hooks/usePricing.js';
-import {useShowcasePricing} from '../../../showcase/hooks/useShowcasePricing.js';
+import {useEnums} from '../../hooks/useEnums.js';
 import {useAgreements} from '../../../agreements/hooks/useAgreements.js';
 import {formatCurrency} from '../../formatters.js';
 import {ROUTES} from '../../constants/routes.js';
 
 const Footer = () => {
-    const { feeConfig, isLoading } = usePricing();
-    const { pricingConfig: showcasePricing, isLoading: showcasePricingLoading } = useShowcasePricing();
+    const { enums, isLoading } = useEnums();
     const { agreements, isLoading: agreementsLoading } = useAgreements();
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [showPricing, setShowPricing] = useState(false);
     const [showReportIssues, setShowReportIssues] = useState(false);
+
+    const feeConfig = enums.listingFeeConfig;
+    const showcasePricing = enums.showcasePricingConfig;
+    const isLoadingPricing = isLoading;
 
     return (
         <footer className="bg-gray-800 text-white py-8">
@@ -42,7 +44,7 @@ const Footer = () => {
                         </button>
                         {showPricing && (
                             <div className="text-sm text-gray-300 space-y-1">
-                                {isLoading || showcasePricingLoading ? (
+                                {isLoadingPricing ? (
                                     <div className="animate-pulse">
                                         <div className="h-4 bg-gray-600 rounded mb-2"></div>
                                         <div className="h-4 bg-gray-600 rounded mb-2"></div>

@@ -12,5 +12,6 @@ public enum ElectronicType {
     MICROPHONE,
     SPEAKER,
     TV_STB,
-    VIDEO_PLAYER
+    VIDEO_PLAYER,
+    TABLET
 }

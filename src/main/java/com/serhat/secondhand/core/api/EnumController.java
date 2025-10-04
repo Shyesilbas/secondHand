@@ -1,25 +1,31 @@
 package com.serhat.secondhand.core.api;
 
-import com.serhat.secondhand.user.domain.entity.enums.Gender;
-import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
-import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
+import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
+import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.showcase.ShowcaseService;
+import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +34,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Locale;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/enums")
 @RequiredArgsConstructor
 @Tag(name = "Enum Values", description = "Endpoints for getting enum values from backend")
 public class EnumController {
+
+    private final PaymentService paymentService;
+    private final ShowcaseService showcaseService;
 
     @GetMapping("/listing-types")
     @Operation(summary = "Get all listing types", description = "Returns all available listing types with labels")
@@ -608,6 +613,7 @@ public class EnumController {
             case SPEAKER -> "Speaker";
             case TV_STB -> "TV Set-Top Box";
             case VIDEO_PLAYER -> "Video Player";
+            case TABLET -> "Tablet";
         };
     }
 
@@ -841,5 +847,45 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(eventStatuses);
+    }
+
+    @GetMapping("/listing-fee-config")
+    @Operation(summary = "Get listing fee configuration", description = "Returns listing fee configuration for caching")
+    public ResponseEntity<Map<String, Object>> getListingFeeConfig() {
+        var config = paymentService.getListingFeeConfig();
+        Map<String, Object> configMap = new LinkedHashMap<>();
+        configMap.put("creationFee", config.getCreationFee());
+        configMap.put("taxPercentage", config.getTaxPercentage());
+        configMap.put("totalCreationFee", config.getTotalCreationFee());
+        
+        // Add cache version based on config hash
+        String configHash = String.valueOf(
+            (config.getCreationFee().hashCode() + 
+             config.getTaxPercentage().hashCode() + 
+             config.getTotalCreationFee().hashCode()) % 10000
+        );
+        configMap.put("cacheVersion", configHash);
+        
+        return ResponseEntity.ok(configMap);
+    }
+
+    @GetMapping("/showcase-pricing-config")
+    @Operation(summary = "Get showcase pricing configuration", description = "Returns showcase pricing configuration for caching")
+    public ResponseEntity<Map<String, Object>> getShowcasePricingConfig() {
+        var config = showcaseService.getShowcasePricingConfig();
+        Map<String, Object> configMap = new LinkedHashMap<>();
+        configMap.put("dailyCost", config.getDailyCost());
+        configMap.put("taxPercentage", config.getTaxPercentage());
+        configMap.put("totalDailyCost", config.getTotalDailyCost());
+        
+        // Add cache version based on config hash
+        String configHash = String.valueOf(
+            (config.getDailyCost().hashCode() + 
+             config.getTaxPercentage().hashCode() + 
+             config.getTotalDailyCost().hashCode()) % 10000
+        );
+        configMap.put("cacheVersion", configHash);
+        
+        return ResponseEntity.ok(configMap);
     }
 }
