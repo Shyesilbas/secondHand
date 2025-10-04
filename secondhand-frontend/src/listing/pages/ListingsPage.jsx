@@ -4,16 +4,21 @@ import ListingGrid from '../components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import ListingSearch from '../components/ListingSearch.jsx';
 import SearchResult from '..//components/SearchResult.jsx';
 import FilterStatus from '../components/FilterStatus.jsx';
 import FilterModal from '../components/FilterModal.jsx';
+import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+import { listingService } from '../services/listingService.js';
 
 const ListingsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchResult, setSearchResult] = useState(null);
     const [showSearchResult, setShowSearchResult] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState(null);
+    const [isSearchMode, setIsSearchMode] = useState(false);
 
     const navState = useMemo(() => window.history.state && window.history.state.usr, []);
     const initialListingType = navState?.listingType || null;
@@ -58,12 +63,34 @@ const ListingsPage = () => {
         setShowFilterModal(false);
     };
 
-    const handleSearchResult = (result) => {
-        setSearchResult(result);
-        setShowSearchResult(true);
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        if (!searchTerm.trim()) return;
+
+        setSearchLoading(true);
+        setSearchError(null);
+
+        try {
+            const listing = await listingService.getListingByNo(searchTerm.trim());
+            if (listing) {
+                setSearchResult(listing);
+                setShowSearchResult(true);
+                setIsSearchMode(true);
+                setSearchTerm('');
+            }
+        } catch (error) {
+            setSearchError('Listing not found. Please check the listing number.');
+            console.error('Search error:', error);
+        } finally {
+            setSearchLoading(false);
+        }
     };
 
-    const handleClearSearch = () => {
+    const clearSearch = () => {
+        setSearchTerm('');
+        setSearchError(null);
+        setIsSearchMode(false);
         setShowSearchResult(false);
         setSearchResult(null);
     };
@@ -95,13 +122,46 @@ const ListingsPage = () => {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Search */}
-                <div className="mb-8">
-                    <ListingSearch
-                        onSearchResult={handleSearchResult}
-                        onClearSearch={showSearchResult ? handleClearSearch : null}
-                    />
+                {/* Search Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
+                    <form onSubmit={handleSearch} className="flex items-center gap-3">
+                        <div className="flex-1 relative">
+                            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search by listing number"
+                                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                                disabled={searchLoading}
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={searchLoading || !searchTerm.trim()}
+                            className="px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            {searchLoading ? 'Searching...' : 'Search'}
+                        </button>
+                        {isSearchMode && (
+                            <button
+                                type="button"
+                                onClick={clearSearch}
+                                className="px-4 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                            >
+                                Show All
+                            </button>
+                        )}
+                    </form>
+                    {searchError && (
+                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-800">{searchError}</p>
+                        </div>
+                    )}
                 </div>
+
 
                 {/* Search Result */}
                 {showSearchResult && searchResult ? (
@@ -123,17 +183,21 @@ const ListingsPage = () => {
                 {/* Listings Grid */}
                 {!showSearchResult && (
                     <>
-                        <div className="mb-8">
-                            <ListingGrid listings={listings} isLoading={isLoading} error={error} />
-                        </div>
-                        {!isLoading && totalPages > 1 && (
+                        {isLoading ? (
+                            <div className="flex justify-center items-center py-12">
+                                <LoadingIndicator />
+                            </div>
+                        ) : (
+                            <div className="mb-8">
+                                <ListingGrid listings={listings} isLoading={isLoading} error={error} />
+                            </div>
+                        )}
+                        {!isLoading && !isSearchMode && totalPages > 1 && (
                             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    totalElements={totalElements}
+                                    page={currentPage || 0}
+                                    totalPages={totalPages || 0}
                                     onPageChange={updatePage}
-                                    itemsPerPage={filters.size}
                                 />
                             </div>
                         )}

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {showcaseService} from '../services/showcaseService.js';
-import {useShowcasePricing} from '../hooks/useShowcasePricing.js';
+import {useEnums} from '../../common/hooks/useEnums.js';
 import {usePaymentMethods} from '../../payments/hooks/usePaymentMethods.js';
 import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
 import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
@@ -21,7 +21,9 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
     const { paymentMethods, isLoading: isPaymentLoading, refetch } = usePaymentMethods();
     const { eWallet, loading: isEWalletLoading, refreshWallet } = useEWallet();
-    const { pricingConfig: showcasePricing, isLoading: isPricingLoading } = useShowcasePricing();
+    const { enums, isLoading: isPricingLoading } = useEnums();
+    
+    const showcasePricing = enums.showcasePricingConfig;
 
     useEffect(() => {
         if (isOpen) {

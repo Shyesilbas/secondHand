@@ -35,6 +35,8 @@ export const useEnums = () => {
     genders: [],
     auditEventTypes: [],
     auditEventStatuses: [],
+    listingFeeConfig: null,
+    showcasePricingConfig: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,7 +91,9 @@ export const useEnums = () => {
           emailTypes,
           genders,
           auditEventTypes,
-          auditEventStatuses
+          auditEventStatuses,
+          listingFeeConfig,
+          showcasePricingConfig
         ] = await Promise.all([
           enumService.getListingTypes(),
           enumService.getListingStatuses(),
@@ -122,6 +126,8 @@ export const useEnums = () => {
           enumService.getGenders(),
           enumService.getAuditEventTypes(),
           enumService.getAuditEventStatuses(),
+          enumService.getListingFeeConfig(),
+          enumService.getShowcasePricingConfig(),
         ]);
 
         const fetchedEnums = {
@@ -156,6 +162,8 @@ export const useEnums = () => {
           genders,
           auditEventTypes,
           auditEventStatuses,
+          listingFeeConfig,
+          showcasePricingConfig,
         };
 
         setEnums(fetchedEnums);

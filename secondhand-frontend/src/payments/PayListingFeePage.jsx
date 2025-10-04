@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePayListingFee } from './hooks/usePayListingFee.js';
 import { useDraftListings } from './hooks/useDraftListings.js';
-import { useFeeConfig } from './hooks/useFeeConfig.js';
+import { useEnums } from '../common/hooks/useEnums.js';
 import { usePaymentMethods } from './hooks/usePaymentMethods.js';
 import { useEmails } from './hooks/useEmails.js';
 import BackButton from '../common/components/ui/BackButton.jsx';
@@ -18,8 +18,10 @@ const PayListingFeePage = () => {
     const navigate = useNavigate();
 
     const { draftListings, isLoading: isListingsLoading, error: listingsError, refetch: refetchListings } = useDraftListings();
-    const { feeConfig, isLoading: isConfigLoading, error: configError } = useFeeConfig();
+    const { enums, isLoading: isConfigLoading } = useEnums();
     const { paymentMethods, isLoading: isPaymentMethodsLoading, refetch: refetchPaymentMethods } = usePaymentMethods();
+    
+    const feeConfig = enums.listingFeeConfig;
     const { emails, isLoading: isEmailsLoading, fetchEmails, clearEmails } = useEmails();
     const {
         selectedListing,
@@ -46,7 +48,7 @@ const PayListingFeePage = () => {
     });
 
     const isLoading = isListingsLoading || isConfigLoading;
-    const error = listingsError || configError;
+    const error = listingsError;
 
     useEffect(() => {
         if (showConfirmModal) {

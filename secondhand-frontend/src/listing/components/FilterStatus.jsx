@@ -45,6 +45,7 @@ const FilterStatus = ({
         if (filters.electronicBrands && filters.electronicBrands.length > 0) count++;
         if (filters.minYear || filters.maxYear) count++;
         if (filters.maxMileage) count++;
+        
         return count;
     });
 
@@ -59,19 +60,28 @@ const FilterStatus = ({
                         </span>
                     )}
                 </p>
-                {checkActiveFilters() && (
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            {countActiveFilters()} filter{countActiveFilters() !== 1 ? 's' : ''} active
-                        </span>
-                        <button
-                            onClick={onResetFilters}
-                            className="text-xs text-slate-500 hover:text-slate-700 underline transition-colors"
-                        >
-                            Clear all
-                        </button>
-                    </div>
-                )}
+                {(() => {
+                    const activeCount = countActiveFilters();
+                    const hasActive = checkActiveFilters();
+                    
+                    // Only show if there are actually active filters (count > 0)
+                    if (hasActive && activeCount > 0) {
+                        return (
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                    {activeCount} filter{activeCount !== 1 ? 's' : ''} active
+                                </span>
+                                <button
+                                    onClick={onResetFilters}
+                                    className="text-xs text-slate-500 hover:text-slate-700 underline transition-colors"
+                                >
+                                    Clear all
+                                </button>
+                            </div>
+                        );
+                    }
+                    return null;
+                })()}
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-sm text-slate-500">
