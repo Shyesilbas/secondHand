@@ -19,6 +19,10 @@ const ListingsPage = () => {
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState(null);
     const [isSearchMode, setIsSearchMode] = useState(false);
+    const [titleSearchTerm, setTitleSearchTerm] = useState('');
+    const [allPagesLoaded, setAllPagesLoaded] = useState(false);
+    const [allListings, setAllListings] = useState([]);
+    const [loadingAllPages, setLoadingAllPages] = useState(false);
 
     const navState = useMemo(() => window.history.state && window.history.state.usr, []);
     const initialListingType = navState?.listingType || null;
@@ -87,12 +91,69 @@ const ListingsPage = () => {
         }
     };
 
+    // Frontend filtering for title and listingNo
+    const filteredListings = useMemo(() => {
+        if (!titleSearchTerm.trim()) {
+            return listings || [];
+        }
+
+        const searchLower = titleSearchTerm.toLowerCase().trim();
+        const listingsToSearch = allPagesLoaded ? allListings : (listings || []);
+        
+        return listingsToSearch.filter(listing => {
+            const titleMatch = listing.title?.toLowerCase().includes(searchLower);
+            const listingNoMatch = listing.listingNo?.toLowerCase().includes(searchLower);
+            return titleMatch || listingNoMatch;
+        });
+    }, [listings, titleSearchTerm, allPagesLoaded, allListings]);
+
     const clearSearch = () => {
         setSearchTerm('');
+        setTitleSearchTerm('');
         setSearchError(null);
         setIsSearchMode(false);
         setShowSearchResult(false);
         setSearchResult(null);
+        setAllPagesLoaded(false);
+        setAllListings([]);
+    };
+
+    const loadAllPages = async () => {
+        setLoadingAllPages(true);
+        try {
+            // Mevcut filtreleri kullanarak tüm sayfaları yükle
+            const allListingsData = [];
+            let currentPage = 0;
+            let hasMorePages = true;
+            
+            while (hasMorePages) {
+                const response = await listingService.filterListings({
+                    ...filters,
+                    page: currentPage,
+                    size: 100 // Daha büyük sayfa boyutu
+                });
+                
+                if (response.content && response.content.length > 0) {
+                    allListingsData.push(...response.content);
+                    currentPage++;
+                    
+                    // Son sayfaya ulaştıysak döngüyü sonlandır
+                    if (response.content.length < 100 || currentPage >= response.totalPages) {
+                        hasMorePages = false;
+                    }
+                } else {
+                    hasMorePages = false;
+                }
+            }
+            
+            setAllListings(allListingsData);
+            setAllPagesLoaded(true);
+        } catch (error) {
+            console.error('Error loading all pages:', error);
+            setSearchError('Error loading all listings. Please try again.');
+        } finally {
+            setLoadingAllPages(false);
+        }
     };
 
     const hasActiveFilters = () => {
@@ -157,28 +218,28 @@ const ListingsPage = () => {
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Search Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+                <div className="bg-white border border-gray-200 rounded p-6 mb-8">
                     <div className="flex items-center gap-3 mb-4">
                         <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <h3 className="text-lg font-medium text-gray-900">Search by Listing Number</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Search Listings</h3>
                     </div>
                     
-                    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
-                        <div className="flex-1 relative">
+                    <div className="space-y-4">
+                        {/* Title and ListingNo Search */}
+                        <div className="relative">
                             <input
                                 type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Enter listing number (e.g., ABC12345)"
+                                value={titleSearchTerm}
+                                onChange={(e) => setTitleSearchTerm(e.target.value)}
+                                placeholder="Search by title or listing number (e.g., MacBook, ABC12345)"
                                 className="w-full px-4 py-2 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                                disabled={searchLoading}
                             />
-                            {searchTerm && (
+                            {titleSearchTerm && (
                                 <button
                                     type="button"
-                                    onClick={() => setSearchTerm('')}
+                                    onClick={() => setTitleSearchTerm('')}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,30 +249,104 @@ const ListingsPage = () => {
                             )}
                         </div>
                         
-                        <div className="flex gap-2">
-                            <button
-                                type="submit"
-                                disabled={searchLoading || !searchTerm.trim()}
-                                className="px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                            >
-                                {searchLoading ? 'Searching...' : 'Search'}
-                            </button>
+                        {/* Exact Listing Number Search */}
+                        <div className="border-t border-gray-200 pt-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                </svg>
+                                <span className="text-sm text-gray-600">Or search by exact listing number:</span>
+                            </div>
                             
-                            {isSearchMode && (
-                                <button
-                                    type="button"
-                                    onClick={clearSearch}
-                                    className="px-4 py-2 text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                >
-                                    Show All
-                                </button>
-                            )}
+                            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+                                <div className="flex-1 relative">
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Enter exact listing number (e.g., ABC12345)"
+                                        className="w-full px-4 py-2 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                                        disabled={searchLoading}
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchTerm('')}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                    <button
+                                        type="submit"
+                                        disabled={searchLoading || !searchTerm.trim()}
+                                        className="px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                    >
+                                        {searchLoading ? 'Searching...' : 'Search'}
+                                    </button>
+                                    
+                                    {(isSearchMode || titleSearchTerm) && (
+                                        <button
+                                            type="button"
+                                            onClick={clearSearch}
+                                            className="px-4 py-2 text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        >
+                                            Clear All
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                     
                     {searchError && (
                         <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded">
-                            <p className="text-sm text-red-800">{searchError}</p>
+                            <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <span className="text-sm text-red-700">{searchError}</span>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {titleSearchTerm && (
+                        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-sm text-gray-600">
+                                        {allPagesLoaded ? (
+                                            <>Found {filteredListings.length} result{filteredListings.length !== 1 ? 's' : ''} in all pages for "{titleSearchTerm}"</>
+                                        ) : (
+                                            <>Found {filteredListings.length} result{filteredListings.length !== 1 ? 's' : ''} on current page for "{titleSearchTerm}" • More results may be available on other pages</>
+                                        )}
+                                    </span>
+                                </div>
+                                
+                                {!allPagesLoaded && !loadingAllPages && (
+                                    <button
+                                        onClick={loadAllPages}
+                                        className="px-3 py-1 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 transition-colors"
+                                    >
+                                        {filteredListings.length === 0 ? 'Search All Pages' : 'Find More Results'}
+                                    </button>
+                                )}
+                                
+                                {loadingAllPages && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                                        <span className="text-xs text-gray-600">Loading all pages...</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -220,7 +355,7 @@ const ListingsPage = () => {
                 {/* Search Result */}
                 {showSearchResult && searchResult ? (
                     <SearchResult searchResult={searchResult} />
-                ) : !isLoading && !showSearchResult && (
+                ) : !isLoading && !showSearchResult && !titleSearchTerm && (
                     <>
                         <div className="mb-6">
                             <FilterStatus
@@ -243,10 +378,10 @@ const ListingsPage = () => {
                             </div>
                         ) : (
                             <div className="mb-8">
-                                <ListingGrid listings={listings} isLoading={isLoading} error={error} />
+                                <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} />
                             </div>
                         )}
-                        {!isLoading && !isSearchMode && totalPages > 1 && (
+                        {!isLoading && !isSearchMode && !titleSearchTerm && totalPages > 1 && (
                             <div className="bg-white border border-gray-200 rounded">
                                 <Pagination
                                     page={currentPage || 0}
