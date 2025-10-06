@@ -11,19 +11,19 @@ const AuthButton = ({
                     }) => {
     const baseClasses = `
     w-full flex justify-center py-2.5 px-4 border border-transparent 
-    rounded-lg shadow-sm text-sm font-medium focus:outline-none 
-    focus:ring-2 focus:ring-offset-2 transition-all duration-200
+    rounded text-sm font-medium focus:outline-none 
+    focus:ring-2 focus:ring-offset-2 transition-colors
     disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
     const variants = {
         primary: `
-      text-white bg-indigo-600 hover:bg-indigo-700 
-      focus:ring-indigo-500 active:bg-indigo-800
+      text-white bg-gray-900 hover:bg-gray-800 
+      focus:ring-gray-500 active:bg-gray-700
     `,
         secondary: `
-      text-indigo-700 bg-indigo-100 hover:bg-indigo-200 
-      focus:ring-indigo-500 active:bg-indigo-300
+      text-gray-700 bg-gray-100 hover:bg-gray-200 
+      focus:ring-gray-500 active:bg-gray-300
     `
     };
 

@@ -75,11 +75,11 @@ const ChangePasswordPage = () => {
     const passwordValidation = validatePassword(formData.newPassword);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 <div className="text-center">
-                    <h2 className="mt-6 text-3xl font-extrabold text-text-primary">Change Password</h2>
-                    <p className="mt-2 text-sm text-text-secondary">Please enter a strong password for your account.</p>
+                    <h2 className="mt-6 text-3xl font-semibold text-gray-900">Change Password</h2>
+                    <p className="mt-2 text-sm text-gray-600">Please enter a strong password for your account.</p>
                 </div>
 
                 <Alert type="error" message={errors.general} />
@@ -96,14 +96,14 @@ const ChangePasswordPage = () => {
                         <AuthButton type="submit" isLoading={isLoading} disabled={isLoading || !passwordValidation.isValid || formData.newPassword !== formData.confirmPassword} className="flex-1">
                             {isLoading ? 'Updating...' : 'Change Password'}
                         </AuthButton>
-                        <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="flex-1 py-2 px-4 border border-header-border rounded-md shadow-sm text-sm font-medium text-text-secondary bg-white hover:bg-app-bg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">Cancel</button>
+                        <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="flex-1 py-2 px-4 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">Cancel</button>
                     </div>
                 </form>
 
                 <div className="text-center">
-                    <p className="text-xs text-text-muted">
+                    <p className="text-xs text-gray-500">
                         If you forgot your password, you can{' '}
-                        <button onClick={() => navigate(ROUTES.FORGOT_PASSWORD)} className="font-medium text-indigo-600 hover:text-indigo-500">use the forgot password form</button>.
+                        <button onClick={() => navigate(ROUTES.FORGOT_PASSWORD)} className="font-medium text-gray-900 hover:text-gray-700">use the forgot password form</button>.
                     </p>
                 </div>
             </div>

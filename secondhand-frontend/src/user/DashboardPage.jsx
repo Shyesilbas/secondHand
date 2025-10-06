@@ -45,13 +45,13 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-6">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-semibold text-gray-900">
             Dashboard
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-1">
             Welcome back, {user?.name}! Manage your account and activities.
           </p>
         </div>
@@ -61,18 +61,18 @@ const DashboardPage = () => {
             <Link
               key={index}
               to={item.route}
-              className="group bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 block"
+              className="bg-white p-6 rounded border border-gray-200 hover:border-gray-300 transition-colors block"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+                  <h3 className="font-medium text-gray-900">
                     {item.title}
                   </h3>
                   <p className="text-gray-600 text-sm mt-1">
                     {item.description}
                   </p>
                 </div>
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

@@ -20,18 +20,37 @@ const ListingDetailPage = () => {
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
   const { isInShowcase } = useShowcaseQuery();
 
-  if (isLoading) return <div className="p-8 text-center">Loading...</div>;
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+  if (isLoading) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading listing details...</p>
+      </div>
+    </div>
+  );
+  if (error) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Listing</h3>
+        <p className="text-gray-600">{error}</p>
+      </div>
+    </div>
+  );
   if (!listing) return null;
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
   const listingInShowcase = isInShowcase(listing.id);
 
   return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
@@ -45,12 +64,12 @@ const ListingDetailPage = () => {
                     Back to Listings
                   </Link>
                   {listing.listingNo && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                       #{listing.listingNo}
                     </span>
                   )}
                   {listingInShowcase && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
@@ -58,7 +77,7 @@ const ListingDetailPage = () => {
                     </span>
                   )}
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{listing.title}</h1>
+                <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">{listing.title}</h1>
                 <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -91,18 +110,18 @@ const ListingDetailPage = () => {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Price Section */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{formatCurrency(listing.price, listing.currency)}</h2>
-                    <p className="text-sm text-gray-500 mt-1">Asking price</p>
+                    <h2 className="text-2xl font-semibold text-gray-900">{formatCurrency(listing.price, listing.currency)}</h2>
+                    <p className="text-sm text-gray-600 mt-1">Asking price</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-500">Status</div>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    <div className="text-sm text-gray-600">Status</div>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
                       listing.status === 'ACTIVE' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-50 text-green-700 border border-green-200' 
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
                     }`}>
                       {listing.status}
                     </span>
@@ -111,7 +130,7 @@ const ListingDetailPage = () => {
               </div>
 
               {/* Description Section */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Description</h3>
                 <div className="prose prose-gray max-w-none">
                   <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
@@ -124,7 +143,7 @@ const ListingDetailPage = () => {
                 if (!cfg?.detailsComponent) return null;
                 const Details = cfg.detailsComponent;
                 return (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
                     <Details listing={listing} />
                   </div>
                 );
@@ -140,7 +159,7 @@ const ListingDetailPage = () => {
             <div className="lg:col-span-1">
               <div className="sticky top-8 space-y-6">
                 {/* Seller Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Seller Information</h3>
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-lg font-semibold text-gray-700">
@@ -178,7 +197,7 @@ const ListingDetailPage = () => {
                 </div>
 
                 {/* Listing Stats */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded border border-gray-200 p-6">
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Listing Information</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
@@ -197,7 +216,7 @@ const ListingDetailPage = () => {
                 </div>
 
                 {/* Safety Tips */}
-                <div className="bg-gray-50 rounded-xl p-6">
+                <div className="bg-gray-50 rounded border border-gray-200 p-6">
                   <h4 className="text-sm font-semibold text-gray-900 mb-3">Safety Tips</h4>
                   <ul className="space-y-2 text-xs text-gray-600">
                     <li className="flex items-start gap-2">

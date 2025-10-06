@@ -9,20 +9,11 @@ const EmptyState = ({
   className = '',
   children
 }) => {
-  const iconWrapperClass = variant === 'blue'
-    ? 'bg-blue-100 text-btn-primary'
-    : variant === 'green'
-      ? 'bg-green-100 text-green-600'
-      : 'bg-gray-100 text-text-muted';
-
-  const buttonColor = (primaryAction?.variant || variant) === 'blue'
-    ? 'bg-btn-primary hover:bg-btn-primary-hover'
-    : (primaryAction?.variant || variant) === 'green'
-      ? 'bg-green-600 hover:bg-green-700'
-      : 'bg-gray-800 hover:bg-gray-900';
+  const iconWrapperClass = 'bg-gray-100 text-gray-600';
+  const buttonColor = 'bg-gray-900 hover:bg-gray-800';
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border p-8 text-center ${className}`}>
+    <div className={`bg-white rounded border border-gray-200 p-8 text-center ${className}`}>
       {(Icon || variant !== 'default') && (
         <div className={`w-16 h-16 mx-auto mb-4 ${iconWrapperClass} rounded-full flex items-center justify-center`}>
           {Icon ? <Icon className="w-8 h-8" /> : (
@@ -32,13 +23,13 @@ const EmptyState = ({
           )}
         </div>
       )}
-      <h3 className="text-lg font-medium text-text-primary mb-2">{title}</h3>
-      {description && <p className="text-text-secondary mb-6">{description}</p>}
+      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+      {description && <p className="text-gray-600 mb-6">{description}</p>}
       {primaryAction && (
         <button
           onClick={primaryAction.onClick}
           disabled={primaryAction.disabled}
-          className={`text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50 ${buttonColor}`}
+          className={`text-white px-6 py-2 rounded transition-colors disabled:opacity-50 ${buttonColor}`}
         >
           {primaryAction.label}
         </button>

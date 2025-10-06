@@ -51,43 +51,46 @@ const ShoppingCartPage = () => {
 
     if (isLoading) {
         return (
-            <div className="container mx-auto px-4 py-10">
-                <div className="flex items-center justify-center h-64">
-                    <LoadingIndicator />
+            <div className="min-h-screen bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="flex items-center justify-center h-64">
+                        <LoadingIndicator />
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-10">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center space-x-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5" />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-                        <p className="text-gray-600 mt-1">
-                            {cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart
-                        </p>
+        <div className="min-h-screen bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center space-x-4">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 hover:bg-gray-100 rounded transition-colors"
+                        >
+                            <ArrowLeftIcon className="w-5 h-5" />
+                        </button>
+                        <div>
+                            <h1 className="text-3xl font-semibold text-gray-900">Shopping Cart</h1>
+                            <p className="text-gray-600 mt-1">
+                                {cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart
+                            </p>
+                        </div>
                     </div>
+                    
+                    {cartCount > 0 && (
+                        <button
+                            onClick={() => setShowClearModal(true)}
+                            className="flex items-center space-x-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded transition-colors"
+                        >
+                            <TrashIcon className="w-4 h-4" />
+                            <span>Clear Cart</span>
+                        </button>
+                    )}
                 </div>
-                
-                {cartCount > 0 && (
-                    <button
-                        onClick={() => setShowClearModal(true)}
-                        className="flex items-center space-x-2 px-4 py-2 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
-                    >
-                        <TrashIcon className="w-4 h-4" />
-                        <span>Clear Cart</span>
-                    </button>
-                )}
-            </div>
 
             {/* Cart Content */}
             {cartCount === 0 ? (
@@ -96,17 +99,16 @@ const ShoppingCartPage = () => {
                     description="Add some items to your cart to get started."
                     primaryAction={{
                         label: "Browse Listings",
-                        onClick: () => navigate('/listings'),
-                        variant: "blue"
+                        onClick: () => navigate('/listings')
                     }}
                 />
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left column: Cart Items with controls */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-lg shadow-sm border">
+                        <div className="bg-white rounded border border-gray-200">
                             <div className="p-6 border-b border-gray-200">
-                                <h2 className="text-lg font-semibold text-gray-900">Cart Items</h2>
+                                <h2 className="text-lg font-medium text-gray-900">Cart Items</h2>
                             </div>
                             <div className="divide-y divide-gray-200">
                                 {cartItems.map((item) => (
@@ -180,6 +182,7 @@ const ShoppingCartPage = () => {
                 isClearing={isClearingCart}
             />
 
+            </div>
         </div>
     );
 };

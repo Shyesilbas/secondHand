@@ -39,53 +39,60 @@ const CreateListingPage = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-card-text-primary mb-8">
-                Publish Listing
-            </h1>
-
-            <div className="bg-card-bg rounded-card shadow-card border border-card-border p-6">
-                <h2 className="text-xl font-semibold text-card-text-primary mb-6">
-                    Select Listing Type
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {listingTypeOptions.map((type) => (
-                        <button
-                            key={type.value}
-                            onClick={() => handleTypeSelect(type.value)}
-                            className="p-6 border-2 border-card-border rounded-card hover:border-card-border-hover hover:text-primary transition-all duration-200 text-left group"
-                        >
-                            <div className="flex items-center space-x-4">
-                                <div className="text-3xl">
-                                    {type.icon || '📦'}
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-card-text-primary group-hover:text-primary">
-                                        {type.label}
-                                    </h3>
-                                    <p className="text-sm text-card-text-muted mt-1">
-                                        {type.description}
-                                    </p>
-                                </div>
-                            </div>
-                        </button>
-                    ))}
+        <div className="min-h-screen bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+                        Create New Listing
+                    </h1>
+                    <p className="text-gray-600">
+                        Choose the type of item you want to list
+                    </p>
                 </div>
 
-                {selectedType && !SelectedForm && (
-                    <div className="mt-8 p-4 bg-warning-bg border border-warning-border rounded-lg">
-                        <p className="text-warning-text">
-                            {selectedConfig?.label || selectedType} is not ready yet.
-                        </p>
-                        <button
-                            onClick={handleBackToSelection}
-                            className="mt-2 text-warning-text hover:text-warning-text underline"
-                        >
-                            Go Back
-                        </button>
+                <div className="bg-white border border-gray-200 rounded p-6">
+                    <h2 className="text-lg font-medium text-gray-900 mb-6">
+                        Select Listing Type
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {listingTypeOptions.map((type) => (
+                            <button
+                                key={type.value}
+                                onClick={() => handleTypeSelect(type.value)}
+                                className="p-4 border border-gray-200 rounded hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <div className="text-2xl">
+                                        {type.icon || '📦'}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-medium text-gray-900">
+                                            {type.label}
+                                        </h3>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {type.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
                     </div>
-                )}
+
+                    {selectedType && !SelectedForm && (
+                        <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded">
+                            <p className="text-gray-700">
+                                {selectedConfig?.label || selectedType} is not ready yet.
+                            </p>
+                            <button
+                                onClick={handleBackToSelection}
+                                className="mt-2 text-gray-600 hover:text-gray-800 underline"
+                            >
+                                Go Back
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

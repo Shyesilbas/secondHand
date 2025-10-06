@@ -17,6 +17,7 @@ const ChatPage = () => {
   const navigate = useNavigate();
   const notification = useNotification();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const {
     chatRooms,
     selectedChatRoom,
@@ -47,6 +48,18 @@ const ChatPage = () => {
     }
   };
 
+  // Filter chat rooms based on search term
+  const filteredChatRooms = chatRooms.filter(room => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      room.otherParticipantName?.toLowerCase().includes(searchLower) ||
+      room.listingTitle?.toLowerCase().includes(searchLower) ||
+      room.roomName?.toLowerCase().includes(searchLower) ||
+      room.lastMessage?.toLowerCase().includes(searchLower)
+    );
+  });
+
   const handleDeleteConversation = (roomId) => {
     notification.showConfirmation(
       'Delete Conversation',
@@ -73,18 +86,18 @@ const ChatPage = () => {
   }
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-semibold text-gray-900">
                 Messages
               </h1>
-              <p className="text-gray-600 mt-2">Connect with buyers and sellers</p>
+              <p className="text-gray-600 mt-1">Connect with buyers and sellers</p>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm">
-                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+              <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded border border-gray-200">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-gray-400' : 'bg-gray-300'}`}></div>
                 <span className="text-sm font-medium text-gray-700">
                   {isConnected ? 'Online' : 'Offline'}
                 </span>
@@ -95,24 +108,82 @@ const ChatPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-200px)]">
             {/* Chat Rooms List */}
             <div className="lg:col-span-4">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 h-full flex flex-col">
-                <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-800">Conversations</h2>
+              <div className="bg-white rounded border border-gray-200 h-full flex flex-col">
+                <div className="px-6 py-5 border-b border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">Conversations</h2>
+                      <p className="text-sm text-gray-500 mt-1">{filteredChatRooms.length} active chats</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                        <span className="text-xs font-medium text-gray-600">
+                          {isConnected ? 'Online' : 'Offline'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Search Input */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search conversations..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 bg-white"
+                    />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      >
+                        <svg className="h-4 w-4 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
                   {isLoadingRooms ? (
-                      <div className="p-4 text-center">
-                        <LoadingIndicator />
+                      <div className="flex flex-col items-center justify-center h-64">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
+                        <p className="text-sm text-gray-500">Loading conversations...</p>
                       </div>
                   ) : chatRooms.length === 0 ? (
-                      <EmptyState
-                          icon={ChatBubbleLeftRightIcon}
-                          title="No Messages Yet"
-                          description="Start a conversation with a seller"
-                      />
+                      <div className="flex flex-col items-center justify-center h-64 text-center px-6">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                          <ChatBubbleLeftRightIcon className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Messages Yet</h3>
+                        <p className="text-sm text-gray-500 mb-4">Start a conversation with a seller to see your messages here</p>
+                        <button
+                          onClick={() => window.location.href = '/listings'}
+                          className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors text-sm font-medium"
+                        >
+                          Browse Listings
+                        </button>
+                      </div>
+                  ) : filteredChatRooms.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-64 text-center px-6">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No conversations found</h3>
+                        <p className="text-sm text-gray-500">Try adjusting your search terms</p>
+                      </div>
                   ) : (
-                      chatRooms.map((room) => (
+                      filteredChatRooms.map((room) => (
                           <ChatRoomListItem
                               key={room.id}
                               room={room}
@@ -147,12 +218,12 @@ const ChatPage = () => {
                           }}
                       />
               ) : (
-                  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 h-full flex items-center justify-center">
+                  <div className="bg-white rounded border border-gray-200 h-full flex items-center justify-center">
                     <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <ChatBubbleLeftRightIcon className="w-10 h-10 text-blue-600" />
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <ChatBubbleLeftRightIcon className="w-8 h-8 text-gray-600" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Select a conversation</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
                       <p className="text-gray-600">Choose a chat from the sidebar to start messaging</p>
                     </div>
                   </div>
@@ -195,49 +266,79 @@ const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId, o
   };
 
   return (
-      <div className={`relative cursor-pointer ${isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}>
-        <div className="flex justify-between items-center">
-          <div onClick={onClick} className="flex-1">
-            <AvatarMessageItem
-                containerClassName="p-4 border-b border-gray-100"
-                title={
-                  room.listingTitle ? (
-                      <div className="flex flex-col">
-                        <span className="text-text-secondary">{room.otherParticipantName}</span>
-                        <div className="flex items-center space-x-1">
-                          <span>Listing:</span>
-                          <button
-                              onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
-                              className="text-btn-primary hover:text-blue-800 hover:underline cursor-pointer transition-colors"
-                              title="View listing"
-                          >
-                            {room.listingTitle}
-                          </button>
-                        </div>
-                      </div>
-                  ) : (
-                      getRoomTitle()
-                  )
-                }
-                subtitle={room.lastMessage ? `${getLastMessageSenderName()}: ${room.lastMessage}` : getRoomSubtitle()}
-                createdAt={room.lastMessageTime}
-            />
+      <div className={`relative cursor-pointer transition-colors ${isSelected ? 'bg-gray-50 border-l-4 border-l-gray-900' : 'hover:bg-gray-50'}`}>
+        <div className="flex justify-between items-start">
+          <div onClick={onClick} className="flex-1 min-w-0">
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-start space-x-3">
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-gray-600">
+                      {getRoomTitle().charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">
+                      {room.listingTitle ? room.otherParticipantName : getRoomTitle()}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      {unreadCount > 0 && (
+                        <span className="flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-gray-900 rounded-full">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                      <span className="text-xs text-gray-500">
+                        {room.lastMessageTime && new Date(room.lastMessageTime).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {room.listingTitle && (
+                    <div className="mb-1">
+                      <button
+                        onClick={(e) => onListingClick && onListingClick(room.listingId, e)}
+                        className="text-xs text-gray-600 hover:text-gray-900 hover:underline transition-colors"
+                        title={`View listing: ${room.listingTitle}`}
+                      >
+                        📦 {room.listingTitle.length > 10 ? `${room.listingTitle.substring(0, 10)}...` : room.listingTitle}
+                      </button>
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-gray-500 truncate">
+                    {room.lastMessage ? (
+                      <span>
+                        <span className="font-medium">{getLastMessageSenderName()}:</span> {room.lastMessage}
+                      </span>
+                    ) : (
+                      getRoomSubtitle()
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="relative p-4">
+          {/* Options Button */}
+          <div className="relative p-2">
             <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowOptions(!showOptions);
                 }}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
                 title="Options"
             >
               <EllipsisVerticalIcon className="w-4 h-4" />
             </button>
             
             {showOptions && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-[140px]">
                   <button
                       onClick={handleDeleteClick}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -248,12 +349,6 @@ const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId, o
                 </div>
             )}
           </div>
-
-          {unreadCount > 0 && (
-              <span className="absolute top-2 right-12 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow-lg animate-pulse">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-          )}
         </div>
       </div>
   );

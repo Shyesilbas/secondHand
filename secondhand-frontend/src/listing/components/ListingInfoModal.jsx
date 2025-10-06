@@ -56,17 +56,17 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl p-6 w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl border border-gray-100"
+        className="bg-white rounded border border-gray-200 p-6 w-full max-w-3xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900">Listing Info</h3>
+          <h3 className="text-xl font-semibold text-gray-900">Listing Info</h3>
           <button
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
             onClick={onClose}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,16 +81,16 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
         </div>
 
         <div className="mb-6">
-          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden bg-gray-50">
+          <div className="inline-flex rounded border border-gray-200 overflow-hidden bg-gray-50">
             <button
               onClick={() => setActiveTab('history')}
-              className={`${activeTab === 'history' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm`}
+              className={`${activeTab === 'history' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm transition-colors`}
             >
               Price History
             </button>
             <button
               onClick={() => setActiveTab('exchange')}
-              className={`${activeTab === 'exchange' ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm`}
+              className={`${activeTab === 'exchange' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm transition-colors`}
             >
               Exchange Rates
             </button>

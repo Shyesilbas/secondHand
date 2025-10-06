@@ -3,20 +3,20 @@ import { Outlet } from 'react-router-dom';
 
 const AuthLayout = () => {
     return (
-        <div className="min-h-screen bg-auth-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-text-primary mb-2">
+                    <h1 className="text-3xl font-semibold text-gray-900 mb-2">
                         SecondHand
                     </h1>
-                    <p className="text-text-secondary">
+                    <p className="text-gray-600">
                         Second Hand Application
                     </p>
                 </div>
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div className="bg-white py-8 px-4 border border-gray-200 sm:rounded sm:px-10">
                     <Outlet />
                 </div>
             </div>
