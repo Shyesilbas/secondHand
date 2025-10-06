@@ -44,19 +44,19 @@ const FilterModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded border border-gray-200 w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="border-b border-gray-200 bg-white px-6 py-5">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">Advanced Filters</h2>
-                            <p className="text-sm text-gray-500 mt-1">Refine your search with detailed options</p>
+                            <h2 className="text-xl font-semibold text-gray-900">Advanced Filters</h2>
+                            <p className="text-sm text-gray-600 mt-1">Refine your search with detailed options</p>
                         </div>
                         <button
                             onClick={onClose}
-                            className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
+                            className="text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
@@ -273,7 +273,7 @@ const FilterModal = ({
                         <div className="flex gap-3">
                             <button
                                 onClick={onClose}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors"
+                                className="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded hover:bg-gray-50 hover:border-gray-400 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -285,7 +285,7 @@ const FilterModal = ({
                                     }
                                     onClose();
                                 }}
-                                className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                                className="px-6 py-2 bg-gray-900 text-white font-medium rounded hover:bg-gray-800 transition-colors"
                             >
                                 Apply Filters
                             </button>

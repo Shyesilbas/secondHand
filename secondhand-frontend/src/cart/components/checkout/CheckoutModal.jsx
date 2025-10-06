@@ -52,18 +52,21 @@ const CheckoutModal = ({
     };
 
     const stepConfig = [
-        { number: 1, title: 'Cart Review', icon: ShoppingBagIcon },
-        { number: 2, title: 'Shipping', icon: TruckIcon },
-        { number: 3, title: 'Payment', icon: CreditCardIcon },
-        { number: 4, title: 'Verify', icon: ShieldCheckIcon }
+        { number: 1, title: 'Review', icon: ShoppingBagIcon, description: 'Review items' },
+        { number: 2, title: 'Address', icon: TruckIcon, description: 'Shipping & billing' },
+        { number: 3, title: 'Payment', icon: CreditCardIcon, description: 'Choose method' },
+        { number: 4, title: 'Verify', icon: ShieldCheckIcon, description: 'Confirm order' }
     ];
 
     const renderStepContent = () => {
         switch (step) {
             case 1:
                 return (
-                    <div className="animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Review Your Order</h2>
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Review Your Order</h2>
+                            <p className="text-gray-600">Please review your items and quantities before proceeding.</p>
+                        </div>
                         <CheckoutSummaryStep
                             cartItems={cartItems}
                             calculateTotal={calculateTotal}
@@ -72,8 +75,11 @@ const CheckoutModal = ({
                 );
             case 2:
                 return (
-                    <div className="animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Shipping & Billing</h2>
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Shipping & Billing Addresses</h2>
+                            <p className="text-gray-600">Select your shipping and billing addresses for this order.</p>
+                        </div>
                         <AddressSelectionStep
                             addresses={addresses}
                             selectedShippingAddressId={selectedShippingAddressId}
@@ -85,8 +91,11 @@ const CheckoutModal = ({
                 );
             case 3:
                 return (
-                    <div className="animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Payment Method</h2>
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Payment Method</h2>
+                            <p className="text-gray-600">Choose how you'd like to pay for your order.</p>
+                        </div>
                         <PaymentSelectionStep
                             selectedPaymentType={selectedPaymentType}
                             setSelectedPaymentType={setSelectedPaymentType}
@@ -101,7 +110,7 @@ const CheckoutModal = ({
                         />
                         <div className="mt-6 flex justify-end">
                             <button
-                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200 flex items-center gap-2"
+                                className="px-6 py-3 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                                 onClick={async () => {
                                     await sendVerificationCode();
                                     setStep(4);
@@ -116,30 +125,32 @@ const CheckoutModal = ({
                 );
             case 4:
                 return (
-                    <div className="animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Payment</h2>
-                        <p className="text-gray-600 mb-6">Enter the verification code sent to your email</p>
+                    <div>
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Verify Payment</h2>
+                            <p className="text-gray-600">Enter the verification code sent to your email to complete your purchase.</p>
+                        </div>
 
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Verification Code</label>
+                        <div className="bg-gray-50 rounded border border-gray-200 p-6 mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
                             <input
                                 type="text"
                                 value={paymentVerificationCode}
                                 onChange={(e) => setPaymentVerificationCode(e.target.value)}
                                 placeholder="Enter 6-digit code"
-                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg tracking-wider text-center font-mono bg-white"
+                                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-lg tracking-wider text-center font-mono bg-white"
                                 maxLength="6"
                             />
                         </div>
 
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="bg-white rounded border border-gray-200 overflow-hidden">
                             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                    <h5 className="text-sm font-semibold text-gray-900">Recent Emails</h5>
+                                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                    <h5 className="text-sm font-medium text-gray-900">Recent Emails</h5>
                                 </div>
                                 <button
-                                    className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center gap-1 transition-colors"
+                                    className="text-gray-600 text-sm font-medium hover:text-gray-900 flex items-center gap-1 transition-colors"
                                     onClick={fetchEmails}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +162,7 @@ const CheckoutModal = ({
                             <div className="max-h-64 overflow-y-auto">
                                 {isEmailsLoading ? (
                                     <div className="flex items-center justify-center py-12">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                                     </div>
                                 ) : (emails && emails.length > 0 ? (
                                      <div className="divide-y divide-gray-100">
@@ -192,21 +203,22 @@ const CheckoutModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-            <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden animate-slideUp flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white w-full max-w-5xl rounded overflow-hidden flex flex-col max-h-[95vh]">
                 {/* Header */}
-                 <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
+                 <div className="bg-gray-900 px-6 py-5 border-b border-gray-700">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                                <ShieldCheckIcon className="w-7 h-7 text-white" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                                <ShieldCheckIcon className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-bold text-white">Secure Checkout</h3>
+                                <h3 className="text-xl font-semibold text-white">Secure Checkout</h3>
+                                <p className="text-gray-400 text-sm">Complete your purchase safely</p>
                             </div>
                         </div>
                         <button
-                            className="p-2 rounded-full hover:bg-white/20 text-white transition-colors"
+                            className="p-2 text-gray-400 hover:text-white transition-colors"
                             onClick={onClose}
                         >
                             <XMarkIcon className="w-6 h-6" />
@@ -215,8 +227,8 @@ const CheckoutModal = ({
                 </div>
 
                 {/* Progress Steps */}
-                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 shrink-0">
-                     <div className="flex items-center justify-between max-w-2xl mx-auto">
+                 <div className="px-6 py-5 bg-gray-50 border-b border-gray-200 shrink-0">
+                     <div className="flex items-center justify-between max-w-3xl mx-auto">
                         {stepConfig.map((s, idx) => {
                             const Icon = s.icon;
                             const isActive = step === s.number;
@@ -225,9 +237,9 @@ const CheckoutModal = ({
                             return (
                                 <React.Fragment key={s.number}>
                                      <div className="flex flex-col items-center gap-2 flex-1">
-                                         <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
-                                            isActive ? 'bg-blue-600 text-white scale-110 shadow-lg shadow-blue-500/50' :
-                                                isCompleted ? 'bg-green-500 text-white' :
+                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors ${
+                                            isActive ? 'bg-gray-900 text-white' :
+                                                isCompleted ? 'bg-gray-600 text-white' :
                                                     'bg-gray-200 text-gray-500'
                                         }`}>
                                             {isCompleted ? (
@@ -242,11 +254,14 @@ const CheckoutModal = ({
                                             <div className={`text-xs font-medium ${isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'}`}>
                                                 {s.title}
                                             </div>
+                                            <div className={`text-xs mt-1 ${isActive ? 'text-gray-700' : 'text-gray-400'}`}>
+                                                {s.description}
+                                            </div>
                                         </div>
                                     </div>
                                     {idx < stepConfig.length - 1 && (
-                                         <div className={`h-1 w-full max-w-[64px] rounded-full transition-all duration-300 ${
-                                            step > s.number ? 'bg-green-500' : 'bg-gray-200'
+                                         <div className={`h-1 w-full max-w-[64px] rounded-full transition-colors ${
+                                            step > s.number ? 'bg-gray-900' : 'bg-gray-200'
                                         }`} />
                                     )}
                                 </React.Fragment>
@@ -265,9 +280,9 @@ const CheckoutModal = ({
                         {/* Order Summary Sidebar */}
                          <div className="lg:col-span-4">
                             <div className="sticky top-4">
-                                 <div className="rounded-2xl border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-lg">
-                                     <h4 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                        <ShoppingBagIcon className="w-5 h-5 text-blue-600" />
+                                 <div className="rounded border border-gray-200 bg-white p-5">
+                                     <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <ShoppingBagIcon className="w-5 h-5 text-gray-600" />
                                         Order Summary
                                     </h4>
                                      <div className="space-y-2.5 mb-3">
@@ -303,9 +318,9 @@ const CheckoutModal = ({
                 </div>
 
                  {/* Footer */}
-                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                 <div className="px-6 py-5 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                     <button
-                        className="px-5 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-white hover:border-gray-400 font-medium transition-all duration-200 flex items-center gap-2"
+                        className="px-5 py-2.5 rounded border border-gray-300 text-gray-700 hover:bg-white hover:border-gray-400 font-medium transition-colors flex items-center gap-2"
                         onClick={() => step > 1 ? setStep(step - 1) : onClose()}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,7 +330,7 @@ const CheckoutModal = ({
                     </button>
                     {step < 3 ? (
                         <button
-                            className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 disabled:shadow-none"
+                            className="px-6 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                             onClick={() => setStep(step + 1)}
                             disabled={
                                 (step === 1 && cartCount === 0) ||
@@ -329,7 +344,7 @@ const CheckoutModal = ({
                         </button>
                     ) : step === 4 ? (
                         <button
-                            className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 disabled:shadow-none"
+                            className="px-6 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                             onClick={onCheckout}
                             disabled={proceedDisabled || isCheckingOut || !paymentVerificationCode}
                         >
@@ -351,11 +366,11 @@ const CheckoutModal = ({
 
             {/* eWallet Warning Modal */}
             {showEWalletWarning && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] animate-fadeIn">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-slideUp">
-                        <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
-                            <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+                    <div className="bg-white rounded w-full max-w-md mx-4 overflow-hidden">
+                        <div className="bg-gray-900 px-6 py-4">
+                            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                                 Spending Warning
@@ -367,13 +382,13 @@ const CheckoutModal = ({
                             </p>
                             <div className="flex gap-3">
                                 <button
-                                    className="flex-1 px-4 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                                    className="flex-1 px-4 py-2.5 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                                     onClick={onClose}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 font-medium shadow-lg shadow-blue-500/30 transition-all"
+                                    className="flex-1 px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium transition-colors"
                                     onClick={onConfirmEWalletWarning}
                                 >
                                     Proceed Anyway
