@@ -38,27 +38,27 @@ const ShowcaseSection = ({ showcases }) => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header Section */}
             <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                     </div>
-                    <h2 className="text-4xl font-bold text-gray-900">
+                    <h2 className="text-3xl font-semibold text-gray-900">
                         Featured Listings
                     </h2>
                 </div>
                 
-                <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
                     Discover our handpicked selection of premium second-hand items
                 </p>
                 
                 <Link 
                     to={ROUTES.LISTINGS} 
-                    className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
+                    className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
                     View All Listings
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@ const ShowcaseSection = ({ showcases }) => {
             </div>
 
             {/* Showcase Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {showcases.map((showcase, index) => {
                     const listing = showcase?.listing || listingMap[showcase?.listingId] || showcase || {};
                     const city = listing.city || '-';
@@ -84,77 +84,61 @@ const ShowcaseSection = ({ showcases }) => {
                     return (
                         <div 
                             key={showcase.id || listingId} 
-                            className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
+                            className="bg-white border border-gray-200 rounded overflow-hidden hover:border-gray-300 transition-colors"
                         >
-                            {/* Header with badges */}
-                            <div className="relative p-6 pb-4">
-                                {/* Featured Badge */}
-                                <div className="absolute top-4 right-4 bg-gray-900 text-white px-3 py-1.5 rounded text-xs font-medium">
-                                    Featured
+                            {/* Card Header */}
+                            <div className="p-4 border-b border-gray-100">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                        Featured
+                                    </span>
+                                    {daysLeft !== null && daysLeft > 0 && (
+                                        <span className="text-xs text-gray-500">
+                                            {daysLeft} days left
+                                        </span>
+                                    )}
                                 </div>
-
-                                {/* Days Left Badge */}
-                                {daysLeft !== null && daysLeft > 0 && (
-                                    <div className="absolute top-4 left-4 bg-white text-gray-900 px-3 py-1.5 rounded text-xs font-medium border border-gray-200">
-                                        {daysLeft} days left
-                                    </div>
-                                )}
-
+                                
                                 {/* Location */}
-                                <div className="flex items-center gap-2 mb-3 pt-8">
-                                    <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="flex items-center gap-1 mb-2">
+                                    <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                     </svg>
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-xs text-gray-600">
                                         {city}{district ? `, ${district}` : ''}
                                     </span>
                                 </div>
 
                                 {/* Title */}
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
+                                <h3 className="text-base font-medium text-gray-900 mb-2 line-clamp-2">
                                     {title}
                                 </h3>
 
                                 {/* Description */}
-                                <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                                <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                                     {description}
                                 </p>
                             </div>
 
-                            {/* Content Section */}
-                            <div className="px-6 pb-6">
-                                {/* Price Section */}
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex flex-col">
-                                        <span className="text-2xl font-bold text-gray-900">
-                                            {formatCurrency(price, currency)}
-                                        </span>
-                                        {endDate && (
-                                            <span className="text-xs text-gray-500 mt-1">
-                                                Ends {endDate.toLocaleDateString('en-US', { 
-                                                    month: 'short', 
-                                                    day: 'numeric' 
-                                                })}
-                                            </span>
-                                        )}
-                                    </div>
-                                    
-                                    {/* Status indicator */}
-                                    <div className="flex flex-col items-end">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <span className="text-xs text-gray-500 mt-1">Active</span>
+                            {/* Card Footer */}
+                            <div className="p-4">
+                                {/* Price */}
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-lg font-semibold text-gray-900">
+                                        {formatCurrency(price, currency)}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                        <span className="text-xs text-gray-500">Active</span>
                                     </div>
                                 </div>
 
                                 {/* Action Button */}
                                 <Link
                                     to={listingId ? ROUTES.LISTING_DETAIL(listingId) : ROUTES.LISTINGS}
-                                    className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200 text-center block flex items-center justify-center gap-2"
+                                    className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded text-sm font-medium text-center block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                 >
-                                    <span>View Details</span>
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
+                                    View Details
                                 </Link>
                             </div>
                         </div>

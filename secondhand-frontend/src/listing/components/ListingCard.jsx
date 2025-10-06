@@ -43,7 +43,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
 
 
     return (
-        <div className="group bg-white rounded-2xl shadow-sm hover:shadow-lg border border-gray-200 overflow-hidden transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-white rounded border border-gray-200 overflow-hidden hover:border-gray-300 transition-colors">
             {/* Header with badges */}
             <div className="relative p-4 pb-3">
                 <div className="flex items-center justify-between mb-3">
@@ -71,7 +71,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
 
                 <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="block">
                     <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors leading-tight">
+                        <h3 className="text-base font-medium text-gray-900 line-clamp-2 leading-tight">
                             {listing.title}
                         </h3>
                         {listing.listingNo && (
@@ -88,7 +88,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                     {/* Price and Location */}
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-gray-900">
+                            <span className="text-lg font-semibold text-gray-900">
                                 {formatCurrency(listing.price, listing.currency)}
                             </span>
                             <button
