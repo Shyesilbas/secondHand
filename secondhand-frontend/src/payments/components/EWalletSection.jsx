@@ -8,9 +8,10 @@ import {formatCurrency} from '../../common/formatters.js';
 
 const EWalletSection = () => {
     const notification = useNotification();
-    const { eWallet, loading, error, createEWallet, updateLimits, updateSpendingWarningLimit, removeSpendingWarningLimit, deposit, withdraw } = useEWallet();
+    const { eWallet, loading, error, createEWallet, updateLimits, updateSpendingWarningLimit, removeSpendingWarningLimit, deposit, withdraw } = useEWallet({ enabled: true }); // Enable since this component is only rendered when eWallet tab is active
 
     const [bankAccounts, setBankAccounts] = React.useState([]);
+    const [bankAccountsLoaded, setBankAccountsLoaded] = React.useState(false);
     const [showModal, setShowModal] = React.useState(false);
     const [action, setAction] = React.useState('');
     const [amount, setAmount] = React.useState('');
@@ -19,31 +20,56 @@ const EWalletSection = () => {
     const [createLimit, setCreateLimit] = React.useState('1000');
     const [createSpendingWarningLimit, setCreateSpendingWarningLimit] = React.useState('200');
     const [totalSpent, setTotalSpent] = React.useState(null);
+    const [statisticsLoaded, setStatisticsLoaded] = React.useState(false);
 
     const fetchBankAccounts = React.useCallback(async () => {
+        if (bankAccountsLoaded) return;
         try {
             const data = await bankService.getBankAccount();
             const list = Array.isArray(data) ? data : [data].filter(Boolean);
             setBankAccounts(list);
+            setBankAccountsLoaded(true);
         } catch {
             setBankAccounts([]);
+            setBankAccountsLoaded(true);
         }
-    }, []);
+    }, [bankAccountsLoaded]);
 
-    React.useEffect(() => {
-        fetchBankAccounts();
-        paymentService.getStatistics('EWALLET').then((stats) => {
+    const fetchStatistics = React.useCallback(async () => {
+        if (statisticsLoaded) return;
+        try {
+            const stats = await paymentService.getStatistics('EWALLET');
             if (stats && typeof stats.totalAmount !== 'undefined') {
                 setTotalSpent(stats.totalAmount);
             }
-        }).catch(() => {});
-    }, [fetchBankAccounts]);
-
-    const openModal = (nextAction) => {
-        setAction(nextAction);
-        if ((nextAction === 'deposit' || nextAction === 'withdraw') && bankAccounts.length > 0) {
-            setSelectedBankId(bankAccounts[0].id);
+            setStatisticsLoaded(true);
+        } catch {
+            setStatisticsLoaded(true);
         }
+    }, [statisticsLoaded]);
+
+    // Don't load data automatically - only when needed
+    // React.useEffect(() => {
+    //     fetchBankAccounts();
+    //     fetchStatistics();
+    // }, [fetchBankAccounts, fetchStatistics]);
+
+    const openModal = async (nextAction) => {
+        setAction(nextAction);
+        
+        // Load bank accounts only when deposit/withdraw buttons are clicked
+        if (nextAction === 'deposit' || nextAction === 'withdraw') {
+            await fetchBankAccounts();
+            if (bankAccounts.length > 0) {
+                setSelectedBankId(bankAccounts[0].id);
+            }
+        }
+        
+        // Load statistics only when needed (for spending warning display)
+        if (nextAction === 'updateSpendingWarning' || (eWallet?.spendingWarningLimit && !statisticsLoaded)) {
+            await fetchStatistics();
+        }
+        
         setShowModal(true);
     };
 
@@ -177,17 +203,28 @@ const EWalletSection = () => {
                             <p className="mt-2 text-lg font-medium text-gray-900">
                                 {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not set'}
                             </p>
-                            <div className="mt-3 border-t pt-3">
-                                <p className="text-xs uppercase tracking-wide text-gray-500">Total Spent</p>
-                                <p className="mt-1 text-sm font-medium text-gray-900">
-                                    {totalSpent != null ? formatCurrency(totalSpent) : '—'}
-                                </p>
-                                <p className="mt-1 text-sm font-medium text-gray-900">
-                                    ({eWallet.spendingWarningLimit && totalSpent != null
-                                        ? `${((totalSpent / eWallet.spendingWarningLimit) * 100).toFixed(2)}%`
-                                        : '—'})
-                                </p>
-                            </div>
+                            {eWallet.spendingWarningLimit && (
+                                <div className="mt-3 border-t pt-3">
+                                    <p className="text-xs uppercase tracking-wide text-gray-500">Total Spent</p>
+                                    <p className="mt-1 text-sm font-medium text-gray-900">
+                                        {statisticsLoaded && totalSpent != null ? formatCurrency(totalSpent) : (
+                                            <button 
+                                                onClick={() => fetchStatistics()}
+                                                className="text-blue-600 hover:text-blue-800 text-sm underline"
+                                            >
+                                                Load spending data
+                                            </button>
+                                        )}
+                                    </p>
+                                    {statisticsLoaded && totalSpent != null && (
+                                        <p className="mt-1 text-sm font-medium text-gray-900">
+                                            ({eWallet.spendingWarningLimit
+                                                ? `${((totalSpent / eWallet.spendingWarningLimit) * 100).toFixed(2)}%`
+                                                : '—'})
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

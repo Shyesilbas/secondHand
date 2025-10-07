@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { ewalletService } from '../services/ewalletService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
-export const useEWallet = () => {
+export const useEWallet = (options = {}) => {
     const [eWallet, setEWallet] = useState(null);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { showNotification } = useNotification();
+    const enabled = options.enabled ?? true;
 
         const fetchEWallet = async () => {
         setLoading(true);
@@ -162,8 +163,10 @@ export const useEWallet = () => {
     };
 
         useEffect(() => {
-        fetchEWallet();
-    }, []);
+        if (enabled) {
+            fetchEWallet();
+        }
+    }, [enabled]);
 
     return {
         eWallet,

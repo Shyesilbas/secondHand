@@ -3,9 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cartService } from '../services/cartService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 
-export const useCart = () => {
+export const useCart = (options = {}) => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
+    
+    const isEnabled = options.enabled ?? true;
+    const loadCartItems = options.loadCartItems ?? isEnabled;
 
         const {
         data: cartItems = [],
@@ -15,25 +18,32 @@ export const useCart = () => {
     } = useQuery({
         queryKey: ['cartItems', user?.id],
         queryFn: () => cartService.getCartItems(),
-        enabled: !!user,
-        staleTime: 5 * 60 * 1000,     });
+        enabled: !!user && loadCartItems,
+        staleTime: 15 * 60 * 1000, // 15 minutes - cart doesn't change often
+        cacheTime: 60 * 60 * 1000, // 1 hour
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchInterval: false,
+        retry: 1,
+    });
 
-        const {
-        data: cartCount = { count: 0 },
-        isLoading: isLoadingCount,
-        refetch: refetchCount
-    } = useQuery({
-        queryKey: ['cartCount', user?.id],
-        queryFn: () => cartService.getCartItemCount(),
-        enabled: !!user,
-        staleTime: 2 * 60 * 1000,     });
+    // Calculate cart count from cart items instead of separate API call
+    const cartCount = Array.isArray(cartItems) ? cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 0;
+    
+    // Update localStorage and dispatch event when cart count changes
+    useEffect(() => {
+        if (cartItems !== undefined) { // Only when data is loaded
+            localStorage.setItem('cartCount', cartCount.toString());
+            window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: cartCount }));
+        }
+    }, [cartCount, cartItems]);
 
         const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => 
             cartService.addToCart(listingId, quantity, notes),
         onSuccess: () => {
+            // Only invalidate cart items - count is calculated from items
             queryClient.invalidateQueries(['cartItems']);
-            queryClient.invalidateQueries(['cartCount']);
         },
         onError: (error) => {
             console.error('Failed to add to cart:', error);
@@ -44,8 +54,8 @@ export const useCart = () => {
         mutationFn: ({ listingId, quantity, notes }) => 
             cartService.updateCartItem(listingId, quantity, notes),
         onSuccess: () => {
+            // Only invalidate cart items - count is calculated from items
             queryClient.invalidateQueries(['cartItems']);
-            queryClient.invalidateQueries(['cartCount']);
         },
         onError: (error) => {
             console.error('Failed to update cart item:', error);
@@ -55,8 +65,8 @@ export const useCart = () => {
         const removeFromCartMutation = useMutation({
         mutationFn: (listingId) => cartService.removeFromCart(listingId),
         onSuccess: () => {
+            // Only invalidate cart items - count is calculated from items
             queryClient.invalidateQueries(['cartItems']);
-            queryClient.invalidateQueries(['cartCount']);
         },
         onError: (error) => {
             console.error('Failed to remove from cart:', error);
@@ -66,8 +76,8 @@ export const useCart = () => {
         const clearCartMutation = useMutation({
         mutationFn: () => cartService.clearCart(),
         onSuccess: () => {
+            // Only invalidate cart items - count is calculated from items
             queryClient.invalidateQueries(['cartItems']);
-            queryClient.invalidateQueries(['cartCount']);
         },
         onError: (error) => {
             console.error('Failed to clear cart:', error);
@@ -103,11 +113,11 @@ export const useCart = () => {
 
     return {
                 cartItems,
-        cartCount: cartCount.count,
+        cartCount, // Now calculated from cartItems
         
-                isLoading: isLoadingItems || isLoadingCount,
+                isLoading: isLoadingItems,
         isLoadingItems,
-        isLoadingCount,
+        isLoadingCount: isLoadingItems, // Same as items loading since count is calculated
         
                 error: itemsError,
         
@@ -124,7 +134,7 @@ export const useCart = () => {
         isCheckingCart: checkInCartMutation.isPending,
         
                 refetchItems,
-        refetchCount,
+        refetchCount: refetchItems, // Same as refetchItems since count is calculated
         
                 addToCartError: addToCartMutation.error,
         updateCartError: updateCartItemMutation.error,

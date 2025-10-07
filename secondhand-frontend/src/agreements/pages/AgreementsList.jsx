@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AgreementCard from '../components/AgreementCard.jsx';
 import AgreementModal from '../components/AgreementModal.jsx';
 import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { agreementService } from '../service/agreementService.js';
+import { agreementService } from '../services/agreementService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter }) => {

@@ -181,10 +181,9 @@ export const API_ENDPOINTS = {
         SEND_MESSAGE: '/chat/messages',
         ROOM_MESSAGES: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages`,
         MARK_READ: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/read`,
-        UNREAD_COUNT: (chatRoomId, userId) => `/chat/rooms/${chatRoomId}/messages/unread-count?userId=${userId}`,
         
         ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
-        TOTAL_UNREAD_COUNT: (userId) => `/chat/messages/unread-count/user/${userId}`,
+        TOTAL_UNREAD_COUNT: `/chat/messages/unread-count`,
         
         DELETE_CONVERSATION: (chatRoomId) => `/chat/rooms/${chatRoomId}`,
         DELETE_MESSAGE: (messageId) => `/chat/messages/${messageId}`,

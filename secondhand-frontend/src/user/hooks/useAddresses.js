@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { userService } from '../services/userService.js';
 
-const useAddresses = () => {
+const useAddresses = (options = {}) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const enabled = options.enabled ?? true;
 
   const fetchAddresses = useCallback(async () => {
     setLoading(true);
@@ -20,8 +21,10 @@ const useAddresses = () => {
   }, []);
 
   useEffect(() => {
-    fetchAddresses();
-  }, [fetchAddresses]);
+    if (enabled) {
+      fetchAddresses();
+    }
+  }, [fetchAddresses, enabled]);
 
   const addAddress = async (address) => {
     const newAddress = await userService.addAddress(address);

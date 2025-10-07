@@ -10,7 +10,6 @@ import AvatarMessageItem from '../common/components/ui/AvatarMessageItem.jsx';
 import { chatService } from "./services/chatService.js";
 import { useNotification } from '../notification/NotificationContext.jsx';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRoomUnreadCount } from './hooks/useUnreadCount.js';
 
 const ChatPage = () => {
   const { user } = useAuth();
@@ -18,6 +17,7 @@ const ChatPage = () => {
   const notification = useNotification();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
   const {
     chatRooms,
     selectedChatRoom,
@@ -293,7 +293,7 @@ const ChatPage = () => {
 
 const ChatRoomListItem = ({ room, isSelected, onClick, onListingClick, userId, onDeleteConversation }) => {
   const [showOptions, setShowOptions] = useState(false);
-  const { unreadCount } = useRoomUnreadCount(room.id);
+  const unreadCount = room.unreadCount || 0;
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();

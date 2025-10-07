@@ -328,44 +328,53 @@ const MyOrdersPage = () => {
 
         {orderModalOpen && selectedOrder && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-              <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">Order #{selectedOrder.orderNumber}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{formatDateTime(selectedOrder.createdAt)}</p>
+              <div className="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden">
+                <div className="bg-gray-50 border-b border-gray-200">
+                  <div className="flex items-center justify-between p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900">Order #{selectedOrder.orderNumber}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{formatDateTime(selectedOrder.createdAt)}</p>
+                      </div>
+                    </div>
+                    <button
+                        className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-white transition-colors"
+                        onClick={closeOrderModal}
+                    >
+                      Close
+                    </button>
                   </div>
-                  <button
-                      className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                      onClick={closeOrderModal}
-                  >
-                    Close
-                  </button>
                 </div>
 
                 <div className="p-6 max-h-[80vh] overflow-y-auto space-y-6">
                   {/* Status Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Status</p>
-                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedOrder.status)}`}>
-                    {selectedOrder.status}
-                  </span>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Order Status</p>
+                      <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedOrder.status)}`}>
+                        {selectedOrder.status}
+                      </span>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Payment</p>
-                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedOrder.paymentStatus)}`}>
-                    {selectedOrder.paymentStatus}
-                  </span>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Payment</p>
+                      <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedOrder.paymentStatus)}`}>
+                        {selectedOrder.paymentStatus}
+                      </span>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Shipping</p>
-                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedOrder.shippingStatus)}`}>
-                    {selectedOrder.shippingStatus}
-                  </span>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Shipping</p>
+                      <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedOrder.shippingStatus)}`}>
+                        {selectedOrder.shippingStatus}
+                      </span>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Total</p>
-                      <p className="font-semibold text-gray-900">{formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}</p>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Total Amount</p>
+                      <p className="text-lg font-semibold text-gray-900">{formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}</p>
                     </div>
                   </div>
 
@@ -403,25 +412,25 @@ const MyOrdersPage = () => {
 
                   {/* Addresses */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Shipping Address</h4>
+                    <div className="bg-white border border-gray-200 rounded-lg p-5">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h4>
                       {selectedOrder.shippingAddress ? (
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <div>{selectedOrder.shippingAddress.addressLine}</div>
+                          <div className="text-sm text-gray-600 space-y-2">
+                            <div className="font-medium text-gray-900">{selectedOrder.shippingAddress.addressLine}</div>
                             <div>{selectedOrder.shippingAddress.city} {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}</div>
-                            <div>{selectedOrder.shippingAddress.country}</div>
+                            <div className="text-gray-500">{selectedOrder.shippingAddress.country}</div>
                           </div>
                       ) : (
                           <p className="text-sm text-gray-500">Not provided</p>
                       )}
                     </div>
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Billing Address</h4>
+                    <div className="bg-white border border-gray-200 rounded-lg p-5">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Billing Address</h4>
                       {selectedOrder.billingAddress ? (
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <div>{selectedOrder.billingAddress.addressLine}</div>
+                          <div className="text-sm text-gray-600 space-y-2">
+                            <div className="font-medium text-gray-900">{selectedOrder.billingAddress.addressLine}</div>
                             <div>{selectedOrder.billingAddress.city} {selectedOrder.billingAddress.state} {selectedOrder.billingAddress.postalCode}</div>
-                            <div>{selectedOrder.billingAddress.country}</div>
+                            <div className="text-gray-500">{selectedOrder.billingAddress.country}</div>
                           </div>
                       ) : (
                           <p className="text-sm text-gray-500">Same as shipping</p>
@@ -430,23 +439,28 @@ const MyOrdersPage = () => {
                   </div>
 
                   {/* Order Items */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                      <h4 className="font-medium text-gray-900">Order Items</h4>
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                      <h4 className="text-lg font-semibold text-gray-900">Order Items</h4>
                     </div>
                     <div className="divide-y divide-gray-200">
                       {(selectedOrder.orderItems || []).map((item, idx) => (
-                          <div key={idx} className="p-4">
-                            <div className="flex items-center justify-between">
+                          <div key={idx} className="p-5 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <h5 className="font-medium text-gray-900">{item.listing?.title || item.listing?.listingNo}</h5>
-                                <p className="text-sm text-gray-500 mt-1">ID: {item.listing?.listingNo || item.listing?.id}</p>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {formatCurrency(item.unitPrice, selectedOrder.currency)} × {item.quantity}
-                                </p>
+                                <h5 className="text-lg font-semibold text-gray-900 mb-2">{item.listing?.title || item.listing?.listingNo}</h5>
+                                <div className="space-y-1">
+                                  <p className="text-sm text-gray-500">Listing ID: <span className="font-medium text-gray-700">{item.listing?.listingNo || item.listing?.id}</span></p>
+                                  <p className="text-sm text-gray-600">
+                                    Unit Price: <span className="font-medium text-gray-900">{formatCurrency(item.unitPrice, selectedOrder.currency)}</span>
+                                  </p>
+                                  <p className="text-sm text-gray-600">
+                                    Quantity: <span className="font-medium text-gray-900">{item.quantity}</span>
+                                  </p>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <p className="font-semibold text-gray-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</p>
+                              <div className="flex flex-col items-end gap-3">
+                                <p className="text-xl font-bold text-gray-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</p>
                                 <ReviewButton
                                     orderItem={{ ...item, shippingStatus: selectedOrder.shippingStatus }}
                                     onReviewCreated={() => {}}
@@ -460,21 +474,23 @@ const MyOrdersPage = () => {
 
                   {/* Additional Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Order Notes</h4>
-                      <p className="text-sm text-gray-600">{selectedOrder.notes || 'No notes provided'}</p>
+                    <div className="bg-white border border-gray-200 rounded-lg p-5">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Notes</h4>
+                      <p className="text-sm text-gray-600 leading-relaxed">{selectedOrder.notes || 'No notes provided'}</p>
                     </div>
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">Payment Reference</h4>
-                      <p className="text-sm font-mono text-gray-600 mb-2">{selectedOrder.paymentReference || '—'}</p>
-                      {selectedOrder.paymentReference && (
-                          <button
-                              className="text-sm text-gray-900 hover:underline"
-                              onClick={() => openReceipt(selectedOrder.paymentReference)}
-                          >
-                            View receipt →
-                          </button>
-                      )}
+                    <div className="bg-white border border-gray-200 rounded-lg p-5">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Payment Reference</h4>
+                      <div className="space-y-3">
+                        <p className="text-sm font-mono text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{selectedOrder.paymentReference || '—'}</p>
+                        {selectedOrder.paymentReference && (
+                            <button
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                onClick={() => openReceipt(selectedOrder.paymentReference)}
+                            >
+                              View Receipt
+                            </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

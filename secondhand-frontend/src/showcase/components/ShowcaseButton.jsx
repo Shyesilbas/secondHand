@@ -22,12 +22,14 @@ const ShowcaseButton = ({ listingId, onSuccess }) => {
                 Add to Showcase
             </button>
             
-            <ShowcaseModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                listingId={listingId}
-                onSuccess={onSuccess}
-            />
+            {isModalOpen && (
+                <ShowcaseModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    listingId={listingId}
+                    onSuccess={onSuccess}
+                />
+            )}
         </>
     );
 };

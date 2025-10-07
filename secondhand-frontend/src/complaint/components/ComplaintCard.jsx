@@ -15,37 +15,82 @@ const ComplaintCard = ({ complaint }) => {
     if (!complaint) return null;
 
     const getReasonLabel = (reason) => COMPLAINT_REASONS[reason] || reason || 'UNKNOWN REASON';
+    const getStatusColor = (resolvedAt) => {
+        if (resolvedAt) return 'bg-green-50 text-green-700 border-green-200';
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+    };
+    const getStatusText = (resolvedAt) => resolvedAt ? 'Resolved' : 'Under Review';
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
-        <div className="bg-white rounded-lg border border-sidebar-border p-4 hover:shadow-md transition-shadow">
-            <div className="flex flex-col gap-2 text-sm">
-                <div>
-                    <strong>Complaint ID:</strong> {complaint.complaintId}
+        <div className="p-6">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-gray-900">Complaint #{complaint.complaintId}</h3>
+                        <p className="text-sm text-gray-500">{formatDate(complaint.createdAt)}</p>
+                    </div>
                 </div>
-                <div>
-                    <strong>Complainer:</strong> {complaint.complainerId}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(complaint.resolvedAt)}`}>
+                    {getStatusText(complaint.resolvedAt)}
+                </span>
+            </div>
+
+            {/* Reason Badge */}
+            <div className="mb-4">
+                <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
+                    {getReasonLabel(complaint.reason)}
+                </span>
+            </div>
+
+            {/* Description */}
+            <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-900 mb-2">Description</h4>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                    {complaint.description || 'No description provided'}
+                </p>
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 gap-3 text-sm">
+                <div className="flex justify-between">
+                    <span className="text-gray-500">Complained User:</span>
+                    <span className="font-medium text-gray-900">{complaint.complainedUserId}</span>
                 </div>
-                <div>
-                    <strong>Complained User :</strong> {complaint.complainedUserId}
-                </div>
-                <div>
-                    <strong>Listing ID:</strong> {complaint.listingId || 'N/A'}
-                </div>
-                <div>
-                    <strong>Reason:</strong> {getReasonLabel(complaint.reason)}
-                </div>
-                <div>
-                    <strong>Description:</strong> {complaint.description || 'No description'}
-                </div>
-                <div>
-                    <strong>Created At:</strong> {complaint.createdAt || '-'}
-                </div>
-                <div>
-                    <strong>Updated At:</strong> {complaint.updatedAt || '-'}
-                </div>
-                <div>
-                    <strong>Resolved At:</strong> {complaint.resolvedAt || '-'}
-                </div>
+                {complaint.listingId && (
+                    <div className="flex justify-between">
+                        <span className="text-gray-500">Listing ID:</span>
+                        <span className="font-medium text-gray-900">{complaint.listingId}</span>
+                    </div>
+                )}
+                {complaint.updatedAt && complaint.updatedAt !== complaint.createdAt && (
+                    <div className="flex justify-between">
+                        <span className="text-gray-500">Last Updated:</span>
+                        <span className="font-medium text-gray-900">{formatDate(complaint.updatedAt)}</span>
+                    </div>
+                )}
+                {complaint.resolvedAt && (
+                    <div className="flex justify-between">
+                        <span className="text-gray-500">Resolved:</span>
+                        <span className="font-medium text-gray-900">{formatDate(complaint.resolvedAt)}</span>
+                    </div>
+                )}
             </div>
         </div>
     );

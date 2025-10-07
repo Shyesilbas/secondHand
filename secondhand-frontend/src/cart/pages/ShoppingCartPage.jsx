@@ -187,40 +187,42 @@ const ShoppingCartPage = () => {
             )}
 
             {/* Checkout Modal */}
-            <CheckoutModal
-                isOpen={checkout.showCheckoutModal}
-                onClose={checkout.closeCheckoutModal}
-                step={checkout.step}
-                setStep={checkout.setStep}
-                cartItems={cartItems}
-                cartCount={cartCount}
-                calculateTotal={calculateTotal}
-                addresses={checkout.addresses}
-                selectedShippingAddressId={checkout.selectedShippingAddressId}
-                setSelectedShippingAddressId={checkout.setSelectedShippingAddressId}
-                selectedBillingAddressId={checkout.selectedBillingAddressId}
-                setSelectedBillingAddressId={checkout.setSelectedBillingAddressId}
-                selectedPaymentType={checkout.selectedPaymentType}
-                setSelectedPaymentType={checkout.setSelectedPaymentType}
-                cards={checkout.cards}
-                selectedCardNumber={checkout.selectedCardNumber}
-                setSelectedCardNumber={checkout.setSelectedCardNumber}
-                bankAccounts={checkout.bankAccounts}
-                selectedBankAccountIban={checkout.selectedBankAccountIban}
-                setSelectedBankAccountIban={checkout.setSelectedBankAccountIban}
-                eWallet={checkout.eWallet}
-                paymentVerificationCode={checkout.paymentVerificationCode}
-                setPaymentVerificationCode={checkout.setPaymentVerificationCode}
-                sendVerificationCode={checkout.sendVerificationCode}
-                emails={checkout.emails}
-                isEmailsLoading={checkout.isEmailsLoading}
-                fetchEmails={checkout.fetchEmails}
-                onCheckout={checkout.handleCheckout}
-                proceedDisabled={checkout.proceedDisabled}
-                isCheckingOut={checkout.isCheckingOut}
-                showEWalletWarning={checkout.showEWalletWarning}
-                onConfirmEWalletWarning={checkout.confirmEWalletWarningAndCheckout}
-            />
+            {checkout.showCheckoutModal && (
+                <CheckoutModal
+                    isOpen={checkout.showCheckoutModal}
+                    onClose={checkout.closeCheckoutModal}
+                    step={checkout.step}
+                    setStep={checkout.setStep}
+                    cartItems={cartItems}
+                    cartCount={cartCount}
+                    calculateTotal={calculateTotal}
+                    addresses={checkout.addresses}
+                    selectedShippingAddressId={checkout.selectedShippingAddressId}
+                    setSelectedShippingAddressId={checkout.setSelectedShippingAddressId}
+                    selectedBillingAddressId={checkout.selectedBillingAddressId}
+                    setSelectedBillingAddressId={checkout.setSelectedBillingAddressId}
+                    selectedPaymentType={checkout.selectedPaymentType}
+                    setSelectedPaymentType={checkout.setSelectedPaymentType}
+                    cards={checkout.cards}
+                    selectedCardNumber={checkout.selectedCardNumber}
+                    setSelectedCardNumber={checkout.setSelectedCardNumber}
+                    bankAccounts={checkout.bankAccounts}
+                    selectedBankAccountIban={checkout.selectedBankAccountIban}
+                    setSelectedBankAccountIban={checkout.setSelectedBankAccountIban}
+                    eWallet={checkout.eWallet}
+                    paymentVerificationCode={checkout.paymentVerificationCode}
+                    setPaymentVerificationCode={checkout.setPaymentVerificationCode}
+                    sendVerificationCode={checkout.sendVerificationCode}
+                    emails={checkout.emails}
+                    isEmailsLoading={checkout.isEmailsLoading}
+                    fetchEmails={checkout.fetchEmails}
+                    onCheckout={checkout.handleCheckout}
+                    proceedDisabled={checkout.proceedDisabled}
+                    isCheckingOut={checkout.isCheckingOut}
+                    showEWalletWarning={checkout.showEWalletWarning}
+                    onConfirmEWalletWarning={checkout.confirmEWalletWarningAndCheckout}
+                />
+            )}
 
             {/* Clear Cart Modal */}
             <ClearCartModal

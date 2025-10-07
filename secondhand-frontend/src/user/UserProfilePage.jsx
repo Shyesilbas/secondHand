@@ -51,7 +51,9 @@ const UserProfilePage = () => {
     const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId);
     const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, hasMore, loadMore } = useReviews(userId);
     const { reviews: givenReviews, loading: givenReviewsLoading, error: givenReviewsError } = useReviewsByUser(userId);
-    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId);
+    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId, { 
+        enabled: activeTab === 'reviews' 
+    });
 
     const formatDate = (dateString) => formatDateTime(dateString);
     const isOwnProfile = currentUser?.id === userId;

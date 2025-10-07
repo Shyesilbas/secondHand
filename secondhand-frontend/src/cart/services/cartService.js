@@ -29,9 +29,8 @@ export const cartService = {
         return del(API_ENDPOINTS.CART.CLEAR_CART);
     },
 
-        getCartItemCount: async () => {
-        return get(API_ENDPOINTS.CART.GET_COUNT);
-    },
+        // getCartItemCount: Removed - count is now calculated from cart items in frontend
+    // Backend endpoint still exists for backward compatibility
 
         isInCart: async (listingId) => {
         return get(API_ENDPOINTS.CART.CHECK_ITEM(listingId));

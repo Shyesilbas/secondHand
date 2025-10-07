@@ -8,11 +8,16 @@ import {ROUTES} from '../../constants/routes.js';
 
 const Footer = () => {
     const { enums, isLoading } = useEnums();
-    const { agreements, isLoading: agreementsLoading } = useAgreements();
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [showPricing, setShowPricing] = useState(false);
     const [showReportIssues, setShowReportIssues] = useState(false);
+    const [loadAgreements, setLoadAgreements] = useState(false);
+    
+    // Only load agreements for non-authenticated users and only when needed
+    const { agreements, isLoading: agreementsLoading } = useAgreements({
+        enabled: !isAuthenticated && loadAgreements
+    });
 
     const feeConfig = enums.listingFeeConfig;
     const showcasePricing = enums.showcasePricingConfig;
@@ -118,7 +123,16 @@ const Footer = () => {
                             </div>
                         ) : (
                             <ul className="space-y-2 text-sm text-gray-300">
-                                {agreementsLoading ? (
+                                {!loadAgreements ? (
+                                    <li>
+                                        <button
+                                            onClick={() => setLoadAgreements(true)}
+                                            className="text-sm text-gray-300 hover:text-white transition-colors"
+                                        >
+                                            Load Legal Documents →
+                                        </button>
+                                    </li>
+                                ) : agreementsLoading ? (
                                     <div className="animate-pulse space-y-2">
                                         <div className="h-4 bg-gray-600 rounded"></div>
                                         <div className="h-4 bg-gray-600 rounded"></div>
