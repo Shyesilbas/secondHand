@@ -1,43 +1,44 @@
 import React from 'react';
-import {CreditCardIcon, ShieldCheckIcon, ShoppingBagIcon, TruckIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import { CreditCardIcon, ShieldCheckIcon, ShoppingBagIcon, TruckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { formatCurrency } from '../../../common/formatters.js';
 import CheckoutSummaryStep from './CheckoutSummaryStep.jsx';
 import AddressSelectionStep from './AddressSelectionStep.jsx';
 import PaymentSelectionStep from './PaymentSelectionStep.jsx';
 
 const CheckoutModal = ({
-                           isOpen,
-                           onClose,
-                           step,
-                           setStep,
-                           cartItems,
-                           cartCount,
-                           calculateTotal,
-                           addresses,
-                           selectedShippingAddressId,
-                           setSelectedShippingAddressId,
-                           selectedBillingAddressId,
-                           setSelectedBillingAddressId,
-                           selectedPaymentType,
-                           setSelectedPaymentType,
-                           cards,
-                           selectedCardNumber,
-                           setSelectedCardNumber,
-                           bankAccounts,
-                           selectedBankAccountIban,
-                           setSelectedBankAccountIban,
-                           eWallet,
-                           paymentVerificationCode,
-                           setPaymentVerificationCode,
-                           onCheckout,
-                           proceedDisabled,
-                           isCheckingOut,
-                           showEWalletWarning,
-                           onConfirmEWalletWarning,
-                           sendVerificationCode,
-                           emails,
-                           isEmailsLoading,
-                           fetchEmails
-                       }) => {
+    isOpen,
+    onClose,
+    step,
+    setStep,
+    cartItems,
+    cartCount,
+    calculateTotal,
+    addresses,
+    selectedShippingAddressId,
+    setSelectedShippingAddressId,
+    selectedBillingAddressId,
+    setSelectedBillingAddressId,
+    selectedPaymentType,
+    setSelectedPaymentType,
+    cards,
+    selectedCardNumber,
+    setSelectedCardNumber,
+    bankAccounts,
+    selectedBankAccountIban,
+    setSelectedBankAccountIban,
+    eWallet,
+    paymentVerificationCode,
+    setPaymentVerificationCode,
+    onCheckout,
+    proceedDisabled,
+    isCheckingOut,
+    showEWalletWarning,
+    onConfirmEWalletWarning,
+    sendVerificationCode,
+    emails,
+    isEmailsLoading,
+    fetchEmails
+}) => {
     if (!isOpen) return null;
 
     const isPaymentMethodSelected = () => {
@@ -52,10 +53,10 @@ const CheckoutModal = ({
     };
 
     const stepConfig = [
-        { number: 1, title: 'Review', icon: ShoppingBagIcon, description: 'Review items' },
-        { number: 2, title: 'Address', icon: TruckIcon, description: 'Shipping & billing' },
-        { number: 3, title: 'Payment', icon: CreditCardIcon, description: 'Choose method' },
-        { number: 4, title: 'Verify', icon: ShieldCheckIcon, description: 'Confirm order' }
+        { number: 1, title: 'Review', icon: ShoppingBagIcon },
+        { number: 2, title: 'Address', icon: TruckIcon },
+        { number: 3, title: 'Payment', icon: CreditCardIcon },
+        { number: 4, title: 'Verify', icon: ShieldCheckIcon }
     ];
 
     const renderStepContent = () => {
@@ -64,8 +65,8 @@ const CheckoutModal = ({
                 return (
                     <div>
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Review Your Order</h2>
-                            <p className="text-gray-600">Please review your items and quantities before proceeding.</p>
+                            <h2 className="text-lg font-semibold text-gray-900 mb-2">Review Your Order</h2>
+                            <p className="text-sm text-gray-600">Please review your items and quantities before proceeding.</p>
                         </div>
                         <CheckoutSummaryStep
                             cartItems={cartItems}
@@ -77,8 +78,8 @@ const CheckoutModal = ({
                 return (
                     <div>
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Shipping & Billing Addresses</h2>
-                            <p className="text-gray-600">Select your shipping and billing addresses for this order.</p>
+                            <h2 className="text-lg font-semibold text-gray-900 mb-2">Shipping & Billing Addresses</h2>
+                            <p className="text-sm text-gray-600">Select your shipping and billing addresses for this order.</p>
                         </div>
                         <AddressSelectionStep
                             addresses={addresses}
@@ -93,8 +94,8 @@ const CheckoutModal = ({
                 return (
                     <div>
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Payment Method</h2>
-                            <p className="text-gray-600">Choose how you'd like to pay for your order.</p>
+                            <h2 className="text-lg font-semibold text-gray-900 mb-2">Payment Method</h2>
+                            <p className="text-sm text-gray-600">Choose how you'd like to pay for your order.</p>
                         </div>
                         <PaymentSelectionStep
                             selectedPaymentType={selectedPaymentType}
@@ -108,49 +109,33 @@ const CheckoutModal = ({
                             eWallet={eWallet}
                             calculateTotal={calculateTotal}
                         />
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                className="px-6 py-3 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                                onClick={async () => {
-                                    await sendVerificationCode();
-                                    setStep(4);
-                                }}
-                                disabled={isCheckingOut || !isPaymentMethodSelected()}
-                            >
-                                <ShieldCheckIcon className="w-5 h-5" />
-                                Proceed to Verification
-                            </button>
-                        </div>
                     </div>
                 );
             case 4:
                 return (
                     <div>
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-2">Verify Payment</h2>
-                            <p className="text-gray-600">Enter the verification code sent to your email to complete your purchase.</p>
+                            <h2 className="text-lg font-semibold text-gray-900 mb-2">Verify Payment</h2>
+                            <p className="text-sm text-gray-600">Enter the verification code sent to your email to complete your purchase.</p>
                         </div>
 
-                        <div className="bg-gray-50 rounded border border-gray-200 p-6 mb-6">
+                        <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
                             <input
                                 type="text"
                                 value={paymentVerificationCode}
                                 onChange={(e) => setPaymentVerificationCode(e.target.value)}
                                 placeholder="Enter 6-digit code"
-                                className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-lg tracking-wider text-center font-mono bg-white"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-center font-mono bg-white"
                                 maxLength="6"
                             />
                         </div>
 
-                        <div className="bg-white rounded border border-gray-200 overflow-hidden">
+                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                    <h5 className="text-sm font-medium text-gray-900">Recent Emails</h5>
-                                </div>
+                                <h5 className="text-sm font-medium text-gray-900">Recent Emails</h5>
                                 <button
-                                    className="text-gray-600 text-sm font-medium hover:text-gray-900 flex items-center gap-1 transition-colors"
+                                    className="text-gray-600 text-sm hover:text-gray-900 flex items-center gap-1 transition-colors"
                                     onClick={fetchEmails}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,38 +144,38 @@ const CheckoutModal = ({
                                     Refresh
                                 </button>
                             </div>
-                            <div className="max-h-64 overflow-y-auto">
+                            <div className="max-h-48 overflow-y-auto">
                                 {isEmailsLoading ? (
-                                    <div className="flex items-center justify-center py-12">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
                                     </div>
                                 ) : (emails && emails.length > 0 ? (
-                                     <div className="divide-y divide-gray-100">
-                                         {([...emails]
-                                             .sort((a, b) => new Date(b.sentAt || b.createdAt) - new Date(a.sentAt || a.createdAt))
-                                             .slice(0, 2)
-                                         ).map((e, idx) => (
-                                            <div key={idx} className="p-4 hover:bg-gray-50 transition-colors">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                    <div className="divide-y divide-gray-100">
+                                        {([...emails]
+                                            .sort((a, b) => new Date(b.sentAt || b.createdAt) - new Date(a.sentAt || a.createdAt))
+                                            .slice(0, 2)
+                                        ).map((e, idx) => (
+                                            <div key={idx} className="p-3 hover:bg-gray-50 transition-colors">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
                                                         {e.sentAt || e.createdAt}
                                                     </span>
                                                 </div>
-                                                <div className="text-sm font-semibold text-gray-900 mb-1">
+                                                <div className="text-sm font-medium text-gray-900 mb-1">
                                                     {e.subject || 'Verification Code'}
                                                 </div>
-                                                <div className="text-sm text-gray-600 whitespace-pre-wrap font-mono bg-gray-50 p-3 rounded-lg">
+                                                <div className="text-sm text-gray-600 font-mono bg-gray-50 p-2 rounded">
                                                     {e.body || e.content}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                                        <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                                        <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
-                                        <p className="text-sm font-medium">No emails found</p>
+                                        <p className="text-sm">No emails found</p>
                                     </div>
                                 ))}
                             </div>
@@ -204,31 +189,26 @@ const CheckoutModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white w-full max-w-5xl rounded overflow-hidden flex flex-col max-h-[95vh]">
-                {/* Header */}
-                 <div className="bg-gray-900 px-6 py-5 border-b border-gray-700">
+            <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg overflow-hidden flex flex-col max-h-[90vh]">
+                {/* Clean Header */}
+                <div className="bg-white px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
-                                <ShieldCheckIcon className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-semibold text-white">Secure Checkout</h3>
-                                <p className="text-gray-400 text-sm">Complete your purchase safely</p>
-                            </div>
+                        <div className="flex items-center space-x-3">
+                            <ShieldCheckIcon className="w-5 h-5 text-gray-600" />
+                            <h3 className="text-lg font-semibold text-gray-900">Secure Checkout</h3>
                         </div>
                         <button
-                            className="p-2 text-gray-400 hover:text-white transition-colors"
+                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                             onClick={onClose}
                         >
-                            <XMarkIcon className="w-6 h-6" />
+                            <XMarkIcon className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                {/* Progress Steps */}
-                 <div className="px-6 py-5 bg-gray-50 border-b border-gray-200 shrink-0">
-                     <div className="flex items-center justify-between max-w-3xl mx-auto">
+                {/* Simple Progress Steps */}
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center justify-between max-w-2xl mx-auto">
                         {stepConfig.map((s, idx) => {
                             const Icon = s.icon;
                             const isActive = step === s.number;
@@ -236,32 +216,29 @@ const CheckoutModal = ({
 
                             return (
                                 <React.Fragment key={s.number}>
-                                     <div className="flex flex-col items-center gap-2 flex-1">
-                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors ${
+                                    <div className="flex items-center space-x-2">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                                             isActive ? 'bg-gray-900 text-white' :
-                                                isCompleted ? 'bg-gray-600 text-white' :
+                                                isCompleted ? 'bg-green-600 text-white' :
                                                     'bg-gray-200 text-gray-500'
                                         }`}>
                                             {isCompleted ? (
-                                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             ) : (
-                                                 <Icon className="w-6 h-6" />
+                                                <Icon className="w-4 h-4" />
                                             )}
                                         </div>
-                                        <div className="text-center">
-                                            <div className={`text-xs font-medium ${isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'}`}>
-                                                {s.title}
-                                            </div>
-                                            <div className={`text-xs mt-1 ${isActive ? 'text-gray-700' : 'text-gray-400'}`}>
-                                                {s.description}
-                                            </div>
-                                        </div>
+                                        <span className={`text-sm font-medium ${
+                                            isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'
+                                        }`}>
+                                            {s.title}
+                                        </span>
                                     </div>
                                     {idx < stepConfig.length - 1 && (
-                                         <div className={`h-1 w-full max-w-[64px] rounded-full transition-colors ${
-                                            step > s.number ? 'bg-gray-900' : 'bg-gray-200'
+                                        <div className={`h-px w-8 transition-colors ${
+                                            step > s.number ? 'bg-green-600' : 'bg-gray-200'
                                         }`} />
                                     )}
                                 </React.Fragment>
@@ -270,46 +247,69 @@ const CheckoutModal = ({
                     </div>
                 </div>
 
-                 {/* Content */}
-                 <div className="p-6 flex-1 overflow-y-auto">
-                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                         <div className="lg:col-span-8">
+                {/* Content */}
+                <div className="p-6 flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2">
                             {renderStepContent()}
                         </div>
 
-                        {/* Order Summary Sidebar */}
-                         <div className="lg:col-span-4">
-                            <div className="sticky top-4">
-                                 <div className="rounded border border-gray-200 bg-white p-5">
-                                     <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <ShoppingBagIcon className="w-5 h-5 text-gray-600" />
-                                        Order Summary
-                                    </h4>
-                                     <div className="space-y-2.5 mb-3">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600">Items</span>
-                                            <span className="font-semibold text-gray-900">{cartCount}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600">Subtotal</span>
-                                            <span className="font-semibold text-gray-900">{calculateTotal().toFixed(2)} TRY</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600">Shipping</span>
-                                            <span className="text-xs text-gray-500">Free</span>
-                                        </div>
-                                         <div className="border-t-2 border-dashed border-gray-300 pt-2.5 mt-2.5">
-                                            <div className="flex items-center justify-between">
-                                                 <span className="text-sm font-bold text-gray-900">Total</span>
-                                                 <span className="text-xl font-bold text-blue-600">{calculateTotal().toFixed(2)} TRY</span>
+                        {/* Order Summary */}
+                        <div className="lg:col-span-1">
+                            <div className="bg-gray-50 rounded-lg p-4 sticky top-4">
+                                <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <ShoppingBagIcon className="w-4 h-4 text-gray-600" />
+                                    Order Summary
+                                </h4>
+                                
+                                <div className="space-y-2 mb-4">
+                                    {cartItems.map((item) => (
+                                        <div key={item.id} className="flex items-center justify-between text-sm">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-gray-900 truncate">{item.listing.title}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    {item.quantity} × {formatCurrency(item.listing.price, item.listing.currency)}
+                                                </p>
                                             </div>
+                                            <span className="text-sm font-medium text-gray-900 ml-2">
+                                                {formatCurrency(parseFloat(item.listing.price) * item.quantity, item.listing.currency)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                <div className="space-y-2 border-t border-gray-200 pt-3">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Subtotal</span>
+                                        <span className="font-medium text-gray-900">
+                                            {cartItems.length > 0 ? formatCurrency(calculateTotal(), cartItems[0].listing.currency) : '$0.00'}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Shipping</span>
+                                        <span className="font-medium text-green-600">Free</span>
+                                    </div>
+                                    
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Tax</span>
+                                        <span className="font-medium text-gray-900">$0.00</span>
+                                    </div>
+                                    
+                                    <div className="border-t border-gray-200 pt-2">
+                                        <div className="flex justify-between text-base font-semibold">
+                                            <span className="text-gray-900">Total</span>
+                                            <span className="text-gray-900">
+                                                {cartItems.length > 0 ? formatCurrency(calculateTotal(), cartItems[0].listing.currency) : '$0.00'}
+                                            </span>
                                         </div>
                                     </div>
-                                     <div className="bg-blue-50 rounded-lg p-2.5 mt-3">
-                                         <p className="text-xs text-blue-800 flex items-start gap-2">
-                                            <ShieldCheckIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                            <span>Your payment information is secure and encrypted</span>
-                                        </p>
+                                </div>
+
+                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                                        <ShieldCheckIcon className="w-3 h-3" />
+                                        <span>Secure checkout</span>
                                     </div>
                                 </div>
                             </div>
@@ -317,10 +317,10 @@ const CheckoutModal = ({
                     </div>
                 </div>
 
-                 {/* Footer */}
-                 <div className="px-6 py-5 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                {/* Footer */}
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                     <button
-                        className="px-5 py-2.5 rounded border border-gray-300 text-gray-700 hover:bg-white hover:border-gray-400 font-medium transition-colors flex items-center gap-2"
+                        className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-white hover:border-gray-400 font-medium transition-colors flex items-center gap-2"
                         onClick={() => step > 1 ? setStep(step - 1) : onClose()}
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,7 +330,7 @@ const CheckoutModal = ({
                     </button>
                     {step < 3 ? (
                         <button
-                            className="px-6 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                            className="px-6 py-2 bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                             onClick={() => setStep(step + 1)}
                             disabled={
                                 (step === 1 && cartCount === 0) ||
@@ -342,9 +342,21 @@ const CheckoutModal = ({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
+                    ) : step === 3 ? (
+                        <button
+                            className="px-6 py-2 bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                            onClick={async () => {
+                                await sendVerificationCode();
+                                setStep(4);
+                            }}
+                            disabled={isCheckingOut || !isPaymentMethodSelected()}
+                        >
+                            <ShieldCheckIcon className="w-4 h-4" />
+                            Proceed to Verification
+                        </button>
                     ) : step === 4 ? (
                         <button
-                            className="px-6 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                            className="px-6 py-2 bg-green-600 text-white hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                             onClick={onCheckout}
                             disabled={proceedDisabled || isCheckingOut || !paymentVerificationCode}
                         >
@@ -355,7 +367,7 @@ const CheckoutModal = ({
                                 </>
                             ) : (
                                 <>
-                                    <ShieldCheckIcon className="w-5 h-5" />
+                                    <ShieldCheckIcon className="w-4 h-4" />
                                     Complete Payment
                                 </>
                             )}
@@ -367,7 +379,7 @@ const CheckoutModal = ({
             {/* eWallet Warning Modal */}
             {showEWalletWarning && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-                    <div className="bg-white rounded w-full max-w-md mx-4 overflow-hidden">
+                    <div className="bg-white rounded-lg w-full max-w-md mx-4 overflow-hidden">
                         <div className="bg-gray-900 px-6 py-4">
                             <h4 className="text-lg font-semibold text-white flex items-center gap-2">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -377,18 +389,18 @@ const CheckoutModal = ({
                             </h4>
                         </div>
                         <div className="p-6">
-                            <p className="text-gray-700 mb-6 leading-relaxed">
+                            <p className="text-gray-700 mb-6">
                                 Your eWallet spending warning limit has been reached or exceeded with this purchase. Do you want to proceed?
                             </p>
                             <div className="flex gap-3">
                                 <button
-                                    className="flex-1 px-4 py-2.5 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                                     onClick={onClose}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    className="flex-1 px-4 py-2.5 rounded bg-gray-900 text-white hover:bg-gray-800 font-medium transition-colors"
+                                    className="flex-1 px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 font-medium transition-colors"
                                     onClick={onConfirmEWalletWarning}
                                 >
                                     Proceed Anyway
@@ -398,29 +410,6 @@ const CheckoutModal = ({
                     </div>
                 </div>
             )}
-
-            <style jsx>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { 
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to { 
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                .animate-fadeIn {
-                    animation: fadeIn 0.3s ease-out;
-                }
-                .animate-slideUp {
-                    animation: slideUp 0.4s ease-out;
-                }
-            `}</style>
         </div>
     );
 };
