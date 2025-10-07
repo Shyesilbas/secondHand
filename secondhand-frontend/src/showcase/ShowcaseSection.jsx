@@ -1,37 +1,9 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {ROUTES} from '../common/constants/routes.js';
-import {listingService} from '../listing/services/listingService.js';
 import {formatCurrency} from '../common/formatters.js';
 
 const ShowcaseSection = ({ showcases }) => {
-    const [listingMap, setListingMap] = React.useState({});
-    const [loadingIds, setLoadingIds] = React.useState([]);
-
-    React.useEffect(() => {
-        if (!Array.isArray(showcases)) return;
-        const missingIds = Array.from(new Set(
-            showcases
-                .map(s => (!s?.listing && s?.listingId) ? s.listingId : null)
-                .filter(Boolean)
-                .filter(id => !listingMap[id])
-        ));
-        if (missingIds.length === 0) return;
-        setLoadingIds(prev => Array.from(new Set([...prev, ...missingIds])));
-                (async () => {
-            const updates = {};
-            for (const id of missingIds) {
-                try {
-                    const data = await listingService.getListingById(id);
-                    updates[id] = data;
-                } catch {
-                    updates[id] = null;
-                }
-            }
-            setListingMap(prev => ({ ...prev, ...updates }));
-            setLoadingIds(prev => prev.filter(id => !missingIds.includes(id)));
-        })();
-    }, [showcases, listingMap]);
 
     if (!showcases || showcases.length === 0) {
         return null;
@@ -70,10 +42,10 @@ const ShowcaseSection = ({ showcases }) => {
             {/* Showcase Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {showcases.map((showcase, index) => {
-                    const listing = showcase?.listing || listingMap[showcase?.listingId] || showcase || {};
+                    const listing = showcase?.listing || {};
                     const city = listing.city || '-';
                     const district = listing.district || '-';
-                    const title = listing.title || (loadingIds.includes(showcase?.listingId) ? 'Loading…' : 'Untitled Listing');
+                    const title = listing.title || 'Untitled Listing';
                     const description = listing.description || '';
                     const price = typeof listing.price !== 'undefined' ? listing.price : '';
                     const currency = listing.currency || '';

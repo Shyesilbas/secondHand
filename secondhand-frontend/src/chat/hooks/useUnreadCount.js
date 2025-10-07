@@ -19,8 +19,16 @@ export const useTotalUnreadCount = (options = {}) => {
         refetch
     } = useQuery({
         queryKey: UNREAD_COUNT_KEYS.total(user?.id),
-        queryFn: () => chatService.getTotalUnreadMessageCount(user.id),
-        enabled: !!(isAuthenticated && user?.id && (options.enabled ?? true)),         staleTime: 3 * 60 * 1000,         cacheTime: 10 * 60 * 1000,         refetchInterval: 3 * 60 * 1000,         refetchOnWindowFocus: false,         refetchOnMount: false,         refetchIntervalInBackground: false,         retry: 2,         retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+        queryFn: () => chatService.getTotalUnreadMessageCount(),
+        enabled: !!(isAuthenticated && user?.id && (options.enabled ?? true)),
+        staleTime: 10 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchIntervalInBackground: false,
+        retry: 1,
+        retryDelay: 1000,
     });
 
         const invalidateTotalUnread = () => {
@@ -57,27 +65,3 @@ export const useTotalUnreadCount = (options = {}) => {
     };
 };
 
-export const useRoomUnreadCount = (roomId) => {
-    const { user, isAuthenticated } = useAuth();
-
-    const {
-        data: unreadCount = 0,
-        isLoading,
-        error,
-        refetch
-    } = useQuery({
-        queryKey: UNREAD_COUNT_KEYS.room(roomId, user?.id),
-        queryFn: () => chatService.getChatRoomUnreadCount(roomId, user.id),
-        enabled: !!(isAuthenticated && user?.id && roomId),
-        staleTime: 2 * 60 * 1000,         cacheTime: 5 * 60 * 1000,         refetchInterval: 2 * 60 * 1000,         refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        refetchIntervalInBackground: false,
-    });
-
-    return {
-        unreadCount,
-        isLoading,
-        error,
-        refetch
-    };
-};

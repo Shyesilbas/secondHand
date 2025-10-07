@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { usePhoneUpdate } from './hooks/usePhoneUpdate.js';
@@ -21,8 +21,38 @@ const ProfilePage = () => {
     const [showPhoneModal, setShowPhoneModal] = useState(false);
     const [phoneFormData, setPhoneFormData] = useState({ ...UpdatePhoneRequestDTO });
     const { updatePhone, isUpdating } = usePhoneUpdate();
-    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(user?.id);
     const [activeTab, setActiveTab] = useState('personal');
+    
+    // Intersection Observer for reviews section
+    const reviewsSectionRef = useRef(null);
+    const [reviewsVisible, setReviewsVisible] = useState(false);
+    
+    // Only load review stats when reviews section is visible or actions tab is active
+    const shouldLoadReviews = reviewsVisible || activeTab === 'actions';
+    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(user?.id, { 
+        enabled: shouldLoadReviews 
+    });
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setReviewsVisible(true);
+                        // Once visible, we can disconnect the observer
+                        observer.disconnect();
+                    }
+                });
+            },
+            { threshold: 0.1 } // Trigger when 10% of the element is visible
+        );
+
+        if (reviewsSectionRef.current) {
+            observer.observe(reviewsSectionRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     const handlePhoneUpdate = async () => {
         const success = await updatePhone(phoneFormData);
@@ -236,7 +266,7 @@ const ProfilePage = () => {
                                 iconPath="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                             />
 
-                            <div className="border border-gray-200 rounded-lg p-4">
+                            <div ref={reviewsSectionRef} className="border border-gray-200 rounded-lg p-4">
                                 <div className="flex items-center space-x-3 mb-3">
                                     <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                                         <svg
@@ -252,7 +282,9 @@ const ProfilePage = () => {
                                             Reviews & Ratings
                                         </h3>
                                         <p className="text-sm text-gray-600">
-                                            Manage your review activity
+                                            {reviewStatsLoading ? 'Loading review data...' : 
+                                             reviewStats ? `${reviewStats.totalReviews || 0} reviews, ${(reviewStats.averageRating || 0).toFixed(1)} avg rating` :
+                                             'Manage your review activity'}
                                         </p>
                                     </div>
                                 </div>

@@ -6,7 +6,6 @@ import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UserSearchBar from '../../../user/components/UserSearchBar.jsx';
 import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
-import { useCart } from '../../../cart/hooks/useCart.js';
 
 const icons = {
     myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -30,8 +29,35 @@ const Header = () => {
     const navigate = useNavigate();
     const notification = useNotification();
     const location = useLocation();
-    const { cartCount } = useCart();
-    const { totalUnread, setTotalUnread } = useTotalUnreadCount({ enabled: location.pathname !== ROUTES.HOME });
+    
+    // Use localStorage for cart count in header - no API calls needed
+    const [cartCount, setCartCount] = useState(() => {
+        if (!isAuthenticated) return 0;
+        try {
+            return parseInt(localStorage.getItem('cartCount') || '0', 10);
+        } catch {
+            return 0;
+        }
+    });
+    
+    // Listen for cart count changes from other components
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setCartCount(0);
+            return;
+        }
+        
+        const handleCartCountChange = (event) => {
+            setCartCount(parseInt(event.detail || '0', 10));
+        };
+        
+        window.addEventListener('cartCountChanged', handleCartCountChange);
+        return () => window.removeEventListener('cartCountChanged', handleCartCountChange);
+    }, [isAuthenticated]);
+    
+    const { totalUnread, setTotalUnread } = useTotalUnreadCount({ 
+        enabled: isAuthenticated && location.pathname !== ROUTES.HOME 
+    });
 
     const handleChatClick = () => {
         setTotalUnread(0);

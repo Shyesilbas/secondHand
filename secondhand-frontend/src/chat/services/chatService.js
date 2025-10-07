@@ -24,21 +24,18 @@ export const chatService = {
         return requestWithParams('GET', API_ENDPOINTS.CHAT.ROOM_MESSAGES(chatRoomId), { page, size });
     },
 
-    markMessagesAsRead: async (chatRoomId, userId) => {
-        return requestWithParams('PUT', API_ENDPOINTS.CHAT.MARK_READ(chatRoomId), { userId });
+    markMessagesAsRead: async (chatRoomId) => {
+        return request('PUT', API_ENDPOINTS.CHAT.MARK_READ(chatRoomId));
     },
 
     getAllUserMessages: async (userId, page = 0, size = 20) => {
         return requestWithParams('GET', API_ENDPOINTS.CHAT.ALL_USER_MESSAGES(userId), { page, size });
     },
 
-    getTotalUnreadMessageCount: async (userId) => {
-        return request('GET', API_ENDPOINTS.CHAT.TOTAL_UNREAD_COUNT(userId));
+    getTotalUnreadMessageCount: async () => {
+        return request('GET', API_ENDPOINTS.CHAT.TOTAL_UNREAD_COUNT);
     },
 
-    getChatRoomUnreadCount: async (chatRoomId, userId) => {
-        return request('GET', API_ENDPOINTS.CHAT.UNREAD_COUNT(chatRoomId, userId));
-    },
 
     deleteConversation: async (chatRoomId, userId) => {
         return requestWithParams('DELETE', API_ENDPOINTS.CHAT.DELETE_CONVERSATION(chatRoomId), { userId });

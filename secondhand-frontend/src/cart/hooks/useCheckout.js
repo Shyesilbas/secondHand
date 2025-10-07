@@ -11,12 +11,15 @@ import { useEmails } from '../../payments/hooks/useEmails.js';
 export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const navigate = useNavigate();
     const { showError, showSuccess } = useNotification();
-    const { addresses } = useAddresses();
-    const { eWallet } = useEWallet();
-
+    
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [step, setStep] = useState(1);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+    // Only load data when checkout modal is open
+    const { addresses } = useAddresses({ enabled: showCheckoutModal });
+    const { eWallet } = useEWallet({ enabled: showCheckoutModal });
+    const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
 
     const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
     const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
@@ -29,9 +32,11 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
 
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
-    const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
 
+    // Load payment methods only when checkout modal is open
     useEffect(() => {
+        if (!showCheckoutModal) return;
+        
         creditCardService
             .getAll()
             .then((data) => {
@@ -59,7 +64,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 setBankAccounts(normalized);
             })
             .catch(() => setBankAccounts([]));
-    }, []);
+    }, [showCheckoutModal]);
 
     useEffect(() => {
         if (selectedPaymentType === 'TRANSFER' &&
@@ -139,6 +144,17 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
 
     const closeCheckoutModal = () => {
         setShowCheckoutModal(false);
+        // Reset states when modal closes to prevent stale data
+        setStep(1);
+        setSelectedShippingAddressId(null);
+        setSelectedBillingAddressId(null);
+        setSelectedPaymentType('CREDIT_CARD');
+        setCards([]);
+        setSelectedCardNumber(null);
+        setBankAccounts([]);
+        setSelectedBankAccountIban(null);
+        setPaymentVerificationCode('');
+        setShowEWalletWarning(false);
     };
 
     const sendVerificationCode = async () => {

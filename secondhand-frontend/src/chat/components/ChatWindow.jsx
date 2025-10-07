@@ -69,15 +69,7 @@ const ChatWindow = ({
         notification.showSuccess('Success', 'Message deleted successfully.');
     };
 
-        useEffect(() => {
-        if (isOpen && selectedChatRoom?.id && messages.length > 0 && user?.id) {
-            const timer = setTimeout(() => {
-                chatService.markMessagesAsRead(selectedChatRoom.id, user.id)
-                    .catch(error => console.error('Error marking messages as read:', error));
-            }, 1000); 
-            return () => clearTimeout(timer);
-        }
-    }, [isOpen, selectedChatRoom?.id, messages.length, user?.id]);
+    // Removed duplicate markMessagesAsRead call - it's already handled in useChat hook
 
     if (!isOpen) return null;
 

@@ -7,7 +7,7 @@ const SHOWCASE_KEYS = {
     userShowcases: () => [...SHOWCASE_KEYS.all, 'user']
 };
 
-export const useShowcaseQuery = () => {
+export const useShowcaseQuery = (options = {}) => {
     const {
         data: showcases = [],
         isLoading: loading,
@@ -16,8 +16,13 @@ export const useShowcaseQuery = () => {
     } = useQuery({
         queryKey: SHOWCASE_KEYS.active(),
         queryFn: showcaseService.getActiveShowcases,
-        staleTime: 5 * 60 * 1000,         cacheTime: 10 * 60 * 1000,         refetchOnWindowFocus: false,
-        refetchOnMount: false,         retry: 1,         retryDelay: 1000,
+        enabled: options.enabled ?? true,
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 1,
+        retryDelay: 1000,
         onError: (error) => {
             console.debug('Showcase fetch failed (this is normal for unauthenticated users):', error.message);
         }

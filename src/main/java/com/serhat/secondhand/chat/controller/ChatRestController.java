@@ -3,12 +3,14 @@ package com.serhat.secondhand.chat.controller;
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
 import com.serhat.secondhand.chat.service.ChatService;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,20 +81,12 @@ public class ChatRestController {
     @PutMapping("/rooms/{chatRoomId}/messages/read")
     public ResponseEntity<Void> markMessagesAsRead(
             @PathVariable Long chatRoomId, 
-            @RequestParam Long userId) {
-        log.info("Marking messages as read - room: {}, user: {}", chatRoomId, userId);
-        chatService.markMessagesAsRead(chatRoomId, userId);
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Marking messages as read - room: {}, user: {}", chatRoomId, currentUser.getEmail());
+        chatService.markMessagesAsRead(chatRoomId, currentUser.getId());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/rooms/{chatRoomId}/messages/unread-count")
-    public ResponseEntity<Long> getUnreadMessageCount(
-            @PathVariable Long chatRoomId, 
-            @RequestParam Long userId) {
-        log.info("Getting unread message count - room: {}, user: {}", chatRoomId, userId);
-        Long count = chatService.getUnreadMessageCount(chatRoomId, userId);
-        return ResponseEntity.ok(count);
-    }
 
     @GetMapping("/messages/user/{userId}")
     public ResponseEntity<Page<ChatMessageDto>> getAllUserMessages(
@@ -109,10 +103,10 @@ public class ChatRestController {
         return ResponseEntity.ok(messages);
     }
 
-    @GetMapping("/messages/unread-count/user/{userId}")
-    public ResponseEntity<Long> getTotalUnreadMessageCount(@PathVariable Long userId) {
-        log.info("Getting total unread message count for user: {}", userId);
-        Long count = chatService.getTotalUnreadMessageCount(userId);
+    @GetMapping("/messages/unread-count")
+    public ResponseEntity<Long> getTotalUnreadMessageCount(@AuthenticationPrincipal User currentUser) {
+        log.info("Getting total unread message count for user: {}", currentUser.getEmail());
+        Long count = chatService.getTotalUnreadMessageCount(currentUser.getId());
         return ResponseEntity.ok(count);
     }
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { agreementService } from '../service/agreementService.js';
+import { agreementService } from '../services/agreementService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
 export const useRegisterAgreements = () => {

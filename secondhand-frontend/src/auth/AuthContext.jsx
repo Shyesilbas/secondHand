@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
     getUser,
     getToken,
@@ -22,13 +23,20 @@ export const useAuth = () => {
     return context;
 };
 
+// Global flag to prevent multiple initializations
+let isAuthInitializing = false;
+let isAuthInitialized = false;
+
 export const AuthProvider = ({ children }) => {
     const [user, setUserState] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
+        if (isAuthInitialized || isAuthInitializing) return;
+        
         const initializeAuth = async () => {
+            isAuthInitializing = true;
             try {
                 const userData = getUser();
                 const isCookieAuth = isCookieBasedAuth();
@@ -43,7 +51,8 @@ export const AuthProvider = ({ children }) => {
                                 if (isCookieAuth) {
                     try {
                         console.debug('Attempting cookie-based validation...');
-                                                const validationResult = await authService.validateToken();
+                        // Cache validation for 5 minutes to prevent duplicate calls
+                        const validationResult = await authService.validateToken();
                         
                         if (validationResult.valid) {
                             console.debug('Session is valid');
@@ -97,6 +106,8 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(false);
             } finally {
                 setIsLoading(false);
+                isAuthInitialized = true;
+                isAuthInitializing = false;
             }
         };
 
@@ -156,8 +167,12 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
                         console.debug('Server logout failed, continuing with local logout');
         } finally {
-            clearTokens();             setUserState(null);
+            clearTokens();
+            setUserState(null);
             setIsAuthenticated(false);
+            // Reset global flags so auth can be re-initialized if needed
+            isAuthInitialized = false;
+            isAuthInitializing = false;
         }
     };
 

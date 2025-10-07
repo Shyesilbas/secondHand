@@ -8,7 +8,7 @@ const AGREEMENT_KEYS = {
     required: (group) => [...AGREEMENT_KEYS.all, 'required', group]
 };
 
-export const useAgreements = () => {
+export const useAgreements = (options = {}) => {
     const {
         data: agreements = [],
         isLoading,
@@ -17,10 +17,12 @@ export const useAgreements = () => {
     } = useQuery({
         queryKey: AGREEMENT_KEYS.allAgreements(),
         queryFn: agreementService.getAllAgreements,
-        staleTime: 30 * 60 * 1000, // 30 minutes
-        cacheTime: 60 * 60 * 1000, // 1 hour
+        enabled: options.enabled ?? true,
+        staleTime: 60 * 60 * 1000, // 1 hour
+        cacheTime: 2 * 60 * 60 * 1000, // 2 hours
         refetchOnWindowFocus: false,
         refetchOnMount: false,
+        refetchInterval: false,
         retry: 1,
         retryDelay: 1000,
         onError: (error) => {
@@ -57,6 +59,33 @@ export const useAgreementByType = (agreementType) => {
 
     return {
         agreement,
+        isLoading,
+        error,
+        refetch
+    };
+};
+
+export const useUserAgreements = () => {
+    const {
+        data: userAgreements = [],
+        isLoading,
+        error,
+        refetch
+    } = useQuery({
+        queryKey: [...AGREEMENT_KEYS.all, 'user'],
+        queryFn: agreementService.getUserAgreements,
+        staleTime: 30 * 60 * 1000,
+        cacheTime: 60 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 1,
+        onError: (error) => {
+            console.debug('User agreements fetch failed:', error.message);
+        }
+    });
+
+    return {
+        userAgreements,
         isLoading,
         error,
         refetch

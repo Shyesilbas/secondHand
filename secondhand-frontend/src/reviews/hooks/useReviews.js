@@ -89,10 +89,11 @@ export const useReviewsByUser = (userId) => {
     };
 };
 
-export const useUserReviewStats = (userId) => {
+export const useUserReviewStats = (userId, options = {}) => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const enabled = options.enabled ?? true;
 
     const fetchStats = async () => {
         if (!userId) return;
@@ -111,8 +112,10 @@ export const useUserReviewStats = (userId) => {
     };
 
     useEffect(() => {
-        fetchStats();
-    }, [userId]);
+        if (enabled) {
+            fetchStats();
+        }
+    }, [userId, enabled]);
 
     return {
         stats,

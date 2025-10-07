@@ -16,7 +16,7 @@ public interface ShowcaseRepository extends JpaRepository<Showcase, UUID> {
     
     List<Showcase> findByUserIdAndStatus(Long userId, ShowcaseStatus status);
     
-    @Query("SELECT s FROM Showcase s WHERE s.status = :status AND s.endDate > :currentTime ORDER BY s.createdAt DESC")
+    @Query("SELECT s FROM Showcase s LEFT JOIN FETCH s.listing l LEFT JOIN FETCH l.seller WHERE s.status = :status AND s.endDate > :currentTime ORDER BY s.createdAt DESC")
     List<Showcase> findActiveShowcases(@Param("status") ShowcaseStatus status, @Param("currentTime") LocalDateTime currentTime);
     
     @Query("SELECT s FROM Showcase s WHERE s.listing.id = :listingId AND s.status = :status")

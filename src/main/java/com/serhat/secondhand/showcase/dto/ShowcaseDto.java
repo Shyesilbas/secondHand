@@ -1,7 +1,6 @@
 package com.serhat.secondhand.showcase.dto;
 
-import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -19,6 +18,7 @@ public record ShowcaseDto(
         BigDecimal dailyCost,
         String status,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        ListingDto listing
 ) {
 }

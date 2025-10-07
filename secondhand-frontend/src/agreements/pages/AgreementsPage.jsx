@@ -1,33 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AgreementsList from './AgreementsList.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { agreementService } from '../service/agreementService.js';
+import { useAgreements, useUserAgreements } from '../hooks/useAgreements.js';
 
 const AgreementsPage = () => {
-    const [agreements, setAgreements] = useState([]);
-    const [userAgreements, setUserAgreements] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
-    const notification = useNotification();
-
-    useEffect(() => {
-        const loadAgreements = async () => {
-            try {
-                setLoading(true);
-                const [all, user] = await Promise.all([
-                    agreementService.getAllAgreements(),
-                    agreementService.getUserAgreements()
-                ]);
-                setAgreements(all);
-                setUserAgreements(user);
-            } catch (err) {
-                notification.showError('Error', 'Failed to load agreements.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadAgreements();
-    }, []);
+    const { agreements, isLoading: agreementsLoading } = useAgreements();
+    const { userAgreements, isLoading: userAgreementsLoading } = useUserAgreements();
+    
+    const loading = agreementsLoading || userAgreementsLoading;
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
