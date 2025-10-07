@@ -145,6 +145,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                 price={listing.price}
                 currency={listing.currency}
             />
+
         </div>
     );
 });

@@ -178,43 +178,60 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
         )}
 
         {activeTab === 'exchange' && (
-          <div>
-            <div className="mb-5">
-              <div className="inline-flex rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
-                {['USD', 'EUR'].map(opt => (
-                  <button
-                    key={opt}
-                    onClick={() => { setSelected(opt); setExError(''); }}
-                    className={`${selected === opt ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm`}
-                    disabled={currency === opt}
-                    title={currency === opt ? 'Same as listing currency' : ''}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
+          <div className="space-y-3">
+            {/* Simple Price Display */}
+            <div className="text-center py-2">
+              <p className="text-sm text-gray-600">Convert {formatCurrency(price, currency)} {currency}</p>
             </div>
 
-            <div className="mb-4">
+            {/* Minimal Currency Selection */}
+            <div className="flex justify-center gap-2">
+              {['USD', 'EUR'].map(opt => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelected(opt); setExError(''); }}
+                  disabled={currency === opt}
+                  className={`px-3 py-1.5 text-xs rounded transition-colors ${
+                    selected === opt 
+                      ? 'bg-gray-900 text-white' 
+                      : currency === opt
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+
+            {/* Simple Convert Button */}
+            <div className="flex justify-center">
               <button
                 onClick={handleExchangeQuery}
                 disabled={exLoading || currency === selected}
-                className="px-3 py-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 text-sm"
+                className="px-4 py-1.5 bg-gray-900 text-white text-xs rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {exLoading ? 'Loading...' : 'Query'}
+                {exLoading ? 'Loading...' : 'Convert'}
               </button>
             </div>
 
+            {/* Error */}
             {exError && (
-              <div className="text-sm text-red-600 mb-3">Failed to fetch exchange rate</div>
+              <div className="text-center">
+                <p className="text-xs text-red-600">{exError}</p>
+              </div>
             )}
 
-            <div className="space-y-2 max-w-md">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                <span className="text-gray-700">{selected}</span>
-                <span className="font-medium">{convertedValue ? `${convertedValue} ${selected}` : '-'}</span>
+            {/* Simple Result */}
+            {convertedValue && (
+              <div className="text-center py-3 bg-gray-50 rounded border border-gray-200">
+                <p className="text-sm text-gray-600 mb-1">Converted Amount</p>
+                <p className="text-lg font-semibold text-gray-900">{convertedValue} {selected}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  1 {currency} = {(rates[selected] || 0).toFixed(4)} {selected}
+                </p>
               </div>
-            </div>
+            )}
           </div>
         )}
 

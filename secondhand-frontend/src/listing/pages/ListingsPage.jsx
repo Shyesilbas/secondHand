@@ -129,6 +129,7 @@ const ListingsPage = () => {
             while (hasMorePages) {
                 const response = await listingService.filterListings({
                     ...filters,
+                    listingType: selectedCategory || filters.listingType, // Seçili kategoriyi kullan
                     page: currentPage,
                     size: 100 // Daha büyük sayfa boyutu
                 });
