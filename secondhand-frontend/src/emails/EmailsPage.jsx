@@ -44,11 +44,17 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
 
 const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail, isDeleting }) => (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="px-4 py-3 border-b border-sidebar-border bg-app-bg">
-                <h3 className="font-semibold text-text-primary">Emails ({emails.length})</h3>
+        <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <h3 className="font-semibold text-gray-900">Email Inbox</h3>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">{emails.length} emails</p>
             </div>
-            <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+            <div className="max-h-[600px] overflow-y-auto">
                 {emails.map((email, i) => (
                     <EmailListItem
                         key={i}

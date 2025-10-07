@@ -133,9 +133,14 @@ const CheckoutModal = ({
 
                         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
-                                <h5 className="text-sm font-medium text-gray-900">Recent Emails</h5>
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <h5 className="text-sm font-semibold text-gray-900">Verification Emails</h5>
+                                </div>
                                 <button
-                                    className="text-gray-600 text-sm hover:text-gray-900 flex items-center gap-1 transition-colors"
+                                    className="text-gray-600 text-sm hover:text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition-colors flex items-center gap-1"
                                     onClick={fetchEmails}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,28 +149,38 @@ const CheckoutModal = ({
                                     Refresh
                                 </button>
                             </div>
-                            <div className="max-h-48 overflow-y-auto">
+                            <div className="max-h-64 overflow-y-auto">
                                 {isEmailsLoading ? (
                                     <div className="flex items-center justify-center py-8">
                                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
                                     </div>
                                 ) : (emails && emails.length > 0 ? (
-                                    <div className="divide-y divide-gray-100">
+                                    <div className="space-y-3">
                                         {([...emails]
                                             .sort((a, b) => new Date(b.sentAt || b.createdAt) - new Date(a.sentAt || a.createdAt))
                                             .slice(0, 2)
                                         ).map((e, idx) => (
-                                            <div key={idx} className="p-3 hover:bg-gray-50 transition-colors">
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                                                        {e.sentAt || e.createdAt}
+                                            <div key={idx} className="p-4 hover:bg-gray-50 transition-colors border border-gray-100 rounded-lg">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                                            {e.sentAt || e.createdAt}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                                                        Email #{idx + 1}
                                                     </span>
                                                 </div>
-                                                <div className="text-sm font-medium text-gray-900 mb-1">
-                                                    {e.subject || 'Verification Code'}
+                                                <div className="mb-3">
+                                                    <h6 className="text-sm font-semibold text-gray-900 mb-1">
+                                                        {e.subject || 'Verification Code'}
+                                                    </h6>
                                                 </div>
-                                                <div className="text-sm text-gray-600 font-mono bg-gray-50 p-2 rounded">
-                                                    {e.body || e.content}
+                                                <div className="bg-white border border-gray-200 rounded-md p-3">
+                                                    <div className="text-sm text-gray-800 font-mono leading-relaxed whitespace-pre-wrap break-words">
+                                                        {e.body || e.content}
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
