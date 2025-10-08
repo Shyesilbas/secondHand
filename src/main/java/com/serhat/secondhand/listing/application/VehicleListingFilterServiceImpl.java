@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -31,7 +31,7 @@ public class VehicleListingFilterServiceImpl implements VehicleListingFilterServ
 
         @Override
     public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
-        log.info("Filtering vehicles with criteria: {}", filters);
+        log.info("Filtering vehicles : {}", filters);
         
         Pageable pageable = FilterHelper.initializeFilter(filters);
 

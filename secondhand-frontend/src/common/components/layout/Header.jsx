@@ -30,7 +30,6 @@ const Header = () => {
     const notification = useNotification();
     const location = useLocation();
     
-    // Use localStorage for cart count in header - no API calls needed
     const [cartCount, setCartCount] = useState(() => {
         if (!isAuthenticated) return 0;
         try {
@@ -40,7 +39,6 @@ const Header = () => {
         }
     });
     
-    // Listen for cart count changes from other components
     useEffect(() => {
         if (!isAuthenticated) {
             setCartCount(0);
@@ -55,8 +53,15 @@ const Header = () => {
         return () => window.removeEventListener('cartCountChanged', handleCartCountChange);
     }, [isAuthenticated]);
     
+    // Only load unread count on chat-related or main app pages, not on static pages
+    const chatRelatedPages = [ROUTES.CHAT, ROUTES.DASHBOARD, ROUTES.LISTINGS, ROUTES.MY_LISTINGS, ROUTES.SHOPPING_CART];
+    const isStaticPage = location.pathname.includes('/agreements') || 
+                        location.pathname.includes('/terms') || 
+                        location.pathname.includes('/privacy') ||
+                        location.pathname === ROUTES.HOME;
+    
     const { totalUnread, setTotalUnread } = useTotalUnreadCount({ 
-        enabled: isAuthenticated && location.pathname !== ROUTES.HOME 
+        enabled: isAuthenticated && !isStaticPage
     });
 
     const handleChatClick = () => {
