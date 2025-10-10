@@ -170,7 +170,7 @@ public class ChatService {
     public Page<ChatMessageDto> getChatMessages(Long chatRoomId, Pageable pageable) {
         log.info("Getting messages for chat room: {}", chatRoomId);
         
-        Page<Message> messages = messageRepository.findByChatRoomIdOrderByCreatedAtDesc(chatRoomId, pageable);
+        Page<Message> messages = messageRepository.findByChatRoomIdOrderByCreatedAtAsc(chatRoomId, pageable);
         log.info("Found {} messages for chat room {}", messages.getTotalElements(), chatRoomId);
         
         messages.getContent().forEach(message -> {

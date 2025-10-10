@@ -187,8 +187,7 @@ export const useChat = (userId) => {
 
     useEffect(() => {
         if (chatMessages?.content) {
-            const sortedMessages = [...chatMessages.content].reverse();
-            setMessages(sortedMessages);
+            setMessages(chatMessages.content);
         }
     }, [chatMessages]);
 

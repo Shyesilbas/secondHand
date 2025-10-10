@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 
 export const useChatWindow = ({ selectedChatRoom, onSendMessage }) => {
   const [messageText, setMessageText] = useState('');
@@ -6,12 +6,16 @@ export const useChatWindow = ({ selectedChatRoom, onSendMessage }) => {
   const inputRef = useRef(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesEndRef.current;
+    if (el) {
+      const container = el.closest('.overflow-y-auto');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      } else if (typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }
+    }
   }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [scrollToBottom, selectedChatRoom]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

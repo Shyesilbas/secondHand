@@ -82,6 +82,7 @@ const EmailsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => { fetchEmails(); }, []);
 
@@ -123,9 +124,17 @@ const EmailsPage = () => {
         onSuccess: () => { setEmails([]); setSelectedEmail(null); }
     });
 
-    const filteredEmails = useMemo(() =>
-            filterType === 'ALL' ? emails : emails.filter(email => email.emailType === filterType),
-        [emails, filterType]
+    const filteredEmails = useMemo(() => {
+            const byType = filterType === 'ALL' ? emails : emails.filter(email => email.emailType === filterType);
+            if (!searchTerm || !searchTerm.trim()) return byType;
+            const q = searchTerm.toLowerCase().trim();
+            return byType.filter(e =>
+                e.subject?.toLowerCase().includes(q) ||
+                e.senderEmail?.toLowerCase().includes(q) ||
+                e.recipientEmail?.toLowerCase().includes(q) ||
+                e.content?.toLowerCase().includes(q)
+            );
+        }, [emails, filterType, searchTerm]
     );
 
     if (isLoading) return <EmailsPageLoader />;
@@ -133,8 +142,24 @@ const EmailsPage = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <PageHeader title="Email History" subtitle="View all emails sent to your account" onBack={() => navigate(-1)} />
-            <div className="flex justify-end mb-6">
-                <EmailFilterTabs filterType={filterType} onFilterChange={setFilterType} onDeleteAll={handleDeleteAllEmails} hasEmails={filteredEmails.length > 0} isDeleting={isDeleting} />
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
+                <div className="flex-1">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search emails by subject, sender, recipient, or content"
+                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z" />
+                        </svg>
+                    </div>
+                </div>
+                <div className="flex-none">
+                    <EmailFilterTabs filterType={filterType} onFilterChange={setFilterType} onDeleteAll={handleDeleteAllEmails} hasEmails={filteredEmails.length > 0} isDeleting={isDeleting} />
+                </div>
             </div>
             <EmailsPageFeedback error={error} emails={filteredEmails} filterType={filterType} />
             {filteredEmails.length > 0 && (
