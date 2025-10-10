@@ -154,6 +154,21 @@ const RegisterPage = () => {
                     <div className="flex-grow border-t border-gray-200"></div>
                 </div>
 
+                <div>
+                    <a
+                        href="/api/auth/oauth2/google"
+                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 border border-header-border rounded-md shadow-sm text-sm font-medium text-text-secondary bg-white hover:bg-app-bg"
+                    >
+                        <svg className="h-5 w-5" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4"/>
+                            <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853"/>
+                            <path d="M120.1 325.1c-10.2-30.2-10.2-62.9 0-93.1V161.8h-90.9c-38.2 76.3-38.2 168.4 0 244.7l90.9-81.4z" fill="#FBBC05"/>
+                            <path d="M272.1 107.7c39.8-.6 78 14.5 107.3 42.4l80.1-80.1C406.9 24 344.9-.1 272.1 0 165.3 0 73.8 60.2 29.2 148.8l90.9 70.2c21.4-64.1 81.3-111.8 152-111.3z" fill="#EA4335"/>
+                        </svg>
+                        Continue with Google
+                    </a>
+                </div>
+
                 <div className="text-center text-sm">
                     <span className="text-gray-500">Already have an account? </span>
                     <Link to={ROUTES.LOGIN} className="text-indigo-600 hover:text-indigo-500 font-medium">

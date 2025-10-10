@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PaperAirplaneIcon, XMarkIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
@@ -33,8 +33,37 @@ const ChatWindow = ({
         messagesEndRef,
         inputRef,
         handleKeyPress,
-        handleSendMessage
+        handleSendMessage,
+        scrollToBottom
     } = useChatWindow({ selectedChatRoom, onSendMessage });
+
+    const prevLenRef = useRef(messages?.length || 0);
+    const messagesContainerRef = useRef(null);
+    const prevChatRoomIdRef = useRef(selectedChatRoom?.id);
+
+    useEffect(() => {
+        const currentChatRoomId = selectedChatRoom?.id;
+        const prevChatRoomId = prevChatRoomIdRef.current;
+        
+        if (currentChatRoomId !== prevChatRoomId) {
+            prevChatRoomIdRef.current = currentChatRoomId;
+            prevLenRef.current = 0;
+            // Yeni conversation seçildiğinde scroll'u biraz geciktir
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        } else if (messages?.length > 0 && !isLoadingMessages) {
+            const prev = prevLenRef.current;
+            const curr = messages?.length || 0;
+            if (prev === 0 || curr > prev) {
+                // İlk yükleme veya yeni mesaj geldiğinde scroll
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 50);
+                prevLenRef.current = curr;
+            }
+        }
+    }, [messages, selectedChatRoom, scrollToBottom, isLoadingMessages]);
 
     const handleListingTitleClick = () => {
         if (selectedChatRoom?.listingId) {
@@ -85,9 +114,9 @@ const ChatWindow = ({
 
     if (isEmbedded) {
         return (
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col overflow-hidden">
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto space-y-4">
+                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto max-h-[calc(100vh-300px)] space-y-4 p-6">
                     {isLoadingMessages ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -116,7 +145,7 @@ const ChatWindow = ({
                 </div>
 
                 {/* Input */}
-                <div className="border-t border-gray-200 bg-white p-4">
+                <div className="border-t border-gray-200 bg-white p-4 flex-shrink-0">
                     <div className="flex items-end space-x-3">
                         <div className="flex-1">
                             <textarea
@@ -201,7 +230,7 @@ const ChatWindow = ({
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 max-h-full">
                 {isLoadingMessages ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
