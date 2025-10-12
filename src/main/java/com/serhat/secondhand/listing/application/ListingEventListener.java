@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
@@ -26,6 +27,7 @@ public class ListingEventListener {
     private final ListingRepository listingRepository;
     private final EmailService emailService;
     private final PaymentMapper paymentMapper;
+    private final EWalletService eWalletService;
 
     @EventListener
     @Transactional
@@ -53,6 +55,16 @@ public class ListingEventListener {
                 listing.setStatus(ListingStatus.SOLD);
                 listingRepository.save(listing);
                 log.info("Listing {} marked as SOLD due to successful purchase payment.", listing.getId());
+                
+                // Transfer earnings to seller's e-wallet
+                if (payment.getToUser() != null) {
+                    try {
+                        eWalletService.creditToUser(payment.getToUser(), payment.getAmount());
+                        log.info("Transferred {} to seller's e-wallet for listing {}", payment.getAmount(), listing.getId());
+                    } catch (Exception e) {
+                        log.error("Failed to transfer earnings to seller's e-wallet: {}", e.getMessage());
+                    }
+                }
             } else {
                 log.warn("Received item purchase payment for listing {} which is not in ACTIVE status (current: {}).", 
                          listing.getId(), listing.getStatus());

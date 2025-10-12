@@ -31,9 +31,6 @@ public class BankPaymentStrategy implements PaymentStrategy {
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
         try {
             bankService.debit(fromUser, amount);
-            if (toUser != null) {
-                bankService.credit(toUser, amount);
-            }
             return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.TRANSFER, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         } catch (Exception e) {
             return PaymentResult.failure(e.getMessage(), amount, PaymentType.TRANSFER, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);

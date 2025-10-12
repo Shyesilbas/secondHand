@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { PaperAirplaneIcon, XMarkIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import { useChatWindow } from '../hooks/useChatWindow.js';
-import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
-import EmptyState from '../../common/components/ui/EmptyState.jsx';
-import { chatService } from '../services/chatService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import React, {useEffect, useRef, useState} from 'react';
+import {EllipsisVerticalIcon, PaperAirplaneIcon, TrashIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {useNavigate} from 'react-router-dom';
+import {formatDistanceToNow} from 'date-fns';
+import {enUS} from 'date-fns/locale';
+import {useChatWindow} from '../hooks/useChatWindow.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 const ChatWindow = ({
                         isOpen,
@@ -48,7 +45,6 @@ const ChatWindow = ({
         if (currentChatRoomId !== prevChatRoomId) {
             prevChatRoomIdRef.current = currentChatRoomId;
             prevLenRef.current = 0;
-            // Yeni conversation seçildiğinde scroll'u biraz geciktir
             setTimeout(() => {
                 scrollToBottom();
             }, 100);
@@ -56,7 +52,6 @@ const ChatWindow = ({
             const prev = prevLenRef.current;
             const curr = messages?.length || 0;
             if (prev === 0 || curr > prev) {
-                // İlk yükleme veya yeni mesaj geldiğinde scroll
                 setTimeout(() => {
                     scrollToBottom();
                 }, 50);
@@ -98,7 +93,6 @@ const ChatWindow = ({
         notification.showSuccess('Success', 'Message deleted successfully.');
     };
 
-    // Removed duplicate markMessagesAsRead call - it's already handled in useChat hook
 
     if (!isOpen) return null;
 

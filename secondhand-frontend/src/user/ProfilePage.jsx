@@ -7,6 +7,7 @@ import { UpdatePhoneRequestDTO } from './users.js';
 import PhoneUpdateModal from '../common/components/modals/PhoneUpdateModal.jsx';
 import AddressList from './components/AddressList.jsx';
 import { useUserReviewStats } from '../reviews/index.js';
+import { formatPhoneForDisplay } from '../common/utils/phoneFormatter.js';
 
 const TABS = [
     { key: 'personal', label: 'Personal Info' },
@@ -164,7 +165,7 @@ const ProfilePage = () => {
                                 />
                                 <InfoField
                                     label="Phone Number"
-                                    value={user?.phoneNumber || 'Not provided'}
+                                    value={user?.phoneNumber ? formatPhoneForDisplay(user.phoneNumber) : 'Not provided'}
                                     action={
                                         <button
                                             onClick={() => {

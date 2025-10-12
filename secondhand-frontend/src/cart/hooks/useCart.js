@@ -27,8 +27,10 @@ export const useCart = (options = {}) => {
         retry: 1,
     });
 
-    // Calculate cart count from cart items instead of separate API call
-    const cartCount = Array.isArray(cartItems) ? cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 0;
+    // Calculate cart count from cart items
+    const cartCount = loadCartItems && Array.isArray(cartItems) ? 
+        cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 
+        parseInt(localStorage.getItem('cartCount') || '0', 10);
     
     // Update localStorage and dispatch event when cart count changes
     useEffect(() => {
@@ -103,8 +105,8 @@ export const useCart = (options = {}) => {
         removeFromCartMutation.mutate(listingId);
     };
 
-    const clearCart = () => {
-        clearCartMutation.mutate();
+    const clearCart = async () => {
+        await clearCartMutation.mutateAsync();
     };
 
     const checkInCart = (listingId) => {

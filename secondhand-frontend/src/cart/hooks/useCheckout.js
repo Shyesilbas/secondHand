@@ -115,7 +115,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             };
             console.debug('Checkout payload:', payload);
             await orderService.checkout(payload);
-            clearCart();
+            await clearCart();
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
             navigate('/profile/orders');
         } catch (e) {

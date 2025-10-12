@@ -79,6 +79,7 @@ const RegisterPage = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
+                        placeholder="+90 5XX XXX XX XX"
                         error={errors.phone}
                         required
                     />
@@ -101,6 +102,17 @@ const RegisterPage = () => {
                         required
                     />
                 )}
+
+                <AuthInput
+                    label="Birth Date"
+                    type="text"
+                    name="birthdate"
+                    value={formData.birthdate}
+                    onChange={handleChange}
+                    placeholder="DD/MM/YYYY"
+                    error={errors.birthdate}
+                    required
+                />
 
                 <div className="grid grid-cols-2 gap-3">
                     <PasswordInput

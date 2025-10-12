@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatPhoneNumber } from '../../utils/phoneFormatter.js';
 
 const PhoneUpdateModal = ({ isOpen, formData, handleChange, submit, closeModal, isUpdating }) => {
     if (!isOpen) return null;
@@ -20,10 +21,12 @@ const PhoneUpdateModal = ({ isOpen, formData, handleChange, submit, closeModal, 
                         <input
                             type="tel"
                             value={formData.newPhone}
-                            onChange={(e) => handleChange('newPhone', e.target.value)}
+                            onChange={(e) => {
+                                const formattedPhone = formatPhoneNumber(e.target.value, true);
+                                handleChange('newPhone', formattedPhone);
+                            }}
                             className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="05321234567"
-                            maxLength="11"
+                            placeholder="+90 5XX XXX XX XX"
                         />
                     </div>
 
