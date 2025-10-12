@@ -30,7 +30,7 @@ export const useCart = (options = {}) => {
     // Calculate cart count from cart items
     const cartCount = loadCartItems && Array.isArray(cartItems) ? 
         cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 
-        parseInt(localStorage.getItem('cartCount') || '0', 10);
+        0; // Default to 0 instead of localStorage to avoid stale data
     
     // Update localStorage and dispatch event when cart count changes
     useEffect(() => {
@@ -43,9 +43,14 @@ export const useCart = (options = {}) => {
         const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => 
             cartService.addToCart(listingId, quantity, notes),
-        onSuccess: () => {
-            // Only invalidate cart items - count is calculated from items
+        onSuccess: (data, variables) => {
+            // Invalidate cart items to refresh the count
             queryClient.invalidateQueries(['cartItems']);
+            // Also update localStorage immediately for instant UI feedback
+            const currentCount = parseInt(localStorage.getItem('cartCount') || '0', 10);
+            const newCount = currentCount + (variables.quantity || 1);
+            localStorage.setItem('cartCount', newCount.toString());
+            window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: newCount }));
         },
         onError: (error) => {
             console.error('Failed to add to cart:', error);
@@ -67,8 +72,10 @@ export const useCart = (options = {}) => {
         const removeFromCartMutation = useMutation({
         mutationFn: (listingId) => cartService.removeFromCart(listingId),
         onSuccess: () => {
-            // Only invalidate cart items - count is calculated from items
+            // Invalidate cart items to refresh the count
             queryClient.invalidateQueries(['cartItems']);
+            // Trigger immediate UI update
+            window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: 'refresh' }));
         },
         onError: (error) => {
             console.error('Failed to remove from cart:', error);
@@ -78,8 +85,11 @@ export const useCart = (options = {}) => {
         const clearCartMutation = useMutation({
         mutationFn: () => cartService.clearCart(),
         onSuccess: () => {
-            // Only invalidate cart items - count is calculated from items
+            // Invalidate cart items to refresh the count
             queryClient.invalidateQueries(['cartItems']);
+            // Clear localStorage and trigger immediate UI update
+            localStorage.setItem('cartCount', '0');
+            window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: 0 }));
         },
         onError: (error) => {
             console.error('Failed to clear cart:', error);

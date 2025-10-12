@@ -10,7 +10,7 @@ const AddToCartButton = ({
                              className = ''
                          }) => {
     const { user } = useAuth();
-    const { addToCart, isAddingToCart, checkInCart } = useCart({ loadCartItems: false });
+    const { addToCart, isAddingToCart, checkInCart } = useCart({ loadCartItems: true });
     const [isInCart, setIsInCart] = useState(false);
     const [isChecking, setIsChecking] = useState(false);
 
