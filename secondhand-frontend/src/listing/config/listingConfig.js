@@ -148,6 +148,8 @@ export const listingTypeConfig = {
       { value: 'brand', label: 'Brand' },
       { value: 'type', label: 'Type' },
       { value: 'condition', label: 'Condition' },
+      { value: 'clothingGender', label: 'Clothing Gender' },
+      { value: 'clothingCategory', label: 'Clothing Category' },
       { value: 'purchaseDate', label: 'Purchase Date' },
       { value: 'price', label: 'Price' },
       { value: 'createdAt', label: 'Date Added' }
@@ -158,6 +160,8 @@ export const listingTypeConfig = {
       { label: listing.clothingType, icon: '👕', show: !!listing.clothingType },
       { label: listing.color, icon: '🎨', show: !!listing.color },
       { label: listing.condition, icon: '⭐', show: !!listing.condition },
+      { label: listing.clothingGender, icon: '👤', show: !!listing.clothingGender },
+      { label: listing.clothingCategory, icon: '👶', show: !!listing.clothingCategory },
       { 
         label: listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : null, 
         icon: '📅', 

@@ -3,6 +3,8 @@ package com.serhat.secondhand.listing.domain.dto.request.clothing;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import jakarta.validation.constraints.Size;
@@ -23,5 +25,7 @@ public record ClothingUpdateRequest(
     Optional<ClothingType> clothingType,
     Optional<Color> color,
     Optional<LocalDate> purchaseDate,
-    Optional<ClothingCondition> condition
+    Optional<ClothingCondition> condition,
+    Optional<ClothingGender> clothingGender,
+    Optional<ClothingCategory> clothingCategory
 ) {}

@@ -57,7 +57,6 @@ public class ClothingListingService {
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
         var oldPrice = existing.getPrice();
-        var oldCurrency = existing.getCurrency();
 
                 request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
@@ -71,6 +70,8 @@ public class ClothingListingService {
         request.color().ifPresent(existing::setColor);
         request.purchaseDate().ifPresent(existing::setPurchaseDate);
         request.condition().ifPresent(existing::setCondition);
+        request.clothingGender().ifPresent(existing::setClothingGender);
+        request.clothingCategory().ifPresent(existing::setClothingCategory);
 
         clothingRepository.save(existing);
 

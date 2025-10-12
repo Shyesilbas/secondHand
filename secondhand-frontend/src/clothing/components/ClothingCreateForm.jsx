@@ -39,13 +39,15 @@ const ClothingCreateForm = ({ onBack, initialData = null, isEdit = false, onUpda
       case 2:
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {['brand', 'clothingType', 'color', 'condition'].map((field) => (
+              {['brand', 'clothingType', 'color', 'condition', 'clothingGender', 'clothingCategory'].map((field) => (
                   <div key={field}>
                     <EnumDropdown
-                        label={field.charAt(0).toUpperCase() + field.slice(1) + ' *'}
+                        label={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1') + ' *'}
                         enumKey={field === 'brand' ? 'clothingBrands' :
                             field === 'clothingType' ? 'clothingTypes' :
-                                field === 'condition' ? 'clothingConditions' : 'colors'}
+                                field === 'condition' ? 'clothingConditions' :
+                                    field === 'clothingGender' ? 'clothingGenders' :
+                                        field === 'clothingCategory' ? 'clothingCategories' : 'colors'}
                         value={formData[field]}
                         onChange={(v) => handleDropdownChange(field, v)}
                     />

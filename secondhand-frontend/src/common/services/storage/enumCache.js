@@ -19,6 +19,8 @@ const ENUM_CACHE_VERSION = '2.2'; const REQUIRED_ENUM_KEYS = [
     'clothingBrands',
   'clothingTypes',
   'clothingConditions',
+  'clothingGenders',
+  'clothingCategories',
     'bookGenres',
   'bookLanguages',
   'bookFormats',

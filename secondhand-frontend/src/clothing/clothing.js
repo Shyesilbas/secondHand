@@ -11,7 +11,9 @@ export const createClothingCreateRequest = (data) => ({
     clothingType: data.clothingType,
     color: data.color,
     purchaseDate: data.purchaseDate,
-    condition: data.condition
+    condition: data.condition,
+    clothingGender: data.clothingGender,
+    clothingCategory: data.clothingCategory
 });
 
 export const createClothingUpdateRequest = (data) => ({
@@ -25,7 +27,9 @@ export const createClothingUpdateRequest = (data) => ({
     clothingType: data.clothingType ? data.clothingType : undefined,
     color: data.color ? data.color : undefined,
     purchaseDate: data.purchaseDate ? data.purchaseDate : undefined,
-    condition: data.condition ? data.condition : undefined
+    condition: data.condition ? data.condition : undefined,
+    clothingGender: data.clothingGender ? data.clothingGender : undefined,
+    clothingCategory: data.clothingCategory ? data.clothingCategory : undefined
 });
 
 export const ClothingListingDTO = {
@@ -90,6 +94,8 @@ export const createClothingFilterRequest = (data) => ({
     types: Array.isArray(data.types) ? data.types : [],
     colors: Array.isArray(data.colors) ? data.colors : [],
     conditions: Array.isArray(data.conditions) ? data.conditions : [],
+    clothingGenders: Array.isArray(data.clothingGenders) ? data.clothingGenders : [],
+    clothingCategories: Array.isArray(data.clothingCategories) ? data.clothingCategories : [],
     minPurchaseDate: data.minPurchaseDate || null,
     maxPurchaseDate: data.maxPurchaseDate || null,
     

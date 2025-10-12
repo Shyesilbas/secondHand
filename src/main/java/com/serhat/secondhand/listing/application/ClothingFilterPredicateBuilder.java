@@ -40,6 +40,14 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
             predicates.add(root.get("condition").in(filters.getConditions()));
         }
         
+        if (filters.getClothingGenders() != null && !filters.getClothingGenders().isEmpty()) {
+            predicates.add(root.get("clothingGender").in(filters.getClothingGenders()));
+        }
+        
+        if (filters.getClothingCategories() != null && !filters.getClothingCategories().isEmpty()) {
+            predicates.add(root.get("clothingCategory").in(filters.getClothingCategories()));
+        }
+        
         // Date range filters
         if (filters.getMinPurchaseDate() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("purchaseDate"), filters.getMinPurchaseDate()));
@@ -60,6 +68,8 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
             case "brand" -> Optional.of(root.get("brand"));
             case "type" -> Optional.of(root.get("clothingType"));
             case "condition" -> Optional.of(root.get("condition"));
+            case "clothingGender" -> Optional.of(root.get("clothingGender"));
+            case "clothingCategory" -> Optional.of(root.get("clothingCategory"));
             case "purchasedate", "purchase_date" -> Optional.of(root.get("purchaseDate"));
             default -> Optional.empty();
         };

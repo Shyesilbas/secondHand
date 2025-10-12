@@ -94,6 +94,8 @@ export const API_ENDPOINTS = {
         CLOTHING_BRANDS: '/v1/enums/clothing-brands',
         CLOTHING_TYPES: '/v1/enums/clothing-types',
         CLOTHING_CONDITIONS: '/v1/enums/clothing-conditions',
+        CLOTHING_GENDERS: '/v1/enums/clothing-genders',
+        CLOTHING_CATEGORIES: '/v1/enums/clothing-categories',
         BOOK_GENRES: '/v1/enums/book-genres',
         BOOK_LANGUAGES: '/v1/enums/book-languages',
         BOOK_FORMATS: '/v1/enums/book-formats',

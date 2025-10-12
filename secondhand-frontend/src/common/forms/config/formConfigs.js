@@ -146,12 +146,12 @@ export const clothingFormConfig = {
   totalSteps: 3,
   initialData: {
     title: '', description: '', price: '', currency: 'TRY', brand: '', clothingType: '', color: '',
-    condition: '', purchaseDate: '', city: '', district: ''
+    condition: '', clothingGender: '', clothingCategory: '', purchaseDate: '', city: '', district: ''
   },
   steps: [basicInfoStep, clothingDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
-    step2: ['brand', 'clothingType', 'color', 'condition', 'purchaseDate'],
+    step2: ['brand', 'clothingType', 'color', 'condition', 'clothingGender', 'clothingCategory', 'purchaseDate'],
     step3: ['city', 'district']
   }
 };
