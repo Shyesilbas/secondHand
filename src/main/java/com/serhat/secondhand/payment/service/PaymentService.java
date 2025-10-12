@@ -126,6 +126,7 @@ public class PaymentService {
         payment = paymentRepository.save(payment);
 
         if (result.success()) {
+            // PaymentCompletedEvent will handle seller eWallet credit via ListingEventListener
             eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
         }
 

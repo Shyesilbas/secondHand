@@ -91,7 +91,7 @@ public class OrderPaymentService {
                 .toUserId(sellerId)
                 .receiverName(sellerInfo.name())
                 .receiverSurname(sellerInfo.surname())
-                .listingId(null)
+                .listingId(sellerItems.get(0).getListing().getId()) 
                 .amount(sellerTotal)
                 .paymentType(resolvePaymentType(request))
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
