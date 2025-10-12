@@ -2,12 +2,15 @@ import apiClient from './config.js';
 
 export const request = async (method, url, data, config = {}) => {
   const start = performance.now();
+  console.log(`API Request: ${method.toUpperCase()} ${url}`, { data, config }); // Debug log
   try {
     const response = await apiClient({ method, url, data, ...config });
+    console.log(`API Response: ${method.toUpperCase()} ${url}`, response.data); // Debug log
     if (import.meta.env.DEV) {
     }
     return response.data;
   } catch (error) {
+    console.error(`API Error: ${method.toUpperCase()} ${url}`, error); // Debug log
     if (import.meta.env.DEV) {
     }
     throw error;

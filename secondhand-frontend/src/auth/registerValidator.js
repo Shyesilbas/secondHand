@@ -1,3 +1,5 @@
+import { validatePhoneNumber } from '../common/utils/phoneFormatter.js';
+
 export const validateRegisterForm = (formData, acceptedAgreements, agreements) => {
   const errors = {};
 
@@ -19,14 +21,36 @@ export const validateRegisterForm = (formData, acceptedAgreements, agreements) =
     errors.email = 'Please enter a valid email address';
   }
 
-    if (!formData.phone?.trim()) {
+  if (!formData.phone?.trim()) {
     errors.phone = 'Phone number is required';
-  } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ''))) {
-    errors.phone = 'Please enter a valid phone number';
+  } else {
+    const phoneValidation = validatePhoneNumber(formData.phone);
+    if (!phoneValidation.valid) {
+      errors.phone = phoneValidation.error;
+    }
   }
 
     if (!formData.gender) {
     errors.gender = 'Gender is required';
+  }
+
+  if (!formData.birthdate?.trim()) {
+    errors.birthdate = 'Birth date is required';
+  } else if (!/^\d{2}\/\d{2}\/\d{4}$/.test(formData.birthdate.trim())) {
+    errors.birthdate = 'Please enter birth date in DD/MM/YYYY format';
+  } else {
+    // Validate the date
+    const [day, month, year] = formData.birthdate.trim().split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    const currentDate = new Date();
+    
+    if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
+      errors.birthdate = 'Please enter a valid date';
+    } else if (date > currentDate) {
+      errors.birthdate = 'Birth date cannot be in the future';
+    } else if (year < 1900 || year > currentDate.getFullYear() - 13) {
+      errors.birthdate = 'Age must be at least 13 years old';
+    }
   }
 
     if (!formData.password) {

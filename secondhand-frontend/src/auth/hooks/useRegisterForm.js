@@ -7,6 +7,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {useRegisterAgreements} from '../../agreements/hooks/useRegisterAgreements.js';
 import {validateRegisterForm} from '../registerValidator.js';
 import {useGenderEnum} from '../../common/hooks/useGenderEnum.js';
+import {formatPhoneNumber} from '../../common/utils/phoneFormatter.js';
 
 export const useRegisterForm = () => {
   const [formData, setFormData] = useState({ ...RegisterRequestDTO, confirmPassword: '' });
@@ -21,7 +22,30 @@ export const useRegisterForm = () => {
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Special handling for birthdate to format DD/MM/YYYY
+    if (name === 'birthdate') {
+      // Remove all non-numeric characters
+      let formattedValue = value.replace(/\D/g, '');
+      
+      // Add slashes at appropriate positions
+      if (formattedValue.length >= 2) {
+        formattedValue = formattedValue.substring(0, 2) + '/' + formattedValue.substring(2);
+      }
+      if (formattedValue.length >= 5) {
+        formattedValue = formattedValue.substring(0, 5) + '/' + formattedValue.substring(5, 9);
+      }
+      
+      setFormData(prev => ({ ...prev, [name]: formattedValue }));
+    } 
+    // Special handling for phone number formatting
+    else if (name === 'phone') {
+      const formattedPhone = formatPhoneNumber(value, true);
+      setFormData(prev => ({ ...prev, [name]: formattedPhone }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   }, [errors]);
 
@@ -41,7 +65,8 @@ export const useRegisterForm = () => {
         email: formData.email.trim(),
         password: formData.password,
         gender: formData.gender,
-        phoneNumber: formData.phone?.replace(/\s/g, '') || '',
+        phoneNumber: formData.phone || '',
+        birthdate: formData.birthdate,
         agreementsAccepted: agreementsApi.acceptedAgreements.size === agreementsApi.agreements.length,
         acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
       };

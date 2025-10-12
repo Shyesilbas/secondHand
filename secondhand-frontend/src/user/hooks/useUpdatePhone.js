@@ -3,6 +3,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { userService } from '../services/userService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { UpdatePhoneRequestDTO } from '../users.js';
+import { validatePhoneNumber, formatPhoneForDisplay } from '../../common/utils/phoneFormatter.js';
 
 export const useUpdatePhone = () => {
     const [isUpdating, setIsUpdating] = useState(false);
@@ -13,21 +14,23 @@ export const useUpdatePhone = () => {
     const { updateUser } = useAuth();
 
     const validate = (newPhone, password) => {
-        const cleanPhone = (newPhone || '').replace(/\D/g, '');
-
-        if (!cleanPhone) {
+        if (!newPhone?.trim()) {
             notification.showError('Error', 'Please enter a phone number');
             return { valid: false };
         }
-        if (cleanPhone.length !== 11) {
-            notification.showError('Error', 'Phone number must be 11 digits');
+        
+        const phoneValidation = validatePhoneNumber(newPhone);
+        if (!phoneValidation.valid) {
+            notification.showError('Error', phoneValidation.error);
             return { valid: false };
         }
+        
         if (!password?.trim()) {
             notification.showError('Error', 'Please enter your password');
             return { valid: false };
         }
-        return { valid: true, cleanPhone };
+        
+        return { valid: true, cleanPhone: newPhone };
     };
 
     const handleChange = (field, value) => {

@@ -8,8 +8,8 @@ import AuthInput from '../common/components/ui/AuthInput.jsx';
 import AuthButton from '../common/components/ui/AuthButton.jsx';
 import { SuccessIcon, WarningIcon } from '../common/Icons.jsx';
 
-const VerificationButton = ({ onClick, isLoading, disabled, children }) => (
-    <AuthButton onClick={onClick} isLoading={isLoading} disabled={disabled} className="w-full">
+const VerificationButton = ({ onClick, isLoading, disabled, children, type = 'button' }) => (
+    <AuthButton type={type} onClick={onClick} isLoading={isLoading} disabled={disabled} className="w-full">
         {isLoading ? 'Processing...' : children}
     </AuthButton>
 );
@@ -77,18 +77,31 @@ const AccountVerificationPage = () => {
 
     const handleVerifyCode = async (e) => {
         e.preventDefault();
+        console.log('handleVerifyCode called'); // Debug log
+        
         const code = verificationData.code.trim();
-        if (!code) return setErrors({ code: 'Please enter the verification code' });
-        if (code.length !== 6) return setErrors({ code: 'Verification code must be 6 digits' });
+        console.log('Verification code:', code); // Debug log
+        
+        if (!code) {
+            console.log('No code entered');
+            return setErrors({ code: 'Please enter the verification code' });
+        }
+        if (code.length !== 6) {
+            console.log('Code length invalid:', code.length);
+            return setErrors({ code: 'Verification code must be 6 digits' });
+        }
 
         setIsLoading(true);
         setErrors({});
         try {
+            console.log('Calling verificationService.verify...'); // Debug log
             await verificationService.verify({ code });
+            console.log('Verification successful'); // Debug log
             updateUser({ accountVerified: true });
             notification.showSuccess('Success', 'Your account has been verified.');
             setTimeout(() => navigate(ROUTES.PROFILE), 2000);
         } catch (error) {
+            console.error('Verification error:', error); // Debug log
             const msg = error.response?.data?.message;
             if (msg?.toLowerCase().includes('code') || msg?.toLowerCase().includes('invalid') || msg?.toLowerCase().includes('expired')) {
                 setErrors({ code: msg });
@@ -132,7 +145,10 @@ const AccountVerificationPage = () => {
                         </VerificationButton>
                     </div>
                 ) : (
-                    <form className="mt-8 space-y-6" onSubmit={handleVerifyCode}>
+                    <form className="mt-8 space-y-6" onSubmit={(e) => {
+                        console.log('Form submit triggered'); // Debug log
+                        handleVerifyCode(e);
+                    }}>
                         <div className="space-y-4">
                             <AuthInput
                                 label="Verification Code"
@@ -153,7 +169,12 @@ const AccountVerificationPage = () => {
                         </div>
 
                         <div className="flex space-x-4">
-                            <VerificationButton type="submit" isLoading={isLoading} disabled={isLoading || verificationData.code.length !== 6}>
+                            <VerificationButton 
+                                type="submit" 
+                                isLoading={isLoading} 
+                                disabled={isLoading || verificationData.code.length !== 6}
+                                onClick={() => console.log('Verify button clicked')}
+                            >
                                 Verify Account
                             </VerificationButton>
                             <button

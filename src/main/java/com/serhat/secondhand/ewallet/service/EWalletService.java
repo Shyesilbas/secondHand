@@ -206,23 +206,6 @@ public class EWalletService {
         eWalletRepository.save(fromWallet);
         log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
 
-        Optional.ofNullable(toUser).ifPresent(user -> {
-            EWallet toWallet = eWalletRepository.findByUser(user)
-                    .orElseGet(() -> {
-                        log.info("Creating new wallet for seller: {}", user.getEmail());
-                        return EWallet.builder()
-                                .user(user)
-                                .balance(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
-                                .walletLimit(new BigDecimal("10000.00").setScale(2, RoundingMode.HALF_UP))
-                                .build();
-                    });
-
-            log.info("Found seller wallet with balance: {}", toWallet.getBalance());
-            toWallet.setBalance(toWallet.getBalance().add(amount).setScale(2, RoundingMode.HALF_UP));
-            eWalletRepository.save(toWallet);
-            log.info("Credited {} to seller wallet. New balance: {}", amount, toWallet.getBalance());
-        });
-
         log.info("eWallet payment completed successfully: {} -> {} amount: {}",
                 fromUser != null ? fromUser.getEmail() : "SYSTEM",
                 toUser != null ? toUser.getEmail() : "SYSTEM",
@@ -236,6 +219,30 @@ public class EWalletService {
     private EWallet getEWalletOrThrow(User user) {
         return eWalletRepository.findByUser(user)
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
+    }
+
+    @Transactional
+    public void creditToUser(User user, BigDecimal amount) {
+        log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
+        
+        EWallet eWallet = eWalletRepository.findByUser(user)
+                .orElseGet(() -> {
+                    log.info("Creating new e-wallet for user: {}", user.getEmail());
+                    EWallet newWallet = EWallet.builder()
+                            .user(user)
+                            .balance(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
+                            .walletLimit(new BigDecimal("10000.00").setScale(2, RoundingMode.HALF_UP))
+                            .build();
+                    return eWalletRepository.save(newWallet);
+                });
+        
+        eWallet.setBalance(eWallet.getBalance().add(amount).setScale(2, RoundingMode.HALF_UP));
+        eWalletRepository.save(eWallet);
+        log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
+    }
+
+    public boolean hasEWallet(User user) {
+        return eWalletRepository.existsByUser(user);
     }
 
     private User getCurrentUser() {
