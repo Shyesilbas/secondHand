@@ -34,7 +34,7 @@ const Header = () => {
     // Use useCart hook for real-time cart count
     const { cartCount: hookCartCount } = useCart({ 
         enabled: isAuthenticated,
-        loadCartItems: false // We only need the count, not the full cart items
+        loadCartItems: true // We need cart items to calculate accurate count
     });
     
     const [cartCount, setCartCount] = useState(() => {
@@ -59,7 +59,13 @@ const Header = () => {
         
         // Listen for cart count changes
         const handleCartCountChange = (event) => {
-            setCartCount(parseInt(event.detail || '0', 10));
+            if (event.detail === 'refresh') {
+                // If it's a refresh signal, get the latest count from localStorage
+                const latestCount = parseInt(localStorage.getItem('cartCount') || '0', 10);
+                setCartCount(latestCount);
+            } else {
+                setCartCount(parseInt(event.detail || '0', 10));
+            }
         };
         
         window.addEventListener('cartCountChanged', handleCartCountChange);
