@@ -145,6 +145,7 @@ const FilterModal = ({
                                                         classNamePrefix="select"
                                                         placeholder={`Select ${field.label.toLowerCase()}...`}
                                                         menuPortalTarget={document.body}
+                                                        menuPosition="fixed"
                                                         styles={{
                                                             control: (base) => ({
                                                                 ...base,
@@ -188,6 +189,8 @@ const FilterModal = ({
                                                                 borderRadius: '8px',
                                                                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                                                                 zIndex: 9999,
+                                                                maxHeight: '200px',
+                                                                overflowY: 'auto',
                                                             }),
                                                             menuPortal: (base) => ({
                                                                 ...base,

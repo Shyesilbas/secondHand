@@ -9,6 +9,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
@@ -353,6 +355,34 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(conditions);
+    }
+
+    @GetMapping("/clothing-genders")
+    @Operation(summary = "Get all clothing genders")
+    public ResponseEntity<List<Map<String, Object>>> getClothingGenders() {
+        List<Map<String, Object>> genders = Arrays.stream(ClothingGender.values())
+                .map(gender -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", gender.name());
+                    map.put("label", getClothingGenderLabel(gender));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(genders);
+    }
+
+    @GetMapping("/clothing-categories")
+    @Operation(summary = "Get all clothing categories")
+    public ResponseEntity<List<Map<String, Object>>> getClothingCategories() {
+        List<Map<String, Object>> categories = Arrays.stream(ClothingCategory.values())
+                .map(category -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", category.name());
+                    map.put("label", getClothingCategoryLabel(category));
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/book-genres")
@@ -818,6 +848,27 @@ public class EnumController {
             case MALE -> "Male";
             case FEMALE -> "Female";
             case PREFER_NOT_TO_SAY -> "Prefer not to say";
+        };
+    }
+
+    private String getClothingGenderLabel(ClothingGender gender) {
+        return switch (gender) {
+            case MALE -> "Male";
+            case FEMALE -> "Female";
+        };
+    }
+
+    private String getClothingCategoryLabel(ClothingCategory category) {
+        return switch (category) {
+            case BOY_CHILD -> "Boy Child";
+            case GIRL_CHILD -> "Girl Child";
+            case BOY_BABY -> "Boy Baby";
+            case GIRL_BABY -> "Girl Baby";
+            case BOY_YOUTH -> "Boy Youth";
+            case GIRL_YOUTH -> "Girl Youth";
+            case MALE_ADULT -> "Male Adult";
+            case FEMALE_ADULT -> "Female Adult";
+            case UNISEX -> "Unisex";
         };
     }
 

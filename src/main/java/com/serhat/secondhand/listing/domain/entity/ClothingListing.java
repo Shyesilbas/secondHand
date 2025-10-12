@@ -3,6 +3,8 @@ package com.serhat.secondhand.listing.domain.entity;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -37,4 +38,12 @@ public class ClothingListing extends Listing {
 
     @Enumerated(EnumType.STRING)
     private ClothingCondition condition;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clothing_gender", nullable = false)
+    private ClothingGender clothingGender;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clothing_category", nullable = false)
+    private ClothingCategory clothingCategory;
 }

@@ -26,6 +26,8 @@ const ClothingDetails = ({ listing }) => {
         <DetailItem label="Type" value={getEnumLabel('clothingTypes', listing.clothingType)} />
         <DetailItem label="Color" value={getEnumLabel('colors', listing.color)} />
         <DetailItem label="Condition" value={getEnumLabel('clothingConditions', listing.condition)} />
+        <DetailItem label="Clothing Gender" value={getEnumLabel('clothingGenders', listing.clothingGender)} />
+        <DetailItem label="Clothing Category" value={getEnumLabel('clothingCategories', listing.clothingCategory)} />
         <DetailItem label="Purchase Date" value={listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : '-'} />
       </div>
     </div>

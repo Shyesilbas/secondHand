@@ -183,6 +183,8 @@ export const ClothingListingFilterDTO = {
   types: [],
   colors: [],
   conditions: [],
+  clothingGenders: [],
+  clothingCategories: [],
   minPurchaseDate: null,
   maxPurchaseDate: null,
   

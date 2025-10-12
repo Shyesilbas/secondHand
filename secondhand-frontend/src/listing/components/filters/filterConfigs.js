@@ -33,6 +33,8 @@ export const createClothingFilterConfig = () => {
     .addEnumField('types', 'Type', 'clothingTypes')
     .addEnumField('colors', 'Color', 'colors')
     .addEnumField('conditions', 'Condition', 'clothingConditions')
+    .addEnumField('clothingGenders', 'Clothing Gender', 'clothingGenders')
+    .addEnumField('clothingCategories', 'Clothing Category', 'clothingCategories')
     .addDateRangeField('purchaseDate', 'Purchase Date');
 };
 
