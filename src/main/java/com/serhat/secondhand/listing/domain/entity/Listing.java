@@ -50,6 +50,8 @@ public class Listing {
     private String city;
     private String district;
 
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User seller;
 

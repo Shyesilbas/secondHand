@@ -256,4 +256,8 @@ export const API_ENDPOINTS = {
     EXCHANGE: {
         RATE: (from, to) => `/v1/exchange/${from}/${to}`,
     },
+    IMAGES: {
+        UPLOAD: '/images/upload',
+        DELETE: '/images/delete',
+    },
 };

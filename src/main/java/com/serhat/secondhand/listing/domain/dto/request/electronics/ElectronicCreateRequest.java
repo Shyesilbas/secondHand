@@ -20,6 +20,7 @@ public record ElectronicCreateRequest (
         String origin,
         boolean warrantyProof,
         int year,
-        Color color
+        Color color,
+        String imageUrl
         ){
 }

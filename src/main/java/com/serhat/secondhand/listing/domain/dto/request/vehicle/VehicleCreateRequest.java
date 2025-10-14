@@ -26,5 +26,6 @@ public record VehicleCreateRequest(
     Integer fuelConsumption,
     Integer horsePower,
     Integer kilometersPerLiter,
-    FuelType fuelType
+    FuelType fuelType,
+    String imageUrl
 ) {} 

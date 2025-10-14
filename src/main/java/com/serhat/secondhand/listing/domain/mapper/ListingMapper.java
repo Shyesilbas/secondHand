@@ -34,36 +34,42 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     ClothingListingDto toClothingDto(ClothingListing clothingListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     BooksListingDto toBooksDto(BooksListing booksListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "imageUrl", source = "imageUrl")
     SportsListingDto toSportsDto(SportsListing sportsListing);
 
     @Mapping(target = "id", ignore = true)
