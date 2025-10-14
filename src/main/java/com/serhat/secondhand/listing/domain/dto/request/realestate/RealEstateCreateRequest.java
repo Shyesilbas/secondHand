@@ -24,6 +24,7 @@ public record RealEstateCreateRequest(
         Integer bathroomCount,
         Integer floor,
         Integer buildingAge,
-        boolean furnished
+        boolean furnished,
+        String imageUrl
 ) {
 }

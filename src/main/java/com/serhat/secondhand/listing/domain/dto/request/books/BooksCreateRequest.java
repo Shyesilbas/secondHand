@@ -22,7 +22,8 @@ public record BooksCreateRequest(
         @NotNull @Positive Integer pageCount,
         @NotNull BookFormat format,
         @NotNull BookCondition condition,
-        String isbn
+        String isbn,
+        String imageUrl
 ) {}
 
 

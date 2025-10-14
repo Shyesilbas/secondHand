@@ -13,7 +13,8 @@ export const createClothingCreateRequest = (data) => ({
     purchaseDate: data.purchaseDate,
     condition: data.condition,
     clothingGender: data.clothingGender,
-    clothingCategory: data.clothingCategory
+    clothingCategory: data.clothingCategory,
+    imageUrl: data.imageUrl || undefined
 });
 
 export const createClothingUpdateRequest = (data) => ({
@@ -29,7 +30,8 @@ export const createClothingUpdateRequest = (data) => ({
     purchaseDate: data.purchaseDate ? data.purchaseDate : undefined,
     condition: data.condition ? data.condition : undefined,
     clothingGender: data.clothingGender ? data.clothingGender : undefined,
-    clothingCategory: data.clothingCategory ? data.clothingCategory : undefined
+    clothingCategory: data.clothingCategory ? data.clothingCategory : undefined,
+    imageUrl: data.imageUrl ? data.imageUrl : undefined
 });
 
 export const ClothingListingDTO = {
@@ -73,11 +75,12 @@ export const createClothingListingDto = (data) => ({
     sellerSurname: data.sellerSurname,
     sellerId: data.sellerId,
     type: data.type,
-        brand: data.brand,
+    brand: data.brand,
     clothingType: data.clothingType,
     color: data.color,
     purchaseDate: data.purchaseDate,
-    condition: data.condition
+    condition: data.condition,
+    imageUrl: data.imageUrl
 });
 
 export const createClothingFilterRequest = (data) => ({

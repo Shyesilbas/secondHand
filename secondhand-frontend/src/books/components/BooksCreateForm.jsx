@@ -9,6 +9,7 @@ import { booksService } from '../services/booksService.js';
 import booksValidator from '../booksValidator.js';
 import { createFormConfig } from '../../common/forms/config/formConfigs.js';
 import ListingBasics from "../../common/components/forms/ListingBasics.jsx";
+import ImageUpload from '../../common/components/ImageUpload.jsx';
 
 const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate = null }) => {
   const { enums } = useEnums();
@@ -31,15 +32,23 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
 
+  const handleImageUpload = (imageUrl) => {
+    handleInputChange({ target: { name: 'imageUrl', value: imageUrl } });
+  };
+
+  const handleImageRemove = () => {
+    handleInputChange({ target: { name: 'imageUrl', value: '' } });
+  };
+
   const renderStep = (stepId) => {
     if (stepId === 1) {
-            return (
-          <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
+      return (
+        <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
       );
     }
 
     if (stepId === 2) {
-            const fields = formConfig.fieldGroups.step2;
+      const fields = formConfig.fieldGroups.step2;
       return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {fields.map((field) => {
@@ -78,7 +87,17 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
     }
 
     if (stepId === 3) {
-            return <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />;
+      return (
+        <div className="space-y-6">
+          <ImageUpload
+            onImageUpload={handleImageUpload}
+            onImageRemove={handleImageRemove}
+            imageUrl={formData.imageUrl}
+            disabled={false}
+          />
+          <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+        </div>
+      );
     }
 
     return null;

@@ -45,6 +45,7 @@ public abstract class ListingDto {
     private boolean isListingFeePaid;
     private String city;
     private String district;
+    private String imageUrl;
     private String sellerName;
     private String sellerSurname;
     private Long sellerId;

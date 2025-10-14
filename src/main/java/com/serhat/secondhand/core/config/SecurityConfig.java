@@ -105,6 +105,10 @@ public class SecurityConfig {
             "/v3/api-docs/**"
     );
 
+    private static final List<String> IMAGE_ENDPOINTS = Arrays.asList(
+            "/api/images/upload"
+    );
+
     private static final List<String> WEBSOCKET_ENDPOINTS = Arrays.asList(
             "/ws/**"
     );
@@ -144,6 +148,9 @@ public class SecurityConfig {
                         
                         // Documentation endpoints
                         .requestMatchers(DOCUMENTATION_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Image endpoints
+                        .requestMatchers(IMAGE_ENDPOINTS.toArray(new String[0])).authenticated()
                         
                         // WebSocket endpoints
                         .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()

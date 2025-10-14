@@ -16,7 +16,8 @@ public record SportsCreateRequest(
         @NotBlank String district,
         @NotNull SportDiscipline discipline,
         @NotNull SportEquipmentType equipmentType,
-        @NotNull SportCondition condition
+        @NotNull SportCondition condition,
+        String imageUrl
 ) {}
 
 

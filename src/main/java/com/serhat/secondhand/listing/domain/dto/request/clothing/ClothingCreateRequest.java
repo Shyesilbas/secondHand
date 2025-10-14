@@ -56,5 +56,7 @@ public record ClothingCreateRequest(
     ClothingGender clothingGender,
 
     @NotNull(message = "Clothing category is required")
-    ClothingCategory clothingCategory
+    ClothingCategory clothingCategory,
+
+    String imageUrl
 ) {}

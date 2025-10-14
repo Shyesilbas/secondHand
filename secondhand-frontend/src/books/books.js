@@ -38,6 +38,7 @@ export const createBooksCreateRequest = (data) => ({
   format: data.format,
   condition: data.condition,
   isbn: data.isbn || undefined,
+  imageUrl: data.imageUrl || undefined,
 });
 
 export const createBooksUpdateRequest = (data) => ({
@@ -55,6 +56,7 @@ export const createBooksUpdateRequest = (data) => ({
   format: data.format ?? undefined,
   condition: data.condition ?? undefined,
   isbn: data.isbn ?? undefined,
+  imageUrl: data.imageUrl ?? undefined,
 });
 
 export const createBooksListingDto = (data) => ({
@@ -82,6 +84,7 @@ export const createBooksListingDto = (data) => ({
   format: data.format,
   condition: data.condition,
   isbn: data.isbn,
+  imageUrl: data.imageUrl,
 });
 
 
