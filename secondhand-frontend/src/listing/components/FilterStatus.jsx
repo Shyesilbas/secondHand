@@ -23,13 +23,30 @@ const FilterStatus = ({
         const checkActiveFilters = hasActiveFilters || (() => {
         return filters.minPrice || filters.maxPrice || filters.city || filters.district ||
             (filters.brands && filters.brands.length > 0) ||
+            (filters.electronicBrands && filters.electronicBrands.length > 0) ||
             (filters.fuelTypes && filters.fuelTypes.length > 0) ||
             (filters.colors && filters.colors.length > 0) ||
             (filters.gearTypes && filters.gearTypes.length > 0) ||
             (filters.seatCounts && filters.seatCounts.length > 0) ||
             (filters.electronicTypes && filters.electronicTypes.length > 0) ||
-            (filters.electronicBrands && filters.electronicBrands.length > 0) ||
-            filters.minYear || filters.maxYear || filters.maxMileage;
+            (filters.types && filters.types.length > 0) ||
+            (filters.conditions && filters.conditions.length > 0) ||
+            (filters.clothingGenders && filters.clothingGenders.length > 0) ||
+            (filters.clothingCategories && filters.clothingCategories.length > 0) ||
+            (filters.genres && filters.genres.length > 0) ||
+            (filters.languages && filters.languages.length > 0) ||
+            (filters.formats && filters.formats.length > 0) ||
+            (filters.disciplines && filters.disciplines.length > 0) ||
+            (filters.equipmentTypes && filters.equipmentTypes.length > 0) ||
+            (filters.realEstateTypes && filters.realEstateTypes.length > 0) ||
+            (filters.adTypes && filters.adTypes.length > 0) ||
+            filters.minYear || filters.maxYear || filters.maxMileage ||
+            filters.minSquareMeters || filters.maxSquareMeters ||
+            filters.minRoomCount || filters.maxRoomCount ||
+            filters.minBuildingAge || filters.maxBuildingAge ||
+            filters.minFloor || filters.maxFloor ||
+            filters.minPageCount || filters.maxPageCount ||
+            filters.purchaseDateFrom || filters.purchaseDateTo;
     });
 
     const countActiveFilters = getActiveFilterCount || (() => {
@@ -37,14 +54,31 @@ const FilterStatus = ({
         if (filters.minPrice || filters.maxPrice) count++;
         if (filters.city || filters.district) count++;
         if (filters.brands && filters.brands.length > 0) count++;
+        if (filters.electronicBrands && filters.electronicBrands.length > 0) count++;
         if (filters.fuelTypes && filters.fuelTypes.length > 0) count++;
         if (filters.colors && filters.colors.length > 0) count++;
         if (filters.gearTypes && filters.gearTypes.length > 0) count++;
         if (filters.seatCounts && filters.seatCounts.length > 0) count++;
         if (filters.electronicTypes && filters.electronicTypes.length > 0) count++;
-        if (filters.electronicBrands && filters.electronicBrands.length > 0) count++;
+        if (filters.types && filters.types.length > 0) count++;
+        if (filters.conditions && filters.conditions.length > 0) count++;
+        if (filters.clothingGenders && filters.clothingGenders.length > 0) count++;
+        if (filters.clothingCategories && filters.clothingCategories.length > 0) count++;
+        if (filters.genres && filters.genres.length > 0) count++;
+        if (filters.languages && filters.languages.length > 0) count++;
+        if (filters.formats && filters.formats.length > 0) count++;
+        if (filters.disciplines && filters.disciplines.length > 0) count++;
+        if (filters.equipmentTypes && filters.equipmentTypes.length > 0) count++;
+        if (filters.realEstateTypes && filters.realEstateTypes.length > 0) count++;
+        if (filters.adTypes && filters.adTypes.length > 0) count++;
         if (filters.minYear || filters.maxYear) count++;
         if (filters.maxMileage) count++;
+        if (filters.minSquareMeters || filters.maxSquareMeters) count++;
+        if (filters.minRoomCount || filters.maxRoomCount) count++;
+        if (filters.minBuildingAge || filters.maxBuildingAge) count++;
+        if (filters.minFloor || filters.maxFloor) count++;
+        if (filters.minPageCount || filters.maxPageCount) count++;
+        if (filters.purchaseDateFrom || filters.purchaseDateTo) count++;
         
         return count;
     });

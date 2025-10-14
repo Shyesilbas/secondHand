@@ -35,7 +35,7 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
         }
         
         if (filters.getGearTypes() != null && !filters.getGearTypes().isEmpty()) {
-            predicates.add(root.get("gearType").in(filters.getGearTypes()));
+            predicates.add(root.get("gearbox").in(filters.getGearTypes()));
         }
         
         if (filters.getSeatCounts() != null && !filters.getSeatCounts().isEmpty()) {
@@ -71,7 +71,7 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
             case "brand" -> Optional.of(root.get("brand"));
             case "doors" -> Optional.of(root.get("doors"));
             case "fueltype", "fuel_type" -> Optional.of(root.get("fuelType"));
-            case "geartype", "gear_type" -> Optional.of(root.get("gearType"));
+            case "geartype", "gear_type" -> Optional.of(root.get("gearbox"));
             case "model" -> Optional.of(root.get("model"));
             default -> Optional.empty();
         };
