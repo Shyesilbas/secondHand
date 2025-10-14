@@ -6,11 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.*;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
@@ -537,6 +533,16 @@ public class EnumController {
             case CUPRA -> "Cupra";
             case HONDA -> "Honda";
             case OPEL -> "Opel";
+            case TESLA -> "Tesla";
+            case FIAT -> "Fiat";
+            case JEEP -> "Jeep";
+            case VOLVO -> "Volvo";
+            case CITROEN -> "Citroen";
+            case MAZDA -> "Mazda";
+            case MINI -> "Mini Cooper";
+            case PORSCHE -> "Porsche";
+            case ALFA_ROMEO -> "Alfa Romeo";
+            case LAND_ROVER -> "Land Rover";
         };
     }
 

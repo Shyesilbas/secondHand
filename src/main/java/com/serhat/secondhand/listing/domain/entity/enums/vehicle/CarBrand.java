@@ -1,5 +1,32 @@
 package com.serhat.secondhand.listing.domain.entity.enums.vehicle;
 
 public enum CarBrand {
-    AUDI,BMW,MERCEDES,TOYOTA,VOLKSWAGEN,HYUNDAI,PEUGEOT,NISSAN,KIA,FORD,SUZUKI,TOGG,RENAULT,SKODA,SEAT,CUPRA,HONDA,OPEL
+    AUDI,
+    BMW,
+    MERCEDES,
+    TOYOTA,
+    VOLKSWAGEN,
+    HYUNDAI,
+    PEUGEOT,
+    NISSAN,
+    KIA,
+    FORD,
+    SUZUKI,
+    TOGG,
+    RENAULT,
+    SKODA,
+    SEAT,
+    CUPRA,
+    HONDA,
+    OPEL,
+    TESLA,
+    FIAT,
+    JEEP,
+    VOLVO,
+    CITROEN,
+    MAZDA,
+    MINI,
+    PORSCHE,
+    ALFA_ROMEO,
+    LAND_ROVER
 }

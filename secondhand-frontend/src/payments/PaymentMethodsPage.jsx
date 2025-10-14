@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useNotification } from '../notification/NotificationContext.jsx';
 import BankAccountsSection from './components/BankAccountsSection.jsx';
 import CreditCardsSection from './components/CreditCardsSection.jsx';
@@ -8,7 +8,16 @@ import EWalletSection from './components/EWalletSection.jsx';
 const PaymentMethodsPage = () => {
     const navigate = useNavigate();
     const notification = useNotification();
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('bank-accounts');
+
+    // Check URL parameters for tab selection
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (tabParam && ['bank-accounts', 'credit-cards', 'ewallet'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [searchParams]);
 
         const isLoading = false;
     const error = null;
