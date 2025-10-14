@@ -50,7 +50,7 @@ public class EnumController {
                 .map(type -> {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
                     typeMap.put("value", type.name());
-                    typeMap.put("label", getListingTypeLabel(type));
+                    typeMap.put("label", type.getLabel());
                     typeMap.put("icon", getListingTypeIcon(type));
                     return typeMap;
                 })
@@ -65,7 +65,7 @@ public class EnumController {
                 .map(status -> {
                     Map<String, Object> statusMap = new LinkedHashMap<>();
                     statusMap.put("value", status.name());
-                    statusMap.put("label", getListingStatusLabel(status));
+                    statusMap.put("label", status.getLabel());
                     return statusMap;
                 })
                 .toList();
@@ -79,7 +79,7 @@ public class EnumController {
                 .map(brand -> {
                     Map<String, Object> brandMap = new LinkedHashMap<>();
                     brandMap.put("value", brand.name());
-                    brandMap.put("label", getCarBrandLabel(brand));
+                    brandMap.put("label", brand.getLabel());
                     return brandMap;
                 })
                 .toList();
@@ -93,7 +93,7 @@ public class EnumController {
                 .map(fuel -> {
                     Map<String, Object> fuelMap = new LinkedHashMap<>();
                     fuelMap.put("value", fuel.name());
-                    fuelMap.put("label", getFuelTypeLabel(fuel));
+                    fuelMap.put("label", fuel.getLabel());
                     return fuelMap;
                 })
                 .toList();
@@ -107,7 +107,7 @@ public class EnumController {
                 .map(color -> {
                     Map<String, Object> colorMap = new LinkedHashMap<>();
                     colorMap.put("value", color.name());
-                    colorMap.put("label", getColorLabel(color));
+                    colorMap.put("label", color.getLabel());
                     return colorMap;
                 })
                 .toList();
@@ -135,7 +135,7 @@ public class EnumController {
                 .map(door -> {
                     Map<String, Object> doorMap = new LinkedHashMap<>();
                     doorMap.put("value", door.name());
-                    doorMap.put("label", getDoorsLabel(door));
+                    doorMap.put("label", door.getLabel());
                     return doorMap;
                 })
                 .toList();
@@ -149,8 +149,8 @@ public class EnumController {
                 .map(currency -> {
                     Map<String, Object> currencyMap = new LinkedHashMap<>();
                     currencyMap.put("value", currency.name());
-                    currencyMap.put("label", getCurrencyLabel(currency));
-                    currencyMap.put("symbol", getCurrencySymbol(currency));
+                    currencyMap.put("label", currency.getLabel());
+                    currencyMap.put("symbol", currency.getSymbol());
                     return currencyMap;
                 })
                 .toList();
@@ -164,7 +164,7 @@ public class EnumController {
                 .map(gearType -> {
                     Map<String, Object> gearTypeMap = new LinkedHashMap<>();
                     gearTypeMap.put("value", gearType.name());
-                    gearTypeMap.put("label", getGearTypeLabel(gearType));
+                    gearTypeMap.put("label", gearType.getLabel());
                     return gearTypeMap;
                 })
                 .toList();
@@ -178,7 +178,7 @@ public class EnumController {
                 .map(seatCount -> {
                     Map<String, Object> seatCountMap = new LinkedHashMap<>();
                     seatCountMap.put("value", seatCount.name());
-                    seatCountMap.put("label", getSeatCountLabel(seatCount));
+                    seatCountMap.put("label", seatCount.getLabel());
                     return seatCountMap;
                 })
                 .toList();
@@ -192,7 +192,7 @@ public class EnumController {
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", type.name());
-                    map.put("label", getElectronicTypeLabel(type));
+                    map.put("label", type.getLabel());
                     return map;
                 })
                 .toList();
@@ -206,7 +206,7 @@ public class EnumController {
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", brand.name());
-                    map.put("label", getElectronicBrandLabel(brand));
+                    map.put("label", brand.getLabel());
                     return map;
                 })
                 .toList();
@@ -220,7 +220,7 @@ public class EnumController {
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", type.name());
-                    map.put("label", getRealEstateTypeLabel(type));
+                    map.put("label", type.getLabel());
                     return map;
                 })
                 .toList();
@@ -234,7 +234,7 @@ public class EnumController {
                 .map(adType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", adType.name());
-                    map.put("label", getRealEstateAdTypeLabel(adType));
+                    map.put("label", adType.getLabel());
                     return map;
                 })
                 .toList();
@@ -248,7 +248,7 @@ public class EnumController {
                 .map(heatingType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", heatingType.name());
-                    map.put("label", getHeatingTypeLabel(heatingType));
+                    map.put("label", heatingType.getLabel());
                     return map;
                 })
                 .toList();
@@ -262,7 +262,7 @@ public class EnumController {
                 .map(ownerType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", ownerType.name());
-                    map.put("label", getOwnerTypeLabel(ownerType));
+                    map.put("label", ownerType.getLabel());
                     return map;
                 })
                 .toList();
@@ -276,7 +276,7 @@ public class EnumController {
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", type.name());
-                    map.put("label", getPaymentTypeLabel(type));
+                    map.put("label", type.getLabel());
                     return map;
                 })
                 .toList();
@@ -290,7 +290,7 @@ public class EnumController {
                 .map(status -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", status.name());
-                    map.put("label", getShippingStatusLabel(status));
+                    map.put("label", status.getLabel());
                     return map;
                 })
                 .toList();
@@ -318,7 +318,7 @@ public class EnumController {
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", brand.name());
-                    map.put("label", getClothingBrandLabel(brand));
+                    map.put("label", brand.getLabel());
                     return map;
                 })
                 .toList();
@@ -332,7 +332,7 @@ public class EnumController {
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", type.name());
-                    map.put("label", getClothingTypeLabel(type));
+                    map.put("label", type.getLabel());
                     return map;
                 })
                 .toList();
@@ -346,7 +346,7 @@ public class EnumController {
                 .map(condition -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", condition.name());
-                    map.put("label", getClothingConditionLabel(condition));
+                    map.put("label", condition.getLabel());
                     return map;
                 })
                 .toList();
@@ -360,7 +360,7 @@ public class EnumController {
                 .map(gender -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", gender.name());
-                    map.put("label", getClothingGenderLabel(gender));
+                    map.put("label", gender.getLabel());
                     return map;
                 })
                 .toList();
@@ -374,7 +374,7 @@ public class EnumController {
                 .map(category -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", category.name());
-                    map.put("label", getClothingCategoryLabel(category));
+                    map.put("label", category.getLabel());
                     return map;
                 })
                 .toList();
@@ -479,17 +479,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-        private String getListingTypeLabel(ListingType type) {
-        return switch (type) {
-            case VEHICLE -> "Vehicle";
-            case ELECTRONICS -> "Electronics";
-            case REAL_ESTATE -> "Real Estate";
-            case CLOTHING -> "Clothing";
-            case BOOKS -> "Books";
-            case SPORTS -> "Sports";
-            case OTHER -> "Other";
-        };
-    }
+    
 
     private String getListingTypeIcon(ListingType type) {
         return switch (type) {
@@ -503,312 +493,11 @@ public class EnumController {
         };
     }
 
-    private String getListingStatusLabel(ListingStatus status) {
-        return switch (status) {
-            case ACTIVE -> "Active";
-            case RESERVED -> "Reserved";
-            case INACTIVE -> "Inactive";
-            case DRAFT -> "Draft";
-            case SOLD -> "Sold";
-        };
-    }
-
-    private String getCarBrandLabel(CarBrand brand) {
-        return switch (brand) {
-            case AUDI -> "Audi";
-            case BMW -> "BMW";
-            case MERCEDES -> "Mercedes-Benz";
-            case TOYOTA -> "Toyota";
-            case VOLKSWAGEN -> "Volkswagen";
-            case HYUNDAI -> "Hyundai";
-            case PEUGEOT -> "Peugeot";
-            case NISSAN -> "Nissan";
-            case KIA -> "Kia";
-            case FORD -> "Ford";
-            case SUZUKI -> "Suzuki";
-            case TOGG -> "TOGG";
-            case RENAULT -> "Renault";
-            case SKODA -> "Škoda";
-            case SEAT -> "SEAT";
-            case CUPRA -> "Cupra";
-            case HONDA -> "Honda";
-            case OPEL -> "Opel";
-            case TESLA -> "Tesla";
-            case FIAT -> "Fiat";
-            case JEEP -> "Jeep";
-            case VOLVO -> "Volvo";
-            case CITROEN -> "Citroen";
-            case MAZDA -> "Mazda";
-            case MINI -> "Mini Cooper";
-            case PORSCHE -> "Porsche";
-            case ALFA_ROMEO -> "Alfa Romeo";
-            case LAND_ROVER -> "Land Rover";
-        };
-    }
-
-    private String getFuelTypeLabel(FuelType fuel) {
-        return switch (fuel) {
-            case GASOLINE -> "Gasoline";
-            case DIESEL -> "Diesel";
-            case HYBRID -> "Hybrid";
-            case ELECTRIC -> "Electric";
-            case LPG -> "LPG";
-        };
-    }
-
-    private String getColorLabel(Color color) {
-        return switch (color) {
-            case WHITE -> "White";
-            case BLACK -> "Black";
-            case SILVER -> "Silver";
-            case GRAY -> "Gray";
-            case NARDO_GRAY -> "Nardo Gray";
-            case GUNMETAL -> "Metal Gray";
-            case RED -> "Red";
-            case ROSSO_CORSA -> "Rosso Corsa";
-            case DEEP_BLACK -> "Deep Black";
-            case PEARL_WHITE -> "Pearl White";
-            case METALLIC_GRAY -> "Metallic Gray";
-            case CANDY_RED -> "Candy Red";
-            case FOREST_GREEN -> "Forest Green";
-            case SUNSET_ORANGE -> "Sunset Orange";
-            case ROYAL_PURPLE -> "Royal Purple";
-            case CHAMPAGNE_GOLD -> "Champagne Gold";
-            case BLUE -> "Blue";
-            case MIDNIGHT_BLUE -> "Midnight Blue";
-            case ATLANTIC_BLUE -> "Atlantic Blue";
-            case BRITISH_RACING_GREEN -> "British Racing Green";
-            case GREEN -> "Green";
-            case YELLOW -> "Yellow";
-            case SUNBURST_YELLOW -> "Sunset Yellow";
-            case ORANGE -> "Orange";
-            case LAVA_ORANGE -> "Lava Orange";
-            case BROWN -> "Brown";
-            case BEIGE -> "Beige";
-            case PURPLE_AMETHYST -> "Purple Amethyst";
-            case MATTE_BLACK -> "Matte Black";
-        };
-    }
-
-    private String getDoorsLabel(Doors door) {
-        return switch (door) {
-            case TWO -> "2 Doors";
-            case FOUR -> "4 Doors";
-        };
-    }
-
-    private String getCurrencyLabel(Currency currency) {
-        return switch (currency) {
-            case TRY -> "Turkish Lira";
-            case EUR -> "Euro";
-            case USD -> "United States Dollar";
-        };
-    }
-
-    private String getCurrencySymbol(Currency currency) {
-        return switch (currency) {
-            case TRY -> "₺";
-            case EUR -> "€";
-            case USD -> "$";
-        };
-    }
-
-    private String getGearTypeLabel(GearType gearType) {
-        return switch (gearType) {
-            case MANUAL -> "Manuel";
-            case AUTOMATIC -> "Automatic";
-            case SEMI_AUTOMATIC -> "Semi Automatic";
-            case CVT -> "CVT";
-        };
-    }
-
-    private String getSeatCountLabel(SeatCount seatCount) {
-        return switch (seatCount) {
-            case TWO -> "2";
-            case FOUR -> "4";
-            case FIVE -> "5";
-            case SEVEN -> "7";
-            case EIGHT -> "8";
-            case NINE -> "9";
-            case TEN -> "10";
-            case MORE_THAN_TEN -> "10+";
-        };
-    }
-
-    private String getElectronicTypeLabel(ElectronicType type) {
-        return switch (type) {
-            case MOBILE_PHONE -> "Mobile Phone";
-            case LAPTOP -> "Laptop";
-            case TV -> "TV";
-            case AIR_CONDITIONER -> "Air Conditioner";
-            case WASHING_MACHINE -> "Washing Machine";
-            case KITCHENARY -> "Kitchen Appliances";
-            case GAMES_CONSOLE -> "Game Console";
-            case HEADPHONES -> "Headphones";
-            case MICROPHONE -> "Microphone";
-            case SPEAKER -> "Speaker";
-            case TV_STB -> "TV Set-Top Box";
-            case VIDEO_PLAYER -> "Video Player";
-            case TABLET -> "Tablet";
-        };
-    }
-
-    private String getElectronicBrandLabel(ElectronicBrand brand) {
-        return switch (brand) {
-            case APPLE -> "Apple";
-            case SAMSUNG -> "Samsung";
-            case MICROSOFT -> "Microsoft";
-            case GOOGLE -> "Google";
-            case SONY -> "Sony";
-            case LG -> "LG";
-            case ASUS -> "ASUS";
-            case XIAOMI -> "Xiaomi";
-            case HUAWEI -> "Huawei";
-            case FUJITSU -> "Fujitsu";
-            case OKI -> "OKI";
-            case BENQ -> "BenQ";
-            case KODAK -> "Kodak";
-            case NIKON -> "Nikon";
-            case PHILLIPS -> "Phillips";
-        };
-    }
-
-    private String getRealEstateTypeLabel(RealEstateType type) {
-        return switch (type) {
-            case APARTMENT -> "Apartment";
-            case HOUSE -> "House";
-            case VILLA -> "Villa";
-            case LAND -> "Land";
-            case COMMERCIAL -> "Commercial";
-            case INDUSTRIAL -> "Industrial";
-            case FARM -> "Farm";
-            case RESIDENCE -> "Residence";
-            case SUMMER_HOUSE -> "Summer House";
-        };
-    }
-
-    private String getRealEstateAdTypeLabel(RealEstateAdType adType) {
-        return switch (adType) {
-            case FOR_SALE -> "For Sale";
-            case FOR_RENT -> "For Rent";
-        };
-    }
-
-    private String getHeatingTypeLabel(HeatingType heatingType) {
-        return switch (heatingType) {
-            case NONE -> "None";
-            case STOVE -> "Stove";
-            case NATURAL_GAS -> "Natural Gas";
-            case CENTRAL_SYSTEM -> "Central System";
-            case COMBI_BOILER -> "Combi Boiler";
-            case AIR_CONDITIONER -> "Air Conditioner";
-            case GEOTHERMAL -> "Geothermal";
-            case FLOOR_HEATING -> "Floor Heating";
-            case OTHER -> "Other";
-        };
-    }
-
-    private String getOwnerTypeLabel(ListingOwnerType ownerType) {
-        return switch (ownerType) {
-            case OWNER -> "Owner";
-            case AGENCY -> "Agency";
-        };
-    }
-
-    private String getClothingBrandLabel(ClothingBrand brand) {
-        return switch (brand) {
-            case NIKE -> "Nike";
-            case ADIDAS -> "Adidas";
-            case PUMA -> "Puma";
-            case UNDER_ARMOUR -> "Under Armour";
-            case ZARA -> "Zara";
-            case H_M -> "H&M";
-            case UNIQLO -> "Uniqlo";
-            case GAP -> "Gap";
-            case TOMMY_HILFIGER -> "Tommy Hilfiger";
-            case CALVIN_KLEIN -> "Calvin Klein";
-            case LACOSTE -> "Lacoste";
-            case RALPH_LAUREN -> "Ralph Lauren";
-            case LEVI_S -> "Levi's";
-            case DIESEL -> "Diesel";
-            case ARMANI -> "Armani";
-            case GUCCI -> "Gucci";
-            case PRADA -> "Prada";
-            case LOUIS_VUITTON -> "Louis Vuitton";
-            case CHANEL -> "Chanel";
-            case HERMES -> "Hermès";
-            case OTHER -> "Other";
-        };
-    }
-
-    private String getClothingTypeLabel(ClothingType type) {
-        return switch (type) {
-            case TSHIRT -> "T-Shirt";
-            case SHIRT -> "Shirt";
-            case PANTS -> "Pants";
-            case JEANS -> "Jeans";
-            case SHORTS -> "Shorts";
-            case DRESS -> "Dress";
-            case SKIRT -> "Skirt";
-            case JACKET -> "Jacket";
-            case COAT -> "Coat";
-            case SWEATER -> "Sweater";
-            case HOODIE -> "Hoodie";
-            case SWEATSHIRT -> "Sweatshirt";
-            case SUIT -> "Suit";
-            case BLAZER -> "Blazer";
-            case VEST -> "Vest";
-            case UNDERWEAR -> "Underwear";
-            case SOCKS -> "Socks";
-            case HAT -> "Hat";
-            case CAP -> "Cap";
-            case SCARF -> "Scarf";
-            case GLOVES -> "Gloves";
-            case BELT -> "Belt";
-            case TIE -> "Tie";
-            case BAG -> "Bag";
-            case SHOES -> "Shoes";
-            case SNEAKERS -> "Sneakers";
-            case BOOTS -> "Boots";
-            case SANDALS -> "Sandals";
-            case HEELS -> "Heels";
-            case FLATS -> "Flats";
-            case OTHER -> "Other";
-        };
-    }
-
-    private String getClothingConditionLabel(ClothingCondition condition) {
-        return switch (condition) {
-            case EXCELLENT -> "Excellent";
-            case GOOD -> "Good";
-            case FAIR -> "Fair";
-            case WORN -> "Worn";
-            case DAMAGED -> "Damaged";
-        };
-    }
-
-    private String getPaymentTypeLabel(PaymentType type) {
-        return switch (type) {
-            case CREDIT_CARD -> "Credit Card";
-            case TRANSFER -> "Bank Transfer";
-            case EWALLET -> "E-Wallet";
-        };
-    }
-
-    private String getShippingStatusLabel(ShippingStatus status) {
-        return switch (status) {
-            case PENDING -> "Pending";
-            case IN_TRANSIT -> "In Transit";
-            case DELIVERED -> "Delivered";
-            case CANCELLED -> "Cancelled";
-        };
-    }
-
     private String getEmailTypeLabel(EmailType type) {
         return toTitleCase(type.name());
     }
 
-        private String getBookGenreLabel(BookGenre genre) {
+    private String getBookGenreLabel(BookGenre genre) {
         return toTitleCase(genre.name());
     }
 
@@ -837,46 +526,17 @@ public class EnumController {
         return sb.toString();
     }
 
-        private String getSportDisciplineLabel(SportDiscipline discipline) {
-        return toTitleCase(discipline.name());
-    }
+    private String getSportDisciplineLabel(SportDiscipline discipline) { return discipline.getLabel(); }
 
-    private String getSportEquipmentTypeLabel(SportEquipmentType equipmentType) {
-        return toTitleCase(equipmentType.name());
-    }
+    private String getSportEquipmentTypeLabel(SportEquipmentType equipmentType) { return equipmentType.getLabel(); }
 
-    private String getSportConditionLabel(SportCondition condition) {
-        return toTitleCase(condition.name());
-    }
+    private String getSportConditionLabel(SportCondition condition) { return condition.getLabel(); }
 
-    private String getGenderLabel(Gender gender) {
-        return switch (gender) {
-            case MALE -> "Male";
-            case FEMALE -> "Female";
-            case PREFER_NOT_TO_SAY -> "Prefer not to say";
-        };
-    }
+    private String getGenderLabel(Gender gender) { return gender.getLabel(); }
 
-    private String getClothingGenderLabel(ClothingGender gender) {
-        return switch (gender) {
-            case MALE -> "Male";
-            case FEMALE -> "Female";
-        };
-    }
+    private String getClothingGenderLabel(ClothingGender gender) { return gender.getLabel(); }
 
-    private String getClothingCategoryLabel(ClothingCategory category) {
-        return switch (category) {
-            case BOY_CHILD -> "Boy Child";
-            case GIRL_CHILD -> "Girl Child";
-            case BOY_BABY -> "Boy Baby";
-            case GIRL_BABY -> "Girl Baby";
-            case BOY_YOUTH -> "Boy Youth";
-            case GIRL_YOUTH -> "Girl Youth";
-            case MALE_ADULT -> "Male Adult";
-            case FEMALE_ADULT -> "Female Adult";
-            case UNISEX -> "Unisex";
-        };
-    }
+    private String getClothingCategoryLabel(ClothingCategory category) { return category.getLabel(); }
 
     @GetMapping("/audit-event-types")
     @Operation(summary = "Get audit event types", description = "Returns all available audit event types with display names")

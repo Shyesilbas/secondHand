@@ -1,13 +1,22 @@
 package com.serhat.secondhand.listing.domain.entity.enums.realestate;
 
+import lombok.Getter;
+
+@Getter
 public enum RealEstateType {
-    APARTMENT,
-    HOUSE,
-    VILLA,
-    LAND,
-    COMMERCIAL,
-    INDUSTRIAL,
-    FARM,
-    RESIDENCE,
-    SUMMER_HOUSE
+    APARTMENT("Apartment"),
+    HOUSE("House"),
+    VILLA("Villa"),
+    LAND("Land"),
+    COMMERCIAL("Commercial"),
+    INDUSTRIAL("Industrial"),
+    FARM("Farm"),
+    RESIDENCE("Residence"),
+    SUMMER_HOUSE("Summer House");
+
+    private final String label;
+
+    RealEstateType(String label) {
+        this.label = label;
+    }
 }
