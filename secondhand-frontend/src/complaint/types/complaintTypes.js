@@ -41,11 +41,12 @@ export const createComplaintRequest = ({ complainerId, complainedUserId, listing
 });
 
 export class ComplaintDto {
-    constructor({ complaintId, complainerId, complainedUserId, listingId, reason, description, createdAt, updatedAt, resolvedAt }) {
+    constructor({ complaintId, complainerId, complainedUserId, listingId, listingTitle, reason, description, createdAt, updatedAt, resolvedAt }) {
         this.complaintId = complaintId;
         this.complainerId = complainerId;
         this.complainedUserId = complainedUserId;
         this.listingId = listingId;
+        this.listingTitle = listingTitle;
         this.reason = reason;
         this.description = description;
         this.createdAt = createdAt;

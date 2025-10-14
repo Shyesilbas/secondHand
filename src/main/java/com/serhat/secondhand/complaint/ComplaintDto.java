@@ -10,6 +10,7 @@ public record ComplaintDto(
         String complainerId,
         String complainedUserId,
         UUID listingId,
+        String listingTitle,
         String reason,
         String description,
         @JsonFormat(pattern = "dd/MM/yyyy")
