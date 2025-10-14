@@ -15,8 +15,8 @@ export const createVehicleFilterConfig = () => {
 export const createElectronicsFilterConfig = () => {
   return new FilterConfig()
     .addNumericRangeField('year', 'Year', { min: 2000, max: new Date().getFullYear(), placeholder: '2020' })
-    .addEnumField('brands', 'Brand', 'electronicBrands')
-    .addEnumField('types', 'Type', 'electronicTypes');
+    .addEnumField('electronicBrands', 'Brand', 'electronicBrands')
+    .addEnumField('electronicTypes', 'Type', 'electronicTypes');
 };
 
 export const createRealEstateFilterConfig = () => {

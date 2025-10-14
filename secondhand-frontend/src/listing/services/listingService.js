@@ -46,6 +46,7 @@ const createFilterPayload = (filters, listingType) => {
 
     case LISTING_TYPES.ELECTRONICS:
       payload.electronicTypes = Array.isArray(filters.electronicTypes) ? filters.electronicTypes : [];
+      payload.electronicBrands = Array.isArray(filters.electronicBrands) ? filters.electronicBrands : [];
       payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
       break;
 
@@ -69,7 +70,7 @@ const createFilterPayload = (filters, listingType) => {
 
     case LISTING_TYPES.SPORTS:
       payload.disciplines = Array.isArray(filters.disciplines) ? filters.disciplines : [];
-      payload.types = Array.isArray(filters.types) ? filters.types : [];
+      payload.equipmentTypes = Array.isArray(filters.equipmentTypes) ? filters.equipmentTypes : [];
       payload.conditions = Array.isArray(filters.conditions) ? filters.conditions : [];
       break;
 
