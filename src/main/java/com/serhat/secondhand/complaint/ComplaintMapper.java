@@ -14,6 +14,7 @@ public class ComplaintMapper {
                 complaint.getComplainer().getEmail(),
                 complaint.getComplainedUser().getEmail(),
                 complaint.getListing() != null ? complaint.getListing().getId() : null,
+                complaint.getListing() != null ? complaint.getListing().getTitle() : null,
                 complaint.getReason(),
                 complaint.getDescription(),
                 complaint.getCreatedAt(),

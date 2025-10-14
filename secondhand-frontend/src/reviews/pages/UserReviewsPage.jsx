@@ -13,6 +13,31 @@ const UserReviewsPage = () => {
     const { reviews, loading, error, hasMore, loadMore } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 
+    const givenStats = React.useMemo(() => {
+        if (!isGivenReviews) return null;
+        const total = reviews?.length || 0;
+        const sum = reviews?.reduce((acc, r) => acc + (r.rating || 0), 0) || 0;
+        const average = total > 0 ? sum / total : 0;
+        const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0, 0: 0 };
+        reviews?.forEach(r => {
+            const key = Number.isInteger(r.rating) ? r.rating : 0;
+            if (counts[key] !== undefined) counts[key] += 1;
+        });
+        return {
+            userId,
+            userName: '',
+            userSurname: '',
+            totalReviews: total,
+            averageRating: average,
+            fiveStarReviews: counts[5],
+            fourStarReviews: counts[4],
+            threeStarReviews: counts[3],
+            twoStarReviews: counts[2],
+            oneStarReviews: counts[1],
+            zeroStarReviews: counts[0],
+        };
+    }, [isGivenReviews, reviews, userId]);
+
         const getPageTitle = () => {
         if (isReceivedReviews) return 'Reviews Received';
         if (isGivenReviews) return 'Given Reviews';
@@ -26,7 +51,7 @@ const UserReviewsPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Review Stats */}
                 <div className="lg:col-span-1">
-                    <ReviewStats stats={stats} loading={statsLoading} />
+                    <ReviewStats stats={isGivenReviews ? givenStats : stats} loading={isGivenReviews ? false : statsLoading} />
                 </div>
                 
                 {/* Reviews List */}
