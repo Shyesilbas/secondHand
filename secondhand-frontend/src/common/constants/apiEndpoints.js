@@ -226,7 +226,7 @@ export const API_ENDPOINTS = {
     },
     REVIEWS: {
         CREATE: '/reviews',
-        GET_FOR_USER: (userId) => `/reviews/user/${userId}`,
+        GET_FOR_USER: '/reviews/user',
         GET_BY_USER: (userId) => `/reviews/by-user/${userId}`,
         GET_USER_STATS: (userId) => `/reviews/user/${userId}/stats`,
         GET_FOR_ORDER_ITEMS: '/reviews/order-items',

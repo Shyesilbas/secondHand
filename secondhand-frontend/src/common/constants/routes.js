@@ -26,6 +26,7 @@ export const ROUTES = {
     PAYMENTS: '/payments',
     PAY_LISTING_FEE: '/payments/listing-fee',
     PAYMENT_METHODS: '/payment-methods',
+    EWALLET: '/ewallet',
     EMAILS: '/emails',
     CHAT: '/chat',
     AGREEMENTS: '/agreements',

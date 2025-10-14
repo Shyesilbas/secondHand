@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { reviewService } from '../services/reviewService.js';
 
-export const useReviews = (userId) => {
+export const useReviews = () => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -9,13 +9,11 @@ export const useReviews = (userId) => {
     const [hasMore, setHasMore] = useState(true);
 
     const fetchReviews = async (pageNum = 0, reset = false) => {
-        if (!userId) return;
-        
         setLoading(true);
         setError(null);
         
         try {
-            const response = await reviewService.getReviewsForUser(userId, pageNum, 10);
+            const response = await reviewService.getReviewsForUser(pageNum, 10);
             
             if (reset) {
                 setReviews(response.content || []);
@@ -44,7 +42,7 @@ export const useReviews = (userId) => {
 
     useEffect(() => {
         fetchReviews(0, true);
-    }, [userId]);
+    }, []);
 
     return {
         reviews,

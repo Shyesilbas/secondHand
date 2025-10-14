@@ -9,7 +9,7 @@ const UserReviewsPage = () => {
         const isReceivedReviews = location.pathname.includes('/reviews/received/');
     const isGivenReviews = location.pathname.includes('/reviews/given/');
     
-        const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
+        const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews();
     const { reviews, loading, error, hasMore, loadMore } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 

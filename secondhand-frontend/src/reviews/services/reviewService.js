@@ -6,8 +6,8 @@ export const reviewService = {
         return post(API_ENDPOINTS.REVIEWS.CREATE, reviewData);
     },
 
-        getReviewsForUser: async (userId, page = 0, size = 10) => {
-        return get(`${API_ENDPOINTS.REVIEWS.GET_FOR_USER(userId)}?page=${page}&size=${size}`);
+        getReviewsForUser: async (page = 0, size = 10) => {
+        return get(`${API_ENDPOINTS.REVIEWS.GET_FOR_USER}?page=${page}&size=${size}`);
     },
 
         getReviewsByUser: async (userId, page = 0, size = 10) => {
