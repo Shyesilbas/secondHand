@@ -16,7 +16,8 @@ public record SportsUpdateRequest(
         Optional<String> district,
         Optional<SportDiscipline> discipline,
         Optional<SportEquipmentType> equipmentType,
-        Optional<SportCondition> condition
+        Optional<SportCondition> condition,
+        Optional<String> imageUrl
 ) {}
 
 

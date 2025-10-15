@@ -23,7 +23,8 @@ public record BooksUpdateRequest(
         Optional<Integer> pageCount,
         Optional<BookFormat> format,
         Optional<BookCondition> condition,
-        Optional<String> isbn
+        Optional<String> isbn,
+        Optional<String> imageUrl
 ) {}
 
 

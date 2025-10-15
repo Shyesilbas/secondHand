@@ -58,14 +58,15 @@ public class ClothingListingService {
 
         var oldPrice = existing.getPrice();
 
-                request.title().ifPresent(existing::setTitle);
+        request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
         request.currency().ifPresent(existing::setCurrency);
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
+        request.imageUrl().ifPresent(existing::setImageUrl);
 
-                request.brand().ifPresent(existing::setBrand);
+        request.brand().ifPresent(existing::setBrand);
         request.clothingType().ifPresent(existing::setClothingType);
         request.color().ifPresent(existing::setColor);
         request.purchaseDate().ifPresent(existing::setPurchaseDate);

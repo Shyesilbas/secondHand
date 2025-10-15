@@ -21,6 +21,7 @@ public record ElectronicUpdateRequest(
         Optional<String> origin,
         Optional<Boolean> warrantyProof,
         Optional<Integer> year,
-        Optional<Color> color
+        Optional<Color> color,
+        Optional<String> imageUrl
 ) {
 }

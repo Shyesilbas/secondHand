@@ -31,7 +31,7 @@ export const createClothingUpdateRequest = (data) => ({
     condition: data.condition ? data.condition : undefined,
     clothingGender: data.clothingGender ? data.clothingGender : undefined,
     clothingCategory: data.clothingCategory ? data.clothingCategory : undefined,
-    imageUrl: data.imageUrl ? data.imageUrl : undefined
+    imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined
 });
 
 export const ClothingListingDTO = {
