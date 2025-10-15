@@ -65,6 +65,7 @@ public class RealEstateListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
+        request.imageUrl().ifPresent(existing::setImageUrl);
 
         request.adType().ifPresent(existing::setAdType);
         request.realEstateType().ifPresent(existing::setRealEstateType);

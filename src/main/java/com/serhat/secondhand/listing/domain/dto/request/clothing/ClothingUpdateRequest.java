@@ -27,5 +27,6 @@ public record ClothingUpdateRequest(
     Optional<LocalDate> purchaseDate,
     Optional<ClothingCondition> condition,
     Optional<ClothingGender> clothingGender,
-    Optional<ClothingCategory> clothingCategory
+    Optional<ClothingCategory> clothingCategory,
+    Optional<String> imageUrl
 ) {}

@@ -149,11 +149,11 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
       
       {imageUrl ? (
         <div className="relative">
-          <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+          <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 flex items-center justify-center">
             <img
               src={imageUrl}
               alt="Ürün fotoğrafı"
-              className="w-full h-full object-cover"
+              className="max-w-full max-h-full object-contain"
             />
           </div>
           {!disabled && (

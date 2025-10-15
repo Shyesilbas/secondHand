@@ -25,6 +25,7 @@ public record RealEstateUpdateRequest(
         Optional<Integer>  bathroomCount,
         Optional<Integer>   floor,
         Optional<Integer>   buildingAge,
-        Optional<Boolean> furnished
+        Optional<Boolean> furnished,
+        Optional<String> imageUrl
 ) {
 }

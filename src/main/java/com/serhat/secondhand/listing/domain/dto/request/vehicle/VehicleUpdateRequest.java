@@ -26,5 +26,6 @@ public record VehicleUpdateRequest(
     Optional<Integer> horsePower,
     Optional<Integer> kilometersPerLiter,
     Optional<FuelType> fuelType,
-    Optional<Boolean> swap
+    Optional<Boolean> swap,
+    Optional<String> imageUrl
 ) {} 

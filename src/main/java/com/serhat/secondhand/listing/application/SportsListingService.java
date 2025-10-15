@@ -62,6 +62,7 @@ public class SportsListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
+        request.imageUrl().ifPresent(existing::setImageUrl);
         request.discipline().ifPresent(existing::setDiscipline);
         request.equipmentType().ifPresent(existing::setEquipmentType);
         request.condition().ifPresent(existing::setCondition);

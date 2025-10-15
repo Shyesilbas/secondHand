@@ -64,6 +64,7 @@ public class VehicleListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
+        request.imageUrl().ifPresent(existing::setImageUrl);
 
         request.model().ifPresent(existing::setModel);
         request.mileage().ifPresent(existing::setMileage);

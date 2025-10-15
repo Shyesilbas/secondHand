@@ -62,6 +62,7 @@ public class BooksListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
+        request.imageUrl().ifPresent(existing::setImageUrl);
 
         request.author().ifPresent(existing::setAuthor);
         request.genre().ifPresent(existing::setGenre);
