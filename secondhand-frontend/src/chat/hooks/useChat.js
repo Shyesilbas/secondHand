@@ -5,11 +5,12 @@ import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { UNREAD_COUNT_KEYS } from './useUnreadCount.js';
 
-export const useChat = (userId) => {
+export const useChat = (userId, options = {}) => {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
     const [messages, setMessages] = useState([]);
+    const enableChatRoomsFetch = options.enableChatRoomsFetch ?? false;
 
     const {
         isConnected,
@@ -31,7 +32,7 @@ export const useChat = (userId) => {
     } = useQuery({
         queryKey: ['chatRooms', userId],
         queryFn: () => chatService.getUserChatRooms(userId),
-        enabled: !!userId,
+        enabled: !!userId && enableChatRoomsFetch,
         staleTime: 10 * 60 * 1000,
         cacheTime: 30 * 60 * 1000,
         refetchInterval: false,

@@ -30,7 +30,7 @@ const ChatPage = () => {
     deleteMessage,
     deleteConversation,
     isDeletingConversation
-  } = useChat(user?.id);
+  } = useChat(user?.id, { enableChatRoomsFetch: true });
 
   const handleChatRoomSelect = (chatRoom) => {
     selectChatRoom(chatRoom);

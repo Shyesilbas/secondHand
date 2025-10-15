@@ -121,6 +121,32 @@ public class ListingService {
         return new PageImpl<>(dtos, result.getPageable(), result.getTotalElements());
     }
 
+    public Page<ListingDto> globalSearch(String query, int page, int size, String userEmail) {
+        log.info("Global search - query: {}, page: {}, size: {}", query, page, size);
+        
+        if (query == null || query.trim().isEmpty()) {
+            return Page.empty();
+        }
+        
+        String searchTerm = query.trim().toLowerCase();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        
+        // Search by title and listing number
+        Page<Listing> results = listingRepository.findByTitleContainingIgnoreCaseOrListingNoContainingIgnoreCaseAndStatus(
+            searchTerm, searchTerm, ListingStatus.ACTIVE, pageable
+        );
+        
+        List<ListingDto> dtos = results.getContent().stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+        
+        // Enrich with stats
+        favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
+        reviewStatsUtil.enrichWithReviewStats(dtos);
+        
+        return new PageImpl<>(dtos, pageable, results.getTotalElements());
+    }
+
         private List<ListingDto> getListingsGeneric(List<Listing> listings, String userEmail) {
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)

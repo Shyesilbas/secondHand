@@ -32,6 +32,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
 
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
+    const [notes, setNotes] = useState('');
 
     // Load payment methods only when checkout modal is open
     useEffect(() => {
@@ -109,7 +110,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             const payload = {
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
-                notes: '',
+                notes: notes?.trim() || null,
                 paymentType: selectedPaymentType,
                 paymentVerificationCode: paymentVerificationCode?.trim() || null
             };
@@ -154,6 +155,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setBankAccounts([]);
         setSelectedBankAccountIban(null);
         setPaymentVerificationCode('');
+        setNotes('');
         setShowEWalletWarning(false);
     };
 
@@ -189,7 +191,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
             const payload = {
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
-                notes: '',
+                notes: notes?.trim() || null,
                 paymentType: selectedPaymentType,
                 paymentVerificationCode: paymentVerificationCode?.trim() || null
             };
@@ -240,6 +242,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         eWallet,
         paymentVerificationCode,
         setPaymentVerificationCode,
+        notes,
+        setNotes,
 
         handleCheckout,
         proceedDisabled,

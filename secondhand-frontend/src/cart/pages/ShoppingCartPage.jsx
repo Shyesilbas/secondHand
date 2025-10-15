@@ -212,6 +212,8 @@ const ShoppingCartPage = () => {
                     eWallet={checkout.eWallet}
                     paymentVerificationCode={checkout.paymentVerificationCode}
                     setPaymentVerificationCode={checkout.setPaymentVerificationCode}
+                    notes={checkout.notes}
+                    setNotes={checkout.setNotes}
                     sendVerificationCode={checkout.sendVerificationCode}
                     emails={checkout.emails}
                     isEmailsLoading={checkout.isEmailsLoading}

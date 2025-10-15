@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { reviewService } from '../services/reviewService.js';
 
-export const useReviews = () => {
+export const useReviews = (userId, options = {}) => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [hasBeenFetched, setHasBeenFetched] = useState(false);
+    const enabled = options.enabled ?? true;
 
     const fetchReviews = async (pageNum = 0, reset = false) => {
+        if (!enabled) return;
+        
         setLoading(true);
         setError(null);
         
@@ -23,6 +27,7 @@ export const useReviews = () => {
             
             setHasMore(!response.last);
             setPage(pageNum);
+            setHasBeenFetched(true);
         } catch (err) {
             setError(err.message || 'Failed to fetch reviews');
         } finally {
@@ -31,18 +36,22 @@ export const useReviews = () => {
     };
 
     const loadMore = () => {
-        if (!loading && hasMore) {
+        if (!loading && hasMore && enabled) {
             fetchReviews(page + 1, false);
         }
     };
 
     const refresh = () => {
-        fetchReviews(0, true);
+        if (enabled) {
+            fetchReviews(0, true);
+        }
     };
 
     useEffect(() => {
-        fetchReviews(0, true);
-    }, []);
+        if (enabled && !hasBeenFetched) {
+            fetchReviews(0, true);
+        }
+    }, [enabled, hasBeenFetched]);
 
     return {
         reviews,
@@ -54,13 +63,15 @@ export const useReviews = () => {
     };
 };
 
-export const useReviewsByUser = (userId) => {
+export const useReviewsByUser = (userId, options = {}) => {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hasBeenFetched, setHasBeenFetched] = useState(false);
+    const enabled = options.enabled ?? true;
 
     const fetchReviews = async () => {
-        if (!userId) return;
+        if (!userId || !enabled) return;
         
         setLoading(true);
         setError(null);
@@ -68,6 +79,7 @@ export const useReviewsByUser = (userId) => {
         try {
             const response = await reviewService.getReviewsByUser(userId, 0, 100);
             setReviews(response.content || []);
+            setHasBeenFetched(true);
         } catch (err) {
             setError(err.message || 'Failed to fetch reviews');
         } finally {
@@ -76,8 +88,10 @@ export const useReviewsByUser = (userId) => {
     };
 
     useEffect(() => {
-        fetchReviews();
-    }, [userId]);
+        if (enabled && !hasBeenFetched) {
+            fetchReviews();
+        }
+    }, [userId, enabled, hasBeenFetched]);
 
     return {
         reviews,

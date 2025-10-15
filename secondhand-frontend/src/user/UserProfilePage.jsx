@@ -8,6 +8,7 @@ import { ROUTES } from '../common/constants/routes.js';
 import { formatDateTime, formatCurrency } from '../common/formatters.js';
 import ComplaintButton from '../complaint/components/ComplaintButton.jsx';
 import { ReviewStats, ReviewsList, useReviews, useReviewsByUser, useUserReviewStats } from '../reviews/index.js';
+import ListingCard from '../listing/components/ListingCard.jsx';
 
 const TABS = [
     { key: 'overview', label: 'Overview' },
@@ -48,11 +49,17 @@ const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState('overview');
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
-    const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId);
-    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, hasMore, loadMore } = useReviews(userId);
-    const { reviews: givenReviews, loading: givenReviewsLoading, error: givenReviewsError } = useReviewsByUser(userId);
+    const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId, {
+        enabled: activeTab === 'listings'
+    });
+    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, hasMore, loadMore } = useReviews(userId, {
+        enabled: activeTab === 'reviews'
+    });
+    const { reviews: givenReviews, loading: givenReviewsLoading, error: givenReviewsError } = useReviewsByUser(userId, {
+        enabled: activeTab === 'reviews'
+    });
     const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId, { 
-        enabled: activeTab === 'reviews' 
+        enabled: true // Always load for header display
     });
 
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -91,9 +98,24 @@ const UserProfilePage = () => {
                             </svg>
                             Go Back
                         </button>
-                        <h1 className="text-2xl font-semibold text-gray-900">
-                            {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-gray-500">(You)</span>}
-                        </h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl font-semibold text-gray-900">
+                                {user.name} {user.surname} {isOwnProfile && <span className="text-sm text-gray-500">(You)</span>}
+                            </h1>
+                            {reviewStats && reviewStats.totalReviews > 0 && (
+                                <div className="flex items-center gap-1 px-3 py-1 bg-yellow-50 border border-yellow-200 rounded-full">
+                                    <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span className="text-sm font-semibold text-yellow-800">
+                                        {(reviewStats.averageRating || 0).toFixed(1)}
+                                    </span>
+                                    <span className="text-sm text-yellow-700">
+                                        ({reviewStats.totalReviews})
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                         <p className="text-sm text-gray-600 mt-1">
                             {isOwnProfile ? 'Your profile information and activity' : 'User profile and listings'}
                         </p>
@@ -176,47 +198,62 @@ const UserProfilePage = () => {
                 )}
 
                 {activeTab === 'listings' && (
-                    <div className="bg-white border border-gray-200 rounded-lg">
-                        <div className="p-6 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-900">Listings ({listings.length})</h2>
-                            <p className="text-sm text-gray-600 mt-1">All listings by this user</p>
+                    <div className="space-y-6">
+                        {/* Header */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-6">
+                                <h2 className="text-lg font-medium text-gray-900">Listings ({listings.length})</h2>
+                                <p className="text-sm text-gray-600 mt-1">All active listings by this user</p>
+                            </div>
                         </div>
-                        <div className="p-6">
-                            {listingsLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {[...Array(6)].map((_, i) => (
-                                        <div key={i} className="bg-gray-100 animate-pulse h-64 rounded-lg"></div>
-                                    ))}
+
+                        {/* Listings Grid */}
+                        {listingsLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {[...Array(8)].map((_, i) => (
+                                    <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
+                                        <div className="aspect-video bg-gray-200"></div>
+                                        <div className="p-4 space-y-3">
+                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : listingsError ? (
+                            <div className="bg-white border border-gray-200 rounded-lg">
+                                <div className="text-center text-red-500 py-12">
+                                    <svg className="w-12 h-12 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p className="text-lg font-medium mb-2">Failed to load listings</p>
+                                    <p className="text-sm text-gray-500">Please try again later</p>
                                 </div>
-                            ) : listingsError ? (
-                                <div className="text-center text-red-500 py-8">Failed to load listings.</div>
-                            ) : listings.length === 0 ? (
-                                <div className="text-center text-gray-500 py-8">No listings available.</div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {listings.map(listing => (
-                                        <Link
-                                            key={listing.id}
-                                            to={ROUTES.LISTING_DETAIL(listing.id)}
-                                            className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                                        >
-                                            <div className="p-4">
-                                                <h3 className="text-lg font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                                                    {listing.title}
-                                                </h3>
-                                                <p className="text-green-600 font-bold mt-2 text-lg">
-                                                    {formatCurrency(listing.price, listing.currency)}
-                                                </p>
-                                                <div className="flex items-center justify-between mt-3 text-sm text-gray-500">
-                                                    <span>{listing.type}</span>
-                                                    <span>{formatDate(listing.createdAt)}</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
+                            </div>
+                        ) : listings.length === 0 ? (
+                            <div className="bg-white border border-gray-200 rounded-lg">
+                                <div className="text-center text-gray-500 py-12">
+                                    <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    <p className="text-lg font-medium mb-2">No listings available</p>
+                                    <p className="text-sm text-gray-400">
+                                        {isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"}
+                                    </p>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {listings.map(listing => (
+                                    <ListingCard
+                                        key={listing.id}
+                                        listing={listing}
+                                        showActions={false} // Don't show edit/delete actions on other users' profiles
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
