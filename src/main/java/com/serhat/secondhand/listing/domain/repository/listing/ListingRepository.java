@@ -5,6 +5,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 
 import com.serhat.secondhand.user.domain.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -25,6 +27,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     List<Listing> findByListingTypeOrderByCreatedAtDesc(ListingType listingType);
     
     List<Listing> findBySeller(User seller);
+    
+    Page<Listing> findBySeller(User seller, Pageable pageable);
     
     List<Listing> findBySellerOrderByCreatedAtDesc(User seller);
     

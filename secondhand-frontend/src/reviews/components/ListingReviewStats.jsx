@@ -1,8 +1,10 @@
 import React from 'react';
-import { useListingReviews } from '../hooks/useListingReviews.js';
 
-const ListingReviewStats = ({ listingId, size = 'sm', showIcon = true, showText = true }) => {
-  const { stats, isLoading, error } = useListingReviews(listingId);
+const ListingReviewStats = ({ listing, listingId, size = 'sm', showIcon = true, showText = true }) => {
+  // Use listing.reviewStats if available, otherwise fallback to null
+  const stats = listing?.reviewStats || null;
+  const isLoading = false; // No loading since we get stats from listing
+  const error = null; // No error since we get stats from listing
 
   if (isLoading) {
     return (

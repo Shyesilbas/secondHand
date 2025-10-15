@@ -1,52 +1,47 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import { ERROR_MESSAGES } from '../types/index.js';
 
+const LISTING_KEYS = {
+  all: ['listings'],
+  detail: (id) => [...LISTING_KEYS.all, 'detail', id],
+};
+
 export const useListingData = (listingId, autoFetch = true) => {
-  const [listing, setListing] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const {
+    data: listing,
+    isLoading,
+    error: queryError,
+    refetch,
+    isError
+  } = useQuery({
+    queryKey: LISTING_KEYS.detail(listingId),
+    queryFn: () => {
+      console.log('🔍 useListingData: Fetching listing', listingId);
+      return listingService.getListingById(listingId);
+    },
+    enabled: autoFetch && !!listingId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 2,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
-  const fetchListing = useCallback(async () => {
-    if (!listingId) {
-      setError(ERROR_MESSAGES.INVALID_DATA);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await listingService.getListingById(listingId);
-      setListing(data);
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          ERROR_MESSAGES.NETWORK_ERROR;
-      setError(errorMessage);
-      setListing(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [listingId]);
-
-  const refetch = useCallback(() => {
-    fetchListing();
-  }, [fetchListing]);
+  const error = isError ? (queryError?.response?.data?.message || queryError?.message || ERROR_MESSAGES.NETWORK_ERROR) : null;
 
   const reset = useCallback(() => {
-    setListing(null);
-    setError(null);
-    setIsLoading(false);
+    // React Query handles this automatically
   }, []);
 
-  useEffect(() => {
-    if (autoFetch && listingId) {
-      fetchListing();
-    }
-  }, [fetchListing, autoFetch, listingId]);
+  const fetchListing = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   return {
-    listing,
+    listing: listing || null,
     isLoading,
     error,
     refetch,

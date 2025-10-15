@@ -3,8 +3,9 @@ import { useListingReviews } from '../hooks/useListingReviews.js';
 import ReviewCard from './ReviewCard.jsx';
 import { StarIcon } from '@heroicons/react/24/solid';
 
-const ListingReviewsSection = ({ listingId }) => {
-  const { reviews, stats, isLoading, error, hasReviews } = useListingReviews(listingId);
+const ListingReviewsSection = ({ listingId, listing }) => {
+  const { reviews, isLoading, error, hasReviews } = useListingReviews(listingId);
+  const stats = listing?.reviewStats || null;
 
   if (isLoading) {
     return (

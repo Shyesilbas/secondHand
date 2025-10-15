@@ -7,6 +7,7 @@ export const ElectronicCreateRequestDTO = {
   currency: 'TRY',
   city: '',
   district: '',
+  imageUrl: '',
 
     electronicType: '',
   electronicBrand: '',
@@ -19,6 +20,7 @@ export const ElectronicCreateRequestDTO = {
 
 export const ElectronicListingDTO = {
   ...ListingDTO,
+  imageUrl: '',
     electronicType: '',
   electronicBrand: '',
   model: '',
@@ -58,6 +60,7 @@ export const createElectronicCreateRequest = (data) => {
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
+    imageUrl: data.imageUrl || undefined,
 
     electronicType: data.electronicType || '',
     electronicBrand: data.electronicBrand || '',
@@ -84,6 +87,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.warrantyProof !== undefined && data.warrantyProof !== '') updateData.warrantyProof = Boolean(data.warrantyProof);
   if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
   if (data.color !== undefined && data.color !== '') updateData.color = data.color;
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
   return updateData;
 };
 
