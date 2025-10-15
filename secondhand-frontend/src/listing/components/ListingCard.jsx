@@ -13,8 +13,7 @@ import { LISTING_STATUS } from '../types/index.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
-const ListingCard = memo(({ listing, onDeleted }) => {
-    const { priceHistory } = usePriceHistory(listing?.id);
+const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const [showInfo, setShowInfo] = useState(false);
     const { user } = useAuth();
     const { showcases } = useShowcase();
@@ -81,7 +80,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                 
                 {/* Top right overlay buttons */}
                 <div className="absolute top-3 right-3 flex items-center gap-2">
-                    <ListingCardActions listing={listing} onChanged={onDeleted} />
+                    {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
                     <FavoriteButton
                         listingId={listing.id}
                         listing={listing}

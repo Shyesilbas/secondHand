@@ -4,7 +4,7 @@ import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.jsx';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
-import UserSearchBar from '../../../user/components/UserSearchBar.jsx';
+import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
 import { useCart } from '../../../cart/hooks/useCart.js';
 
@@ -100,8 +100,6 @@ const Header = () => {
         );
     };
 
-    const linkClass = "text-text-secondary hover:text-btn-primary transition-colors flex items-center space-x-2";
-
     const listingsMenu = [
         { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: icons.myListings },
         { to: ROUTES.CREATE_LISTING, label: 'New Listing', icon: icons.newListing },
@@ -133,70 +131,125 @@ const Header = () => {
     ];
 
     return (
-        <header className="bg-header-bg shadow-sm border-b border-header-border">
+        <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    <Link to={ROUTES.HOME} className="text-xl font-bold text-btn-primary">SecondHand</Link>
-                    {isAuthenticated && <div className="flex-1 max-w-xs mx-4"><UserSearchBar /></div>}
+                <div className="flex items-center justify-between h-16">
+                    {/* Logo */}
+                    <div className="flex items-center">
+                        <Link to={ROUTES.HOME} className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                            </div>
+                            <span className="text-xl font-bold text-gray-900">SecondHand</span>
+                        </Link>
+                    </div>
 
-                    <nav className="hidden md:flex space-x-8">
-                        <DropdownMenu trigger="Listings">
-                            {listingsMenu.map((item, idx) =>
-                                item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
-                            )}
-                        </DropdownMenu>
+                    {/* Search Bar - Center */}
+                    {isAuthenticated && (
+                        <div className="flex-1 max-w-lg mx-8">
+                            <UnifiedSearchBar />
+                        </div>
+                    )}
 
-                        {isAuthenticated && (
-                            <DropdownMenu trigger="Payment">
-                                {paymentMenu.map((item, idx) =>
-                                    item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
-                                )}
-                            </DropdownMenu>
-                        )}
+                    {/* Right Side Navigation */}
+                    <div className="flex items-center space-x-1">
+                        {isAuthenticated ? (
+                            <>
+                                {/* Quick Actions */}
+                                <div className="hidden lg:flex items-center space-x-1 mr-4">
+                                    {/* Listings Dropdown */}
+                                    <DropdownMenu trigger={
+                                        <button className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                            <icons.allListings />
+                                            <span>Listings</span>
+                                        </button>
+                                    }>
+                                        {listingsMenu.map((item, idx) =>
+                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                        )}
+                                    </DropdownMenu>
 
-                        {isAuthenticated && userLinks.map(link => (
-                            <Link key={link.to} to={link.to} onClick={link.onClick} className="relative flex items-center">
-                                <div className={linkClass}>
-                                    <link.icon />
-                                    <span>{link.label}</span>
+                                    {/* Payment Dropdown */}
+                                    <DropdownMenu trigger={
+                                        <button className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                            <icons.paymentMethods />
+                                            <span>Payment</span>
+                                        </button>
+                                    }>
+                                        {paymentMenu.map((item, idx) =>
+                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                        )}
+                                    </DropdownMenu>
                                 </div>
 
-                                {link.to === ROUTES.CHAT && totalUnread > 0 && (
-                                    <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-600 rounded-full shadow-lg animate-pulse">
-                {totalUnread > 99 ? '99+' : totalUnread}
-                                    </span>
-                                )}
+                                {/* Icon Links */}
+                                <div className="flex items-center space-x-1">
+                                    {userLinks.map(link => (
+                                        <Link 
+                                            key={link.to} 
+                                            to={link.to} 
+                                            onClick={link.onClick} 
+                                            className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                            title={link.label}
+                                        >
+                                            <link.icon />
+                                            
+                                            {link.to === ROUTES.CHAT && totalUnread > 0 && (
+                                                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">
+                                                    {totalUnread > 9 ? '9+' : totalUnread}
+                                                </span>
+                                            )}
 
-                                {link.to === ROUTES.SHOPPING_CART && link.badge > 0 && (
-                                    <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold leading-none text-white bg-blue-600 rounded-full shadow-lg">
-                {link.badge > 99 ? '99+' : link.badge}
-                                    </span>
-                                )}
-                            </Link>
-                        ))}
+                                            {link.to === ROUTES.SHOPPING_CART && link.badge > 0 && (
+                                                <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full">
+                                                    {link.badge > 9 ? '9+' : link.badge}
+                                                </span>
+                                            )}
+                                        </Link>
+                                    ))}
+                                </div>
 
-                    </nav>
-
-                    <div className="flex items-center space-x-4">
-                        {isAuthenticated ? (
-                            <DropdownMenu trigger={`${user?.name || 'Profile'}`}>
-                                {userMenuItems.map((item, idx) =>
-                                    item.divider ? <DropdownDivider key={idx} /> :
-                                        item.isButton ? (
-                                            <button key={idx} onClick={item.action} className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
-                                                <item.icon />
-                                                <span>{item.label}</span>
-                                            </button>
-                                        ) : (
-                                            <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
-                                        )
-                                )}
-                            </DropdownMenu>
-                        ) : (
-                            <>
-                                <Link to={ROUTES.LOGIN} className="text-text-secondary hover:text-btn-primary transition-colors">Login</Link>
-                                <Link to={ROUTES.REGISTER} className="bg-btn-primary text-white px-4 py-2 rounded-md hover:bg-btn-primary-hover transition-colors">Register</Link>
+                                {/* User Menu */}
+                                <div className="ml-3 pl-3 border-l border-gray-200">
+                                    <DropdownMenu trigger={
+                                        <button className="flex items-center space-x-2 p-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                                                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                            </div>
+                                            <span className="hidden sm:block">{user?.name || 'Profile'}</span>
+                                        </button>
+                                    }>
+                                        {userMenuItems.map((item, idx) =>
+                                            item.divider ? <DropdownDivider key={idx} /> :
+                                                item.isButton ? (
+                                                    <button key={idx} onClick={item.action} className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
+                                                        <item.icon />
+                                                        <span>{item.label}</span>
+                                                    </button>
+                                                ) : (
+                                                    <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                                )
+                                        )}
+                                    </DropdownMenu>
+                                </div>
                             </>
+                        ) : (
+                            <div className="flex items-center space-x-3">
+                                <Link 
+                                    to={ROUTES.LOGIN} 
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                                >
+                                    Login
+                                </Link>
+                                <Link 
+                                    to={ROUTES.REGISTER} 
+                                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                                >
+                                    Register
+                                </Link>
+                            </div>
                         )}
                     </div>
                 </div>

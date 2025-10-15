@@ -89,6 +89,10 @@ export const listingService = {
   getMyListingsByStatus: async (status) => {
     return get(`${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}`);
   },
+  
+  globalSearch: async (query, page = 0, size = 8) => {
+    return get(`${API_ENDPOINTS.LISTINGS.SEARCH}?query=${encodeURIComponent(query)}&page=${page}&size=${size}`);
+  },
   getListingById: async (id) => {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
   },

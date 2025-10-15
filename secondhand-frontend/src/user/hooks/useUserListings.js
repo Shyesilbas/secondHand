@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { listingService } from '../../listing/services/listingService.js';
 
-export const useUserListings = (userId) => {
+export const useUserListings = (userId, options = {}) => {
     const [listings, setListings] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hasBeenFetched, setHasBeenFetched] = useState(false);
+    const enabled = options.enabled ?? true;
 
     const fetchUserListings = async () => {
-        if (!userId) return;
+        if (!userId || !enabled) return;
 
         setIsLoading(true);
         setError(null);
@@ -19,10 +21,10 @@ export const useUserListings = (userId) => {
             } else if (response && Array.isArray(response) && response.length === 0) {
                 setListings([]);
             }
+            setHasBeenFetched(true);
         } catch (err) {
             console.error('User listings fetch error:', err);
             console.error('Error details:', err.response?.data);
-
 
             setError(null);
         } finally {
@@ -31,8 +33,10 @@ export const useUserListings = (userId) => {
     };
 
     useEffect(() => {
-        fetchUserListings();
-    }, [userId]);
+        if (enabled && !hasBeenFetched) {
+            fetchUserListings();
+        }
+    }, [userId, enabled, hasBeenFetched]);
 
     return {
         listings,

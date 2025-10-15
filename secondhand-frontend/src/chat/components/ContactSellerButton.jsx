@@ -23,7 +23,7 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
         isLoadingMessages,
         isConnected,
         selectedChatRoom
-    } = useChat(user?.id);
+    } = useChat(user?.id, { enableChatRoomsFetch: false });
 
     const targetUserId = listing.userId || listing.sellerId;
     if (targetUserId === user?.id) {

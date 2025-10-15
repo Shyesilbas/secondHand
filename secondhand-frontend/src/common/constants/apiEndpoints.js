@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
         MY_LISTINGS: '/v1/listings/my-listings',
         BY_ID: (id) => `/v1/listings/${id}`,
         BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
+        SEARCH: '/v1/listings/search',
         CREATE: '/v1/listings',
         DELETE: (id) => `/v1/listings/${id}`,
         MARK_SOLD: (id) => `/v1/listings/${id}/mark-sold`,

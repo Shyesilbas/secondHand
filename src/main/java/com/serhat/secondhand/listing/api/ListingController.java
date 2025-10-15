@@ -65,6 +65,22 @@ public class ListingController {
                     return ResponseEntity.notFound().build();
                 });
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "Global search for listings", description = "Search listings by title or listing number")
+    public ResponseEntity<Page<ListingDto>> globalSearch(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @AuthenticationPrincipal User currentUser) {
+        
+        log.info("Global search request - query: {}, page: {}, size: {}", query, page, size);
+        
+        String userEmail = currentUser != null ? currentUser.getEmail() : null;
+        Page<ListingDto> results = listingService.globalSearch(query, page, size, userEmail);
+        
+        return ResponseEntity.ok(results);
+    }
     
     @GetMapping("/status/{status}")
     @Operation(summary = "Get listings by status - Returns appropriate DTOs based on listing types")
