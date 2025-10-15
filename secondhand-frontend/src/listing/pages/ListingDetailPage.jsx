@@ -175,7 +175,7 @@ const ListingDetailPage = () => {
 
               {/* Reviews Section */}
               {!['VEHICLE', 'REAL_ESTATE'].includes(listing.type) && (
-                <ListingReviewsSection listingId={listing.id} />
+                <ListingReviewsSection listingId={listing.id} listing={listing} />
               )}
             </div>
 

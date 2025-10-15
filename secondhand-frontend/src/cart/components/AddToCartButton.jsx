@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ShoppingCartIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -10,64 +10,50 @@ const AddToCartButton = ({
                              className = ''
                          }) => {
     const { user } = useAuth();
-    const { addToCart, isAddingToCart, checkInCart } = useCart({ loadCartItems: true });
-    const [isInCart, setIsInCart] = useState(false);
-    const [isChecking, setIsChecking] = useState(false);
+    const { addToCart, isAddingToCart, cartItems } = useCart({ loadCartItems: true });
+    
+    // Check if item is in cart from cartItems array (no API call needed!)
+    const isInCart = Array.isArray(cartItems) && cartItems.some(item => item.listing?.id === listing?.id);
 
     const canAddToCart = () => {
         if (!user) return false;
         if (!listing) return false;
-        if (listing.seller?.id === user.id) return false;
-        if (listing.listingType === 'VEHICLE') return false;
-        if (listing.listingType === 'REAL_ESTATE') return false;
+        if (String(listing.seller?.id || listing.sellerId) === String(user.id)) return false;
+        if (listing.type === 'VEHICLE') return false;
+        if (listing.type === 'REAL_ESTATE') return false;
         if (listing.status !== 'ACTIVE') return false;
         return true;
-    };
-
-    const checkCartStatus = async () => {
-        if (!canAddToCart()) return;
-        setIsChecking(true);
-        try {
-            const result = await checkInCart(listing.id);
-            setIsInCart(result.inCart);
-        } catch (error) {
-            console.error('Failed to check cart status:', error);
-        } finally {
-            setIsChecking(false);
-        }
     };
 
     const handleAddToCart = async () => {
         if (!canAddToCart() || isInCart) return;
         try {
             await addToCart(listing.id, 1, '');
-            setIsInCart(true);
         } catch (error) {
             console.error('Failed to add to cart:', error);
         }
     };
-
-    useEffect(() => {
-        checkCartStatus();
-    }, [listing?.id]);
 
     if (!canAddToCart()) {
         return null;
     }
 
     const sizeClasses = {
+        xs: 'p-1.5',
         sm: 'p-2',
         md: 'p-3',
         lg: 'p-4'
     };
 
     const iconSizes = {
+        xs: 'w-3 h-3',
         sm: 'w-4 h-4',
         md: 'w-5 h-5',
         lg: 'w-6 h-6'
     };
 
     const textSizes = {
+        xs: 'text-xs',
         sm: 'text-sm',
         md: 'text-base',
         lg: 'text-lg'
@@ -76,7 +62,7 @@ const AddToCartButton = ({
     return (
         <button
             onClick={handleAddToCart}
-            disabled={isAddingToCart || isChecking || isInCart}
+            disabled={isAddingToCart || isInCart}
             className={`
                 ${sizeClasses[size]}
                 ${isInCart
@@ -88,7 +74,7 @@ const AddToCartButton = ({
             `}
             title={isInCart ? 'Added to cart' : 'Add to cart'}
         >
-            {isAddingToCart || isChecking ? (
+            {isAddingToCart ? (
                 <div className={`${iconSizes[size]} animate-spin rounded-full border-2 border-current border-t-transparent`} />
             ) : isInCart ? (
                 <CheckIcon className={iconSizes[size]} />

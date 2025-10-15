@@ -6,13 +6,14 @@ import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.UserReviewStatsDto;
+import com.serhat.secondhand.reviews.dto.ReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.shipping.ShippingService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class ReviewService {
     private final OrderItemRepository orderItemRepository;
     private final UserService userService;
     private final ReviewMapper reviewMapper;
-    private final ListingService listingService;
+    private final ListingRepository listingRepository;
     private final ShippingService shippingService;
 
     public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
@@ -180,7 +181,7 @@ public class ReviewService {
         
         UUID uuid = UUID.fromString(listingId);
         
-                Optional<Listing> listing = listingService.findById(uuid);
+        Optional<Listing> listing = listingRepository.findById(uuid);
         if (listing.isEmpty()) {
             throw new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND");
         }
@@ -214,5 +215,28 @@ public class ReviewService {
                 .oneStarReviews((Long) stats[6])
                 .zeroStarReviews((Long) stats[7])
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewStatsDto getListingReviewStatsDto(UUID listingId) {
+        log.info("Getting review stats DTO for listing: {}", listingId);
+        
+        List<Object[]> statsList = reviewRepository.getListingReviewStats(listingId);
+        
+        if (statsList == null || statsList.isEmpty()) {
+            return ReviewStatsDto.empty();
+        }
+
+        Object[] stats = statsList.get(0);
+        
+        return new ReviewStatsDto(
+            (Long) stats[0],  // totalReviews
+            stats[1] != null ? (Double) stats[1] : 0.0,  // averageRating
+            (Long) stats[2],  // fiveStarCount
+            (Long) stats[3],  // fourStarCount
+            (Long) stats[4],  // threeStarCount
+            (Long) stats[5],  // twoStarCount
+            (Long) stats[6]   // oneStarCount
+        );
     }
 }

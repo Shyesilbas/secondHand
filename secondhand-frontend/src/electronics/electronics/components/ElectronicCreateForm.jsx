@@ -6,6 +6,7 @@ import { ROUTES } from '../../../common/constants/routes.js';
 import ListingBasics from '../../../common/components/forms/ListingBasics.jsx';
 import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
 import LocationFields from '../../../common/components/forms/LocationFields.jsx';
+import ImageUpload from '../../../common/components/ImageUpload.jsx';
 import { ElectronicCreateRequestDTO } from '../../electronics.js';
 import { useElectronic } from '../hooks/useElectronic.js';
 import ListingWizard from '../../../listing/components/ListingWizard.jsx';
@@ -42,6 +43,14 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
   const handleDropdownChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
+  };
+
+  const handleImageUpload = (imageUrl) => {
+    handleInputChange({ target: { name: 'imageUrl', value: imageUrl } });
+  };
+
+  const handleImageRemove = () => {
+    handleInputChange({ target: { name: 'imageUrl', value: '' } });
   };
 
   const nextStep = () => {
@@ -149,7 +158,15 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                           <p className="text-sm text-slate-600">{steps[2].description}</p>
                         </div>
                       </div>
-                      <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+                      <div className="space-y-6">
+                        <ImageUpload
+                          onImageUpload={handleImageUpload}
+                          onImageRemove={handleImageRemove}
+                          imageUrl={formData.imageUrl}
+                          disabled={false}
+                        />
+                        <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+                      </div>
                       {(!formData.city?.trim() || !formData.district?.trim()) && (
                           <div className="mt-3 text-sm text-red-600">City and district are required</div>
                       )}

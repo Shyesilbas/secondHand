@@ -2,6 +2,7 @@ import React from 'react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import ListingBasics from '../../common/components/forms/ListingBasics.jsx';
 import LocationFields from '../../common/components/forms/LocationFields.jsx';
+import ImageUpload from '../../common/components/ImageUpload.jsx';
 import ListingWizard from '../../listing/components/ListingWizard.jsx';
 import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
@@ -30,6 +31,14 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
+
+  const handleImageUpload = (imageUrl) => {
+    handleInputChange({ target: { name: 'imageUrl', value: imageUrl } });
+  };
+
+  const handleImageRemove = () => {
+    handleInputChange({ target: { name: 'imageUrl', value: '' } });
+  };
 
   const renderStep = (stepId) => {
     switch (stepId) {
@@ -76,7 +85,17 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
             </div>
         );
       case 3:
-        return <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />;
+        return (
+          <div className="space-y-6">
+            <ImageUpload
+              onImageUpload={handleImageUpload}
+              onImageRemove={handleImageRemove}
+              imageUrl={formData.imageUrl}
+              disabled={false}
+            />
+            <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+          </div>
+        );
       default:
         return null;
     }

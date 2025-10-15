@@ -33,11 +33,12 @@ const ListingCard = memo(({ listing, onDeleted }) => {
     };
 
     const canShowCartButton =
-        listing.sellerId &&
+        (listing.seller?.id || listing.sellerId) &&
         user?.id &&
-        listing.sellerId !== user.id &&
+        String(listing.seller?.id || listing.sellerId) !== String(user.id) &&
         listing.status === 'ACTIVE' &&
         !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
+    
 
     const isInShowcase = Array.isArray(showcases) && showcases.some(s => (s.listing?.id || s.listingId) === listing.id);
 
@@ -157,7 +158,7 @@ const ListingCard = memo(({ listing, onDeleted }) => {
                     <div className="flex items-center gap-3 mt-2">
                         <ListingFavoriteStats listing={listing} size="xs" showIcon showText />
                         {!['VEHICLE', 'REAL_ESTATE'].includes(listing.type) && (
-                            <ListingReviewStats listingId={listing.id} size="xs" showIcon showText />
+                            <ListingReviewStats listing={listing} listingId={listing.id} size="xs" showIcon showText />
                         )}
                     </div>
                 </div>

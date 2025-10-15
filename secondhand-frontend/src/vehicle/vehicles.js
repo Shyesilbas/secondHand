@@ -8,6 +8,7 @@ export const VehicleCreateRequestDTO = {
   currency: 'TRY',
   city: '',
   district: '',
+  imageUrl: '',
   
     brand: '',
   model: '',
@@ -31,6 +32,7 @@ export const VehicleCreateRequestDTO = {
 
 export const VehicleListingDTO = {
   ...ListingDTO,
+  imageUrl: '',
     brand: '',
   model: '',
   year: 0,
@@ -84,6 +86,7 @@ export const createVehicleCreateRequest = (data) => {
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
+    imageUrl: data.imageUrl || undefined,
     
         brand: data.brand || '',
     model: (data.model || '').trim(),
@@ -127,6 +130,7 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter);
   if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
   if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
   
   return updateData;
 };

@@ -83,8 +83,8 @@ const createFilterPayload = (filters, listingType) => {
 
 export const listingService = {
 
-  getMyListings: async () => {
-    return get(API_ENDPOINTS.LISTINGS.MY_LISTINGS);
+  getMyListings: async (page = 0, size = 10) => {
+    return get(`${API_ENDPOINTS.LISTINGS.MY_LISTINGS}?page=${page}&size=${size}`);
   },
   getMyListingsByStatus: async (status) => {
     return get(`${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}`);

@@ -11,6 +11,7 @@ import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicL
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.reviews.dto.ReviewStatsDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,4 +59,5 @@ public abstract class ListingDto {
     private LocalDateTime updatedAt;
     
     private FavoriteStatsDto favoriteStats;
+    private ReviewStatsDto reviewStats;
 }

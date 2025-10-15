@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
+import com.serhat.secondhand.listing.application.util.ListingReviewStatsUtil;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -14,6 +15,9 @@ import com.serhat.secondhand.user.domain.entity.User;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final UserService userService;
     private final ListingFavoriteStatsUtil favoriteStatsUtil;
+    private final ListingReviewStatsUtil reviewStatsUtil;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
 
     public ListingService(
@@ -45,12 +50,14 @@ public class ListingService {
         RealEstateListingFilterService realEstateListingFilterService,
         SportsListingFilterService sportsListingFilterService,
         UserService userService,
-        ListingFavoriteStatsUtil favoriteStatsUtil
+        ListingFavoriteStatsUtil favoriteStatsUtil,
+        ListingReviewStatsUtil reviewStatsUtil
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
         this.userService = userService;
         this.favoriteStatsUtil = favoriteStatsUtil;
+        this.reviewStatsUtil = reviewStatsUtil;
 
         this.filterStrategyMap = new HashMap<>();
         filterStrategyMap.put(VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f));
@@ -70,6 +77,7 @@ public class ListingService {
                 .map(listing -> {
                     ListingDto dto = listingMapper.toDynamicDto(listing);
                     favoriteStatsUtil.enrichWithFavoriteStats(dto, userEmail);
+                    reviewStatsUtil.enrichWithReviewStats(dto);
                     return dto;
                 });
     }
@@ -92,6 +100,7 @@ public class ListingService {
             log.info("Found listing with listingNo: {} - ID: {}", cleanListingNo, listing.get().getId());
             ListingDto dto = listingMapper.toDynamicDto(listing.get());
             favoriteStatsUtil.enrichWithFavoriteStats(dto, null);
+            reviewStatsUtil.enrichWithReviewStats(dto);
             return Optional.of(dto);
         } else {
             log.info("No listing found with listingNo: {}", cleanListingNo);
@@ -108,6 +117,7 @@ public class ListingService {
         Page<ListingDto> result = strategy.apply(filters);
         List<ListingDto> dtos = result.getContent();
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
+        reviewStatsUtil.enrichWithReviewStats(dtos);
         return new PageImpl<>(dtos, result.getPageable(), result.getTotalElements());
     }
 
@@ -116,9 +126,25 @@ public class ListingService {
                 .map(listingMapper::toDynamicDto)
                 .toList();
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
+        reviewStatsUtil.enrichWithReviewStats(dtos);
         return dtos;
     }
 
+    public Page<ListingDto> getMyListings(User user, int page, int size) {
+        log.info("Getting listings for user: {} with pagination - page: {}, size: {}", user.getEmail(), page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
+        
+        List<ListingDto> dtos = listingsPage.getContent().stream()
+                .map(listingMapper::toDynamicDto)
+                .toList();
+        favoriteStatsUtil.enrichWithFavoriteStats(dtos, user.getEmail());
+        reviewStatsUtil.enrichWithReviewStats(dtos);
+        
+        return new PageImpl<>(dtos, pageable, listingsPage.getTotalElements());
+    }
+
+    // Keep the old method for backward compatibility
     public List<ListingDto> getMyListings(User user) {
         log.info("Getting all listings for user: {}", user.getEmail());
         return getListingsGeneric(listingRepository.findBySellerOrderByCreatedAtDesc(user), user.getEmail());

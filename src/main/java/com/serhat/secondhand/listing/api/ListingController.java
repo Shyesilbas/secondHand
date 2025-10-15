@@ -106,9 +106,12 @@ public class ListingController {
 
 
     @GetMapping("/my-listings")
-    @Operation(summary = "Get current user's all listings")
-    public ResponseEntity<List<ListingDto>> getMyListings(@AuthenticationPrincipal User currentUser) {
-        List<ListingDto> myListings = listingService.getMyListings(currentUser);
+    @Operation(summary = "Get current user's all listings with pagination")
+    public ResponseEntity<Page<ListingDto>> getMyListings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User currentUser) {
+        Page<ListingDto> myListings = listingService.getMyListings(currentUser, page, size);
         return ResponseEntity.ok(myListings);
     }
 

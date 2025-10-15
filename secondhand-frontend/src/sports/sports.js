@@ -8,6 +8,7 @@ export const SportsListingDTO = {
     status: '',
     city: '',
     district: '',
+    imageUrl: '',
     createdAt: '',
     updatedAt: '',
     sellerName: '',
@@ -26,6 +27,7 @@ export const createSportsCreateRequest = (data) => ({
   currency: data.currency || 'TRY',
   city: data.city,
   district: data.district,
+  imageUrl: data.imageUrl || undefined,
   discipline: data.sportType,   equipmentType: data.equipmentType,
   condition: data.condition,
 });
@@ -37,6 +39,7 @@ export const createSportsUpdateRequest = (data) => ({
   currency: data.currency ?? undefined,
   city: data.city ?? undefined,
   district: data.district ?? undefined,
+  imageUrl: data.imageUrl ?? undefined,
   discipline: data.sportType ?? undefined,   equipmentType: data.equipmentType ?? undefined,
   condition: data.condition ?? undefined,
 });

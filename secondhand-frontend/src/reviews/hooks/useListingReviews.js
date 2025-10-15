@@ -1,53 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
 
+const REVIEW_KEYS = {
+  all: ['reviews'],
+  listing: (listingId) => [...REVIEW_KEYS.all, 'listing', listingId],
+};
+
 export const useListingReviews = (listingId) => {
-  const [reviews, setReviews] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    data: reviewsResponse,
+    isLoading,
+    error: queryError,
+    isError
+  } = useQuery({
+    queryKey: REVIEW_KEYS.listing(listingId),
+    queryFn: () => {
+      console.log('📝 useListingReviews: Fetching reviews for listing', listingId);
+      return reviewService.getReviewsForListing(listingId);
+    },
+    enabled: !!listingId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 2,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
-  useEffect(() => {
-    if (!listingId) return;
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        console.log('Fetching reviews for listing:', listingId);
-        
-                const reviewsResponse = await reviewService.getReviewsForListing(listingId);
-        console.log('Reviews response:', reviewsResponse);
-        
-                setReviews(reviewsResponse.content || []);
-        
-                try {
-          const statsResponse = await reviewService.getListingReviewStats(listingId);
-          console.log('Stats response:', statsResponse);
-          
-                    setStats(statsResponse);
-        } catch (statsError) {
-          console.warn('Failed to fetch stats, continuing with reviews only:', statsError);
-          setStats(null);
-        }
-        
-      } catch (err) {
-        console.error('Error fetching listing reviews:', err);
-        setError(err.message || 'Failed to load reviews');
-        setReviews([]);
-        setStats(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [listingId]);
+  const reviews = reviewsResponse?.content || [];
+  const error = isError ? (queryError?.message || 'Failed to load reviews') : null;
 
   return {
     reviews,
-    stats,
     isLoading,
     error,
     hasReviews: reviews.length > 0

@@ -8,6 +8,7 @@ export const RealEstateCreateRequestDTO = {
   currency: 'TRY',
   city: '',
   district: '',
+  imageUrl: '',
   
     adType: '',
   realEstateType: '',
@@ -23,6 +24,7 @@ export const RealEstateCreateRequestDTO = {
 
 export const RealEstateListingDTO = {
   ...ListingDTO,
+  imageUrl: '',
     adType: '',
   realEstateType: '',
   heatingType: '',
@@ -74,6 +76,7 @@ export const createRealEstateCreateRequest = (data) => {
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
+    imageUrl: data.imageUrl || undefined,
     
         adType: data.adType || '',
     realEstateType: data.realEstateType || '',
@@ -107,6 +110,7 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.floor !== undefined && data.floor !== '') updateData.floor = parseInt(data.floor);
   if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
   if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
+  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
   
   return updateData;
 };
