@@ -53,15 +53,6 @@ export const API_ENDPOINTS = {
         GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
     },
-    REFUNDS: {
-        CREATE_REFUND_REQUEST: '/v1/refunds',                                            // POST - Create refund request
-        LIST_MY_REFUNDS: '/v1/refunds',                                                  // GET - List user's refunds
-        GET_REFUND_DETAILS: (id) => `/v1/refunds/details/${id}`,                        // GET - Get refund details
-        GET_ORDER_REFUNDS: (orderId) => `/v1/refunds/order/${orderId}`,                 // GET - Get refunds for order
-        CANCEL_REFUND: (id) => `/v1/refunds/cancel/${id}`,                              // DELETE - Cancel refund
-        CHECK_ORDER_CANCELLABLE: (orderId) => `/v1/refunds/can-cancel/order/${orderId}`,           // GET - Check if order can be cancelled
-        CHECK_ITEM_CANCELLABLE: (orderItemId) => `/v1/refunds/can-cancel/order-item/${orderItemId}`,  // GET - Check if order item can be cancelled
-    },
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',
         CREATE: '/v1/credit-card',

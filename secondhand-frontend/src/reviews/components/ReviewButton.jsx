@@ -2,29 +2,33 @@ import React, {useState} from 'react';
 import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
 
-const ReviewButton = ({ orderItem, onReviewCreated }) => {
+const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null }) => {
     const [showModal, setShowModal] = useState(false);
-    const [existingReview, setExistingReview] = useState(null);
+    const [review, setReview] = useState(existingReview);
     const [loading, setLoading] = useState(false);
 
     React.useEffect(() => {
-        const checkExistingReview = async () => {
-            try {
-                const review = await reviewService.getReviewByOrderItem(orderItem.id);
-                setExistingReview(review);
-            } catch (error) {
-                // 404 is expected if no review exists yet - suppress the error
-                if (error?.response?.status !== 404) {
-                    console.error('Error checking review:', error);
-                }
-                setExistingReview(null);
-            }
-        };
+        setReview(existingReview);
+    }, [existingReview]);
 
-        if (orderItem && orderItem.id) {
+    // Eğer existingReview prop olarak gelmediyse, API'den çek
+    React.useEffect(() => {
+        if (!existingReview && orderItem && orderItem.id) {
+            const checkExistingReview = async () => {
+                try {
+                    const reviewData = await reviewService.getReviewByOrderItem(orderItem.id);
+                    setReview(reviewData);
+                } catch (error) {
+                    // 404 is expected if no review exists yet - suppress the error
+                    if (error?.response?.status !== 404) {
+                        console.error('Error checking review:', error);
+                    }
+                    setReview(null);
+                }
+            };
             checkExistingReview();
         }
-    }, [orderItem]);
+    }, [orderItem, existingReview]);
 
     const canReview = orderItem?.shippingStatus === 'DELIVERED';
     
@@ -38,13 +42,29 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
         return null;
     }
 
-    if (existingReview) {
+    if (review) {
         return (
             <div className="text-sm">
                 <div className="flex items-center space-x-1 text-green-600">
                     <span className="text-lg">⭐</span>
-                    <span>Reviewed! ({existingReview.rating}/5)</span>
+                    <span>Reviewed! ({review.rating}/5)</span>
                 </div>
+                {review.comment && (
+                    <div className="mt-1 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg max-w-xs">
+                        <p 
+                            className="overflow-hidden"
+                            style={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                lineHeight: '1.4em',
+                                maxHeight: '2.8em'
+                            }}
+                        >
+                            {review.comment}
+                        </p>
+                    </div>
+                )}
             </div>
         );
     }
@@ -53,7 +73,7 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
         onReviewCreated?.();
         setLoading(true);
         reviewService.getReviewByOrderItem(orderItem.id)
-            .then(setExistingReview)
+            .then(setReview)
             .catch(error => {
                 // 404 is expected if review creation failed
                 if (error?.response?.status !== 404) {

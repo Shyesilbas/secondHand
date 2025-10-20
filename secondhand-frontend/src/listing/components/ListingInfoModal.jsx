@@ -1,8 +1,32 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import usePriceHistory from '../hooks/usePriceHistory.js';
-import { formatCurrency } from '../../common/formatters.js';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { fetchExchangeRate } from '../services/exchangeService.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, currency }) => {
   const [activeTab, setActiveTab] = useState('history');
@@ -54,13 +78,117 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
     return percentage > 0 ? 'text-red-500' : 'text-green-500';
   };
 
+  const prepareChartData = () => {
+    if (!priceHistory || priceHistory.length === 0) return null;
+
+    // Sort by date (oldest first for chart)
+    const sortedHistory = [...priceHistory].sort((a, b) => 
+      new Date(a.changeDate) - new Date(b.changeDate)
+    );
+
+    const labels = sortedHistory.map(item => 
+      formatDateTime(item.changeDate, 'tr-TR')
+    );
+
+    const prices = sortedHistory.map(item => item.newPrice);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Price',
+          data: prices,
+          borderColor: '#3B82F6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 3,
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: '#3B82F6',
+          pointBorderColor: '#3B82F6',
+          fill: true,
+          tension: 0.4,
+        }
+      ]
+    };
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#374151',
+        borderWidth: 1,
+        callbacks: {
+          label: function(context) {
+            const item = priceHistory[context.dataIndex];
+            const currency = item?.currency || currency;
+            return `${formatCurrency(context.parsed.y, currency)}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Date',
+          color: '#6B7280',
+          font: {
+            size: 12
+          }
+        },
+        grid: {
+          color: 'rgba(107, 114, 128, 0.1)'
+        },
+        ticks: {
+          color: '#6B7280',
+          maxRotation: 45,
+          minRotation: 0
+        }
+      },
+      y: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Price',
+          color: '#6B7280',
+          font: {
+            size: 12
+          }
+        },
+        grid: {
+          color: 'rgba(107, 114, 128, 0.1)'
+        },
+        ticks: {
+          color: '#6B7280',
+          callback: function(value) {
+            const currencyCode = priceHistory?.[0]?.currency || currency;
+            return formatCurrency(value, currencyCode);
+          }
+        }
+      }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    }
+  };
+
   const modalContent = (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded border border-gray-200 p-6 w-full max-w-3xl max-h-[85vh] overflow-y-auto"
+        className="bg-white rounded border border-gray-200 p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
@@ -99,30 +227,6 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
 
         {activeTab === 'history' && (
           <div>
-            {priceHistory && priceHistory.length > 0 && (
-              (() => {
-                const latest = priceHistory[0];
-                const oldest = priceHistory[priceHistory.length - 1];
-                const base = (oldest.oldPrice != null ? oldest.oldPrice : oldest.newPrice);
-                const currentVal = latest.newPrice;
-                const currencyCode = latest.currency || currency;
-                const diff = (base != null && currentVal != null) ? (currentVal - base) : null;
-                const pct = (base && diff != null) ? (diff / base) * 100 : null;
-                return (
-                  <div className="mb-3 p-3 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-between">
-                    <span className="text-sm text-gray-700">Total change since first price</span>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-sm font-medium ${pct != null ? getChangeColor(pct) : 'text-gray-500'}`}>
-                        {pct != null ? `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%` : '-'}
-                      </span>
-                      <span className="text-sm text-gray-800">
-                        {diff != null ? `${diff > 0 ? '+' : ''}${formatCurrency(Math.abs(diff), currencyCode)}` : '-'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })()
-            )}
             {historyError && (
               <div className="text-sm text-red-600 mb-3">Failed to load price history</div>
             )}
@@ -130,48 +234,133 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
             {historyLoading ? (
               <div className="text-center py-6 text-gray-500 text-sm">Loading...</div>
             ) : priceHistory.length === 0 ? (
-              <div className="text-center py-6 text-gray-500 text-sm">No records</div>
+              <div className="text-center py-6 text-gray-500 text-sm">No price history available</div>
             ) : (
-              <div className="space-y-4">
-                {priceHistory.map((entry, index) => (
-                  <div
-                    key={entry.id ?? index}
-                    className={`p-3 rounded-lg border ${index === 0 ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-base font-semibold text-gray-900">
-                              {formatCurrency(entry.newPrice, entry.currency)} {entry.currency}
-                            </span>
-                            {entry.percentageChange !== undefined && entry.percentageChange !== null && (
-                              <span className={`text-xs font-medium ${getChangeColor(entry.percentageChange)}`}>
-                                {formatPercentage(entry.percentageChange)}
-                              </span>
-                            )}
-                            {index === 0 && (
-                              <span className="px-1.5 py-0.5 text-[10px] bg-blue-100 text-blue-800 rounded-full">Current</span>
-                            )}
-                          </div>
-                          {entry.oldPrice && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Previous: {formatCurrency(entry.oldPrice, entry.currency)} {entry.currency}
+              <div className="space-y-6">
+                {/* Statistics */}
+                {(() => {
+                  const latest = priceHistory[0];
+                  const oldest = priceHistory[priceHistory.length - 1];
+                  const base = (oldest.oldPrice != null ? oldest.oldPrice : oldest.newPrice);
+                  const currentVal = latest.newPrice;
+                  const currencyCode = latest.currency || currency;
+                  const diff = (base != null && currentVal != null) ? (currentVal - base) : null;
+                  const pct = (base && diff != null) ? (diff / base) * 100 : null;
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="text-sm font-medium text-blue-800 mb-1">Current Price</div>
+                        <div className="text-lg font-semibold text-blue-900">
+                          {formatCurrency(currentVal, currencyCode)}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <div className="text-sm font-medium text-gray-800 mb-1">Initial Price</div>
+                        <div className="text-lg font-semibold text-gray-900">
+                          {formatCurrency(base, currencyCode)}
+                        </div>
+                      </div>
+                      
+                      <div className={`border rounded-lg p-3 ${
+                        pct > 0 
+                          ? 'bg-red-50 border-red-200' 
+                          : pct < 0
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}>
+                        <div className={`text-sm font-medium mb-1 ${
+                          pct > 0 ? 'text-red-800' : pct < 0 ? 'text-green-800' : 'text-gray-800'
+                        }`}>
+                          Total Change
+                        </div>
+                        <div className={`text-lg font-semibold ${
+                          pct > 0 ? 'text-red-900' : pct < 0 ? 'text-green-900' : 'text-gray-900'
+                        }`}>
+                          {pct != null ? `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%` : '—'}
+                          {diff != null && (
+                            <div className="text-sm">
+                              ({diff > 0 ? '+' : ''}{formatCurrency(Math.abs(diff), currencyCode)})
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs text-gray-600">
-                          {new Date(entry.changeDate).toLocaleString('tr-TR')}
-                        </div>
-                        {entry.changeReason && (
-                          <div className="text-[11px] text-gray-500 mt-1">{entry.changeReason}</div>
-                        )}
-                      </div>
                     </div>
+                  );
+                })()}
+
+                {/* Chart */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Price Trend</h4>
+                  <div className="h-64">
+                    {prepareChartData() && (
+                      <Line data={prepareChartData()} options={chartOptions} />
+                    )}
                   </div>
-                ))}
+                </div>
+
+                {/* Price History Table */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <h4 className="text-lg font-semibold text-gray-900">Price Changes</h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Old Price
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            New Price
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Change
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Reason
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {priceHistory.map((entry, index) => (
+                          <tr key={entry.id ?? index} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm text-gray-900">
+                              {formatDateTime(entry.changeDate, 'tr-TR')}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {entry.oldPrice ? formatCurrency(entry.oldPrice, entry.currency) : '—'}
+                            </td>
+                            <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                              {formatCurrency(entry.newPrice, entry.currency)}
+                            </td>
+                            <td className="px-4 py-3 text-sm">
+                              {entry.percentageChange !== null && entry.percentageChange !== undefined ? (
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  entry.percentageChange > 0 
+                                    ? 'bg-red-100 text-red-800' 
+                                    : entry.percentageChange < 0
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {entry.percentageChange > 0 ? '+' : ''}{entry.percentageChange.toFixed(1)}%
+                                </span>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {entry.changeReason || '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
           </div>

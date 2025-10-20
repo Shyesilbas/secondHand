@@ -22,11 +22,11 @@ public class ShippingService {
 
     @Getter
     @Value("${app.shipping.pickup.duration.hours}")
-    private Integer pickupDurationHours;
+    private Double pickupDurationHours;
 
     @Getter
     @Value("${app.shipping.delivery.duration.hours}")
-    private Integer deliveryDurationHours;
+    private Double deliveryDurationHours;
 
 
     public ShippingStatus calculateShippingStatus(Order order) {
@@ -36,11 +36,14 @@ public class ShippingService {
 
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(order.getCreatedAt(), now);
+        
+        // Convert hours to minutes for more precise calculation
+        double durationInHours = duration.toMinutes() / 60.0;
 
         ShippingStatus newStatus;
-        if (duration.toHours() < pickupDurationHours) {
+        if (durationInHours < pickupDurationHours) {
             newStatus = ShippingStatus.PENDING;
-        } else if (duration.toHours() < deliveryDurationHours) {
+        } else if (durationInHours < deliveryDurationHours) {
             newStatus = ShippingStatus.IN_TRANSIT;
         } else {
             newStatus = ShippingStatus.DELIVERED;

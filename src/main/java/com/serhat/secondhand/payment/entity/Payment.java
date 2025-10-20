@@ -24,7 +24,8 @@ public class Payment {
     private UUID id;
 
     @Version
-    private Long version;
+    @Builder.Default
+    private Long version = 0L;
 
     private BigDecimal amount;
 
