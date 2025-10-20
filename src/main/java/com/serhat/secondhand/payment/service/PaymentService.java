@@ -126,22 +126,17 @@ public class PaymentService {
         payment = paymentRepository.save(payment);
 
         if (result.success()) {
-            // PaymentCompletedEvent will handle seller eWallet credit via ListingEventListener
             eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
         }
 
         return paymentMapper.toDto(payment);
     }
 
-    /**
-     * Verification kontrolü OLMADAN payment oluşturur.
-     * Bu metod sadece batch payment işlemlerinde kullanılmalıdır.
-     */
+
     private PaymentDto createPaymentWithoutVerification(PaymentRequest paymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
-        // Verification kontrolü YOK - sadece payment validation
         paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());

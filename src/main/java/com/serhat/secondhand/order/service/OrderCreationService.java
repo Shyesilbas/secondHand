@@ -111,8 +111,8 @@ public class OrderCreationService {
         private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
                            BigDecimal totalAmount, String orderNumber, String notes) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime estimatedTransitDate = now.plusHours(shippingService.getPickupDurationHours());
-        LocalDateTime estimatedDeliveryDate = now.plusHours(shippingService.getDeliveryDurationHours());
+        LocalDateTime estimatedTransitDate = now.plusMinutes(Math.round(shippingService.getPickupDurationHours() * 60));
+        LocalDateTime estimatedDeliveryDate = now.plusMinutes(Math.round(shippingService.getDeliveryDurationHours() * 60));
         
         return Order.builder()
                 .orderNumber(orderNumber)
