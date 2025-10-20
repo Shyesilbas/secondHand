@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.Address;
 import jakarta.persistence.*;
@@ -25,6 +26,9 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     @Column(name = "order_number", unique = true, nullable = false)
     private String orderNumber;
@@ -63,6 +67,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Column(name = "payment_method")
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentMethod;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

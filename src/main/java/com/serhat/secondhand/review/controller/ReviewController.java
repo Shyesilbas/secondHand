@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {
@@ -36,61 +36,68 @@ public class ReviewController {
         return ResponseEntity.ok(review);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/received")
     public ResponseEntity<Page<ReviewDto>> getReviewsForUser(
             @PageableDefault(size = 10) Pageable pageable,
             Authentication authentication) {
         
         User user = (User) authentication.getPrincipal();
+        log.info("Getting reviews received by user: {}", user.getEmail());
         Page<ReviewDto> reviews = reviewService.getReviewsForUser(user.getId(), pageable);
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/by-user/{userId}")
+    @GetMapping("/written-by/{userId}")
     public ResponseEntity<Page<ReviewDto>> getReviewsByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         
+        log.info("Getting reviews written by user ID: {}", userId);
         Page<ReviewDto> reviews = reviewService.getReviewsByUser(userId, pageable);
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/user/{userId}/stats")
+    @GetMapping("/user-stats/{userId}")
     public ResponseEntity<UserReviewStatsDto> getUserReviewStats(@PathVariable Long userId) {
+        log.info("Getting review stats for user ID: {}", userId);
         UserReviewStatsDto stats = reviewService.getUserReviewStats(userId);
         return ResponseEntity.ok(stats);
     }
 
-    @GetMapping("/order-items")
+    @GetMapping("/by-order-items")
     public ResponseEntity<List<ReviewDto>> getReviewsForOrderItems(
             @RequestParam List<Long> orderItemIds) {
         
+        log.info("Getting reviews for order items: {}", orderItemIds);
         List<ReviewDto> reviews = reviewService.getReviewsForOrderItems(orderItemIds);
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/order-item/{orderItemId}")
+    @GetMapping("/by-order-item/{orderItemId}")
     public ResponseEntity<ReviewDto> getReviewByOrderItem(
             @PathVariable Long orderItemId,
             Authentication authentication) {
         
         User user = (User) authentication.getPrincipal();
+        log.info("Getting review for order item: {} by user: {}", orderItemId, user.getEmail());
         return reviewService.getReviewByOrderItem(orderItemId, user.getId())
                 .map(review -> ResponseEntity.ok(review))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/listing/{listingId}")
+    @GetMapping("/for-listing/{listingId}")
     public ResponseEntity<Page<ReviewDto>> getReviewsForListing(
             @PathVariable String listingId,
             @PageableDefault(size = 10) Pageable pageable) {
         
+        log.info("Getting reviews for listing: {}", listingId);
         Page<ReviewDto> reviews = reviewService.getReviewsForListing(listingId, pageable);
         return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/listing/{listingId}/stats")
+    @GetMapping("/listing-stats/{listingId}")
     public ResponseEntity<UserReviewStatsDto> getListingReviewStats(@PathVariable String listingId) {
+        log.info("Getting review stats for listing: {}", listingId);
         UserReviewStatsDto stats = reviewService.getListingReviewStats(listingId);
         return ResponseEntity.ok(stats);
     }

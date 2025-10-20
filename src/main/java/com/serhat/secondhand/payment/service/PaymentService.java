@@ -133,6 +133,46 @@ public class PaymentService {
         return paymentMapper.toDto(payment);
     }
 
+    /**
+     * Verification kontrolü OLMADAN payment oluşturur.
+     * Bu metod sadece batch payment işlemlerinde kullanılmalıdır.
+     */
+    private PaymentDto createPaymentWithoutVerification(PaymentRequest paymentRequest, Authentication authentication) {
+        User fromUser = userService.getAuthenticatedUser(authentication);
+        User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
+
+        // Verification kontrolü YOK - sadece payment validation
+        paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
+
+        var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
+
+        if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
+            throw new BusinessException(PaymentErrorCodes.UNSUPPORTED_PAYMENT_TYPE);
+        }
+
+        PaymentResult result = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
+
+        Payment payment = Payment.builder()
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .amount(paymentRequest.amount())
+                .paymentType(paymentRequest.paymentType())
+                .transactionType(paymentRequest.transactionType())
+                .paymentDirection(paymentRequest.paymentDirection())
+                .listingId(paymentRequest.listingId())
+                .processedAt(result.processedAt())
+                .isSuccess(result.success())
+                .build();
+
+        payment = paymentRepository.save(payment);
+
+        if (result.success()) {
+            eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
+        }
+
+        return paymentMapper.toDto(payment);
+    }
+
     public void initiatePaymentVerification(Authentication authentication, InitiateVerificationRequest req) {
         User user = userService.getAuthenticatedUser(authentication);
         String code = verificationService.generateCode();
@@ -223,7 +263,6 @@ public class PaymentService {
             throw new BusinessException(PaymentErrorCodes.EMPTY_PAYMENT_BATCH);
         }
 
-        List<PaymentDto> results = new ArrayList<>();
         for (PaymentRequest request : requests) {
             if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
                 throw new BusinessException(PaymentErrorCodes.INVALID_TXN_TYPE);
@@ -231,7 +270,22 @@ public class PaymentService {
             if (request.paymentDirection() != PaymentDirection.OUTGOING) {
                 throw new BusinessException(PaymentErrorCodes.INVALID_DIRECTION);
             }
-            results.add(createPayment(request, authentication));
+        }
+
+        User fromUser = userService.getAuthenticatedUser(authentication);
+        String verificationCode = requests.get(0).verificationCode();
+        
+        log.info("Batch payment verification check for user: {}, code: {}, payment count: {}", 
+                fromUser.getEmail(), verificationCode, requests.size());
+        
+        validateOrGenerateVerification(fromUser, verificationCode, requests.get(0));
+        
+        log.info("Verification successful, processing {} payments", requests.size());
+
+        // Verification başarılı, şimdi tüm payment'ları işle (verification kontrolü YAPMA)
+        List<PaymentDto> results = new ArrayList<>();
+        for (PaymentRequest request : requests) {
+            results.add(createPaymentWithoutVerification(request, authentication));
         }
         return results;
     }
@@ -277,11 +331,16 @@ public class PaymentService {
             throw new BusinessException(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
         }
 
+        log.info("Validating payment verification code for user: {}, code: {}", user.getEmail(), code);
         boolean valid = verificationService.validateVerificationCode(user, code, CodeType.PAYMENT_VERIFICATION);
+        log.info("Verification code validation result: {}", valid);
+        
         if (!valid) {
+            log.error("Invalid verification code for user: {}, code: {}", user.getEmail(), code);
             throw new BusinessException(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
         }
 
+        log.info("Marking verification as used for user: {}", user.getEmail());
         verificationService.findLatestActiveVerification(user, CodeType.PAYMENT_VERIFICATION)
                 .ifPresent(verificationService::markVerificationAsUsed);
     }

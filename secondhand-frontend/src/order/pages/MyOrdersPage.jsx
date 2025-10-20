@@ -7,6 +7,8 @@ import { ReviewButton } from '../../reviews/index.js';
 import { formatDateTime, formatCurrency, resolveEnumLabel } from '../../common/formatters.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useOrders } from '../hooks/useOrders.js';
+import CreateRefundModal from '../../refund/components/CreateRefundModal.jsx';
+import OrderItemRefundStatus from '../../refund/components/OrderItemRefundStatus.jsx';
 
 const MyOrdersPage = () => {
   const { enums } = useEnums();
@@ -29,6 +31,12 @@ const MyOrdersPage = () => {
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [searchError, setSearchError] = React.useState(null);
   const [isSearchMode, setIsSearchMode] = React.useState(false);
+  
+  // Refund states
+  const [refundModalOpen, setRefundModalOpen] = React.useState(false);
+  const [selectedOrderItem, setSelectedOrderItem] = React.useState(null);
+  const [orderRefunds, setOrderRefunds] = React.useState([]);
+  const [cancellableItems, setCancellableItems] = React.useState({});
 
   const openReceipt = async (paymentReference) => {
     try {
@@ -42,14 +50,83 @@ const MyOrdersPage = () => {
     } catch (e) {}
   };
 
-  const openOrderModal = (order) => {
-    setSelectedOrder(order);
-    setOrderModalOpen(true);
+  const openOrderModal = async (order) => {
+    // Order'ı fetch et (güncel veriyi al)
+    try {
+      const freshOrder = await orderService.getById(order.id);
+      setSelectedOrder(freshOrder);
+      setOrderModalOpen(true);
+      
+      // Refund bilgilerini tek seferde çek
+      await fetchRefundData(freshOrder);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      setSelectedOrder(order);
+      setOrderModalOpen(true);
+    }
+  };
+
+  const fetchRefundData = async (order) => {
+    try {
+      // 1. Bu order için tüm refund taleplerini çek
+      const { getOrderRefundRequests } = await import('../../refund/services/refundService.js');
+      const refundsResponse = await getOrderRefundRequests(order.id, { page: 0, size: 100 });
+      setOrderRefunds(refundsResponse.content || []);
+      
+      // 2. Her item için iptal edilebilirlik durumunu hesapla (frontend'te)
+      const cancellable = {};
+      const now = new Date();
+      
+      if (order.orderItems) {
+        for (const item of order.orderItems) {
+          const orderCreatedAt = new Date(order.createdAt);
+          const hoursSinceOrder = (now - orderCreatedAt) / (1000 * 60 * 60);
+          
+          // 1 saat içinde ve refund talebi yok mu?
+          const hasActiveRefund = refundsResponse.content?.some(
+            r => r.orderItem?.id === item.id && 
+            ['PENDING', 'PROCESSING', 'APPROVED', 'COMPLETED'].includes(r.status)
+          );
+          
+          cancellable[item.id] = hoursSinceOrder < 1 && !hasActiveRefund;
+        }
+      }
+      
+      setCancellableItems(cancellable);
+    } catch (error) {
+      console.error('Error fetching refund data:', error);
+      setOrderRefunds([]);
+      setCancellableItems({});
+    }
   };
 
   const closeOrderModal = () => {
     setOrderModalOpen(false);
     setSelectedOrder(null);
+    setOrderRefunds([]);
+    setCancellableItems({});
+  };
+
+  const openRefundModal = (orderItem) => {
+    setSelectedOrderItem(orderItem);
+    setRefundModalOpen(true);
+  };
+
+  const closeRefundModal = () => {
+    setRefundModalOpen(false);
+    setSelectedOrderItem(null);
+  };
+
+  const handleRefundSuccess = async () => {
+    // Refresh orders
+    refresh();
+    // Refresh the selected order details if modal is open
+    if (selectedOrder) {
+      const updatedOrder = await orderService.getById(selectedOrder.id);
+      setSelectedOrder(updatedOrder);
+      // Refund bilgilerini yeniden çek
+      await fetchRefundData(updatedOrder);
+    }
   };
 
   const handleSearch = async (e) => {
@@ -355,10 +432,29 @@ const MyOrdersPage = () => {
 
         {/* Modals */}
         <PaymentReceiptModal isOpen={receiptOpen} onClose={() => setReceiptOpen(false)} payment={receiptPayment} />
+        
+        {/* Refund Modal */}
+        {refundModalOpen && selectedOrderItem && selectedOrder && (
+          <CreateRefundModal
+            isOpen={refundModalOpen}
+            onClose={closeRefundModal}
+            orderItem={selectedOrderItem}
+            orderId={selectedOrder.id}
+            onSuccess={handleRefundSuccess}
+          />
+        )}
 
         {orderModalOpen && selectedOrder && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-              <div className="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden">
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+              onClick={(e) => {
+                // Refund modal açıkken order modalını kapatma
+                if (!refundModalOpen && e.target === e.currentTarget) {
+                  closeOrderModal();
+                }
+              }}
+            >
+              <div className="w-full max-w-5xl bg-white rounded-lg shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
                 <div className="bg-gray-50 border-b border-gray-200">
                   <div className="flex items-center justify-between p-6">
                     <div className="flex items-center gap-4">
@@ -514,6 +610,18 @@ const MyOrdersPage = () => {
                               {/* Price and Actions */}
                               <div className="flex flex-col items-end gap-3">
                                 <p className="text-xl font-bold text-gray-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</p>
+                                
+                                {/* Refund Status or Create Button */}
+                                <OrderItemRefundStatus
+                                  orderItem={item}
+                                  refundRequest={orderRefunds.find(r => r.orderItem?.id === item.id)}
+                                  canCancel={cancellableItems[item.id]}
+                                  onCreateRefund={(e) => {
+                                    e?.stopPropagation();
+                                    openRefundModal(item);
+                                  }}
+                                />
+                                
                                 <ReviewButton
                                     orderItem={{ ...item, shippingStatus: selectedOrder.shippingStatus }}
                                     onReviewCreated={() => {}}

@@ -232,11 +232,12 @@ public class ReviewService {
         return new ReviewStatsDto(
             (Long) stats[0],  // totalReviews
             stats[1] != null ? (Double) stats[1] : 0.0,  // averageRating
-            (Long) stats[2],  // fiveStarCount
-            (Long) stats[3],  // fourStarCount
-            (Long) stats[4],  // threeStarCount
-            (Long) stats[5],  // twoStarCount
-            (Long) stats[6]   // oneStarCount
+            (Long) stats[2],  // fiveStarReviews
+            (Long) stats[3],  // fourStarReviews
+            (Long) stats[4],  // threeStarReviews
+            (Long) stats[5],  // twoStarReviews
+            (Long) stats[6],  // oneStarReviews
+            (Long) stats[7]   // zeroStarReviews
         );
     }
 }

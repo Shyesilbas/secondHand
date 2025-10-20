@@ -13,7 +13,11 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
                 const review = await reviewService.getReviewByOrderItem(orderItem.id);
                 setExistingReview(review);
             } catch (error) {
-                                setExistingReview(null);
+                // 404 is expected if no review exists yet - suppress the error
+                if (error?.response?.status !== 404) {
+                    console.error('Error checking review:', error);
+                }
+                setExistingReview(null);
             }
         };
 
@@ -47,9 +51,15 @@ const ReviewButton = ({ orderItem, onReviewCreated }) => {
 
     const handleReviewCreated = () => {
         onReviewCreated?.();
-                setLoading(true);
+        setLoading(true);
         reviewService.getReviewByOrderItem(orderItem.id)
             .then(setExistingReview)
+            .catch(error => {
+                // 404 is expected if review creation failed
+                if (error?.response?.status !== 404) {
+                    console.error('Error fetching review after creation:', error);
+                }
+            })
             .finally(() => setLoading(false));
     };
 

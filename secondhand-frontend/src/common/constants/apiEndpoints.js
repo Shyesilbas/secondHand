@@ -47,10 +47,20 @@ export const API_ENDPOINTS = {
         INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
     },
     ORDERS: {
-        CHECKOUT: '/v1/orders/checkout',
-        MY_ORDERS: '/v1/orders',
-        BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`,
-        BY_ID: (id) => `/v1/orders/${id}`,
+        CHECKOUT: '/v1/orders/checkout',                                                 // POST - Checkout
+        LIST_MY_ORDERS: '/v1/orders',                                                    // GET - List all orders
+        GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`, // GET - Get by order number
+        GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
+        CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
+    },
+    REFUNDS: {
+        CREATE_REFUND_REQUEST: '/v1/refunds',                                            // POST - Create refund request
+        LIST_MY_REFUNDS: '/v1/refunds',                                                  // GET - List user's refunds
+        GET_REFUND_DETAILS: (id) => `/v1/refunds/details/${id}`,                        // GET - Get refund details
+        GET_ORDER_REFUNDS: (orderId) => `/v1/refunds/order/${orderId}`,                 // GET - Get refunds for order
+        CANCEL_REFUND: (id) => `/v1/refunds/cancel/${id}`,                              // DELETE - Cancel refund
+        CHECK_ORDER_CANCELLABLE: (orderId) => `/v1/refunds/can-cancel/order/${orderId}`,           // GET - Check if order can be cancelled
+        CHECK_ITEM_CANCELLABLE: (orderItemId) => `/v1/refunds/can-cancel/order-item/${orderItemId}`,  // GET - Check if order item can be cancelled
     },
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',
@@ -226,14 +236,14 @@ export const API_ENDPOINTS = {
         CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
     },
     REVIEWS: {
-        CREATE: '/reviews',
-        GET_FOR_USER: '/reviews/user',
-        GET_BY_USER: (userId) => `/reviews/by-user/${userId}`,
-        GET_USER_STATS: (userId) => `/reviews/user/${userId}/stats`,
-        GET_FOR_ORDER_ITEMS: '/reviews/order-items',
-        GET_BY_ORDER_ITEM: (orderItemId) => `/reviews/order-item/${orderItemId}`,
-        GET_FOR_LISTING: (listingId) => `/reviews/listing/${listingId}`,
-        GET_LISTING_REVIEW_STATS: (listingId) => `/reviews/listing/${listingId}/stats`,
+        CREATE_REVIEW: '/v1/reviews',                                                        // POST - Create review
+        GET_REVIEWS_RECEIVED: '/v1/reviews/received',                                        // GET - Reviews received by me
+        GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/reviews/written-by/${userId}`,            // GET - Reviews written by user
+        GET_USER_REVIEW_STATS: (userId) => `/v1/reviews/user-stats/${userId}`,             // GET - User review stats
+        GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews/by-order-items',                          // GET - Reviews for order items
+        GET_REVIEW_BY_ORDER_ITEM: (orderItemId) => `/v1/reviews/by-order-item/${orderItemId}`, // GET - Review by order item
+        GET_REVIEWS_FOR_LISTING: (listingId) => `/v1/reviews/for-listing/${listingId}`,    // GET - Reviews for listing
+        GET_LISTING_REVIEW_STATS: (listingId) => `/v1/reviews/listing-stats/${listingId}`, // GET - Listing review stats
     },
     EWALLET: {
         CREATE: '/ewallet',

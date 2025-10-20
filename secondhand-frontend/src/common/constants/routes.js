@@ -38,4 +38,5 @@ export const ROUTES = {
     REVIEWS_RECEIVED: (userId) => `/reviews/received/${userId}`,
     REVIEWS_GIVEN: (userId) => `/reviews/given/${userId}`,
     MY_SHOWCASES: '/my-showcases',
+    REFUNDS: '/refunds',
 };
