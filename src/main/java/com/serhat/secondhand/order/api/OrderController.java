@@ -57,7 +57,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/details/{orderId}")
     @Operation(summary = "Get order by ID", description = "Retrieve specific order details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order retrieved successfully"),

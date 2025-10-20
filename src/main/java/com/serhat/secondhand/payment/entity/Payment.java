@@ -23,6 +23,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Version
+    private Long version;
+
     private BigDecimal amount;
 
     private UUID listingId;

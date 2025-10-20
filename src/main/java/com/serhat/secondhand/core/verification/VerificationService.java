@@ -61,8 +61,33 @@ public class VerificationService implements IVerificationService {
     
     @Override
     public boolean validateVerificationCode(User user, String code, CodeType codeType) {
+        log.info("Validating verification code for user: {}, codeType: {}, code: {}", 
+                user.getEmail(), codeType, code);
+        
+        LocalDateTime now = LocalDateTime.now();
+        log.info("Current time: {}", now);
+        
         Optional<Verification> verification = verificationRepository.findActiveVerificationByUserCodeTypeAndCode(
-                user, codeType, code, LocalDateTime.now());
+                user, codeType, code, now);
+        
+        log.info("Verification found: {}", verification.isPresent());
+        
+        if (verification.isPresent()) {
+            Verification v = verification.get();
+            log.info("Verification details - Code: {}, ExpiresAt: {}, IsVerified: {}", 
+                    v.getCode(), v.getCodeExpiresAt(), v.isVerified());
+        } else {
+            // Tüm aktif verification'ları kontrol et
+            List<Verification> allActive = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(
+                    user, codeType, now);
+            log.warn("No matching verification found. All active verifications count: {}", allActive.size());
+            
+            for (Verification v : allActive) {
+                log.warn("Active verification - Code: {}, ExpiresAt: {}, IsVerified: {}, Match: {}", 
+                        v.getCode(), v.getCodeExpiresAt(), v.isVerified(), v.getCode().equals(code));
+            }
+        }
+        
         return verification.isPresent();
     }
     

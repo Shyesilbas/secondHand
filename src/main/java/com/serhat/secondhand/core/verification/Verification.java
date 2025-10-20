@@ -36,6 +36,7 @@ public class Verification {
     @Builder.Default
     private Integer verificationAttemptLeft = 3;
 
+    @Column(name = "is_verified")
     private boolean isVerified;
 
 }

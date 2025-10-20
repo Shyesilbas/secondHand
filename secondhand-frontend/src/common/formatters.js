@@ -75,15 +75,17 @@ export const formatCurrencyCompact = (value, currency = 'TRY') => {
   }
 };
 
-export const formatDateTime = (dateString) => {
+export const formatDateTime = (dateString, locale = 'tr-TR') => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleDateString('tr-TR', {
+  return date.toLocaleDateString(locale, {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Istanbul'
   });
 };
 

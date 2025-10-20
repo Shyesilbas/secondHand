@@ -10,13 +10,14 @@ import lombok.NoArgsConstructor;
 public class ReviewStatsDto {
     private Long totalReviews;
     private Double averageRating;
-    private Long fiveStarCount;
-    private Long fourStarCount;
-    private Long threeStarCount;
-    private Long twoStarCount;
-    private Long oneStarCount;
+    private Long fiveStarReviews;
+    private Long fourStarReviews;
+    private Long threeStarReviews;
+    private Long twoStarReviews;
+    private Long oneStarReviews;
+    private Long zeroStarReviews;
     
     public static ReviewStatsDto empty() {
-        return new ReviewStatsDto(0L, 0.0, 0L, 0L, 0L, 0L, 0L);
+        return new ReviewStatsDto(0L, 0.0, 0L, 0L, 0L, 0L, 0L, 0L);
     }
 }

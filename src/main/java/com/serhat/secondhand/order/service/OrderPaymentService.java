@@ -46,7 +46,7 @@ public class OrderPaymentService {
             List<PaymentDto> paymentResults = paymentService.createPurchasePayments(paymentRequests, getAuthentication());
             
             boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
-            updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful);
+            updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful, request.getPaymentType());
 
             return new PaymentProcessingResult(paymentResults, allPaymentsSuccessful);
             
@@ -116,13 +116,15 @@ public class OrderPaymentService {
         return request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
     }
 
-        private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful) {
+        private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful, PaymentType paymentType) {
         order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         order.setPaymentStatus(allSuccessful ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
         order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
+        order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
         
         orderRepository.save(order);
-        log.info("Updated order {} payment status to: {}", order.getOrderNumber(), order.getPaymentStatus());
+        log.info("Updated order {} payment status to: {} with payment method: {}", 
+                order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentMethod());
     }
 
 
