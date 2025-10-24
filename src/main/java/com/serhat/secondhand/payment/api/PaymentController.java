@@ -1,11 +1,13 @@
 package com.serhat.secondhand.payment.api;
 
-import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
+import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.payment.service.PaymentStatsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,8 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final IVerificationService verificationService;
+    private final PaymentStatsService paymentStatsService;
+    private final ListingFeeService listingFeeService;
 
     @PostMapping("/pay")
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
@@ -57,7 +60,7 @@ public class PaymentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Getting paginated payments for user: {}", authentication.getName());
-        Page<PaymentDto> payments = paymentService.getMyPayments(authentication, page, size);
+        Page<PaymentDto> payments = paymentStatsService.getMyPayments(authentication, page, size);
         return ResponseEntity.ok(payments);
     }
 
@@ -67,16 +70,16 @@ public class PaymentController {
                                                                     @RequestParam(name = "paymentType", required = false) String paymentType) {
         log.info("Getting payment statistics for user: {}", authentication.getName());
         if (paymentType == null || paymentType.isBlank()) {
-            return ResponseEntity.ok(paymentService.getPaymentStatistics(authentication));
+            return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(authentication));
         }
-        Map<String, Object> statistics = paymentService.getPaymentStatistics(authentication, com.serhat.secondhand.payment.entity.PaymentType.valueOf(paymentType));
+        Map<String, Object> statistics = paymentStatsService.getPaymentStatistics(authentication, PaymentType.valueOf(paymentType));
         return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/listing-fee-config")
     public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
         log.info("Getting listing fee configuration");
-        ListingFeeConfigDto config = paymentService.getListingFeeConfig();
+        ListingFeeConfigDto config = listingFeeService.getListingFeeConfig();
         return ResponseEntity.ok(config);
     }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { auditLogService } from '../services/auditLogService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -7,6 +7,7 @@ import { useEnums } from '../../common/hooks/useEnums.js';
 export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
     const { user } = useAuth();
     const { enums, isLoading: isLoadingEnums } = useEnums();
+    const [allAuditLogs, setAllAuditLogs] = useState([]);
     const [filteredLogs, setFilteredLogs] = useState([]);
     const [pagination, setPagination] = useState({
         totalPages: 0,
@@ -21,8 +22,8 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
         error,
         refetch
     } = useQuery({
-        queryKey: ['auditLogs', user?.email, page, size],
-        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email, page, size),
+        queryKey: ['auditLogs', user?.email],
+        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email, 0, 1000), // Get all logs
         enabled: !!user?.email,
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
@@ -36,20 +37,23 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
         eventStatuses: enums.auditEventStatuses || []
     };
 
+    // Store all logs for filtering
     useEffect(() => {
         if (auditLogsResponse) {
+            setAllAuditLogs(auditLogsResponse.content || []);
             setPagination({
-                totalPages: auditLogsResponse.totalPages || 0,
-                totalElements: auditLogsResponse.totalElements || 0,
-                currentPage: auditLogsResponse.number || 0,
-                pageSize: auditLogsResponse.size || size
+                totalPages: auditLogsResponse.totalPages || Math.ceil((auditLogsResponse.content || []).length / size),
+                totalElements: auditLogsResponse.totalElements || (auditLogsResponse.content || []).length,
+                currentPage: page,
+                pageSize: size
             });
         }
     }, [auditLogsResponse, size]);
 
+    // Client-side filtering
     useEffect(() => {
-        if (auditLogs && auditLogs.length > 0) {
-            let filtered = auditLogs;
+        if (allAuditLogs && allAuditLogs.length > 0) {
+            let filtered = allAuditLogs;
 
             if (filters.eventType && filters.eventType !== 'ALL') {
                 filtered = filtered.filter(log => log.eventType === filters.eventType);
@@ -62,13 +66,28 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
             if (filters.startDate && filters.endDate) {
                 filtered = filtered.filter(log => {
                     const logDate = new Date(log.createdAt);
-                    return logDate >= filters.startDate && logDate <= filters.endDate;
+                    return logDate >= new Date(filters.startDate) && logDate <= new Date(filters.endDate);
                 });
             }
 
             setFilteredLogs(filtered);
+            
+            // Update pagination based on filtered results
+            setPagination(prev => ({
+                ...prev,
+                totalPages: Math.ceil(filtered.length / size),
+                totalElements: filtered.length,
+                currentPage: 0 // Reset to first page when filters change
+            }));
         }
-    }, [auditLogs, filters]);
+    }, [allAuditLogs, filters, size]);
+
+    // Pagination for filtered results
+    const paginatedLogs = useMemo(() => {
+        const startIndex = page * size;
+        const endIndex = startIndex + size;
+        return filteredLogs.slice(startIndex, endIndex);
+    }, [filteredLogs, page, size]);
 
     const getEventTypeDisplay = (eventType) => {
         const eventTypeEnum = auditEnums.eventTypes.find(et => et.value === eventType);
@@ -149,7 +168,8 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
     };
 
     return {
-        auditLogs: filteredLogs,
+        auditLogs: paginatedLogs,
+        allAuditLogs: filteredLogs,
         auditEnums,
         pagination,
         isLoading: isLoading || isLoadingEnums,

@@ -3,11 +3,14 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { enumService } from '../../common/services/enumService.js';
 
 export const auditLogService = {
-        getUserAuditLogsByEmail: async (userEmail, page = 0, size = 10) => {
-        return request('GET', API_ENDPOINTS.USER.AUDIT_LOGS, {
+        getUserAuditLogsByEmail: async (userEmail, page = 0, size = 10, filters = {}) => {
+        const params = {
             page,
-            size
-        });
+            size,
+            ...filters
+        };
+        
+        return request('GET', API_ENDPOINTS.USER.AUDIT_LOGS, undefined, { params });
     },
 
         getUserAuditLogsById: async (userId, page = 0, size = 10) => {

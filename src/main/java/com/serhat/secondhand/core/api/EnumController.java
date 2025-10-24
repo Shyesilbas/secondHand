@@ -21,7 +21,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.showcase.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ import java.util.*;
 @Tag(name = "Enum Values", description = "Endpoints for getting enum values from backend")
 public class EnumController {
 
-    private final PaymentService paymentService;
+    private final ListingFeeService paymentService;
     private final ShowcaseService showcaseService;
 
     @GetMapping("/listing-types")

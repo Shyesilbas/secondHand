@@ -1,6 +1,7 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '2.2'; const REQUIRED_ENUM_KEYS = [
+const ENUM_CACHE_VERSION = '2.3'; // Updated to force cache refresh for audit enums
+const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
   'carBrands',
