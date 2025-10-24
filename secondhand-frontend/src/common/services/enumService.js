@@ -57,8 +57,8 @@ export const enumService = {
   getShippingStatuses: async () => get(API_ENDPOINTS.ENUMS.SHIPPING_STATUSES),
   getEmailTypes: async () => get(API_ENDPOINTS.ENUMS.EMAIL_TYPES),
 
-  getAuditEventTypes: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_TYPES),
-  getAuditEventStatuses: async () => get(API_ENDPOINTS.ENUMS.AUDIT_EVENT_STATUSES),
+  getAuditEventTypes: async () => get(API_ENDPOINTS.AUDIT_ENUMS.EVENT_TYPES),
+  getAuditEventStatuses: async () => get(API_ENDPOINTS.AUDIT_ENUMS.EVENT_STATUSES),
 
   getListingFeeConfig: async () => get(API_ENDPOINTS.ENUMS.LISTING_FEE_CONFIG),
   getShowcasePricingConfig: async () => get(API_ENDPOINTS.ENUMS.SHOWCASE_PRICING_CONFIG),

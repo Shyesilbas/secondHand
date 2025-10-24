@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -241,9 +240,6 @@ public class EWalletService {
         log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
     }
 
-    public boolean hasEWallet(User user) {
-        return eWalletRepository.existsByUser(user);
-    }
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

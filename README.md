@@ -81,6 +81,7 @@ SecondHand is a modern, feature-rich marketplace platform that connects buyers a
 - **Payment Statistics**: Revenue and transaction analytics
 - **User Analytics**: Registration and activity metrics
 - **Listing Analytics**: Popular categories and trends
+- **Admin Dashboard**: Comprehensive system overview
 
 
 

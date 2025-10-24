@@ -30,7 +30,7 @@ public class AuditLogController {
     @Operation(summary = "Get audit logs by user email", description = "Retrieve paginated audit logs for a specific user")
     public ResponseEntity<Page<AuditLog>> getAuditLogsByUserEmail(
             @PathVariable String userEmail,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable) {
         log.info("Fetching audit logs for user: {} with pagination", userEmail);
         Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userEmail, pageable);
         return ResponseEntity.ok(auditLogs);

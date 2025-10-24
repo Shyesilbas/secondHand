@@ -51,10 +51,13 @@ export const useEnums = () => {
         
                 const cachedEnums = getCachedEnums();
         if (cachedEnums) {
-          if (!cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses) {
-            console.log('Cached enums missing audit enums, clearing cache and refetching...');
+          // Check if audit enums are missing or empty
+          if (!cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses || 
+              cachedEnums.auditEventTypes.length === 0 || cachedEnums.auditEventStatuses.length === 0) {
+            console.log('Cached enums missing or empty audit enums, clearing cache and refetching...');
             forceClearEnumCache();
           } else {
+            console.log('Using cached enums with audit enums');
             setEnums(cachedEnums);
             setIsLoading(false);
             return;

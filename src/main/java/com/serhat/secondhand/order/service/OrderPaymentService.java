@@ -10,7 +10,7 @@ import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.payment.service.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +32,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrderPaymentService {
 
-    private final PaymentService paymentService;
+    private final PaymentOrchestrator paymentOrchestrator;
     private final OrderRepository orderRepository;
-
 
     public PaymentProcessingResult processOrderPayments(User user, List<Cart> cartItems, 
                                                       CheckoutRequest request, Order order) {
@@ -42,9 +41,9 @@ public class OrderPaymentService {
 
         try {
             List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request);
-            log.info("Checkout received verificationCode: {}", request.getPaymentVerificationCode());
-            List<PaymentDto> paymentResults = paymentService.createPurchasePayments(paymentRequests, getAuthentication());
-            
+            paymentOrchestrator.validateOrGenerateVerification(user, request.getPaymentVerificationCode());
+            List<PaymentDto> paymentResults = paymentOrchestrator.processPayments(paymentRequests, getAuthentication());
+                        
             boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
             updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful, request.getPaymentType());
 
@@ -116,7 +115,7 @@ public class OrderPaymentService {
         return request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
     }
 
-        private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful, PaymentType paymentType) {
+    private void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, boolean allSuccessful, PaymentType paymentType) {
         order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         order.setPaymentStatus(allSuccessful ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
         order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
