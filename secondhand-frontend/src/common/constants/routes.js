@@ -33,6 +33,7 @@ export const ROUTES = {
     AGREEMENTS_ALL: '/agreements/all',
     SECURITY: '/security',
     SHOPPING_CART: '/cart',
+    CHECKOUT: '/checkout',
     MY_ORDERS: '/profile/orders',
     USER_REVIEWS: (userId) => `/users/${userId}/reviews`,
     REVIEWS_RECEIVED: (userId) => `/reviews/received/${userId}`,
