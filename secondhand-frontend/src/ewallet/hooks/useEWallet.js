@@ -10,23 +10,30 @@ export const useEWallet = (options = {}) => {
     const { showNotification } = useNotification();
     const enabled = options.enabled ?? true;
 
+    useEffect(() => {
+        if (!enabled) return;
+        
         const fetchEWallet = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const walletData = await ewalletService.getEWallet();
-            setEWallet(walletData);
-        } catch (err) {
-            if (err.response?.status === 404) {
-                                setEWallet(null);
-            } else {
-                setError(err.message || 'Failed to fetch eWallet');
-                showNotification('Failed to fetch eWallet information', 'error');
+            setLoading(true);
+            setError(null);
+            try {
+                const walletData = await ewalletService.getEWallet();
+                setEWallet(walletData);
+            } catch (err) {
+                if (err.response?.status === 404) {
+                    setEWallet(null);
+                } else {
+                    setError(err.message || 'Failed to fetch eWallet');
+                    showNotification('Failed to fetch eWallet information', 'error');
+                }
+            } finally {
+                setLoading(false);
             }
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
+        
+        fetchEWallet();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [enabled]);
 
         const createEWallet = async (options = {}) => {
         setLoading(true);
@@ -68,12 +75,30 @@ export const useEWallet = (options = {}) => {
         }
     };
 
+    const fetchEWalletData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const walletData = await ewalletService.getEWallet();
+            setEWallet(walletData);
+        } catch (err) {
+            if (err.response?.status === 404) {
+                setEWallet(null);
+            } else {
+                setError(err.message || 'Failed to fetch eWallet');
+                showNotification('Failed to fetch eWallet information', 'error');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const updateSpendingWarningLimit = async (newLimit) => {
         setLoading(true);
         setError(null);
         try {
             await ewalletService.updateSpendingWarningLimit(newLimit);
-            await fetchEWallet();
+            await fetchEWalletData();
             showNotification('Spending warning limit updated', 'success');
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to update spending warning limit';
@@ -90,7 +115,7 @@ export const useEWallet = (options = {}) => {
         setError(null);
         try {
             await ewalletService.removeSpendingWarningLimit();
-            await fetchEWallet();
+            await fetchEWalletData();
             showNotification('Spending warning limit removed', 'success');
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to remove spending warning limit';
@@ -108,7 +133,7 @@ export const useEWallet = (options = {}) => {
         try {
             await ewalletService.deposit(amount, bankId);
             showNotification('Deposit successful', 'success');
-            await fetchEWallet();
+            await fetchEWalletData();
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to deposit';
             setError(errorMessage);
@@ -125,7 +150,7 @@ export const useEWallet = (options = {}) => {
         try {
             await ewalletService.withdraw(amount, bankId);
             showNotification('Withdrawal successful', 'success');
-            await fetchEWallet();
+            await fetchEWalletData();
         } catch (err) {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to withdraw';
             setError(errorMessage);
@@ -162,12 +187,6 @@ export const useEWallet = (options = {}) => {
         }
     };
 
-        useEffect(() => {
-        if (enabled) {
-            fetchEWallet();
-        }
-    }, [enabled]);
-
     return {
         eWallet,
         transactions,
@@ -181,6 +200,6 @@ export const useEWallet = (options = {}) => {
         withdraw,
         fetchTransactions,
         checkBalance,
-        refreshWallet: fetchEWallet
+        refreshWallet: fetchEWalletData
     };
 };

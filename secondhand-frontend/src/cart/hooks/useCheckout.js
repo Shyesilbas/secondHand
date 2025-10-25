@@ -16,9 +16,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const [step, setStep] = useState(1);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-    // Only load data when checkout modal is open
-    const { addresses } = useAddresses({ enabled: showCheckoutModal });
-    const { eWallet } = useEWallet({ enabled: showCheckoutModal });
+    const { addresses } = useAddresses();
+    const { eWallet } = useEWallet();
     const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
 
     const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
@@ -34,9 +33,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
     const [notes, setNotes] = useState('');
 
-    // Load payment methods only when checkout modal is open
     useEffect(() => {
-        if (!showCheckoutModal) return;
         
         creditCardService
             .getAll()
@@ -65,7 +62,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 setBankAccounts(normalized);
             })
             .catch(() => setBankAccounts([]));
-    }, [showCheckoutModal]);
+    }, []);
 
     useEffect(() => {
         if (selectedPaymentType === 'TRANSFER' &&

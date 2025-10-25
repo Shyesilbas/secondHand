@@ -176,10 +176,10 @@ const Header = () => {
 
                                     {/* Payment Dropdown */}
                                     <DropdownMenu trigger={
-                                        <button className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <div className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                                             <icons.paymentMethods />
                                             <span>Payment</span>
-                                        </button>
+                                        </div>
                                     }>
                                         {paymentMenu.map((item, idx) =>
                                             item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
@@ -217,12 +217,12 @@ const Header = () => {
                                 {/* User Menu */}
                                 <div className="ml-3 pl-3 border-l border-gray-200">
                                     <DropdownMenu trigger={
-                                        <button className="flex items-center space-x-2 p-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                        <div className="flex items-center space-x-2 p-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                                             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                                                 {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                                             </div>
                                             <span className="hidden sm:block">{user?.name || 'Profile'}</span>
-                                        </button>
+                                        </div>
                                     }>
                                         {userMenuItems.map((item, idx) =>
                                             item.divider ? <DropdownDivider key={idx} /> :

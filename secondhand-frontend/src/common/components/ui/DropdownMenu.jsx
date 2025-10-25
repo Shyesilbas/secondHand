@@ -20,9 +20,9 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
 
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
-            <button
+            <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-1 text-text-secondary hover:text-btn-primary transition-colors"
+                className="flex items-center space-x-1 text-text-secondary hover:text-btn-primary transition-colors cursor-pointer"
             >
                 <span>{trigger}</span>
                 <svg
@@ -33,7 +33,7 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-            </button>
+            </div>
 
             {isOpen && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-sidebar-border py-2 z-50">
