@@ -106,9 +106,10 @@ export const cleanObject = (obj) => {
     if (value === '' || value === null || value === undefined) {
       return acc;
     }
-    if (Array.isArray(value) && value.length === 0) {
-      return acc;
-    }
+    // Boş array'leri temizleme - filtreler için gerekli olabilir
+    // if (Array.isArray(value) && value.length === 0) {
+    //   return acc;
+    // }
     if (typeof value === 'object' && !Array.isArray(value)) {
       const cleaned = cleanObject(value);
       if (Object.keys(cleaned).length === 0) {

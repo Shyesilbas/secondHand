@@ -21,10 +21,9 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
             label: enums[enumKey]?.find((o) => o.value === v)?.label,
           }))}
           onChange={(selected) => {
-            onInputChange(
-              fieldKey,
-              selected ? selected.map((s) => s.value) : []
-            );
+            const values = selected ? selected.map((s) => s.value) : [];
+            console.log('🚗 VehicleFilters - onChange:', fieldKey, values);
+            onInputChange(fieldKey, values);
           }}
           className="basic-multi-select"
           classNamePrefix="select"
@@ -138,7 +137,7 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
 
   return (
     <div className="space-y-8">
-      {renderEnumField('carBrands', 'Car Brand', 'carBrands')}
+      {renderEnumField('brands', 'Car Brand', 'carBrands')}
       {renderEnumField('fuelTypes', 'Fuel Type', 'fuelTypes')}
       {renderEnumField('colors', 'Color', 'colors')}
       {renderEnumField('doors', 'Number of Doors', 'doors')}

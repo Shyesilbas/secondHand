@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import ReviewCard from './ReviewCard.jsx';
 
-const ReviewsList = ({ reviews, loading, error, hasMore, onLoadMore, showLoadMore = true }) => {
+const ReviewsList = memo(({ reviews, loading, error, hasMore, onLoadMore, showLoadMore = true }) => {
     if (loading && reviews.length === 0) {
         return (
             <div className="space-y-4">
@@ -84,6 +84,8 @@ const ReviewsList = ({ reviews, loading, error, hasMore, onLoadMore, showLoadMor
             )}
         </div>
     );
-};
+});
+
+ReviewsList.displayName = 'ReviewsList';
 
 export default ReviewsList;

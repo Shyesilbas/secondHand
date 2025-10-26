@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import useAddresses from '../hooks/useAddresses.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
 
-const AddressList = () => {
+const AddressList = memo(() => {
   const { addresses, loading, error, addAddress, updateAddress, selectMainAddress, deleteAddress } = useAddresses();
   const { showSuccess, showError, showConfirmation } = useNotification();
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -15,7 +15,7 @@ const AddressList = () => {
   const [addError, setAddError] = useState(null);
   const [updateError, setUpdateError] = useState(null);
 
-  const handleAddAddress = async (addressData) => {
+  const handleAddAddress = useCallback(async (addressData) => {
     setAdding(true);
     setAddError(null);
     try {
@@ -27,9 +27,9 @@ const AddressList = () => {
     } finally {
       setAdding(false);
     }
-  };
+  }, [addAddress, showSuccess]);
 
-  const handleUpdateAddress = async (addressData) => {
+  const handleUpdateAddress = useCallback(async (addressData) => {
     setUpdating(true);
     setUpdateError(null);
     try {
@@ -42,9 +42,9 @@ const AddressList = () => {
     } finally {
       setUpdating(false);
     }
-  };
+  }, [updateAddress, selectedAddress, showSuccess]);
 
-  const handleSelectAsMain = async (addressId) => {
+  const handleSelectAsMain = useCallback(async (addressId) => {
     try {
       await selectMainAddress(addressId);
       showSuccess('Main Address Set', 'Address has been set as your main address successfully.');
@@ -52,9 +52,9 @@ const AddressList = () => {
       console.error('Failed to select main address:', err);
       showError('Error', 'Failed to set main address. Please try again.');
     }
-  };
+  }, [selectMainAddress, showSuccess, showError]);
 
-  const handleDeleteAddress = (addressId, addressType) => {
+  const handleDeleteAddress = useCallback((addressId, addressType) => {
     showConfirmation(
       'Delete Address',
       `Are you sure you want to delete this ${addressType.toLowerCase()} address? This action cannot be undone.`,
@@ -68,23 +68,27 @@ const AddressList = () => {
         }
       }
     );
-  };
+  }, [deleteAddress, showConfirmation, showSuccess, showError]);
 
-  const handleEditAddress = (address) => {
+  const handleEditAddress = useCallback((address) => {
     setSelectedAddress({ ...address });
     setShowUpdateAddress(true);
-  };
+  }, []);
 
-  const handleCloseAddForm = () => {
+  const handleCloseAddForm = useCallback(() => {
     setShowAddAddress(false);
     setAddError(null);
-  };
+  }, []);
 
-  const handleCloseUpdateForm = () => {
+  const handleCloseUpdateForm = useCallback(() => {
     setShowUpdateAddress(false);
     setSelectedAddress(null);
     setUpdateError(null);
-  };
+  }, []);
+
+  const handleAddClick = useCallback(() => {
+    setShowAddAddress(true);
+  }, []);
 
   return (
     <div className="mt-10">
@@ -92,7 +96,7 @@ const AddressList = () => {
         <h2 className="text-xl font-semibold text-text-primary">Addresses</h2>
         <button
           className="ml-3 text-btn-primary hover:text-btn-primary-hover transition-colors"
-          onClick={() => setShowAddAddress(true)}
+          onClick={handleAddClick}
           title="Add Address"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,6 +153,8 @@ const AddressList = () => {
       )}
     </div>
   );
-};
+});
+
+AddressList.displayName = 'AddressList';
 
 export default AddressList;

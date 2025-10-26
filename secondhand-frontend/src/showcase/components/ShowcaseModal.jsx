@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import ShowcasePayment from './ShowcasePayment.jsx';
 
@@ -8,6 +8,46 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const { enums, isLoading: isPricingLoading } = useEnums();
     
     const showcasePricing = enums.showcasePricingConfig;
+
+    const today = useMemo(() => new Date(), []);
+    const startDate = useMemo(() => today.toLocaleDateString('tr-TR'), [today]);
+    const endDate = useMemo(() => 
+        new Date(today.getTime() + (days - 1) * 24 * 60 * 60 * 1000).toLocaleDateString('tr-TR'), 
+        [today, days]
+    );
+    
+    const calculateTotal = useCallback(() => {
+        if (!showcasePricing) return 0;
+        return showcasePricing.totalDailyCost * days;
+    }, [showcasePricing, days]);
+    
+    const calculateSubtotal = useCallback(() => {
+        if (!showcasePricing) return 0;
+        return showcasePricing.dailyCost * days;
+    }, [showcasePricing, days]);
+    
+    const calculateTax = useCallback(() => {
+        if (!showcasePricing) return 0;
+        return (showcasePricing.totalDailyCost - showcasePricing.dailyCost) * days;
+    }, [showcasePricing, days]);
+    
+    const totalCost = useMemo(() => calculateTotal(), [calculateTotal]);
+
+    const handleDaysChange = useCallback((e) => {
+        setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)));
+    }, []);
+
+    const handleNextStep = useCallback(() => {
+        setStep(step + 1);
+    }, [step]);
+
+    const handlePrevStep = useCallback(() => {
+        if (step > 1) {
+            setStep(step - 1);
+        } else {
+            onClose();
+        }
+    }, [step, onClose]);
 
     if (!isOpen) return null;
     if (!listingId) {
@@ -22,28 +62,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         );
     }
 
-    const today = new Date();
-    const startDate = today.toLocaleDateString('tr-TR');
-    const endDate = new Date(today.getTime() + (days - 1) * 24 * 60 * 60 * 1000).toLocaleDateString('tr-TR');
-    
-    const calculateTotal = () => {
-        if (!showcasePricing) return 0;
-        return showcasePricing.totalDailyCost * days;
-    };
-    
-    const calculateSubtotal = () => {
-        if (!showcasePricing) return 0;
-        return showcasePricing.dailyCost * days;
-    };
-    
-    const calculateTax = () => {
-        if (!showcasePricing) return 0;
-        return (showcasePricing.totalDailyCost - showcasePricing.dailyCost) * days;
-    };
-    
-    const totalCost = calculateTotal();
-
-    const renderStepContent = () => {
+    const renderStepContent = useCallback(() => {
         if (step === 1) {
             return (
                 <div>
@@ -54,7 +73,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         min="1"
                         max="30"
                         value={days}
-                        onChange={e => setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
+                        onChange={handleDaysChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         required
                     />
@@ -105,7 +124,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                 />
             );
         }
-    };
+    }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listingTitle, onSuccess, onClose]);
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -134,14 +153,14 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                 <div className="p-4 border-t flex items-center justify-between">
                     <button
                         className="px-4 py-2 border rounded"
-                        onClick={() => step > 1 ? setStep(step - 1) : onClose}
+                        onClick={handlePrevStep}
                     >
                         {step > 1 ? 'Back' : 'Cancel'}
                     </button>
                     {step === 1 && (
                         <button
                             className="px-4 py-2 bg-emerald-600 text-white rounded disabled:opacity-50"
-                            onClick={() => setStep(step + 1)}
+                            onClick={handleNextStep}
                             disabled={days < 1 || days > 30}
                         >
                             Continue
