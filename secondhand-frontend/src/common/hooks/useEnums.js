@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { enumService } from '../services/enumService.js';
 import { getCachedEnums, setCachedEnums, clearEnumCache, forceClearEnumCache } from '../services/storage/enumCache.js';
+import { fetchVehicleEnums, getCarBrandLabel, getFuelTypeLabel, getColorLabel } from '../enums/vehicleEnums.js';
+import { fetchListingEnums, getListingTypeLabel, getListingTypeIcon, getCurrencyLabel, getCurrencySymbol } from '../enums/listingEnums.js';
+import { fetchPaymentEnums } from '../enums/paymentEnums.js';
 
 export const useEnums = () => {
   const [enums, setEnums] = useState({
@@ -49,7 +51,7 @@ export const useEnums = () => {
         setIsLoading(true);
         setError(null);
         
-                const cachedEnums = getCachedEnums();
+        const cachedEnums = getCachedEnums();
         if (cachedEnums) {
           // Check if audit enums are missing or empty
           if (!cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses || 
@@ -64,121 +66,21 @@ export const useEnums = () => {
           }
         }
         
-                console.log('Fetching enums from API...');
-        const [
-          listingTypes,
-          listingStatuses,
-          carBrands,
-          fuelTypes,
-          colors,
-          doors,
-          currencies,
-          gearTypes,
-          seatCounts,
-          electronicTypes,
-          electronicBrands,
-          realEstateTypes,
-          realEstateAdTypes,
-          heatingTypes,
-          ownerTypes,
-          clothingBrands,
-          clothingTypes,
-          clothingConditions,
-          clothingGenders,
-          clothingCategories,
-          bookGenres,
-          bookLanguages,
-          bookFormats,
-          bookConditions,
-          sportDisciplines,
-          sportEquipmentTypes,
-          sportConditions,
-          paymentTypes,
-          shippingStatuses,
-          emailTypes,
-          genders,
-          auditEventTypes,
-          auditEventStatuses,
-          listingFeeConfig,
-          showcasePricingConfig
-        ] = await Promise.all([
-          enumService.getListingTypes(),
-          enumService.getListingStatuses(),
-          enumService.getCarBrands(),
-          enumService.getFuelTypes(),
-          enumService.getColors(),
-          enumService.getDoors(),
-          enumService.getCurrencies(),
-          enumService.getGearTypes(),
-          enumService.getSeatCounts(),
-          enumService.getElectronicTypes(),
-          enumService.getElectronicBrands(),
-          enumService.getRealEstateTypes(),
-          enumService.getRealEstateAdTypes(),
-          enumService.getHeatingTypes(),
-          enumService.getOwnerTypes(),
-          enumService.getClothingBrands(),
-          enumService.getClothingTypes(),
-          enumService.getClothingConditions(),
-          enumService.getClothingGenders(),
-          enumService.getClothingCategories(),
-          enumService.getBookGenres(),
-          enumService.getBookLanguages(),
-          enumService.getBookFormats(),
-          enumService.getBookConditions(),
-          enumService.getSportDisciplines(),
-          enumService.getSportEquipmentTypes(),
-          enumService.getSportConditions(),
-          enumService.getPaymentTypes(),
-          enumService.getShippingStatuses(),
-          enumService.getEmailTypes(),
-          enumService.getGenders(),
-          enumService.getAuditEventTypes(),
-          enumService.getAuditEventStatuses(),
-          enumService.getListingFeeConfig(),
-          enumService.getShowcasePricingConfig(),
+        console.log('Fetching enums from API...');
+        const [vehicleEnumsData, listingEnumsData, paymentEnumsData] = await Promise.all([
+          fetchVehicleEnums(),
+          fetchListingEnums(),
+          fetchPaymentEnums(),
         ]);
 
         const fetchedEnums = {
-          listingTypes,
-          listingStatuses,
-          carBrands,
-          fuelTypes,
-          colors,
-          doors,
-          currencies,
-          gearTypes,
-          seatCounts,
-          electronicTypes,
-          electronicBrands,
-          realEstateTypes,
-          realEstateAdTypes,
-          heatingTypes,
-          ownerTypes,
-          clothingBrands,
-          clothingTypes,
-          clothingConditions,
-          clothingGenders,
-          clothingCategories,
-          bookGenres,
-          bookLanguages,
-          bookFormats,
-          bookConditions,
-          sportDisciplines,
-          sportEquipmentTypes,
-          sportConditions,
-          paymentTypes,
-          shippingStatuses,
-          emailTypes,
-          genders,
-          auditEventTypes,
-          auditEventStatuses,
-          listingFeeConfig,
-          showcasePricingConfig,
+          ...vehicleEnumsData,
+          ...listingEnumsData,
+          ...paymentEnumsData,
         };
 
         setEnums(fetchedEnums);
-                setCachedEnums(fetchedEnums);
+        setCachedEnums(fetchedEnums);
       } catch (err) {
         setError(err.response?.data?.message || 'An error occurred while fetching enums.');
         console.error('Error fetching enums:', err);
@@ -190,42 +92,6 @@ export const useEnums = () => {
     fetchAllEnums();
   }, []);
 
-    const getListingTypeLabel = (value) => {
-    const type = enums.listingTypes.find(t => t.value === value);
-    return type?.label || value;
-  };
-
-  const getListingTypeIcon = (value) => {
-    const type = enums.listingTypes.find(t => t.value === value);
-    return type?.icon || '📦';
-  };
-
-  const getCarBrandLabel = (value) => {
-    const brand = enums.carBrands.find(b => b.value === value);
-    return brand?.label || value;
-  };
-
-  const getFuelTypeLabel = (value) => {
-    const fuel = enums.fuelTypes.find(f => f.value === value);
-    return fuel?.label || value;
-  };
-
-  const getColorLabel = (value) => {
-    const color = enums.colors.find(c => c.value === value);
-    return color?.label || value;
-  };
-
-  const getCurrencyLabel = (value) => {
-    const currency = enums.currencies.find(c => c.value === value);
-    return currency?.label || value;
-  };
-
-  const getCurrencySymbol = (value) => {
-    const currency = enums.currencies.find(c => c.value === value);
-    return currency?.symbol || value;
-  };
-
-
   const refreshEnums = async () => {
     clearEnumCache();
     setIsLoading(true);
@@ -233,104 +99,16 @@ export const useEnums = () => {
     
     try {
       console.log('Force refreshing enums from API...');
-      const [
-        listingTypes,
-        listingStatuses,
-        carBrands,
-        fuelTypes,
-        colors,
-        doors,
-        currencies,
-        gearTypes,
-        seatCounts,
-        electronicTypes,
-        electronicBrands,
-        realEstateTypes,
-        realEstateAdTypes,
-        heatingTypes,
-        ownerTypes,
-        clothingBrands,
-        clothingTypes,
-        clothingConditions,
-        bookGenres,
-        bookLanguages,
-        bookFormats,
-        bookConditions,
-        sportDisciplines,
-        sportEquipmentTypes,
-        sportConditions,
-        paymentTypes,
-        shippingStatuses,
-        emailTypes,
-        genders,
-        auditEventTypes,
-        auditEventStatuses
-      ] = await Promise.all([
-        enumService.getListingTypes(),
-        enumService.getListingStatuses(),
-        enumService.getCarBrands(),
-        enumService.getFuelTypes(),
-        enumService.getColors(),
-        enumService.getDoors(),
-        enumService.getCurrencies(),
-        enumService.getGearTypes(),
-        enumService.getSeatCounts(),
-        enumService.getElectronicTypes(),
-        enumService.getElectronicBrands(),
-        enumService.getRealEstateTypes(),
-        enumService.getRealEstateAdTypes(),
-        enumService.getHeatingTypes(),
-        enumService.getOwnerTypes(),
-        enumService.getClothingBrands(),
-        enumService.getClothingTypes(),
-        enumService.getClothingConditions(),
-        enumService.getBookGenres(),
-        enumService.getBookLanguages(),
-        enumService.getBookFormats(),
-        enumService.getBookConditions(),
-        enumService.getSportDisciplines(),
-        enumService.getSportEquipmentTypes(),
-        enumService.getSportConditions(),
-        enumService.getPaymentTypes(),
-        enumService.getShippingStatuses(),
-        enumService.getEmailTypes(),
-        enumService.getGenders(),
-        enumService.getAuditEventTypes(),
-        enumService.getAuditEventStatuses()
+      const [vehicleEnumsData, listingEnumsData, paymentEnumsData] = await Promise.all([
+        fetchVehicleEnums(),
+        fetchListingEnums(),
+        fetchPaymentEnums(),
       ]);
 
       const freshEnums = {
-        listingTypes,
-        listingStatuses,
-        carBrands,
-        fuelTypes,
-        colors,
-        doors,
-        currencies,
-        gearTypes,
-        seatCounts,
-        electronicTypes,
-        electronicBrands,
-        realEstateTypes,
-        realEstateAdTypes,
-        heatingTypes,
-        ownerTypes,
-        clothingBrands,
-        clothingTypes,
-        clothingConditions,
-        bookGenres,
-        bookLanguages,
-        bookFormats,
-        bookConditions,
-        sportDisciplines,
-        sportEquipmentTypes,
-        sportConditions,
-        paymentTypes,
-        shippingStatuses,
-        emailTypes,
-        genders,
-        auditEventTypes,
-        auditEventStatuses
+        ...vehicleEnumsData,
+        ...listingEnumsData,
+        ...paymentEnumsData,
       };
 
       setEnums(freshEnums);
@@ -347,13 +125,13 @@ export const useEnums = () => {
     enums,
     isLoading,
     error,
-    getListingTypeLabel,
-    getListingTypeIcon,
-    getCarBrandLabel,
-    getFuelTypeLabel,
-    getColorLabel,
-    getCurrencyLabel,
-    getCurrencySymbol,
+    getListingTypeLabel: (value) => getListingTypeLabel(value, enums.listingTypes),
+    getListingTypeIcon: (value) => getListingTypeIcon(value, enums.listingTypes),
+    getCarBrandLabel: (value) => getCarBrandLabel(value, enums.carBrands),
+    getFuelTypeLabel: (value) => getFuelTypeLabel(value, enums.fuelTypes),
+    getColorLabel: (value) => getColorLabel(value, enums.colors),
+    getCurrencyLabel: (value) => getCurrencyLabel(value, enums.currencies),
+    getCurrencySymbol: (value) => getCurrencySymbol(value, enums.currencies),
     refreshEnums
   };
 };

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useEnums } from "../../common/hooks/useEnums.js";
-import { filtersRegistry } from "./filters/filtersRegistry.js";
 import CategorySelector from "./CategorySelector.jsx";
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
-import Select from "react-select";
+import VehicleFilters from "./filters/VehicleFilters.jsx";
+import ElectronicsFilters from "./filters/ElectronicsFilters.jsx";
 
 const FilterModal = ({
                          isOpen,
@@ -39,8 +39,6 @@ const FilterModal = ({
 
     if (!isOpen) return null;
     if (enumsLoading) return <div>Loading...</div>;
-
-    const filterConfig = filtersRegistry[localCategory]?.config;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -113,148 +111,28 @@ const FilterModal = ({
                             </div>
                         )}
 
-                        {activeStep === "filters" && filterConfig && (
+                        {activeStep === "filters" && (
                             <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <div className="space-y-8">
-                                    {filterConfig.getFields().map((field) => {
-                                        if (field.type === "enum") {
-                                            const selectedValues = localFilters[field.key] || [];
-
-                                            return (
-                                                <div key={field.key} className="space-y-3">
-                                                    <label className="block text-sm font-semibold text-gray-900">
-                                                        {field.label}
-                                                    </label>
-                                                    <Select
-                                                        isMulti
-                                                        options={enums[field.enumKey]?.map((opt) => ({
-                                                            value: opt.value,
-                                                            label: opt.label,
-                                                        }))}
-                                                        value={selectedValues.map((v) => ({
-                                                            value: v,
-                                                            label: enums[field.enumKey]?.find((o) => o.value === v)?.label,
-                                                        }))}
-                                                        onChange={(selected) => {
-                                                            handleInputChange(
-                                                                field.key,
-                                                                selected ? selected.map((s) => s.value) : []
-                                                            );
-                                                        }}
-                                                        className="basic-multi-select"
-                                                        classNamePrefix="select"
-                                                        placeholder={`Select ${field.label.toLowerCase()}...`}
-                                                        menuPortalTarget={document.body}
-                                                        menuPosition="fixed"
-                                                        styles={{
-                                                            control: (base) => ({
-                                                                ...base,
-                                                                minHeight: '44px',
-                                                                border: '1px solid #d1d5db',
-                                                                borderRadius: '8px',
-                                                                boxShadow: 'none',
-                                                                '&:hover': {
-                                                                    border: '1px solid #9ca3af',
-                                                                },
-                                                                '&:focus-within': {
-                                                                    border: '2px solid #374151',
-                                                                    boxShadow: '0 0 0 3px rgba(55, 65, 81, 0.1)',
-                                                                },
-                                                            }),
-                                                            multiValue: (base) => ({
-                                                                ...base,
-                                                                backgroundColor: '#f3f4f6',
-                                                                borderRadius: '6px',
-                                                            }),
-                                                            multiValueLabel: (base) => ({
-                                                                ...base,
-                                                                color: '#374151',
-                                                                fontSize: '14px',
-                                                            }),
-                                                            multiValueRemove: (base) => ({
-                                                                ...base,
-                                                                color: '#6b7280',
-                                                                '&:hover': {
-                                                                    backgroundColor: '#ef4444',
-                                                                    color: 'white',
-                                                                },
-                                                            }),
-                                                            placeholder: (base) => ({
-                                                                ...base,
-                                                                color: '#9ca3af',
-                                                                fontSize: '14px',
-                                                            }),
-                                                            menu: (base) => ({
-                                                                ...base,
-                                                                borderRadius: '8px',
-                                                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                                                                zIndex: 9999,
-                                                                maxHeight: '200px',
-                                                                overflowY: 'auto',
-                                                            }),
-                                                            menuPortal: (base) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                            }),
-                                                            option: (base, state) => ({
-                                                                ...base,
-                                                                backgroundColor: state.isSelected 
-                                                                    ? '#374151' 
-                                                                    : state.isFocused 
-                                                                        ? '#f3f4f6' 
-                                                                        : 'white',
-                                                                color: state.isSelected ? 'white' : '#374151',
-                                                                '&:hover': {
-                                                                    backgroundColor: state.isSelected ? '#374151' : '#f3f4f6',
-                                                                },
-                                                            }),
-                                                        }}
-                                                    />
-                                                </div>
-                                            );
-                                        }
-
-                                        if (field.type === "numericRange") {
-                                            const minKey =
-                                                "min" + field.key.charAt(0).toUpperCase() + field.key.slice(1);
-                                            const maxKey =
-                                                "max" + field.key.charAt(0).toUpperCase() + field.key.slice(1);
-                                            return (
-                                                <div key={field.key} className="space-y-3">
-                                                    <label className="block text-sm font-semibold text-gray-900">
-                                                        {field.label} Range
-                                                    </label>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                            <input
-                                                                type="number"
-                                                                placeholder={`Min ${field.label}`}
-                                                                value={localFilters[minKey] || ""}
-                                                                onChange={(e) => handleInputChange(minKey, e.target.value)}
-                                                                min={field.min}
-                                                                max={field.max}
-                                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <input
-                                                                type="number"
-                                                                placeholder={`Max ${field.label}`}
-                                                                value={localFilters[maxKey] || ""}
-                                                                onChange={(e) => handleInputChange(maxKey, e.target.value)}
-                                                                min={field.min}
-                                                                max={field.max}
-                                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-
-                                        return null;
-                                    })}
-                                </div>
+                                {localCategory === "VEHICLE" && (
+                                    <VehicleFilters
+                                        filters={localFilters}
+                                        onInputChange={handleInputChange}
+                                        enums={enums}
+                                    />
+                                )}
+                                {localCategory === "ELECTRONICS" && (
+                                    <ElectronicsFilters
+                                        filters={localFilters}
+                                        onInputChange={handleInputChange}
+                                        enums={enums}
+                                    />
+                                )}
+                                {localCategory !== "VEHICLE" && localCategory !== "ELECTRONICS" && (
+                                    <div className="text-center text-gray-500 py-8">
+                                        <p>No specific filters available for this category.</p>
+                                        <p className="text-sm mt-2">Use price and location filters instead.</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
