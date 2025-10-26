@@ -1,28 +1,25 @@
 import React from 'react';
-import { orderService } from '../services/orderService.js';
+import {orderService} from '../services/orderService.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
-import { ReviewButton } from '../../reviews/index.js';
-import { formatCurrency, formatDateTime, resolveEnumLabel } from '../../common/formatters.js';
-import { useEnums } from '../../common/hooks/useEnums.js';
-import { useOrders } from '../hooks/useOrders.js';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import {useOrders} from '../hooks/useOrders.js';
 import OrdersHeader from '../components/OrdersHeader.jsx';
 import OrdersSearch from '../components/OrdersSearch.jsx';
 import OrdersList from '../components/OrdersList.jsx';
 import OrdersPagination from '../components/OrdersPagination.jsx';
 import OrderModal from '../components/OrderModal.jsx';
-import { useOrdersSearch } from '../hooks/useOrdersSearch.js';
-import { useOrdersModal } from '../hooks/useOrdersModal.js';
-import { useOrdersReceipt } from '../hooks/useOrdersReceipt.js';
-import { useOrdersReviews } from '../hooks/useOrdersReviews.js';
-import { getEstimatedDeliveryTime, getStatusColor } from '../utils/orderUtils.js';
+import {useOrdersSearch} from '../hooks/useOrdersSearch.js';
+import {useOrdersModal} from '../hooks/useOrdersModal.js';
+import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
+import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
+import {getEstimatedDeliveryTime, getStatusColor} from '../utils/orderUtils.js';
 
 const MyOrdersPage = () => {
   const { enums } = useEnums();
   const {
     orders,
     loading,
-    error,
     pagination,
     fetchOrders,
     loadPage,
