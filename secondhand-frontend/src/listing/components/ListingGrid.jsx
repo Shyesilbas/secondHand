@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import ListingCard from './ListingCard.jsx';
 
-const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
+const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -65,6 +65,8 @@ const ListingGrid = ({ listings, isLoading, error, onDeleted }) => {
             ))}
         </div>
     );
-};
+});
+
+ListingGrid.displayName = 'ListingGrid';
 
 export default ListingGrid;

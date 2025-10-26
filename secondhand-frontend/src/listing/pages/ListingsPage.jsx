@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAdvancedListingsQuery } from '../hooks/useAdvancedListingsQuery.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import FilterModal from '../components/FilterModal.jsx';
@@ -43,17 +43,24 @@ const ListingsPage = () => {
         }
     }, [initialListingType]);
 
-    const handleCategoryChange = (category) => {
+    const handleCategoryChange = useCallback((category) => {
         setSelectedCategory(category);
         updateFilters({ listingType: category });
-    };
+    }, [updateFilters]);
 
-    const handleResetFilters = () => {
+    const handleResetFilters = useCallback(() => {
         setSelectedCategory('VEHICLE');
         resetFilters();
-    };
+    }, [resetFilters]);
 
+    const handlePageChange = useCallback((page) => {
+        updatePage(page);
+    }, [updatePage]);
 
+    const handleFiltersChange = useCallback((newFilters) => {
+        console.log('📋 ListingsPage - handleFiltersChange:', newFilters);
+        updateFilters(newFilters);
+    }, [updateFilters]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -81,12 +88,12 @@ const ListingsPage = () => {
                 error={error}
                 totalPages={totalPages}
                 currentPage={currentPage}
-                onPageChange={updatePage}
+                onPageChange={handlePageChange}
                 totalElements={totalElements}
                 filters={filters}
                 getListingTypeLabel={getListingTypeLabel}
                 onResetFilters={resetFilters}
-                updateFilters={updateFilters}
+                updateFilters={handleFiltersChange}
                 titleSearchTerm={titleSearchTerm}
             />
 
@@ -94,7 +101,7 @@ const ListingsPage = () => {
                 isOpen={showFilterModal}
                 onClose={closeFilterModal}
                 filters={filters}
-                onFiltersChange={updateFilters}
+                onFiltersChange={handleFiltersChange}
                 onReset={handleResetFilters}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}

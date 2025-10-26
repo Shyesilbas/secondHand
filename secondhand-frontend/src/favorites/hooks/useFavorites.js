@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { favoriteService } from '../services/favoriteService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
@@ -9,7 +9,7 @@ export const useFavorites = () => {
   const [error, setError] = useState(null);
   const notification = useNotification();
 
-  const fetchFavorites = async (params = {}) => {
+  const fetchFavorites = useCallback(async (params = {}) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -30,13 +30,13 @@ export const useFavorites = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const loadPage = (page) => {
+  const loadPage = useCallback((page) => {
     fetchFavorites({ page });
-  };
+  }, [fetchFavorites]);
 
-  const toggleFavorite = async (listing) => {
+  const toggleFavorite = useCallback(async (listing) => {
     try {
       setIsLoading(true);
       const response = await favoriteService.toggleFavorite(listing.id);
@@ -58,7 +58,7 @@ export const useFavorites = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [notification]);
 
   return {
     favorites,

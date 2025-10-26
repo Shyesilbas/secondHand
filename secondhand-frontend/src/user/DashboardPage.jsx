@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {Link} from 'react-router-dom';
 import {useAuth} from '../auth/AuthContext.jsx';
 import {ROUTES} from '../common/constants/routes.js';
@@ -15,7 +15,7 @@ import {
 const DashboardPage = () => {
   const { user } = useAuth();
 
-  const dashboardItems = [
+  const dashboardItems = useMemo(() => [
     {
       title: "My Listings",
       description: "Manage your listings",
@@ -65,7 +65,7 @@ const DashboardPage = () => {
       icon: MessageSquare,
       color: "text-indigo-600"
     },
-  ];
+  ], [user?.id]);
 
   return (
     <div className="min-h-screen bg-white">

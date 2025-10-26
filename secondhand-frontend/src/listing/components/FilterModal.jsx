@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useEnums } from "../../common/hooks/useEnums.js";
 import CategorySelector from "./CategorySelector.jsx";
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
@@ -27,9 +27,32 @@ const FilterModal = ({
         }
     }, [isOpen, filters, selectedCategory]);
 
-    const handleInputChange = (field, value) => {
+    const handleInputChange = useCallback((field, value) => {
         setLocalFilters((prev) => ({ ...prev, [field]: value }));
-    };
+    }, []);
+
+    const handleCategoryChange = useCallback((category) => {
+        setLocalCategory(category);
+    }, []);
+
+    const handleStepChange = useCallback((stepId) => {
+        setActiveStep(stepId);
+    }, []);
+
+    const handleReset = useCallback(() => {
+        setLocalFilters({});
+        setLocalCategory("VEHICLE");
+        onReset();
+    }, [onReset]);
+
+    const handleApplyFilters = useCallback(() => {
+        console.log('🔍 FilterModal - localFilters before apply:', localFilters);
+        onFiltersChange(localFilters);
+        if (localCategory !== selectedCategory) {
+            onCategoryChange(localCategory);
+        }
+        onClose();
+    }, [localFilters, localCategory, selectedCategory, onFiltersChange, onCategoryChange, onClose]);
 
     const steps = [
         { id: "category", label: "Category", icon: "🏷️" },
@@ -66,7 +89,7 @@ const FilterModal = ({
                             {steps.map((step, index) => (
                                 <button
                                     key={step.id}
-                                    onClick={() => setActiveStep(step.id)}
+                                    onClick={() => handleStepChange(step.id)}
                                     className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                                         activeStep === step.id
                                             ? "bg-white text-gray-900 shadow-sm"
@@ -96,7 +119,7 @@ const FilterModal = ({
                             <div className="bg-white rounded-lg border border-gray-200 p-6">
                                 <CategorySelector
                                     selectedCategory={localCategory}
-                                    onCategoryChange={(c) => setLocalCategory(c)}
+                                    onCategoryChange={handleCategoryChange}
                                 />
                             </div>
                         )}
@@ -142,11 +165,7 @@ const FilterModal = ({
                 <div className="border-t border-gray-200 bg-white px-6 py-5">
                     <div className="flex items-center justify-between">
                         <button
-                            onClick={() => {
-                                setLocalFilters({});
-                                setLocalCategory("VEHICLE");
-                                onReset();
-                            }}
+                            onClick={handleReset}
                             className="px-4 py-2 text-gray-600 font-medium hover:text-gray-900 transition-colors"
                         >
                             Reset All
@@ -159,13 +178,7 @@ const FilterModal = ({
                                 Cancel
                             </button>
                             <button
-                                onClick={() => {
-                                    onFiltersChange(localFilters);
-                                    if (localCategory !== selectedCategory) {
-                                        onCategoryChange(localCategory);
-                                    }
-                                    onClose();
-                                }}
+                                onClick={handleApplyFilters}
                                 className="px-6 py-2 bg-gray-900 text-white font-medium rounded hover:bg-gray-800 transition-colors"
                             >
                                 Apply Filters

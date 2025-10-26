@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useFavorites } from './hooks/useFavorites.js';
 import ListingGrid from '../listing/components/ListingGrid.jsx';
 import Pagination from '../common/components/ui/Pagination.jsx';
@@ -16,23 +16,28 @@ const FavoritesPage = () => {
 
     useEffect(() => {
         fetchFavorites();
-    }, []);
+    }, [fetchFavorites]);
 
-    const handlePageChange = (page) => {
+    const handlePageChange = useCallback((page) => {
         loadPage(page);
-    };
+    }, [loadPage]);
 
+    const favoritedListings = useMemo(() => {
+        return favorites.map(fav => {
+            const listing = fav?.listing;
+            if (!listing) return null;
 
-    const favoritedListings = favorites.map(fav => {
-        const listing = fav?.listing;
-        if (!listing) return null;
+            return {
+                ...listing,
+                createdAt: formatDate(fav.createdAt),
+                favoriteStats: listing.favoriteStats
+            };
+        }).filter(Boolean);
+    }, [favorites]);
 
-        return {
-            ...listing,
-            createdAt: formatDate(fav.createdAt),
-            favoriteStats: listing.favoriteStats
-        };
-    }).filter(Boolean);
+    const handleRefresh = useCallback(() => {
+        fetchFavorites({ page: pagination.number });
+    }, [fetchFavorites, pagination.number]);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -45,7 +50,7 @@ const FavoritesPage = () => {
                 </div>
 
                 <button
-                    onClick={() => fetchFavorites({ page: pagination.number })}
+                    onClick={handleRefresh}
                     disabled={isLoading}
                     className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
                 >

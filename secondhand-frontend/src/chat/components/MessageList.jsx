@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 
-const MessageBubble = ({ message, isOwnMessage, onDeleteMessage }) => {
+const MessageBubble = memo(({ message, isOwnMessage, onDeleteMessage }) => {
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
   const handleDeleteClick = () => {
@@ -49,9 +49,11 @@ const MessageBubble = ({ message, isOwnMessage, onDeleteMessage }) => {
       </div>
     </div>
   );
-};
+});
 
-const MessageList = ({ 
+MessageBubble.displayName = 'MessageBubble';
+
+const MessageList = memo(({ 
   messages, 
   isLoadingMessages, 
   messagesEndRef, 
@@ -88,6 +90,8 @@ const MessageList = ({
       <div ref={messagesEndRef} />
     </div>
   );
-};
+});
+
+MessageList.displayName = 'MessageList';
 
 export default MessageList;
