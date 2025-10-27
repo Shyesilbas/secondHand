@@ -1,5 +1,7 @@
 package com.serhat.secondhand.ewallet.service;
 
+import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.entity.EWallet;
@@ -29,6 +31,7 @@ public class EWalletService {
     private final EWalletRepository eWalletRepository;
     private final BankService bankService;
     private final PaymentRepository paymentRepository;
+    private final AgreementService agreementService;
 
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
         User user = getCurrentUser();
@@ -79,10 +82,12 @@ public class EWalletService {
     }
 
     @Transactional
-    public void deposit( DepositRequest request) {
+    public void deposit(DepositRequest request) {
         User user = getCurrentUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
+        // Validate payment agreements
+        validatePaymentAgreements(request);
 
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
@@ -124,9 +129,12 @@ public class EWalletService {
     }
 
     @Transactional
-    public void withdraw( WithdrawRequest request) {
+    public void withdraw(WithdrawRequest request) {
         User user = getCurrentUser();
         EWallet eWallet = getEWalletOrThrow(user);
+
+        // Validate payment agreements
+        validatePaymentAgreements(request);
 
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
@@ -244,5 +252,38 @@ public class EWalletService {
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (User) auth.getPrincipal();
+    }
+
+    private void validatePaymentAgreements(Object request) {
+        boolean agreementsAccepted = false;
+        java.util.List<java.util.UUID> acceptedAgreementIds = null;
+
+        if (request instanceof DepositRequest) {
+            DepositRequest depositRequest = (DepositRequest) request;
+            agreementsAccepted = depositRequest.isAgreementsAccepted();
+            acceptedAgreementIds = depositRequest.getAcceptedAgreementIds();
+        } else if (request instanceof WithdrawRequest) {
+            WithdrawRequest withdrawRequest = (WithdrawRequest) request;
+            agreementsAccepted = withdrawRequest.isAgreementsAccepted();
+            acceptedAgreementIds = withdrawRequest.getAcceptedAgreementIds();
+        }
+
+        if (!agreementsAccepted) {
+            throw new BusinessException(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+        }
+
+        var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.ONLINE_PAYMENT);
+
+        if (acceptedAgreementIds == null || acceptedAgreementIds.size() != requiredAgreements.size()) {
+            throw new BusinessException(PaymentErrorCodes.INVALID_AGREEMENT_COUNT);
+        }
+
+        var requiredAgreementIds = requiredAgreements.stream()
+                .map(agreement -> agreement.getAgreementId())
+                .toList();
+
+        if (!acceptedAgreementIds.containsAll(requiredAgreementIds)) {
+            throw new BusinessException(PaymentErrorCodes.REQUIRED_AGREEMENTS_NOT_ACCEPTED);
+        }
     }
 }

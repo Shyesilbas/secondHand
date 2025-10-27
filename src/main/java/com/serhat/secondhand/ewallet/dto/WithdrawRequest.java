@@ -11,7 +11,6 @@ import java.util.UUID;
 public class WithdrawRequest {
     private BigDecimal amount;
     private UUID bankId;
-
-
-
+    private boolean agreementsAccepted;
+    private java.util.List<java.util.UUID> acceptedAgreementIds;
 }

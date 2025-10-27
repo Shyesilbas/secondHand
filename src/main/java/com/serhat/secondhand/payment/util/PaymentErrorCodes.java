@@ -31,7 +31,10 @@ public enum PaymentErrorCodes implements ErrorCode {
     INVALID_WALLET_LIMIT("INVALID_WALLET_LIMIT", "Wallet limit cannot be negative", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_NOT_EMPTY("BANK_ACCOUNT_NOT_EMPTY", "Bank account must be empty before deleting." , HttpStatus.BAD_REQUEST ),
     INVALID_CREDIT_AMOUNT("INVALID_CREDIT_AMOUNT", "Credit amount must be greater than zero" , HttpStatus.BAD_REQUEST ),
-    WALLET_LIMIT_EXCEEDED("WALLET_LIMIT_EXCEEDED","Your balance will exceed your limit after this operation." , HttpStatus.BAD_REQUEST);
+    WALLET_LIMIT_EXCEEDED("WALLET_LIMIT_EXCEEDED","Your balance will exceed your limit after this operation." , HttpStatus.BAD_REQUEST),
+    AGREEMENTS_NOT_ACCEPTED("AGREEMENTS_NOT_ACCEPTED", "Payment agreements must be accepted", HttpStatus.BAD_REQUEST),
+    INVALID_AGREEMENT_COUNT("INVALID_AGREEMENT_COUNT", "All required agreements must be accepted", HttpStatus.BAD_REQUEST),
+    REQUIRED_AGREEMENTS_NOT_ACCEPTED("REQUIRED_AGREEMENTS_NOT_ACCEPTED", "Required payment agreements are not accepted", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

@@ -96,6 +96,8 @@ public class OrderPaymentService {
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.getPaymentVerificationCode())
+                .agreementsAccepted(request.isAgreementsAccepted())
+                .acceptedAgreementIds(request.getAcceptedAgreementIds())
                 .build();
     }
 

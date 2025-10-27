@@ -20,6 +20,10 @@ export const agreementService = {
         return get(`${API_ENDPOINTS.AGREEMENTS.REQUIRED}?agreementGroup=REGISTER`);
     },
 
+    getRequiredAgreementsForPayment: async () => {
+        return get(`${API_ENDPOINTS.AGREEMENTS.REQUIRED}?agreementGroup=ONLINE_PAYMENT`);
+    },
+
     acceptAgreement: async (acceptRequest) => {
         return post(API_ENDPOINTS.AGREEMENTS.ACCEPT, acceptRequest);
     },
@@ -30,5 +34,9 @@ export const agreementService = {
             ...ua,
             isAcceptedTheLastVersion: ua?.isAcceptedTheLastVersion ?? ua?.acceptedTheLastVersion ?? false,
         })) : [];
+    },
+
+    getUserAcceptanceHistory: async (agreementId) => {
+        return get(API_ENDPOINTS.AGREEMENTS.USER_ACCEPTANCE_HISTORY(agreementId));
     }
 };

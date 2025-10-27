@@ -15,7 +15,9 @@ const ShowcasePayment = ({
   calculateSubtotal,
   calculateTax,
   onSuccess,
-  onClose 
+  onClose,
+  acceptedAgreements,
+  getAcceptedAgreementIds
 }) => {
   const [step, setStep] = useState(1);
   const [paymentType, setPaymentType] = useState('CREDIT_CARD');
@@ -49,17 +51,29 @@ const ShowcasePayment = ({
       setError('Listing Information not found. Please Try Again');
       return;
     }
+    if (!verificationCode || verificationCode.trim() === '') {
+      setError('Verification code is required to complete the payment');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      await showcaseService.createShowcase(listingId, days, paymentType, verificationCode);
+      const acceptedAgreementIds = getAcceptedAgreementIds ? getAcceptedAgreementIds() : [];
+      await showcaseService.createShowcase(
+        listingId, 
+        days, 
+        paymentType, 
+        verificationCode, 
+        acceptedAgreements.size > 0, 
+        acceptedAgreementIds
+      );
       setSuccess(true);
       try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
       onSuccess?.();
       setTimeout(() => {
         setSuccess(false);
         onClose();
-      }, 1500);
+      }, 1000);
     } catch (err) {
       setError(err.message || 'Payment failed');
     } finally {

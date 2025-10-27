@@ -135,6 +135,15 @@ public class AgreementController {
         return ResponseEntity.ok(hasAccepted);
     }
 
+    @GetMapping("/user/acceptance-history/{agreementId}")
+    @Operation(summary = "Get user acceptance history for an agreement", description = "Retrieves all acceptance records for a specific agreement by the current user")
+    public ResponseEntity<List<UserAgreementDto>> getUserAcceptanceHistory(
+            @PathVariable UUID agreementId,
+            @AuthenticationPrincipal User user) {
+        var history = userAgreementService.getUserAcceptanceHistory(user, agreementId);
+        return ResponseEntity.ok(history);
+    }
+
     @PostMapping("/admin/accept-all-users")
     @Operation(summary = "Accept agreements for all users", description = "Admin endpoint to accept required agreements for all existing users")
     public ResponseEntity<String> acceptAgreementsForAllUsers() {

@@ -24,6 +24,8 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.showcase.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -604,5 +606,33 @@ public class EnumController {
         configMap.put("cacheVersion", configHash);
         
         return ResponseEntity.ok(configMap);
+    }
+
+    @GetMapping("/agreement-groups")
+    @Operation(summary = "Get agreement groups", description = "Returns all available agreement groups")
+    public ResponseEntity<List<Map<String, Object>>> getAgreementGroups() {
+        List<Map<String, Object>> agreementGroups = Arrays.stream(AgreementGroup.values())
+                .map(group -> {
+                    Map<String, Object> groupMap = new LinkedHashMap<>();
+                    groupMap.put("value", group.name());
+                    groupMap.put("label", group.name().replace("_", " "));
+                    return groupMap;
+                })
+                .toList();
+        return ResponseEntity.ok(agreementGroups);
+    }
+
+    @GetMapping("/agreement-types")
+    @Operation(summary = "Get agreement types", description = "Returns all available agreement types")
+    public ResponseEntity<List<Map<String, Object>>> getAgreementTypes() {
+        List<Map<String, Object>> agreementTypes = Arrays.stream(AgreementType.values())
+                .map(type -> {
+                    Map<String, Object> typeMap = new LinkedHashMap<>();
+                    typeMap.put("value", type.name());
+                    typeMap.put("label", type.name().replace("_", " "));
+                    return typeMap;
+                })
+                .toList();
+        return ResponseEntity.ok(agreementTypes);
     }
 }

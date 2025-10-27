@@ -3,6 +3,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
 import { createListingFeePaymentRequest } from '../payments.js';
+import { usePaymentAgreements } from './usePaymentAgreements.js';
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess, onVerificationRequired }) => {
     const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
@@ -16,6 +17,15 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     const { showSuccess, showError, showInfo } = useNotification();
 
     const [countdown, setCountdown] = useState(null);
+
+    // Payment agreements
+    const {
+        acceptedAgreements,
+        handleAgreementToggle,
+        resetAgreements,
+        areAllAgreementsAccepted,
+        getAcceptedAgreementIds
+    } = usePaymentAgreements();
 
     useEffect(() => {
         if (!codeExpiryTime) {
@@ -61,6 +71,8 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
                 listingId: selectedListing.id,
                 paymentType: paymentType,
                 verificationCode: verificationCode,
+                agreementsAccepted: true,
+                acceptedAgreementIds: getAcceptedAgreementIds()
             });
             await paymentService.createListingFeePayment(paymentData);
 
@@ -146,6 +158,10 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         setShowConfirmModal,
         handlePayment,
         confirmPayment,
-        resendVerificationCode
+        resendVerificationCode,
+        // Agreement related
+        acceptedAgreements,
+        agreementsAccepted: areAllAgreementsAccepted([]), // Will be updated when we have required agreements
+        onAgreementToggle: handleAgreementToggle
     };
 };

@@ -62,4 +62,6 @@ export const enumService = {
 
   getListingFeeConfig: async () => get(API_ENDPOINTS.ENUMS.LISTING_FEE_CONFIG),
   getShowcasePricingConfig: async () => get(API_ENDPOINTS.ENUMS.SHOWCASE_PRICING_CONFIG),
+  getAgreementGroups: async () => get(API_ENDPOINTS.ENUMS.AGREEMENT_GROUPS),
+  getAgreementTypes: async () => get(API_ENDPOINTS.ENUMS.AGREEMENT_TYPES),
 };

@@ -39,7 +39,11 @@ const PayListingFeePage = () => {
         confirmPayment,
         resendVerificationCode,
         showConfirmModal,
-        setShowConfirmModal
+        setShowConfirmModal,
+        // Agreement related
+        acceptedAgreements,
+        agreementsAccepted,
+        onAgreementToggle
     } = usePayListingFee({
         selectedListing: null,
         feeConfig,
@@ -109,6 +113,9 @@ const PayListingFeePage = () => {
                             await refetchPaymentMethods();
                             handlePayment();
                         }}
+                        agreementsAccepted={agreementsAccepted}
+                        acceptedAgreementIds={acceptedAgreements}
+                        onAgreementToggle={onAgreementToggle}
                     />
                 </div>
             )}

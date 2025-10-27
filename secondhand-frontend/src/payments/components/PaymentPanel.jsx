@@ -1,6 +1,8 @@
 import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
+import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
+import { usePaymentAgreements } from '../hooks/usePaymentAgreements.js';
 
 const PaymentPanel = ({
     selectedListing,
@@ -9,7 +11,9 @@ const PaymentPanel = ({
     onPaymentTypeChange,
     isProcessingPayment,
     onPayment,
-    
+    agreementsAccepted,
+    acceptedAgreementIds,
+    onAgreementToggle
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const { eWallet, checkBalance } = useEWallet();
@@ -158,10 +162,22 @@ const PaymentPanel = ({
                             </div>
                         )}
 
+                        {/* Payment Agreements */}
+                        {selectedListing && (
+                            <div className="mb-6">
+                                <PaymentAgreementsSection 
+                                    acceptedAgreements={acceptedAgreementIds}
+                                    onToggle={onAgreementToggle}
+                                    error={!agreementsAccepted ? "Please accept all payment agreements to proceed" : null}
+                                />
+                            </div>
+                        )}
+
                         <button
                             onClick={onPayment}
                             disabled={
                                 isProcessingPayment || 
+                                !agreementsAccepted ||
                                 (paymentType === 'EWALLET' && eWallet && eWallet.balance < feeConfig?.totalCreationFee)
                             }
                             className="w-full bg-btn-primary text-white py-3 px-4 rounded-lg hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"

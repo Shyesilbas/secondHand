@@ -63,18 +63,20 @@ public class ShowcaseService {
                 .add(showcaseDailyCost);
         BigDecimal totalCost = dailyCostWithTax.multiply(new BigDecimal(request.days()));
         
-        PaymentRequest paymentRequest = new PaymentRequest(
-                user.getId(),
-                null,
-                user.getName(),
-                user.getSurname(),
-                listing.getId(),
-                totalCost,
-                request.paymentType(),
-                PaymentTransactionType.SHOWCASE_PAYMENT,
-                PaymentDirection.OUTGOING,
-                request.verificationCode()
-        );
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .fromUserId(user.getId())
+                .toUserId(null)
+                .receiverName(user.getName())
+                .receiverSurname(user.getSurname())
+                .listingId(listing.getId())
+                .amount(totalCost)
+                .paymentType(request.paymentType())
+                .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
+                .paymentDirection(PaymentDirection.OUTGOING)
+                .verificationCode(request.verificationCode())
+                .agreementsAccepted(request.agreementsAccepted())
+                .acceptedAgreementIds(request.acceptedAgreementIds())
+                .build();
 
         paymentService.createPayment(paymentRequest, authentication);
         

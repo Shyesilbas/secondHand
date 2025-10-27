@@ -1,5 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
+import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -30,12 +32,16 @@ public class GenericPaymentService {
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
     private final PaymentVerificationService paymentVerificationService;
+    private final AgreementService agreementService;
 
 
     @Transactional
     public PaymentDto createPayment(PaymentRequest paymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
+
+        // Validate payment agreements
+        validatePaymentAgreements(paymentRequest);
 
         paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
 
@@ -68,6 +74,27 @@ public class GenericPaymentService {
         }
 
         return paymentMapper.toDto(payment);
+    }
+
+    private void validatePaymentAgreements(PaymentRequest paymentRequest) {
+        if (!paymentRequest.agreementsAccepted()) {
+            throw new BusinessException(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+        }
+
+        var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.ONLINE_PAYMENT);
+        var acceptedAgreementIds = paymentRequest.acceptedAgreementIds();
+
+        if (acceptedAgreementIds == null || acceptedAgreementIds.size() != requiredAgreements.size()) {
+            throw new BusinessException(PaymentErrorCodes.INVALID_AGREEMENT_COUNT);
+        }
+
+        var requiredAgreementIds = requiredAgreements.stream()
+                .map(agreement -> agreement.getAgreementId())
+                .toList();
+
+        if (!acceptedAgreementIds.containsAll(requiredAgreementIds)) {
+            throw new BusinessException(PaymentErrorCodes.REQUIRED_AGREEMENTS_NOT_ACCEPTED);
+        }
     }
 }
 

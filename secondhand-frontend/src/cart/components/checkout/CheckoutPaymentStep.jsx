@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CreditCardIcon, BanknotesIcon, WalletIcon } from '@heroicons/react/24/outline';
+import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 
 const CheckoutPaymentStep = ({
     selectedPaymentType,
@@ -14,8 +15,15 @@ const CheckoutPaymentStep = ({
     calculateTotal,
     onNext,
     onBack,
-    sendVerificationCode
+    sendVerificationCode,
+    acceptedAgreements,
+    onAgreementToggle,
+    areAllAgreementsAccepted
 }) => {
+    const canProceed = () => {
+        return isPaymentMethodValid() && areAllAgreementsAccepted();
+    };
+
     const paymentMethods = [
         {
             id: 'CREDIT_CARD',
@@ -127,8 +135,8 @@ const CheckoutPaymentStep = ({
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="">Choose a card</option>
-                                    {cards?.map((card) => (
-                                        <option key={card.id} value={card.number || card.cardNumber}>
+                                    {cards?.map((card, index) => (
+                                        <option key={card.id || `card-${index}`} value={card.number || card.cardNumber}>
                                             •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4)}
                                         </option>
                                     ))}
@@ -152,8 +160,8 @@ const CheckoutPaymentStep = ({
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="">Choose an account</option>
-                                    {bankAccounts?.map((account) => (
-                                        <option key={account.id} value={account.IBAN}>
+                                    {bankAccounts?.map((account, index) => (
+                                        <option key={account.id || `account-${index}`} value={account.IBAN}>
                                             •••• {account.IBAN?.slice(-4)}
                                         </option>
                                     ))}
@@ -187,6 +195,14 @@ const CheckoutPaymentStep = ({
                         )}
                     </div>
                 )}
+
+                {/* Payment Agreements */}
+                <div className="bg-gray-50 rounded-lg p-6">
+                    <PaymentAgreementsSection 
+                        acceptedAgreements={acceptedAgreements}
+                        onToggle={onAgreementToggle}
+                    />
+                </div>
             </div>
 
             {/* Navigation */}
@@ -199,11 +215,25 @@ const CheckoutPaymentStep = ({
                 </button>
                 <button
                     onClick={handleNext}
-                    disabled={!isPaymentMethodValid()}
+                    disabled={!canProceed()}
                     className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Send Verification Code
                 </button>
+                
+                {/* Help text */}
+                {!canProceed() && (
+                    <div className="text-center mt-4">
+                        <p className="text-sm text-gray-500">
+                            {!isPaymentMethodValid() && !areAllAgreementsAccepted() 
+                                ? "Please select a payment method and accept all agreements to continue"
+                                : !isPaymentMethodValid() 
+                                    ? "Please select a valid payment method to continue"
+                                    : "Please accept all payment agreements to continue"
+                            }
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );
