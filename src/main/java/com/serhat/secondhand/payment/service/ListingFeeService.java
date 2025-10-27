@@ -54,6 +54,8 @@ public class ListingFeeService {
                 .transactionType(PaymentTransactionType.LISTING_CREATION)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.verificationCode())
+                .agreementsAccepted(request.agreementsAccepted())
+                .acceptedAgreementIds(request.acceptedAgreementIds())
                 .build();
     }
 

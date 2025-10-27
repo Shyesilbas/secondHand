@@ -91,6 +91,8 @@ export const createPaymentRequest = (data) => {
     bankAccountId: data.bankAccountId || '',
     listingId: data.listingId || '',
     paymentType: data.paymentType || '',
+    agreementsAccepted: data.agreementsAccepted || false,
+    acceptedAgreementIds: data.acceptedAgreementIds || []
   };
 };
 
@@ -99,5 +101,7 @@ export const createListingFeePaymentRequest = (data) => {
     paymentType: data.paymentType || '',
     listingId: data.listingId || '',
     verificationCode: data.verificationCode || null,
+    agreementsAccepted: data.agreementsAccepted || false,
+    acceptedAgreementIds: data.acceptedAgreementIds || []
   };
 };

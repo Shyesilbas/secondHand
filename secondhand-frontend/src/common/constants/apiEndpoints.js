@@ -113,6 +113,8 @@ export const API_ENDPOINTS = {
         AUDIT_EVENT_STATUSES: '/v1/enums/audit-event-statuses',
         LISTING_FEE_CONFIG: '/v1/enums/listing-fee-config',
         SHOWCASE_PRICING_CONFIG: '/v1/enums/showcase-pricing-config',
+        AGREEMENT_GROUPS: '/v1/enums/agreement-groups',
+        AGREEMENT_TYPES: '/v1/enums/agreement-types',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',
@@ -173,6 +175,7 @@ export const API_ENDPOINTS = {
         USER_AGREEMENTS: '/agreements/user/agreements',
         USER_STATUS_ALL: '/agreements/user/status',
         USER_STATUS_BY_TYPE: (agreementType) => `/agreements/user/status/${agreementType}`,
+        USER_ACCEPTANCE_HISTORY: (agreementId) => `/agreements/user/acceptance-history/${agreementId}`,
         ADMIN_ACCEPT_ALL: '/agreements/admin/accept-all-users',
     },
     CHAT: {

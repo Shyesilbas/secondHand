@@ -127,6 +127,9 @@ const CheckoutPage = () => {
                             proceedDisabled={checkout.proceedDisabled}
                             isCheckingOut={checkout.isCheckingOut}
                             sendVerificationCode={checkout.sendVerificationCode}
+                            acceptedAgreements={checkout.acceptedAgreements}
+                            onAgreementToggle={checkout.onAgreementToggle}
+                            areAllAgreementsAccepted={checkout.areAllAgreementsAccepted}
                         />
                     </div>
 

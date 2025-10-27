@@ -6,6 +6,7 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -19,6 +20,8 @@ public record PaymentRequest(
         PaymentType paymentType,
         PaymentTransactionType transactionType,
         PaymentDirection paymentDirection,
-        String verificationCode
+        String verificationCode,
+        boolean agreementsAccepted,
+        List<UUID> acceptedAgreementIds
 ) {
 }

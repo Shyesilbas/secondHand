@@ -31,6 +31,12 @@ public class AgreementService {
     @Value("${app.agreements.privacyPolicy.content}")
     private String privacyPolicyContent;
 
+    @Value("${app.agreements.distanceSelling.content}")
+    private String distanceSellingContent;
+
+    @Value("${app.agreements.paymentTerms.content}")
+    private String paymentTermsContent;
+
     private final AgreementRepository agreementRepository;
     private final AgreementVersionHelper agreementVersionHelper;
 
@@ -76,6 +82,8 @@ public class AgreementService {
                 case TERMS_OF_SERVICE -> termsOfServiceContent;
                 case PRIVACY_POLICY -> privacyPolicyContent;
                 case KVKK -> kvkkContent;
+                case DISTANCE_SELLING -> distanceSellingContent;
+                case PAYMENT_TERMS -> paymentTermsContent;
                 default -> throw new IllegalArgumentException("Unknown agreement type: " + agreementType);
             };
         }

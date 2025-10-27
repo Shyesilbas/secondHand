@@ -34,7 +34,10 @@ const CheckoutStep = ({
     onCheckout,
     proceedDisabled,
     isCheckingOut,
-    sendVerificationCode
+    sendVerificationCode,
+    acceptedAgreements,
+    onAgreementToggle,
+    areAllAgreementsAccepted
 }) => {
     const renderStepContent = () => {
         switch (step) {
@@ -77,6 +80,9 @@ const CheckoutStep = ({
                         onNext={onNext}
                         onBack={onBack}
                         sendVerificationCode={sendVerificationCode}
+                        acceptedAgreements={acceptedAgreements}
+                        onAgreementToggle={onAgreementToggle}
+                        areAllAgreementsAccepted={areAllAgreementsAccepted}
                     />
                 );
             case 4:

@@ -1,14 +1,14 @@
 package com.serhat.secondhand.agreements.service;
 
-import com.serhat.secondhand.agreements.entity.Agreement;
-import com.serhat.secondhand.agreements.entity.enums.AgreementType;
-import com.serhat.secondhand.agreements.entity.UserAgreement;
-import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
 import com.serhat.secondhand.agreements.dto.UserAgreementDto;
 import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
+import com.serhat.secondhand.agreements.entity.Agreement;
+import com.serhat.secondhand.agreements.entity.UserAgreement;
+import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.mapper.UserAgreementMapper;
-import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
 import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 
 @Service
 @Slf4j
@@ -53,24 +52,11 @@ public class UserAgreementService {
                 user.getId(), agreementType);
     }
 
-    public boolean hasAcceptedAllRequiredAgreements(User user, AgreementGroup group) {
-        for (var type : group.getRequiredTypes()) {
-            if (!hasUserAcceptedAgreement(user, type)) return false;
-        }
-        return true;
-    }
-
-    @Transactional
-    public void acceptRequiredAgreementsForUser(User user, AgreementGroup group) {
-        for (var type : group.getRequiredTypes()) {
-            if (hasUserAcceptedAgreement(user, type)) continue;
-            var agreement = agreementService.getAgreementByType(type);
-            AcceptAgreementRequest acceptRequest = AcceptAgreementRequest.builder()
-                    .agreementId(agreement.getAgreementId())
-                    .isAcceptedTheLastVersion(true)
-                    .build();
-            acceptAgreement(user, acceptRequest);
-        }
+    public List<UserAgreementDto> getUserAcceptanceHistory(User user, java.util.UUID agreementId) {
+        return userAgreementMapper.toDtoList(
+            userAgreementRepository.findByUser_IdAndAgreement_AgreementIdOrderByAcceptedDateDesc(
+                user.getId(), agreementId)
+        );
     }
 
 

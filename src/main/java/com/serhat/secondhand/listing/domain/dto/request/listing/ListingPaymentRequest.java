@@ -8,5 +8,8 @@ import java.util.UUID;
 public record ListingPaymentRequest(
     UUID listingId,
     PaymentType paymentType,
-    CreditCardDto creditCard  ) {
+    CreditCardDto creditCard,
+    boolean agreementsAccepted,
+    java.util.List<java.util.UUID> acceptedAgreementIds
+) {
 }

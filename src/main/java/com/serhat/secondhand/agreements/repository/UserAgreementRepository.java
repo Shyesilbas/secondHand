@@ -14,4 +14,5 @@ public interface UserAgreementRepository extends JpaRepository<UserAgreement, UU
     Optional<UserAgreement> findByUser_IdAndAgreement_AgreementId(Long userId, UUID agreementId);
     List<UserAgreement> findByUser_Id(Long userId);
     boolean existsByUser_IdAndAgreement_AgreementTypeAndIsAcceptedTheLastVersionTrue(Long userId, AgreementType type);
+    List<UserAgreement> findByUser_IdAndAgreement_AgreementIdOrderByAcceptedDateDesc(Long userId, UUID agreementId);
 }

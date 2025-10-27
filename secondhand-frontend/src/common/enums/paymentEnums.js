@@ -4,6 +4,8 @@ export const paymentEnums = {
   paymentTypes: [],
   shippingStatuses: [],
   emailTypes: [],
+  agreementGroups: [],
+  agreementTypes: [],
 };
 
 export const fetchPaymentEnums = async () => {
@@ -12,16 +14,22 @@ export const fetchPaymentEnums = async () => {
       paymentTypes,
       shippingStatuses,
       emailTypes,
+      agreementGroups,
+      agreementTypes,
     ] = await Promise.all([
       enumService.getPaymentTypes(),
       enumService.getShippingStatuses(),
       enumService.getEmailTypes(),
+      enumService.getAgreementGroups(),
+      enumService.getAgreementTypes(),
     ]);
 
     return {
       paymentTypes,
       shippingStatuses,
       emailTypes,
+      agreementGroups,
+      agreementTypes,
     };
   } catch (error) {
     console.error('Error fetching payment enums:', error);
@@ -41,5 +49,15 @@ export const getShippingStatusLabel = (value, shippingStatuses) => {
 
 export const getEmailTypeLabel = (value, emailTypes) => {
   const type = emailTypes.find(t => t.value === value);
+  return type?.label || value;
+};
+
+export const getAgreementGroupLabel = (value, agreementGroups) => {
+  const group = agreementGroups.find(g => g.value === value);
+  return group?.label || value;
+};
+
+export const getAgreementTypeLabel = (value, agreementTypes) => {
+  const type = agreementTypes.find(t => t.value === value);
   return type?.label || value;
 };

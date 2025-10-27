@@ -4,8 +4,11 @@ const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-        return parts.pop().split(';').shift();
+        const cookieValue = parts.pop().split(';').shift();
+        console.debug(`🍪 Cookie ${name}:`, cookieValue ? 'exists' : 'not found');
+        return cookieValue;
     }
+    console.debug(`🍪 Cookie ${name}: not found`);
     return null;
 };
 
@@ -33,7 +36,29 @@ export const clearTokens = () => {
 
 export const setUser = (userData) => {
     if (userData) {
-        localStorage.setItem(USER_KEY, JSON.stringify(userData));
+        // Remove sensitive data before storing
+        const sanitizedUserData = { ...userData };
+        
+        // Remove password and other sensitive fields
+        delete sanitizedUserData.password;
+        delete sanitizedUserData.currentPassword;
+        delete sanitizedUserData.newPassword;
+        delete sanitizedUserData.confirmPassword;
+        delete sanitizedUserData.accessToken;
+        delete sanitizedUserData.refreshToken;
+        delete sanitizedUserData.token;
+        
+        // Remove any other sensitive fields that might exist
+        Object.keys(sanitizedUserData).forEach(key => {
+            if (key.toLowerCase().includes('password') || 
+                key.toLowerCase().includes('token') ||
+                key.toLowerCase().includes('secret') ||
+                key.toLowerCase().includes('key')) {
+                delete sanitizedUserData[key];
+            }
+        });
+        
+        localStorage.setItem(USER_KEY, JSON.stringify(sanitizedUserData));
     } else {
         localStorage.removeItem(USER_KEY);
     }
@@ -81,7 +106,8 @@ export const hasValidTokens = () => {
 export const isCookieBasedAuth = () => {
     const accessToken = getToken();
     const refreshToken = getRefreshToken();
-
+    console.debug('🍪 Cookie check - sh_at:', !!accessToken, 'sh_rt:', !!refreshToken);
+    
     // Cookie-based auth if both cookies exist
     return !!(accessToken && refreshToken);
 };

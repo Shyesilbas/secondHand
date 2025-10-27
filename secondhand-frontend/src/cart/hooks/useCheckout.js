@@ -7,6 +7,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import useAddresses from '../../user/hooks/useAddresses.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
+import { usePaymentAgreements } from '../../payments/hooks/usePaymentAgreements.js';
 
 export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const navigate = useNavigate();
@@ -32,6 +33,14 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
     const [notes, setNotes] = useState('');
+
+    // Payment agreements
+    const {
+        acceptedAgreements,
+        handleAgreementToggle,
+        areAllAgreementsAccepted,
+        getAcceptedAgreementIds
+    } = usePaymentAgreements();
 
     useEffect(() => {
         
@@ -109,7 +118,9 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 billingAddressId: selectedBillingAddressId,
                 notes: notes?.trim() || null,
                 paymentType: selectedPaymentType,
-                paymentVerificationCode: paymentVerificationCode?.trim() || null
+                paymentVerificationCode: paymentVerificationCode?.trim() || null,
+                agreementsAccepted: true,
+                acceptedAgreementIds: getAcceptedAgreementIds()
             };
             console.debug('Checkout payload:', payload);
             await orderService.checkout(payload);
@@ -250,6 +261,11 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         sendVerificationCode,
         emails,
         isEmailsLoading,
-        fetchEmails
+        fetchEmails,
+        
+        // Agreement related
+        acceptedAgreements,
+        onAgreementToggle: handleAgreementToggle,
+        areAllAgreementsAccepted
     };
 };

@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +24,7 @@ public class CheckoutRequest {
 
     private PaymentType paymentType;
     private String paymentVerificationCode;
+    
+    private boolean agreementsAccepted;
+    private List<UUID> acceptedAgreementIds;
 }

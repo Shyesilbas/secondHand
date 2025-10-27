@@ -41,6 +41,8 @@ export const useEnums = () => {
     auditEventStatuses: [],
     listingFeeConfig: null,
     showcasePricingConfig: null,
+    agreementGroups: [],
+    agreementTypes: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
