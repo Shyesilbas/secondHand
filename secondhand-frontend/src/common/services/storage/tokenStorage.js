@@ -79,5 +79,9 @@ export const hasValidTokens = () => {
 };
 
 export const isCookieBasedAuth = () => {
-        return !getToken() || !getRefreshToken();
+    const accessToken = getToken();
+    const refreshToken = getRefreshToken();
+
+    // Cookie-based auth if both cookies exist
+    return !!(accessToken && refreshToken);
 };
