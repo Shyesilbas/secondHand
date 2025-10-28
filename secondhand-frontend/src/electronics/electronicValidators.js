@@ -7,6 +7,11 @@ const validateElectronicStep2 = (formData) => {
   if (!formData.model || !String(formData.model).trim()) errors.model = "Model is required";
   if (!formData.year || Number(formData.year) <= 0) errors.year = "Year is required";
   if (!formData.color) errors.color = "Color is required";
+  if (formData.electronicType === 'LAPTOP') {
+    if (!formData.ram || Number(formData.ram) <= 0) errors.ram = "RAM is required for laptops";
+    if (!formData.storage || Number(formData.storage) <= 0) errors.storage = "Storage is required for laptops";
+    if (!formData.screenSize || Number(formData.screenSize) <= 0) errors.screenSize = "Screen Size is required for laptops";
+  }
   return errors;
 };
 

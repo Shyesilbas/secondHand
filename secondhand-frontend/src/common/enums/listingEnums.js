@@ -21,6 +21,7 @@ export const listingEnums = {
   sportDisciplines: [],
   sportEquipmentTypes: [],
   sportConditions: [],
+  processors: [],
   currencies: [],
   genders: [],
   auditEventTypes: [],
@@ -58,6 +59,7 @@ export const fetchListingEnums = async () => {
       auditEventStatuses,
       listingFeeConfig,
       showcasePricingConfig,
+      processors,
     ] = await Promise.all([
       enumService.getListingTypes(),
       enumService.getListingStatuses(),
@@ -85,6 +87,7 @@ export const fetchListingEnums = async () => {
       enumService.getAuditEventStatuses(),
       enumService.getListingFeeConfig(),
       enumService.getShowcasePricingConfig(),
+      enumService.getProcessors(),
     ]);
 
     return {
@@ -114,6 +117,7 @@ export const fetchListingEnums = async () => {
       auditEventStatuses,
       listingFeeConfig,
       showcasePricingConfig,
+      processors,
     };
   } catch (error) {
     console.error('Error fetching listing enums:', error);

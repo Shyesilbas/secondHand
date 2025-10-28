@@ -136,14 +136,17 @@ const ElectronicsFilters = ({ filters, onInputChange, enums }) => {
     );
   };
 
+  const laptopSelected = Array.isArray(filters.electronicTypes) && filters.electronicTypes.includes('LAPTOP');
+
   return (
     <div className="space-y-8">
       {renderEnumField('electronicTypes', 'Electronic Type', 'electronicTypes')}
       {renderEnumField('electronicBrands', 'Brand', 'electronicBrands')}
       {renderNumericRangeField('year', 'Year', 1990, new Date().getFullYear())}
-      {renderNumericRangeField('storage', 'Storage (GB)', 1, 10000)}
-      {renderNumericRangeField('ram', 'RAM (GB)', 1, 128)}
-      {renderNumericRangeField('screenSize', 'Screen Size (inches)', 1, 100)}
+      {laptopSelected && renderNumericRangeField('storage', 'Storage (GB)', 1, 10000)}
+      {laptopSelected && renderNumericRangeField('ram', 'RAM (GB)', 1, 128)}
+      {laptopSelected && renderNumericRangeField('screenSize', 'Screen Size (inch)', 1, 50)}
+      {laptopSelected && renderEnumField('processors', 'Processor', 'processors')}
     </div>
   );
 };

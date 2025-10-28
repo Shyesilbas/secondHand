@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.dto.request.electronics;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 
 import java.math.BigDecimal;
@@ -21,6 +22,10 @@ public record ElectronicCreateRequest (
         boolean warrantyProof,
         int year,
         Color color,
-        String imageUrl
+        String imageUrl,
+        Integer ram,
+        Integer storage,
+        Processor processor,
+        Integer screenSize
         ){
 }

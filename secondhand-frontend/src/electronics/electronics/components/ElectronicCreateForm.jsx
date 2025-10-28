@@ -125,7 +125,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                           <p className="text-sm text-slate-600">{steps[1].description}</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 xl:grid-cols-4 gap-6">
                         <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
                         <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => handleDropdownChange('electronicBrand', v)} />
                         <div>
@@ -134,11 +134,35 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                           {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
                         </div>
                         <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Origin</label>
+                          <input type="text" name="origin" value={formData.origin} onChange={handleInputChange} className="w-full px-4 py-3 border rounded-lg border-slate-200" />
+                        </div>
+                        <div>
                           <label className="block text-sm font-medium text-slate-700 mb-2">Year *</label>
                           <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear() + 1} className={`w-full px-4 py-3 border rounded-lg ${errors.year ? 'border-red-500' : 'border-slate-200'}`} />
                           {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
                         </div>
                         <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
+                        {formData.electronicType === 'LAPTOP' && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">RAM (GB) *</label>
+                              <input type="number" name="ram" value={formData.ram} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-lg ${errors.ram ? 'border-red-500' : 'border-slate-200'}`} />
+                              {errors.ram && <p className="mt-1 text-sm text-red-600">{errors.ram}</p>}
+                            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Storage (GB) *</label>
+                    <input type="number" name="storage" value={formData.storage} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-lg ${errors.storage ? 'border-red-500' : 'border-slate-200'}`} />
+                    {errors.storage && <p className="mt-1 text-sm text-red-600">{errors.storage}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Screen Size (inch) *</label>
+                    <input type="number" name="screenSize" value={formData.screenSize} onChange={handleInputChange} min="1" step="0.1" className={`w-full px-4 py-3 border rounded-lg ${errors.screenSize ? 'border-red-500' : 'border-slate-200'}`} />
+                    {errors.screenSize && <p className="mt-1 text-sm text-red-600">{errors.screenSize}</p>}
+                  </div>
+                  <EnumDropdown label="Processor" enumKey="processors" value={formData.processor} onChange={(v) => handleDropdownChange('processor', v)} />
+                          </>
+                        )}
                         <div className="flex items-center gap-3">
                           <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-4 w-4 text-btn-primary border-slate-300 rounded" />
                           <label htmlFor="warrantyProof" className="text-sm font-medium text-slate-700">Warranty Proof Available</label>

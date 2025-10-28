@@ -33,6 +33,7 @@ export const useEnums = () => {
     sportDisciplines: [],
     sportEquipmentTypes: [],
     sportConditions: [],
+    processors: [],
     paymentTypes: [],
     shippingStatuses: [],
     emailTypes: [],
@@ -55,13 +56,13 @@ export const useEnums = () => {
         
         const cachedEnums = getCachedEnums();
         if (cachedEnums) {
-          // Check if audit enums are missing or empty
-          if (!cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses || 
-              cachedEnums.auditEventTypes.length === 0 || cachedEnums.auditEventStatuses.length === 0) {
-            console.log('Cached enums missing or empty audit enums, clearing cache and refetching...');
+          const auditEnumsMissing = !cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses ||
+            cachedEnums.auditEventTypes.length === 0 || cachedEnums.auditEventStatuses.length === 0;
+          const processorsMissing = !cachedEnums.processors || cachedEnums.processors.length === 0;
+
+          if (auditEnumsMissing || processorsMissing) {
             forceClearEnumCache();
           } else {
-            console.log('Using cached enums with audit enums');
             setEnums(cachedEnums);
             setIsLoading(false);
             return;

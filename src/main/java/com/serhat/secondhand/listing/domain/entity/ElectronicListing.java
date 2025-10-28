@@ -3,10 +3,7 @@ package com.serhat.secondhand.listing.domain.entity;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,6 +41,13 @@ public class ElectronicListing extends Listing {
     private Color color;
 
 
+    private Integer ram;
 
+    private Integer storage;
+
+    @Enumerated(EnumType.STRING)
+    private Processor processor;
+
+    private Integer screenSize;
 
 }

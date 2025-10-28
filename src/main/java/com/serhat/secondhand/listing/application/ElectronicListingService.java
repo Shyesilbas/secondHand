@@ -36,6 +36,20 @@ public class ElectronicListingService {
     @Transactional
     public UUID createElectronicListing(ElectronicCreateRequest request, User seller) {
         ElectronicListing electronicListing = listingMapper.toElectronicEntity(request);
+        if (electronicListing.getElectronicType() == ElectronicType.LAPTOP) {
+            if (electronicListing.getRam() == null || electronicListing.getStorage() == null) {
+                throw new BusinessException(
+                        "ram and storage are required for LAPTOP",
+                        HttpStatus.BAD_REQUEST,
+                        "LAPTOP_SPECS_REQUIRED"
+                );
+            }
+        } else {
+            electronicListing.setRam(null);
+            electronicListing.setStorage(null);
+            electronicListing.setProcessor(null);
+            electronicListing.setScreenSize(null);
+        }
         electronicListing.setSeller(seller);
         ElectronicListing saved = repository.save(electronicListing);
         log.info("Electronic listing created: {}", saved.getId());
@@ -72,6 +86,25 @@ public class ElectronicListingService {
         request.warrantyProof().ifPresent(existing::setWarrantyProof);
         request.color().ifPresent(existing::setColor);
         request.year().ifPresent(existing::setYear);
+        request.ram().ifPresent(existing::setRam);
+        request.storage().ifPresent(existing::setStorage);
+        request.processor().ifPresent(existing::setProcessor);
+        request.screenSize().ifPresent(existing::setScreenSize);
+
+        if (existing.getElectronicType() == ElectronicType.LAPTOP) {
+            if (existing.getRam() == null || existing.getStorage() == null) {
+                throw new BusinessException(
+                        "ram and storage are required for LAPTOP",
+                        HttpStatus.BAD_REQUEST,
+                        "LAPTOP_SPECS_REQUIRED"
+                );
+            }
+        } else {
+            existing.setRam(null);
+            existing.setStorage(null);
+            existing.setProcessor(null);
+            existing.setScreenSize(null);
+        }
 
         repository.save(existing);
 
