@@ -10,6 +10,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.*;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
@@ -114,6 +115,20 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(colors);
+    }
+
+    @GetMapping("/processors")
+    @Operation(summary = "Get all processors")
+    public ResponseEntity<List<Map<String, Object>>> getProcessors() {
+        List<Map<String, Object>> processors = Arrays.stream(Processor.values())
+                .map(proc -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", proc.name());
+                    map.put("label", proc.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(processors);
     }
 
     @GetMapping("/genders")

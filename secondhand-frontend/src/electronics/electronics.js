@@ -16,6 +16,10 @@ export const ElectronicCreateRequestDTO = {
   warrantyProof: false,
   year: 0,
   color: '',
+  ram: '',
+  storage: '',
+  processor: '',
+  screenSize: '',
 };
 
 export const ElectronicListingDTO = {
@@ -28,6 +32,10 @@ export const ElectronicListingDTO = {
   warrantyProof: false,
   year: 0,
   color: '',
+  ram: '',
+  storage: '',
+  processor: '',
+  screenSize: '',
 };
 
 export const ElectronicSearchFiltersDTO = {
@@ -44,6 +52,13 @@ export const ElectronicSearchFiltersDTO = {
   minYear: 0,
   maxYear: 0,
   colors: [],
+  minRam: 0,
+  maxRam: 0,
+  minStorage: 0,
+  maxStorage: 0,
+  processors: [],
+  minScreenSize: 0,
+  maxScreenSize: 0,
 
     sortBy: 'createdAt',
   sortDirection: 'DESC',
@@ -69,6 +84,12 @@ export const createElectronicCreateRequest = (data) => {
     warrantyProof: Boolean(data.warrantyProof),
     year: parseInt(data.year) || 0,
     color: data.color || '',
+    ...(data.electronicType === 'LAPTOP' ? {
+      ram: data.ram ? parseInt(data.ram) : undefined,
+      storage: data.storage ? parseInt(data.storage) : undefined,
+      processor: data.processor || undefined,
+      screenSize: data.screenSize ? parseInt(data.screenSize) : undefined,
+    } : {}),
   };
 };
 
@@ -88,6 +109,12 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
   if (data.color !== undefined && data.color !== '') updateData.color = data.color;
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.electronicType === 'LAPTOP') {
+    if (data.ram !== undefined && data.ram !== '') updateData.ram = parseInt(data.ram);
+    if (data.storage !== undefined && data.storage !== '') updateData.storage = parseInt(data.storage);
+    if (data.processor !== undefined && data.processor !== '') updateData.processor = data.processor;
+    if (data.screenSize !== undefined && data.screenSize !== '') updateData.screenSize = parseInt(data.screenSize);
+  }
   return updateData;
 };
 

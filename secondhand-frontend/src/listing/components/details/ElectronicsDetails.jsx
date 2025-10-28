@@ -29,6 +29,10 @@ const ElectronicsDetails = ({ listing }) => {
         <DetailItem label="Year" value={listing.year} />
         <DetailItem label="Color" value={getEnumLabel('colors', listing.color)} />
         <DetailItem label="Warranty Proof" value={listing.warrantyProof ? 'Yes' : 'No'} />
+        {listing.ram ? <DetailItem label="RAM" value={`${listing.ram} GB`} /> : null}
+        {listing.storage ? <DetailItem label="Storage" value={`${listing.storage} GB`} /> : null}
+        {listing.screenSize ? <DetailItem label="Screen Size" value={`${listing.screenSize}"`} /> : null}
+        {listing.processor ? <DetailItem label="Processor" value={getEnumLabel('processors', listing.processor)} /> : null}
       </div>
     </div>
   );

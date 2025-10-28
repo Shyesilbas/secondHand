@@ -48,6 +48,16 @@ const createFilterPayload = (filters, listingType) => {
       payload.electronicTypes = Array.isArray(filters.electronicTypes) ? filters.electronicTypes : [];
       payload.electronicBrands = Array.isArray(filters.electronicBrands) ? filters.electronicBrands : [];
       payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
+      payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
+      payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
+      payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
+      payload.minRam = filters.minRam ? parseInt(filters.minRam) : null;
+      payload.maxRam = filters.maxRam ? parseInt(filters.maxRam) : null;
+      payload.minStorage = filters.minStorage ? parseInt(filters.minStorage) : null;
+      payload.maxStorage = filters.maxStorage ? parseInt(filters.maxStorage) : null;
+      payload.processors = Array.isArray(filters.processors) ? filters.processors : [];
+      payload.minScreenSize = filters.minScreenSize ? parseInt(filters.minScreenSize) : null;
+      payload.maxScreenSize = filters.maxScreenSize ? parseInt(filters.maxScreenSize) : null;
       break;
 
     case LISTING_TYPES.REAL_ESTATE:

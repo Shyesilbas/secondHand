@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
@@ -43,6 +44,28 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         
         if (filters.getMaxYear() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("year"), filters.getMaxYear()));
+        }
+
+        if (filters.getMinRam() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("ram"), filters.getMinRam()));
+        }
+        if (filters.getMaxRam() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("ram"), filters.getMaxRam()));
+        }
+        if (filters.getMinStorage() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("storage"), filters.getMinStorage()));
+        }
+        if (filters.getMaxStorage() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("storage"), filters.getMaxStorage()));
+        }
+        if (filters.getProcessors() != null && !filters.getProcessors().isEmpty()) {
+            predicates.add(root.get("processor").in(filters.getProcessors()));
+        }
+        if (filters.getMinScreenSize() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("screenSize"), filters.getMinScreenSize()));
+        }
+        if (filters.getMaxScreenSize() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("screenSize"), filters.getMaxScreenSize()));
         }
         
         return predicates;

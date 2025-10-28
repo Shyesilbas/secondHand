@@ -24,6 +24,8 @@ export const enumService = {
 
   getElectronicBrands: async () => get(API_ENDPOINTS.ENUMS.ELECTRONIC_BRANDS),
 
+  getProcessors: async () => get(API_ENDPOINTS.ENUMS.PROCESSORS),
+
     getRealEstateTypes: async () => get(API_ENDPOINTS.ENUMS.REAL_ESTATE_TYPES),
 
   getRealEstateAdTypes: async () => get(API_ENDPOINTS.ENUMS.REAL_ESTATE_AD_TYPES),
