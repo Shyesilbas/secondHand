@@ -185,7 +185,6 @@ export const API_ENDPOINTS = {
         CREATE_ROOM: '/chat/rooms',
         USER_ROOMS: (userId) => `/chat/rooms/user/${userId}`,
         DIRECT_ROOM: '/chat/rooms/direct',
-        LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
         CREATE_LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
         
         SEND_MESSAGE: '/chat/messages',

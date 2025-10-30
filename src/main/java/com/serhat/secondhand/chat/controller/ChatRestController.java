@@ -110,14 +110,6 @@ public class ChatRestController {
         return ResponseEntity.ok(count);
     }
 
-    @PostMapping("/fix-listing-chats")
-    public ResponseEntity<String> fixListingChats() {
-        log.info("Fixing listing chat rooms...");
-        chatService.fixListingChatRooms();
-        return ResponseEntity.ok("Listing chat rooms fixed");
-    }
-    
-
     @DeleteMapping("/rooms/{chatRoomId}")
     public ResponseEntity<Void> deleteConversation(
             @PathVariable Long chatRoomId,

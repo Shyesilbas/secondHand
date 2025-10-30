@@ -1,9 +1,17 @@
 package com.serhat.secondhand.core.verification;
 
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.exception.VerificationLockedException;
+import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -17,6 +25,8 @@ import java.util.Optional;
 public class VerificationService implements IVerificationService {
 
     private final VerificationRepository verificationRepository;
+    private final EmailService emailService;
+    private final UserService userService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
@@ -77,7 +87,6 @@ public class VerificationService implements IVerificationService {
             log.info("Verification details - Code: {}, ExpiresAt: {}, IsVerified: {}", 
                     v.getCode(), v.getCodeExpiresAt(), v.isVerified());
         } else {
-            // Tüm aktif verification'ları kontrol et
             List<Verification> allActive = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(
                     user, codeType, now);
             log.warn("No matching verification found. All active verifications count: {}", allActive.size());
@@ -89,6 +98,56 @@ public class VerificationService implements IVerificationService {
         }
         
         return verification.isPresent();
+    }
+
+    public void sendAccountVerificationCode(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+
+        if (user.isAccountVerified()) {
+            throw new BusinessException(UserErrorCodes.ACCOUNT_ALREADY_VERIFIED);
+        }
+
+        String code = generateCode();
+        generateVerification(user, code, CodeType.ACCOUNT_VERIFICATION);
+        emailService.sendVerificationCodeEmail(user, code);
+
+        log.info("Verification code sent to user with email: {}", user.getEmail());
+    }
+
+    public void verifyUser(VerificationRequest request, Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        log.info("Verifying user with email: {}", user.getEmail());
+        log.info("Code written by user: {}", request.code());
+
+        var verificationOpt = findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);
+
+        if (verificationOpt.isEmpty()) {
+            throw new BusinessException(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
+        }
+
+        var verification = verificationOpt.get();
+        log.info("Stored verification code: {}", verification.getCode());
+
+        if (!request.code().equals(verification.getCode())) {
+            decrementVerificationAttempts(verification);
+            int verificationAttemptLeft = verification.getVerificationAttemptLeft();
+
+            if (verificationAttemptLeft <= 0) {
+                user.setAccountStatus(AccountStatus.BLOCKED);
+                userService.update(user);
+                throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
+            }
+            throw new BusinessException(
+                    String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), verificationAttemptLeft),
+                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getHttpStatus(),
+                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
+        }
+
+        markVerificationAsUsed(verification);
+        user.setAccountVerified(true);
+        userService.update(user);
+
+        log.info("User verified successfully: {}", user.getEmail());
     }
     
     @Override

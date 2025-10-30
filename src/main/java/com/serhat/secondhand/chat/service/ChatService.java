@@ -2,16 +2,16 @@ package com.serhat.secondhand.chat.service;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
-import com.serhat.secondhand.chat.util.ChatErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.chat.entity.ChatRoom;
 import com.serhat.secondhand.chat.entity.Message;
 import com.serhat.secondhand.chat.repository.ChatRoomRepository;
 import com.serhat.secondhand.chat.repository.MessageRepository;
+import com.serhat.secondhand.chat.util.ChatErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,368 +24,205 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChatService {
-    
+
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
     private final ListingRepository listingRepository;
+    private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
 
     public List<ChatRoomDto> getUserChatRooms(Long userId) {
-        log.info("Getting chat rooms for user: {}", userId);
-        
-        List<ChatRoom> chatRooms = chatRoomRepository.findByParticipantIdOrderByLastMessageTimeDesc(userId);
-        log.info("Found {} chat rooms for user {}", chatRooms.size(), userId);
-        
-        return chatRooms.stream()
+        List<ChatRoom> rooms = chatRoomRepository.findByParticipantIdOrderByLastMessageTimeDesc(userId);
+        return rooms.stream()
                 .map(room -> enrichChatRoomDtoForUser(room, userId))
                 .collect(Collectors.toList());
     }
-    
 
     @Transactional
-    public ChatRoomDto createOrGetDirectChat(Long userId1, Long userId2) {
-        log.info("Creating or getting direct chat between users: {} and {}", userId1, userId2);
-        
-                validateUsersExist(userId1, userId2);
-        
-        Optional<ChatRoom> existingRoom = chatRoomRepository.findDirectChatRoom(userId1, userId2);
-        if (existingRoom.isPresent()) {
-            log.info("Found existing direct chat room: {}", existingRoom.get().getId());
-            return enrichChatRoomDtoForUser(existingRoom.get(), userId1);
-        }
-        
-        ChatRoom newRoom = createDirectChatRoom(userId1, userId2);
-        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
-        log.info("Created new direct chat room: {}", savedRoom.getId());
-        
-        return enrichChatRoomDtoForUser(savedRoom, userId1);
+    public ChatRoomDto createOrGetDirectChat(Long user1, Long user2) {
+        validateUsersExist(user1, user2);
+        return chatRoomRepository.findDirectChatRoom(user1, user2)
+                .map(room -> enrichChatRoomDtoForUser(room, user1))
+                .orElseGet(() -> createChatRoom("Direct Chat", ChatRoom.RoomType.DIRECT, List.of(user1, user2), null, user1));
     }
-    
-        private void validateUsersExist(Long userId1, Long userId2) {
-        findUserById(userId1, ChatErrorCodes.SENDER_USER_NOT_FOUND);
-        findUserById(userId2, ChatErrorCodes.RECIPIENT_USER_NOT_FOUND);
-    }
-    
-        private ChatRoom createDirectChatRoom(Long userId1, Long userId2) {
-        ChatRoom newRoom = new ChatRoom();
-        newRoom.setRoomName("Direct Chat");
-        newRoom.setRoomType(ChatRoom.RoomType.DIRECT);
-        newRoom.setParticipantIds(List.of(userId1, userId2));
-        return newRoom;
-    }
-    
+
 
     @Transactional
     public ChatRoomDto createOrGetListingChat(Long userId, String listingId, String listingTitle) {
-        log.info("Creating or getting listing chat - userId: {}, listingId: {}, title: {}", userId, listingId, listingTitle);
-        
-        List<ChatRoom> existingRooms = chatRoomRepository.findByListingIdAndUserIdOrderByCreatedAtDesc(listingId, userId);
-        if (!existingRooms.isEmpty()) {
-            log.info("Found existing listing chat room: {}", existingRooms.get(0).getId());
-            return enrichChatRoomDtoForUser(existingRooms.get(0), userId);
-        }
-        
+        List<ChatRoom> existing = chatRoomRepository.findByListingIdAndUserIdOrderByCreatedAtDesc(listingId, userId);
+        if (!existing.isEmpty()) return enrichChatRoomDtoForUser(existing.get(0), userId);
+
         Listing listing = listingRepository.findById(UUID.fromString(listingId))
                 .orElseThrow(() -> new BusinessException(ChatErrorCodes.LISTING_NOT_FOUND));
-        
         Long sellerId = listing.getSeller().getId();
-        log.info("Found listing seller: {}", sellerId);
-        
-        ChatRoom newRoom = new ChatRoom();
-        newRoom.setRoomName("Chat about: " + listingTitle);
-        newRoom.setRoomType(ChatRoom.RoomType.LISTING);
-        newRoom.setListingId(listingId);
-        newRoom.setParticipantIds(List.of(userId, sellerId));
-        
-        ChatRoom savedRoom = chatRoomRepository.save(newRoom);
-        log.info("Created new listing chat room: {} with participants: {}", savedRoom.getId(), savedRoom.getParticipantIds());
-        
-        return enrichChatRoomDtoForUser(savedRoom, userId);
+        return createChatRoom("Chat about: " + listingTitle, ChatRoom.RoomType.LISTING, List.of(userId, sellerId), listingId, userId);
     }
-    
 
     @Transactional
-    public ChatMessageDto sendMessage(ChatMessageDto messageDto) {
-        log.info("Sending message - sender: {}, recipient: {}, room: {}, content: {}", 
-                messageDto.getSenderId(), messageDto.getRecipientId(), messageDto.getChatRoomId(), messageDto.getContent());
-        
-                validateMessageContent(messageDto.getContent());
-        
-                validateChatRoomAccess(messageDto.getChatRoomId(), messageDto.getSenderId());
-        
-        User sender = findUserById(messageDto.getSenderId(), ChatErrorCodes.SENDER_USER_NOT_FOUND);
-        User recipient = findUserById(messageDto.getRecipientId(), ChatErrorCodes.RECIPIENT_USER_NOT_FOUND);
-        
-        Message message = buildMessage(messageDto, sender, recipient);
-        Message savedMessage = messageRepository.save(message);
-        ChatMessageDto savedMessageDto = ChatMessageDto.fromEntity(savedMessage);
-        
-        updateChatRoomLastMessage(messageDto.getChatRoomId(), savedMessageDto);
-        sendMessageViaWebSocket(savedMessageDto);
-        
-        log.info("Message sent successfully - ID: {}", savedMessage.getId());
-        return savedMessageDto;
-    }
-    
-        private void validateMessageContent(String content) {
-        if (content == null || content.trim().isEmpty()) {
-            throw new BusinessException(ChatErrorCodes.INVALID_MESSAGE_CONTENT);
-        }
-        if (content.length() > 1000) {             throw new BusinessException(ChatErrorCodes.MESSAGE_TOO_LONG);
-        }
-    }
-    
-        private void validateChatRoomAccess(Long chatRoomId, Long userId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
-        
-        if (!chatRoom.getParticipantIds().contains(userId)) {
-            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
-        }
-    }
-    
-        private User findUserById(Long userId, ChatErrorCodes errorCode) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(errorCode));
-    }
-    
-        private Message buildMessage(ChatMessageDto messageDto, User sender, User recipient) {
-        Message message = new Message();
-        message.setContent(messageDto.getContent().trim());
-        message.setSender(sender);
-        message.setRecipient(recipient);
-        message.setChatRoomId(messageDto.getChatRoomId());
-        message.setMessageType(messageDto.getMessageType() != null ? messageDto.getMessageType() : Message.MessageType.TEXT);
-        message.setIsRead(false);
-        return message;
+    public ChatMessageDto sendMessage(ChatMessageDto dto) {
+        validateMessage(dto);
+        validateChatRoomAccess(dto.getChatRoomId(), dto.getSenderId());
+
+        Message msg = buildMessage(dto);
+        Message saved = messageRepository.save(msg);
+        ChatMessageDto savedDto = ChatMessageDto.fromEntity(saved);
+
+        refreshChatRoomLastMessage(dto.getChatRoomId());
+        sendViaWebSocket(savedDto);
+        return savedDto;
     }
 
     public Page<ChatMessageDto> getChatMessages(Long chatRoomId, Pageable pageable) {
-        log.info("Getting messages for chat room: {}", chatRoomId);
-        
-        Page<Message> messages = messageRepository.findByChatRoomIdOrderByCreatedAtAsc(chatRoomId, pageable);
-        log.info("Found {} messages for chat room {}", messages.getTotalElements(), chatRoomId);
-        
-        messages.getContent().forEach(message -> {
-            log.info("Message - ID: {}, Content: {}, Sender: {}, Recipient: {}", 
-                    message.getId(), message.getContent(), 
-                    message.getSender() != null ? message.getSender().getId() : "NULL",
-                    message.getRecipient() != null ? message.getRecipient().getId() : "NULL");
-        });
-        
-        return messages.map(ChatMessageDto::fromEntity);
+        return messageRepository.findByChatRoomIdOrderByCreatedAtAsc(chatRoomId, pageable)
+                .map(ChatMessageDto::fromEntity);
     }
-    
 
     @Transactional
     public void markMessagesAsRead(Long chatRoomId, Long userId) {
-        log.info("Marking messages as read - room: {}, user: {}", chatRoomId, userId);
-        
         messageRepository.markMessagesAsRead(chatRoomId, userId);
-        log.info("Messages marked as read successfully");
     }
-    
 
     public Long getUnreadMessageCount(Long chatRoomId, Long userId) {
         return chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoomId, userId);
     }
-    
-
-    public Page<ChatMessageDto> getAllUserMessages(Long userId, Pageable pageable) {
-        log.info("Getting all messages for user: {}", userId);
-        
-        Page<Message> messages = messageRepository.findBySenderIdOrRecipientIdOrderByCreatedAtDesc(userId, pageable);
-        log.info("Found {} messages for user {}", messages.getTotalElements(), userId);
-        
-        return messages.map(ChatMessageDto::fromEntity);
-    }
 
     public Long getTotalUnreadMessageCount(Long userId) {
-        log.info("Getting total unread message count for user: {}", userId);
         return messageRepository.countTotalUnreadMessagesByUser(userId);
     }
 
+    @Transactional
+    public void deleteConversation(Long chatRoomId, Long userId) {
+        ChatRoom room = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
+        if (!room.getParticipantIds().contains(userId))
+            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
 
-    private ChatRoomDto enrichChatRoomDtoForUser(ChatRoom chatRoom, Long currentUserId) {
-        ChatRoomDto dto = ChatRoomDto.fromEntity(chatRoom);
+        messageRepository.deleteByChatRoomId(chatRoomId);
+        chatRoomRepository.delete(room);
+    }
 
-        dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(chatRoom.getId(), currentUserId).intValue());
+    @Transactional
+    public void deleteMessage(Long messageId, Long userId) {
+        Message msg = messageRepository.findById(messageId)
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.MESSAGE_NOT_FOUND));
 
-        enrichOtherParticipantInfo(dto, chatRoom, currentUserId);
+        if (!msg.getSender().getId().equals(userId))
+            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
 
-        if (chatRoom.getLastMessageSenderId() != null) {
-            User lastMessageSender = userRepository.findById(chatRoom.getLastMessageSenderId()).orElse(null);
-            if (lastMessageSender != null) {
-                dto.setLastMessageSenderName(lastMessageSender.getName() + " " + lastMessageSender.getSurname());
+        messageRepository.delete(msg);
+        refreshChatRoomLastMessage(msg.getChatRoomId());
+    }
+
+    private ChatRoomDto createChatRoom(String name, ChatRoom.RoomType type, List<Long> participants, String listingId, Long currentUserId) {
+        ChatRoom room = new ChatRoom();
+        room.setRoomName(name);
+        room.setRoomType(type);
+        room.setParticipantIds(participants);
+        room.setListingId(listingId);
+        return enrichChatRoomDtoForUser(chatRoomRepository.save(room), currentUserId);
+    }
+
+    private void validateUsersExist(Long... ids) {
+        for (Long id : ids) userService.findById(id);
+    }
+
+    private void validateMessage(ChatMessageDto dto) {
+        if (dto.getContent() == null || dto.getContent().trim().isEmpty())
+            throw new BusinessException(ChatErrorCodes.INVALID_MESSAGE_CONTENT);
+        if (dto.getContent().length() > 1000)
+            throw new BusinessException(ChatErrorCodes.MESSAGE_TOO_LONG);
+    }
+
+    private void validateChatRoomAccess(Long roomId, Long userId) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
+        if (!room.getParticipantIds().contains(userId))
+            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
+    }
+
+    private Message buildMessage(ChatMessageDto dto) {
+        User sender = userService.findById(dto.getSenderId());
+        User recipient = userService.findById(dto.getRecipientId());
+        Message m = new Message();
+        m.setContent(dto.getContent().trim());
+        m.setSender(sender);
+        m.setRecipient(recipient);
+        m.setChatRoomId(dto.getChatRoomId());
+        m.setMessageType(dto.getMessageType() != null ? dto.getMessageType() : Message.MessageType.TEXT);
+        m.setIsRead(false);
+        return m;
+    }
+
+    @Transactional
+    public void refreshChatRoomLastMessage(Long roomId) {
+        Optional<Message> lastMsg = messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId);
+        chatRoomRepository.findById(roomId).ifPresent(room -> {
+            if (lastMsg.isPresent()) {
+                Message m = lastMsg.get();
+                room.setLastMessage(m.getContent());
+                room.setLastMessageTime(m.getCreatedAt());
+                room.setLastMessageSenderId(m.getSender().getId());
+            } else {
+                room.setLastMessage(null);
+                room.setLastMessageTime(null);
+                room.setLastMessageSenderId(null);
             }
-        }
+            chatRoomRepository.save(room);
+        });
+    }
 
+    private void sendViaWebSocket(ChatMessageDto dto) {
+        messagingTemplate.convertAndSend("/topic/chat/" + dto.getChatRoomId(), dto);
+    }
+
+    private ChatRoomDto enrichChatRoomDtoForUser(ChatRoom room, Long currentUserId) {
+        ChatRoomDto dto = ChatRoomDto.fromEntity(room);
+        dto.setUnreadCount(chatRoomRepository.countUnreadMessagesByChatRoomAndUser(room.getId(), currentUserId).intValue());
+        enrichOtherParticipant(dto, room, currentUserId);
+        if (room.getLastMessageSenderId() != null) {
+            User sender = userService.findById(room.getLastMessageSenderId());
+            dto.setLastMessageSenderName(sender.getName() + " " + sender.getSurname());
+        }
         return dto;
     }
 
-
-    private void enrichOtherParticipantInfo(ChatRoomDto dto, ChatRoom chatRoom, Long currentUserId) {
-        if (chatRoom.getRoomType() == ChatRoom.RoomType.DIRECT) {
-            if (chatRoom.getParticipantIds().size() >= 2) {
-                Long otherParticipantId = chatRoom.getParticipantIds().stream()
-                        .filter(id -> !id.equals(currentUserId))
-                        .findFirst()
-                        .orElse(null);
-
-                if (otherParticipantId != null) {
-                    User otherUser = userRepository.findById(otherParticipantId).orElse(null);
-                    if (otherUser != null) {
-                        dto.setOtherParticipantId(otherUser.getId());
-                        dto.setOtherParticipantName(otherUser.getName() + " " + otherUser.getSurname());
-                    }
+    private void enrichOtherParticipant(ChatRoomDto dto, ChatRoom room, Long currentUserId) {
+        if (room.getRoomType() == ChatRoom.RoomType.DIRECT) {
+            room.getParticipantIds().stream()
+                    .filter(id -> !id.equals(currentUserId))
+                    .findFirst()
+                    .ifPresent(id -> {
+                        User other = userService.findById(id);
+                        dto.setOtherParticipantId(other.getId());
+                        dto.setOtherParticipantName(other.getName() + " " + other.getSurname());
+                    });
+        } else if (room.getRoomType() == ChatRoom.RoomType.LISTING && room.getListingId() != null) {
+            listingRepository.findById(UUID.fromString(room.getListingId())).ifPresent(listing -> {
+                dto.setListingTitle(listing.getTitle());
+                Long sellerId = listing.getSeller().getId();
+                Long otherId = currentUserId.equals(sellerId)
+                        ? room.getParticipantIds().stream().filter(id -> !id.equals(sellerId)).findFirst().orElse(null)
+                        : sellerId;
+                if (otherId != null) {
+                    User other = userService.findById(otherId);
+                    dto.setOtherParticipantId(other.getId());
+                    dto.setOtherParticipantName(other.getName() + " " + other.getSurname());
                 }
-            }
-        } else if (chatRoom.getRoomType() == ChatRoom.RoomType.LISTING) {
-            if (chatRoom.getListingId() != null) {
-                Listing listing = listingRepository.findById(UUID.fromString(chatRoom.getListingId())).orElse(null);
-                if (listing != null) {
-                    dto.setListingTitle(listing.getTitle());
-
-                    Long sellerId = listing.getSeller().getId();
-                    if (currentUserId.equals(sellerId)) {
-                                                Long buyerId = chatRoom.getParticipantIds().stream()
-                                .filter(id -> !id.equals(sellerId))
-                                .findFirst()
-                                .orElse(null);
-                        if (buyerId != null) {
-                            User buyer = userRepository.findById(buyerId).orElse(null);
-                            if (buyer != null) {
-                                dto.setOtherParticipantId(buyer.getId());
-                                dto.setOtherParticipantName(buyer.getName() + " " + buyer.getSurname());
-                            }
-                        }
-                    } else {
-                                                User seller = listing.getSeller();
-                        dto.setOtherParticipantId(seller.getId());
-                        dto.setOtherParticipantName(seller.getName() + " " + seller.getSurname());
-                    }
-                }
-            }
+            });
         }
     }
 
+    public Page<ChatMessageDto> getAllUserMessages(Long userId, Pageable pageable) {
+        log.info("Getting all messages for user: {}", userId);
 
-    @Transactional
-    public void updateChatRoomLastMessage(Long chatRoomId, ChatMessageDto messageDto) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
-        if (chatRoom != null) {
-            chatRoom.setLastMessage(messageDto.getContent());
-            chatRoom.setLastMessageTime(messageDto.getCreatedAt());
-            chatRoom.setLastMessageSenderId(messageDto.getSenderId());
-            chatRoomRepository.save(chatRoom);
-        }
-    }
-    
+        Page<Message> messages = messageRepository.findBySenderIdOrRecipientIdOrderByCreatedAtDesc(userId, pageable);
+        log.info("Found {} messages for user {}", messages.getTotalElements(), userId);
 
-    private void sendMessageViaWebSocket(ChatMessageDto messageDto) {
-        String destination = "/topic/chat/" + messageDto.getChatRoomId();
-        messagingTemplate.convertAndSend(destination, messageDto);
-        
-        log.info("Message sent via WebSocket to destination: {}", destination);
-        log.info("Message details - ID: {}, Content: {}, Sender: {}, Room: {}", 
-                messageDto.getId(), messageDto.getContent(), messageDto.getSenderId(), messageDto.getChatRoomId());
-    }
-
-        @Transactional
-    public void deleteConversation(Long chatRoomId, Long userId) {
-        log.info("Deleting conversation - roomId: {}, userId: {}", chatRoomId, userId);
-        
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new BusinessException(ChatErrorCodes.CHAT_ROOM_NOT_FOUND));
-        
-                if (!chatRoom.getParticipantIds().contains(userId)) {
-            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
-        }
-        
-                messageRepository.deleteByChatRoomId(chatRoomId);
-        log.info("Deleted all messages for chat room: {}", chatRoomId);
-        
-                chatRoomRepository.delete(chatRoom);
-        log.info("Deleted chat room: {}", chatRoomId);
-    }
-    
-        @Transactional
-    public void deleteMessage(Long messageId, Long userId) {
-        log.info("Deleting message - messageId: {}, userId: {}", messageId, userId);
-        
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new BusinessException(ChatErrorCodes.MESSAGE_NOT_FOUND));
-        
-                if (!message.getSender().getId().equals(userId)) {
-            throw new BusinessException(ChatErrorCodes.ACCESS_DENIED);
-        }
-        
-        Long chatRoomId = message.getChatRoomId();
-        
-                messageRepository.delete(message);
-        log.info("Deleted message: {}", messageId);
-        
-                updateChatRoomLastMessageAfterDeletion(chatRoomId);
-    }
-    
-        private void updateChatRoomLastMessageAfterDeletion(Long chatRoomId) {
-        Optional<Message> lastMessage = messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(chatRoomId);
-        
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
-        if (chatRoom != null) {
-            if (lastMessage.isPresent()) {
-                Message msg = lastMessage.get();
-                chatRoom.setLastMessage(msg.getContent());
-                chatRoom.setLastMessageTime(msg.getCreatedAt());
-                chatRoom.setLastMessageSenderId(msg.getSender().getId());
-            } else {
-                                chatRoom.setLastMessage(null);
-                chatRoom.setLastMessageTime(null);
-                chatRoom.setLastMessageSenderId(null);
-            }
-            chatRoomRepository.save(chatRoom);
-            log.info("Updated last message info for chat room: {}", chatRoomId);
-        }
-    }
-
-    @Transactional
-    public void fixListingChatRooms() {
-        log.info("Fixing listing chat rooms...");
-        
-        List<ChatRoom> listingRooms = chatRoomRepository.findAll().stream()
-                .filter(room -> room.getRoomType() == ChatRoom.RoomType.LISTING)
-                .toList();
-        
-        log.info("Found {} listing chat rooms to fix", listingRooms.size());
-        
-        for (ChatRoom room : listingRooms) {
-            try {
-                Listing listing = listingRepository.findById(UUID.fromString(room.getListingId()))
-                        .orElse(null);
-                
-                if (listing != null) {
-                    Long sellerId = listing.getSeller().getId();
-                    
-                    if (!room.getParticipantIds().contains(sellerId)) {
-                        List<Long> newParticipants = new ArrayList<>(room.getParticipantIds());
-                        newParticipants.add(sellerId);
-                        room.setParticipantIds(newParticipants);
-                        chatRoomRepository.save(room);
-                        log.info("Added seller {} to chat room {}", sellerId, room.getId());
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Error fixing chat room {}: {}", room.getId(), e.getMessage());
-            }
-        }
-        
-        log.info("Finished fixing listing chat rooms");
+        return messages.map(ChatMessageDto::fromEntity);
     }
 }

@@ -2,6 +2,7 @@ package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
@@ -30,6 +31,7 @@ public class UserController {
 
     private final UserService userService;
     private final AuditLogService auditLogService;
+    private final VerificationService verificationService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
@@ -41,7 +43,7 @@ public class UserController {
     @PostMapping("/verification/send")
     public ResponseEntity<Void> sendVerificationCode(Authentication authentication) {
         log.info("Sending verification code for user: {}", authentication.getName());
-        userService.sendVerificationCode(authentication);
+        verificationService.sendAccountVerificationCode(authentication);
         return ResponseEntity.ok().build();
     }
 
@@ -51,7 +53,7 @@ public class UserController {
             @Valid @RequestBody VerificationRequest request,
             Authentication authentication) {
         log.info("Verifying user account for: {}", authentication.getName());
-        userService.verifyUser(request, authentication);
+        verificationService.verifyUser(request, authentication);
         return ResponseEntity.ok().build();
     }
 

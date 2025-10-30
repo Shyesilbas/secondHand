@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
+import { useEnums } from '../../hooks/useEnums.js';
 import { ROUTES } from '../../constants/routes.js';
 import { DropdownMenu, DropdownItem, DropdownDivider } from '../ui/DropdownMenu.jsx';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
 import { useCart } from '../../../cart/hooks/useCart.js';
+import { listingService } from '../../../listing/services/listingService.js';
 
 const icons = {
     myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -83,6 +85,38 @@ const Header = () => {
     const { totalUnread, setTotalUnread } = useTotalUnreadCount({ 
         enabled: isAuthenticated && !isStaticPage
     });
+    const { enums } = useEnums();
+    const [allListingsOpen, setAllListingsOpen] = useState(false);
+    const [categoryCounts, setCategoryCounts] = useState({});
+    const [countsLoading, setCountsLoading] = useState(false);
+
+    useEffect(() => {
+        let isCancelled = false;
+        const fetchCounts = async () => {
+            if (!allListingsOpen) return;
+            if (!enums?.listingTypes || (Object.keys(categoryCounts).length > 0)) return;
+            try {
+                setCountsLoading(true);
+                const results = await Promise.all(
+                    (enums.listingTypes || []).map(async (t) => {
+                        try {
+                            const resp = await listingService.filterListings({ listingType: t.value, status: 'ACTIVE', page: 0, size: 1 });
+                            return [t.value, Number(resp?.totalElements || 0)];
+                        } catch (e) {
+                            return [t.value, 0];
+                        }
+                    })
+                );
+                if (!isCancelled) {
+                    setCategoryCounts(Object.fromEntries(results));
+                }
+            } finally {
+                if (!isCancelled) setCountsLoading(false);
+            }
+        };
+        fetchCounts();
+        return () => { isCancelled = true; };
+    }, [allListingsOpen, enums, categoryCounts]);
 
     const handleChatClick = () => {
         setTotalUnread(0);
@@ -169,8 +203,36 @@ const Header = () => {
                                             <span>Listings</span>
                                         </button>
                                     }>
-                                        {listingsMenu.map((item, idx) =>
-                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                        {/* Static items */}
+                                        <DropdownItem to={ROUTES.MY_LISTINGS} icon={<icons.myListings />}>My Listings</DropdownItem>
+                                        <DropdownItem to={ROUTES.CREATE_LISTING} icon={<icons.newListing />}>New Listing</DropdownItem>
+                                        <DropdownDivider />
+                                        {/* All Listings with submenu */}
+                                        <button
+                                            type="button"
+                                            className="flex items-center w-full px-4 py-2 text-sm text-text-secondary hover:bg-blue-50 hover:text-btn-primary transition-colors text-left"
+                                            onClick={() => setAllListingsOpen((v) => !v)}
+                                        >
+                                            <span className="mr-3"><icons.allListings /></span>
+                                            <span className="flex-1">All Listings</span>
+                                            <svg className={`w-4 h-4 transition-transform ${allListingsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        {allListingsOpen && (
+                                            <div className="py-1">
+                                                <div className="px-4 py-2 text-xs uppercase tracking-wide text-gray-400">Browse by Category</div>
+                                                {(enums.listingTypes || []).map((t) => (
+                                                    <DropdownItem key={t.value} to={`${ROUTES.LISTINGS}?category=${t.value}`}>
+                                                        <span className="flex items-center justify-between w-full">
+                                                            <span>{t.label}</span>
+                                                            <span className="ml-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                                                {countsLoading && categoryCounts[t.value] === undefined ? '...' : (categoryCounts[t.value] ?? 0)}
+                                                            </span>
+                                                        </span>
+                                                    </DropdownItem>
+                                                ))}
+                                            </div>
                                         )}
                                     </DropdownMenu>
 
