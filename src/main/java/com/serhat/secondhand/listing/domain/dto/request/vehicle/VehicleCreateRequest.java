@@ -27,5 +27,10 @@ public record VehicleCreateRequest(
     Integer horsePower,
     Integer kilometersPerLiter,
     FuelType fuelType,
-    String imageUrl
+    String imageUrl,
+    Boolean accidentHistory,
+    String accidentDetails,
+    java.time.LocalDate inspectionValidUntil,
+    Drivetrain drivetrain,
+    BodyType bodyType
 ) {} 

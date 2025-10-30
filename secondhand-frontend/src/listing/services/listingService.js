@@ -42,6 +42,8 @@ const createFilterPayload = (filters, listingType) => {
       payload.doors = filters.doors || null;
       payload.gearTypes = Array.isArray(filters.gearTypes) ? filters.gearTypes : [];
       payload.seatCounts = Array.isArray(filters.seatCounts) ? filters.seatCounts : [];
+      payload.drivetrains = Array.isArray(filters.drivetrains) ? filters.drivetrains : [];
+      payload.bodyTypes = Array.isArray(filters.bodyTypes) ? filters.bodyTypes : [];
       break;
 
     case LISTING_TYPES.ELECTRONICS:

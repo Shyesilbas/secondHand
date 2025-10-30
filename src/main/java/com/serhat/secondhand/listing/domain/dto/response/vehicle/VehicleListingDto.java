@@ -6,6 +6,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,4 +36,9 @@ public class VehicleListingDto extends ListingDto {
     private Integer kilometersPerLiter;
     private FuelType fuelType;
     private Boolean swap;
+    private Boolean accidentHistory;
+    private String accidentDetails;
+    private java.time.LocalDate inspectionValidUntil;
+    private Drivetrain drivetrain;
+    private BodyType bodyType;
 }

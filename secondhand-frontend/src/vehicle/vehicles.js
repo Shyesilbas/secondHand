@@ -26,6 +26,11 @@ export const VehicleCreateRequestDTO = {
   kilometersPerLiter: 0,
   fuelType: '',
   swap: false,
+  accidentHistory: false,
+  accidentDetails: '',
+  inspectionValidUntil: '',
+  drivetrain: '',
+  bodyType: '',
 };
 
 
@@ -49,6 +54,11 @@ export const VehicleListingDTO = {
   kilometersPerLiter: 0,
   fuelType: '',
   swap: false,
+  accidentHistory: false,
+  accidentDetails: '',
+  inspectionValidUntil: '',
+  drivetrain: '',
+  bodyType: '',
 };
 
 export const VehicleSearchFiltersDTO = {
@@ -104,6 +114,11 @@ export const createVehicleCreateRequest = (data) => {
     kilometersPerLiter: parseInt(data.kilometersPerLiter) || 0,
     fuelType: data.fuelType || '',
     swap: Boolean(data.swap),
+    accidentHistory: Boolean(data.accidentHistory),
+    accidentDetails: (data.accidentDetails || '').trim() || undefined,
+    inspectionValidUntil: data.inspectionValidUntil ? String(data.inspectionValidUntil) : undefined,
+    drivetrain: data.drivetrain || undefined,
+    bodyType: data.bodyType || undefined,
   };
 };
 
@@ -131,6 +146,11 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
   if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.accidentHistory !== undefined) updateData.accidentHistory = Boolean(data.accidentHistory);
+  if (data.accidentDetails !== undefined) updateData.accidentDetails = (data.accidentDetails || '').trim();
+  if (data.inspectionValidUntil !== undefined && data.inspectionValidUntil !== '') updateData.inspectionValidUntil = String(data.inspectionValidUntil);
+  if (data.drivetrain !== undefined && data.drivetrain !== '') updateData.drivetrain = data.drivetrain;
+  if (data.bodyType !== undefined && data.bodyType !== '') updateData.bodyType = data.bodyType;
   
   return updateData;
 };

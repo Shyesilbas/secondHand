@@ -143,6 +143,8 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
       {renderEnumField('doors', 'Number of Doors', 'doors')}
       {renderEnumField('gearTypes', 'Gear Type', 'gearTypes')}
       {renderEnumField('seatCounts', 'Seat Count', 'seatCounts')}
+      {renderEnumField('drivetrains', 'Drivetrain', 'drivetrains')}
+      {renderEnumField('bodyTypes', 'Body Type', 'bodyTypes')}
       {renderNumericRangeField('year', 'Year', 1900, new Date().getFullYear())}
       {renderNumericRangeField('mileage', 'Mileage', 0, 1000000)}
       {renderNumericRangeField('enginePower', 'Engine Power (HP)', 0, 1000)}

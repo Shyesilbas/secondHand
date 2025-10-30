@@ -7,6 +7,8 @@ export const vehicleEnums = {
   doors: [],
   gearTypes: [],
   seatCounts: [],
+  drivetrains: [],
+  bodyTypes: [],
 };
 
 export const fetchVehicleEnums = async () => {
@@ -18,6 +20,8 @@ export const fetchVehicleEnums = async () => {
       doors,
       gearTypes,
       seatCounts,
+      drivetrains,
+      bodyTypes,
     ] = await Promise.all([
       enumService.getCarBrands(),
       enumService.getFuelTypes(),
@@ -25,6 +29,8 @@ export const fetchVehicleEnums = async () => {
       enumService.getDoors(),
       enumService.getGearTypes(),
       enumService.getSeatCounts(),
+      enumService.getDrivetrains(),
+      enumService.getBodyTypes(),
     ]);
 
     return {
@@ -34,6 +40,8 @@ export const fetchVehicleEnums = async () => {
       doors,
       gearTypes,
       seatCounts,
+      drivetrains,
+      bodyTypes,
     };
   } catch (error) {
     console.error('Error fetching vehicle enums:', error);

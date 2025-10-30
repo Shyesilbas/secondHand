@@ -90,6 +90,8 @@ export const API_ENDPOINTS = {
         ELECTRONIC_TYPES: '/v1/enums/electronic-types',
         ELECTRONIC_BRANDS: '/v1/enums/electronic-brands',
         PROCESSORS: '/v1/enums/processors',
+        DRIVETRAINS: '/v1/enums/drivetrains',
+        BODY_TYPES: '/v1/enums/body-types',
         REAL_ESTATE_TYPES: '/v1/enums/real-estate-types',
         REAL_ESTATE_AD_TYPES: '/v1/enums/real-estate-ad-types',
         HEATING_TYPES: '/v1/enums/heating-types',

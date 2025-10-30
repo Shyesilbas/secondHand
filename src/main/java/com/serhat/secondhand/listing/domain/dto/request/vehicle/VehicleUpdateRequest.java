@@ -27,5 +27,10 @@ public record VehicleUpdateRequest(
     Optional<Integer> kilometersPerLiter,
     Optional<FuelType> fuelType,
     Optional<Boolean> swap,
-    Optional<String> imageUrl
+    Optional<String> imageUrl,
+    Optional<Boolean> accidentHistory,
+    Optional<String> accidentDetails,
+    Optional<java.time.LocalDate> inspectionValidUntil,
+    Optional<Drivetrain> drivetrain,
+    Optional<BodyType> bodyType
 ) {} 

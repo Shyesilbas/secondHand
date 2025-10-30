@@ -5,6 +5,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -54,4 +56,16 @@ public class VehicleListing extends Listing {
     private FuelType fuelType;
 
     private boolean swap;
+
+    private Boolean accidentHistory;
+
+    private String accidentDetails;
+
+    private java.time.LocalDate inspectionValidUntil;
+
+    @Enumerated(EnumType.STRING)
+    private Drivetrain drivetrain;
+
+    @Enumerated(EnumType.STRING)
+    private BodyType bodyType;
 }

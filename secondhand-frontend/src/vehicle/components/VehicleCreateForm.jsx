@@ -83,6 +83,8 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <EnumDropdown label="Door Count" enumKey="doors" value={formData.doors} onChange={(v) => handleDropdownChange('doors', v)} />
                   <EnumDropdown label="Transmission" enumKey="gearTypes" value={formData.gearbox} onChange={(v) => handleDropdownChange('gearbox', v)} />
                   <EnumDropdown label="Seat Count" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => handleDropdownChange('seatCount', v)} />
+                  <EnumDropdown label="Drivetrain" enumKey="drivetrains" value={formData.drivetrain} onChange={(v) => handleDropdownChange('drivetrain', v)} />
+                  <EnumDropdown label="Body Type" enumKey="bodyTypes" value={formData.bodyType} onChange={(v) => handleDropdownChange('bodyType', v)} />
                   <input type="text" name="model" value={formData.model} onChange={handleInputChange} placeholder="Model *" className={`w-full px-4 py-3 border rounded-lg ${errors.model ? 'border-red-500' : 'border-slate-200'}`} />
                   <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1950" max={new Date().getFullYear() + 1} placeholder="Year *" className={`w-full px-4 py-3 border rounded-lg ${errors.year ? 'border-red-500' : 'border-slate-200'}`} />
                   <input type="number" name="mileage" value={formData.mileage} onChange={handleInputChange} placeholder="Mileage" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
@@ -92,6 +94,17 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <input type="number" name="fuelCapacity" value={formData.fuelCapacity} onChange={handleInputChange} placeholder="Fuel Capacity (L)" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
                   <input type="number" name="fuelConsumption" value={formData.fuelConsumption} onChange={handleInputChange} placeholder="Fuel Consumption (L/100km)" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
                   <input type="number" name="kilometersPerLiter" value={formData.kilometersPerLiter} onChange={handleInputChange} placeholder="Kilometers/Liter" className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
+                  <div className="col-span-full">
+                    <label className="inline-flex items-center gap-3">
+                      <input type="checkbox" name="accidentHistory" checked={Boolean(formData.accidentHistory)} onChange={handleInputChange} className="w-5 h-5 text-blue-600 border-gray-300 rounded" />
+                      <span className="text-sm text-slate-700">Accident History</span>
+                    </label>
+                  </div>
+                  <input type="text" name="accidentDetails" value={formData.accidentDetails} onChange={handleInputChange} placeholder="Accident Details (optional)" className="w-full px-4 py-3 border border-slate-200 rounded-lg col-span-full" />
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Inspection Valid Until</label>
+                    <input type="date" name="inspectionValidUntil" value={formData.inspectionValidUntil} onChange={handleInputChange} className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
+                  </div>
                 </div>
                 
                 {/* Swap Option */}
