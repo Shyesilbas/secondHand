@@ -52,31 +52,31 @@ const VehicleDetails = ({ listing }) => {
       </div>
 
       <Section id="basic" title="Basic">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <DetailItem label="Brand" value={getCarBrandLabel(listing.brand)} />
-          <DetailItem label="Model" value={listing.model} />
-          <DetailItem label="Year" value={listing.year} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <DetailItem label="Brand" value={getCarBrandLabel(listing.brand)} />
+        <DetailItem label="Model" value={listing.model} />
+        <DetailItem label="Year" value={listing.year} />
           <DetailItem label="Color" value={getColorLabel(listing.color)} />
         </div>
       </Section>
 
       <Section id="mechanical" title="Mechanical">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <DetailItem label="Gear Type" value={getEnumLabel('gearTypes', listing.gearbox)} />
-          <DetailItem label="Fuel Type" value={getFuelTypeLabel(listing.fuelType)} />
+        <DetailItem label="Gear Type" value={getEnumLabel('gearTypes', listing.gearbox)} />
+        <DetailItem label="Fuel Type" value={getFuelTypeLabel(listing.fuelType)} />
           <DetailItem label="Horse Power" value={listing.horsePower ? `${listing.horsePower} HP` : '-'} />
           <DetailItem label="Engine Capacity" value={listing.engineCapacity ? `${listing.engineCapacity} cc` : '-'} />
           <DetailItem label="Drivetrain" value={getEnumLabel('drivetrains', listing.drivetrain)} />
           <DetailItem label="Body Type" value={getEnumLabel('bodyTypes', listing.bodyType)} />
-          <DetailItem label="Door" value={getEnumLabel('doors', listing.doors)} />
-          <DetailItem label="Seat Count" value={getEnumLabel('seatCounts', listing.seatCount)} />
+        <DetailItem label="Door" value={getEnumLabel('doors', listing.doors)} />
+        <DetailItem label="Seat Count" value={getEnumLabel('seatCounts', listing.seatCount)} />
         </div>
       </Section>
 
       <Section id="usage" title="Usage">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <DetailItem label="Kilometer" value={listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : '-'} />
-          <DetailItem label="Fuel Consumption" value={listing.fuelConsumption ? `${listing.fuelConsumption} L/100km` : '-'} />
+        <DetailItem label="Fuel Consumption" value={listing.fuelConsumption ? `${listing.fuelConsumption} L/100km` : '-'} />
           <DetailItem label="Kilometers/Liter" value={listing.kilometersPerLiter ? `${listing.kilometersPerLiter} km/L` : '-'} />
           <DetailItem label="Wheels" value={listing.wheels ? `${listing.wheels}\"` : '-'} />
         </div>
@@ -92,8 +92,8 @@ const VehicleDetails = ({ listing }) => {
 
       <Section id="extras" title="Extras">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <DetailItem label="Open To Swap" value={listing.swap ? 'Yes' : 'No'} />
-        </div>
+        <DetailItem label="Open To Swap" value={listing.swap ? 'Yes' : 'No'} />
+      </div>
       </Section>
     </div>
   );

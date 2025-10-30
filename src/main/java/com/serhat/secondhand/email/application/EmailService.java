@@ -9,7 +9,6 @@ import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +21,8 @@ import java.util.UUID;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
+import org.springframework.beans.factory.annotation.Value;
+import com.serhat.secondhand.email.config.EmailConfig;
 
 @Service
 @RequiredArgsConstructor
@@ -31,83 +32,40 @@ public class EmailService {
 
     private final EmailRepository emailRepository;
     private final EmailMapper emailMapper;
+    private final EmailConfig emailConfig;
 
-    @Value("${app.email.sender}")
-    private String defaultSenderEmail;
-
-    @Value("${app.email.verification.subject}")
-    private String verificationSubject;
-
-    @Value("${app.email.verification.content}")
-    private String verificationContentTemplate;
-
-    @Value("${app.email.welcome.subject}")
-    private String welcomeSubject;
-
-    @Value("${app.email.welcome.content}")
-    private String welcomeContentTemplate;
-
-    @Value("${app.email.phoneUpdate.subject}")
-    private String phoneUpdateSubject;
-
-    @Value("${app.email.phoneUpdate.content}")
-    private String phoneUpdateContentTemplate;
-
-    @Value("${app.email.paymentSuccess.subject}")
-    private String paymentSuccessSubject;
-
-    @Value("${app.email.paymentSuccess.content}")
-    private String paymentSuccessContentTemplate;
-
-    @Value("${app.email.priceChange.subject}")
-    private String priceChangeSubject;
-
-    @Value("${app.email.priceChange.content}")
-    private String priceChangeContentTemplate;
-
-    @Value("${app.email.paymentVerification.subject:SecondHand - Payment Verification}")
-    private String paymentVerificationSubject;
-
-    @Value("${app.email.paymentVerification.content:Hello %s, your payment verification code is %s. This code is valid for %d minutes.}")
-    private String paymentVerificationContentTemplate;
     @Value("${app.verification.code.expiry.minutes:3}")
     private int verificationExpiryMinutes;
 
-    @Value("${app.email.orderConfirmation.subject:SecondHand - Order Confirmation}")
-    private String orderConfirmationSubject;
-
-    @Value("${app.email.saleNotification.subject:SecondHand - Your Item Has Been Sold!}")
-    private String saleNotificationSubject;
-
     public EmailDto sendVerificationCodeEmail(User user, String verificationCode) {
-        String subject = verificationSubject;
-        String content = String.format(verificationContentTemplate, user.getName(), verificationCode);
+        String subject = emailConfig.getVerificationSubject();
+        String content = String.format(emailConfig.getVerificationContent(), user.getName(), verificationCode);
         return sendAndSaveEmail(user, subject, content, EmailType.VERIFICATION_CODE);
     }
 
     public EmailDto sendPhoneNumberUpdatedEmail(User user) {
-        String subject = phoneUpdateSubject;
-        String content = String.format(phoneUpdateContentTemplate, user.getName());
+        String subject = emailConfig.getPhoneUpdateSubject();
+        String content = String.format(emailConfig.getPhoneUpdateContent(), user.getName());
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
     public EmailDto sendWelcomeEmail(User user) {
-        String subject = welcomeSubject;
-        String content = String.format(welcomeContentTemplate, user.getName());
+        String subject = emailConfig.getWelcomeSubject();
+        String content = String.format(emailConfig.getWelcomeContent(), user.getName());
         return sendAndSaveEmail(user, subject, content, EmailType.WELCOME);
     }
 
     public EmailDto sendPaymentSuccessEmail(User user, PaymentDto paymentDto, String listingTitle) {
-        String subject = paymentSuccessSubject;
-        String content = String.format(paymentSuccessContentTemplate, user.getName(), listingTitle, paymentDto.amount(), paymentDto.transactionType());
+        String subject = emailConfig.getPaymentSuccessSubject();
+        String content = String.format(emailConfig.getPaymentSuccessContent(), user.getName(), listingTitle, paymentDto.amount(), paymentDto.transactionType());
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EmailDto sendPaymentVerificationEmail(User user, String code) {
         log.info("Sending payment verification email to user: {} with code: {}", user.getEmail(), code);
-        String subject = paymentVerificationSubject;
-        String content = String.format(paymentVerificationContentTemplate, user.getName(), code, verificationExpiryMinutes);
+        String subject = emailConfig.getPaymentVerificationSubject();
+        String content = String.format(emailConfig.getPaymentVerificationContent(), user.getName(), code, verificationExpiryMinutes);
         log.info("Payment verification email subject: {}", subject);
         log.info("Payment verification email content: {}", content);
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
@@ -118,8 +76,8 @@ public class EmailService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EmailDto sendPaymentVerificationEmail(User user, String code, String extraDetails) {
         log.info("Sending payment verification email with details to user: {}", user.getEmail());
-        String subject = paymentVerificationSubject;
-        String base = String.format(paymentVerificationContentTemplate, user.getName(), code, verificationExpiryMinutes);
+        String subject = emailConfig.getPaymentVerificationSubject();
+        String base = String.format(emailConfig.getPaymentVerificationContent(), user.getName(), code, verificationExpiryMinutes);
         String content = base + (extraDetails != null ? ("\n" + extraDetails) : "");
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
         log.info("Payment verification email (with details) sent successfully with ID: {}", result.id());
@@ -128,7 +86,7 @@ public class EmailService {
 
     public EmailDto sendOrderConfirmationEmail(User user, OrderDto order) {
         log.info("Sending order confirmation email to user: {} for order: {}", user.getEmail(), order.getOrderNumber());
-        String subject = orderConfirmationSubject;
+        String subject = emailConfig.getOrderConfirmationSubject();
         String content = buildOrderConfirmationContent(user, order);
         EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
         log.info("Order confirmation email sent successfully with ID: {}", result.id());
@@ -193,7 +151,7 @@ public class EmailService {
 
     public EmailDto sendSaleNotificationEmail(User seller, OrderDto order, List<OrderItemDto> sellerItems) {
         log.info("Sending sale notification email to seller: {} for order: {}", seller.getEmail(), order.getOrderNumber());
-        String subject = saleNotificationSubject;
+        String subject = emailConfig.getSaleNotificationSubject();
         String content = buildSaleNotificationContent(seller, order, sellerItems);
         EmailDto result = sendAndSaveEmail(seller, subject, content, EmailType.NOTIFICATION);
         log.info("Sale notification email sent successfully with ID: {}", result.id());
@@ -240,8 +198,8 @@ public class EmailService {
     }
 
     public EmailDto sendPriceChangeEmail(User user, String listingTitle, String oldPriceStr, String newPriceStr) {
-        String subject = priceChangeSubject;
-        String content = String.format(priceChangeContentTemplate, user.getName(), listingTitle, oldPriceStr, newPriceStr);
+        String subject = emailConfig.getPriceChangeSubject();
+        String content = String.format(emailConfig.getPriceChangeContent(), user.getName(), listingTitle, oldPriceStr, newPriceStr);
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
@@ -251,7 +209,7 @@ public class EmailService {
         Email email = Email.builder()
                 .user(user)
                 .recipientEmail(user.getEmail())
-                .senderEmail(defaultSenderEmail)
+                .senderEmail(emailConfig.getSender())
                 .subject(subject)
                 .content(content)
                 .emailType(emailType)
@@ -294,5 +252,4 @@ public class EmailService {
         emailRepository.deleteAll(emails);
         return "Emails deleted for user : "+user.getEmail();
     }
-
 }
