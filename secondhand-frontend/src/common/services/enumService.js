@@ -26,6 +26,9 @@ export const enumService = {
 
   getProcessors: async () => get(API_ENDPOINTS.ENUMS.PROCESSORS),
 
+  getDrivetrains: async () => get(API_ENDPOINTS.ENUMS.DRIVETRAINS),
+  getBodyTypes: async () => get(API_ENDPOINTS.ENUMS.BODY_TYPES),
+
     getRealEstateTypes: async () => get(API_ENDPOINTS.ENUMS.REAL_ESTATE_TYPES),
 
   getRealEstateAdTypes: async () => get(API_ENDPOINTS.ENUMS.REAL_ESTATE_AD_TYPES),

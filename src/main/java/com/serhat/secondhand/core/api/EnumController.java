@@ -496,6 +496,34 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/drivetrains")
+    @Operation(summary = "Get all drivetrains")
+    public ResponseEntity<List<Map<String, Object>>> getDrivetrains() {
+        List<Map<String, Object>> list = Arrays.stream(Drivetrain.values())
+                .map(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", v.name());
+                    map.put("label", v.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/body-types")
+    @Operation(summary = "Get all vehicle body types")
+    public ResponseEntity<List<Map<String, Object>>> getBodyTypes() {
+        List<Map<String, Object>> list = Arrays.stream(BodyType.values())
+                .map(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", v.name());
+                    map.put("label", v.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
     
 
     private String getListingTypeIcon(ListingType type) {

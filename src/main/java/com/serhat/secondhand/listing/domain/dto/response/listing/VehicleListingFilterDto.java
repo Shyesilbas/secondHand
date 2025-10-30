@@ -20,4 +20,6 @@ public class VehicleListingFilterDto extends ListingFilterDto {
     private Doors doors;
     private List<GearType> gearTypes;
     private List<SeatCount> seatCounts;
+    private List<Drivetrain> drivetrains;
+    private List<BodyType> bodyTypes;
 }

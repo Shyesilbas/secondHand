@@ -57,6 +57,14 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
         if (filters.getMaxMileage() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("mileage"), filters.getMaxMileage()));
         }
+
+        if (filters.getDrivetrains() != null && !filters.getDrivetrains().isEmpty()) {
+            predicates.add(root.get("drivetrain").in(filters.getDrivetrains()));
+        }
+
+        if (filters.getBodyTypes() != null && !filters.getBodyTypes().isEmpty()) {
+            predicates.add(root.get("bodyType").in(filters.getBodyTypes()));
+        }
         
         return predicates;
     }

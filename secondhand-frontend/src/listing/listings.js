@@ -106,6 +106,8 @@ export const VehicleListingFilterDTO = {
   doors: '',
   gearTypes: [],
   seatCounts: [],
+  drivetrains: [],
+  bodyTypes: [],
   
   sortBy: 'createdAt',
   sortDirection: 'DESC',
@@ -244,6 +246,8 @@ export const createVehicleFilterRequest = (data) => {
     doors: data.doors || null,
     gearTypes: Array.isArray(data.gearTypes) ? data.gearTypes : [],
     seatCounts: Array.isArray(data.seatCounts) ? data.seatCounts : [],
+    drivetrains: Array.isArray(data.drivetrains) ? data.drivetrains : [],
+    bodyTypes: Array.isArray(data.bodyTypes) ? data.bodyTypes : [],
         sortBy: data.sortBy || 'createdAt',
     sortDirection: data.sortDirection || 'DESC',
         page: parseInt(data.page) || 0,

@@ -44,6 +44,8 @@ export const useEnums = () => {
     showcasePricingConfig: null,
     agreementGroups: [],
     agreementTypes: [],
+    drivetrains: [],
+    bodyTypes: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -59,8 +61,10 @@ export const useEnums = () => {
           const auditEnumsMissing = !cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses ||
             cachedEnums.auditEventTypes.length === 0 || cachedEnums.auditEventStatuses.length === 0;
           const processorsMissing = !cachedEnums.processors || cachedEnums.processors.length === 0;
+          const vehicleNewEnumsMissing = !cachedEnums.drivetrains || cachedEnums.drivetrains.length === 0 ||
+            !cachedEnums.bodyTypes || cachedEnums.bodyTypes.length === 0;
 
-          if (auditEnumsMissing || processorsMissing) {
+          if (auditEnumsMissing || processorsMissing || vehicleNewEnumsMissing) {
             forceClearEnumCache();
           } else {
             setEnums(cachedEnums);
