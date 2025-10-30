@@ -9,11 +9,8 @@ public class UserAlreadyExistsException extends BusinessException {
         super(message, HttpStatus.CONFLICT, "USER_ALREADY_EXISTS");
     }
 
-    public static UserAlreadyExistsException withEmail(String email) {
-        return new UserAlreadyExistsException(String.format("User with email [%s] already exists.", email));
+    public static UserAlreadyExistsException withCredentials(String email , String phone) {
+        return new UserAlreadyExistsException(String.format("User with email [%s] or phone [%s] already exists.", email,phone));
     }
 
-    public static UserAlreadyExistsException withPhone(String phone) {
-        return new UserAlreadyExistsException(String.format("User with phone number [%s] already exists.", phone));
-    }
 }

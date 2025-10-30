@@ -2,20 +2,15 @@ package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.core.exception.VerificationLockedException;
-import com.serhat.secondhand.user.util.UserErrorCodes;
-import com.serhat.secondhand.core.verification.CodeType;
-import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
-import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
+import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +29,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final EmailService emailService;
-    private final IVerificationService verificationService;
     private final UserMapper userMapper;
 
     public User getAuthenticatedUser(Authentication authentication) {
@@ -65,12 +59,8 @@ public class UserService {
     }
 
     public void validateUniqueUser(String email, String phoneNumber) {
-        if (userRepository.existsByEmail(email)) {
-            throw UserAlreadyExistsException.withEmail(email);
-        }
-
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw UserAlreadyExistsException.withPhone(phoneNumber);
+        if (userRepository.existsByEmail(email) || userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw UserAlreadyExistsException.withCredentials(email,phoneNumber);
         }
     }
 
@@ -95,55 +85,6 @@ public class UserService {
         return "Phone number updated successfully.";
     }
 
-    public void sendVerificationCode(Authentication authentication) {
-        User user = getAuthenticatedUser(authentication);
-
-        if (user.isAccountVerified()) {
-            throw new BusinessException(UserErrorCodes.ACCOUNT_ALREADY_VERIFIED);
-        }
-
-        String code = verificationService.generateCode();
-        verificationService.generateVerification(user, code, CodeType.ACCOUNT_VERIFICATION);
-        emailService.sendVerificationCodeEmail(user, code);
-
-        log.info("Verification code sent to user with email: {}", user.getEmail());
-    }
-
-    public void verifyUser(VerificationRequest request, Authentication authentication) {
-        User user = getAuthenticatedUser(authentication);
-        log.info("Verifying user with email: {}", user.getEmail());
-        log.info("Code written by user: {}", request.code());
-
-        var verificationOpt = verificationService.findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);
-
-        if (verificationOpt.isEmpty()) {
-            throw new BusinessException(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
-        }
-
-        var verification = verificationOpt.get();
-        log.info("Stored verification code: {}", verification.getCode());
-
-        if (!request.code().equals(verification.getCode())) {
-            verificationService.decrementVerificationAttempts(verification);
-            int verificationAttemptLeft = verification.getVerificationAttemptLeft();
-
-            if (verificationAttemptLeft <= 0) {
-                user.setAccountStatus(AccountStatus.BLOCKED);
-                update(user);
-                throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
-            }
-            throw new BusinessException(
-                    String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), verificationAttemptLeft),
-                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getHttpStatus(), 
-                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
-        }
-
-        verificationService.markVerificationAsUsed(verification);
-        user.setAccountVerified(true);
-        update(user);
-
-        log.info("User verified successfully: {}", user.getEmail());
-    }
 
     public String updateEmail(UpdateEmailRequest updateEmailRequest, Authentication authentication) {
         User user = getAuthenticatedUser(authentication);

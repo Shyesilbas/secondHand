@@ -1,19 +1,18 @@
 package com.serhat.secondhand.listing.domain.entity;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
-import jakarta.persistence.*;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -61,7 +60,7 @@ public class VehicleListing extends Listing {
 
     private String accidentDetails;
 
-    private java.time.LocalDate inspectionValidUntil;
+    private LocalDate inspectionValidUntil;
 
     @Enumerated(EnumType.STRING)
     private Drivetrain drivetrain;

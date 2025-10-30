@@ -100,7 +100,9 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                       <span className="text-sm text-slate-700">Accident History</span>
                     </label>
                   </div>
-                  <input type="text" name="accidentDetails" value={formData.accidentDetails} onChange={handleInputChange} placeholder="Accident Details (optional)" className="w-full px-4 py-3 border border-slate-200 rounded-lg col-span-full" />
+                  {Boolean(formData.accidentHistory) && (
+                    <input type="text" name="accidentDetails" value={formData.accidentDetails} onChange={handleInputChange} placeholder="Accident Details (optional)" className="w-full px-4 py-3 border border-slate-200 rounded-lg col-span-full" />
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Inspection Valid Until</label>
                     <input type="date" name="inspectionValidUntil" value={formData.inspectionValidUntil} onChange={handleInputChange} className="w-full px-4 py-3 border border-slate-200 rounded-lg" />
