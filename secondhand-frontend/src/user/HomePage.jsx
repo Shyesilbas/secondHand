@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  HeroSection,
   ShowcaseSection,
   CategoriesSection
 } from '../home/components/index.js';
@@ -8,7 +7,6 @@ import {
 const HomePage = () => {
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection />
       <ShowcaseSection />
       <CategoriesSection />
     </div>

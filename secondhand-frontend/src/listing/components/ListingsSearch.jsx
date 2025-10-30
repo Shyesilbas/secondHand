@@ -9,7 +9,7 @@ const ListingsSearch = React.memo(({
     loadAllPages
 }) => {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">

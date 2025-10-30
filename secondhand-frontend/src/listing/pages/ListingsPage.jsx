@@ -14,13 +14,7 @@ const ListingsPage = () => {
 
     const location = useLocation();
     const navState = useMemo(() => window.history.state && window.history.state.usr, []);
-    const initialListingType = useMemo(() => {
-        const fromState = navState?.listingType;
-        if (fromState) return fromState;
-        const params = new URLSearchParams(location.search);
-        const fromQuery = params.get('category');
-        return fromQuery || null;
-    }, [location.search, navState]);
+    const initialListingType = navState?.listingType || null;
     const {
         listings,
         totalPages,
@@ -32,7 +26,7 @@ const ListingsPage = () => {
         updateFilters,
         updatePage,
         resetFilters
-    } = useAdvancedListingsQuery(initialListingType ? { listingType: initialListingType } : { listingType: null });
+    } = useAdvancedListingsQuery(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
 
     const { getListingTypeLabel } = useEnums();
     const { showFilterModal, hasActiveFilters, openFilterModal, closeFilterModal } = useListingsFilters(filters);
@@ -50,6 +44,15 @@ const ListingsPage = () => {
             setSelectedCategory(initialListingType);
         }
     }, [initialListingType]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const category = params.get('category');
+        if (category && category !== selectedCategory) {
+            setSelectedCategory(category);
+            updateFilters({ listingType: category, page: 0 });
+        }
+    }, [location.search, selectedCategory, updateFilters]);
 
     const handleCategoryChange = useCallback((category) => {
         setSelectedCategory(category);
