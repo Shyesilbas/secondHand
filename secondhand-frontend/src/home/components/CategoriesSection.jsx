@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
-import { listingService } from '../../listing/services/listingService.js';
+import { useListingStatistics } from '../../listing/hooks/useListingStatistics.js';
 
 const CategoriesSection = () => {
-  const [counts, setCounts] = useState({});
-  const [loading, setLoading] = useState(false);
+  const { countsByCategory, isLoading: loading } = useListingStatistics();
   const categories = useMemo(() => [
     {
       id: 'VEHICLE',
@@ -69,33 +68,6 @@ const CategoriesSection = () => {
     }
   ], []);
 
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchCounts = async () => {
-      try {
-        setLoading(true);
-        const results = await Promise.all(
-          categories.map(async (c) => {
-            try {
-              const resp = await listingService.filterListings({ listingType: c.id, status: 'ACTIVE', page: 0, size: 1 });
-              return [c.id, Number(resp?.totalElements || 0)];
-            } catch (e) {
-              return [c.id, 0];
-            }
-          })
-        );
-        if (!isCancelled) {
-          const map = Object.fromEntries(results);
-          setCounts(map);
-        }
-      } finally {
-        if (!isCancelled) setLoading(false);
-      }
-    };
-    fetchCounts();
-    return () => { isCancelled = true; };
-  }, [categories]);
-
   return (
     <section className="bg-gray-50 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,7 +93,7 @@ const CategoriesSection = () => {
                   <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors flex items-center gap-2">
                     <span>{category.name}</span>
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 group-hover:bg-gray-200">
-                      {loading && counts[category.id] === undefined ? '...' : (counts[category.id] ?? 0)}
+                      {loading && countsByCategory[category.id] === undefined ? '...' : (countsByCategory[category.id] ?? 0)}
                     </span>
                   </h3>
                   <p className="text-sm text-gray-600">

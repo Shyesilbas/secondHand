@@ -18,13 +18,25 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'Not provided';
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      let d;
+      if (typeof dateString === 'number') {
+        d = new Date(dateString);
+      } else if (typeof dateString === 'string') {
+        const trimmed = dateString.trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+          d = new Date(trimmed);
+        } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
+          const [day, month, year] = trimmed.split('/').map(Number);
+          d = new Date(year, month - 1, day);
+        } else {
+          const ts = Date.parse(trimmed);
+          d = isNaN(ts) ? null : new Date(ts);
+        }
+      }
+      if (!d || isNaN(d.getTime())) return 'Not provided';
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     } catch {
-      return dateString;
+      return 'Not provided';
     }
   };
 

@@ -8,7 +8,7 @@ import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
 import { useCart } from '../../../cart/hooks/useCart.js';
-import { listingService } from '../../../listing/services/listingService.js';
+import { useListingStatistics } from '../../../listing/hooks/useListingStatistics.js';
 
 const icons = {
     myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -87,36 +87,13 @@ const Header = () => {
     });
     const { enums } = useEnums();
     const [allListingsOpen, setAllListingsOpen] = useState(false);
-    const [categoryCounts, setCategoryCounts] = useState({});
-    const [countsLoading, setCountsLoading] = useState(false);
+    const { countsByCategory, isLoading: countsLoading } = useListingStatistics();
 
-    useEffect(() => {
-        let isCancelled = false;
-        const fetchCounts = async () => {
-            if (!allListingsOpen) return;
-            if (!enums?.listingTypes || (Object.keys(categoryCounts).length > 0)) return;
-            try {
-                setCountsLoading(true);
-                const results = await Promise.all(
-                    (enums.listingTypes || []).map(async (t) => {
-                        try {
-                            const resp = await listingService.filterListings({ listingType: t.value, status: 'ACTIVE', page: 0, size: 1 });
-                            return [t.value, Number(resp?.totalElements || 0)];
-                        } catch (e) {
-                            return [t.value, 0];
-                        }
-                    })
-                );
-                if (!isCancelled) {
-                    setCategoryCounts(Object.fromEntries(results));
-                }
-            } finally {
-                if (!isCancelled) setCountsLoading(false);
-            }
-        };
-        fetchCounts();
-        return () => { isCancelled = true; };
-    }, [allListingsOpen, enums, categoryCounts]);
+    const getCategoryCount = (listingType) => {
+        if (!listingType) return 0;
+        const key = String(listingType).toUpperCase();
+        return countsByCategory[key] ?? 0;
+    };
 
     const handleChatClick = () => {
         setTotalUnread(0);
@@ -227,7 +204,7 @@ const Header = () => {
                                                         <span className="flex items-center justify-between w-full">
                                                             <span>{t.label}</span>
                                                             <span className="ml-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                                                {countsLoading && categoryCounts[t.value] === undefined ? '...' : (categoryCounts[t.value] ?? 0)}
+                                                                {countsLoading ? '...' : getCategoryCount(t.value)}
                                                             </span>
                                                         </span>
                                                     </DropdownItem>
