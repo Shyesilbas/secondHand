@@ -62,7 +62,7 @@ const MessageList = memo(({
   onDeleteMessage 
 }) => {
   return (
-    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 max-h-full">
+    <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 bg-gray-50 max-h-[calc(100vh-300px)]">
       {isLoadingMessages ? (
         <div className="flex justify-center items-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>

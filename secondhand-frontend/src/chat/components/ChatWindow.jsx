@@ -66,7 +66,7 @@ const ChatWindow = ({
 
     if (isEmbedded) {
         return (
-            <div className="h-full flex flex-col overflow-hidden">
+            <div className="h-full min-h-0 flex flex-col overflow-hidden">
                 <MessageList
                     messages={messages}
                     isLoadingMessages={isLoadingMessages}

@@ -107,7 +107,7 @@ const ChatPage = () => {
             {/* Chat Window - WhatsApp Style */}
             <div className="lg:col-span-8">
               {selectedChatRoom ? (
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden max-h-full">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden">
                     {/* Chat Header */}
                     <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                       <div className="flex items-center space-x-3">
