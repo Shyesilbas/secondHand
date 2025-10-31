@@ -244,9 +244,7 @@ public class ListingService {
         Listing listing = findById(listingId)
                 .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
-        listing.setStatus(ListingStatus.SOLD);
-        listingRepository.save(listing);
-        log.info("Listing marked as sold: {}", listingId);
+        log.info("markAsSold called for listing {}, but status change is disabled. Keeping status as {}.", listingId, listing.getStatus());
     }
     
     @Transactional

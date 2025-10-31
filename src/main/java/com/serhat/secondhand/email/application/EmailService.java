@@ -1,14 +1,19 @@
 package com.serhat.secondhand.email.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.email.mapper.EmailMapper;
+import com.serhat.secondhand.order.dto.OrderDto;
+import com.serhat.secondhand.order.dto.OrderItemDto;
+import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,12 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import com.serhat.secondhand.payment.dto.PaymentDto;
-import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.order.dto.OrderItemDto;
-import org.springframework.beans.factory.annotation.Value;
-import com.serhat.secondhand.email.config.EmailConfig;
 
 @Service
 @RequiredArgsConstructor
@@ -61,17 +60,6 @@ public class EmailService {
         return sendAndSaveEmail(user, subject, content, EmailType.NOTIFICATION);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public EmailDto sendPaymentVerificationEmail(User user, String code) {
-        log.info("Sending payment verification email to user: {} with code: {}", user.getEmail(), code);
-        String subject = emailConfig.getPaymentVerificationSubject();
-        String content = String.format(emailConfig.getPaymentVerificationContent(), user.getName(), code, verificationExpiryMinutes);
-        log.info("Payment verification email subject: {}", subject);
-        log.info("Payment verification email content: {}", content);
-        EmailDto result = sendAndSaveEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
-        log.info("Payment verification email sent successfully with ID: {}", result.id());
-        return result;
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public EmailDto sendPaymentVerificationEmail(User user, String code, String extraDetails) {

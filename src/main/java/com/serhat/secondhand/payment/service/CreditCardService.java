@@ -2,11 +2,11 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.CreditCardDto;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,8 @@ public class CreditCardService {
                 .cvv(CreditCardHelper.generateCvv())
                 .expiryMonth(CreditCardHelper.generateExpiryMonth())
                 .expiryYear(CreditCardHelper.generateExpiryYear())
-                .amount(BigDecimal.ZERO)                 .limit(creditCardRequest.limit())
+                .amount(BigDecimal.ZERO)
+                .limit(creditCardRequest.limit())
                 .createdAt(LocalDateTime.now())
                 .build();
 

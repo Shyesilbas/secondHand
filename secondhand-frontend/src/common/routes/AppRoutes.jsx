@@ -10,7 +10,6 @@ import HomePage from '../../user/HomePage.jsx';
 import LoginPage from '../../auth/LoginPage.jsx';
 import RegisterPage from '../../auth/RegisterPage.jsx';
 import ForgotPasswordPage from '../../auth/ForgotPasswordPage.jsx';
-import ResetPasswordPage from '../../auth/ResetPasswordPage.jsx';
 import ChangePasswordPage from '../../auth/ChangePasswordPage.jsx';
 import AccountVerificationPage from '../../auth/AccountVerificationPage.jsx';
 import DashboardPage from '../../user/DashboardPage.jsx';
@@ -39,7 +38,6 @@ import ShoppingCartPage from '../../cart/pages/ShoppingCartPage.jsx';
 import CheckoutPage from '../../cart/pages/CheckoutPage.jsx';
 import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
-import MyShowcasesPage from '../../showcase/pages/MyShowcasesPage.jsx';
 
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
@@ -120,14 +118,6 @@ const AppRoutes = () => {
                         </PublicRoute>
                     }
                 />
-                <Route
-                    path={ROUTES.RESET_PASSWORD}
-                    element={
-                        <PublicRoute>
-                            <ResetPasswordPage />
-                        </PublicRoute>
-                    }
-                />
             </Route>
 
             {/* Public Routes with Main Layout */}
@@ -169,7 +159,6 @@ const AppRoutes = () => {
                         <Route path={ROUTES.SECURITY} element={<SecurityPage />} />
                         <Route path={ROUTES.SHOPPING_CART} element={<ShoppingCartPage />} />
                         <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
-                        <Route path={ROUTES.MY_SHOWCASES} element={<MyShowcasesPage />} />
             </Route>
 
             {/* Fallback */}

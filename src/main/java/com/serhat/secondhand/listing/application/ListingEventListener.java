@@ -52,9 +52,7 @@ public class ListingEventListener {
 
         } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
             if (listing.getStatus() == ListingStatus.ACTIVE) {
-                listing.setStatus(ListingStatus.SOLD);
-                listingRepository.save(listing);
-                log.info("Listing {} marked as SOLD due to successful purchase payment.", listing.getId());
+                log.info("Purchase completed for listing {}. Status change disabled; keeping {}.", listing.getId(), listing.getStatus());
                 
                 // Transfer earnings to seller's e-wallet
                 if (payment.getToUser() != null) {
