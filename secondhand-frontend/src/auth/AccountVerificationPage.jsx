@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext.jsx';
-import { useNotification } from '../notification/NotificationContext.jsx';
-import { verificationService } from './services/verificationService.js';
-import { ROUTES } from '../common/constants/routes.js';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAuth} from './AuthContext.jsx';
+import {useNotification} from '../notification/NotificationContext.jsx';
+import {verificationService} from './services/verificationService.js';
+import {ROUTES} from '../common/constants/routes.js';
 import AuthInput from '../common/components/ui/AuthInput.jsx';
 import AuthButton from '../common/components/ui/AuthButton.jsx';
-import { SuccessIcon, WarningIcon } from '../common/Icons.jsx';
+import {SuccessIcon, WarningIcon} from '../common/Icons.jsx';
 
 const VerificationButton = ({ onClick, isLoading, disabled, children, type = 'button' }) => (
     <AuthButton type={type} onClick={onClick} isLoading={isLoading} disabled={disabled} className="w-full">
@@ -77,31 +77,24 @@ const AccountVerificationPage = () => {
 
     const handleVerifyCode = async (e) => {
         e.preventDefault();
-        console.log('handleVerifyCode called'); // Debug log
-        
+
         const code = verificationData.code.trim();
-        console.log('Verification code:', code); // Debug log
-        
+
         if (!code) {
-            console.log('No code entered');
             return setErrors({ code: 'Please enter the verification code' });
         }
         if (code.length !== 6) {
-            console.log('Code length invalid:', code.length);
             return setErrors({ code: 'Verification code must be 6 digits' });
         }
 
         setIsLoading(true);
         setErrors({});
         try {
-            console.log('Calling verificationService.verify...'); // Debug log
             await verificationService.verify({ code });
-            console.log('Verification successful'); // Debug log
             updateUser({ accountVerified: true });
             notification.showSuccess('Success', 'Your account has been verified.');
             setTimeout(() => navigate(ROUTES.PROFILE), 2000);
         } catch (error) {
-            console.error('Verification error:', error); // Debug log
             const msg = error.response?.data?.message;
             if (msg?.toLowerCase().includes('code') || msg?.toLowerCase().includes('invalid') || msg?.toLowerCase().includes('expired')) {
                 setErrors({ code: msg });

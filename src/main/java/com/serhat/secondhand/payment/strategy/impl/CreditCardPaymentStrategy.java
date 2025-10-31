@@ -27,7 +27,7 @@ public class CreditCardPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return amount.compareTo(BigDecimal.ZERO) > 0;
+        return creditCardService.findByUser(fromUser).isPresent();
     }
 
     @Override

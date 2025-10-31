@@ -91,7 +91,6 @@ public class BankService {
     }
 
 
-
     public Optional<Bank> findByUser(User user) {
         return bankRepository.findByAccountHolder(user);
     }

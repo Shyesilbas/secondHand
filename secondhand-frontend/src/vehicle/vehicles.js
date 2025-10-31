@@ -1,4 +1,4 @@
-import { ListingDTO } from '../listing/listings.js';
+import {ListingDTO} from '../listing/listings.js';
 
 
 export const VehicleCreateRequestDTO = {
@@ -59,32 +59,6 @@ export const VehicleListingDTO = {
   inspectionValidUntil: '',
   drivetrain: '',
   bodyType: '',
-};
-
-export const VehicleSearchFiltersDTO = {
-  listingType: 'VEHICLE',
-  status: 'ACTIVE',
-  city: '',
-  district: '',
-  minPrice: 0,
-  maxPrice: 0,
-  currency: 'TRY',
-  
-    brands: [],
-  minYear: 0,
-  maxYear: 0,
-  maxMileage: 0,
-  fuelTypes: [],
-  colors: [],
-  doors: '',
-  gearTypes: [],
-  seatCounts: [],
-  
-    sortBy: 'createdAt',
-  sortDirection: 'DESC',
-  
-    page: 0,
-  size: 20,
 };
 
 

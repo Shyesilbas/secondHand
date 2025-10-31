@@ -1,7 +1,8 @@
 package com.serhat.secondhand.ewallet.service;
 
-import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.service.AgreementService;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.entity.EWallet;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -256,14 +258,12 @@ public class EWalletService {
 
     private void validatePaymentAgreements(Object request) {
         boolean agreementsAccepted = false;
-        java.util.List<java.util.UUID> acceptedAgreementIds = null;
+        List<UUID> acceptedAgreementIds = null;
 
-        if (request instanceof DepositRequest) {
-            DepositRequest depositRequest = (DepositRequest) request;
+        if (request instanceof DepositRequest depositRequest) {
             agreementsAccepted = depositRequest.isAgreementsAccepted();
             acceptedAgreementIds = depositRequest.getAcceptedAgreementIds();
-        } else if (request instanceof WithdrawRequest) {
-            WithdrawRequest withdrawRequest = (WithdrawRequest) request;
+        } else if (request instanceof WithdrawRequest withdrawRequest) {
             agreementsAccepted = withdrawRequest.isAgreementsAccepted();
             acceptedAgreementIds = withdrawRequest.getAcceptedAgreementIds();
         }
@@ -279,7 +279,7 @@ public class EWalletService {
         }
 
         var requiredAgreementIds = requiredAgreements.stream()
-                .map(agreement -> agreement.getAgreementId())
+                .map(Agreement::getAgreementId)
                 .toList();
 
         if (!acceptedAgreementIds.containsAll(requiredAgreementIds)) {

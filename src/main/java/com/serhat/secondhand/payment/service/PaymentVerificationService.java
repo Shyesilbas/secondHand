@@ -54,7 +54,7 @@ public class PaymentVerificationService {
 
         switch (type) {
             case ITEM_PURCHASE -> {
-                details.append("Service: ITEM_PURCHASE\n");
+                details.append("Service: Item Purchase\n");
                 List<Cart> cartItems = cartRepository.findByUserWithListing(user);
                 BigDecimal total = cartItems.stream()
                         .map(c -> c.getListing().getPrice().multiply(BigDecimal.valueOf(c.getQuantity())))
@@ -71,7 +71,7 @@ public class PaymentVerificationService {
                 details.append("Total: ").append(total).append(" TRY\n");
             }
             case LISTING_CREATION -> {
-                details.append("Service: LISTING_CREATION\n");
+                details.append("Service: Listing Creation\n");
                 if (req != null && req.getListingId() != null) {
                     try {
                         listingService.findById(req.getListingId()).ifPresent(listing -> {
@@ -84,7 +84,7 @@ public class PaymentVerificationService {
                 details.append("Amount: ").append(fee).append(" TRY\n");
             }
             case SHOWCASE_PAYMENT -> {
-                details.append("Service: SHOWCASE_PAYMENT\n");
+                details.append("Service: Showcase Payment\n");
                 if (req != null && req.getListingId() != null) {
                     try {
                         listingService.findById(req.getListingId()).ifPresent(listing -> {
@@ -126,8 +126,7 @@ public class PaymentVerificationService {
         if (!valid) {
             throw new BusinessException(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
         }
-        // Verification code'u tek seferde kullanmak yerine, süresi dolana kadar geçerli tutuyoruz
-        // Böylece sepetteki birden fazla ürün için aynı verification code kullanılabilir
+
         log.info("Verification code validated successfully for user: {}", user.getEmail());
     }
 
