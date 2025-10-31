@@ -22,4 +22,11 @@ public class ListingStatisticsDto {
     
 
     private long activeCityCount;
+
+    private long vehicleCount;
+    private long electronicsCount;
+    private long realEstateCount;
+    private long clothingCount;
+    private long booksCount;
+    private long sportsCount;
 }

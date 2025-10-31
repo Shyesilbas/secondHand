@@ -16,7 +16,8 @@ public enum ElectronicType {
     SPEAKER("Speaker"),
     TV_STB("TV Set-Top Box"),
     VIDEO_PLAYER("Video Player"),
-    TABLET("Tablet");
+    TABLET("Tablet"),
+    CAMERA("Camera");
 
     private final String label;
 

@@ -317,12 +317,43 @@ public class ListingService {
         long activeListings = getTotalActiveListingCount();
         long activeSellerCount = getActiveSellerCount();
         long activeCityCount = getActiveCityCount();
+        long vehicleCount = 0;
+        long electronicsCount = 0;
+        long realEstateCount = 0;
+        long clothingCount = 0;
+        long booksCount = 0;
+        long sportsCount = 0;
+        try {
+            var rows = listingRepository.getActiveCountsByType(ListingStatus.ACTIVE);
+            for (Object[] row : rows) {
+                Object type = row[0];
+                long count = ((Number) row[1]).longValue();
+                if (type != null) {
+                    String key = type.toString();
+                    switch (key) {
+                        case "VEHICLE" -> vehicleCount = count;
+                        case "ELECTRONICS" -> electronicsCount = count;
+                        case "REAL_ESTATE" -> realEstateCount = count;
+                        case "CLOTHING" -> clothingCount = count;
+                        case "BOOKS" -> booksCount = count;
+                        case "SPORTS" -> sportsCount = count;
+                        default -> {}
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
         
         return ListingStatisticsDto.builder()
                 .totalListings(totalListings)
                 .activeListings(activeListings)
                 .activeSellerCount(activeSellerCount)
                 .activeCityCount(activeCityCount)
+                .vehicleCount(vehicleCount)
+                .electronicsCount(electronicsCount)
+                .realEstateCount(realEstateCount)
+                .clothingCount(clothingCount)
+                .booksCount(booksCount)
+                .sportsCount(sportsCount)
                 .build();
     }
 

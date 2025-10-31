@@ -52,4 +52,7 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     
         @Query("SELECT COUNT(DISTINCT l.city) FROM Listing l WHERE l.status = :status AND l.city IS NOT NULL")
     long getActiveCityCount(ListingStatus status);
+
+        @Query("SELECT l.listingType, COUNT(l) FROM Listing l WHERE l.status = :status GROUP BY l.listingType")
+    List<Object[]> getActiveCountsByType(ListingStatus status);
 }

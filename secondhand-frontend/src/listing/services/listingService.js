@@ -129,8 +129,8 @@ export const listingService = {
   deleteListing: async (id) => {
     return del(API_ENDPOINTS.LISTINGS.DELETE(id));
   },
-  getListingStatistics: async (listingType) => {
-    return get(API_ENDPOINTS.LISTINGS.STATISTICS(listingType));
+  getListingStatistics: async () => {
+    return get(API_ENDPOINTS.LISTINGS.STATISTICS);
   },
 
   filterListings: async (filters) => {
