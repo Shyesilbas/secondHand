@@ -42,6 +42,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     Page<Review> findByOrderItemListingIdOrderByCreatedAtDesc(@Param("listingId") UUID listingId, Pageable pageable);
 
         @Query("SELECT " +
+            "r.orderItem.listing.id, " +
             "COUNT(r), " +
             "AVG(CAST(r.rating AS double)), " +
             "SUM(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END), " +
@@ -50,8 +51,9 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
             "SUM(CASE WHEN r.rating = 2 THEN 1 ELSE 0 END), " +
             "SUM(CASE WHEN r.rating = 1 THEN 1 ELSE 0 END), " +
             "SUM(CASE WHEN r.rating = 0 THEN 1 ELSE 0 END) " +
-            "FROM Review r WHERE r.orderItem.listing.id = :listingId")
-    List<Object[]> getListingReviewStats(@Param("listingId") UUID listingId);
+            "FROM Review r WHERE r.orderItem.listing.id IN :listingIds " +
+            "GROUP BY r.orderItem.listing.id")
+    List<Object[]> getListingReviewStats(@Param("listingIds") List<UUID> listingIds);
 
         boolean existsByReviewerAndOrderItem(User reviewer, OrderItem orderItem);
 }

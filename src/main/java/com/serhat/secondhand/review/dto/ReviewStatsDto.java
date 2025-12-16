@@ -1,4 +1,4 @@
-package com.serhat.secondhand.reviews.dto;
+package com.serhat.secondhand.review.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,3 +21,4 @@ public class ReviewStatsDto {
         return new ReviewStatsDto(0L, 0.0, 0L, 0L, 0L, 0L, 0L, 0L);
     }
 }
+

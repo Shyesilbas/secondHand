@@ -6,7 +6,7 @@ import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.UserReviewStatsDto;
-import com.serhat.secondhand.reviews.dto.ReviewStatsDto;
+import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -94,6 +96,35 @@ public class ReviewService {
         return reviews.map(reviewMapper::toDto);
     }
 
+    private ReviewStatsDto mapToReviewStatsDto(Object[] stats, int startIndex) {
+        return new ReviewStatsDto(
+            (Long) stats[startIndex],      // totalReviews
+            stats[startIndex + 1] != null ? (Double) stats[startIndex + 1] : 0.0, // averageRating
+            (Long) stats[startIndex + 2],  // fiveStarReviews
+            (Long) stats[startIndex + 3],  // fourStarReviews
+            (Long) stats[startIndex + 4],  // threeStarReviews
+            (Long) stats[startIndex + 5],  // twoStarReviews
+            (Long) stats[startIndex + 6],  // oneStarReviews
+            (Long) stats[startIndex + 7]   // zeroStarReviews
+        );
+    }
+
+    private UserReviewStatsDto mapToUserReviewStatsDto(Long userId, String name, String surname, ReviewStatsDto stats) {
+        return UserReviewStatsDto.builder()
+                .userId(userId)
+                .userName(name)
+                .userSurname(surname)
+                .totalReviews(stats.getTotalReviews())
+                .averageRating(stats.getAverageRating())
+                .fiveStarReviews(stats.getFiveStarReviews())
+                .fourStarReviews(stats.getFourStarReviews())
+                .threeStarReviews(stats.getThreeStarReviews())
+                .twoStarReviews(stats.getTwoStarReviews())
+                .oneStarReviews(stats.getOneStarReviews())
+                .zeroStarReviews(stats.getZeroStarReviews())
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public UserReviewStatsDto getUserReviewStats(Long userId) {
         log.info("Getting review statistics for user: {}", userId);
@@ -101,38 +132,13 @@ public class ReviewService {
         User user = userService.findById(userId);
         List<Object[]> statsList = reviewRepository.getUserReviewStats(userId);
         
-        if (statsList == null || statsList.isEmpty()) {
-            return UserReviewStatsDto.builder()
-                    .userId(userId)
-                    .userName(user.getName())
-                    .userSurname(user.getSurname())
-                    .totalReviews(0L)
-                    .averageRating(0.0)
-                    .fiveStarReviews(0L)
-                    .fourStarReviews(0L)
-                    .threeStarReviews(0L)
-                    .twoStarReviews(0L)
-                    .oneStarReviews(0L)
-                    .zeroStarReviews(0L)
-                    .build();
-        }
+        ReviewStatsDto stats = (statsList == null || statsList.isEmpty()) 
+            ? ReviewStatsDto.empty() 
+            : mapToReviewStatsDto(statsList.get(0), 0);
 
-        Object[] stats = statsList.get(0);
-        
-        return UserReviewStatsDto.builder()
-                .userId(userId)
-                .userName(user.getName())
-                .userSurname(user.getSurname())
-                .totalReviews((Long) stats[0])
-                .averageRating(stats[1] != null ? (Double) stats[1] : 0.0)
-                .fiveStarReviews((Long) stats[2])
-                .fourStarReviews((Long) stats[3])
-                .threeStarReviews((Long) stats[4])
-                .twoStarReviews((Long) stats[5])
-                .oneStarReviews((Long) stats[6])
-                .zeroStarReviews((Long) stats[7])
-                .build();
+        return mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats);
     }
+
 
     @Transactional(readOnly = true)
     public List<ReviewDto> getReviewsForOrderItems(List<Long> orderItemIds) {
@@ -186,58 +192,35 @@ public class ReviewService {
             throw new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND");
         }
         
-                List<Object[]> statsList = reviewRepository.getListingReviewStats(uuid);
-        
-        if (statsList == null || statsList.isEmpty()) {
-            return UserReviewStatsDto.builder()
-                    .userId(listing.get().getSeller().getId())
-                    .userName(listing.get().getTitle())                     .userSurname("")                     .totalReviews(0L)
-                    .averageRating(0.0)
-                    .fiveStarReviews(0L)
-                    .fourStarReviews(0L)
-                    .threeStarReviews(0L)
-                    .twoStarReviews(0L)
-                    .oneStarReviews(0L)
-                    .zeroStarReviews(0L)
-                    .build();
-        }
+        // Use batch method for single item to reuse logic and query
+        Map<UUID, ReviewStatsDto> statsMap = getListingReviewStatsDto(List.of(uuid));
+        ReviewStatsDto stats = statsMap.getOrDefault(uuid, ReviewStatsDto.empty());
 
-        Object[] stats = statsList.get(0);
-        
-        return UserReviewStatsDto.builder()
-                .userId(listing.get().getSeller().getId())
-                .userName(listing.get().getTitle())                 .userSurname("")                 .totalReviews((Long) stats[0])
-                .averageRating(stats[1] != null ? (Double) stats[1] : 0.0)
-                .fiveStarReviews((Long) stats[2])
-                .fourStarReviews((Long) stats[3])
-                .threeStarReviews((Long) stats[4])
-                .twoStarReviews((Long) stats[5])
-                .oneStarReviews((Long) stats[6])
-                .zeroStarReviews((Long) stats[7])
-                .build();
+        return mapToUserReviewStatsDto(listing.get().getSeller().getId(), listing.get().getTitle(), "", stats);
     }
 
     @Transactional(readOnly = true)
-    public ReviewStatsDto getListingReviewStatsDto(UUID listingId) {
-        log.info("Getting review stats DTO for listing: {}", listingId);
-        
-        List<Object[]> statsList = reviewRepository.getListingReviewStats(listingId);
-        
-        if (statsList == null || statsList.isEmpty()) {
-            return ReviewStatsDto.empty();
+    public Map<UUID, ReviewStatsDto> getListingReviewStatsDto(List<UUID> listingIds) {
+        log.info("Getting review stats DTO for {} listings", listingIds.size());
+
+        if (listingIds == null || listingIds.isEmpty()) {
+            return new HashMap<>();
         }
 
-        Object[] stats = statsList.get(0);
-        
-        return new ReviewStatsDto(
-            (Long) stats[0],  // totalReviews
-            stats[1] != null ? (Double) stats[1] : 0.0,  // averageRating
-            (Long) stats[2],  // fiveStarReviews
-            (Long) stats[3],  // fourStarReviews
-            (Long) stats[4],  // threeStarReviews
-            (Long) stats[5],  // twoStarReviews
-            (Long) stats[6],  // oneStarReviews
-            (Long) stats[7]   // zeroStarReviews
-        );
+        List<Object[]> statsList = reviewRepository.getListingReviewStats(listingIds);
+        Map<UUID, ReviewStatsDto> statsMap = new HashMap<>();
+
+        // Initialize all with empty stats
+        for (UUID id : listingIds) {
+            statsMap.put(id, ReviewStatsDto.empty());
+        }
+
+        for (Object[] stats : statsList) {
+            UUID listingId = (UUID) stats[0];
+            ReviewStatsDto dto = mapToReviewStatsDto(stats, 1);
+            statsMap.put(listingId, dto);
+        }
+
+        return statsMap;
     }
 }
