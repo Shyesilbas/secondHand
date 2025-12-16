@@ -4,8 +4,12 @@ import ReviewCard from './ReviewCard.jsx';
 import { StarIcon } from '@heroicons/react/24/solid';
 
 const ListingReviewsSection = ({ listingId, listing }) => {
-  const { reviews, isLoading, error, hasReviews } = useListingReviews(listingId);
   const stats = listing?.reviewStats || null;
+  const shouldFetchReviews = !stats || stats.totalReviews > 0;
+  
+  const { reviews, isLoading, error, hasReviews } = useListingReviews(listingId, { 
+    enabled: shouldFetchReviews 
+  });
 
   if (isLoading) {
     return (

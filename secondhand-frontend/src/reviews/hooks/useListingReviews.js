@@ -6,7 +6,7 @@ const REVIEW_KEYS = {
   listing: (listingId) => [...REVIEW_KEYS.all, 'listing', listingId],
 };
 
-export const useListingReviews = (listingId) => {
+export const useListingReviews = (listingId, options = {}) => {
   const {
     data: reviewsResponse,
     isLoading,
@@ -18,7 +18,7 @@ export const useListingReviews = (listingId) => {
       console.log('📝 useListingReviews: Fetching reviews for listing', listingId);
       return reviewService.getReviewsForListing(listingId);
     },
-    enabled: !!listingId,
+    enabled: !!listingId && (options.enabled !== undefined ? options.enabled : true),
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,

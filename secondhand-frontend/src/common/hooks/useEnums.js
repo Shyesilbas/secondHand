@@ -58,13 +58,11 @@ export const useEnums = () => {
         
         const cachedEnums = getCachedEnums();
         if (cachedEnums) {
-          const auditEnumsMissing = !cachedEnums.auditEventTypes || !cachedEnums.auditEventStatuses ||
-            cachedEnums.auditEventTypes.length === 0 || cachedEnums.auditEventStatuses.length === 0;
           const processorsMissing = !cachedEnums.processors || cachedEnums.processors.length === 0;
           const vehicleNewEnumsMissing = !cachedEnums.drivetrains || cachedEnums.drivetrains.length === 0 ||
             !cachedEnums.bodyTypes || cachedEnums.bodyTypes.length === 0;
 
-          if (auditEnumsMissing || processorsMissing || vehicleNewEnumsMissing) {
+          if (processorsMissing || vehicleNewEnumsMissing) {
             forceClearEnumCache();
           } else {
             setEnums(cachedEnums);

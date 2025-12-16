@@ -33,8 +33,6 @@ const REQUIRED_ENUM_KEYS = [
   'shippingStatuses',
   'emailTypes',
     'genders',
-  'auditEventTypes',
-  'auditEventStatuses',
   'listingFeeConfig',
   'showcasePricingConfig',
 ];
