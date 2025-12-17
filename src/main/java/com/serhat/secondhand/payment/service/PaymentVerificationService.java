@@ -5,7 +5,7 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.payment.service.PaymentNotificationService;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -31,7 +31,7 @@ public class PaymentVerificationService {
     private final UserService userService;
     private final ListingService listingService;
     private final CartRepository cartRepository;
-    private final EmailService emailService;
+    private final PaymentNotificationService paymentNotificationService;
 
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
@@ -110,7 +110,7 @@ public class PaymentVerificationService {
 
         details.append("Date: ").append(java.time.LocalDateTime.now()).append('\n');
 
-        emailService.sendPaymentVerificationEmail(user, code, details.toString());
+        paymentNotificationService.sendPaymentVerificationNotification(user, code, details.toString());
 
     }
 
@@ -118,7 +118,7 @@ public class PaymentVerificationService {
         if (code == null || code.isBlank()) {
             String generatedCode = verificationService.generateCode();
             verificationService.generateVerification(user, generatedCode, CodeType.PAYMENT_VERIFICATION);
-            emailService.sendPaymentVerificationEmail(user, generatedCode, "Payment verification code generated.");
+            paymentNotificationService.sendPaymentVerificationNotification(user, generatedCode, "Payment verification code generated.");
             log.info("Payment verification code generated for user {}: {}", user.getEmail(), generatedCode);
             throw new BusinessException(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
         }

@@ -2,7 +2,9 @@ package com.serhat.secondhand.order.api;
 
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.order.service.OrderService;
+import com.serhat.secondhand.order.service.CheckoutService;
+import com.serhat.secondhand.order.service.OrderCancellationService;
+import com.serhat.secondhand.order.service.OrderQueryService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +27,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Order Management", description = "Order operations")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final CheckoutService checkoutService;
+    private final OrderQueryService orderQueryService;
+    private final OrderCancellationService orderCancellationService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -39,7 +43,7 @@ public class OrderController {
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to checkout for user: {}", currentUser.getEmail());
-        OrderDto order = orderService.checkout(currentUser, request);
+        OrderDto order = checkoutService.checkout(currentUser, request);
         return ResponseEntity.ok(order);
     }
 
@@ -53,7 +57,7 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
         log.info("API request to get orders for user: {}", currentUser.getEmail());
-        Page<OrderDto> orders = orderService.getUserOrders(currentUser, pageable);
+        Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser, pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -68,7 +72,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by ID: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderService.getOrderById(orderId, currentUser);
+        OrderDto order = orderQueryService.getOrderById(orderId, currentUser);
         return ResponseEntity.ok(order);
     }
 
@@ -83,7 +87,7 @@ public class OrderController {
             @PathVariable String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by order number: {} for user: {}", orderNumber, currentUser.getEmail());
-        OrderDto order = orderService.getOrderByOrderNumber(orderNumber, currentUser);
+        OrderDto order = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser);
         return ResponseEntity.ok(order);
     }
 
@@ -99,7 +103,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to cancel order: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderService.cancelOrder(orderId, currentUser);
+        OrderDto order = orderCancellationService.cancelOrder(orderId, currentUser);
         return ResponseEntity.ok(order);
     }
 }

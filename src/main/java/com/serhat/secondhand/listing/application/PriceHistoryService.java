@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.listing.domain.dto.PriceHistoryDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -26,7 +26,7 @@ public class PriceHistoryService {
 
     private final PriceHistoryRepository priceHistoryRepository;
     private final PriceHistoryMapper priceHistoryMapper;
-    private final EmailService emailService;
+    private final UserNotificationService userNotificationService;
     private final FavoriteRepository favoriteRepository;
 
     public List<PriceHistoryDto> getPriceHistoryByListingId(UUID listingId) {
@@ -76,7 +76,7 @@ public class PriceHistoryService {
             List<User> users = favoriteRepository.findUsersByListingId(listing.getId());
 
             for (User user : users) {
-                emailService.sendPriceChangeEmail(user,
+                userNotificationService.sendPriceChangeNotification(user,
                         listing.getTitle(),
                         oldPrice.toPlainString(),
                         newPrice.toPlainString());

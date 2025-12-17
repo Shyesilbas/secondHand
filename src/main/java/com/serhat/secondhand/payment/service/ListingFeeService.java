@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
+import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -26,12 +27,19 @@ public class ListingFeeService {
 
     private final UserService userService;
     private final ListingService listingService;
+    private final PaymentProcessor paymentProcessor;
 
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
 
     @Value("${app.listing.fee.tax}")
     private BigDecimal listingFeeTax;
+
+    @Transactional
+    public PaymentDto payListingCreationFee(ListingFeePaymentRequest request, Authentication authentication) {
+        PaymentRequest builtRequest = buildListingFeePaymentRequest(request, authentication);
+        return paymentProcessor.process(builtRequest, authentication);
+    }
 
     @Transactional(readOnly = true)
     public PaymentRequest buildListingFeePaymentRequest(ListingFeePaymentRequest request, Authentication authentication) {

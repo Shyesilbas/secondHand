@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class GenericPaymentService {
+public class PaymentProcessor {
 
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final PaymentRepository paymentRepository;
@@ -36,7 +36,7 @@ public class GenericPaymentService {
 
 
     @Transactional
-    public PaymentDto createPayment(PaymentRequest paymentRequest, Authentication authentication) {
+    public PaymentDto process(PaymentRequest paymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
@@ -97,4 +97,3 @@ public class GenericPaymentService {
         }
     }
 }
-

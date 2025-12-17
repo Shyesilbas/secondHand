@@ -17,13 +17,16 @@ import {
   Flag, 
   ArrowLeft,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  ShoppingBag
 } from 'lucide-react';
+import { useCart } from '../../cart/hooks/useCart.js';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
+  const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
   const [activeTab, setActiveTab] = useState('about');
 
   if (isLoading) return (
@@ -58,6 +61,7 @@ const ListingDetailPage = () => {
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
   const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
   const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
+  const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
 
   const tabs = [
     { id: 'about', label: 'About' },
@@ -77,6 +81,16 @@ const ListingDetailPage = () => {
           </nav>
           
           <div className="flex items-center gap-3">
+            {canAddToCart && (
+              <button 
+                onClick={() => addToCart(listing.id)}
+                disabled={isAddingToCart}
+                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Add to Cart"
+              >
+                <ShoppingBag className="w-5 h-5" />
+              </button>
+            )}
             {!isOwner && (
               <FavoriteButton 
                 listingId={listing.id} 

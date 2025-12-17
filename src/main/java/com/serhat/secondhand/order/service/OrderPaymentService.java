@@ -10,7 +10,8 @@ import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.PaymentOrchestrator;
+import com.serhat.secondhand.payment.service.PurchaseService;
+import com.serhat.secondhand.payment.service.PaymentVerificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrderPaymentService {
 
-    private final PaymentOrchestrator paymentOrchestrator;
+    private final PurchaseService purchaseService;
+    private final PaymentVerificationService paymentVerificationService;
     private final OrderRepository orderRepository;
 
     public PaymentProcessingResult processOrderPayments(User user, List<Cart> cartItems, 
@@ -41,8 +43,8 @@ public class OrderPaymentService {
 
         try {
             List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request);
-            paymentOrchestrator.validateOrGenerateVerification(user, request.getPaymentVerificationCode());
-            List<PaymentDto> paymentResults = paymentOrchestrator.processPayments(paymentRequests, getAuthentication());
+            paymentVerificationService.validateOrGenerateVerification(user, request.getPaymentVerificationCode());
+            List<PaymentDto> paymentResults = purchaseService.createPurchasePayments(paymentRequests, getAuthentication());
                         
             boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
             updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful, request.getPaymentType());

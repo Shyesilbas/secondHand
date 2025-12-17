@@ -2,7 +2,6 @@ package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
@@ -28,7 +27,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final UserNotificationService userNotificationService;
     private final UserMapper userMapper;
 
     public User getAuthenticatedUser(Authentication authentication) {
@@ -81,7 +80,7 @@ public class UserService {
         user.setPhoneNumber(requestedPhone);
         update(user);
         log.info("User phone number updated for user: {}, new phone number: {}", user.getEmail(), requestedPhone);
-        emailService.sendPhoneNumberUpdatedEmail(user);
+        userNotificationService.sendPhoneNumberUpdatedNotification(user);
         return "Phone number updated successfully.";
     }
 

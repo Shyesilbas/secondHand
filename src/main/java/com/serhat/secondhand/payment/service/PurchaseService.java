@@ -16,9 +16,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PurchasePaymentService {
+public class PurchaseService {
 
-    private final GenericPaymentService genericPaymentService;
+    private final PaymentProcessor paymentProcessor;
 
     @Transactional
     public List<PaymentDto> createPurchasePayments(List<PaymentRequest> requests, Authentication authentication) {
@@ -28,14 +28,26 @@ public class PurchasePaymentService {
 
         List<PaymentDto> results = new ArrayList<>();
         for (PaymentRequest request : requests) {
-            if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
-                throw new BusinessException(PaymentErrorCodes.INVALID_TXN_TYPE);
-            }
-            if (request.paymentDirection() != PaymentDirection.OUTGOING) {
-                throw new BusinessException(PaymentErrorCodes.INVALID_DIRECTION);
-            }
-            results.add(genericPaymentService.createPayment(request, authentication));
+            validatePurchaseRequest(request);
+            results.add(paymentProcessor.process(request, authentication));
         }
         return results;
+    }
+
+    @Transactional
+    public PaymentDto createPayment(PaymentRequest request, Authentication authentication) {
+        if (request.transactionType() == PaymentTransactionType.ITEM_PURCHASE) {
+            validatePurchaseRequest(request);
+        }
+        return paymentProcessor.process(request, authentication);
+    }
+
+    private void validatePurchaseRequest(PaymentRequest request) {
+        if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
+            throw new BusinessException(PaymentErrorCodes.INVALID_TXN_TYPE);
+        }
+        if (request.paymentDirection() != PaymentDirection.OUTGOING) {
+            throw new BusinessException(PaymentErrorCodes.INVALID_DIRECTION);
+        }
     }
 }

@@ -8,14 +8,19 @@ import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag } from 'lucide-react';
+import { useCart } from '../../cart/hooks/useCart.js';
 
 const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const [showInfo, setShowInfo] = useState(false);
     const { user } = useAuth();
     const { showcases } = useShowcase();
+    const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
 
     if (!listing) return null;
+
+    const isOwner = user?.id === listing.sellerId;
+    const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -72,6 +77,20 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 {/* Action Buttons Overlay (Top Right) */}
                 <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-x-2 group-hover:translate-x-0">
                     {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
+                    {canAddToCart && (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                addToCart(listing.id);
+                            }}
+                            disabled={isAddingToCart}
+                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-indigo-600 border-none h-8 w-8 rounded-full shadow-sm flex items-center justify-center transition-colors"
+                            title="Add to Cart"
+                        >
+                            <ShoppingBag className="w-4 h-4" />
+                        </button>
+                    )}
                     <FavoriteButton
                         listingId={listing.id}
                         listing={listing}

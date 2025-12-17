@@ -2,7 +2,7 @@ package com.serhat.secondhand.core.verification;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -25,7 +25,7 @@ import java.util.Optional;
 public class VerificationService implements IVerificationService {
 
     private final VerificationRepository verificationRepository;
-    private final EmailService emailService;
+    private final UserNotificationService userNotificationService;
     private final UserService userService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
@@ -109,7 +109,7 @@ public class VerificationService implements IVerificationService {
 
         String code = generateCode();
         generateVerification(user, code, CodeType.ACCOUNT_VERIFICATION);
-        emailService.sendVerificationCodeEmail(user, code);
+        userNotificationService.sendVerificationCodeNotification(user, code);
 
         log.info("Verification code sent to user with email: {}", user.getEmail());
     }
