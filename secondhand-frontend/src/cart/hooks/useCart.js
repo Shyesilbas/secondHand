@@ -20,7 +20,7 @@ export const useCart = (options = {}) => {
         queryFn: () => cartService.getCartItems(),
         enabled: !!user && loadCartItems,
         staleTime: 15 * 60 * 1000, // 15 minutes - cart doesn't change often
-        cacheTime: 60 * 60 * 1000, // 1 hour
+        gcTime: 60 * 60 * 1000, // 1 hour
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         refetchInterval: false,

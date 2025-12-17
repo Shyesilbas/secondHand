@@ -20,8 +20,11 @@ export const useShowcase = () => {
     } = useQuery({
         queryKey: SHOWCASE_KEYS.active(),
         queryFn: showcaseService.getActiveShowcases,
-        staleTime: 5 * 60 * 1000,         cacheTime: 10 * 60 * 1000,         refetchOnWindowFocus: false,
-        refetchOnMount: false,         onError: (err) => setError(err.message)
+        staleTime: 5 * 60 * 1000, 
+        gcTime: 10 * 60 * 1000, 
+        refetchOnWindowFocus: false,
+        refetchOnMount: false, 
+        onError: (err) => setError(err.message)
     });
 
         const createShowcaseMutation = useMutation({

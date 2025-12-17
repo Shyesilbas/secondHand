@@ -85,6 +85,105 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
     }
   };
 
+  const renderStep = (step) => {
+    switch (step) {
+      case 1:
+        return (
+          <ListingBasics 
+            formData={formData} 
+            errors={errors} 
+            onInputChange={handleInputChange} 
+            enums={enums} 
+            isEdit={isEdit} 
+          />
+        );
+
+      case 2:
+        return (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+              <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
+              <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => handleDropdownChange('electronicBrand', v)} />
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Model *</label>
+                <input type="text" name="model" value={formData.model} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.model ? 'border-red-500' : 'border-gray-200'}`} placeholder="e.g. MacBook Pro M1" />
+                {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Origin</label>
+                <input type="text" name="origin" value={formData.origin} onChange={handleInputChange} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" placeholder="e.g. Apple Store TR" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Year *</label>
+                <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear() + 1} className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.year ? 'border-red-500' : 'border-gray-200'}`} placeholder="YYYY" />
+                {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
+              </div>
+
+              <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
+              
+              {formData.electronicType === 'LAPTOP' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">RAM (GB) *</label>
+                    <input type="number" name="ram" value={formData.ram} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.ram ? 'border-red-500' : 'border-gray-200'}`} placeholder="8, 16, 32..." />
+                    {errors.ram && <p className="mt-1 text-sm text-red-600">{errors.ram}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Storage (GB) *</label>
+                    <input type="number" name="storage" value={formData.storage} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.storage ? 'border-red-500' : 'border-gray-200'}`} placeholder="256, 512, 1024..." />
+                    {errors.storage && <p className="mt-1 text-sm text-red-600">{errors.storage}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Screen Size (inch) *</label>
+                    <input type="number" name="screenSize" value={formData.screenSize} onChange={handleInputChange} min="1" step="0.1" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.screenSize ? 'border-red-500' : 'border-gray-200'}`} placeholder="13.3, 15.6..." />
+                    {errors.screenSize && <p className="mt-1 text-sm text-red-600">{errors.screenSize}</p>}
+                  </div>
+                  <EnumDropdown label="Processor" enumKey="processors" value={formData.processor} onChange={(v) => handleDropdownChange('processor', v)} />
+                </>
+              )}
+            </div>
+
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => handleInputChange({ target: { name: 'warrantyProof', checked: !formData.warrantyProof, type: 'checkbox' } })}>
+                <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                <div>
+                  <label htmlFor="warrantyProof" className="block text-sm font-medium text-gray-900 cursor-pointer">Warranty Proof Available</label>
+                  <p className="text-xs text-gray-500">Check this if you have the original warranty documents</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-8">
+            <ImageUpload
+              onImageUpload={handleImageUpload}
+              onImageRemove={handleImageRemove}
+              imageUrl={formData.imageUrl}
+              disabled={false}
+            />
+            <div className="border-t border-gray-100 pt-8">
+              <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+              {(!formData.city?.trim() || !formData.district?.trim()) && (
+                  <div className="mt-3 p-3 bg-amber-50 text-amber-700 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    City and district are required to publish
+                  </div>
+              )}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
       <ListingWizard
           title={isEdit ? 'Edit Electronics Listing' : 'Create Electronics Listing'}
@@ -97,107 +196,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
           onSubmit={handleSubmit}
           isLoading={isLoading}
           canSubmit={Boolean(formData.city?.trim() && formData.district?.trim())}
-          renderStep={(step) => (
-              <div className="space-y-6">
-                {step === 1 && (
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-xl">{steps[0].icon}</span>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900">{steps[0].title}</h3>
-                          <p className="text-sm text-slate-600">{steps[0].description}</p>
-                        </div>
-                      </div>
-                      <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
-                    </div>
-                )}
-
-                {step === 2 && (
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: steps[1].bgColor }}>
-                          <span className="text-xl">{steps[1].icon}</span>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900">{steps[1].title}</h3>
-                          <p className="text-sm text-slate-600">{steps[1].description}</p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 xl:grid-cols-4 gap-6">
-                        <EnumDropdown label="Type *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
-                        <EnumDropdown label="Brand *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => handleDropdownChange('electronicBrand', v)} />
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Model *</label>
-                          <input type="text" name="model" value={formData.model} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-lg ${errors.model ? 'border-red-500' : 'border-slate-200'}`} />
-                          {errors.model && <p className="mt-1 text-sm text-red-600">{errors.model}</p>}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Origin</label>
-                          <input type="text" name="origin" value={formData.origin} onChange={handleInputChange} className="w-full px-4 py-3 border rounded-lg border-slate-200" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Year *</label>
-                          <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1990" max={new Date().getFullYear() + 1} className={`w-full px-4 py-3 border rounded-lg ${errors.year ? 'border-red-500' : 'border-slate-200'}`} />
-                          {errors.year && <p className="mt-1 text-sm text-red-600">{errors.year}</p>}
-                        </div>
-                        <EnumDropdown label="Color *" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
-                        {formData.electronicType === 'LAPTOP' && (
-                          <>
-                            <div>
-                              <label className="block text-sm font-medium text-slate-700 mb-2">RAM (GB) *</label>
-                              <input type="number" name="ram" value={formData.ram} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-lg ${errors.ram ? 'border-red-500' : 'border-slate-200'}`} />
-                              {errors.ram && <p className="mt-1 text-sm text-red-600">{errors.ram}</p>}
-                            </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Storage (GB) *</label>
-                    <input type="number" name="storage" value={formData.storage} onChange={handleInputChange} min="1" className={`w-full px-4 py-3 border rounded-lg ${errors.storage ? 'border-red-500' : 'border-slate-200'}`} />
-                    {errors.storage && <p className="mt-1 text-sm text-red-600">{errors.storage}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Screen Size (inch) *</label>
-                    <input type="number" name="screenSize" value={formData.screenSize} onChange={handleInputChange} min="1" step="0.1" className={`w-full px-4 py-3 border rounded-lg ${errors.screenSize ? 'border-red-500' : 'border-slate-200'}`} />
-                    {errors.screenSize && <p className="mt-1 text-sm text-red-600">{errors.screenSize}</p>}
-                  </div>
-                  <EnumDropdown label="Processor" enumKey="processors" value={formData.processor} onChange={(v) => handleDropdownChange('processor', v)} />
-                          </>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <input id="warrantyProof" type="checkbox" name="warrantyProof" checked={Boolean(formData.warrantyProof)} onChange={handleInputChange} className="h-4 w-4 text-btn-primary border-slate-300 rounded" />
-                          <label htmlFor="warrantyProof" className="text-sm font-medium text-slate-700">Warranty Proof Available</label>
-                        </div>
-                      </div>
-                    </div>
-                )}
-
-                {step === 3 && (
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: steps[2].bgColor }}>
-                          <span className="text-xl">{steps[2].icon}</span>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900">{steps[2].title}</h3>
-                          <p className="text-sm text-slate-600">{steps[2].description}</p>
-                        </div>
-                      </div>
-                      <div className="space-y-6">
-                        <ImageUpload
-                          onImageUpload={handleImageUpload}
-                          onImageRemove={handleImageRemove}
-                          imageUrl={formData.imageUrl}
-                          disabled={false}
-                        />
-                        <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
-                      </div>
-                      {(!formData.city?.trim() || !formData.district?.trim()) && (
-                          <div className="mt-3 text-sm text-red-600">City and district are required</div>
-                      )}
-                    </div>
-                )}
-              </div>
-          )}
+          renderStep={renderStep}
       />
   );
 };

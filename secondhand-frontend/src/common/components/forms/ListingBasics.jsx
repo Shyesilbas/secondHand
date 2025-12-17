@@ -1,90 +1,121 @@
 import React from 'react';
 import { formatCurrency } from '../../formatters.js';
+import { Type, Tag, AlignLeft } from 'lucide-react';
 
 const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = false }) => {
   return (
-    <div className="bg-white border border-gray-200 rounded p-6 space-y-6">
+    <div className="space-y-8">
+      {/* Title Field */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Listing Topic *</label>
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={onInputChange}
-          className={`w-full px-4 py-2 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${errors.title ? 'border-red-500' : ''}`}
-          placeholder="Ex: Product or service title"
-        />
-        {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+        <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <Type className="w-4 h-4 text-indigo-500" />
+          Listing Title <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={onInputChange}
+            className={`w-full px-5 py-3 rounded-xl border ${errors.title ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100'} text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 transition-all shadow-sm`}
+            placeholder="e.g., iPhone 13 Pro - Excellent Condition"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium bg-gray-50 px-2 py-1 rounded">
+            {formData.title?.length || 0}/100
+          </div>
+        </div>
+        {errors.title ? (
+          <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+            <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+            {errors.title}
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-gray-500">Make it catchy! Good titles attract more buyers.</p>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Price Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Price *</label>
-          <div className="flex">
-            <div className="flex-1 relative">
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={onInputChange}
-                className={`w-full px-4 py-2 pr-12 border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${errors.price ? 'border-red-500' : ''}`}
-                placeholder="Enter price (e.g., 15000.00)"
-                step="0.01"
-                min="0"
-                disabled={false}
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <span className="text-gray-500 text-sm font-medium">
-                  {formData.currency === 'TRY' ? '₺' : 
-                   formData.currency === 'USD' ? '$' : 
-                   formData.currency === 'EUR' ? '€' : formData.currency}
-                </span>
-              </div>
-            </div>
-            <select
-              name="currency"
-              value={formData.currency}
+          <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <Tag className="w-4 h-4 text-indigo-500" />
+            Price <span className="text-red-500">*</span>
+          </label>
+          <div className="relative rounded-xl shadow-sm">
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
               onChange={onInputChange}
-              className="px-4 py-2 border border-l-0 border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-              disabled={false}
-            >
-              {enums.currencies?.map(currency => (
-                <option key={currency.value} value={currency.value}>
-                  {currency.symbol} {currency.label}
-                </option>
-              ))}
-            </select>
+              className={`block w-full px-5 py-3 pr-24 rounded-xl border ${errors.price ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100'} focus:outline-none focus:ring-4 transition-all`}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <select
+                name="currency"
+                value={formData.currency}
+                onChange={onInputChange}
+                className="h-full py-0 pl-3 pr-8 border-l border-gray-200 bg-gray-50 text-gray-600 text-sm font-medium rounded-r-xl focus:ring-indigo-500 focus:border-indigo-500 hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                {enums.currencies?.map(currency => (
+                  <option key={currency.value} value={currency.value}>
+                    {currency.symbol} {currency.value}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           {formData.price && !isNaN(parseFloat(formData.price)) && (
-            <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded">
-              <p className="text-sm text-gray-700">
-                <span className="font-medium">Formatted Price:</span> 
-                <span className="ml-2 font-semibold text-gray-900">
-                  {formatCurrency(parseFloat(formData.price), formData.currency)}
-                </span>
-              </p>
+            <div className="mt-2 text-sm text-gray-600 font-medium flex items-center gap-2 bg-indigo-50/50 p-2 rounded-lg border border-indigo-100/50 inline-block">
+              Price Preview: 
+              <span className="text-indigo-700">
+                {formatCurrency(parseFloat(formData.price), formData.currency)}
+              </span>
             </div>
           )}
-          {errors.price && <p className="mt-2 text-sm text-red-600">{errors.price}</p>}
+          {errors.price && (
+            <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+              <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+              {errors.price}
+            </p>
+          )}
         </div>
       </div>
 
+      {/* Description Field */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={onInputChange}
-          rows={5}
-          className={`w-full px-4 py-2 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 resize-none ${errors.description ? 'border-red-500' : ''}`}
-          placeholder="Ex: Provide detailed information about the product or service (condition, features, usage time, additional details)"
-        />
-        {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
-        <p className="mt-2 text-xs text-gray-500">A clear and detailed description helps attract potential buyers.</p>
+        <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+          <AlignLeft className="w-4 h-4 text-indigo-500" />
+          Description <span className="text-red-500">*</span>
+        </label>
+        <div className="relative">
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={onInputChange}
+            rows={6}
+            className={`w-full px-5 py-3 rounded-xl border ${errors.description ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100'} text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 transition-all resize-none shadow-sm`}
+            placeholder="Describe your item in detail. Include condition, features, usage history, and any flaws..."
+          />
+          <div className="absolute bottom-3 right-3 text-xs text-gray-400 font-medium bg-white/80 px-2 py-1 rounded backdrop-blur-sm border border-gray-100">
+            {formData.description?.length || 0} chars
+          </div>
+        </div>
+        {errors.description ? (
+          <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+            <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+            {errors.description}
+          </p>
+        ) : (
+          <p className="mt-2 text-xs text-gray-500">
+            Be honest and detailed. Listings with detailed descriptions sell 2x faster.
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
 export default ListingBasics;
-

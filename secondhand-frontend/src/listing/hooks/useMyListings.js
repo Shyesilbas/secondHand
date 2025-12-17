@@ -1,25 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { listingService } from '../services/listingService';
-import useApi from '../../common/hooks/useApi.js';
 
 export const useMyListings = (statusFilter = null, initialPage = 0, initialSize = 10) => {
     const [page, setPage] = useState(initialPage);
     const [size, setSize] = useState(initialSize);
-    const { data: paginatedData, isLoading, error, callApi } = useApi({
-        content: [],
-        totalPages: 0,
-        totalElements: 0,
-        number: 0,
-        size: initialSize
+
+    const { 
+        data: paginatedData, 
+        isLoading, 
+        error, 
+        refetch 
+    } = useQuery({
+        queryKey: ['myListings', page, size],
+        queryFn: () => listingService.getMyListings(page, size),
+        placeholderData: keepPreviousData,
+        staleTime: 1000 * 60, // 1 minute
     });
-
-    const fetchListings = async (pageNum = page, pageSize = size) => {
-        await callApi(() => listingService.getMyListings(pageNum, pageSize));
-    };
-
-    useEffect(() => {
-        fetchListings();
-    }, [page, size]);
 
     const filteredListings = useMemo(() => {
         if (!paginatedData?.content) return [];
@@ -35,8 +32,6 @@ export const useMyListings = (statusFilter = null, initialPage = 0, initialSize 
         setSize(newSize);
         setPage(0); // Reset to first page when size changes
     };
-
-    const refetch = () => fetchListings();
 
     return {
         listings: filteredListings,

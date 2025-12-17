@@ -22,7 +22,7 @@ export const useTotalUnreadCount = (options = {}) => {
         queryFn: () => chatService.getTotalUnreadMessageCount(),
         enabled: !!(isAuthenticated && user?.id && (options.enabled ?? true)),
         staleTime: 10 * 60 * 1000,
-        cacheTime: 30 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
         refetchInterval: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false,

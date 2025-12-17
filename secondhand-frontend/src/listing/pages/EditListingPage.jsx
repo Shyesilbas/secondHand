@@ -12,210 +12,186 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { LISTING_TYPES } from '../types/index.js';
+import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
+
+// --- Service Configuration Strategy ---
+const SERVICE_STRATEGIES = {
+    [LISTING_TYPES.ELECTRONICS]: {
+        service: electronicService,
+        serviceMethod: 'getElectronicById',
+        updateMethod: 'updateElectronicListing'
+    },
+    [LISTING_TYPES.VEHICLE]: {
+        service: vehicleService,
+        serviceMethod: 'getVehicleById',
+        updateMethod: 'updateVehicleListing'
+    },
+    [LISTING_TYPES.REAL_ESTATE]: {
+        service: realEstateService,
+        serviceMethod: 'getRealEstateById',
+        updateMethod: 'updateRealEstateListing'
+    },
+    [LISTING_TYPES.CLOTHING]: {
+        service: clothingService,
+        serviceMethod: 'getClothingDetails',
+        updateMethod: 'updateClothingListing'
+    },
+    [LISTING_TYPES.BOOKS]: {
+        service: booksService,
+        serviceMethod: 'getBooksDetails',
+        updateMethod: 'updateBooksListing'
+    },
+    [LISTING_TYPES.SPORTS]: {
+        service: sportsService,
+        serviceMethod: 'getSportsDetails',
+        updateMethod: 'updateSportsListing'
+    }
+};
+
+const DEFAULT_SERVICE_STRATEGY = {
+    service: listingService,
+    serviceMethod: 'getListingById',
+    updateMethod: 'updateListing'
+};
+
+// --- Components ---
 
 const PageLoader = () => (
-    <div className="min-h-screen bg-app-bg py-8">
-        <div className="max-w-2xl mx-auto p-6 animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="bg-white rounded-lg shadow-sm border p-6 grid gap-4">
-                {[...Array(6)].map((_, i) => <div key={i} className="h-4 bg-gray-200 rounded"></div>)}
-            </div>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+        <h3 className="text-lg font-medium text-gray-900">Loading listing details...</h3>
     </div>
 );
 
-const PageError = ({ error, entityNameCapitalized, onBack }) => (
-    <div className="min-h-screen bg-app-bg py-8">
-        <div className="max-w-2xl mx-auto p-6 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+const PageError = ({ error, onBack }) => (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-medium text-text-primary mb-2">{entityNameCapitalized} not found</h3>
-            <p className="text-text-secondary mb-4">{error}</p>
-            <button onClick={onBack} className="bg-btn-primary text-white px-4 py-2 rounded-md hover:bg-btn-primary-hover transition-colors">Go Back</button>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
+            <p className="text-gray-600 mb-8">{error}</p>
+            <button 
+                onClick={onBack}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium w-full justify-center"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Go Back to Listings
+            </button>
         </div>
     </div>
 );
-
-const BackButton = ({ navigate }) => (
-    <button
-        onClick={() => navigate(-1)}
-        className="flex items-center text-text-secondary hover:text-text-primary transition-colors mb-4"
-    >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Go Back
-    </button>
-);
-
-const useFetchData = (fetchFunc) => {
-    const [data, setData] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchData = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const res = await fetchFunc();
-            setData(res);
-        } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred.');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [fetchFunc]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    return { data, setData, isLoading, error, refetch: fetchData };
-};
-
-const renderEditForm = (listing, type, handleUpdate) => {
-    const listingType = type || listing.type;
-    const cfg = listingTypeRegistry[listingType];
-    if (!cfg?.editComponent) {
-        return (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                <p className="text-red-800">Edit form not available for listing type: {listingType}</p>
-            </div>
-        );
-    }
-    const EditForm = cfg.editComponent;
-    return <EditForm initialData={listing} isEdit onUpdate={handleUpdate} />;
-};
-
-const useOwnershipRedirect = (listing, isOwner, notification, navigate) => {
-    const redirectedRef = useRef(false);
-
-    useEffect(() => {
-        if (listing && !isOwner && !redirectedRef.current) {
-            redirectedRef.current = true;
-            notification.showError('Error', 'You are not authorized to edit this listing');
-            navigate(ROUTES.MY_LISTINGS, { replace: true });
-        }
-    }, [listing, isOwner, navigate, notification]);
-};
-
-const getServiceConfig = (listingType) => {
-    switch (listingType) {
-        case LISTING_TYPES.ELECTRONICS:
-            return {
-                service: electronicService,
-                serviceMethod: 'getElectronicById',
-                updateMethod: 'updateElectronicListing'
-            };
-        case LISTING_TYPES.VEHICLE:
-            return {
-                service: vehicleService,
-                serviceMethod: 'getVehicleById',
-                updateMethod: 'updateVehicleListing'
-            };
-        case LISTING_TYPES.REAL_ESTATE:
-            return {
-                service: realEstateService,
-                serviceMethod: 'getRealEstateById',
-                updateMethod: 'updateRealEstateListing'
-            };
-        case LISTING_TYPES.CLOTHING:
-            return {
-                service: clothingService,
-                serviceMethod: 'getClothingDetails',
-                updateMethod: 'updateClothingListing'
-            };
-        case LISTING_TYPES.BOOKS:
-            return {
-                service: booksService,
-                serviceMethod: 'getBooksDetails',
-                updateMethod: 'updateBooksListing'
-            };
-        case LISTING_TYPES.SPORTS:
-            return {
-                service: sportsService,
-                serviceMethod: 'getSportsDetails',
-                updateMethod: 'updateSportsListing'
-            };
-        default:
-            return {
-                service: listingService,
-                serviceMethod: 'getListingById',
-                updateMethod: 'updateListing'
-            };
-    }
-};
 
 const EditListingPage = ({
-                             service = null,
-                             serviceMethod = null,
-                             updateMethod = null,
-                             type = null,
-                             entityName = 'listing',
-                             entityNameCapitalized = 'Listing'
-                         }) => {
+    service = null,
+    serviceMethod = null,
+    updateMethod = null,
+    type = null,
+    entityName = 'listing',
+    entityNameCapitalized = 'Listing'
+}) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuth();
     const notification = useNotification();
 
-        const fetchFunc = useMemo(() => {
-        return () => listingService.getListingById(id);
-    }, [id]);
+    // 1. Fetch Logic
+    const [data, setData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const { data: listing, setData: setListing, isLoading, error } = useFetchData(fetchFunc);
-
-        const serviceConfig = useMemo(() => {
-        if (listing?.type) {
-            console.log('EditListingPage: Listing type detected:', listing.type);
-            const config = getServiceConfig(listing.type);
-            console.log('EditListingPage: Service config:', config);
-            return config;
-        }
-                console.log('EditListingPage: Using fallback service config');
-        return {
-            service: service || listingService,
-            serviceMethod: serviceMethod || 'getListingById',
-            updateMethod: updateMethod || 'updateListing'
-        };
-    }, [listing?.type, service, serviceMethod, updateMethod]);
-
-    const handleUpdate = async (updatedData) => {
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
         try {
-            console.log('EditListingPage: Updating listing with:', {
-                id,
-                service: serviceConfig.service,
-                updateMethod: serviceConfig.updateMethod,
-                updatedData
-            });
-            await serviceConfig.service[serviceConfig.updateMethod](id, updatedData);
-            notification.showSuccess('Success', `${entityNameCapitalized} updated successfully`);
+            // First generic fetch to get the type if not provided
+            let initialData = null;
+            if (!type) {
+                initialData = await listingService.getListingById(id);
+            }
+
+            const currentType = type || initialData?.type;
+            const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
+
+            // If we have a specific service provided via props, use that
+            const activeService = service || strategy.service;
+            const activeMethod = serviceMethod || strategy.serviceMethod;
+
+            // Fetch full details using the specific service
+            // If initialData was already fetched and it's the generic one, we might need the specific one now
+            // But usually getListingById returns enough. However, specific endpoints might return more details.
+            // Let's rely on the strategy.
+            const fullData = await activeService[activeMethod](id);
+            setData(fullData);
+            
+        } catch (err) {
+            console.error('Failed to fetch listing:', err);
+            setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [id, type, service, serviceMethod]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // 2. Authorization Check
+    useEffect(() => {
+        if (!isLoading && data && isAuthenticated) {
+             const isOwner = user?.id === data?.sellerId;
+             if (!isOwner) {
+                 notification.showError('Access Denied', 'You can only edit your own listings.');
+                 navigate(ROUTES.MY_LISTINGS, { replace: true });
+             }
+        }
+    }, [isLoading, data, isAuthenticated, user, navigate, notification]);
+
+    // 3. Update Handler
+    const handleUpdate = async (updatedFields) => {
+        try {
+            const currentType = type || data?.type;
+            const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
+            
+            const activeService = service || strategy.service;
+            const activeUpdateMethod = updateMethod || strategy.updateMethod;
+
+            console.log('Updating listing:', { id, method: activeUpdateMethod, fields: updatedFields });
+            
+            await activeService[activeUpdateMethod](id, updatedFields);
+            
+            notification.showSuccess('Success', 'Listing updated successfully');
             navigate(ROUTES.MY_LISTINGS);
         } catch (err) {
-            console.error('EditListingPage: Update failed:', err);
-            notification.showError('Error', `Failed to update ${entityName}: ${err.response?.data?.message || err.message}`);
-            throw err;
+            console.error('Update failed:', err);
+            notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
+            throw err; // Propagate to form for internal error handling if needed
         }
     };
 
-    const isOwner = isAuthenticated && user?.id === listing?.sellerId;
-    useOwnershipRedirect(listing, isOwner, notification, navigate);
-
     if (isLoading) return <PageLoader />;
-    if (error) return <PageError error={error} entityNameCapitalized={entityNameCapitalized} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
-    if (!listing) return null;
+    if (error) return <PageError error={error} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+    if (!data) return <PageError error="Listing not found" onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+
+    // 4. Render Form
+    // We render the specific form component directly without a wrapping container
+    // The form component (e.g. VehicleCreateForm) handles its own layout via ListingWizard
+    
+    const listingType = type || data.type;
+    const config = listingTypeRegistry[listingType];
+    const EditComponent = config?.editComponent;
+
+    if (!EditComponent) {
+        return <PageError error={`No editor available for listing type: ${listingType}`} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+    }
 
     return (
-        <div className="min-h-screen bg-app-bg py-8">
-            <div className="max-w-2xl mx-auto p-6">
-                <BackButton navigate={navigate} />
-                <h1 className="text-3xl font-bold text-text-primary mb-2">Edit {entityNameCapitalized}</h1>
-                <p className="text-text-secondary mb-8">Update your listing details</p>
-                {renderEditForm(listing, type, handleUpdate)}
-            </div>
-        </div>
+        <EditComponent 
+            initialData={data} 
+            isEdit={true} 
+            onUpdate={handleUpdate} 
+            onBack={() => navigate(-1)}
+        />
     );
 };
 

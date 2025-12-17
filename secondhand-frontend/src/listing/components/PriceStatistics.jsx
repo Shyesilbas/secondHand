@@ -1,5 +1,19 @@
 import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
+import { TrendingUp, TrendingDown, Minus, DollarSign, Clock } from 'lucide-react';
+
+const StatCard = ({ title, value, subtext, icon: Icon, trend }) => (
+  <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm flex items-start justify-between">
+    <div>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{title}</p>
+      <p className="text-xl font-bold text-gray-900 tracking-tight">{value}</p>
+      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+    </div>
+    <div className={`p-2 rounded-lg ${trend === 'up' ? 'bg-red-50 text-red-600' : trend === 'down' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-500'}`}>
+      <Icon className="w-5 h-5" />
+    </div>
+  </div>
+);
 
 const PriceStatistics = ({ priceHistory, currency }) => {
   if (!priceHistory || priceHistory.length === 0) return null;
@@ -10,47 +24,32 @@ const PriceStatistics = ({ priceHistory, currency }) => {
   const currentVal = latest.newPrice;
   const currencyCode = latest.currency || currency;
   const diff = (base != null && currentVal != null) ? (currentVal - base) : null;
-  const pct = (base && diff != null) ? (diff / base) * 100 : null;
+  const pct = (base && diff != null) ? (diff / base) * 100 : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <div className="text-sm font-medium text-blue-800 mb-1">Current Price</div>
-        <div className="text-lg font-semibold text-blue-900">
-          {formatCurrency(currentVal, currencyCode)}
-        </div>
-      </div>
+      <StatCard
+        title="Current Price"
+        value={formatCurrency(currentVal, currencyCode)}
+        icon={DollarSign}
+        trend={null}
+      />
       
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-        <div className="text-sm font-medium text-gray-800 mb-1">Initial Price</div>
-        <div className="text-lg font-semibold text-gray-900">
-          {formatCurrency(base, currencyCode)}
-        </div>
-      </div>
+      <StatCard
+        title="Initial Price"
+        value={formatCurrency(base, currencyCode)}
+        subtext="Starting point"
+        icon={Clock}
+        trend={null}
+      />
       
-      <div className={`border rounded-lg p-3 ${
-        pct > 0 
-          ? 'bg-red-50 border-red-200' 
-          : pct < 0
-          ? 'bg-green-50 border-green-200'
-          : 'bg-gray-50 border-gray-200'
-      }`}>
-        <div className={`text-sm font-medium mb-1 ${
-          pct > 0 ? 'text-red-800' : pct < 0 ? 'text-green-800' : 'text-gray-800'
-        }`}>
-          Total Change
-        </div>
-        <div className={`text-lg font-semibold ${
-          pct > 0 ? 'text-red-900' : pct < 0 ? 'text-green-900' : 'text-gray-900'
-        }`}>
-          {pct != null ? `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%` : '—'}
-          {diff != null && (
-            <div className="text-sm">
-              ({diff > 0 ? '+' : ''}{formatCurrency(Math.abs(diff), currencyCode)})
-            </div>
-          )}
-        </div>
-      </div>
+      <StatCard
+        title="Total Change"
+        value={`${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`}
+        subtext={diff != null ? `${diff > 0 ? '+' : ''}${formatCurrency(Math.abs(diff), currencyCode)}` : null}
+        icon={pct > 0 ? TrendingUp : pct < 0 ? TrendingDown : Minus}
+        trend={pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral'}
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import ProfilePersonalInfo from './components/ProfilePersonalInfo.jsx';
 import ProfileAccountStatus from './components/ProfileAccountStatus.jsx';
 import ProfileQuickActions from './components/ProfileQuickActions.jsx';
 import AddressList from './components/AddressList.jsx';
+import { useQueryClient } from '@tanstack/react-query';
 
 const TABS = [
     { 
@@ -39,9 +40,18 @@ const ProfilePage = () => {
     const { user } = useAuth();
     const { updatePhone } = usePhoneUpdate();
     const [activeTab, setActiveTab] = useState('personal');
+    const queryClient = useQueryClient();
 
     const handlePhoneUpdate = async (phoneFormData) => {
         return await updatePhone(phoneFormData);
+    };
+
+    const handleTabChange = (key) => {
+        setActiveTab(key);
+        // Invalidate or prefetch queries if needed when switching tabs
+        if (key === 'addresses') {
+            queryClient.invalidateQueries(['addresses']);
+        }
     };
 
     return (
@@ -69,7 +79,7 @@ const ProfilePage = () => {
                                     return (
                                         <button
                                             key={tab.key}
-                                            onClick={() => setActiveTab(tab.key)}
+                                            onClick={() => handleTabChange(tab.key)}
                                             className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
                                                 isActive
                                                     ? 'border-gray-900 bg-gray-900 text-white'
@@ -155,7 +165,7 @@ const ProfilePage = () => {
                                 </div>
                             </div>
                             <div className="p-6">
-                                <AddressList />
+                                <AddressList isActive={activeTab === 'addresses'} />
                             </div>
                         </div>
                     )}

@@ -4,6 +4,7 @@ import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import PriceHistoryTab from './PriceHistoryTab.jsx';
 import ExchangeRatesTab from './ExchangeRatesTab.jsx';
+import { X, TrendingUp, RefreshCw, DollarSign } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,71 +42,92 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded border border-gray-200 p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all scale-100"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">Listing Info</h3>
-          <button
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            onClick={onClose}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="mb-5">
-          <h4 className="text-lg font-medium text-gray-700 truncate">{listingTitle}</h4>
-          <div className="text-sm text-gray-600 mt-1">{formatCurrency(price, currency)} {currency}</div>
-        </div>
-
-        <div className="mb-6">
-          <div className="inline-flex rounded border border-gray-200 overflow-hidden bg-gray-50">
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`${activeTab === 'history' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm transition-colors`}
-            >
-              Price History
-            </button>
-            <button
-              onClick={() => setActiveTab('exchange')}
-              className={`${activeTab === 'exchange' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700'} px-3 py-1.5 text-sm transition-colors`}
-            >
-              Exchange Rates
-            </button>
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 leading-tight truncate max-w-md">
+                Market Insights
+              </h3>
+              <p className="text-sm text-gray-500 truncate max-w-md">{listingTitle}</p>
+            </div>
           </div>
+          <button
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
+            onClick={onClose}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {activeTab === 'history' && (
-          <PriceHistoryTab
-            priceHistory={priceHistory}
-            loading={historyLoading}
-            error={historyError}
-            currency={currency}
-          />
-        )}
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-sm font-medium text-gray-500 mb-1">Current Price</p>
+              <p className="text-3xl font-bold text-gray-900 tracking-tight">
+                {formatCurrency(price, currency)}
+              </p>
+            </div>
+            
+            <div className="bg-white p-1 rounded-xl border border-gray-200 shadow-sm inline-flex">
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                  ${activeTab === 'history' 
+                    ? 'bg-indigo-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }
+                `}
+              >
+                <TrendingUp className="w-4 h-4" />
+                Price History
+              </button>
+              <button
+                onClick={() => setActiveTab('exchange')}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                  ${activeTab === 'exchange' 
+                    ? 'bg-indigo-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }
+                `}
+              >
+                <RefreshCw className="w-4 h-4" />
+                Currency Converter
+              </button>
+            </div>
+          </div>
 
-        {activeTab === 'exchange' && (
-          <ExchangeRatesTab
-            price={price}
-            currency={currency}
-            listingId={listingId}
-          />
-        )}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 min-h-[400px]">
+            {activeTab === 'history' && (
+              <PriceHistoryTab
+                priceHistory={priceHistory}
+                loading={historyLoading}
+                error={historyError}
+                currency={currency}
+              />
+            )}
 
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <button
-            onClick={onClose}
-            className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
-          >
-            Close
-          </button>
+            {activeTab === 'exchange' && (
+              <ExchangeRatesTab
+                price={price}
+                currency={currency}
+                listingId={listingId}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -115,5 +137,3 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
 };
 
 export default ListingInfoModal;
-
-
