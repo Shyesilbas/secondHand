@@ -4,8 +4,10 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
 
-const AddressList = memo(() => {
-  const { addresses, loading, error, addAddress, updateAddress, selectMainAddress, deleteAddress } = useAddresses();
+const AddressList = memo(({ isActive }) => {
+  const { addresses, loading, error, addAddress, updateAddress, selectMainAddress, deleteAddress } = useAddresses({
+    enabled: isActive
+  });
   const { showSuccess, showError, showConfirmation } = useNotification();
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [showUpdateAddress, setShowUpdateAddress] = useState(false);

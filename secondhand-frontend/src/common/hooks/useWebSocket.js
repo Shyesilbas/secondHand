@@ -12,19 +12,27 @@ const useWebSocket = (userId) => {
     // ==================== CONNECTION MANAGEMENT ====================
     
     const connect = useCallback(() => {
+        // Prevent multiple connection attempts
+        if (stompClient.current?.connected) {
+            console.log('WebSocket already connected');
+            return;
+        }
+
         console.log('Attempting to connect to WebSocket...');
         const socket = new WebSocket('ws://localhost:8080/ws');
         stompClient.current = Stomp.over(socket);
         
+        // Disable debug logs to reduce console noise
+        stompClient.current.debug = () => {};
+        
         stompClient.current.connect(
             {},
             (frame) => {
-                console.log('✅ Connected to WebSocket:', frame);
+                console.log('✅ Connected to WebSocket');
                 setIsConnected(true);
                 
                 // Kullanıcıya özel mesajları dinle
                 if (userId) {
-                    console.log('Subscribing to user messages for userId:', userId);
                     subscribeToUserMessages(userId);
                 }
             },
@@ -41,11 +49,17 @@ const useWebSocket = (userId) => {
         if (stompClient.current) {
             // Tüm subscription'ları temizle
             subscriptions.current.forEach((subscription) => {
-                subscription.unsubscribe();
+                try {
+                    subscription.unsubscribe();
+                } catch (e) {
+                    console.warn('Error unsubscribing:', e);
+                }
             });
             subscriptions.current.clear();
             
-            stompClient.current.disconnect();
+            if (stompClient.current.connected) {
+                stompClient.current.disconnect();
+            }
             setIsConnected(false);
         }
     }, []);

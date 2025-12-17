@@ -47,36 +47,19 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
     switch (step) {
       case 1:
         return (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl">{vehicleFormConfig.steps[0].icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{vehicleFormConfig.steps[0].title}</h3>
-                    <p className="text-sm text-slate-600">{vehicleFormConfig.steps[0].description}</p>
-                  </div>
-                </div>
-                <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} />
-              </div>
-            </div>
+            <ListingBasics 
+              formData={formData} 
+              errors={errors} 
+              onInputChange={handleInputChange} 
+              enums={enums} 
+              isEdit={isEdit} 
+            />
         );
 
       case 2:
         return (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl">{vehicleFormConfig.steps[1].icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{vehicleFormConfig.steps[1].title}</h3>
-                    <p className="text-sm text-slate-600">{vehicleFormConfig.steps[1].description}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                   <EnumDropdown label="Brand *" enumKey="carBrands" value={formData.brand} onChange={(v) => handleDropdownChange('brand', v)} />
                   <EnumDropdown label="Fuel Type *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => handleDropdownChange('fuelType', v)} />
                   <EnumDropdown label="Color" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
@@ -85,73 +68,89 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <EnumDropdown label="Seat Count" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => handleDropdownChange('seatCount', v)} />
                   <EnumDropdown label="Drivetrain" enumKey="drivetrains" value={formData.drivetrain} onChange={(v) => handleDropdownChange('drivetrain', v)} />
                   <EnumDropdown label="Body Type" enumKey="bodyTypes" value={formData.bodyType} onChange={(v) => handleDropdownChange('bodyType', v)} />
-                  <input type="text" name="model" value={formData.model} onChange={handleInputChange} placeholder="Model *" className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.model ? 'border-red-500' : 'border-slate-200'}`} />
-                  <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1950" max={new Date().getFullYear() + 1} placeholder="Year *" className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.year ? 'border-red-500' : 'border-slate-200'}`} />
-                  <input type="number" name="mileage" value={formData.mileage} onChange={handleInputChange} placeholder="Mileage" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="engineCapacity" value={formData.engineCapacity} onChange={handleInputChange} placeholder="Engine Capacity (cc)" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="horsePower" value={formData.horsePower} onChange={handleInputChange} placeholder="Horsepower" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="wheels" value={formData.wheels} onChange={handleInputChange} placeholder="Wheel Size (inch)" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="fuelCapacity" value={formData.fuelCapacity} onChange={handleInputChange} placeholder="Fuel Capacity (L)" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="fuelConsumption" value={formData.fuelConsumption} onChange={handleInputChange} placeholder="Fuel Consumption (L/100km)" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <input type="number" name="kilometersPerLiter" value={formData.kilometersPerLiter} onChange={handleInputChange} placeholder="Kilometers/Liter" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  <div className="col-span-full">
-                    <label className="inline-flex items-center gap-3">
-                      <input type="checkbox" name="accidentHistory" checked={Boolean(formData.accidentHistory)} onChange={handleInputChange} className="w-5 h-5 text-blue-600 border-gray-300 rounded" />
-                      <span className="text-sm text-slate-700">Accident History</span>
-                    </label>
-                  </div>
-                  {Boolean(formData.accidentHistory) && (
-                    <input type="text" name="accidentDetails" value={formData.accidentDetails} onChange={handleInputChange} placeholder="Accident Details (optional)" className="w-full px-4 py-3 border border-slate-200 rounded-lg col-span-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                  )}
+                  
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Inspection Valid Until</label>
-                    <input type="date" name="inspectionValidUntil" value={formData.inspectionValidUntil} onChange={handleInputChange} className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Model *</label>
+                    <input type="text" name="model" value={formData.model} onChange={handleInputChange} placeholder="Model Name" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.model ? 'border-red-500' : 'border-gray-200'}`} />
                   </div>
-                </div>
-                
-                {/* Swap Option */}
-                <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="checkbox" 
-                      name="swap" 
-                      checked={formData.swap} 
-                      onChange={handleInputChange}
-                      className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                    />
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Year *</label>
+                    <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1950" max={new Date().getFullYear() + 1} placeholder="Year" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all ${errors.year ? 'border-red-500' : 'border-gray-200'}`} />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Mileage (km)</label>
+                    <input type="number" name="mileage" value={formData.mileage} onChange={handleInputChange} placeholder="0" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+
+                  <div>
+                     <label className="block text-sm font-semibold text-gray-700 mb-2">Engine (cc)</label>
+                     <input type="number" name="engineCapacity" value={formData.engineCapacity} onChange={handleInputChange} placeholder="e.g. 1600" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+
+                  <div>
+                     <label className="block text-sm font-semibold text-gray-700 mb-2">Horsepower</label>
+                     <input type="number" name="horsePower" value={formData.horsePower} onChange={handleInputChange} placeholder="e.g. 110" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+
+                  <div>
+                     <label className="block text-sm font-semibold text-gray-700 mb-2">Wheel Size (inch)</label>
+                     <input type="number" name="wheels" value={formData.wheels} onChange={handleInputChange} placeholder="e.g. 17" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+                  
+                  <div>
+                     <label className="block text-sm font-semibold text-gray-700 mb-2">Fuel Capacity (L)</label>
+                     <input type="number" name="fuelCapacity" value={formData.fuelCapacity} onChange={handleInputChange} placeholder="e.g. 50" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+
+                  <div>
+                     <label className="block text-sm font-semibold text-gray-700 mb-2">Consumption (L/100km)</label>
+                     <input type="number" name="fuelConsumption" value={formData.fuelConsumption} onChange={handleInputChange} placeholder="e.g. 6.5" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Inspection Valid Until</label>
+                    <input type="date" name="inspectionValidUntil" value={formData.inspectionValidUntil} onChange={handleInputChange} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all" />
+                  </div>
+              </div>
+
+              <div className="flex flex-col gap-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => handleInputChange({ target: { name: 'accidentHistory', checked: !formData.accidentHistory, type: 'checkbox' } })}>
+                    <input type="checkbox" name="accidentHistory" checked={Boolean(formData.accidentHistory)} onChange={handleInputChange} className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                    <span className="text-sm font-medium text-gray-900">This vehicle has an accident history</span>
+                  </div>
+                  
+                  {Boolean(formData.accidentHistory) && (
+                    <div className="pl-8 animate-fade-in">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Accident Details</label>
+                        <textarea name="accidentDetails" value={formData.accidentDetails} onChange={handleInputChange} placeholder="Please describe the damage or accident details..." rows={3} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all resize-none" />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-xl cursor-pointer" onClick={() => handleInputChange({ target: { name: 'swap', checked: !formData.swap, type: 'checkbox' } })}>
+                    <input type="checkbox" name="swap" checked={formData.swap} onChange={handleInputChange} className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500" />
                     <div>
-                      <label className="text-sm font-medium text-emerald-800">Open to Swap</label>
-                      <p className="text-xs text-emerald-600">Check this if you're open to exchanging your vehicle with another one</p>
+                      <span className="text-sm font-medium text-emerald-900">Open to Swap</span>
+                      <p className="text-xs text-emerald-700">Check this if you're willing to trade</p>
                     </div>
                   </div>
-                </div>
               </div>
             </div>
         );
 
       case 3:
         return (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl">{vehicleFormConfig.steps[2].icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{vehicleFormConfig.steps[2].title}</h3>
-                    <p className="text-sm text-slate-600">{vehicleFormConfig.steps[2].description}</p>
-                  </div>
-                </div>
-                <div className="space-y-6">
-                  <ImageUpload
-                    onImageUpload={handleImageUpload}
-                    onImageRemove={handleImageRemove}
-                    imageUrl={formData.imageUrl}
-                    disabled={false}
-                  />
+            <div className="space-y-8">
+               <ImageUpload
+                  onImageUpload={handleImageUpload}
+                  onImageRemove={handleImageRemove}
+                  imageUrl={formData.imageUrl}
+                  disabled={false}
+               />
+               <div className="border-t border-gray-100 pt-8">
                   <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
-                </div>
-              </div>
+               </div>
             </div>
         );
 

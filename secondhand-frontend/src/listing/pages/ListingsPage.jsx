@@ -66,15 +66,15 @@ const ListingsPage = () => {
 
     const handlePageChange = useCallback((page) => {
         updatePage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [updatePage]);
 
     const handleFiltersChange = useCallback((newFilters) => {
-        console.log('📋 ListingsPage - handleFiltersChange:', newFilters);
         updateFilters(newFilters);
     }, [updateFilters]);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50/50">
             <ListingsHeader
                 totalElements={totalElements}
                 selectedCategory={selectedCategory}

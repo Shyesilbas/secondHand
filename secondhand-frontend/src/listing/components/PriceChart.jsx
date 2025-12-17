@@ -11,7 +11,7 @@ const PriceChart = ({ priceHistory, currency }) => {
     );
 
     const labels = sortedHistory.map(item => 
-      formatDateTime(item.changeDate, 'tr-TR')
+      formatDateTime(item.changeDate, 'tr-TR').split(' ')[0]
     );
 
     const prices = sortedHistory.map(item => item.newPrice);
@@ -22,13 +22,20 @@ const PriceChart = ({ priceHistory, currency }) => {
         {
           label: 'Price',
           data: prices,
-          borderColor: '#3B82F6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderWidth: 3,
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          pointBackgroundColor: '#3B82F6',
-          pointBorderColor: '#3B82F6',
+          borderColor: '#4F46E5', // Indigo-600
+          backgroundColor: (context) => {
+            const ctx = context.chart.ctx;
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+            return gradient;
+          },
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#FFFFFF',
+          pointBorderColor: '#4F46E5',
+          pointBorderWidth: 2,
           fill: true,
           tension: 0.4,
         }
@@ -40,62 +47,36 @@ const PriceChart = ({ priceHistory, currency }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: '#374151',
-        borderWidth: 1,
+        backgroundColor: '#1F2937',
+        titleColor: '#F9FAFB',
+        bodyColor: '#F9FAFB',
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: false,
         callbacks: {
           label: function(context) {
             const item = priceHistory[context.dataIndex];
             const currencyCode = item?.currency || currency;
-            return `${formatCurrency(context.parsed.y, currencyCode)}`;
+            return formatCurrency(context.parsed.y, currencyCode);
           }
         }
       }
     },
     scales: {
       x: {
-        display: true,
-        title: {
-          display: true,
-          text: 'Date',
-          color: '#6B7280',
-          font: {
-            size: 12
-          }
-        },
-        grid: {
-          color: 'rgba(107, 114, 128, 0.1)'
-        },
-        ticks: {
-          color: '#6B7280',
-          maxRotation: 45,
-          minRotation: 0
-        }
+        grid: { display: false },
+        ticks: { color: '#9CA3AF', font: { size: 10 } }
       },
       y: {
-        display: true,
-        title: {
-          display: true,
-          text: 'Price',
-          color: '#6B7280',
-          font: {
-            size: 12
-          }
-        },
-        grid: {
-          color: 'rgba(107, 114, 128, 0.1)'
-        },
-        ticks: {
-          color: '#6B7280',
+        grid: { color: '#F3F4F6', borderDash: [4, 4] },
+        ticks: { 
+          color: '#9CA3AF', 
+          font: { size: 10 },
           callback: function(value) {
             const currencyCode = priceHistory?.[0]?.currency || currency;
-            return formatCurrency(value, currencyCode);
+            return formatCurrency(value, currencyCode).replace(/\D00(?=\D*$)/, ''); // Remove .00
           }
         }
       }
@@ -111,11 +92,8 @@ const PriceChart = ({ priceHistory, currency }) => {
   if (!chartData) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <h4 className="text-lg font-semibold text-gray-900 mb-4">Price Trend</h4>
-      <div className="h-64">
-        <Line data={chartData} options={chartOptions} />
-      </div>
+    <div className="w-full h-full">
+      <Line data={chartData} options={chartOptions} />
     </div>
   );
 };

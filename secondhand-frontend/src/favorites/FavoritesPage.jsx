@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useFavorites } from './hooks/useFavorites.js';
 import ListingGrid from '../listing/components/ListingGrid.jsx';
 import Pagination from '../common/components/ui/Pagination.jsx';
@@ -13,10 +13,6 @@ const FavoritesPage = () => {
         fetchFavorites,
         loadPage
     } = useFavorites();
-
-    useEffect(() => {
-        fetchFavorites();
-    }, [fetchFavorites]);
 
     const handlePageChange = useCallback((page) => {
         loadPage(page);
@@ -36,8 +32,8 @@ const FavoritesPage = () => {
     }, [favorites]);
 
     const handleRefresh = useCallback(() => {
-        fetchFavorites({ page: pagination.number });
-    }, [fetchFavorites, pagination.number]);
+        fetchFavorites();
+    }, [fetchFavorites]);
 
     return (
         <div className="container mx-auto px-4 py-8">

@@ -18,14 +18,11 @@ export const useShowcaseQuery = (options = {}) => {
         queryFn: showcaseService.getActiveShowcases,
         enabled: options.enabled ?? true,
         staleTime: 5 * 60 * 1000,
-        cacheTime: 10 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         retry: 1,
         retryDelay: 1000,
-        onError: (error) => {
-            console.debug('Showcase fetch failed (this is normal for unauthenticated users):', error.message);
-        }
     });
 
     return {
@@ -33,7 +30,8 @@ export const useShowcaseQuery = (options = {}) => {
         loading,
         error: queryError?.message,
         fetchShowcases,
-                isInShowcase: (listingId) => {
+        // Check if a listing is currently in an active showcase
+        isInShowcase: (listingId) => {
             if (!Array.isArray(showcases)) return false;
             return showcases.some(s => (s.listing?.id || s.listingId) === listingId);
         }

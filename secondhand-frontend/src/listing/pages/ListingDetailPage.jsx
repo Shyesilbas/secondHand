@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
-import ListingFavoriteStats from '../../favorites/components/ListingFavoriteStats.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
@@ -12,263 +11,255 @@ import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
-/* Showcase info is no longer fetched on this page to avoid extra API calls */
+import { 
+  Share2, 
+  ShieldCheck, 
+  Flag, 
+  ArrowLeft,
+  ChevronRight,
+  AlertTriangle
+} from 'lucide-react';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuth();
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
+  const [activeTab, setActiveTab] = useState('about');
 
   if (isLoading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading listing details...</p>
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
       </div>
     </div>
   );
+
   if (error) return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="text-center max-w-md">
+        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="w-6 h-6 text-gray-500" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Listing</h3>
-        <p className="text-gray-600">{error}</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Unavailable</h3>
+        <p className="text-gray-500 mb-6">{error || "This listing could not be found."}</p>
+        <Link 
+          to={ROUTES.LISTINGS}
+          className="inline-flex items-center text-sm font-medium text-gray-900 hover:underline"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Listings
+        </Link>
       </div>
     </div>
   );
+
   if (!listing) return null;
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
-  /* Avoid triggering showcases fetch here; if needed, pass this via route state or listing DTO */
+  const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
+  const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
+
+  const tabs = [
+    { id: 'about', label: 'About' },
+    { id: 'details', label: 'Details' },
+    ...(hasReviews ? [{ id: 'reviews', label: 'Reviews' }] : [])
+  ];
 
   return (
-      <div className="min-h-screen bg-white">
-        {/* Header Section */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <Link 
-                    to={`${ROUTES.LISTINGS}?category=${listing.type}`}
-                    state={{ usr: { listingType: listing.type } }}
-                    className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back to Listings
-                  </Link>
-                  {listing.listingNo && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
-                      #{listing.listingNo}
-                    </span>
-                  )}
-                  {false && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      Featured
-                    </span>
-                  )}
-                </div>
-                <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">{listing.title}</h1>
-                <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    {listing.district}, {listing.city}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                    </svg>
-                    {formatDateTime(listing.createdAt)}
-                  </span>
-                </div>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Navigation */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <nav className="flex items-center text-sm text-gray-500">
+            <Link to={ROUTES.LISTINGS} className="hover:text-gray-900 transition-colors">Listings</Link>
+            <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
+            <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
+          </nav>
+          
+          <div className="flex items-center gap-3">
+            {!isOwner && (
+              <FavoriteButton 
+                listingId={listing.id} 
+                listing={listing} 
+                size="md" 
+                showCount={false}
+                className="hover:bg-gray-100 rounded-full p-2 border-0 text-gray-400 hover:text-red-500 transition-colors"
+              />
+            )}
+            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
+              <Share2 className="w-5 h-5" />
+            </button>
+            {isOwner && (
+               <ListingCardActions listing={listing} onChanged={fetchListing} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-12 gap-8">
+          
+          {/* Main Content */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Image Gallery - Smaller Height */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group h-[400px]">
+              {listing.imageUrl ? (
+                <img 
+                  src={listing.imageUrl} 
+                  alt={listing.title}
+                  className="w-full h-full object-contain bg-gray-50"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div className={`w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+                  <p className="font-medium">No photos</p>
               </div>
-              <div className="ml-6">
-                {!isOwner ? (
-                    <FavoriteButton listingId={listing.id} listing={listing} size="lg" showCount={true} />
-                ) : (
-                    <ListingCardActions listing={listing} onChanged={fetchListing} />
+            </div>
+
+            {/* Title & Price (Mobile Only) */}
+            <div className="lg:hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+               <h1 className="text-xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+               <p className="text-2xl font-bold text-gray-900">{formatCurrency(listing.price, listing.currency)}</p>
+            </div>
+
+            {/* Tabs & Content */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
+              {/* Tab Headers */}
+              <div className="flex items-center border-b border-gray-100 px-6">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                      relative py-4 px-4 text-sm font-medium transition-colors
+                      ${activeTab === tab.id 
+                        ? 'text-gray-900' 
+                        : 'text-gray-500 hover:text-gray-700'
+                      }
+                    `}
+                  >
+                    {tab.label}
+                    {activeTab === tab.id && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-t-full" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Panels */}
+              <div className="p-6 sm:p-8">
+                {activeTab === 'about' && (
+                  <div className="animate-fade-in">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4">About this item</h2>
+                    <div className="prose prose-slate max-w-none prose-p:text-gray-600 prose-headings:font-bold">
+                      <p className="whitespace-pre-wrap leading-relaxed">{listing.description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'details' && DetailsComponent && (
+                  <div className="animate-fade-in">
+                    <h2 className="text-lg font-bold text-gray-900 mb-6">Technical Details</h2>
+                    <DetailsComponent listing={listing} />
+                  </div>
+                )}
+
+                {activeTab === 'reviews' && hasReviews && (
+                  <div className="animate-fade-in">
+                    <ListingReviewsSection listingId={listing.id} listing={listing} />
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Image Section */}
-              <div className="bg-white rounded border border-gray-200 overflow-hidden">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-                  {listing.imageUrl ? (
-                    <img 
-                      src={listing.imageUrl} 
-                      alt={listing.title}
-                      className="max-w-full max-h-full object-contain"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
-                    />
-                  ) : null}
-                  <div className={`w-full h-full flex items-center justify-center ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                    <div className="text-center">
-                      <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-gray-500 text-sm">No image available</p>
-                    </div>
-                  </div>
+          {/* Sidebar */}
+          <div className="lg:col-span-4 space-y-6">
+             {/* Sticky Info Card */}
+             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
+                <div className="mb-6 hidden lg:block">
+                   <h1 className="text-xl font-bold text-gray-900 leading-snug mb-2">{listing.title}</h1>
+                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                      <span>{listing.district}, {listing.city}</span>
+                      <span>•</span>
+                      <span>{formatDateTime(listing.createdAt)}</span>
+                   </div>
+                   <p className="text-3xl font-bold text-gray-900 tracking-tight">
+                      {formatCurrency(listing.price, listing.currency)}
+                   </p>
                 </div>
-              </div>
 
-              {/* Price Section */}
-              <div className="bg-white rounded border border-gray-200 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-semibold text-gray-900">{formatCurrency(listing.price, listing.currency)}</h2>
-                    <p className="text-sm text-gray-600 mt-1">Asking price</p>
+                {/* Seller Info */}
+                <div className="border-t border-b border-gray-100 py-6 mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
+                        {listing.sellerName?.[0]?.toUpperCase() || 'U'}
+                     </div>
+                     <div>
+                        <Link 
+                          to={ROUTES.USER_PROFILE(listing.sellerId)}
+                          className="font-semibold text-sm text-gray-900 hover:underline block"
+                        >
+                           {listing.sellerName} {listing.sellerSurname}
+                        </Link>
+                        <div className="text-xs text-gray-500">Joined 2024</div>
+                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-gray-600">Status</div>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
-                      listing.status === 'ACTIVE' 
-                        ? 'bg-green-50 text-green-700 border border-green-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
-                    }`}>
-                      {listing.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Description Section */}
-              <div className="bg-white rounded border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Description</h3>
-                <div className="prose prose-gray max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
-                </div>
-              </div>
-
-              {/* Details Section */}
-              {(() => {
-                const cfg = listingTypeRegistry[listing.type];
-                if (!cfg?.detailsComponent) return null;
-                const Details = cfg.detailsComponent;
-                return (
-                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
-                    <Details listing={listing} />
-                  </div>
-                );
-              })()}
-
-              {/* Reviews Section */}
-              {!['VEHICLE', 'REAL_ESTATE'].includes(listing.type) && (
-                <ListingReviewsSection listingId={listing.id} listing={listing} />
-              )}
-            </div>
-
-            {/* Right Column - Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-8 space-y-6">
-                {/* Seller Card */}
-                <div className="bg-white rounded border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Seller Information</h3>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-lg font-semibold text-gray-700">
-                      {listing.sellerName?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <Link 
-                        to={ROUTES.USER_PROFILE(listing.sellerId)} 
-                        className="block font-semibold text-gray-900 hover:text-gray-700 transition-colors truncate"
+                  
+                  {!isOwner ? (
+                    <div className="space-y-3">
+                      <ContactSellerButton 
+                          listing={listing} 
+                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors" 
                       >
-                        {listing.sellerName} {listing.sellerSurname}
-                      </Link>
-                      <p className="text-sm text-gray-500 mt-1">Verified Seller</p>
-                    </div>
-                  </div>
-
-                  {!isOwner && (
-                    <div className="mt-6 space-y-3">
-                      <ContactSellerButton listing={listing} className="w-full" />
+                          Contact Seller
+                      </ContactSellerButton>
                       <ComplaintButton
-                        targetUserId={listing.sellerId}
-                        targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
-                        listingId={listing.id}
-                        listingTitle={listing.title}
-                        className="w-full"
-                      />
+                          targetUserId={listing.sellerId}
+                          targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
+                          listingId={listing.id}
+                          listingTitle={listing.title}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors"
+                      >
+                          <Flag className="w-4 h-4" />
+                          Report
+                      </ComplaintButton>
                     </div>
-                  )}
-
-                  {isOwner && (
-                    <div className="mt-6">
-                      <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
-                    </div>
+                  ) : (
+                    <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
                   )}
                 </div>
 
-                {/* Listing Stats */}
-                <div className="bg-white rounded border border-gray-200 p-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Listing Information</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                      <span className="text-sm text-gray-600">Listing No</span>
-                      <span className="text-sm font-medium text-gray-900">{listing.listingNo || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                      <span className="text-sm text-gray-600">Views</span>
-                      <span className="text-sm font-medium text-gray-900">-</span>
-                    </div>
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-600">Favorites</span>
-                      <ListingFavoriteStats listing={listing} size="sm" showIcon showText />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Safety Tips */}
-                <div className="bg-gray-50 rounded border border-gray-200 p-6">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Safety Tips</h4>
-                  <ul className="space-y-2 text-xs text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <svg className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
+                {/* Safety */}
+                <div className="bg-blue-50/50 rounded-xl p-4">
+                  <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4" />
+                    Safety tips
+                  </h3>
+                  <ul className="space-y-1.5 text-xs text-blue-800/70">
+                    <li className="flex items-center gap-2">
+                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
                       Meet in public places
                     </li>
-                    <li className="flex items-start gap-2">
-                      <svg className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Inspect items thoroughly
+                    <li className="flex items-center gap-2">
+                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                      Check before paying
                     </li>
-                    <li className="flex items-start gap-2">
-                      <svg className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Use secure payment methods
+                    <li className="flex items-center gap-2">
+                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                      Don't pay in advance
                     </li>
                   </ul>
                 </div>
-              </div>
-            </div>
+             </div>
           </div>
         </div>
       </div>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS } from '../constants/apiEndpoints.js';
 import { getToken, isCookieBasedAuth } from '../services/storage/tokenStorage.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -7,24 +7,26 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
   const { isAuthenticated } = useAuth();
 
   const handleFileSelect = async (file) => {
+    setError(null);
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Lütfen sadece resim dosyası seçin.');
+      setError('Please select an image file (PNG, JPG, GIF).');
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Dosya boyutu 10MB\'dan küçük olmalıdır.');
+      setError('File size must be less than 10MB.');
       return;
     }
 
     if (!isAuthenticated) {
-      alert('Lütfen önce giriş yapın.');
+      setError('Please login to upload images.');
       return;
     }
 
@@ -43,7 +45,6 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
         credentials: 'include'
       };
 
-      // 30 saniye timeout ekle
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
       requestOptions.signal = controller.signal;
@@ -58,37 +59,26 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
       
       clearTimeout(timeoutId);
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
       if (!response.ok) {
-        let errorMessage = 'Resim yüklenirken hata oluştu';
+        const responseText = await response.text();
+        let errorMessage = 'Failed to upload image.';
         try {
           const errorData = JSON.parse(responseText);
           errorMessage = errorData.error || errorMessage;
         } catch (e) {
-          errorMessage = `Server error: ${response.status} - ${responseText}`;
+          // ignore
         }
         throw new Error(errorMessage);
       }
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error('Invalid JSON response from server');
-      }
-      
+      const data = await response.json();
       onImageUpload(data.imageUrl);
     } catch (error) {
       console.error('Image upload error:', error);
       if (error.name === 'AbortError') {
-        alert('Resim yükleme işlemi zaman aşımına uğradı. Lütfen tekrar deneyin.');
+        setError('Upload timed out. Please try again.');
       } else {
-        alert(error.message || 'Resim yüklenirken hata oluştu');
+        setError(error.message || 'Failed to upload image.');
       }
     } finally {
       setIsUploading(false);
@@ -139,40 +129,46 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
     if (onImageRemove) {
       onImageRemove();
     }
+    setError(null);
   };
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Ürün Fotoğrafı
+      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+        <ImageIcon className="w-4 h-4 text-indigo-500" />
+        Product Photo
       </label>
       
       {imageUrl ? (
-        <div className="relative">
-          <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 flex items-center justify-center">
+        <div className="relative group">
+          <div className="w-full h-80 bg-gray-100 rounded-xl overflow-hidden border-2 border-gray-200 flex items-center justify-center shadow-inner">
             <img
               src={imageUrl}
-              alt="Ürün fotoğrafı"
-              className="max-w-full max-h-full object-contain"
+              alt="Product"
+              className="w-full h-full object-contain"
             />
           </div>
           {!disabled && (
-            <button
-              type="button"
-              onClick={handleRemoveImage}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-            >
-              <X size={16} />
-            </button>
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="bg-white text-red-600 px-4 py-2 rounded-lg font-medium shadow-lg hover:bg-red-50 transition-colors flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+              >
+                <X className="w-4 h-4" />
+                Remove Photo
+              </button>
+            </div>
           )}
         </div>
       ) : (
         <div
           className={`
-            w-full h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors
-            ${dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
-            ${disabled ? 'cursor-not-allowed opacity-50' : ''}
+            w-full h-64 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden
+            ${dragActive ? 'border-indigo-500 bg-indigo-50 scale-[1.02]' : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50'}
+            ${disabled ? 'cursor-not-allowed opacity-50 bg-gray-50' : ''}
             ${isUploading ? 'pointer-events-none' : ''}
+            ${error ? 'border-red-300 bg-red-50' : ''}
           `}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -180,35 +176,45 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
           onClick={handleClick}
         >
           {isUploading ? (
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
-              <p className="text-sm text-gray-600">Yükleniyor...</p>
+            <div className="flex flex-col items-center z-10">
+              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-3" />
+              <p className="text-sm font-medium text-indigo-600">Uploading your image...</p>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col items-center">
-                <div className="bg-gray-100 rounded-full p-3 mb-3">
-                  {dragActive ? (
-                    <Upload className="h-6 w-6 text-blue-600" />
-                  ) : (
-                    <ImageIcon className="h-6 w-6 text-gray-400" />
-                  )}
-                </div>
-                <p className="text-sm text-gray-600 text-center mb-1">
-                  {dragActive ? 'Dosyayı buraya bırakın' : 'Fotoğraf yüklemek için tıklayın'}
-                </p>
-                <p className="text-xs text-gray-500 text-center">
-                  veya sürükleyip bırakın
-                </p>
-                <p className="text-xs text-gray-400 mt-2">
-                  PNG, JPG, GIF (max. 10MB)
-                </p>
+            <div className="flex flex-col items-center z-10 p-6 text-center">
+              <div className={`p-4 rounded-full mb-4 transition-colors ${dragActive ? 'bg-indigo-100' : 'bg-gray-100 group-hover:bg-indigo-50'}`}>
+                {dragActive ? (
+                  <Upload className="w-8 h-8 text-indigo-600" />
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-gray-400" />
+                )}
               </div>
-            </>
+              <p className="text-base font-semibold text-gray-700 mb-1">
+                {dragActive ? 'Drop it like it\'s hot!' : 'Click to upload or drag and drop'}
+              </p>
+              <p className="text-xs text-gray-500 max-w-xs">
+                SVG, PNG, JPG or GIF (max. 10MB)
+              </p>
+            </div>
+          )}
+          
+          {/* Background decoration */}
+          {!isUploading && !imageUrl && (
+            <div className="absolute inset-0 pointer-events-none">
+               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl" />
+               <div className="absolute -left-10 -top-10 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl" />
+            </div>
           )}
         </div>
       )}
       
+      {error && (
+        <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-lg flex items-start gap-2 text-sm text-red-600 animate-fade-in">
+          <X className="w-4 h-4 shrink-0 mt-0.5" />
+          <span>{error}</span>
+        </div>
+      )}
+
       <input
         ref={fileInputRef}
         type="file"

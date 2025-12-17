@@ -6,7 +6,7 @@ const STATISTICS_KEYS = {
     listing: () => [...STATISTICS_KEYS.all, 'listing'],
 };
 
-export const useListingStatistics = () => {
+export const useListingStatistics = (options = {}) => {
     const {
         data: statistics,
         isLoading,
@@ -15,8 +15,9 @@ export const useListingStatistics = () => {
     } = useQuery({
         queryKey: STATISTICS_KEYS.listing(),
         queryFn: () => listingService.getListingStatistics(),
+        enabled: options.enabled ?? true,
         staleTime: 5 * 60 * 1000,
-        cacheTime: 10 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         retry: 2,

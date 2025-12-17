@@ -1,7 +1,6 @@
 import React from 'react';
 import ListingGrid from './ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
-import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import FilterStatus from './FilterStatus.jsx';
 import ListingsSkeleton from './ListingsSkeleton.jsx';
 
@@ -20,9 +19,9 @@ const ListingsContent = React.memo(({
     titleSearchTerm
 }) => {
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
             {!isLoading && !titleSearchTerm && (
-                <div className="mb-6">
+                <div className="mb-8">
                     <FilterStatus
                         totalElements={totalElements}
                         filters={filters}
@@ -34,22 +33,20 @@ const ListingsContent = React.memo(({
             )}
 
             {isLoading ? (
-                <div className="mb-8">
-                    <ListingsSkeleton />
-                </div>
+                <ListingsSkeleton />
             ) : (
-                <div className="mb-8">
-                    <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} />
-                </div>
+                <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} />
             )}
             
             {!isLoading && !titleSearchTerm && totalPages > 1 && (
-                <div className="bg-white border border-gray-200 rounded">
-                    <Pagination
-                        page={currentPage || 0}
-                        totalPages={totalPages || 0}
-                        onPageChange={onPageChange}
-                    />
+                <div className="mt-12 flex justify-center">
+                    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-2">
+                        <Pagination
+                            page={currentPage || 0}
+                            totalPages={totalPages || 0}
+                            onPageChange={onPageChange}
+                        />
+                    </div>
                 </div>
             )}
         </div>

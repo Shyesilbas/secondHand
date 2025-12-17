@@ -1,141 +1,90 @@
 import React from 'react';
 import EnumDropdown from '../../../../common/components/ui/EnumDropdown.jsx';
+import { MapPin, DollarSign, Building2, Map } from 'lucide-react';
 
 const PriceLocationFields = ({ filters, onPriceChange, onInputChange }) => (
-  <div className="space-y-6">
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
     {/* Price Section */}
-    <div className="bg-gray-50 rounded-xl p-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <span className="text-2xl">💰</span>
-        <h3 className="text-lg font-semibold text-gray-900">Price Range</h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="p-1.5 bg-emerald-50 rounded-md text-emerald-600">
+          <DollarSign className="w-4 h-4" />
+        </div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Price Range</h3>
       </div>
       
       <div className="space-y-4">
-        {/* Price Range */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <span className="flex items-center space-x-1">
-                <span>Min Price</span>
-                <span className="text-gray-400">(₺)</span>
-              </span>
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={filters.minPrice || ''}
-                onChange={(e) => onPriceChange('minPrice', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                placeholder="0"
-                min="0"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <span className="text-gray-400 text-sm">₺</span>
-              </div>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <input
+              type="number"
+              value={filters.minPrice || ''}
+              onChange={(e) => onPriceChange('minPrice', e.target.value)}
+              className="w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all font-medium"
+              placeholder="Min"
+              min="0"
+            />
+            <span className="absolute right-3 top-2.5 text-gray-400 text-xs font-bold">₺</span>
           </div>
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <span className="flex items-center space-x-1">
-                <span>Max Price</span>
-                <span className="text-gray-400">(₺)</span>
-              </span>
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={filters.maxPrice || ''}
-                onChange={(e) => onPriceChange('maxPrice', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                placeholder="No limit"
-                min="0"
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <span className="text-gray-400 text-sm">₺</span>
-              </div>
-            </div>
+          <span className="text-gray-300 font-medium">-</span>
+          <div className="relative flex-1">
+            <input
+              type="number"
+              value={filters.maxPrice || ''}
+              onChange={(e) => onPriceChange('maxPrice', e.target.value)}
+              className="w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all font-medium"
+              placeholder="Max"
+              min="0"
+            />
+            <span className="absolute right-3 top-2.5 text-gray-400 text-xs font-bold">₺</span>
           </div>
         </div>
         
-        {/* Currency */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <span className="flex items-center space-x-1">
-              <span>Currency</span>
-              <span className="text-gray-400">(Optional)</span>
-            </span>
-          </label>
-          <EnumDropdown 
-            label="" 
-            enumKey="currencies" 
-            value={filters.currency || ''} 
-            onChange={(value) => onInputChange('currency', value)} 
-            multiple={false} 
-          />
-        </div>
+        <EnumDropdown 
+          label="Currency" 
+          enumKey="currencies" 
+          value={filters.currency || ''} 
+          onChange={(value) => onInputChange('currency', value)} 
+          multiple={false} 
+          className="w-full"
+        />
       </div>
     </div>
 
     {/* Location Section */}
-    <div className="bg-blue-50 rounded-xl p-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <span className="text-2xl">📍</span>
-        <h3 className="text-lg font-semibold text-gray-900">Location</h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="p-1.5 bg-blue-50 rounded-md text-blue-600">
+          <MapPin className="w-4 h-4" />
+        </div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Location</h3>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <span className="flex items-center space-x-1">
-              <span>City</span>
-              <span className="text-gray-400">(Optional)</span>
-            </span>
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={filters.city || ''}
-              onChange={(e) => onInputChange('city', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Enter city name..."
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-400">🏙️</span>
-            </div>
-          </div>
+      <div className="space-y-4">
+        <div className="relative">
+          <input
+            type="text"
+            value={filters.city || ''}
+            onChange={(e) => onInputChange('city', e.target.value)}
+            className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all"
+            placeholder="City (e.g. Istanbul)"
+          />
+          <Building2 className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <span className="flex items-center space-x-1">
-              <span>District</span>
-              <span className="text-gray-400">(Optional)</span>
-            </span>
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={filters.district || ''}
-              onChange={(e) => onInputChange('district', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Enter district name..."
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-400">🏘️</span>
-            </div>
-          </div>
+        
+        <div className="relative">
+          <input
+            type="text"
+            value={filters.district || ''}
+            onChange={(e) => onInputChange('district', e.target.value)}
+            className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all"
+            placeholder="District (e.g. Kadikoy)"
+          />
+          <Map className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
         </div>
-      </div>
-      
-      {/* Quick Location Tips */}
-      <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-        <p className="text-sm text-blue-700">
-          💡 <strong>Tip:</strong> You can search by city or district. Leave empty to search all locations.
-        </p>
       </div>
     </div>
   </div>
 );
 
 export default PriceLocationFields;
-
-
