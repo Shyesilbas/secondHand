@@ -6,8 +6,9 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.ListingFeeService;
-import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.payment.service.PurchaseService;
 import com.serhat.secondhand.payment.service.PaymentStatsService;
+import com.serhat.secondhand.payment.service.PaymentVerificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,20 +27,21 @@ import java.util.Map;
 @Tag(name = "Payment Management", description = "Payment processing operations")
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PurchaseService purchaseService;
     private final PaymentStatsService paymentStatsService;
     private final ListingFeeService listingFeeService;
+    private final PaymentVerificationService paymentVerificationService;
 
     @PostMapping("/pay")
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
         log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
-        PaymentDto paymentDto = paymentService.createPayment(paymentRequest, authentication);
+        PaymentDto paymentDto = purchaseService.createPayment(paymentRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
     }
 
     @PostMapping("/initiate-verification")
     public ResponseEntity<Void> initiatePaymentVerification(@RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request, Authentication authentication) {
-        paymentService.initiatePaymentVerification(authentication, request);
+        paymentVerificationService.initiatePaymentVerification(authentication, request);
         return ResponseEntity.ok().build();
     }
 
@@ -49,7 +51,7 @@ public class PaymentController {
             @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
             Authentication authentication) {
         log.info("Processing listing fee payment for listing {} by user {}", listingFeePaymentRequest.listingId(), authentication.getName());
-        PaymentDto paymentDto = paymentService.createListingFeePayment(listingFeePaymentRequest, authentication);
+        PaymentDto paymentDto = listingFeeService.payListingCreationFee(listingFeePaymentRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
     }
 

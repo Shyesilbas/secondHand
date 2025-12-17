@@ -1,29 +1,29 @@
 package com.serhat.secondhand.auth.application;
 
+import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
 import com.serhat.secondhand.agreements.entity.Agreement;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.service.UserAgreementService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
-import com.serhat.secondhand.auth.util.AuthErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
+import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.entity.Token;
+import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
+import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
-import com.serhat.secondhand.agreements.service.UserAgreementService;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
-import com.serhat.secondhand.agreements.service.AgreementService;
-import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final UserNotificationService userNotificationService;
     private final UserAgreementService userAgreementService;
     private final AuditLogService auditLogService;
     private final AgreementService agreementService;
@@ -89,7 +89,7 @@ public class AuthService {
 
         log.info("User registered successfully: {}", user.getEmail());
 
-        emailService.sendWelcomeEmail(user);
+        userNotificationService.sendWelcomeNotification(user);
 
         return new RegisterResponse(
                 "Registration Successful.",
@@ -294,7 +294,7 @@ public class AuthService {
                 .build();
 
         userService.save(user);
-        emailService.sendWelcomeEmail(user);
+        userNotificationService.sendWelcomeNotification(user);
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);

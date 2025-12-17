@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.payment.service.PaymentNotificationService;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -25,7 +25,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 public class ListingEventListener {
 
     private final ListingRepository listingRepository;
-    private final EmailService emailService;
+    private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
     private final EWalletService eWalletService;
 
@@ -71,7 +71,7 @@ public class ListingEventListener {
 
         User user = payment.getFromUser();
         PaymentDto paymentDto = paymentMapper.toDto(payment);
-        emailService.sendPaymentSuccessEmail(user, paymentDto, listing.getTitle());
+        paymentNotificationService.sendPaymentSuccessNotification(user, paymentDto, listing.getTitle());
         log.info("Payment success email sent for payment ID: {}", payment.getId());
     }
 }

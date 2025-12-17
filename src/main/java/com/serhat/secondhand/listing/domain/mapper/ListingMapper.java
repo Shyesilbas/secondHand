@@ -28,49 +28,49 @@ import org.hibernate.Hibernate;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface ListingMapper extends BaseListingMapper {
+public abstract class ListingMapper implements BaseListingMapper {
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
+    public abstract VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
+    public abstract ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
+    public abstract RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    ClothingListingDto toClothingDto(ClothingListing clothingListing);
+    public abstract ClothingListingDto toClothingDto(ClothingListing clothingListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    BooksListingDto toBooksDto(BooksListing booksListing);
+    public abstract BooksListingDto toBooksDto(BooksListing booksListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
-    SportsListingDto toSportsDto(SportsListing sportsListing);
+    public abstract SportsListingDto toSportsDto(SportsListing sportsListing);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -79,7 +79,7 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "REAL_ESTATE")
-    RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
+    public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -88,7 +88,7 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "VEHICLE")
-    VehicleListing toVehicleEntity(VehicleCreateRequest request);
+    public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -97,7 +97,7 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "ELECTRONICS")
-    ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
+    public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -106,7 +106,7 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "CLOTHING")
-    ClothingListing toClothingEntity(ClothingCreateRequest request);
+    public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -115,7 +115,7 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "BOOKS")
-    BooksListing toBooksEntity(BooksCreateRequest request);
+    public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -124,10 +124,18 @@ public interface ListingMapper extends BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "SPORTS")
-    SportsListing toSportsEntity(SportsCreateRequest request);
+    public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
-    default ListingDto toDynamicDto(Listing listing) {
+    public ListingDto toDynamicDto(Listing listing) {
+        if (listing == null) {
+            return null;
+        }
+        
         Listing unproxied = (Listing) Hibernate.unproxy(listing);
+        if (unproxied.getListingType() == null) {
+             return null;
+        }
+
         return switch (unproxied.getListingType()) {
             case VEHICLE -> toVehicleDto((VehicleListing) unproxied);
             case ELECTRONICS -> toElectronicDto((ElectronicListing) unproxied);

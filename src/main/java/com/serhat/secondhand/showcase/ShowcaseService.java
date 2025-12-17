@@ -7,7 +7,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.service.PaymentService;
+import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
@@ -36,7 +36,7 @@ public class ShowcaseService {
     private final ShowcaseRepository showcaseRepository;
     private final ShowcaseMapper showcaseMapper;
     private final ListingService listingService;
-    private final PaymentService paymentService;
+    private final PaymentProcessor paymentProcessor;
     private final UserService userService;
 
     @Getter
@@ -78,7 +78,7 @@ public class ShowcaseService {
                 .acceptedAgreementIds(request.acceptedAgreementIds())
                 .build();
 
-        paymentService.createPayment(paymentRequest, authentication);
+        paymentProcessor.process(paymentRequest, authentication);
         
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
