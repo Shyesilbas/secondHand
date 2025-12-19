@@ -123,5 +123,13 @@ public class BankService {
         log.info("Debited {} from user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasSufficientBalance(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        Bank bank = findByUserMandatory(user);
+        return bank.getBalance().compareTo(amount) >= 0;
+    }
 
 }

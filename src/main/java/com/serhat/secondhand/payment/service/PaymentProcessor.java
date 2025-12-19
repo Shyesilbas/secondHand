@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
-import com.serhat.secondhand.agreements.service.AgreementService;
 import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.service.AgreementService;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -50,7 +50,7 @@ public class PaymentProcessor {
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
 
         if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
-            throw new BusinessException(PaymentErrorCodes.UNSUPPORTED_PAYMENT_TYPE);
+            throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
         }
 
         PaymentResult result = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
