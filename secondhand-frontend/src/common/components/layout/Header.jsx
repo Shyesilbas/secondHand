@@ -26,6 +26,8 @@ const icons = {
     paymentHistory: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
     cart: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" /></svg>,
     orders: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>,
+    coupons: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l2 2 4-4M7 7h10a2 2 0 012 2v2a2 2 0 010 4v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2a2 2 0 010-4V9a2 2 0 012-2z" /></svg>,
+    more: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>,
 };
 
 const Header = () => {
@@ -34,10 +36,9 @@ const Header = () => {
     const notification = useNotification();
     const location = useLocation();
     
-    // Use useCart hook for real-time cart count
     const { cartCount: hookCartCount } = useCart({ 
         enabled: isAuthenticated,
-        loadCartItems: true // We need cart items to calculate accurate count
+        loadCartItems: true
     });
     
     const [cartCount, setCartCount] = useState(() => {
@@ -55,15 +56,12 @@ const Header = () => {
             return;
         }
         
-        // Update from hook cart count
         if (hookCartCount !== undefined) {
             setCartCount(hookCartCount);
         }
         
-        // Listen for cart count changes
         const handleCartCountChange = (event) => {
             if (event.detail === 'refresh') {
-                // If it's a refresh signal, get the latest count from localStorage
                 const latestCount = parseInt(localStorage.getItem('cartCount') || '0', 10);
                 setCartCount(latestCount);
             } else {
@@ -75,7 +73,6 @@ const Header = () => {
         return () => window.removeEventListener('cartCountChanged', handleCartCountChange);
     }, [isAuthenticated, hookCartCount]);
     
-    // Only load unread count on chat-related or main app pages, not on static pages
     const chatRelatedPages = [ROUTES.CHAT, ROUTES.DASHBOARD, ROUTES.LISTINGS, ROUTES.MY_LISTINGS, ROUTES.SHOPPING_CART];
     const isStaticPage = location.pathname.includes('/agreements') || 
                         location.pathname.includes('/terms') || 
@@ -112,43 +109,41 @@ const Header = () => {
         );
     };
 
-    const listingsMenu = [
+    const userLinks = [
+        { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat, onClick: handleChatClick },
+        { to: ROUTES.SHOPPING_CART, label: 'Cart', icon: icons.cart, badge: cartCount },
+    ];
+
+    const moreMenuItems = [
+        { to: ROUTES.LISTINGS, label: 'All Listings', icon: icons.allListings },
         { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: icons.myListings },
         { to: ROUTES.CREATE_LISTING, label: 'New Listing', icon: icons.newListing },
         { divider: true },
-        { to: ROUTES.LISTINGS, label: 'All Listings', icon: icons.allListings },
-    ];
-
-    const paymentMenu = [
-        { to: ROUTES.PAY_LISTING_FEE, label: 'Pay Listing Fee', icon: icons.payListingFee },
+        { to: ROUTES.MY_COUPONS, label: 'Kuponlarım', icon: icons.coupons },
         { divider: true },
-        { to: ROUTES.PAYMENT_METHODS, label: 'Payment Methods', icon: icons.paymentMethods },
-        { divider: true },
-        { to: ROUTES.PAYMENTS, label: 'Payment History', icon: icons.paymentHistory },
-    ];
-
-    const userLinks = [
         { to: ROUTES.FAVORITES, label: 'Favorites', icon: icons.favorites },
         { to: ROUTES.EMAILS, label: 'E-mails', icon: icons.emails },
-        { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat, onClick: handleChatClick },
-        { to: ROUTES.SHOPPING_CART, label: 'Cart', icon: icons.cart, badge: cartCount },
+        { divider: true },
+        { to: ROUTES.PAY_LISTING_FEE, label: 'Pay Listing Fee', icon: icons.payListingFee },
+        { to: ROUTES.PAYMENT_METHODS, label: 'Payment Methods', icon: icons.paymentMethods },
+        { to: ROUTES.PAYMENTS, label: 'Payment History', icon: icons.paymentHistory },
     ];
 
     const userMenuItems = [
         { to: ROUTES.DASHBOARD, label: 'Dashboard', icon: icons.dashboard },
         { to: ROUTES.PROFILE, label: 'Profile', icon: icons.profile },
         { to: ROUTES.CHANGE_PASSWORD, label: 'Change Password', icon: icons.changePassword },
-        { divider: true },
         { to: ROUTES.MY_ORDERS, label: 'My Orders', icon: icons.orders },
         { divider: true },
         { action: handleLogout, label: 'Logout', icon: icons.logout, isButton: true }
     ];
 
+    const showSearch = isAuthenticated;
+
     return (
-        <header className="bg-white shadow-sm border-b border-gray-200">
+        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo */}
+                <div className="flex items-center justify-between h-14">
                     <div className="flex items-center">
                         <Link to={ROUTES.HOME} className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -160,73 +155,15 @@ const Header = () => {
                         </Link>
                     </div>
 
-                    {/* Search Bar - Center */}
-                    {isAuthenticated && (
+                    {showSearch && (
                         <div className="flex-1 max-w-lg mx-8">
                             <UnifiedSearchBar />
                         </div>
                     )}
 
-                    {/* Right Side Navigation */}
                     <div className="flex items-center space-x-1">
                         {isAuthenticated ? (
                             <>
-                                {/* Quick Actions */}
-                                <div className="hidden lg:flex items-center space-x-1 mr-4">
-                                    {/* Listings Dropdown */}
-                                    <DropdownMenu trigger={
-                                        <button className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                                            <icons.allListings />
-                                            <span>Listings</span>
-                                        </button>
-                                    }>
-                                        {/* Static items */}
-                                        <DropdownItem to={ROUTES.MY_LISTINGS} icon={<icons.myListings />}>My Listings</DropdownItem>
-                                        <DropdownItem to={ROUTES.CREATE_LISTING} icon={<icons.newListing />}>New Listing</DropdownItem>
-                                        <DropdownDivider />
-                                        {/* All Listings with submenu */}
-                                        <button
-                                            type="button"
-                                            className="flex items-center w-full px-4 py-2 text-sm text-text-secondary hover:bg-blue-50 hover:text-btn-primary transition-colors text-left"
-                                            onClick={() => setAllListingsOpen((v) => !v)}
-                                        >
-                                            <span className="mr-3"><icons.allListings /></span>
-                                            <span className="flex-1">All Listings</span>
-                                            <svg className={`w-4 h-4 transition-transform ${allListingsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </button>
-                                        {allListingsOpen && (
-                                            <div className="py-1">
-                                                <div className="px-4 py-2 text-xs uppercase tracking-wide text-gray-400">Browse by Category</div>
-                                                {(enums.listingTypes || []).map((t) => (
-                                                    <DropdownItem key={t.value} to={`${ROUTES.LISTINGS}?category=${t.value}`}>
-                                                        <span className="flex items-center justify-between w-full">
-                                                            <span>{t.label}</span>
-                                                            <span className="ml-3 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                                                {countsLoading ? '...' : getCategoryCount(t.value)}
-                                                            </span>
-                                                        </span>
-                                                    </DropdownItem>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </DropdownMenu>
-
-                                    {/* Payment Dropdown */}
-                                    <DropdownMenu trigger={
-                                        <div className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-                                            <icons.paymentMethods />
-                                            <span>Payment</span>
-                                        </div>
-                                    }>
-                                        {paymentMenu.map((item, idx) =>
-                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
-                                        )}
-                                    </DropdownMenu>
-                                </div>
-
-                                {/* Icon Links */}
                                 <div className="flex items-center space-x-1">
                                     {userLinks.map(link => (
                                         <Link 
@@ -253,9 +190,28 @@ const Header = () => {
                                     ))}
                                 </div>
 
-                                {/* User Menu */}
+                                <div className="ml-1">
+                                    <DropdownMenu
+                                        align="right"
+                                        showChevron={false}
+                                        trigger={
+                                            <button
+                                                type="button"
+                                                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                                title="Menu"
+                                            >
+                                                <icons.more />
+                                            </button>
+                                        }
+                                    >
+                                        {moreMenuItems.map((item, idx) =>
+                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
+                                        )}
+                                    </DropdownMenu>
+                                </div>
+
                                 <div className="ml-3 pl-3 border-l border-gray-200">
-                                    <DropdownMenu trigger={
+                                    <DropdownMenu align="right" trigger={
                                         <div className="flex items-center space-x-2 p-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
                                             <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
                                                 {user?.name?.charAt(0)?.toUpperCase() || 'U'}

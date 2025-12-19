@@ -24,6 +24,11 @@ public class OrderDto {
     private Long userId;
     private Order.OrderStatus status;
     private BigDecimal totalAmount;
+    private BigDecimal subtotal;
+    private BigDecimal campaignDiscount;
+    private String couponCode;
+    private BigDecimal couponDiscount;
+    private BigDecimal discountTotal;
     private String currency;
     private AddressDto shippingAddress;
     private AddressDto billingAddress;

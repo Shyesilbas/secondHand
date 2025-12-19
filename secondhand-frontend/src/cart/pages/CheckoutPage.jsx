@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
@@ -7,20 +7,77 @@ import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx'
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+import { couponService } from '../services/couponService.js';
+import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
     const { cartItems, cartCount, clearCart } = useCart();
+
+    const [couponInput, setCouponInput] = useState('');
+    const [appliedCouponCode, setAppliedCouponCode] = useState(null);
+    const [couponError, setCouponError] = useState(null);
+    const [pricing, setPricing] = useState(null);
+    const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+    const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
+
+    const cartKey = useMemo(() => {
+        return cartItems.map((i) => `${i.id}:${i.quantity}`).join('|');
+    }, [cartItems]);
     
     const calculateTotal = () => {
+        if (pricing?.total != null) {
+            return parseFloat(pricing.total) || 0;
+        }
         return cartItems.reduce((total, item) => {
-            const price = parseFloat(item.listing.price) || 0;
+            const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
             return total + (price * item.quantity);
         }, 0);
     };
     
-    const checkout = useCheckout(cartCount, calculateTotal, clearCart);
+    const checkout = useCheckout(cartCount, calculateTotal, clearCart, appliedCouponCode);
     const [currentStep, setCurrentStep] = useState(1);
+
+    const refreshPreview = async (code) => {
+        setIsPreviewLoading(true);
+        try {
+            const data = await couponService.preview(code);
+            setPricing(data);
+            setCouponError(null);
+        } catch (e) {
+            const message = e?.response?.data?.message || e?.response?.data?.error || 'Coupon could not be applied';
+            setCouponError(message);
+            setAppliedCouponCode(null);
+            const data = await couponService.preview(null);
+            setPricing(data);
+        } finally {
+            setIsPreviewLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        refreshPreview(appliedCouponCode);
+    }, [cartKey, appliedCouponCode]);
+
+    const onApplyCoupon = async () => {
+        const next = couponInput?.trim() || '';
+        if (!next) {
+            setAppliedCouponCode(null);
+            setCouponError(null);
+            await refreshPreview(null);
+            return;
+        }
+        const normalized = next.toUpperCase();
+        setAppliedCouponCode(normalized);
+        await refreshPreview(normalized);
+    };
+
+    const onRemoveCoupon = async () => {
+        setAppliedCouponCode(null);
+        setCouponInput('');
+        setCouponError(null);
+        await refreshPreview(null);
+    };
 
     const steps = [
         { id: 1, title: 'Review', description: 'Review your order' },
@@ -138,10 +195,30 @@ const CheckoutPage = () => {
                         <CheckoutOrderSummary
                             cartItems={cartItems}
                             calculateTotal={calculateTotal}
+                            pricing={pricing}
+                            couponInput={couponInput}
+                            setCouponInput={setCouponInput}
+                            appliedCouponCode={appliedCouponCode}
+                            couponError={couponError}
+                            isPreviewLoading={isPreviewLoading}
+                            onApplyCoupon={onApplyCoupon}
+                            onRemoveCoupon={onRemoveCoupon}
+                            onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
                         />
                     </div>
                 </div>
             </div>
+
+            <ActiveCouponsModal
+                isOpen={isCouponsModalOpen}
+                onClose={() => setIsCouponsModalOpen(false)}
+                onApply={async (code) => {
+                    setCouponInput(code);
+                    setAppliedCouponCode(code);
+                    await refreshPreview(code);
+                    setIsCouponsModalOpen(false);
+                }}
+            />
         </div>
     );
 };

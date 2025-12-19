@@ -7,6 +7,7 @@ import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
 import { listingService } from '../services/listingService.js';
 import ShowcaseModal from '../../showcase/components/ShowcaseModal.jsx';
 import ReactDOM from 'react-dom';
+import CreateCampaignModal from '../../campaign/components/CreateCampaignModal.jsx';
 
 const ListingCardActions = ({ listing, onChanged }) => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
   const notification = useNotification();
   const [isShowcaseModalOpen, setIsShowcaseModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
   const { isInShowcase } = useShowcaseQuery();
   const dropdownRef = useRef(null);
 
@@ -104,6 +106,13 @@ const ListingCardActions = ({ listing, onChanged }) => {
     setIsDropdownOpen(false);
     console.log('Showcase açılıyor, listingId:', listing.id);
     setIsShowcaseModalOpen(true);
+  };
+
+  const handleCreateCampaign = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDropdownOpen(false);
+    setIsCampaignModalOpen(true);
   };
 
   const handleShowcaseSuccess = () => {
@@ -211,6 +220,16 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
+            <button
+              onClick={handleCreateCampaign}
+              className="w-full px-4 py-2 text-left text-sm text-indigo-700 hover:bg-indigo-50 flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8" />
+              </svg>
+              Create Campaign
+            </button>
+
             <div className="border-t border-gray-100 my-1"></div>
             
             <button
@@ -236,6 +255,13 @@ const ListingCardActions = ({ listing, onChanged }) => {
         />,
         document.body
       )}
+
+      <CreateCampaignModal
+        isOpen={isCampaignModalOpen}
+        onClose={() => setIsCampaignModalOpen(false)}
+        onSuccess={() => onChanged && onChanged(listing.id)}
+        initialListingId={listing.id}
+      />
     </>
   );
 };

@@ -21,7 +21,9 @@ const CartItemCard = ({
         onRemoveItem(item.listing.id);
     };
 
-    const itemTotal = parseFloat(item.listing.price) * item.quantity;
+    const hasCampaign = item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
+    const unitPrice = parseFloat(hasCampaign ? item.listing.campaignPrice : item.listing.price) || 0;
+    const itemTotal = unitPrice * item.quantity;
     
     // Seller Info
     const sellerName = item.listing.sellerName;
@@ -122,10 +124,20 @@ const CartItemCard = ({
                         <div className="space-y-1">
                             <div className="flex items-baseline space-x-2">
                                 <span className="text-lg font-medium text-gray-900">
-                                    {formatCurrency(item.listing.price, item.listing.currency)}
+                                    {formatCurrency(unitPrice, item.listing.currency)}
                                 </span>
+                                {hasCampaign && (
+                                    <span className="text-sm font-medium text-gray-500 line-through">
+                                        {formatCurrency(item.listing.price, item.listing.currency)}
+                                    </span>
+                                )}
                                 <span className="text-xs text-gray-500">each</span>
                             </div>
+                            {hasCampaign && (
+                                <div className="text-xs text-emerald-700 font-medium">
+                                    {item.listing.campaignName || 'Campaign applied'}
+                                </div>
+                            )}
                             <div className="text-sm text-gray-600">
                                 Total: <span className="font-medium text-gray-900">{formatCurrency(itemTotal, item.listing.currency)}</span>
                             </div>

@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const DropdownMenu = ({ trigger, children, className = '' }) => {
+const DropdownMenu = ({
+    trigger,
+    children,
+    className = '',
+    align = 'left',
+    showChevron = true,
+    menuClassName = ''
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -22,21 +29,25 @@ const DropdownMenu = ({ trigger, children, className = '' }) => {
         <div className={`relative ${className}`} ref={dropdownRef}>
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center space-x-1 text-text-secondary hover:text-btn-primary transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-text-secondary hover:text-btn-primary transition-colors cursor-pointer"
             >
-                <span>{trigger}</span>
-                <svg
-                    className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <span className="flex items-center">{trigger}</span>
+                {showChevron && (
+                    <svg
+                        className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                )}
             </div>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-sidebar-border py-2 z-50">
+                <div
+                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-white rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName}`}
+                >
                     {children}
                 </div>
             )}

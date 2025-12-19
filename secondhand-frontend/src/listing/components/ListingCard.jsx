@@ -37,26 +37,28 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const reviewCount = listing.reviewStats?.totalReviews || 0;
     const averageRating = listing.reviewStats?.averageRating || 0;
     const favoriteCount = listing.favoriteStats?.favoriteCount || 0;
+    const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
+    const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
 
     return (
         <div className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative">
-            {/* Image Container */}
-            <div className="aspect-[3/2] bg-gray-50 relative overflow-hidden border-b border-gray-100 rounded-t-xl">
-                {listing.imageUrl ? (
-                    <img 
-                        src={listing.imageUrl} 
-                        alt={listing.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
-                    />
-                ) : null}
-                
-                {/* Fallback Image */}
-                <div className={`w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                    <ImageIcon className="w-10 h-10 mb-2 opacity-40" />
+            <div className="aspect-[3/2] bg-gray-50 relative border-b border-gray-100 rounded-t-xl">
+                <div className="absolute inset-0 overflow-hidden rounded-t-xl">
+                    {listing.imageUrl ? (
+                        <img 
+                            src={listing.imageUrl} 
+                            alt={listing.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
+                    
+                    <div className={`w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+                        <ImageIcon className="w-10 h-10 mb-2 opacity-40" />
+                    </div>
                 </div>
                 
                 {/* Status Badge */}
@@ -135,9 +137,21 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 )}
 
                 <div className="mb-3 mt-auto">
-                    <p className="text-lg font-bold text-gray-900 tracking-tight">
-                        {formatCurrency(listing.price, listing.currency)}
-                    </p>
+                    <div className="flex items-end gap-2 flex-wrap">
+                        <p className="text-lg font-bold text-gray-900 tracking-tight">
+                            {formatCurrency(displayPrice, listing.currency)}
+                        </p>
+                        {hasCampaign && (
+                            <p className="text-sm font-medium text-gray-500 line-through">
+                                {formatCurrency(listing.price, listing.currency)}
+                            </p>
+                        )}
+                    </div>
+                    {hasCampaign && (
+                        <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+                            <span>{listing.campaignName || 'Campaign'}</span>
+                        </div>
+                    )}
                     {listing.description && (
                         <p className="text-xs text-gray-500 line-clamp-2 mt-1">
                             {listing.description}
@@ -177,7 +191,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 onClose={() => setShowInfo(false)}
                 listingId={listing.id}
                 listingTitle={listing.title}
-                price={listing.price}
+                price={displayPrice}
                 currency={listing.currency}
             />
         </div>

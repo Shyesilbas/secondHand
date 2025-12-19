@@ -12,6 +12,7 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.PurchaseService;
 import com.serhat.secondhand.payment.service.PaymentVerificationService;
+import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +38,12 @@ public class OrderPaymentService {
     private final PaymentVerificationService paymentVerificationService;
     private final OrderRepository orderRepository;
 
-    public PaymentProcessingResult processOrderPayments(User user, List<Cart> cartItems, 
-                                                      CheckoutRequest request, Order order) {
+    public PaymentProcessingResult processOrderPayments(User user, List<Cart> cartItems,
+                                                      CheckoutRequest request, Order order, PricingResultDto pricing) {
         log.info("Processing payments for order: {}", order.getOrderNumber());
 
         try {
-            List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request);
+            List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing);
             paymentVerificationService.validateOrGenerateVerification(user, request.getPaymentVerificationCode());
             List<PaymentDto> paymentResults = purchaseService.createPurchasePayments(paymentRequests, getAuthentication());
                         
@@ -62,7 +63,7 @@ public class OrderPaymentService {
         }
     }
 
-        private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request) {
+        private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         var paymentsBySeller = groupCartItemsBySeller(cartItems);
         List<PaymentRequest> paymentRequests = new ArrayList<>();
 
@@ -70,7 +71,8 @@ public class OrderPaymentService {
             Long sellerId = entry.getKey();
             List<Cart> sellerItems = entry.getValue();
             
-            PaymentRequest paymentRequest = createPaymentRequestForSeller(user, sellerId, sellerItems, request);
+            BigDecimal sellerTotal = resolveSellerTotal(sellerId, sellerItems, pricing);
+            PaymentRequest paymentRequest = createPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request);
             paymentRequests.add(paymentRequest);
         }
 
@@ -83,8 +85,7 @@ public class OrderPaymentService {
                 .collect(Collectors.groupingBy(cart -> cart.getListing().getSeller().getId()));
     }
 
-    private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, CheckoutRequest request) {
-        BigDecimal sellerTotal = calculateSellerTotal(sellerItems);
+    private PaymentRequest createPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, BigDecimal sellerTotal, CheckoutRequest request) {
         var sellerInfo = getSellerInfo(sellerItems);
 
         return PaymentRequest.builder()
@@ -103,8 +104,10 @@ public class OrderPaymentService {
                 .build();
     }
 
-
-        private BigDecimal calculateSellerTotal(List<Cart> sellerItems) {
+    private BigDecimal resolveSellerTotal(Long sellerId, List<Cart> sellerItems, PricingResultDto pricing) {
+        if (pricing != null && pricing.getPayableBySeller() != null && pricing.getPayableBySeller().containsKey(sellerId)) {
+            return pricing.getPayableBySeller().get(sellerId);
+        }
         return sellerItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

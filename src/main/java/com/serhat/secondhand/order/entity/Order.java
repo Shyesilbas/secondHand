@@ -45,6 +45,21 @@ public class Order {
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
+    @Column(name = "subtotal", precision = 10, scale = 2)
+    private BigDecimal subtotal;
+
+    @Column(name = "campaign_discount", precision = 10, scale = 2)
+    private BigDecimal campaignDiscount;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
+
+    @Column(name = "coupon_discount", precision = 10, scale = 2)
+    private BigDecimal couponDiscount;
+
+    @Column(name = "discount_total", precision = 10, scale = 2)
+    private BigDecimal discountTotal;
+
     @Column(name = "currency", length = 3, nullable = false)
     @Builder.Default
     private String currency = "TRY";

@@ -9,6 +9,8 @@ import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.pricing.dto.PricingResultDto;
+import com.serhat.secondhand.pricing.service.PricingService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class PaymentVerificationService {
     private final ListingService listingService;
     private final CartRepository cartRepository;
     private final PaymentNotificationService paymentNotificationService;
+    private final PricingService pricingService;
 
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
@@ -55,7 +58,7 @@ public class PaymentVerificationService {
         details.append("Service: ").append(type.name().replace("_", " ")).append("\n");
 
         switch (type) {
-            case ITEM_PURCHASE -> appendCartDetails(details, user);
+            case ITEM_PURCHASE -> appendCartDetails(details, user, req);
             case LISTING_CREATION -> appendListingDetails(details, req, calculateTotalListingFee());
             case SHOWCASE_PAYMENT -> {
                 appendListingDetails(details, req, req != null ? req.getAmount() : null);
@@ -74,21 +77,35 @@ public class PaymentVerificationService {
         return details.toString();
     }
 
-    private void appendCartDetails(StringBuilder details, User user) {
+    private void appendCartDetails(StringBuilder details, User user, InitiateVerificationRequest req) {
         List<Cart> cartItems = cartRepository.findByUserWithListing(user);
-        BigDecimal total = cartItems.stream()
-                .map(c -> c.getListing().getPrice().multiply(BigDecimal.valueOf(c.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        String couponCode = req != null ? req.getCouponCode() : null;
+        PricingResultDto pricing = pricingService.priceCart(user, cartItems, couponCode);
 
         details.append("Order Summary:\n");
-        for (Cart item : cartItems) {
-            String title = (item.getListing() != null && item.getListing().getTitle() != null)
-                    ? item.getListing().getTitle() : "Item";
-            details.append("- ").append(title)
-                    .append(" x").append(item.getQuantity())
-                    .append(" — ").append(item.getListing().getPrice()).append("\n");
+        if (pricing.getItems() != null) {
+            for (var item : pricing.getItems()) {
+                String title = "Item";
+                if (cartItems != null) {
+                    for (Cart ci : cartItems) {
+                        if (ci.getListing() != null && ci.getListing().getId() != null && ci.getListing().getId().equals(item.getListingId())) {
+                            title = ci.getListing().getTitle() != null ? ci.getListing().getTitle() : title;
+                            break;
+                        }
+                    }
+                }
+                details.append("- ").append(title)
+                        .append(" x").append(item.getQuantity())
+                        .append(" — ").append(item.getCampaignUnitPrice()).append(" TRY\n");
+            }
         }
-        details.append("Total: ").append(total).append(" TRY\n");
+        if (pricing.getCampaignDiscount() != null && pricing.getCampaignDiscount().compareTo(BigDecimal.ZERO) > 0) {
+            details.append("Campaign Discount: -").append(pricing.getCampaignDiscount()).append(" TRY\n");
+        }
+        if (pricing.getCouponDiscount() != null && pricing.getCouponDiscount().compareTo(BigDecimal.ZERO) > 0) {
+            details.append("Coupon Discount: -").append(pricing.getCouponDiscount()).append(" TRY\n");
+        }
+        details.append("Total: ").append(pricing.getTotal()).append(" TRY\n");
     }
 
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {

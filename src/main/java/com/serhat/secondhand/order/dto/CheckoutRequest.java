@@ -27,4 +27,6 @@ public class CheckoutRequest {
     
     private boolean agreementsAccepted;
     private List<UUID> acceptedAgreementIds;
+
+    private String couponCode;
 }

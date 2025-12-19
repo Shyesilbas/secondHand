@@ -9,6 +9,11 @@ const OrderSummary = ({
     disabled = false 
 }) => {
     const total = calculateTotal();
+    const originalSubtotal = cartItems.reduce((sum, item) => {
+        const price = parseFloat(item.listing.price) || 0;
+        return sum + (price * item.quantity);
+    }, 0);
+    const campaignDiscount = Math.max(0, (originalSubtotal || 0) - (total || 0));
     const shipping = 0;
     const tax = 0;
     const finalTotal = total + shipping + tax;
@@ -54,6 +59,13 @@ const OrderSummary = ({
                         <span className="text-gray-600">Subtotal</span>
                         <span className="font-medium text-gray-900">{formatCurrency(total, currency)}</span>
                     </div>
+
+                    {campaignDiscount > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Campaign discount</span>
+                            <span className="font-medium text-emerald-700">-{formatCurrency(campaignDiscount, currency)}</span>
+                        </div>
+                    )}
                     
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Shipping</span>

@@ -9,7 +9,8 @@ import {
   CreditCard, 
   AlertTriangle, 
   Star, 
-  MessageSquare
+  MessageSquare,
+  Tag
 } from 'lucide-react';
 
 const DashboardPage = () => {
@@ -63,6 +64,13 @@ const DashboardPage = () => {
       description: "Reviews you gave others",
       route: ROUTES.REVIEWS_GIVEN(user?.id),
       icon: MessageSquare,
+      color: "text-indigo-600"
+    },
+    {
+      title: "Kuponlarım",
+      description: "Manage your campaigns",
+      route: ROUTES.MY_COUPONS,
+      icon: Tag,
       color: "text-indigo-600"
     },
   ], [user?.id]);
