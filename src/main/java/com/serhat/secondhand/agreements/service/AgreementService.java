@@ -1,11 +1,10 @@
 package com.serhat.secondhand.agreements.service;
 
-import com.serhat.secondhand.agreements.repository.AgreementRepository;
-import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
+import com.serhat.secondhand.agreements.entity.enums.AgreementType;
+import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.util.AgreementErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,7 +124,7 @@ public class AgreementService {
 
     public Agreement updateAgreement(UUID agreementId, String content) {
         Agreement agreement = getAgreementById(agreementId);
-        String newVersion = agreement.getVersion();
+        String newVersion;
         newVersion = agreementVersionHelper.handleContentChange(agreement.getContent(), content, agreement.getVersion());
         agreement.setVersion(newVersion);
         agreement.setContent(content);

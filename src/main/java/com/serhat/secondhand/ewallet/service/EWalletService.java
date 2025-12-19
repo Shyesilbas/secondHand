@@ -196,6 +196,15 @@ public class EWalletService {
         return eWallet.getBalance().compareTo(amount) >= 0;
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasSufficientBalance(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        EWallet eWallet = getEWalletOrThrow(user);
+        return eWallet.getBalance().compareTo(amount) >= 0;
+    }
+
     @Transactional
     public void processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
         log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",

@@ -4,7 +4,10 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.CreditCardDto;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
+import com.serhat.secondhand.payment.entity.PaymentResult;
+import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
+import com.serhat.secondhand.payment.mapper.CreditCardMapper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.UserService;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,7 @@ public class CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
     private final UserService userService;
-    private final com.serhat.secondhand.payment.mapper.CreditCardMapper creditCardMapper;
+    private final CreditCardMapper creditCardMapper;
 
     public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
@@ -63,37 +67,42 @@ public class CreditCardService {
         CreditCard creditCard = findByUserMandatory(user);
         return creditCardMapper.toDto(creditCard);
     }
-    
-    public boolean processPayment(User user, BigDecimal amount) {
-        CreditCard card = findByUserMandatory(user);
 
+    public boolean hasSufficientCredit(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+
+        return findByUser(user)
+                .map(card -> card.getLimit().subtract(card.getAmount()).compareTo(amount) >= 0)
+                .orElse(false);
+    }
+
+    public PaymentResult processCreditCardPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
+        if (fromUser == null) {
+            return PaymentResult.failure("User not found", amount, PaymentType.CREDIT_CARD, listingId, null, toUser != null ? toUser.getId() : null);
+        }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
-        
+
+        CreditCard card = findByUserMandatory(fromUser);
         BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
         if (availableCredit.compareTo(amount) < 0) {
-            log.warn("Insufficient credit limit for user: {}. Available: {}, Requested: {}", user.getEmail(), availableCredit, amount);
-            return false;
+            return PaymentResult.failure("Insufficient credit limit", amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         }
 
         try {
-            log.info("Processing payment of {} for card ending with: {}", amount, CreditCardHelper.maskCardNumber(card.getNumber()));
-
             boolean isSuccessful = Math.random() > 0.05;
-
-            if (isSuccessful) {
-                card.setAmount(card.getAmount().add(amount));
-                creditCardRepository.save(card);
-                log.info("Payment processed successfully for amount: {}. New card balance: {}", amount, card.getAmount());
-                return true;
-            } else {
-                log.warn("Payment processing failed for amount: {}", amount);
-                return false;
+            if (!isSuccessful) {
+                return PaymentResult.failure("Payment processing failed", amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
             }
+
+            card.setAmount(card.getAmount().add(amount));
+            creditCardRepository.save(card);
+            return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         } catch (Exception e) {
-            log.error("Error processing payment for user {}", user.getEmail(), e);
-            return false;
+            return PaymentResult.failure(e.getMessage(), amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         }
     }
 
