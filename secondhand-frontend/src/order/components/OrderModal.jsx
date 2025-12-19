@@ -66,8 +66,62 @@ const OrderModal = React.memo(({
                             </span>
                         </div>
                         <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Total Amount</p>
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Total</p>
                             <p className="text-lg font-semibold text-gray-900">{formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}</p>
+                            {(selectedOrder.campaignDiscount > 0 || selectedOrder.couponDiscount > 0) && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Saved {formatCurrency(selectedOrder.discountTotal || (selectedOrder.campaignDiscount + selectedOrder.couponDiscount), selectedOrder.currency)}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-900">Discount Summary</h4>
+                            {selectedOrder.couponCode && (
+                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    Coupon: {selectedOrder.couponCode}
+                                </span>
+                            )}
+                        </div>
+                        <div className="p-6">
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">Subtotal</span>
+                                    <span className="font-medium text-gray-900">
+                                        {formatCurrency(selectedOrder.subtotal != null ? selectedOrder.subtotal : selectedOrder.totalAmount, selectedOrder.currency)}
+                                    </span>
+                                </div>
+                                {selectedOrder.campaignDiscount > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-gray-600">Campaign discount</span>
+                                        <span className="font-semibold text-emerald-700">
+                                            -{formatCurrency(selectedOrder.campaignDiscount, selectedOrder.currency)}
+                                        </span>
+                                    </div>
+                                )}
+                                {selectedOrder.couponDiscount > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-gray-600">Coupon discount</span>
+                                        <span className="font-semibold text-emerald-700">
+                                            -{formatCurrency(selectedOrder.couponDiscount, selectedOrder.currency)}
+                                        </span>
+                                    </div>
+                                )}
+                                {(selectedOrder.campaignDiscount > 0 || selectedOrder.couponDiscount > 0) && (
+                                    <div className="flex items-center justify-between text-sm border-t border-gray-200 pt-3">
+                                        <span className="text-gray-600">Discount total</span>
+                                        <span className="font-semibold text-emerald-700">
+                                            -{formatCurrency(selectedOrder.discountTotal || (selectedOrder.campaignDiscount + selectedOrder.couponDiscount), selectedOrder.currency)}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between text-base font-semibold border-t border-gray-200 pt-3">
+                                    <span className="text-gray-900">Total</span>
+                                    <span className="text-gray-900">{formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -159,6 +213,14 @@ const OrderModal = React.memo(({
                                             <h5 className="text-lg font-semibold text-gray-900 mb-2">{item.listing?.title || item.listing?.listingNo}</h5>
                                             <div className="space-y-1">
                                                 <p className="text-sm text-gray-500">Listing ID: <span className="font-medium text-gray-700">{item.listing?.listingNo || item.listing?.id}</span></p>
+                                                {item.campaignName && (
+                                                    <p className="text-sm text-emerald-700 font-medium">
+                                                        Campaign: <span className="font-semibold">{item.campaignName}</span>
+                                                        {item.campaignDiscountAmount > 0 && (
+                                                            <span className="text-emerald-800"> (−{formatCurrency(item.campaignDiscountAmount, selectedOrder.currency)} / unit)</span>
+                                                        )}
+                                                    </p>
+                                                )}
                                                 <p className="text-sm text-gray-600">
                                                     Unit Price: <span className="font-medium text-gray-900">{formatCurrency(item.unitPrice, selectedOrder.currency)}</span>
                                                 </p>

@@ -5,13 +5,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
-import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
+import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -60,4 +61,11 @@ public abstract class ListingDto {
     
     private FavoriteStatsDto favoriteStats;
     private ReviewStatsDto reviewStats;
+
+    private BigDecimal campaignPrice;
+    private BigDecimal campaignDiscountAmount;
+    private CampaignDiscountKind campaignDiscountKind;
+    private BigDecimal campaignValue;
+    private UUID campaignId;
+    private String campaignName;
 }

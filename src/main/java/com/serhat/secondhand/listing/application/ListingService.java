@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
+import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.application.util.ListingReviewStatsUtil;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
@@ -38,6 +39,7 @@ public class ListingService {
     private final UserService userService;
     private final ListingFavoriteStatsUtil favoriteStatsUtil;
     private final ListingReviewStatsUtil reviewStatsUtil;
+    private final ListingCampaignPricingUtil campaignPricingUtil;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
 
     public ListingService(
@@ -51,13 +53,15 @@ public class ListingService {
         SportsListingFilterService sportsListingFilterService,
         UserService userService,
         ListingFavoriteStatsUtil favoriteStatsUtil,
-        ListingReviewStatsUtil reviewStatsUtil
+        ListingReviewStatsUtil reviewStatsUtil,
+        ListingCampaignPricingUtil campaignPricingUtil
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
         this.userService = userService;
         this.favoriteStatsUtil = favoriteStatsUtil;
         this.reviewStatsUtil = reviewStatsUtil;
+        this.campaignPricingUtil = campaignPricingUtil;
 
         this.filterStrategyMap = new HashMap<>();
         filterStrategyMap.put(VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f));
@@ -78,6 +82,7 @@ public class ListingService {
                     ListingDto dto = listingMapper.toDynamicDto(listing);
                     favoriteStatsUtil.enrichWithFavoriteStats(dto, userEmail);
                     reviewStatsUtil.enrichWithReviewStats(dto);
+                    campaignPricingUtil.enrichWithCampaignPricing(dto);
                     return dto;
                 });
     }
@@ -101,6 +106,7 @@ public class ListingService {
             ListingDto dto = listingMapper.toDynamicDto(listing.get());
             favoriteStatsUtil.enrichWithFavoriteStats(dto, null);
             reviewStatsUtil.enrichWithReviewStats(dto);
+            campaignPricingUtil.enrichWithCampaignPricing(dto);
             return Optional.of(dto);
         } else {
             log.info("No listing found with listingNo: {}", cleanListingNo);
@@ -118,6 +124,7 @@ public class ListingService {
         List<ListingDto> dtos = result.getContent();
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
         reviewStatsUtil.enrichWithReviewStats(dtos);
+        campaignPricingUtil.enrichWithCampaignPricing(dtos);
         return new PageImpl<>(dtos, result.getPageable(), result.getTotalElements());
     }
 
@@ -143,6 +150,7 @@ public class ListingService {
         // Enrich with stats
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
         reviewStatsUtil.enrichWithReviewStats(dtos);
+        campaignPricingUtil.enrichWithCampaignPricing(dtos);
         
         return new PageImpl<>(dtos, pageable, results.getTotalElements());
     }
@@ -153,6 +161,7 @@ public class ListingService {
                 .toList();
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
         reviewStatsUtil.enrichWithReviewStats(dtos);
+        campaignPricingUtil.enrichWithCampaignPricing(dtos);
         return dtos;
     }
 
@@ -166,6 +175,7 @@ public class ListingService {
                 .toList();
         favoriteStatsUtil.enrichWithFavoriteStats(dtos, user.getEmail());
         reviewStatsUtil.enrichWithReviewStats(dtos);
+        campaignPricingUtil.enrichWithCampaignPricing(dtos);
         
         return new PageImpl<>(dtos, pageable, listingsPage.getTotalElements());
     }

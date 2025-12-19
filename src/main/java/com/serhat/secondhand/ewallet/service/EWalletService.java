@@ -1,8 +1,5 @@
 package com.serhat.secondhand.ewallet.service;
 
-import com.serhat.secondhand.agreements.entity.Agreement;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
-import com.serhat.secondhand.agreements.service.AgreementService;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.entity.EWallet;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,7 +29,6 @@ public class EWalletService {
     private final EWalletRepository eWalletRepository;
     private final BankService bankService;
     private final PaymentRepository paymentRepository;
-    private final AgreementService agreementService;
 
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
         User user = getCurrentUser();
@@ -88,9 +83,6 @@ public class EWalletService {
         User user = getCurrentUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
-        // Validate payment agreements
-        validatePaymentAgreements(request);
-
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
         }
@@ -134,9 +126,6 @@ public class EWalletService {
     public void withdraw(WithdrawRequest request) {
         User user = getCurrentUser();
         EWallet eWallet = getEWalletOrThrow(user);
-
-        // Validate payment agreements
-        validatePaymentAgreements(request);
 
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
@@ -265,34 +254,4 @@ public class EWalletService {
         return (User) auth.getPrincipal();
     }
 
-    private void validatePaymentAgreements(Object request) {
-        boolean agreementsAccepted = false;
-        List<UUID> acceptedAgreementIds = null;
-
-        if (request instanceof DepositRequest depositRequest) {
-            agreementsAccepted = depositRequest.isAgreementsAccepted();
-            acceptedAgreementIds = depositRequest.getAcceptedAgreementIds();
-        } else if (request instanceof WithdrawRequest withdrawRequest) {
-            agreementsAccepted = withdrawRequest.isAgreementsAccepted();
-            acceptedAgreementIds = withdrawRequest.getAcceptedAgreementIds();
-        }
-
-        if (!agreementsAccepted) {
-            throw new BusinessException(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
-        }
-
-        var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.ONLINE_PAYMENT);
-
-        if (acceptedAgreementIds == null || acceptedAgreementIds.size() != requiredAgreements.size()) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AGREEMENT_COUNT);
-        }
-
-        var requiredAgreementIds = requiredAgreements.stream()
-                .map(Agreement::getAgreementId)
-                .toList();
-
-        if (!acceptedAgreementIds.containsAll(requiredAgreementIds)) {
-            throw new BusinessException(PaymentErrorCodes.REQUIRED_AGREEMENTS_NOT_ACCEPTED);
-        }
-    }
 }

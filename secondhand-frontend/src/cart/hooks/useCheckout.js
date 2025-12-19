@@ -9,7 +9,7 @@ import useAddresses from '../../user/hooks/useAddresses.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
 import { usePaymentAgreements } from '../../payments/hooks/usePaymentAgreements.js';
 
-export const useCheckout = (cartCount, calculateTotal, clearCart) => {
+export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode) => {
     const navigate = useNavigate();
     const { showError, showSuccess } = useNotification();
     
@@ -120,7 +120,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 paymentType: selectedPaymentType,
                 paymentVerificationCode: paymentVerificationCode?.trim() || null,
                 agreementsAccepted: true,
-                acceptedAgreementIds: getAcceptedAgreementIds()
+                acceptedAgreementIds: getAcceptedAgreementIds(),
+                couponCode: couponCode?.trim() || null
             };
             console.debug('Checkout payload:', payload);
             await orderService.checkout(payload);
@@ -171,7 +172,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
         setIsCheckingOut(true);
         try {
             await orderService.initiatePaymentVerification?.({
-                transactionType: 'ITEM_PURCHASE'
+                transactionType: 'ITEM_PURCHASE',
+                couponCode: couponCode?.trim() || null
             });
             showSuccess('Verification Code Sent', 'Please check your email for the code.');
             try { await fetchEmails(); } catch {}
@@ -201,7 +203,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart) => {
                 billingAddressId: selectedBillingAddressId,
                 notes: notes?.trim() || null,
                 paymentType: selectedPaymentType,
-                paymentVerificationCode: paymentVerificationCode?.trim() || null
+                paymentVerificationCode: paymentVerificationCode?.trim() || null,
+                agreementsAccepted: true,
+                acceptedAgreementIds: getAcceptedAgreementIds(),
+                couponCode: couponCode?.trim() || null
             };
             console.debug('Checkout payload (confirm):', payload);
             await orderService.checkout(payload);

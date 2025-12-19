@@ -27,12 +27,22 @@ const ShoppingCartPage = () => {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
+            const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
+            return total + (price * item.quantity);
+        }, 0);
+    };
+
+    const calculateOriginalTotal = () => {
+        return cartItems.reduce((total, item) => {
             const price = parseFloat(item.listing.price) || 0;
             return total + (price * item.quantity);
         }, 0);
     };
     
     const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
+    const originalTotal = calculateOriginalTotal();
+    const discountedTotal = calculateTotal();
+    const campaignDiscount = Math.max(0, (originalTotal || 0) - (discountedTotal || 0));
 
     const handleQuantityChange = (listingId, newQuantity) => {
         if (newQuantity < 1) return;
@@ -75,7 +85,11 @@ const ShoppingCartPage = () => {
                         <div>
                             <h1 className="text-2xl font-medium text-gray-900">Shopping Cart</h1>
                             <p className="text-gray-600 mt-1">
-                                {cartCount} {cartCount === 1 ? 'item' : 'items'} • {formatCurrency(calculateTotal(), currency)}
+                                <span>{cartCount} {cartCount === 1 ? 'item' : 'items'} • </span>
+                                <span className="font-medium text-gray-900">{formatCurrency(discountedTotal, currency)}</span>
+                                {campaignDiscount > 0 && (
+                                    <span className="ml-2 text-sm text-gray-500 line-through">{formatCurrency(originalTotal, currency)}</span>
+                                )}
                             </p>
                         </div>
                     </div>
@@ -139,7 +153,10 @@ const ShoppingCartPage = () => {
                                         </div>
                                         <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
                                         <div className="text-sm text-gray-600">
-                                            Subtotal: <span className="font-semibold text-gray-900">{formatCurrency(calculateTotal(), currency)}</span>
+                                            Subtotal: <span className="font-semibold text-gray-900">{formatCurrency(discountedTotal, currency)}</span>
+                                            {campaignDiscount > 0 && (
+                                                <span className="ml-2 text-gray-500 line-through">{formatCurrency(originalTotal, currency)}</span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-2 text-sm text-gray-600">

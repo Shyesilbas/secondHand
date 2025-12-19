@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +23,9 @@ public class OrderItemDto {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private UUID campaignId;
+    private String campaignName;
+    private BigDecimal campaignDiscountAmount;
     private String currency;
     private String notes;
     private LocalDateTime createdAt;

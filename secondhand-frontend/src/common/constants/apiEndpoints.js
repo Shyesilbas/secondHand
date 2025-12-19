@@ -231,6 +231,14 @@ export const API_ENDPOINTS = {
         GET_COUNT: '/v1/cart/count',
         CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
     },
+    COUPONS: {
+        PREVIEW: '/v1/coupons/preview',
+        ACTIVE: '/v1/coupons/active',
+    },
+    CAMPAIGNS: {
+        SELLER: '/v1/seller/campaigns',
+        BY_ID: (id) => `/v1/seller/campaigns/${id}`,
+    },
     REVIEWS: {
         CREATE_REVIEW: '/v1/reviews',                                                        // POST - Create review
         GET_REVIEWS_RECEIVED: '/v1/reviews/received',                                        // GET - Reviews received by me

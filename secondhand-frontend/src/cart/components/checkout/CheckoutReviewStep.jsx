@@ -50,6 +50,8 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
             {/* Items List */}
             <div className="space-y-4 mb-8">
                 {cartItems.map((item) => {
+                    const hasCampaign = item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
+                    const unitPrice = hasCampaign ? item.listing.campaignPrice : item.listing.price;
                     return (
                         <div key={item.id} className="p-5 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-start space-x-4">
@@ -93,10 +95,15 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                                 </div>
                                 <div className="text-right flex-shrink-0">
                                     <div className="text-lg font-medium text-gray-900">
-                                        {formatCurrency(parseFloat(item.listing.price) * item.quantity, item.listing.currency)}
+                                        {formatCurrency(parseFloat(unitPrice) * item.quantity, item.listing.currency)}
                                     </div>
                                     <div className="text-sm text-gray-500">
-                                        {item.quantity} × {formatCurrency(item.listing.price, item.listing.currency)}
+                                        <div className="flex flex-col items-end">
+                                            <span>{item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}</span>
+                                            {hasCampaign && (
+                                                <span className="text-xs text-emerald-700 font-medium">{item.listing.campaignName || 'Campaign applied'}</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

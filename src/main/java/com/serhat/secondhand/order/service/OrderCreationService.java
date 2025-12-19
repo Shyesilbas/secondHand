@@ -8,6 +8,9 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
+import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
+import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.shipping.ShippingService;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
@@ -19,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +38,7 @@ public class OrderCreationService {
     private final AddressService addressService;
     private final ShippingService shippingService;
 
-        public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request) {
+        public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         log.info("Creating order for user: {}", user.getEmail());
 
         validateCartItems(cartItems);
@@ -42,11 +47,24 @@ public class OrderCreationService {
 
         validateAddresses(user, shippingAddress, billingAddress);
 
-        BigDecimal totalAmount = calculateTotalAmount(cartItems);
+        BigDecimal totalAmount = pricing != null && pricing.getTotal() != null ? pricing.getTotal() : calculateTotalAmount(cartItems);
+        BigDecimal subtotal = pricing != null ? pricing.getSubtotalAfterCampaigns() : null;
+        BigDecimal campaignDiscount = pricing != null ? pricing.getCampaignDiscount() : null;
+        BigDecimal couponDiscount = pricing != null ? pricing.getCouponDiscount() : null;
+        BigDecimal discountTotal = pricing != null ? pricing.getDiscountTotal() : null;
+        String couponCode = pricing != null ? pricing.getCouponCode() : null;
         String orderNumber = generateOrderNumber();
         
         Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes());
-        List<OrderItem> orderItems = createOrderItems(cartItems, order);
+        order.setSubtotal(subtotal);
+        order.setCampaignDiscount(campaignDiscount);
+        order.setCouponCode(couponCode);
+        order.setCouponDiscount(couponDiscount);
+        order.setDiscountTotal(discountTotal);
+
+        Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
+        Map<UUID, AppliedCampaignDto> campaignByListingId = buildCampaignByListingId(pricing);
+        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, campaignByListingId);
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
@@ -90,22 +108,59 @@ public class OrderCreationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order) {
+        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
         return cartItems.stream()
-                .map(cart -> createOrderItem(cart, order))
+                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, campaignByListingId))
                 .collect(Collectors.toList());
     }
 
-        private OrderItem createOrderItem(Cart cart, Order order) {
+        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
+        BigDecimal unitPrice = cart.getListing() != null ? cart.getListing().getPrice() : BigDecimal.ZERO;
+        AppliedCampaignDto campaign = null;
+        if (cart.getListing() != null && unitPriceByListingId != null) {
+            unitPrice = unitPriceByListingId.getOrDefault(cart.getListing().getId(), unitPrice);
+            if (campaignByListingId != null) {
+                campaign = campaignByListingId.get(cart.getListing().getId());
+            }
+        }
         return OrderItem.builder()
                 .order(order)
                 .listing(cart.getListing())
                 .quantity(cart.getQuantity())
-                .unitPrice(cart.getListing().getPrice())
-                .totalPrice(cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
+                .unitPrice(unitPrice)
+                .totalPrice(unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity())))
+                .campaignId(campaign != null ? campaign.getCampaignId() : null)
+                .campaignName(campaign != null ? campaign.getName() : null)
+                .campaignDiscountAmount(campaign != null ? campaign.getDiscountAmount() : null)
                 .currency("TRY")
                 .notes(cart.getNotes())
                 .build();
+    }
+
+    private Map<UUID, BigDecimal> buildUnitPriceByListingId(PricingResultDto pricing) {
+        if (pricing == null || pricing.getItems() == null) {
+            return Map.of();
+        }
+        Map<UUID, BigDecimal> map = new HashMap<>();
+        for (PricedCartItemDto item : pricing.getItems()) {
+            if (item.getListingId() != null && item.getCampaignUnitPrice() != null) {
+                map.put(item.getListingId(), item.getCampaignUnitPrice());
+            }
+        }
+        return map;
+    }
+
+    private Map<UUID, AppliedCampaignDto> buildCampaignByListingId(PricingResultDto pricing) {
+        if (pricing == null || pricing.getItems() == null) {
+            return Map.of();
+        }
+        Map<UUID, AppliedCampaignDto> map = new HashMap<>();
+        for (PricedCartItemDto item : pricing.getItems()) {
+            if (item.getListingId() != null && item.getAppliedCampaign() != null) {
+                map.put(item.getListingId(), item.getAppliedCampaign());
+            }
+        }
+        return map;
     }
 
         private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 

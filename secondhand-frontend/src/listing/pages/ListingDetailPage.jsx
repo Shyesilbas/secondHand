@@ -62,6 +62,8 @@ const ListingDetailPage = () => {
   const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
   const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
   const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
+  const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
+  const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
 
   const tabs = [
     { id: 'about', label: 'About' },
@@ -137,7 +139,17 @@ const ListingDetailPage = () => {
             {/* Title & Price (Mobile Only) */}
             <div className="lg:hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                <h1 className="text-xl font-bold text-gray-900 mb-2">{listing.title}</h1>
-               <p className="text-2xl font-bold text-gray-900">{formatCurrency(listing.price, listing.currency)}</p>
+               <div className="flex items-end gap-3 flex-wrap">
+                 <p className="text-2xl font-bold text-gray-900">{formatCurrency(displayPrice, listing.currency)}</p>
+                 {hasCampaign && (
+                   <p className="text-base font-semibold text-gray-500 line-through">{formatCurrency(listing.price, listing.currency)}</p>
+                 )}
+               </div>
+               {hasCampaign && (
+                 <div className="mt-2 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
+                   {listing.campaignName || 'Campaign'}
+                 </div>
+               )}
             </div>
 
             {/* Tabs & Content */}
@@ -203,8 +215,16 @@ const ListingDetailPage = () => {
                       <span>{formatDateTime(listing.createdAt)}</span>
                    </div>
                    <p className="text-3xl font-bold text-gray-900 tracking-tight">
-                      {formatCurrency(listing.price, listing.currency)}
+                      {formatCurrency(displayPrice, listing.currency)}
                    </p>
+                   {hasCampaign && (
+                     <div className="mt-2 flex items-center gap-3">
+                       <p className="text-sm font-medium text-gray-500 line-through">{formatCurrency(listing.price, listing.currency)}</p>
+                       <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
+                         {listing.campaignName || 'Campaign'}
+                       </span>
+                     </div>
+                   )}
                 </div>
 
                 {/* Seller Info */}

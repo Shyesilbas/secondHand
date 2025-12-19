@@ -9,13 +9,13 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.cart.util.CartErrorCodes;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
 import com.serhat.secondhand.listing.application.util.ListingReviewStatsUtil;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +35,9 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
     private final ListingService listingService;
-    private final ListingMapper listingMapper;
     private final ListingFavoriteStatsUtil favoriteStatsUtil;
     private final ListingReviewStatsUtil reviewStatsUtil;
+    private final ListingCampaignPricingUtil campaignPricingUtil;
 
     @Transactional(readOnly = true)
     public List<CartDto> getCartItems(User user) {
@@ -51,6 +50,7 @@ public class CartService {
                 ListingDto listingDto = cartDto.getListing();
                 favoriteStatsUtil.enrichWithFavoriteStats(listingDto, user.getEmail());
                 reviewStatsUtil.enrichWithReviewStats(listingDto);
+                campaignPricingUtil.enrichWithCampaignPricing(listingDto);
             }
         }
         

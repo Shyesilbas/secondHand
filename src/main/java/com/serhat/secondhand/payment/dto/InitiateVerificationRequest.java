@@ -18,6 +18,7 @@ public class InitiateVerificationRequest {
     private String receiverName;
     private String receiverSurname;
     private Integer days;
+    private String couponCode;
 
 }
 
