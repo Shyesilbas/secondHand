@@ -46,3 +46,4 @@ public class CouponRedemption {
     private LocalDateTime redeemedAt;
 }
 
+

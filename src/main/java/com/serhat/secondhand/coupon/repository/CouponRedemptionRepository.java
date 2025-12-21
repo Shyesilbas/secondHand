@@ -14,3 +14,4 @@ public interface CouponRedemptionRepository extends JpaRepository<CouponRedempti
     long countByCouponAndUser(Coupon coupon, User user);
 }
 
+

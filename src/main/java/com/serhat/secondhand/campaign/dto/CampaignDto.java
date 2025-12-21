@@ -28,3 +28,4 @@ public class CampaignDto {
     private Set<UUID> eligibleListingIds;
 }
 
+

@@ -25,3 +25,4 @@ public interface CouponRepository extends JpaRepository<Coupon, UUID> {
     List<Coupon> findActiveNow(@Param("now") LocalDateTime now);
 }
 
+

@@ -27,3 +27,4 @@ public class CreateCampaignRequest {
     private Set<UUID> eligibleListingIds;
 }
 
+

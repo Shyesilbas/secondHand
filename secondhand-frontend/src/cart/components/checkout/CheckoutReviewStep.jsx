@@ -50,8 +50,14 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
             {/* Items List */}
             <div className="space-y-4 mb-8">
                 {cartItems.map((item) => {
-                    const hasCampaign = item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
-                    const unitPrice = hasCampaign ? item.listing.campaignPrice : item.listing.price;
+                    const isOffer = !!item.isOffer;
+                    const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
+                    const unitPrice = isOffer
+                        ? (item.offerTotalPrice != null && item.quantity ? (parseFloat(item.offerTotalPrice) / item.quantity) : item.listing.price)
+                        : (hasCampaign ? item.listing.campaignPrice : item.listing.price);
+                    const lineTotal = isOffer
+                        ? (parseFloat(item.offerTotalPrice) || 0)
+                        : (parseFloat(unitPrice) * item.quantity);
                     return (
                         <div key={item.id} className="p-5 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-start space-x-4">
@@ -61,9 +67,16 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                                     </span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-lg font-medium text-gray-900 truncate mb-2">
-                                        {item.listing.title}
-                                    </h3>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h3 className="text-lg font-medium text-gray-900 truncate">
+                                            {item.listing.title}
+                                        </h3>
+                                        {isOffer && (
+                                            <span className="px-2 py-0.5 rounded-full text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
+                                                Offer
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="space-y-1">
                                         <p className="text-sm text-gray-500">
                                             {item.listing.type} • {item.listing.city}{item.listing.district ? `, ${item.listing.district}` : ''}
@@ -95,7 +108,7 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                                 </div>
                                 <div className="text-right flex-shrink-0">
                                     <div className="text-lg font-medium text-gray-900">
-                                        {formatCurrency(parseFloat(unitPrice) * item.quantity, item.listing.currency)}
+                                        {formatCurrency(lineTotal, item.listing.currency)}
                                     </div>
                                     <div className="text-sm text-gray-500">
                                         <div className="flex flex-col items-end">

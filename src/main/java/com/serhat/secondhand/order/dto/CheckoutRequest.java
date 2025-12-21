@@ -29,4 +29,6 @@ public class CheckoutRequest {
     private List<UUID> acceptedAgreementIds;
 
     private String couponCode;
+
+    private UUID offerId;
 }

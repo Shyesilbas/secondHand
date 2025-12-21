@@ -63,8 +63,9 @@ public class OrderCreationService {
         order.setDiscountTotal(discountTotal);
 
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
+        Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
         Map<UUID, AppliedCampaignDto> campaignByListingId = buildCampaignByListingId(pricing);
-        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, campaignByListingId);
+        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId, campaignByListingId);
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
@@ -108,17 +109,21 @@ public class OrderCreationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
+        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
         return cartItems.stream()
-                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, campaignByListingId))
+                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId, campaignByListingId))
                 .collect(Collectors.toList());
     }
 
-        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
+        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
         BigDecimal unitPrice = cart.getListing() != null ? cart.getListing().getPrice() : BigDecimal.ZERO;
+        BigDecimal lineSubtotal = unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity()));
         AppliedCampaignDto campaign = null;
         if (cart.getListing() != null && unitPriceByListingId != null) {
             unitPrice = unitPriceByListingId.getOrDefault(cart.getListing().getId(), unitPrice);
+            if (lineSubtotalByListingId != null) {
+                lineSubtotal = lineSubtotalByListingId.getOrDefault(cart.getListing().getId(), lineSubtotal);
+            }
             if (campaignByListingId != null) {
                 campaign = campaignByListingId.get(cart.getListing().getId());
             }
@@ -128,7 +133,7 @@ public class OrderCreationService {
                 .listing(cart.getListing())
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
-                .totalPrice(unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity())))
+                .totalPrice(lineSubtotal)
                 .campaignId(campaign != null ? campaign.getCampaignId() : null)
                 .campaignName(campaign != null ? campaign.getName() : null)
                 .campaignDiscountAmount(campaign != null ? campaign.getDiscountAmount() : null)
@@ -158,6 +163,19 @@ public class OrderCreationService {
         for (PricedCartItemDto item : pricing.getItems()) {
             if (item.getListingId() != null && item.getAppliedCampaign() != null) {
                 map.put(item.getListingId(), item.getAppliedCampaign());
+            }
+        }
+        return map;
+    }
+
+    private Map<UUID, BigDecimal> buildLineSubtotalByListingId(PricingResultDto pricing) {
+        if (pricing == null || pricing.getItems() == null) {
+            return Map.of();
+        }
+        Map<UUID, BigDecimal> map = new HashMap<>();
+        for (PricedCartItemDto item : pricing.getItems()) {
+            if (item.getListingId() != null && item.getLineSubtotal() != null) {
+                map.put(item.getListingId(), item.getLineSubtotal());
             }
         }
         return map;

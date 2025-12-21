@@ -239,6 +239,15 @@ export const API_ENDPOINTS = {
         SELLER: '/v1/seller/campaigns',
         BY_ID: (id) => `/v1/seller/campaigns/${id}`,
     },
+    OFFERS: {
+        CREATE: '/v1/offers',
+        MADE: '/v1/offers/made',
+        RECEIVED: '/v1/offers/received',
+        BY_ID: (id) => `/v1/offers/${id}`,
+        ACCEPT: (id) => `/v1/offers/${id}/accept`,
+        REJECT: (id) => `/v1/offers/${id}/reject`,
+        COUNTER: (id) => `/v1/offers/${id}/counter`,
+    },
     REVIEWS: {
         CREATE_REVIEW: '/v1/reviews',                                                        // POST - Create review
         GET_REVIEWS_RECEIVED: '/v1/reviews/received',                                        // GET - Reviews received by me

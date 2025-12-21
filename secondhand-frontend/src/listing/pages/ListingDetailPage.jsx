@@ -18,9 +18,11 @@ import {
   ArrowLeft,
   ChevronRight,
   AlertTriangle,
-  ShoppingBag
+  ShoppingBag,
+  HandCoins
 } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
+import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -28,6 +30,7 @@ const ListingDetailPage = () => {
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
   const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
   const [activeTab, setActiveTab] = useState('about');
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
   if (isLoading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
@@ -62,6 +65,7 @@ const ListingDetailPage = () => {
   const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
   const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
   const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
+  const canMakeOffer = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
   const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
   const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
 
@@ -93,6 +97,15 @@ const ListingDetailPage = () => {
                 <ShoppingBag className="w-5 h-5" />
               </button>
             )}
+            {canMakeOffer && (
+              <button
+                onClick={() => setIsOfferModalOpen(true)}
+                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-gray-100 rounded-full transition-colors"
+                title="Make Offer"
+              >
+                <HandCoins className="w-5 h-5" />
+              </button>
+            )}
             {!isOwner && (
               <FavoriteButton 
                 listingId={listing.id} 
@@ -111,6 +124,12 @@ const ListingDetailPage = () => {
           </div>
         </div>
       </div>
+
+      <MakeOfferModal
+        isOpen={isOfferModalOpen}
+        onClose={() => setIsOfferModalOpen(false)}
+        listing={listing}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-12 gap-8">
