@@ -38,8 +38,14 @@ const CheckoutOrderSummary = ({
                 <div className="px-6 py-4 max-h-80 overflow-y-auto">
                     <div className="space-y-4">
                         {cartItems.map((item) => {
-                            const hasCampaign = item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
-                            const unitPrice = hasCampaign ? item.listing.campaignPrice : item.listing.price;
+                            const isOffer = !!item.isOffer;
+                            const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
+                            const unitPrice = isOffer
+                                ? (item.offerTotalPrice != null && item.quantity ? (parseFloat(item.offerTotalPrice) / item.quantity) : item.listing.price)
+                                : (hasCampaign ? item.listing.campaignPrice : item.listing.price);
+                            const lineTotal = isOffer
+                                ? (parseFloat(item.offerTotalPrice) || 0)
+                                : (parseFloat(unitPrice) * item.quantity);
                             return (
                             <div key={item.id} className="flex items-center space-x-3">
                                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -51,6 +57,11 @@ const CheckoutOrderSummary = ({
                                     <p className="text-sm font-medium text-gray-900 truncate">
                                         {item.listing.title}
                                     </p>
+                                    {isOffer && (
+                                        <p className="text-xs text-emerald-700 font-semibold mt-0.5">
+                                            Offer item
+                                        </p>
+                                    )}
                                     <p className="text-xs text-gray-500">
                                         {item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}
                                     </p>
@@ -61,7 +72,7 @@ const CheckoutOrderSummary = ({
                                     )}
                                 </div>
                                 <span className="text-sm font-medium text-gray-900">
-                                    {formatCurrency(parseFloat(unitPrice) * item.quantity, item.listing.currency)}
+                                    {formatCurrency(lineTotal, item.listing.currency)}
                                 </span>
                             </div>
                         )})}

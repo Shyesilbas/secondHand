@@ -36,6 +36,22 @@ public class PricingService {
     private final CouponService couponService;
 
     public PricingResultDto priceCart(User buyer, List<Cart> cartItems, String couponCode) {
+        return priceCartInternal(buyer, cartItems, couponCode, null);
+    }
+
+    public PricingResultDto priceCart(User buyer, List<Cart> cartItems, String couponCode, UUID offerListingId, Integer offerQuantity, BigDecimal offerTotalPrice) {
+        if (offerListingId == null) {
+            return priceCartInternal(buyer, cartItems, couponCode, null);
+        }
+        OfferOverride override = OfferOverride.builder()
+                .listingId(offerListingId)
+                .quantity(offerQuantity)
+                .totalPrice(offerTotalPrice)
+                .build();
+        return priceCartInternal(buyer, cartItems, couponCode, override);
+    }
+
+    private PricingResultDto priceCartInternal(User buyer, List<Cart> cartItems, String couponCode, OfferOverride offerOverride) {
         if (cartItems == null || cartItems.isEmpty()) {
             return PricingResultDto.builder()
                     .originalSubtotal(BigDecimal.ZERO)
@@ -77,14 +93,28 @@ public class PricingService {
                 cartTypes.add(type);
             }
 
+            boolean isOfferLine = offerOverride != null
+                    && offerOverride.getListingId() != null
+                    && offerOverride.getListingId().equals(listing.getId());
+
             int quantity = cartItem.getQuantity() != null ? cartItem.getQuantity() : 1;
             BigDecimal unitPrice = scale(listing.getPrice());
             BigDecimal lineOriginal = scale(unitPrice.multiply(BigDecimal.valueOf(quantity)));
 
+            if (isOfferLine) {
+                int oq = offerOverride.getQuantity() != null && offerOverride.getQuantity() > 0 ? offerOverride.getQuantity() : quantity;
+                BigDecimal ot = offerOverride.getTotalPrice() != null ? scale(offerOverride.getTotalPrice()) : null;
+                if (ot != null) {
+                    quantity = oq;
+                    unitPrice = scale(ot.divide(BigDecimal.valueOf(quantity), 2, RoundingMode.HALF_UP));
+                    lineOriginal = ot;
+                }
+            }
+
             AppliedCampaignDto appliedCampaign = null;
             BigDecimal campaignUnitPrice = unitPrice;
 
-            if (type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
+            if (!isOfferLine && type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
                 List<Campaign> sellerCampaigns = campaignsBySeller.getOrDefault(listing.getSeller().getId(), List.of());
                 AppliedCampaignDto best = findBestCampaignForListing(sellerCampaigns, listing);
                 if (best != null && best.getDiscountAmount() != null && best.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
@@ -96,8 +126,13 @@ public class PricingService {
                 }
             }
 
-            BigDecimal lineAfterCampaign = scale(campaignUnitPrice.multiply(BigDecimal.valueOf(quantity)));
-            BigDecimal lineCampaignDiscount = scale(lineOriginal.subtract(lineAfterCampaign));
+            BigDecimal lineAfterCampaign;
+            if (isOfferLine && offerOverride != null && offerOverride.getTotalPrice() != null) {
+                lineAfterCampaign = scale(offerOverride.getTotalPrice());
+            } else {
+                lineAfterCampaign = scale(campaignUnitPrice.multiply(BigDecimal.valueOf(quantity)));
+            }
+            BigDecimal lineCampaignDiscount = isOfferLine ? BigDecimal.ZERO : scale(lineOriginal.subtract(lineAfterCampaign));
 
             originalSubtotal = scale(originalSubtotal.add(lineOriginal));
             subtotalAfterCampaigns = scale(subtotalAfterCampaigns.add(lineAfterCampaign));
@@ -322,5 +357,14 @@ public class PricingService {
         }
         return value.setScale(2, RoundingMode.HALF_UP);
     }
+
+    @lombok.Data
+    @lombok.Builder
+    private static class OfferOverride {
+        private UUID listingId;
+        private Integer quantity;
+        private BigDecimal totalPrice;
+    }
 }
+
 

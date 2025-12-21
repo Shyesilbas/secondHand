@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
 import { useCheckout } from '../hooks/index.js';
@@ -9,10 +9,20 @@ import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.js
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import { couponService } from '../services/couponService.js';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
+import { offerService } from '../../offer/services/offerService.js';
+import { listingService } from '../../listing/services/listingService.js';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { cartItems, cartCount, clearCart } = useCart();
+
+    const offerId = useMemo(() => {
+        return new URLSearchParams(location.search).get('offerId');
+    }, [location.search]);
+
+    const [offerContext, setOfferContext] = useState(null);
+    const [isOfferLoading, setIsOfferLoading] = useState(false);
 
     const [couponInput, setCouponInput] = useState('');
     const [appliedCouponCode, setAppliedCouponCode] = useState(null);
@@ -22,33 +32,81 @@ const CheckoutPage = () => {
     const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
 
     const cartKey = useMemo(() => {
-        return cartItems.map((i) => `${i.id}:${i.quantity}`).join('|');
-    }, [cartItems]);
+        const base = cartItems.map((i) => `${i.id}:${i.quantity}`).join('|');
+        return `${base}|offer:${offerId || ''}`;
+    }, [cartItems, offerId]);
+
+    useEffect(() => {
+        if (!offerId) {
+            setOfferContext(null);
+            return;
+        }
+        setIsOfferLoading(true);
+        offerService
+            .getById(offerId)
+            .then(async (offer) => {
+                const listing = offer?.listingId ? await listingService.getListingById(offer.listingId) : null;
+                const safeListing = listing
+                    ? { ...listing, campaignId: null, campaignPrice: null, campaignName: null }
+                    : null;
+                setOfferContext({
+                    offer,
+                    listing: safeListing,
+                });
+            })
+            .catch((e) => {
+                setOfferContext(null);
+                setCouponError(e?.response?.data?.message || 'Offer could not be loaded');
+            })
+            .finally(() => setIsOfferLoading(false));
+    }, [offerId]);
+
+    const displayCartItems = useMemo(() => {
+        if (!offerContext?.offer || !offerContext?.listing) {
+            return cartItems;
+        }
+        const listingId = offerContext.offer.listingId;
+        const filtered = cartItems.filter((ci) => ci?.listing?.id !== listingId);
+        return [
+            ...filtered,
+            {
+                id: `offer-${offerContext.offer.id}`,
+                quantity: offerContext.offer.quantity,
+                listing: offerContext.listing,
+                isOffer: true,
+                offerTotalPrice: offerContext.offer.totalPrice,
+            },
+        ];
+    }, [cartItems, offerContext]);
     
     const calculateTotal = () => {
         if (pricing?.total != null) {
             return parseFloat(pricing.total) || 0;
         }
-        return cartItems.reduce((total, item) => {
+        return displayCartItems.reduce((total, item) => {
+            if (item.isOffer && item.offerTotalPrice != null) {
+                return total + (parseFloat(item.offerTotalPrice) || 0);
+            }
             const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
             return total + (price * item.quantity);
         }, 0);
     };
     
-    const checkout = useCheckout(cartCount, calculateTotal, clearCart, appliedCouponCode);
+    const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
+    const checkout = useCheckout(effectiveCartCount, calculateTotal, clearCart, appliedCouponCode, offerId);
     const [currentStep, setCurrentStep] = useState(1);
 
     const refreshPreview = async (code) => {
         setIsPreviewLoading(true);
         try {
-            const data = await couponService.preview(code);
+            const data = await couponService.preview(code, offerId);
             setPricing(data);
             setCouponError(null);
         } catch (e) {
             const message = e?.response?.data?.message || e?.response?.data?.error || 'Coupon could not be applied';
             setCouponError(message);
             setAppliedCouponCode(null);
-            const data = await couponService.preview(null);
+            const data = await couponService.preview(null, offerId);
             setPricing(data);
         } finally {
             setIsPreviewLoading(false);
@@ -104,7 +162,7 @@ const CheckoutPage = () => {
         }
     };
 
-    if (cartCount === 0) {
+    if (!offerId && cartCount === 0) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
@@ -155,7 +213,7 @@ const CheckoutPage = () => {
                     <div className="lg:col-span-2">
                         <CheckoutStep
                             step={currentStep}
-                            cartItems={cartItems}
+                            cartItems={displayCartItems}
                             calculateTotal={calculateTotal}
                             addresses={checkout.addresses}
                             selectedShippingAddressId={checkout.selectedShippingAddressId}
@@ -193,7 +251,7 @@ const CheckoutPage = () => {
                     {/* Right Column - Order Summary */}
                     <div className="lg:col-span-1">
                         <CheckoutOrderSummary
-                            cartItems={cartItems}
+                            cartItems={displayCartItems}
                             calculateTotal={calculateTotal}
                             pricing={pricing}
                             couponInput={couponInput}

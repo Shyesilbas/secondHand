@@ -150,3 +150,4 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
 
 export default ActiveCouponsModal;
 
+

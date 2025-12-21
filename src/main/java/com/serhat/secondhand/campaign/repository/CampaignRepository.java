@@ -25,3 +25,4 @@ public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
     List<Campaign> findActiveCampaignsForSellers(@Param("sellerIds") List<Long> sellerIds, @Param("now") LocalDateTime now);
 }
 
+

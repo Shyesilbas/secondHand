@@ -9,6 +9,8 @@ import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.offer.entity.Offer;
+import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
 import com.serhat.secondhand.user.application.UserService;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,6 +37,7 @@ public class PaymentVerificationService {
     private final CartRepository cartRepository;
     private final PaymentNotificationService paymentNotificationService;
     private final PricingService pricingService;
+    private final OfferService offerService;
 
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
@@ -80,14 +84,36 @@ public class PaymentVerificationService {
     private void appendCartDetails(StringBuilder details, User user, InitiateVerificationRequest req) {
         List<Cart> cartItems = cartRepository.findByUserWithListing(user);
         String couponCode = req != null ? req.getCouponCode() : null;
-        PricingResultDto pricing = pricingService.priceCart(user, cartItems, couponCode);
+        Offer acceptedOffer = null;
+        List<Cart> effectiveCartItems = cartItems;
+        if (req != null && req.getOfferId() != null) {
+            acceptedOffer = offerService.getAcceptedOfferForCheckout(user, req.getOfferId());
+            effectiveCartItems = new ArrayList<>();
+            for (Cart ci : cartItems) {
+                if (ci.getListing() != null && acceptedOffer.getListing() != null && acceptedOffer.getListing().getId() != null
+                        && acceptedOffer.getListing().getId().equals(ci.getListing().getId())) {
+                    continue;
+                }
+                effectiveCartItems.add(ci);
+            }
+            effectiveCartItems.add(Cart.builder()
+                    .user(user)
+                    .listing(acceptedOffer.getListing())
+                    .quantity(acceptedOffer.getQuantity())
+                    .notes(null)
+                    .build());
+        }
+
+        PricingResultDto pricing = acceptedOffer != null
+                ? pricingService.priceCart(user, effectiveCartItems, couponCode, acceptedOffer.getListing().getId(), acceptedOffer.getQuantity(), acceptedOffer.getTotalPrice())
+                : pricingService.priceCart(user, effectiveCartItems, couponCode);
 
         details.append("Order Summary:\n");
         if (pricing.getItems() != null) {
             for (var item : pricing.getItems()) {
                 String title = "Item";
-                if (cartItems != null) {
-                    for (Cart ci : cartItems) {
+                if (effectiveCartItems != null) {
+                    for (Cart ci : effectiveCartItems) {
                         if (ci.getListing() != null && ci.getListing().getId() != null && ci.getListing().getId().equals(item.getListingId())) {
                             title = ci.getListing().getTitle() != null ? ci.getListing().getTitle() : title;
                             break;

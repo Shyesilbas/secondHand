@@ -39,6 +39,7 @@ import CheckoutPage from '../../cart/pages/CheckoutPage.jsx';
 import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
 import MyCouponsPage from '../../campaign/pages/MyCouponsPage.jsx';
+import OffersPage from '../../offer/pages/OffersPage.jsx';
 
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
@@ -161,6 +162,7 @@ const AppRoutes = () => {
                         <Route path={ROUTES.SHOPPING_CART} element={<ShoppingCartPage />} />
                         <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
                         <Route path={ROUTES.MY_COUPONS} element={<MyCouponsPage />} />
+                        <Route path={ROUTES.OFFERS} element={<OffersPage />} />
             </Route>
 
             {/* Fallback */}

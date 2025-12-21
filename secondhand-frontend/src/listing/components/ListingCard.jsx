@@ -8,11 +8,13 @@ import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
+import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 
 const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const [showInfo, setShowInfo] = useState(false);
+    const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const { user } = useAuth();
     const { showcases } = useShowcase();
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
@@ -21,6 +23,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
 
     const isOwner = user?.id === listing.sellerId;
     const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+    const canMakeOffer = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -79,6 +82,19 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 {/* Action Buttons Overlay (Top Right) */}
                 <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-x-2 group-hover:translate-x-0">
                     {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
+                    {canMakeOffer && (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsOfferModalOpen(true);
+                            }}
+                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-emerald-600 border-none h-8 w-8 rounded-full shadow-sm flex items-center justify-center transition-colors"
+                            title="Make Offer"
+                        >
+                            <HandCoins className="w-4 h-4" />
+                        </button>
+                    )}
                     {canAddToCart && (
                         <button
                             onClick={(e) => {
@@ -193,6 +209,12 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 listingTitle={listing.title}
                 price={displayPrice}
                 currency={listing.currency}
+            />
+
+            <MakeOfferModal
+                isOpen={isOfferModalOpen}
+                onClose={() => setIsOfferModalOpen(false)}
+                listing={listing}
             />
         </div>
     );

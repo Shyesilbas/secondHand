@@ -119,6 +119,7 @@ const Header = () => {
         { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: icons.myListings },
         { to: ROUTES.CREATE_LISTING, label: 'New Listing', icon: icons.newListing },
         { divider: true },
+        { to: ROUTES.OFFERS, label: 'Offers', icon: icons.orders },
         { to: ROUTES.MY_COUPONS, label: 'Kuponlarım', icon: icons.coupons },
         { divider: true },
         { to: ROUTES.FAVORITES, label: 'Favorites', icon: icons.favorites },

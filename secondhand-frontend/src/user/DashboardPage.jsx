@@ -10,7 +10,8 @@ import {
   AlertTriangle, 
   Star, 
   MessageSquare,
-  Tag
+  Tag,
+  HandCoins
 } from 'lucide-react';
 
 const DashboardPage = () => {
@@ -72,6 +73,13 @@ const DashboardPage = () => {
       route: ROUTES.MY_COUPONS,
       icon: Tag,
       color: "text-indigo-600"
+    },
+    {
+      title: "Offers",
+      description: "Offers you made and received",
+      route: ROUTES.OFFERS,
+      icon: HandCoins,
+      color: "text-emerald-600"
     },
   ], [user?.id]);
 

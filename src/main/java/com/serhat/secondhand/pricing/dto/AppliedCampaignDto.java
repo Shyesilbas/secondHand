@@ -21,3 +21,4 @@ public class AppliedCampaignDto {
     private BigDecimal discountAmount;
 }
 
+
