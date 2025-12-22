@@ -20,6 +20,7 @@ const MakeOfferModal = ({ isOpen, onClose, listing }) => {
 
   const listingTitle = listing?.title || 'Listing';
   const currency = listing?.currency || 'TRY';
+  const listingUnitPrice = listing?.price != null ? Number(listing.price) : null;
 
   const previewTotal = useMemo(() => {
     const n = Number(totalPrice);
@@ -125,6 +126,14 @@ const MakeOfferModal = ({ isOpen, onClose, listing }) => {
               {previewTotal != null && (
                 <>
                   {' '}Total offer: <span className="font-semibold text-gray-900">{formatCurrency(previewTotal, currency)}</span>
+                </>
+              )}
+              {listingUnitPrice != null && (
+                <>
+                  {' '}| Listing unit price:{' '}
+                  <span className="font-semibold text-gray-900">
+                    {formatCurrency(listingUnitPrice, currency)}
+                  </span>
                 </>
               )}
             </div>

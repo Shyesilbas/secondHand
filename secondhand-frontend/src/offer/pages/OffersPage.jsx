@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { offerService } from '../services/offerService.js';
-import { formatCurrency, formatDateTime } from '../../common/formatters.js';
-import { ROUTES } from '../../common/constants/routes.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import React, {useEffect, useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {offerService} from '../services/offerService.js';
+import {formatCurrency, formatDateTime} from '../../common/formatters.js';
+import {ROUTES} from '../../common/constants/routes.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
 
 const statusBadge = (status) => {
@@ -157,6 +157,9 @@ const OffersPage = () => {
                       <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-700">
                         <div>
                           Quantity: <span className="font-semibold text-gray-900">{o.quantity}</span>
+                        </div>
+                        <div>
+                          Unit Price: <span className="font-semibold text-gray-900">{formatCurrency(o.listingUnitPrice, currency)}</span>
                         </div>
                         <div>
                           Total: <span className="font-semibold text-gray-900">{formatCurrency(o.totalPrice, currency)}</span>
