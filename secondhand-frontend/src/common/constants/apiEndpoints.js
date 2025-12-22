@@ -74,6 +74,7 @@ export const API_ENDPOINTS = {
     },
     EMAILS: {
         MY_EMAILS: '/v1/emails/my-emails',
+        UNREAD_COUNT: '/v1/emails/unread-count',
         DELETE: (emailId) => `/v1/emails/delete/${emailId}`,
         DELETE_ALL:  `/v1/emails/deleteAll`,
     },

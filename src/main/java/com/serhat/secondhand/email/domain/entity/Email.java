@@ -1,6 +1,5 @@
 package com.serhat.secondhand.email.domain.entity;
 
-import com.serhat.secondhand.email.domain.entity.enums.EmailStatus;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
@@ -50,6 +49,9 @@ public class Email {
     @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
 
     @Column(name = "error_message")
     private String errorMessage;

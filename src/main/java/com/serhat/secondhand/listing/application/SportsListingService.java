@@ -10,6 +10,7 @@ import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,9 @@ public class SportsListingService {
     @Transactional
     public UUID createSportsListing(SportsCreateRequest request, User seller) {
         SportsListing entity = listingMapper.toSportsEntity(request);
+        if (entity.getQuantity() == null || entity.getQuantity() < 1) {
+            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+        }
         entity.setSeller(seller);
         SportsListing saved = sportsRepository.save(entity);
         log.info("Sports listing created: {}", saved.getId());
@@ -54,12 +58,17 @@ public class SportsListingService {
         listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
 
         var oldPrice = existing.getPrice();
-        var oldCurrency = existing.getCurrency();
 
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
         request.currency().ifPresent(existing::setCurrency);
+        request.quantity().ifPresent(q -> {
+            if (q < 1) {
+                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            }
+            existing.setQuantity(q);
+        });
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);

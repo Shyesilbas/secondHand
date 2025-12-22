@@ -115,7 +115,7 @@ export const sportsFormConfig = {
   entityName: 'Sports',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', currency: 'TRY', sportType: '', equipmentType: '', condition: '',
+    title: '', description: '', price: '', currency: 'TRY', quantity: 1, sportType: '', equipmentType: '', condition: '',
     city: '', district: '', address: '', latitude: '', longitude: ''
   },
   steps: [basicInfoStep, sportsDetailsStep, locationStep],
@@ -130,7 +130,7 @@ export const booksFormConfig = {
   entityName: 'Books',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', currency: 'TRY', author: '', genre: '', language: '',
+    title: '', description: '', price: '', currency: 'TRY', quantity: 1, author: '', genre: '', language: '',
     publicationYear: '', pageCount: '', format: '', condition: '', isbn: '', city: '', district: ''
   },
   steps: [basicInfoStep, bookDetailsStep, locationStep],
@@ -145,7 +145,7 @@ export const clothingFormConfig = {
   entityName: 'Clothing',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', currency: 'TRY', brand: '', clothingType: '', color: '',
+    title: '', description: '', price: '', currency: 'TRY', quantity: 1, brand: '', clothingType: '', color: '',
     condition: '', clothingGender: '', clothingCategory: '', purchaseDate: '', city: '', district: ''
   },
   steps: [basicInfoStep, clothingDetailsStep, locationStep],

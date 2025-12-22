@@ -42,6 +42,7 @@ public abstract class ListingDto {
     private String title;
     private String description;
     private BigDecimal price;
+    private Integer quantity;
     private Currency currency;
     private ListingStatus status;
     private boolean isListingFeePaid;

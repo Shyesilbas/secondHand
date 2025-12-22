@@ -68,6 +68,8 @@ const ListingDetailPage = () => {
   const canMakeOffer = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
   const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
   const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
+  const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
+  const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
   const tabs = [
     { id: 'about', label: 'About' },
@@ -158,6 +160,13 @@ const ListingDetailPage = () => {
             {/* Title & Price (Mobile Only) */}
             <div className="lg:hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                <h1 className="text-xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+               {hasStockInfo && (
+                 <div className="mb-2">
+                   <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                     In stock: {Number(listing.quantity)}
+                   </span>
+                 </div>
+               )}
                <div className="flex items-end gap-3 flex-wrap">
                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(displayPrice, listing.currency)}</p>
                  {hasCampaign && (
@@ -167,6 +176,11 @@ const ListingDetailPage = () => {
                {hasCampaign && (
                  <div className="mt-2 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
                    {listing.campaignName || 'Campaign'}
+                 </div>
+               )}
+               {isLowStock && (
+                 <div className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
+                   Low stock: {Number(listing.quantity)} left
                  </div>
                )}
             </div>
@@ -228,6 +242,13 @@ const ListingDetailPage = () => {
              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
                 <div className="mb-6 hidden lg:block">
                    <h1 className="text-xl font-bold text-gray-900 leading-snug mb-2">{listing.title}</h1>
+                   {hasStockInfo && (
+                     <div className="mb-3">
+                       <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                         In stock: {Number(listing.quantity)}
+                       </span>
+                     </div>
+                   )}
                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
                       <span>{listing.district}, {listing.city}</span>
                       <span>•</span>
@@ -242,6 +263,11 @@ const ListingDetailPage = () => {
                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
                          {listing.campaignName || 'Campaign'}
                        </span>
+                     </div>
+                   )}
+                   {isLowStock && (
+                     <div className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
+                       Low stock: {Number(listing.quantity)} left
                      </div>
                    )}
                 </div>

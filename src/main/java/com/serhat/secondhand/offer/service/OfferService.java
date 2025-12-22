@@ -8,6 +8,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
 import com.serhat.secondhand.offer.dto.OfferDto;
+import com.serhat.secondhand.offer.email.OfferEmailNotificationService;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;
 import com.serhat.secondhand.offer.entity.OfferStatus;
@@ -32,6 +33,7 @@ public class OfferService {
 
     private final OfferRepository offerRepository;
     private final ListingService listingService;
+    private final OfferEmailNotificationService offerEmailNotificationService;
 
     public OfferDto create(User buyer, CreateOfferRequest request) {
         if (request.getQuantity() == null || request.getQuantity() < 1) {
@@ -66,6 +68,7 @@ public class OfferService {
                 .build();
 
         Offer saved = offerRepository.save(offer);
+        offerEmailNotificationService.notifyOfferReceived(saved);
         return toDto(saved);
     }
 
@@ -113,6 +116,7 @@ public class OfferService {
 
         offer.setStatus(OfferStatus.ACCEPTED);
         Offer saved = offerRepository.save(offer);
+        offerEmailNotificationService.notifyAcceptedToCreator(saved);
         return toDto(saved);
     }
 
@@ -131,6 +135,7 @@ public class OfferService {
 
         offer.setStatus(OfferStatus.REJECTED);
         Offer saved = offerRepository.save(offer);
+        offerEmailNotificationService.notifyRejectedToCreator(saved);
         return toDto(saved);
     }
 
@@ -172,6 +177,7 @@ public class OfferService {
                 .build();
 
         Offer saved = offerRepository.save(counter);
+        offerEmailNotificationService.notifyCounterReceived(saved);
         return toDto(saved);
     }
 
@@ -194,6 +200,7 @@ public class OfferService {
         if (offer.getStatus() == OfferStatus.ACCEPTED) {
             offer.setStatus(OfferStatus.COMPLETED);
             offerRepository.save(offer);
+            offerEmailNotificationService.notifyCompletedToBoth(offer);
         }
     }
 
@@ -208,6 +215,7 @@ public class OfferService {
         if (offer.getExpiresAt() != null && now.isAfter(offer.getExpiresAt())) {
             offer.setStatus(OfferStatus.EXPIRED);
             offerRepository.save(offer);
+            offerEmailNotificationService.notifyExpiredToBoth(offer);
             throw new BusinessException(OfferErrorCodes.OFFER_EXPIRED);
         }
     }

@@ -69,19 +69,32 @@ public class CartService {
             throw new BusinessException(CartErrorCodes.LISTING_TYPE_NOT_ALLOWED);
         }
 
+        Integer reqQty = request.getQuantity();
+        if (reqQty == null || reqQty < 1) {
+            throw new BusinessException(CartErrorCodes.INVALID_QUANTITY);
+        }
+
         Optional<Cart> existingCartItemOpt = cartRepository.findByUserAndListing(user, listing);
 
         if (existingCartItemOpt.isPresent()) {
             Cart existingCartItem = existingCartItemOpt.get();
-            existingCartItem.setQuantity(existingCartItem.getQuantity() + request.getQuantity());
+            int nextQty = (existingCartItem.getQuantity() != null ? existingCartItem.getQuantity() : 0) + reqQty;
+            if (listing.getQuantity() != null && nextQty > listing.getQuantity()) {
+                throw new BusinessException(CartErrorCodes.INSUFFICIENT_STOCK);
+            }
+            existingCartItem.setQuantity(nextQty);
             existingCartItem.setNotes(request.getNotes());
             return cartMapper.toDto(cartRepository.save(existingCartItem));
+        }
+
+        if (listing.getQuantity() != null && reqQty > listing.getQuantity()) {
+            throw new BusinessException(CartErrorCodes.INSUFFICIENT_STOCK);
         }
 
         Cart newCartItem = Cart.builder()
                 .user(user)
                 .listing(listing)
-                .quantity(request.getQuantity())
+                .quantity(reqQty)
                 .notes(request.getNotes())
                 .build();
 
@@ -97,7 +110,15 @@ public class CartService {
         Cart cartItem = cartRepository.findByUserAndListing(user, listing)
                 .orElseThrow(() -> new BusinessException(CartErrorCodes.ITEM_NOT_FOUND_IN_CART));
 
-        cartItem.setQuantity(request.getQuantity());
+        Integer reqQty = request.getQuantity();
+        if (reqQty == null || reqQty < 1) {
+            throw new BusinessException(CartErrorCodes.INVALID_QUANTITY);
+        }
+        if (listing.getQuantity() != null && reqQty > listing.getQuantity()) {
+            throw new BusinessException(CartErrorCodes.INSUFFICIENT_STOCK);
+        }
+
+        cartItem.setQuantity(reqQty);
         cartItem.setNotes(request.getNotes());
 
         Cart updatedCartItem = cartRepository.save(cartItem);

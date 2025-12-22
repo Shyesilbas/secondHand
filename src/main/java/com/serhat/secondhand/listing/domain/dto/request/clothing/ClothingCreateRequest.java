@@ -8,6 +8,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCatego
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -30,6 +31,10 @@ public record ClothingCreateRequest(
 
     @NotNull(message = "Currency is required")
     Currency currency,
+
+    @NotNull(message = "Quantity is required")
+    @Min(value = 1, message = "Quantity must be at least 1")
+    Integer quantity,
 
     @NotBlank(message = "City is required")
     String city,

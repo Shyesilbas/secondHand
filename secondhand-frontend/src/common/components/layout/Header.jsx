@@ -9,6 +9,7 @@ import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import { useTotalUnreadCount } from '../../../chat/hooks/useUnreadCount.js';
 import { useCart } from '../../../cart/hooks/useCart.js';
 import { useListingStatistics } from '../../../listing/hooks/useListingStatistics.js';
+import { emailService } from '../../../emails/services/emailService.js';
 
 const icons = {
     myListings: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>,
@@ -82,6 +83,7 @@ const Header = () => {
     const { totalUnread, setTotalUnread } = useTotalUnreadCount({ 
         enabled: isAuthenticated && !isStaticPage
     });
+    const [unreadEmailCount, setUnreadEmailCount] = useState(0);
     const { enums } = useEnums();
     const [allListingsOpen, setAllListingsOpen] = useState(false);
     const { countsByCategory, isLoading: countsLoading } = useListingStatistics();
@@ -95,6 +97,44 @@ const Header = () => {
     const handleChatClick = () => {
         setTotalUnread(0);
     };
+
+    const handleEmailsClick = () => {
+        setUnreadEmailCount(0);
+    };
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setUnreadEmailCount(0);
+            return;
+        }
+        if (location.pathname === ROUTES.EMAILS) {
+            setUnreadEmailCount(0);
+            return;
+        }
+
+        let cancelled = false;
+
+        const load = async () => {
+            try {
+                const count = await emailService.getUnreadCount();
+                if (!cancelled) {
+                    setUnreadEmailCount(Number(count) || 0);
+                }
+            } catch {
+                if (!cancelled) {
+                    setUnreadEmailCount(0);
+                }
+            }
+        };
+
+        load();
+        const interval = setInterval(load, 30_000);
+
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [isAuthenticated, location.pathname]);
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -111,6 +151,7 @@ const Header = () => {
 
     const userLinks = [
         { to: ROUTES.CHAT, label: 'Messages', icon: icons.chat, onClick: handleChatClick },
+        { to: ROUTES.EMAILS, label: 'E-mails', icon: icons.emails, badge: unreadEmailCount, badgeColor: 'bg-emerald-600', onClick: handleEmailsClick },
         { to: ROUTES.SHOPPING_CART, label: 'Cart', icon: icons.cart, badge: cartCount },
     ];
 
@@ -184,6 +225,12 @@ const Header = () => {
 
                                             {link.to === ROUTES.SHOPPING_CART && link.badge > 0 && (
                                                 <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full">
+                                                    {link.badge > 9 ? '9+' : link.badge}
+                                                </span>
+                                            )}
+
+                                            {link.to === ROUTES.EMAILS && link.badge > 0 && (
+                                                <span className={`absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white ${link.badgeColor || 'bg-emerald-600'} rounded-full`}>
                                                     {link.badge > 9 ? '9+' : link.badge}
                                                 </span>
                                             )}

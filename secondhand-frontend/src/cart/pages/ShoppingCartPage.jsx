@@ -8,9 +8,11 @@ import { formatCurrency } from '../../common/formatters.js';
 import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const ShoppingCartPage = () => {
     const navigate = useNavigate();
+    const notification = useNotification();
     const { 
         cartItems, 
         cartCount, 
@@ -46,6 +48,13 @@ const ShoppingCartPage = () => {
 
     const handleQuantityChange = (listingId, newQuantity) => {
         if (newQuantity < 1) return;
+        const item = cartItems.find((ci) => ci?.listing?.id === listingId);
+        const max = item?.listing?.quantity;
+        if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
+            updateCartItem(listingId, Number(max), '');
+            notification?.showError('Stock limit', `Available stock is ${Number(max)}.`);
+            return;
+        }
         updateCartItem(listingId, newQuantity, '');
     };
 

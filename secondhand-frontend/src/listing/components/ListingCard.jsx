@@ -42,6 +42,8 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const favoriteCount = listing.favoriteStats?.favoriteCount || 0;
     const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
     const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
+    const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
+    const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
     return (
         <div className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative">
@@ -75,6 +77,11 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-400 text-white shadow-sm uppercase tracking-wider backdrop-blur-md">
                             <Star className="w-3 h-3 fill-current" />
                             Featured
+                        </span>
+                    )}
+                    {isLowStock && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider backdrop-blur-md">
+                            Low stock: {Number(listing.quantity)} left
                         </span>
                     )}
                 </div>
@@ -136,6 +143,13 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                         {listing.title}
                     </h3>
                 </div>
+                {hasStockInfo && (
+                    <div className="mb-2">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                            In stock: {Number(listing.quantity)}
+                        </span>
+                    </div>
+                )}
 
                 {/* Rating & Reviews */}
                 {reviewCount > 0 && (
@@ -161,6 +175,11 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                             <p className="text-sm font-medium text-gray-500 line-through">
                                 {formatCurrency(listing.price, listing.currency)}
                             </p>
+                        )}
+                        {hasStockInfo && (
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                                Stock: {Number(listing.quantity)}
+                            </span>
                         )}
                     </div>
                     {hasCampaign && (

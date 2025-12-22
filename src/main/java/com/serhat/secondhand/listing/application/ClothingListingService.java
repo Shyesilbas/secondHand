@@ -12,6 +12,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,9 @@ public class ClothingListingService {
     @Transactional
     public UUID createClothingListing(ClothingCreateRequest request, User seller) {
         ClothingListing clothing = listingMapper.toClothingEntity(request);
+        if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
+            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+        }
         clothing.setSeller(seller);
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
@@ -62,6 +66,12 @@ public class ClothingListingService {
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
         request.currency().ifPresent(existing::setCurrency);
+        request.quantity().ifPresent(q -> {
+            if (q < 1) {
+                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            }
+            existing.setQuantity(q);
+        });
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);

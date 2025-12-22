@@ -1,8 +1,17 @@
 import React from 'react';
 import { formatDateTime } from '../../common/formatters.js';
+import { EMAIL_TYPES } from '../emails.js';
 
 const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
+
+    const dotClass = (() => {
+        if (email?.emailType === EMAIL_TYPES.VERIFICATION_CODE) return 'bg-green-500';
+        if (email?.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION) return 'bg-orange-500';
+        if (email?.emailType && String(email.emailType).startsWith('OFFER_')) return 'bg-emerald-500';
+        if (email?.emailType === EMAIL_TYPES.NOTIFICATION) return 'bg-blue-500';
+        return 'bg-gray-400';
+    })();
 
     return (
         <div
@@ -13,12 +22,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
         >
             <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
-                    <div className={`w-3 h-3 rounded-full ${
-                        email.emailType === 'VERIFICATION' ? 'bg-green-500' :
-                        email.emailType === 'NOTIFICATION' ? 'bg-blue-500' :
-                        email.emailType === 'PAYMENT' ? 'bg-orange-500' :
-                        'bg-gray-400'
-                    }`}></div>
+                    <div className={`w-3 h-3 rounded-full ${dotClass}`}></div>
                 </div>
                 
                 <div className="flex-1 min-w-0">

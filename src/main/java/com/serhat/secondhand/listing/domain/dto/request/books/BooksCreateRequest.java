@@ -13,6 +13,7 @@ public record BooksCreateRequest(
         @NotBlank String description,
         @NotNull @Positive BigDecimal price,
         @NotNull Currency currency,
+        @NotNull @Min(1) Integer quantity,
         @NotBlank String city,
         @NotBlank String district,
         @NotBlank String author,

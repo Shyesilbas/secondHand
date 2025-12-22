@@ -1,11 +1,20 @@
 import React from 'react';
 import { formatDateTime, replaceEnumCodesInHtml, formatPricesInHtml } from '../../common/formatters.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
+import { EMAIL_TYPES } from '../emails.js';
 
 const EmailContent = ({ email }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
 
     const { enums } = useEnums();
+
+    const dotClass = (() => {
+        if (email?.emailType === EMAIL_TYPES.VERIFICATION_CODE) return 'bg-green-500';
+        if (email?.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION) return 'bg-orange-500';
+        if (email?.emailType && String(email.emailType).startsWith('OFFER_')) return 'bg-emerald-500';
+        if (email?.emailType === EMAIL_TYPES.NOTIFICATION) return 'bg-blue-500';
+        return 'bg-gray-400';
+    })();
 
     if (!email) {
         return (
@@ -33,12 +42,7 @@ const EmailContent = ({ email }) => {
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
-                        <div className={`w-3 h-3 rounded-full mt-2 ${
-                            email.emailType === 'VERIFICATION' ? 'bg-green-500' :
-                            email.emailType === 'NOTIFICATION' ? 'bg-blue-500' :
-                            email.emailType === 'PAYMENT' ? 'bg-orange-500' :
-                            'bg-gray-400'
-                        }`}></div>
+                        <div className={`w-3 h-3 rounded-full mt-2 ${dotClass}`}></div>
                         <div className="flex-1">
                             <h2 className="text-lg font-semibold text-gray-900 mb-2">
                                 {email.subject}

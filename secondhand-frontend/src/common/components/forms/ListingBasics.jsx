@@ -2,7 +2,7 @@ import React from 'react';
 import { formatCurrency } from '../../formatters.js';
 import { Type, Tag, AlignLeft } from 'lucide-react';
 
-const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = false }) => {
+const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = false, showQuantity = true }) => {
   return (
     <div className="space-y-8">
       {/* Title Field */}
@@ -82,6 +82,33 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
             </p>
           )}
         </div>
+
+        {showQuantity && (
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-indigo-500" />
+              Quantity <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity ?? ''}
+              onChange={onInputChange}
+              className={`w-full px-5 py-3 rounded-xl border ${errors.quantity ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-100'} focus:outline-none focus:ring-4 transition-all`}
+              placeholder="e.g. 5"
+              min="1"
+              step="1"
+            />
+            {errors.quantity ? (
+              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <span className="w-1 h-1 bg-red-600 rounded-full"></span>
+                {errors.quantity}
+              </p>
+            ) : (
+              <p className="mt-2 text-xs text-gray-500">This is your available stock.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Description Field */}
