@@ -19,6 +19,7 @@ public record ClothingUpdateRequest(
     Optional<@Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters") String> description,
     Optional<@Positive(message = "Price must be positive") BigDecimal> price,
     Optional<Currency> currency,
+    Optional<Integer> quantity,
     Optional<String> city,
     Optional<String> district,
     Optional<ClothingBrand> brand,

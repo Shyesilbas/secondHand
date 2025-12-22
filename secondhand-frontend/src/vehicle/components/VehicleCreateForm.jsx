@@ -53,6 +53,7 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
               onInputChange={handleInputChange} 
               enums={enums} 
               isEdit={isEdit} 
+              showQuantity={false}
             />
         );
 

@@ -50,7 +50,15 @@ public class EmailService {
 
     public List<EmailDto> getUserEmails(User user) {
         List<Email> emails = emailRepository.findByUserOrderByCreatedAtDesc(user);
+        if (!emails.isEmpty()) {
+            emailRepository.markAllRead(user, LocalDateTime.now());
+        }
         return emails.stream().map(emailMapper::toDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public long getUnreadCount(User user) {
+        return emailRepository.countByUserAndReadAtIsNull(user);
     }
 
     public String deleteEmail(UUID emailId) {

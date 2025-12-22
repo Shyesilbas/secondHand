@@ -14,6 +14,7 @@ public record BooksUpdateRequest(
         Optional<String> description,
         Optional<BigDecimal> price,
         Optional<Currency> currency,
+        Optional<Integer> quantity,
         Optional<String> city,
         Optional<String> district,
         Optional<String> author,

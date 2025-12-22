@@ -33,6 +33,10 @@ public class Listing {
     private String description;
 
     private BigDecimal price;
+
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Enumerated(EnumType.STRING)
     private Currency currency;
 

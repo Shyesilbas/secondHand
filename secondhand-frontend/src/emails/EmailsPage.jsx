@@ -138,7 +138,9 @@ const EmailsPage = () => {
             const data = await emailService.getMyEmails();
             return Array.isArray(data) ? data : [];
         },
-        staleTime: 5 * 60 * 1000, // 5 minutes cache
+        staleTime: 0,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
     });
 
     const handleDelete = async ({ id, title, deleteFunc, onSuccess }) => {

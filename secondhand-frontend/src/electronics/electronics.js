@@ -5,6 +5,7 @@ export const ElectronicCreateRequestDTO = {
   description: '',
   price: 0,
   currency: 'TRY',
+  quantity: 1,
   city: '',
   district: '',
   imageUrl: '',
@@ -73,6 +74,7 @@ export const createElectronicCreateRequest = (data) => {
     description: (data.description || '').trim(),
     price: parseFloat(data.price) || 0,
     currency: data.currency || 'TRY',
+    quantity: parseInt(data.quantity) || 1,
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
     imageUrl: data.imageUrl || undefined,
@@ -99,6 +101,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
   if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
+  if (data.quantity !== undefined && data.quantity !== '') updateData.quantity = parseInt(data.quantity);
   if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
   if (data.electronicType !== undefined && data.electronicType !== '') updateData.electronicType = data.electronicType;

@@ -4,9 +4,6 @@ import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +32,12 @@ public class EmailController {
         User user = userService.getAuthenticatedUser(authentication);
         List<EmailDto> emails = emailService.getUserEmails(user);
         return ResponseEntity.ok(emails);
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Long>> unreadCount(Authentication authentication) {
+        User user = userService.getAuthenticatedUser(authentication);
+        return ResponseEntity.ok(Map.of("count", emailService.getUnreadCount(user)));
     }
 
     @DeleteMapping("/delete/{emailId}")

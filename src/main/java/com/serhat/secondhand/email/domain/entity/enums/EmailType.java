@@ -8,6 +8,12 @@ public enum EmailType {
     PASSWORD_RESET("Password Reset"),
     WELCOME("Welcome"),
     NOTIFICATION("Notification"),
+    OFFER_RECEIVED("Offer Received"),
+    OFFER_COUNTER_RECEIVED("Offer Counter Received"),
+    OFFER_ACCEPTED("Offer Accepted"),
+    OFFER_REJECTED("Offer Rejected"),
+    OFFER_EXPIRED("Offer Expired"),
+    OFFER_COMPLETED("Offer Completed"),
     PROMOTIONAL("Promotional"),
     PAYMENT_VERIFICATION("Payment Verification"),
     SYSTEM("System");

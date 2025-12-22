@@ -14,6 +14,11 @@ const CartItemCard = ({
 }) => {
     const handleQuantityChange = (newQuantity) => {
         if (newQuantity < 1) return;
+        const max = item?.listing?.quantity;
+        if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
+            onQuantityChange(item.listing.id, Number(max));
+            return;
+        }
         onQuantityChange(item.listing.id, newQuantity);
     };
 
@@ -48,6 +53,8 @@ const CartItemCard = ({
 
     const sellerRating = sellerStats?.averageRating || 0;
     const sellerTotalReviews = sellerStats?.totalReviews || 0;
+    const maxStock = item?.listing?.quantity;
+    const isLowStock = maxStock != null && Number.isFinite(Number(maxStock)) && Number(maxStock) > 0 && Number(maxStock) < 10;
 
     return (
         <div className="p-6 hover:bg-gray-50 transition-colors">
@@ -68,6 +75,12 @@ const CartItemCard = ({
                             <h3 className="text-base font-medium text-gray-900 line-clamp-2">
                                 {item.listing.title}
                             </h3>
+
+                            {isLowStock && (
+                                <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border bg-amber-50 text-amber-800 border-amber-200">
+                                    Low stock: {Number(maxStock)} left
+                                </div>
+                            )}
                             
                             {/* Product Reviews */}
                             {totalReviews > 0 && (
@@ -159,7 +172,7 @@ const CartItemCard = ({
                             </div>
                             <button 
                                 onClick={() => handleQuantityChange(item.quantity + 1)}
-                                disabled={isUpdating}
+                                disabled={isUpdating || (maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock))}
                                 className="p-2 hover:bg-gray-50 disabled:opacity-50 transition-colors"
                             >
                                 <PlusIcon className="w-4 h-4 text-gray-600" />

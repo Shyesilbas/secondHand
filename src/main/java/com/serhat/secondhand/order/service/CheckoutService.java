@@ -11,12 +11,17 @@ import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +37,7 @@ public class CheckoutService {
     private final PricingService pricingService;
     private final CouponService couponService;
     private final OfferService offerService;
+    private final ListingRepository listingRepository;
 
     public OrderDto checkout(User user, CheckoutRequest request) {
         log.info("Processing checkout for user: {}", user.getEmail());
@@ -64,6 +70,8 @@ public class CheckoutService {
 
         Order order = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
 
+        Map<java.util.UUID, Integer> reserved = reserveStockOrThrow(effectiveCartItems);
+
         var paymentResult = orderPaymentService.processOrderPayments(user, effectiveCartItems, request, order, pricing);
 
         orderNotificationService.sendOrderNotifications(user, order, paymentResult.allSuccessful());
@@ -79,9 +87,49 @@ public class CheckoutService {
             log.info("Checkout completed successfully for order: {} with {} payments",
                     order.getOrderNumber(), paymentResult.paymentResults().size());
         } else {
+            releaseReservedStock(reserved);
             log.warn("Checkout completed with failed payments for order: {}", order.getOrderNumber());
         }
 
         return orderMapper.toDto(order);
+    }
+
+    private Map<java.util.UUID, Integer> reserveStockOrThrow(java.util.List<com.serhat.secondhand.cart.entity.Cart> cartItems) {
+        Map<java.util.UUID, Integer> reserved = new HashMap<>();
+        if (cartItems == null || cartItems.isEmpty()) {
+            return reserved;
+        }
+        for (var item : cartItems) {
+            if (item == null || item.getListing() == null || item.getListing().getId() == null) {
+                continue;
+            }
+            Integer stock = item.getListing().getQuantity();
+            if (stock == null) {
+                continue;
+            }
+            int qty = item.getQuantity() != null ? item.getQuantity() : 1;
+            if (qty < 1) {
+                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            }
+            int updated = listingRepository.decrementQuantityIfEnough(item.getListing().getId(), qty);
+            if (updated != 1) {
+                releaseReservedStock(reserved);
+                throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
+            }
+            reserved.put(item.getListing().getId(), qty);
+        }
+        return reserved;
+    }
+
+    private void releaseReservedStock(Map<java.util.UUID, Integer> reserved) {
+        if (reserved == null || reserved.isEmpty()) {
+            return;
+        }
+        for (var entry : reserved.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) {
+                continue;
+            }
+            listingRepository.incrementQuantity(entry.getKey(), entry.getValue());
+        }
     }
 }
