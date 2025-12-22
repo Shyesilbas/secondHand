@@ -90,6 +90,21 @@ const MyListingsPage = () => {
         }
     };
 
+    const lowStockListings = useMemo(() => {
+        const source = allPagesLoaded ? allListings : (listings || []);
+        if (!Array.isArray(source)) {
+            return [];
+        }
+        return source.filter((listing) => {
+            if (!listing) return false;
+            if (['VEHICLE', 'REAL_ESTATE'].includes(listing.type)) return false;
+            if (listing.quantity == null) return false;
+            const qty = Number(listing.quantity);
+            if (!Number.isFinite(qty)) return false;
+            return qty > 0 && qty < 10;
+        });
+    }, [allPagesLoaded, allListings, listings]);
+
     return (
         <div className="container mx-auto px-4 py-8">
                     <PageHeader
@@ -105,6 +120,62 @@ const MyListingsPage = () => {
                 selectedStatus={selectedStatus}
                 onStatusClick={handleStatusClick}
             />
+
+            {lowStockListings.length > 0 && (
+                <div className="mb-8 bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-amber-200 bg-amber-50 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L3.82 16a1.75 1.75 0 001.53 2.56h13.3A1.75 1.75 0 0020.18 16l-6.47-12.14a1.75 1.75 0 00-3.42 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-semibold text-amber-900">Stock is running low</h3>
+                                <p className="text-xs text-amber-800">
+                                    {lowStockListings.length} listing{lowStockListings.length === 1 ? '' : 's'} have less than 10 items in stock.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="px-6 py-4">
+                        <div className="space-y-2">
+                            {lowStockListings.slice(0, 6).map((listing) => (
+                                <button
+                                    key={listing.id}
+                                    type="button"
+                                    onClick={() => window.location.assign(`/listings/${listing.id}`)}
+                                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-amber-50 text-left transition-colors"
+                                >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <div className="w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500">
+                                            {listing.title?.charAt(0)?.toUpperCase() || 'L'}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-medium text-gray-900 truncate">
+                                                {listing.title}
+                                            </p>
+                                            <p className="text-[11px] text-gray-500 truncate">
+                                                {listing.listingNo}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-100 text-amber-900 border border-amber-200">
+                                            In stock: {Number(listing.quantity)}
+                                        </span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                        {lowStockListings.length > 6 && (
+                            <p className="mt-3 text-[11px] text-amber-800">
+                                And {lowStockListings.length - 6} more listing{lowStockListings.length - 6 === 1 ? '' : 's'} with low stock.
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Modern Search Section */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">

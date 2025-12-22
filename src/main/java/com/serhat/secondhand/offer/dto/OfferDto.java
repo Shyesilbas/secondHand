@@ -30,6 +30,8 @@ public class OfferDto {
     private String sellerName;
     private String sellerSurname;
 
+    private BigDecimal listingUnitPrice;
+
     private Integer quantity;
     private BigDecimal totalPrice;
 

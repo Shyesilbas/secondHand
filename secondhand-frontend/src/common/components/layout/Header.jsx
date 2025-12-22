@@ -156,7 +156,7 @@ const Header = () => {
     ];
 
     const moreMenuItems = [
-        { to: ROUTES.LISTINGS, label: 'All Listings', icon: icons.allListings },
+        { type: 'ALL_LISTINGS_GROUP' },
         { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: icons.myListings },
         { to: ROUTES.CREATE_LISTING, label: 'New Listing', icon: icons.newListing },
         { divider: true },
@@ -252,9 +252,61 @@ const Header = () => {
                                             </button>
                                         }
                                     >
-                                        {moreMenuItems.map((item, idx) =>
-                                            item.divider ? <DropdownDivider key={idx} /> : <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>{item.label}</DropdownItem>
-                                        )}
+                                        {moreMenuItems.map((item, idx) => {
+                                            if (item.divider) {
+                                                return <DropdownDivider key={idx} />;
+                                            }
+                                            if (item.type === 'ALL_LISTINGS_GROUP') {
+            return (
+                <React.Fragment key="all-listings-group">
+                    <button
+                        type="button"
+                        onClick={() => setAllListingsOpen((open) => !open)}
+                        className="flex w-full items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                        <span className="flex items-center gap-2">
+                            <icons.allListings />
+                            <span>All Listings</span>
+                        </span>
+                        <span className="text-xs text-gray-400">
+                            {allListingsOpen ? 'Hide' : 'Show'}
+                        </span>
+                    </button>
+                    {allListingsOpen && (
+                        <div className="px-4 pb-2 space-y-1 text-sm">
+                            <DropdownItem to={ROUTES.LISTINGS}>
+                                All categories
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=VEHICLE`}>
+                                Vehicles ({getCategoryCount('VEHICLE')})
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=ELECTRONICS`}>
+                                Electronics ({getCategoryCount('ELECTRONICS')})
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=REAL_ESTATE`}>
+                                Real Estate ({getCategoryCount('REAL_ESTATE')})
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=CLOTHING`}>
+                                Clothing ({getCategoryCount('CLOTHING')})
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=BOOKS`}>
+                                Books ({getCategoryCount('BOOKS')})
+                            </DropdownItem>
+                            <DropdownItem to={`${ROUTES.LISTINGS}?category=SPORTS`}>
+                                Sports ({getCategoryCount('SPORTS')})
+                            </DropdownItem>
+                        </div>
+                    )}
+                    <DropdownDivider />
+                </React.Fragment>
+            );
+        }
+                                            return (
+                                                <DropdownItem key={item.to} to={item.to} icon={<item.icon />}>
+                                                    {item.label}
+                                                </DropdownItem>
+                                            );
+                                        })}
                                     </DropdownMenu>
                                 </div>
 

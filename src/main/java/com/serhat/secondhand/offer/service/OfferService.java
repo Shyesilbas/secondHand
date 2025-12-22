@@ -286,6 +286,7 @@ public class OfferService {
                 .sellerId(seller != null ? seller.getId() : null)
                 .sellerName(seller != null ? seller.getName() : null)
                 .sellerSurname(seller != null ? seller.getSurname() : null)
+                .listingUnitPrice(listing.getPrice() != null ? listing.getPrice() : BigDecimal.ZERO)
                 .quantity(offer.getQuantity())
                 .totalPrice(offer.getTotalPrice())
                 .status(offer.getStatus())
