@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { useEnums } from '../../hooks/useEnums.js';
@@ -102,19 +102,32 @@ const Header = () => {
         setUnreadEmailCount(0);
     };
 
+    const locationRef = useRef(location.pathname);
+
+    useEffect(() => {
+        locationRef.current = location.pathname;
+        if (location.pathname === ROUTES.EMAILS) {
+            setUnreadEmailCount(0);
+        }
+    }, [location.pathname]);
+
     useEffect(() => {
         if (!isAuthenticated) {
             setUnreadEmailCount(0);
             return;
         }
-        if (location.pathname === ROUTES.EMAILS) {
-            setUnreadEmailCount(0);
-            return;
-        }
 
         let cancelled = false;
+        let intervalId = null;
 
         const load = async () => {
+            if (cancelled) return;
+            
+            if (locationRef.current === ROUTES.EMAILS) {
+                setUnreadEmailCount(0);
+                return;
+            }
+
             try {
                 const count = await emailService.getUnreadCount();
                 if (!cancelled) {
@@ -128,13 +141,15 @@ const Header = () => {
         };
 
         load();
-        const interval = setInterval(load, 30_000);
+        intervalId = setInterval(load, 120_000);
 
         return () => {
             cancelled = true;
-            clearInterval(interval);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
         };
-    }, [isAuthenticated, location.pathname]);
+    }, [isAuthenticated]);
 
     const handleLogout = async (e) => {
         e.preventDefault();

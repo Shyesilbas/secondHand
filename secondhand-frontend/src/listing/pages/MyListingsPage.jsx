@@ -66,7 +66,7 @@ const MyListingsPage = () => {
             let hasMorePages = true;
             
             while (hasMorePages) {
-                const response = await listingService.getMyListings(currentPage, 100); // Daha büyük sayfa boyutu
+                const response = await listingService.getMyListings(currentPage, 50);
                 
                 if (response.content && response.content.length > 0) {
                     allListingsData.push(...response.content);

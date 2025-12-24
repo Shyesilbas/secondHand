@@ -36,25 +36,12 @@ public class OfferService {
     private final OfferEmailNotificationService offerEmailNotificationService;
 
     public OfferDto create(User buyer, CreateOfferRequest request) {
-        if (request.getQuantity() == null || request.getQuantity() < 1) {
-            throw new BusinessException(OfferErrorCodes.INVALID_QUANTITY);
-        }
-        if (request.getTotalPrice() == null || request.getTotalPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(OfferErrorCodes.INVALID_TOTAL_PRICE);
-        }
+        validateCreateRequest(request);
 
         Listing listing = listingService.findById(request.getListingId())
                 .orElseThrow(() -> new BusinessException(OfferErrorCodes.LISTING_NOT_FOUND));
 
-        if (listing.getStatus() != ListingStatus.ACTIVE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_NOT_ACTIVE);
-        }
-        if (listing.getListingType() == ListingType.VEHICLE || listing.getListingType() == ListingType.REAL_ESTATE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
-        }
-        if (listing.getSeller() != null && listing.getSeller().getId() != null && listing.getSeller().getId().equals(buyer.getId())) {
-            throw new BusinessException(OfferErrorCodes.SELF_OFFER_NOT_ALLOWED);
-        }
+        validateListingForOffer(listing, buyer);
 
         Offer offer = Offer.builder()
                 .listing(listing)
@@ -72,45 +59,38 @@ public class OfferService {
         return toDto(saved);
     }
 
-    @Transactional(readOnly = true)
     public List<OfferDto> listMade(User buyer) {
         return offerRepository.findByBuyerOrderByCreatedAtDesc(buyer).stream()
+                .peek(o -> expireIfNeeded(o, false))
                 .map(this::toDto)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<OfferDto> listReceived(User seller) {
         return offerRepository.findBySellerOrderByCreatedAtDesc(seller).stream()
+                .peek(o -> expireIfNeeded(o, false))
                 .map(this::toDto)
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public OfferDto getByIdForUser(User user, UUID offerId) {
-        Offer offer = offerRepository.findById(offerId)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+        Offer offer = findOffer(offerId);
         if (!isBuyerOrSeller(user, offer)) {
             throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
         }
+        expireIfNeeded(offer, false);
         return toDto(offer);
     }
 
     public OfferDto accept(User seller, UUID offerId) {
-        Offer offer = offerRepository.findById(offerId)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+        Offer offer = getOfferForAction(seller, offerId);
 
-        if (!isBuyerOrSeller(seller, offer) || !isReceiver(seller, offer)) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
-        }
-
-        expireIfNeeded(offer);
-        if (offer.getStatus() != OfferStatus.PENDING) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_PENDING);
-        }
-
+        expireIfNeeded(offer, true);
+        requirePending(offer);
         validateListingEligibility(offer);
-        if (offerRepository.existsByListingAndStatusAndIdNot(offer.getListing(), OfferStatus.ACCEPTED, offer.getId())) {
+
+        if (offerRepository.existsByListingAndStatusAndIdNot(
+                offer.getListing(), OfferStatus.ACCEPTED, offer.getId())) {
             throw new BusinessException(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
         }
 
@@ -121,17 +101,10 @@ public class OfferService {
     }
 
     public OfferDto reject(User user, UUID offerId) {
-        Offer offer = offerRepository.findById(offerId)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+        Offer offer = getOfferForAction(user, offerId);
 
-        if (!isBuyerOrSeller(user, offer) || !isReceiver(user, offer)) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
-        }
-
-        expireIfNeeded(offer);
-        if (offer.getStatus() != OfferStatus.PENDING) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_PENDING);
-        }
+        expireIfNeeded(offer, true);
+        requirePending(offer);
 
         offer.setStatus(OfferStatus.REJECTED);
         Offer saved = offerRepository.save(offer);
@@ -140,30 +113,19 @@ public class OfferService {
     }
 
     public OfferDto counter(User user, UUID offerId, CounterOfferRequest request) {
-        if (request.getQuantity() == null || request.getQuantity() < 1) {
-            throw new BusinessException(OfferErrorCodes.INVALID_QUANTITY);
-        }
-        if (request.getTotalPrice() == null || request.getTotalPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(OfferErrorCodes.INVALID_TOTAL_PRICE);
-        }
+        validateCounterRequest(request);
 
-        Offer previous = offerRepository.findById(offerId)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+        Offer previous = getOfferForAction(user, offerId);
 
-        if (!isBuyerOrSeller(user, previous) || !isReceiver(user, previous)) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
-        }
-
-        expireIfNeeded(previous);
-        if (previous.getStatus() != OfferStatus.PENDING) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_PENDING);
-        }
-
+        expireIfNeeded(previous, true);
+        requirePending(previous);
         validateListingEligibility(previous);
+
         previous.setStatus(OfferStatus.REJECTED);
         offerRepository.save(previous);
 
         OfferActor actor = resolveActor(user, previous);
+
         Offer counter = Offer.builder()
                 .listing(previous.getListing())
                 .buyer(previous.getBuyer())
@@ -185,7 +147,7 @@ public class OfferService {
         Offer offer = offerRepository.findByIdAndBuyer(offerId, buyer)
                 .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
 
-        expireIfNeeded(offer);
+        expireIfNeeded(offer, true);
         if (offer.getStatus() != OfferStatus.ACCEPTED) {
             throw new BusinessException(OfferErrorCodes.OFFER_NOT_ACCEPTED);
         }
@@ -194,70 +156,103 @@ public class OfferService {
     }
 
     public void markCompleted(Offer offer) {
-        if (offer == null) {
-            return;
-        }
-        if (offer.getStatus() == OfferStatus.ACCEPTED) {
+        if (offer != null && offer.getStatus() == OfferStatus.ACCEPTED) {
             offer.setStatus(OfferStatus.COMPLETED);
             offerRepository.save(offer);
             offerEmailNotificationService.notifyCompletedToBoth(offer);
         }
     }
 
-    private void expireIfNeeded(Offer offer) {
-        if (offer == null) {
-            return;
+    private Offer getOfferForAction(User user, UUID offerId) {
+        Offer offer = findOffer(offerId);
+        if (!isBuyerOrSeller(user, offer) || !isReceiver(user, offer)) {
+            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
         }
-        if (offer.getStatus() == OfferStatus.EXPIRED || offer.getStatus() == OfferStatus.REJECTED || offer.getStatus() == OfferStatus.COMPLETED) {
-            return;
+        return offer;
+    }
+
+    private Offer findOffer(UUID offerId) {
+        return offerRepository.findById(offerId)
+                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+    }
+
+    private boolean expireIfNeeded(Offer offer, boolean throwIfExpired) {
+        if (offer == null || offer.getStatus() != OfferStatus.PENDING) {
+            return false;
         }
-        LocalDateTime now = LocalDateTime.now();
-        if (offer.getExpiresAt() != null && now.isAfter(offer.getExpiresAt())) {
+        if (offer.getExpiresAt() != null && LocalDateTime.now().isAfter(offer.getExpiresAt())) {
             offer.setStatus(OfferStatus.EXPIRED);
             offerRepository.save(offer);
             offerEmailNotificationService.notifyExpiredToBoth(offer);
-            throw new BusinessException(OfferErrorCodes.OFFER_EXPIRED);
+            if (throwIfExpired) {
+                throw new BusinessException(OfferErrorCodes.OFFER_EXPIRED);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void requirePending(Offer offer) {
+        if (offer.getStatus() != OfferStatus.PENDING) {
+            throw new BusinessException(OfferErrorCodes.OFFER_NOT_PENDING);
+        }
+    }
+
+    private void validateCreateRequest(CreateOfferRequest request) {
+         validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
+
+    }
+
+    private void validateCounterRequest(CounterOfferRequest request) {
+        validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
+
+    }
+
+    private void validateQuantityAndPrice(Integer quantity, BigDecimal totalPrice) {
+        if (quantity == null || quantity < 1) {
+            throw new BusinessException(OfferErrorCodes.INVALID_QUANTITY);
+        }
+        if (totalPrice == null || totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(OfferErrorCodes.INVALID_TOTAL_PRICE);
+        }
+    }
+
+
+    private void validateListingForOffer(Listing listing, User buyer) {
+        if (listing.getStatus() != ListingStatus.ACTIVE) {
+            throw new BusinessException(OfferErrorCodes.LISTING_NOT_ACTIVE);
+        }
+        if (listing.getListingType() == ListingType.VEHICLE || listing.getListingType() == ListingType.REAL_ESTATE) {
+            throw new BusinessException(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
+        }
+        if (listing.getSeller() != null && listing.getSeller().getId() != null
+                && listing.getSeller().getId().equals(buyer.getId())) {
+            throw new BusinessException(OfferErrorCodes.SELF_OFFER_NOT_ALLOWED);
         }
     }
 
     private boolean isBuyerOrSeller(User user, Offer offer) {
-        if (user == null || offer == null) {
-            return false;
-        }
         Long userId = user.getId();
-        return (offer.getBuyer() != null && offer.getBuyer().getId() != null && offer.getBuyer().getId().equals(userId))
-                || (offer.getSeller() != null && offer.getSeller().getId() != null && offer.getSeller().getId().equals(userId));
+        return offer.getBuyer() != null && offer.getBuyer().getId().equals(userId)
+                || offer.getSeller() != null && offer.getSeller().getId().equals(userId);
     }
 
     private boolean isReceiver(User user, Offer offer) {
-        if (user == null || offer == null || offer.getCreatedBy() == null) {
-            return false;
-        }
-        OfferActor actor = resolveActor(user, offer);
-        if (actor == null) {
-            return false;
-        }
-        return offer.getCreatedBy() != actor;
+        return offer.getCreatedBy() != resolveActor(user, offer);
     }
 
     private OfferActor resolveActor(User user, Offer offer) {
-        if (user == null || offer == null) {
-            return null;
-        }
         Long userId = user.getId();
-        if (offer.getBuyer() != null && offer.getBuyer().getId() != null && offer.getBuyer().getId().equals(userId)) {
+        if (offer.getBuyer() != null && offer.getBuyer().getId().equals(userId)) {
             return OfferActor.BUYER;
         }
-        if (offer.getSeller() != null && offer.getSeller().getId() != null && offer.getSeller().getId().equals(userId)) {
+        if (offer.getSeller() != null && offer.getSeller().getId().equals(userId)) {
             return OfferActor.SELLER;
         }
         return null;
     }
 
     private void validateListingEligibility(Offer offer) {
-        if (offer == null || offer.getListing() == null) {
-            throw new BusinessException(OfferErrorCodes.LISTING_NOT_FOUND);
-        }
         Listing listing = offer.getListing();
         if (listing.getStatus() != ListingStatus.ACTIVE) {
             throw new BusinessException(OfferErrorCodes.LISTING_NOT_ACTIVE);
@@ -268,9 +263,6 @@ public class OfferService {
     }
 
     private OfferDto toDto(Offer offer) {
-        if (offer == null) {
-            return null;
-        }
         Listing listing = offer.getListing();
         User buyer = offer.getBuyer();
         User seller = offer.getSeller();
@@ -297,4 +289,3 @@ public class OfferService {
                 .build();
     }
 }
-

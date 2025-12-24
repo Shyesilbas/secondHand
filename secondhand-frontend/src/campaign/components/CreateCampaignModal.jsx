@@ -72,7 +72,7 @@ const CreateCampaignModal = ({
     if (!isOpen) return;
     setIsLoadingListings(true);
     listingService
-      .getMyListings(0, 200)
+      .getMyListings(0, 50)
       .then((res) => {
         const data = Array.isArray(res) ? res : (Array.isArray(res?.content) ? res.content : []);
         setMyListings(data);

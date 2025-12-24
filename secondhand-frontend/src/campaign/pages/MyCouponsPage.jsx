@@ -29,7 +29,7 @@ const MyCouponsPage = () => {
 
   const loadListingTitles = async () => {
     try {
-      const res = await listingService.getMyListings(0, 500);
+      const res = await listingService.getMyListings(0, 50);
       const items = Array.isArray(res) ? res : (Array.isArray(res?.content) ? res.content : []);
       const map = {};
       items.forEach((l) => {
