@@ -135,8 +135,9 @@ const OffersPage = () => {
           <div className="space-y-3">
             {items.map((o) => {
               const currency = 'TRY';
-              const canActAsSeller = activeTab === 'received' && o.status === 'PENDING';
-              const canCheckout = activeTab === 'made' && o.status === 'ACCEPTED';
+              const isExpired = o.status === 'EXPIRED';
+              const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
+              const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
 
               return (
                 <div key={o.id} className="border border-gray-200 rounded-2xl p-4 hover:bg-gray-50 transition-colors">
@@ -177,42 +178,58 @@ const OffersPage = () => {
                           Buyer: <span className="font-semibold text-gray-900">{`${o.buyerName || ''} ${o.buyerSurname || ''}`.trim()}</span>
                         </div>
                       )}
+                      {activeTab === 'made' && (o.sellerName || o.sellerSurname) && (
+                          <div className="mt-2 text-sm text-gray-600">
+                            Seller: <span className="font-semibold text-gray-900">{`${o.sellerName || ''} ${o.sellerSurname || ''}`.trim()}</span>
+                          </div>
+                      )}
                     </div>
 
                     <div className="shrink-0 flex items-center gap-2">
-                      {canCheckout && (
-                        <button
-                          type="button"
-                          onClick={() => handleCheckout(o.id)}
-                          className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
-                        >
-                          Continue to Checkout
-                        </button>
-                      )}
-
-                      {canActAsSeller && (
+                      {isExpired ? (
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          <span className="text-sm font-semibold">This offer has expired!</span>
+                        </div>
+                      ) : (
                         <>
-                          <button
-                            type="button"
-                            onClick={() => setCounterTarget(o)}
-                            className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50"
-                          >
-                            Counter
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleReject(o.id)}
-                            className="px-4 py-2 rounded-xl border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleAccept(o.id)}
-                            className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700"
-                          >
-                            Accept
-                          </button>
+                          {canCheckout && (
+                            <button
+                              type="button"
+                              onClick={() => handleCheckout(o.id)}
+                              className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+                            >
+                              Continue to Checkout
+                            </button>
+                          )}
+
+                          {canActAsSeller && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setCounterTarget(o)}
+                                className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50"
+                              >
+                                Counter
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleReject(o.id)}
+                                className="px-4 py-2 rounded-xl border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50"
+                              >
+                                Reject
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleAccept(o.id)}
+                                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700"
+                              >
+                                Accept
+                              </button>
+                            </>
+                          )}
                         </>
                       )}
                     </div>

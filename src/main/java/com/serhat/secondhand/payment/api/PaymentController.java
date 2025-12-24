@@ -41,8 +41,15 @@ public class PaymentController {
 
     @PostMapping("/initiate-verification")
     public ResponseEntity<Void> initiatePaymentVerification(@RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request, Authentication authentication) {
-        paymentVerificationService.initiatePaymentVerification(authentication, request);
-        return ResponseEntity.ok().build();
+        log.info("Received initiate payment verification request from user: {}, request: {}", authentication.getName(), request);
+        try {
+            paymentVerificationService.initiatePaymentVerification(authentication, request);
+            log.info("Payment verification initiated successfully for user: {}", authentication.getName());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error initiating payment verification for user: {}, error: {}", authentication.getName(), e.getMessage(), e);
+            throw e;
+        }
     }
 
 

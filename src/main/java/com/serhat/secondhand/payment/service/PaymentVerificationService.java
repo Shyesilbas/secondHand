@@ -47,6 +47,13 @@ public class PaymentVerificationService {
 
     public void initiatePaymentVerification(Authentication authentication, InitiateVerificationRequest req) {
         User user = userService.getAuthenticatedUser(authentication);
+        log.info("Initiating payment verification for user: {}, transactionType: {}, listingId: {}, days: {}, amount: {}", 
+                user.getEmail(), 
+                req != null ? req.getTransactionType() : null,
+                req != null ? req.getListingId() : null,
+                req != null ? req.getDays() : null,
+                req != null ? req.getAmount() : null);
+        
         String code = verificationService.generateCode();
         verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
 
@@ -54,7 +61,15 @@ public class PaymentVerificationService {
                 ? req.getTransactionType() : PaymentTransactionType.ITEM_PURCHASE;
 
         String details = buildPaymentDetails(user, type, req);
-        paymentNotificationService.sendPaymentVerificationNotification(user, code, details);
+        log.info("Built payment details for user: {}, details length: {}", user.getEmail(), details != null ? details.length() : 0);
+        
+        try {
+            paymentNotificationService.sendPaymentVerificationNotification(user, code, details);
+            log.info("Payment verification notification sent successfully to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send payment verification notification to user: {}, error: {}", user.getEmail(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     private String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {

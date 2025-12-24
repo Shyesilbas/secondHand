@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import ReactDOM from 'react-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import {usePaymentAgreements} from '../../payments/hooks/usePaymentAgreements.js';
 import {useListingData} from '../../listing/hooks/useListingData.js';
@@ -78,43 +79,6 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         }
         return true;
     }, [step, allAgreementsAccepted]);
-
-    if (!isOpen) return null;
-    
-    if (isListingLoading) {
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                    <p>Loading listing information...</p>
-                </div>
-            </div>
-        );
-    }
-    
-    if (!listingId || listingError) {
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                    <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-                    <p>{listingError || 'Listing Information Not Found.'}</p>
-                    <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
-                </div>
-            </div>
-        );
-    }
-    
-    if (!listing) {
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                    <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-                    <p>Listing not found.</p>
-                    <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
-                </div>
-            </div>
-        );
-    }
 
     const renderStepContent = useCallback(() => {
         if (step === 1) {
@@ -229,101 +193,141 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                 />
             );
         }
-    }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, paymentAgreements]);
+    }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, paymentAgreements, handleDaysChange]);
 
-    return (
-        <>
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto overflow-hidden max-h-[90vh] flex flex-col">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
-                        <div>
-                            <h3 className="text-xl font-semibold text-white">Showcase Promotion</h3>
-                            <p className="text-emerald-100 text-sm">Boost your listing visibility</p>
-                        </div>
-                        <button 
-                            className="p-2 hover:bg-emerald-600 rounded-lg transition-colors" 
-                            onClick={onClose}
-                        >
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    {/* Step indicator */}
-                    <div className="px-6 py-4 bg-gray-50 flex-shrink-0">
-                        <div className="flex items-center space-x-3">
-                            {[1, 2, 3].map(s => (
-                                <div key={s} className="flex items-center">
-                                    <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                            step >= s 
-                                                ? 'bg-emerald-600 text-white' 
-                                                : 'bg-gray-300 text-gray-600'
-                                        }`}
-                                    >
-                                        {s}
-                                    </div>
-                                    {s < 3 && (
-                                        <div
-                                            className={`w-8 h-0.5 mx-2 ${
-                                                step > s ? 'bg-emerald-600' : 'bg-gray-300'
-                                            }`}
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-2 text-xs text-gray-600">
-                            {step === 1 && 'Duration & Pricing'}
-                            {step === 2 && 'Payment Agreements'}
-                            {step === 3 && 'Payment & Confirmation'}
-                        </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex-1 overflow-y-auto">
-                        {renderStepContent()}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between flex-shrink-0">
-                        <button
-                            className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
-                            onClick={handlePrevStep}
-                        >
-                            {step > 1 ? 'Back' : 'Cancel'}
-                        </button>
-                        {step < 3 && (
-                            <button
-                                className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={handleNextStep}
-                                disabled={
-                                    (step === 1 && (days < 1 || days > 30)) ||
-                                    (step === 2 && !allAgreementsAccepted)
-                                }
-                            >
-                                {step === 1 ? 'Continue' : 'Proceed to Payment'}
-                            </button>
-                        )}
+    if (!isOpen) return null;
+    
+    const renderModalContent = () => {
+        if (isListingLoading) {
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+                        <p>Loading listing information...</p>
                     </div>
                 </div>
-            </div>
-            
-            {/* Success Notification */}
-            <NotificationModal
-                isOpen={showSuccessNotification}
-                onClose={() => setShowSuccessNotification(false)}
-                type="success"
-                title="Showcase success!"
-                message={`"${listing.title || listingTitle}" will be active for ${days} at showcases section.`}
-                autoClose={true}
-                autoCloseDelay={5000}
-                size="md"
-            />
-        </>
-    );
+            );
+        }
+        
+        if (!listingId || listingError) {
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
+                        <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
+                        <p>{listingError || 'Listing Information Not Found.'}</p>
+                        <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
+                    </div>
+                </div>
+            );
+        }
+        
+        if (!listing) {
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
+                        <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
+                        <p>Listing not found.</p>
+                        <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto overflow-hidden max-h-[90vh] flex flex-col">
+                        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                            <div>
+                                <h3 className="text-xl font-semibold text-white">Showcase Promotion</h3>
+                                <p className="text-emerald-100 text-sm">Boost your listing visibility</p>
+                            </div>
+                            <button 
+                                className="p-2 hover:bg-emerald-600 rounded-lg transition-colors" 
+                                onClick={onClose}
+                            >
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="px-6 py-4 bg-gray-50 flex-shrink-0">
+                            <div className="flex items-center space-x-3">
+                                {[1, 2, 3].map(s => (
+                                    <div key={s} className="flex items-center">
+                                        <div
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                                                step >= s 
+                                                    ? 'bg-emerald-600 text-white' 
+                                                    : 'bg-gray-300 text-gray-600'
+                                            }`}
+                                        >
+                                            {s}
+                                        </div>
+                                        {s < 3 && (
+                                            <div
+                                                className={`w-8 h-0.5 mx-2 ${
+                                                    step > s ? 'bg-emerald-600' : 'bg-gray-300'
+                                                }`}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-2 text-xs text-gray-600">
+                                {step === 1 && 'Duration & Pricing'}
+                                {step === 2 && 'Payment Agreements'}
+                                {step === 3 && 'Payment & Confirmation'}
+                            </div>
+                        </div>
+
+                        <div className="p-6 flex-1 overflow-y-auto">
+                            {renderStepContent()}
+                        </div>
+
+                        <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between flex-shrink-0">
+                            <button
+                                className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                                onClick={handlePrevStep}
+                            >
+                                {step > 1 ? 'Back' : 'Cancel'}
+                            </button>
+                            {step < 3 && (
+                                <button
+                                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={handleNextStep}
+                                    disabled={
+                                        (step === 1 && (days < 1 || days > 30)) ||
+                                        (step === 2 && !allAgreementsAccepted)
+                                    }
+                                >
+                                    {step === 1 ? 'Continue' : 'Proceed to Payment'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                
+                <NotificationModal
+                    isOpen={showSuccessNotification}
+                    onClose={() => setShowSuccessNotification(false)}
+                    type="success"
+                    title="Showcase success!"
+                    message={`"${listing.title || listingTitle}" will be active for ${days} at showcases section.`}
+                    autoClose={true}
+                    autoCloseDelay={5000}
+                    size="md"
+                />
+            </>
+        );
+    };
+
+    const modalContent = renderModalContent();
+    
+    if (!modalContent) return null;
+    
+    return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default ShowcaseModal;

@@ -6,7 +6,6 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
 import { listingService } from '../services/listingService.js';
 import ShowcaseModal from '../../showcase/components/ShowcaseModal.jsx';
-import ReactDOM from 'react-dom';
 import CreateCampaignModal from '../../campaign/components/CreateCampaignModal.jsx';
 
 const ListingCardActions = ({ listing, onChanged }) => {
@@ -245,16 +244,13 @@ const ListingCardActions = ({ listing, onChanged }) => {
         )}
       </div>
       
-      {isShowcaseModalOpen && ReactDOM.createPortal(
-        <ShowcaseModal
-          isOpen={isShowcaseModalOpen}
-          onClose={() => setIsShowcaseModalOpen(false)}
-          listingId={listing.id}
-          listingTitle={listing.title}
-          onSuccess={handleShowcaseSuccess}
-        />,
-        document.body
-      )}
+      <ShowcaseModal
+        isOpen={isShowcaseModalOpen}
+        onClose={() => setIsShowcaseModalOpen(false)}
+        listingId={listing.id}
+        listingTitle={listing.title}
+        onSuccess={handleShowcaseSuccess}
+      />
 
       <CreateCampaignModal
         isOpen={isCampaignModalOpen}

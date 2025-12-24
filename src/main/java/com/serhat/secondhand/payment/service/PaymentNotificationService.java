@@ -41,10 +41,12 @@ public class PaymentNotificationService {
                     user.getName(), code, verificationExpiryMinutes);
             String content = base + (extraDetails != null ? ("\n" + extraDetails) : "");
 
+            log.info("Attempting to send payment verification email to user: {}, code: {}", user.getEmail(), code);
             emailService.sendEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
-            log.info("Payment verification notification sent to user: {}", user.getEmail());
+            log.info("Payment verification notification sent successfully to user: {}", user.getEmail());
         } catch (Exception e) {
-            log.warn("Failed to send payment verification notification to user {}: {}", user.getEmail(), e.getMessage());
+            log.error("Failed to send payment verification notification to user {}: {}", user.getEmail(), e.getMessage(), e);
+            throw new RuntimeException("Failed to send payment verification email: " + e.getMessage(), e);
         }
     }
 }
