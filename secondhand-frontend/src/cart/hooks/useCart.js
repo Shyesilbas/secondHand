@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cartService } from '../services/cartService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import {useEffect} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {cartService} from '../services/cartService.js';
+import {useAuth} from '../../auth/AuthContext.jsx';
 
 export const useCart = (options = {}) => {
     const { user } = useAuth();
@@ -85,9 +85,7 @@ export const useCart = (options = {}) => {
         const clearCartMutation = useMutation({
         mutationFn: () => cartService.clearCart(),
         onSuccess: () => {
-            // Invalidate cart items to refresh the count
             queryClient.invalidateQueries(['cartItems']);
-            // Clear localStorage and trigger immediate UI update
             localStorage.setItem('cartCount', '0');
             window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: 0 }));
         },
