@@ -358,9 +358,29 @@ public class ListingService {
                 .build();
     }
 
-    public List<Listing> findAllByIds(List<UUID> ids) {
-        return listingRepository.findAllById(ids);
+
+    @Transactional(readOnly = true)
+    public ListingDto enrichListing(ListingDto dto, String userEmail) {
+        if (dto == null) return null;
+
+        favoriteStatsUtil.enrichWithFavoriteStats(dto, userEmail);
+        reviewStatsUtil.enrichWithReviewStats(dto);
+        campaignPricingUtil.enrichWithCampaignPricing(dto);
+
+        return dto;
     }
+
+    @Transactional(readOnly = true)
+    public List<ListingDto> enrichListings(List<ListingDto> dtos, String userEmail) {
+        if (dtos == null || dtos.isEmpty()) return List.of();
+
+        favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
+        reviewStatsUtil.enrichWithReviewStats(dtos);
+        campaignPricingUtil.enrichWithCampaignPricing(dtos);
+
+        return dtos;
+    }
+
 
 
 }
