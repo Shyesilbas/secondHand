@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
 import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
-import com.serhat.secondhand.listing.application.util.ListingReviewStatsUtil;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
+import com.serhat.secondhand.listing.application.util.ListingReviewStatsUtil;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -13,22 +13,13 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.data.domain.Page;
-import java.util.HashMap;
+import java.util.*;
 import java.util.function.Function;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -366,5 +357,10 @@ public class ListingService {
                 .sportsCount(sportsCount)
                 .build();
     }
+
+    public List<Listing> findAllByIds(List<UUID> ids) {
+        return listingRepository.findAllById(ids);
+    }
+
 
 }

@@ -136,4 +136,8 @@ public class UserService {
                 .toList();
     }
 
+    public List<User> findAllByIds(List<Long> ids) {
+        return userRepository.findAllById(ids);
+    }
+
 }

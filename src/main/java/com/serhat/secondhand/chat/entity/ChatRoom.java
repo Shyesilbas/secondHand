@@ -1,14 +1,15 @@
 package com.serhat.secondhand.chat.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "chat_rooms")
@@ -29,12 +30,13 @@ public class ChatRoom {
     private RoomType roomType;
     
     @Column(name = "listing_id")
-    private String listingId;     
+    private String listingId;
+
     @ElementCollection
-    @CollectionTable(name = "chat_room_participants", 
-                     joinColumns = @JoinColumn(name = "chat_room_id"))
+    @CollectionTable(name = "chat_room_participants", joinColumns = @JoinColumn(name = "chat_room_id"))
     @Column(name = "user_id")
-    private List<Long> participantIds;
+    private Set<Long> participantIds = new HashSet<>();
+
     
     @Column(name = "last_message")
     private String lastMessage;
@@ -54,5 +56,6 @@ public class ChatRoom {
     private LocalDateTime updatedAt;
     
     public enum RoomType {
-        DIRECT,             LISTING         }
+        DIRECT,
+        LISTING         }
 }
