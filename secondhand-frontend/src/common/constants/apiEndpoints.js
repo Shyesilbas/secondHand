@@ -53,6 +53,10 @@ export const API_ENDPOINTS = {
         GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
     },
+    DASHBOARD: {
+        SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard
+        BUYER: '/v1/dashboard/buyer',                                                    // GET - Buyer dashboard
+    },
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',
         CREATE: '/v1/credit-card',

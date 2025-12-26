@@ -40,6 +40,8 @@ import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
 import MyCouponsPage from '../../campaign/pages/MyCouponsPage.jsx';
 import OffersPage from '../../offer/pages/OffersPage.jsx';
+import SellerDashboardPage from '../../dashboard/pages/SellerDashboardPage.jsx';
+import BuyerDashboardPage from '../../dashboard/pages/BuyerDashboardPage.jsx';
 
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
@@ -138,6 +140,8 @@ const AppRoutes = () => {
                 }
             >
                         <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+                        <Route path={ROUTES.SELLER_DASHBOARD} element={<SellerDashboardPage />} />
+                        <Route path={ROUTES.BUYER_DASHBOARD} element={<BuyerDashboardPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePasswordPage />} />
         <Route path={ROUTES.VERIFY_ACCOUNT} element={<AccountVerificationPage />} />
