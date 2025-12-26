@@ -23,11 +23,6 @@ public class BankValidator {
         }
     }
 
-    public void validateBankAccountExists(Optional<Bank> bank) {
-        if (bank.isEmpty()) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND);
-        }
-    }
 
     public void validateSufficientBalance(Bank bank, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -39,11 +34,6 @@ public class BankValidator {
         }
     }
 
-    public void validateAmount(BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
-        }
-    }
 
     public void validateCreditAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -61,6 +51,17 @@ public class BankValidator {
         if (bank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
             throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_EMPTY);
         }
+    }
+
+    public boolean hasSufficientBalance(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        Optional<Bank> bank = bankRepository.findByAccountHolder(user);
+        if (bank.isEmpty()) {
+            return false;
+        }
+        return bank.get().getBalance().compareTo(amount) >= 0;
     }
 }
 

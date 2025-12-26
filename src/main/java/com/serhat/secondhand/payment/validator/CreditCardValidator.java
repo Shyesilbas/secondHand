@@ -31,11 +31,6 @@ public class CreditCardValidator {
         }
     }
 
-    public void validateCreditCardExists(Optional<CreditCard> creditCard) {
-        if (creditCard.isEmpty()) {
-            throw new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND);
-        }
-    }
 
     public void validateSufficientCredit(CreditCard creditCard, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -48,10 +43,18 @@ public class CreditCardValidator {
         }
     }
 
-    public void validateAmount(BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
+
+    public boolean hasSufficientCredit(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
         }
+        Optional<CreditCard> creditCard = creditCardRepository.findByCardHolder(user);
+        if (creditCard.isEmpty()) {
+            return false;
+        }
+        CreditCard card = creditCard.get();
+        BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
+        return availableCredit.compareTo(amount) >= 0;
     }
 }
 

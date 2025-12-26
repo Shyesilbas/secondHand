@@ -139,17 +139,12 @@ public class EWalletService {
     @Transactional(readOnly = true)
     public boolean hasSufficientBalance(BigDecimal amount) {
         User user = getAuthenticatedUser();
-        EWallet eWallet = getEWalletOrThrow(user);
-        return eWallet.getBalance().compareTo(amount) >= 0;
+        return eWalletValidator.hasSufficientBalance(user, amount);
     }
 
     @Transactional(readOnly = true)
     public boolean hasSufficientBalance(User user, BigDecimal amount) {
-        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
-        }
-        EWallet eWallet = getEWalletOrThrow(user);
-        return eWallet.getBalance().compareTo(amount) >= 0;
+        return eWalletValidator.hasSufficientBalance(user, amount);
     }
 
     @Transactional

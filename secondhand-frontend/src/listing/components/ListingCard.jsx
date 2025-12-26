@@ -46,9 +46,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
     return (
-        <div className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative">
-            <div className="aspect-[3/2] bg-gray-50 relative border-b border-gray-100 rounded-t-xl">
-                <div className="absolute inset-0 overflow-hidden rounded-t-xl">
+        <div className="group bg-white rounded-md border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative">
+            <div className="aspect-square bg-gray-50 relative border-b border-gray-100 rounded-t-md">
+                <div className="absolute inset-0 overflow-hidden rounded-t-md">
                     {listing.imageUrl ? (
                         <img 
                             src={listing.imageUrl} 
@@ -62,32 +62,32 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                     ) : null}
                     
                     <div className={`w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                        <ImageIcon className="w-10 h-10 mb-2 opacity-40" />
+                        <ImageIcon className="w-6 h-6 mb-1 opacity-40" />
                     </div>
                 </div>
                 
                 {/* Status Badge */}
-                <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+                <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5">
                     {listing.status !== LISTING_STATUS.ACTIVE && (
-                        <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider backdrop-blur-md ${getStatusBadgeClass(listing.status)}`}>
+                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider backdrop-blur-md ${getStatusBadgeClass(listing.status)}`}>
                             {listing.status}
                         </span>
                     )}
                     {isInShowcase && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-400 text-white shadow-sm uppercase tracking-wider backdrop-blur-md">
-                            <Star className="w-3 h-3 fill-current" />
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-400 text-white shadow-sm uppercase tracking-wider backdrop-blur-md">
+                            <Star className="w-2.5 h-2.5 fill-current" />
                             Featured
                         </span>
                     )}
                     {isLowStock && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider backdrop-blur-md">
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider backdrop-blur-md">
                             Low stock: {Number(listing.quantity)} left
                         </span>
                     )}
                 </div>
                 
                 {/* Action Buttons Overlay (Top Right) */}
-                <div className="absolute top-3 right-3 z-10 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-x-2 group-hover:translate-x-0">
+                <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-x-2 group-hover:translate-x-0">
                     {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
                     {canMakeOffer && (
                         <button
@@ -96,10 +96,10 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                                 e.stopPropagation();
                                 setIsOfferModalOpen(true);
                             }}
-                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-emerald-600 border-none h-8 w-8 rounded-full shadow-sm flex items-center justify-center transition-colors"
+                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-emerald-600 border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center transition-colors"
                             title="Make Offer"
                         >
-                            <HandCoins className="w-4 h-4" />
+                            <HandCoins className="w-3.5 h-3.5" />
                         </button>
                     )}
                     {canAddToCart && (
@@ -110,10 +110,10 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                                 addToCart(listing.id);
                             }}
                             disabled={isAddingToCart}
-                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-indigo-600 border-none h-8 w-8 rounded-full shadow-sm flex items-center justify-center transition-colors"
+                            className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-indigo-600 border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center transition-colors"
                             title="Add to Cart"
                         >
-                            <ShoppingBag className="w-4 h-4" />
+                            <ShoppingBag className="w-3.5 h-3.5" />
                         </button>
                     )}
                     <FavoriteButton
@@ -122,30 +122,30 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                         initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
                         initialCount={listing.favoriteStats?.favoriteCount ?? 0}
                         size="sm"
-                        className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-red-500 border-none h-8 w-8 rounded-full shadow-sm flex items-center justify-center"
+                        className="bg-white/90 backdrop-blur hover:bg-white text-gray-700 hover:text-red-500 border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center"
                     />
                 </div>
 
                  {/* Quick View Button (Bottom Center) */}
                  <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowInfo(true); }}
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur text-xs font-bold text-gray-900 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 hover:bg-black hover:text-white flex items-center gap-1"
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-bold text-gray-900 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 hover:bg-black hover:text-white flex items-center gap-1"
                 >
-                    <Eye className="w-3 h-3" />
+                    <Eye className="w-2.5 h-2.5" />
                     Quick View
                 </button>
             </div>
 
             {/* Content */}
-            <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 p-4 flex flex-col">
+            <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 p-2.5 flex flex-col">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
                         {listing.title}
                     </h3>
                 </div>
                 {hasStockInfo && (
-                    <div className="mb-2">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                    <div className="mb-1">
+                        <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
                             In stock: {Number(listing.quantity)}
                         </span>
                     </div>
@@ -153,55 +153,55 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
 
                 {/* Rating & Reviews */}
                 {reviewCount > 0 && (
-                    <div className="flex items-center gap-1 mb-2">
+                    <div className="flex items-center gap-0.5 mb-1">
                         <div className="flex">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
                                     key={star}
-                                    className={`w-3 h-3 ${star <= Math.round(averageRating) ? 'text-amber-400 fill-current' : 'text-gray-200'}`}
+                                    className={`w-2.5 h-2.5 ${star <= Math.round(averageRating) ? 'text-amber-400 fill-current' : 'text-gray-200'}`}
                                 />
                             ))}
                         </div>
-                        <span className="text-xs text-gray-500 ml-1">({reviewCount})</span>
+                        <span className="text-[10px] text-gray-500 ml-0.5">({reviewCount})</span>
                     </div>
                 )}
 
-                <div className="mb-3 mt-auto">
-                    <div className="flex items-end gap-2 flex-wrap">
-                        <p className="text-lg font-bold text-gray-900 tracking-tight">
+                <div className="mt-1">
+                    <div className="flex items-end gap-1.5 flex-wrap">
+                        <p className="text-sm font-bold text-gray-900 tracking-tight">
                             {formatCurrency(displayPrice, listing.currency)}
                         </p>
                         {hasCampaign && (
-                            <p className="text-sm font-medium text-gray-500 line-through">
+                            <p className="text-[10px] font-medium text-gray-500 line-through">
                                 {formatCurrency(listing.price, listing.currency)}
                             </p>
                         )}
                         {hasStockInfo && (
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
+                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
                                 Stock: {Number(listing.quantity)}
                             </span>
                         )}
                     </div>
                     {hasCampaign && (
-                        <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+                        <div className="mt-0.5 inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200">
                             <span>{listing.campaignName || 'Campaign'}</span>
                         </div>
                     )}
                     {listing.description && (
-                        <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                        <p className="text-[10px] text-gray-500 line-clamp-2 mt-0.5">
                             {listing.description}
                         </p>
                     )}
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                <div className="mt-1.5 pt-1.5 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                         {listing.sellerName && (
-                            <div className="flex items-center gap-1.5 group/seller">
-                                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 group-hover/seller:bg-indigo-100 group-hover/seller:text-indigo-600 transition-colors">
+                            <div className="flex items-center gap-1 group/seller">
+                                <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-bold text-gray-500 group-hover/seller:bg-indigo-100 group-hover/seller:text-indigo-600 transition-colors">
                                     {listing.sellerName[0]?.toUpperCase()}
                                 </div>
-                                <span className="text-xs font-medium text-gray-600 truncate max-w-[80px] group-hover/seller:text-indigo-600 transition-colors">
+                                <span className="text-[10px] font-medium text-gray-600 truncate max-w-[60px] group-hover/seller:text-indigo-600 transition-colors">
                                     {listing.sellerName}
                                 </span>
                             </div>
@@ -209,12 +209,12 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                     </div>
                     
                     <div className="flex flex-col items-end gap-0.5">
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <MapPin className="w-3 h-3 shrink-0" />
-                            <span className="truncate max-w-[80px]">{listing.city}</span>
+                        <div className="flex items-center gap-0.5 text-[10px] text-gray-500">
+                            <MapPin className="w-2.5 h-2.5 shrink-0" />
+                            <span className="truncate max-w-[60px]">{listing.city}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] text-gray-400">
-                            <Heart className="w-2.5 h-2.5 shrink-0 fill-current text-gray-300" />
+                        <div className="flex items-center gap-0.5 text-[9px] text-gray-400">
+                            <Heart className="w-2 h-2 shrink-0 fill-current text-gray-300" />
                             <span>{favoriteCount} likes</span>
                         </div>
                     </div>

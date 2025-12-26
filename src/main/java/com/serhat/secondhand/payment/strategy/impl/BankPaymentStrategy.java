@@ -5,6 +5,7 @@ import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.BankService;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
+import com.serhat.secondhand.payment.validator.BankValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Slf4j
 public class BankPaymentStrategy implements PaymentStrategy {
     private final BankService bankService;
+    private final BankValidator bankValidator;
 
     @Override
     public PaymentType getPaymentType() {
@@ -26,7 +28,7 @@ public class BankPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return bankService.hasSufficientBalance(fromUser, amount);
+        return bankValidator.hasSufficientBalance(fromUser, amount);
     }
 
     @Override

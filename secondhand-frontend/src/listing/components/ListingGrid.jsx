@@ -4,7 +4,7 @@ import ListingCard from './ListingCard.jsx';
 const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {[...Array(8)].map((_, index) => (
                     <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
                         <div className="aspect-video bg-gray-200"></div>
@@ -59,7 +59,7 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} onDeleted={onDeleted} />
             ))}

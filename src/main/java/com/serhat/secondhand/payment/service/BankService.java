@@ -108,11 +108,7 @@ public class BankService {
 
     @Transactional(readOnly = true)
     public boolean hasSufficientBalance(User user, BigDecimal amount) {
-        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
-        }
-        Bank bank = findByUserMandatory(user);
-        return bank.getBalance().compareTo(amount) >= 0;
+        return bankValidator.hasSufficientBalance(user, amount);
     }
 
     @Transactional

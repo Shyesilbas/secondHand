@@ -5,6 +5,7 @@ import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.CreditCardService;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
+import com.serhat.secondhand.payment.validator.CreditCardValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class CreditCardPaymentStrategy implements PaymentStrategy {
     
     private final CreditCardService creditCardService;
+    private final CreditCardValidator creditCardValidator;
 
     @Override
     public PaymentType getPaymentType() {
@@ -27,7 +29,7 @@ public class CreditCardPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return creditCardService.hasSufficientCredit(fromUser, amount);
+        return creditCardValidator.hasSufficientCredit(fromUser, amount);
     }
 
     @Override
