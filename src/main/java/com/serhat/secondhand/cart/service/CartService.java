@@ -11,6 +11,7 @@ import com.serhat.secondhand.cart.validator.CartValidator;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class CartService {
     private final CartMapper cartMapper;
     private final ListingService listingService;
     private final CartValidator cartValidator;
+    private final ListingEnrichmentService enrichmentService;
 
     @Transactional(readOnly = true)
     public List<CartDto> getCartItems(User user) {
@@ -40,9 +42,7 @@ public class CartService {
 
         for (CartDto cartDto : cartDtos) {
             if (cartDto.getListing() != null) {
-                cartDto.setListing(
-                        listingService.enrichListing(cartDto.getListing(), user.getEmail())
-                );
+                cartDto.setListing(enrichmentService.enrich(cartDto.getListing(), user.getEmail()));
             }
         }
 
@@ -53,12 +53,13 @@ public class CartService {
         Listing listing = listingService.findById(request.getListingId())
                 .orElseThrow(() -> new BusinessException(CartErrorCodes.LISTING_NOT_FOUND));
 
-        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
-
         cartValidator.validateListingExists(listing);
         cartValidator.validateListingActive(listing);
         cartValidator.validateListingType(listing);
+
+        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
         cartValidator.validateQuantity(reqQty);
+        cartValidator.validateStock(reqQty, listing.getQuantity());
 
         Optional<Cart> existingCartItemOpt = cartRepository.findByUserAndListing(user, listing);
 
@@ -70,7 +71,6 @@ public class CartService {
             cartItem.setQuantity(nextQty);
             cartItem.setNotes(request.getNotes());
         } else {
-            cartValidator.validateStock(reqQty, listing.getQuantity());
             cartItem = Cart.builder()
                     .user(user)
                     .listing(listing)
@@ -81,9 +81,7 @@ public class CartService {
 
         Cart savedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(savedCart);
-
-        // Listing enrich
-        dto.setListing(listingService.enrichListing(dto.getListing(), user.getEmail()));
+        dto.setListing(enrichmentService.enrich(dto.getListing(), user.getEmail()));
         return dto;
     }
 
@@ -95,7 +93,6 @@ public class CartService {
                 .orElseThrow(() -> new BusinessException(CartErrorCodes.ITEM_NOT_FOUND_IN_CART));
 
         int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
-
         cartValidator.validateQuantity(reqQty);
         cartValidator.validateStock(reqQty, listing.getQuantity());
 
@@ -104,9 +101,7 @@ public class CartService {
 
         Cart updatedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(updatedCart);
-
-        // Listing enrich
-        dto.setListing(listingService.enrichListing(dto.getListing(), user.getEmail()));
+        dto.setListing(enrichmentService.enrich(dto.getListing(), user.getEmail()));
         return dto;
     }
 
@@ -138,5 +133,4 @@ public class CartService {
                 .orElseThrow(() -> new BusinessException(CartErrorCodes.LISTING_NOT_FOUND));
         return cartRepository.existsByUserAndListing(user, listing);
     }
-
 }
