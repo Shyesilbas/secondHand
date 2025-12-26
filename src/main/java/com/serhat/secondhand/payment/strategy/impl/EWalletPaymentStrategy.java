@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.strategy.impl;
 
 import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EWalletPaymentStrategy implements PaymentStrategy {
     private final EWalletService eWalletService;
+    private final EWalletValidator eWalletValidator;
 
     @Override
     public PaymentType getPaymentType() {
@@ -24,7 +26,7 @@ public class EWalletPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return eWalletService.hasSufficientBalance(fromUser, amount);
+        return eWalletValidator.hasSufficientBalance(fromUser, amount);
     }
 
     @Override

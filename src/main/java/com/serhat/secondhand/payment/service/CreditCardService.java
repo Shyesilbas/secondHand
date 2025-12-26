@@ -53,15 +53,6 @@ public class CreditCardService {
         return creditCardMapper.toDto(creditCard);
     }
 
-    public boolean hasSufficientCredit(User user, BigDecimal amount) {
-        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
-        }
-
-        return findByUser(user)
-                .map(card -> card.getLimit().subtract(card.getAmount()).compareTo(amount) >= 0)
-                .orElse(false);
-    }
 
     public PaymentResult processCreditCardPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
         if (fromUser == null) {

@@ -126,7 +126,7 @@ const UserProfilePage = () => {
 
                         {/* Listings Grid */}
                         {listingsLoading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 {[...Array(8)].map((_, i) => (
                                     <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
                                         <div className="aspect-video bg-gray-200"></div>
@@ -161,7 +161,7 @@ const UserProfilePage = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                                 {listings.map(listing => (
                                     <ListingCard
                                         key={listing.id}

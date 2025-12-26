@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -73,6 +74,17 @@ public class EWalletValidator {
         if (eWallet.getBalance().compareTo(amount) < 0) {
             throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
         }
+    }
+
+    public boolean hasSufficientBalance(User user, BigDecimal amount) {
+        if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        Optional<EWallet> eWallet = eWalletRepository.findByUser(user);
+        if (eWallet.isEmpty()) {
+            return false;
+        }
+        return eWallet.get().getBalance().compareTo(amount) >= 0;
     }
 }
 
