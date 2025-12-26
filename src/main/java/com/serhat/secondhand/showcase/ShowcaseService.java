@@ -5,8 +5,6 @@ import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +35,7 @@ public class ShowcaseService {
     private final ListingService listingService;
     private final PaymentProcessor paymentProcessor;
     private final UserService userService;
+    private final com.serhat.secondhand.showcase.validator.ShowcaseValidator showcaseValidator;
 
     @Getter
     @Value("${app.showcase.daily.cost}")
@@ -48,53 +46,23 @@ public class ShowcaseService {
     private BigDecimal showcaseFeeTax;
     
     public Showcase createShowcase(ShowcasePaymentRequest request, Authentication authentication) {
-        if (request.days() <= 0 || request.days() > 30) {
-            throw new BusinessException(ShowcaseErrorCodes.INVALID_DAYS_COUNT);
-        }
+        showcaseValidator.validateDaysCount(request.days());
+        
         User user = userService.getAuthenticatedUser(authentication);
-
-
         Listing listing = listingService.findById(request.listingId())
                 .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
         
-        BigDecimal dailyCostWithTax = showcaseDailyCost
-                .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                .add(showcaseDailyCost);
-        BigDecimal totalCost = dailyCostWithTax.multiply(new BigDecimal(request.days()));
+        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
+        BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
         
-        PaymentRequest paymentRequest = PaymentRequest.builder()
-                .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName(user.getName())
-                .receiverSurname(user.getSurname())
-                .listingId(listing.getId())
-                .amount(totalCost)
-                .paymentType(request.paymentType())
-                .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
-                .paymentDirection(PaymentDirection.OUTGOING)
-                .verificationCode(request.verificationCode())
-                .agreementsAccepted(request.agreementsAccepted())
-                .acceptedAgreementIds(request.acceptedAgreementIds())
-                .build();
-
+        PaymentRequest paymentRequest = showcaseMapper.buildPaymentRequest(request, user, listing, totalCost);
         paymentProcessor.process(paymentRequest, authentication);
         
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
 
-
-        return showcaseRepository.save(Showcase.builder()
-                .listing(listing)
-                .user(user)
-                .startDate(startDate)
-                .endDate(endDate)
-                .totalCost(totalCost)
-                .dailyCost(showcaseDailyCost)
-                .status(ShowcaseStatus.ACTIVE)
-                .build());
-
-
+        Showcase showcase = showcaseMapper.fromCreateRequest(request, user, listing, showcaseDailyCost, totalCost, startDate, endDate);
+        return showcaseRepository.save(showcase);
     }
     
     public List<ShowcaseDto> getActiveShowcases() {
@@ -117,16 +85,12 @@ public class ShowcaseService {
         Showcase showcase = showcaseRepository.findById(showcaseId)
                 .orElseThrow(() -> new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
         
-        if (showcase.getStatus() != ShowcaseStatus.ACTIVE) {
-            throw new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_ACTIVE);
-        }
+        showcaseValidator.validateIsActive(showcase);
         
         showcase.setEndDate(showcase.getEndDate().plusDays(additionalDays));
-        BigDecimal dailyCostWithTax = showcaseDailyCost
-                .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                .add(showcaseDailyCost);
-        showcase.setTotalCost(showcase.getTotalCost().add(dailyCostWithTax.multiply(new BigDecimal(additionalDays))));
+        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
+        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, additionalDays);
+        showcase.setTotalCost(showcase.getTotalCost().add(additionalCost));
         
         showcaseRepository.save(showcase);
     }
@@ -152,17 +116,6 @@ public class ShowcaseService {
     
     public ShowcasePricingDto getShowcasePricingConfig() {
         log.info("Getting showcase pricing configuration");
-
-        BigDecimal dailyCostTax = showcaseDailyCost
-                .multiply(showcaseFeeTax)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-
-        BigDecimal totalDailyCost = showcaseDailyCost.add(dailyCostTax);
-
-        return ShowcasePricingDto.builder()
-                .dailyCost(showcaseDailyCost)
-                .taxPercentage(showcaseFeeTax)
-                .totalDailyCost(totalDailyCost)
-                .build();
+        return showcaseMapper.toPricingDto(showcaseDailyCost, showcaseFeeTax);
     }
 }
