@@ -1,7 +1,6 @@
 package com.serhat.secondhand.review.service;
 
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
@@ -10,12 +9,13 @@ import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
+import com.serhat.secondhand.review.util.ReviewErrorCodes;
+import com.serhat.secondhand.review.validator.ReviewValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.shipping.ShippingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,36 +41,18 @@ public class ReviewService {
     private final UserService userService;
     private final ReviewMapper reviewMapper;
     private final ListingRepository listingRepository;
-    private final ShippingService shippingService;
+    private final ReviewValidator reviewValidator;
 
     public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewer.getId());
 
-                OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
-                .orElseThrow(() -> new RuntimeException("Order item not found"));
+        OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
+                .orElseThrow(() -> new BusinessException(ReviewErrorCodes.ORDER_ITEM_NOT_FOUND));
 
-        if (!orderItem.getOrder().getUser().getId().equals(reviewer.getId())) {
-            throw new RuntimeException("Order item does not belong to user");
-        }
+        reviewValidator.validateForCreate(reviewer, orderItem);
 
-        ShippingStatus currentStatus = shippingService.calculateShippingStatus(orderItem.getOrder());
-        if (currentStatus != ShippingStatus.DELIVERED) {
-            throw new RuntimeException("Can only review delivered orders");
-        }
-
-                if (reviewRepository.existsByReviewerAndOrderItem(reviewer, orderItem)) {
-            throw new RuntimeException("Review already exists for this order item");
-        }
-
-                User reviewedUser = orderItem.getListing().getSeller();
-
-                Review review = Review.builder()
-                .reviewer(reviewer)
-                .reviewedUser(reviewedUser)
-                .orderItem(orderItem)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .build();
+        User reviewedUser = orderItem.getListing().getSeller();
+        Review review = reviewMapper.fromCreateRequest(request, reviewer, reviewedUser, orderItem);
 
         Review savedReview = reviewRepository.save(review);
         log.info("Review created with ID: {}", savedReview.getId());
@@ -96,34 +78,6 @@ public class ReviewService {
         return reviews.map(reviewMapper::toDto);
     }
 
-    private ReviewStatsDto mapToReviewStatsDto(Object[] stats, int startIndex) {
-        return new ReviewStatsDto(
-            (Long) stats[startIndex],      // totalReviews
-            stats[startIndex + 1] != null ? (Double) stats[startIndex + 1] : 0.0, // averageRating
-            (Long) stats[startIndex + 2],  // fiveStarReviews
-            (Long) stats[startIndex + 3],  // fourStarReviews
-            (Long) stats[startIndex + 4],  // threeStarReviews
-            (Long) stats[startIndex + 5],  // twoStarReviews
-            (Long) stats[startIndex + 6],  // oneStarReviews
-            (Long) stats[startIndex + 7]   // zeroStarReviews
-        );
-    }
-
-    private UserReviewStatsDto mapToUserReviewStatsDto(Long userId, String name, String surname, ReviewStatsDto stats) {
-        return UserReviewStatsDto.builder()
-                .userId(userId)
-                .userName(name)
-                .userSurname(surname)
-                .totalReviews(stats.getTotalReviews())
-                .averageRating(stats.getAverageRating())
-                .fiveStarReviews(stats.getFiveStarReviews())
-                .fourStarReviews(stats.getFourStarReviews())
-                .threeStarReviews(stats.getThreeStarReviews())
-                .twoStarReviews(stats.getTwoStarReviews())
-                .oneStarReviews(stats.getOneStarReviews())
-                .zeroStarReviews(stats.getZeroStarReviews())
-                .build();
-    }
 
     @Transactional(readOnly = true)
     public UserReviewStatsDto getUserReviewStats(Long userId) {
@@ -134,9 +88,9 @@ public class ReviewService {
         
         ReviewStatsDto stats = (statsList == null || statsList.isEmpty()) 
             ? ReviewStatsDto.empty() 
-            : mapToReviewStatsDto(statsList.get(0), 0);
+            : reviewMapper.mapToReviewStatsDto(statsList.get(0), 0);
 
-        return mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats);
+        return reviewMapper.mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats);
     }
 
 
@@ -196,7 +150,7 @@ public class ReviewService {
         Map<UUID, ReviewStatsDto> statsMap = getListingReviewStatsDto(List.of(uuid));
         ReviewStatsDto stats = statsMap.getOrDefault(uuid, ReviewStatsDto.empty());
 
-        return mapToUserReviewStatsDto(listing.get().getSeller().getId(), listing.get().getTitle(), "", stats);
+        return reviewMapper.mapToUserReviewStatsDto(listing.get().getSeller().getId(), listing.get().getTitle(), "", stats);
     }
 
     @Transactional(readOnly = true)
@@ -217,7 +171,7 @@ public class ReviewService {
 
         for (Object[] stats : statsList) {
             UUID listingId = (UUID) stats[0];
-            ReviewStatsDto dto = mapToReviewStatsDto(stats, 1);
+            ReviewStatsDto dto = reviewMapper.mapToReviewStatsDto(stats, 1);
             statsMap.put(listingId, dto);
         }
 
