@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-        Page<Order> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
+        Page<Order> findByUser(User user, Pageable pageable);
 
         @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user = :user ORDER BY o.createdAt DESC")
     List<Order> findByUserWithOrderItems(@Param("user") User user);
