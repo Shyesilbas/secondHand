@@ -1,13 +1,15 @@
 package com.serhat.secondhand.ewallet.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.entity.EWallet;
+import com.serhat.secondhand.ewallet.mapper.EWalletMapper;
 import com.serhat.secondhand.ewallet.repository.EWalletRepository;
-import com.serhat.secondhand.payment.entity.*;
+import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
+import com.serhat.secondhand.ewallet.validator.EWalletValidator;
+import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.service.BankService;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -29,49 +29,49 @@ public class EWalletService {
     private final EWalletRepository eWalletRepository;
     private final BankService bankService;
     private final PaymentRepository paymentRepository;
+    private final EWalletMapper eWalletMapper;
+    private final EWalletValidator eWalletValidator;
+    private final UserService userService;
 
+    @Transactional
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
+        log.info("Creating eWallet for user: {}", user.getEmail());
 
-        if (eWalletRepository.existsByUser(user)) {
-            throw new BusinessException(PaymentErrorCodes.EWALLET_EXISTS);
-        }
+        eWalletValidator.validateEWalletNotExists(user);
+        eWalletValidator.validateWalletLimit(ewalletRequest.limit());
+        eWalletValidator.validateSpendingWarningLimit(ewalletRequest.spendingWarningLimit());
 
-        EWallet eWallet = EWallet.builder()
-                .user(user)
-                .balance(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
-                .walletLimit(ewalletRequest.limit())
-                .spendingWarningLimit(ewalletRequest.spendingWarningLimit())
-                .build();
-
+        EWallet eWallet = eWalletMapper.fromCreateRequest(ewalletRequest, user);
         eWallet = eWalletRepository.save(eWallet);
+
         log.info("eWallet created for user: {} with ID: {}", user.getEmail(), eWallet.getId());
-
-        return mapToDto(eWallet);
+        return eWalletMapper.toDto(eWallet);
     }
 
+    @Transactional(readOnly = true)
     public EWalletDto getEWalletByUserId() {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
-        return mapToDto(eWallet);
+        return eWalletMapper.toDto(eWallet);
     }
 
+    @Transactional
     public void updateSpendingWarningLimit(BigDecimal spendingWarningLimit) {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
-        if (spendingWarningLimit.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_WALLET_LIMIT);
-        }
+        eWalletValidator.validateSpendingWarningLimit(spendingWarningLimit);
 
-        eWallet.setSpendingWarningLimit(spendingWarningLimit.setScale(2, RoundingMode.HALF_UP));
+        eWallet.setSpendingWarningLimit(EWalletBalanceUtil.scale(spendingWarningLimit));
         eWalletRepository.save(eWallet);
 
         log.info("eWallet spending warning limit updated for user: {} new limit: {}", user.getEmail(), spendingWarningLimit);
     }
 
+    @Transactional
     public void removeSpendingWarningLimit() {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
         eWallet.setSpendingWarningLimit(null);
         eWalletRepository.save(eWallet);
@@ -80,107 +80,63 @@ public class EWalletService {
 
     @Transactional
     public void deposit(DepositRequest request) {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
-        }
+        eWalletValidator.validateDeposit(eWallet, request.getAmount());
 
-        Bank bank = bankService.findByUser(user)
-                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
-
-        if (!bank.getId().equals(request.getBankId())) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
-        }
-
-        BigDecimal walletLimit = eWallet.getWalletLimit();
-        BigDecimal balanceAfterUpdate = eWallet.getBalance().add(request.getAmount());
-
-        if(balanceAfterUpdate.compareTo(walletLimit)>0){
-            throw new BusinessException(PaymentErrorCodes.WALLET_LIMIT_EXCEEDED);
-        }
+        Bank bank = bankService.findByUser(user).orElse(null);
+        eWalletValidator.validateBankAccount(bank, request.getBankId());
 
         bankService.debit(user, request.getAmount());
 
-        eWallet.setBalance(eWallet.getBalance().add(request.getAmount()).setScale(2, RoundingMode.HALF_UP));
+        eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), request.getAmount()));
         eWalletRepository.save(eWallet);
 
-        Payment payment = Payment.builder()
-                .fromUser(user)
-                .toUser(null)
-                .amount(request.getAmount())
-                .paymentType(PaymentType.TRANSFER)
-                .transactionType(PaymentTransactionType.EWALLET_DEPOSIT)
-                .paymentDirection(PaymentDirection.INCOMING)
-                .listingId(null)
-                .processedAt(LocalDateTime.now())
-                .isSuccess(true)
-                .build();
-
+        var payment = eWalletMapper.buildDepositPayment(user, request.getAmount());
         paymentRepository.save(payment);
+
         log.info("eWallet deposit successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
     @Transactional
     public void withdraw(WithdrawRequest request) {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
-        }
+        eWalletValidator.validateWithdraw(eWallet, request.getAmount());
 
-        if (eWallet.getBalance().compareTo(request.getAmount()) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
-        }
+        Bank bank = bankService.findByUser(user).orElse(null);
+        eWalletValidator.validateBankAccount(bank, request.getBankId());
 
-        Bank bank = bankService.findByUser(user)
-                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
-
-        if (!bank.getId().equals(request.getBankId())) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
-        }
-
-        eWallet.setBalance(eWallet.getBalance().subtract(request.getAmount()).setScale(2, RoundingMode.HALF_UP));
+        eWallet.setBalance(EWalletBalanceUtil.subtract(eWallet.getBalance(), request.getAmount()));
         eWalletRepository.save(eWallet);
 
         bankService.credit(user, request.getAmount());
 
-        Payment payment = Payment.builder()
-                .fromUser(user)
-                .toUser(null)
-                .amount(request.getAmount())
-                .paymentType(PaymentType.TRANSFER)
-                .transactionType(PaymentTransactionType.EWALLET_WITHDRAWAL)
-                .paymentDirection(PaymentDirection.OUTGOING)
-                .listingId(null)
-                .processedAt(LocalDateTime.now())
-                .isSuccess(true)
-                .build();
-
+        var payment = eWalletMapper.buildWithdrawalPayment(user, request.getAmount());
         paymentRepository.save(payment);
+
         log.info("eWallet withdrawal successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
     @Transactional
-    public EWalletDto updateLimits( UpdateLimitRequest request) {
-        User user = getCurrentUser();
+    public EWalletDto updateLimits(UpdateLimitRequest request) {
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
 
-        if (request.getNewLimit().compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_WALLET_LIMIT);
-        }
+        eWalletValidator.validateWalletLimit(request.getNewLimit());
 
-        eWallet.setWalletLimit(request.getNewLimit().setScale(2, RoundingMode.HALF_UP));
+        eWallet.setWalletLimit(EWalletBalanceUtil.scale(request.getNewLimit()));
         eWallet = eWalletRepository.save(eWallet);
 
         log.info("eWallet limit updated for user: {} new limit: {}", user.getEmail(), request.getNewLimit());
-        return mapToDto(eWallet);
+        return eWalletMapper.toDto(eWallet);
     }
 
+    @Transactional(readOnly = true)
     public boolean hasSufficientBalance(BigDecimal amount) {
-        User user = getCurrentUser();
+        User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrow(user);
         return eWallet.getBalance().compareTo(amount) >= 0;
     }
@@ -205,53 +161,44 @@ public class EWalletService {
         EWallet fromWallet = getEWalletOrThrow(fromUser);
         log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
 
-        if (fromWallet.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_EWALLET_BALANCE);
-        }
+        eWalletValidator.validateSufficientBalance(fromWallet, amount);
 
-        fromWallet.setBalance(fromWallet.getBalance().subtract(amount).setScale(2, RoundingMode.HALF_UP));
+        fromWallet.setBalance(EWalletBalanceUtil.subtract(fromWallet.getBalance(), amount));
         eWalletRepository.save(fromWallet);
-        log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
 
+        log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
         log.info("eWallet payment completed successfully: {} -> {} amount: {}",
                 fromUser != null ? fromUser.getEmail() : "SYSTEM",
                 toUser != null ? toUser.getEmail() : "SYSTEM",
                 amount != null ? amount : BigDecimal.ZERO);
     }
 
-    private EWalletDto mapToDto(EWallet eWallet) {
-        return new EWalletDto(eWallet.getUser().getId(), eWallet.getBalance(), eWallet.getWalletLimit(), eWallet.getSpendingWarningLimit());
+    @Transactional
+    public void creditToUser(User user, BigDecimal amount) {
+        log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
+
+        EWallet eWallet = eWalletRepository.findByUser(user)
+                .orElseGet(() -> {
+                    log.info("Creating new e-wallet for user: {}", user.getEmail());
+                    EWallet newWallet = eWalletMapper.createDefaultEWallet(user, new BigDecimal("10000.00"));
+                    return eWalletRepository.save(newWallet);
+                });
+
+        eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), amount));
+        eWalletRepository.save(eWallet);
+
+        log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
     }
 
     private EWallet getEWalletOrThrow(User user) {
         return eWalletRepository.findByUser(user)
-                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
+                .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(
+                        com.serhat.secondhand.payment.util.PaymentErrorCodes.EWALLET_NOT_FOUND));
     }
 
-    @Transactional
-    public void creditToUser(User user, BigDecimal amount) {
-        log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
-        
-        EWallet eWallet = eWalletRepository.findByUser(user)
-                .orElseGet(() -> {
-                    log.info("Creating new e-wallet for user: {}", user.getEmail());
-                    EWallet newWallet = EWallet.builder()
-                            .user(user)
-                            .balance(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
-                            .walletLimit(new BigDecimal("10000.00").setScale(2, RoundingMode.HALF_UP))
-                            .build();
-                    return eWalletRepository.save(newWallet);
-                });
-        
-        eWallet.setBalance(eWallet.getBalance().add(amount).setScale(2, RoundingMode.HALF_UP));
-        eWalletRepository.save(eWallet);
-        log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
-    }
-
-
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (User) auth.getPrincipal();
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getAuthenticatedUser(authentication);
     }
 
 }
