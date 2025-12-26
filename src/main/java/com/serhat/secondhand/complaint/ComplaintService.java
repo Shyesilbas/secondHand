@@ -1,9 +1,8 @@
 package com.serhat.secondhand.complaint;
 
+import com.serhat.secondhand.complaint.validator.ComplaintValidator;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.complaint.util.ComplaintErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,113 +23,87 @@ public class ComplaintService {
     private final ComplaintMapper complaintMapper;
     private final UserService userService;
     private final ListingService listingService;
+    private final ComplaintValidator complaintValidator;
 
 
     @Transactional
     public ComplaintDto createComplaint(ComplaintRequest complaintRequest) {
-        if (complaintRequest.complainerId() == null) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINER_ID_NULL);
-        }
-        if (complaintRequest.complainedUserId() == null) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINED_USER_ID_NULL);
-        }
+        log.info("Creating complaint from user {} about user {}", complaintRequest.complainerId(), complaintRequest.complainedUserId());
+
+        complaintValidator.validateRequest(complaintRequest);
 
         User complainer = userService.findById(complaintRequest.complainerId());
-
         User complainedUser = userService.findById(complaintRequest.complainedUserId());
+
+        complaintValidator.validateComplaint(complainer, complainedUser);
 
         Listing listing = null;
         if (complaintRequest.listingId() != null) {
-            listing = listingService.findById(complaintRequest.listingId())
-                    .orElse(null);
+            listing = listingService.findById(complaintRequest.listingId()).orElse(null);
         }
 
-        Complaint complaint = Complaint.builder()
-                .complainer(complainer)
-                .complainedUser(complainedUser)
-                .listing(listing)
-                .reason(complaintRequest.reason())
-                .description(complaintRequest.description())
-                .status(ComplaintStatus.PENDING)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(null)
-                .resolvedAt(null)
-                .build();
+        Complaint complaint = complaintMapper.fromCreateRequest(complaintRequest, complainer, complainedUser, listing);
+        Complaint savedComplaint = complaintRepository.save(complaint);
 
-         complaintRepository.save(complaint);
-
-         return complaintMapper.mapComplaintToDto(complaint);
+        log.info("Complaint created with ID: {}", savedComplaint.getId());
+        return complaintMapper.mapComplaintToDto(savedComplaint);
     }
 
 
-        @Transactional
-    public Complaint updateComplaintStatus(String complaintId, ComplaintStatus newStatus, String adminNotes, User admin) {
-        Complaint complaint = complaintRepository.findById(complaintId)
-                .orElseThrow(() -> new BusinessException(ComplaintErrorCodes.COMPLAINT_NOT_FOUND));
 
-        complaint.setStatus(newStatus);
-        complaint.setResolvedBy(admin);
-        complaint.setAdminNotes(adminNotes);
-
-        if (newStatus == ComplaintStatus.RESOLVED || newStatus == ComplaintStatus.DISMISSED) {
-            complaint.setResolvedAt(LocalDateTime.now());
-        }
-
-        Complaint updatedComplaint = complaintRepository.save(complaint);
-        log.info("Complaint {} status updated to {} by admin {}", complaintId, newStatus, admin.getId());
-        return updatedComplaint;
-    }
-
-
+    @Transactional(readOnly = true)
     public List<ComplaintDto> getUserComplaints() {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.getAuthenticatedUser(authentication);
-
+        log.info("Getting complaints for authenticated user");
+        User user = getAuthenticatedUser();
         return complaintRepository.findByComplainer(user).stream()
                 .map(complaintMapper::mapComplaintToDto)
                 .toList();
     }
 
-
+    @Transactional(readOnly = true)
     public List<ComplaintDto> getComplaintsAboutUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.getAuthenticatedUser(authentication);
-
-        return complaintRepository.findByComplainedUser(user).stream().map(complaintMapper::mapComplaintToDto).toList();
+        log.info("Getting complaints about authenticated user");
+        User user = getAuthenticatedUser();
+        return complaintRepository.findByComplainedUser(user).stream()
+                .map(complaintMapper::mapComplaintToDto)
+                .toList();
     }
 
 
-    public List<Complaint> getPendingComplaints() {
-        return complaintRepository.findPendingComplaints();
+    @Transactional(readOnly = true)
+    public List<ComplaintDto> getPendingComplaints() {
+        log.info("Getting pending complaints");
+        return complaintRepository.findPendingComplaints().stream()
+                .map(complaintMapper::mapComplaintToDto)
+                .toList();
     }
 
-
-    public List<Complaint> getComplaintsByStatus(ComplaintStatus status) {
-        return complaintRepository.findByStatus(status);
+    @Transactional(readOnly = true)
+    public List<ComplaintDto> getComplaintsByStatus(ComplaintStatus status) {
+        log.info("Getting complaints by status: {}", status);
+        return complaintRepository.findByStatus(status).stream()
+                .map(complaintMapper::mapComplaintToDto)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public Long getUserComplaintCount(User user) {
         return complaintRepository.countComplaintsByComplainer(user.getId());
     }
 
+    @Transactional(readOnly = true)
     public Long getComplaintsAboutUserCount(User user) {
         return complaintRepository.countComplaintsByComplainedUser(user.getId());
     }
 
+    @Transactional(readOnly = true)
     public boolean hasUserComplainedAbout(User complainer, User complainedUser) {
-        List<Complaint> complaints = complaintRepository.findByComplainerAndComplainedUser(complainer, complainedUser);
-        return !complaints.isEmpty();
+        return complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser);
     }
 
-    private void validateComplaint(User complainer, User complainedUser) {
-        if (complainer.getId().equals(complainedUser.getId())) {
-            throw new BusinessException(ComplaintErrorCodes.CANNOT_COMPLAIN_ABOUT_SELF);
-        }
-
-        if (complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser)) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINT_ALREADY_EXISTS);
-        }
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getAuthenticatedUser(authentication);
     }
 }
 
