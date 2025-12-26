@@ -8,8 +8,12 @@ export const orderService = {
   initiatePaymentVerification: async (payload) => {
     return post(API_ENDPOINTS.PAYMENTS.INITIATE_VERIFICATION, payload);
   },
-  myOrders: async (page = 0, size = 10) => {
-    return get(`${API_ENDPOINTS.ORDERS.LIST_MY_ORDERS}?page=${page}&size=${size}`);
+  myOrders: async (page = 0, size = 10, sort = null, direction = 'desc') => {
+    let url = `${API_ENDPOINTS.ORDERS.LIST_MY_ORDERS}?page=${page}&size=${size}`;
+    if (sort) {
+      url += `&sort=${sort},${direction}`;
+    }
+    return get(url);
   },
   getByOrderNumber: async (orderNumber) => {
     return get(API_ENDPOINTS.ORDERS.GET_BY_ORDER_NUMBER(orderNumber));

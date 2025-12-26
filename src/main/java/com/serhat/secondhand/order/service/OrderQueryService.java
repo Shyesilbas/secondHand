@@ -11,7 +11,9 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,17 @@ public class OrderQueryService {
     public Page<OrderDto> getUserOrders(User user, Pageable pageable) {
         log.info("Getting orders for user: {}", user.getEmail());
 
-        Page<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+        // If no sort is specified, default to createdAt DESC
+        Pageable finalPageable = pageable;
+        if (pageable.getSort().isUnsorted()) {
+            finalPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt")
+            );
+        }
+
+        Page<Order> orders = orderRepository.findByUser(user, finalPageable);
         shippingService.updateShippingStatusesForOrders(orders.getContent());
 
         return orders.map(orderMapper::toDto);

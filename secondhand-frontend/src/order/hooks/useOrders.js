@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { orderService } from '../services/orderService.js';
 
-export const useOrders = (initialPage = 0, initialSize = 10) => {
+export const useOrders = (initialPage = 0, initialSize = 10, sortField = null, sortDirection = 'desc') => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,12 +15,12 @@ export const useOrders = (initialPage = 0, initialSize = 10) => {
     last: false
   });
 
-  const fetchOrders = useCallback(async (page = pagination.number, size = pagination.size) => {
+  const fetchOrders = useCallback(async (page = pagination.number, size = pagination.size, sort = sortField, direction = sortDirection) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await orderService.myOrders(page, size);
+      const response = await orderService.myOrders(page, size, sort, direction);
       
             const data = response.data || response;
       
@@ -39,24 +39,25 @@ export const useOrders = (initialPage = 0, initialSize = 10) => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.number, pagination.size]);
+  }, [pagination.number, pagination.size, sortField, sortDirection]);
 
   const loadPage = useCallback((page) => {
-    fetchOrders(page, pagination.size);
-  }, [fetchOrders, pagination.size]);
+    fetchOrders(page, pagination.size, sortField, sortDirection);
+  }, [fetchOrders, pagination.size, sortField, sortDirection]);
 
   const refresh = useCallback(() => {
     setSearchResult(null);
-    fetchOrders(pagination.number, pagination.size);
-  }, [fetchOrders, pagination.number, pagination.size]);
+    fetchOrders(pagination.number, pagination.size, sortField, sortDirection);
+  }, [fetchOrders, pagination.number, pagination.size, sortField, sortDirection]);
 
   const setSearchOrder = useCallback((order) => {
     setSearchResult(order);
   }, []);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(initialPage, initialSize, sortField, sortDirection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortField, sortDirection]);
 
     const displayOrders = searchResult ? [searchResult] : orders;
 
