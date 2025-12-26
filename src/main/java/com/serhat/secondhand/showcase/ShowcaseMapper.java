@@ -1,5 +1,6 @@
 package com.serhat.secondhand.showcase;
 
+import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
@@ -20,11 +21,13 @@ public class ShowcaseMapper {
     
     private final ListingMapper listingMapper;
     private final ListingFavoriteStatsUtil favoriteStatsUtil;
+    private final ListingCampaignPricingUtil listingCampaignPricingUtil;
     
     public ShowcaseDto toDto(Showcase showcase) {
         // Convert listing to DTO with favorite stats
         var listingDto = listingMapper.toDynamicDto(showcase.getListing());
         favoriteStatsUtil.enrichWithFavoriteStats(listingDto, null); // No user context for public showcases
+        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDto); // Enrich with campaign pricing
         
         return ShowcaseDto.builder()
                 .id(showcase.getId())

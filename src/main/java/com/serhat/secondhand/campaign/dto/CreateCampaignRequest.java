@@ -25,6 +25,7 @@ public class CreateCampaignRequest {
     private BigDecimal value;
     private Set<ListingType> eligibleTypes;
     private Set<UUID> eligibleListingIds;
+    private Boolean applyToFutureListings;
 }
 
 

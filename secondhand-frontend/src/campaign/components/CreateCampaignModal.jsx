@@ -14,6 +14,7 @@ const defaultForm = {
   mode: 'LISTING',
   eligibleListingIds: [],
   eligibleTypes: [],
+  applyToFutureListings: false,
 };
 
 const toLocalDateTime = (value) => {
@@ -40,6 +41,7 @@ const normalizeCampaign = (campaign) => {
     mode,
     eligibleListingIds,
     eligibleTypes,
+    applyToFutureListings: Boolean(campaign.applyToFutureListings),
   };
 };
 
@@ -112,6 +114,7 @@ const CreateCampaignModal = ({
         value: form.value !== '' ? Number(form.value) : null,
         eligibleListingIds: form.mode === 'LISTING' ? form.eligibleListingIds : null,
         eligibleTypes: form.mode === 'TYPE' ? form.eligibleTypes : null,
+        applyToFutureListings: Boolean(form.applyToFutureListings),
       };
 
       if (editingCampaign?.id) {
@@ -317,6 +320,25 @@ const CreateCampaignModal = ({
                 )}
               </div>
             )}
+
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.applyToFutureListings}
+                  onChange={(e) => setForm((p) => ({ ...p, applyToFutureListings: e.target.checked }))}
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded mt-0.5"
+                />
+                <div className="flex-1">
+                  <span className="text-sm font-semibold text-gray-900 block mb-1">
+                    Apply to future listings
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    If enabled, this campaign will automatically apply to new listings you create during the campaign period that match the selected criteria.
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 

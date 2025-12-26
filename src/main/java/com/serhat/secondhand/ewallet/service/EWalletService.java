@@ -154,24 +154,24 @@ public class EWalletService {
         }
 
         try {
-            log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",
+        log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",
                     fromUser.getEmail(),
-                    toUser != null ? toUser.getEmail() : "SYSTEM",
+                toUser != null ? toUser.getEmail() : "SYSTEM",
                     amount,
                     listingId);
 
-            EWallet fromWallet = getEWalletOrThrow(fromUser);
-            log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
+        EWallet fromWallet = getEWalletOrThrow(fromUser);
+        log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
 
             eWalletValidator.validateSufficientBalance(fromWallet, amount);
 
             fromWallet.setBalance(EWalletBalanceUtil.subtract(fromWallet.getBalance(), amount));
-            eWalletRepository.save(fromWallet);
+        eWalletRepository.save(fromWallet);
 
-            log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
-            log.info("eWallet payment completed successfully: {} -> {} amount: {}",
+        log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
+        log.info("eWallet payment completed successfully: {} -> {} amount: {}",
                     fromUser.getEmail(),
-                    toUser != null ? toUser.getEmail() : "SYSTEM",
+                toUser != null ? toUser.getEmail() : "SYSTEM",
                     amount);
 
             return PaymentResult.success(
@@ -196,14 +196,14 @@ public class EWalletService {
     @Transactional
     public void creditToUser(User user, BigDecimal amount) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
-
+        
         EWallet eWallet = eWalletRepository.findByUser(user)
                 .orElseGet(() -> {
                     log.info("Creating new e-wallet for user: {}", user.getEmail());
                     EWallet newWallet = eWalletMapper.createDefaultEWallet(user, new BigDecimal("10000.00"));
                     return eWalletRepository.save(newWallet);
                 });
-
+        
         eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), amount));
         eWalletRepository.save(eWallet);
 

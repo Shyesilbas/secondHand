@@ -75,9 +75,9 @@ public class ShowcaseService {
     public List<ShowcaseDto> getActiveShowcases() {
         List<Showcase> activeShowcases = showcaseRepository.findActiveShowcases(ShowcaseStatus.ACTIVE,LocalDateTime.now());
 
-      return activeShowcases.stream()
-              .map(showcaseMapper::toDto)
-              .toList();
+        return activeShowcases.stream()
+                .map(showcaseMapper::toDto)
+                .toList();
     }
     
     public List<ShowcaseDto> getUserShowcases(Long userId) {

@@ -81,7 +81,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                     )}
                     {isLowStock && (
                         <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider backdrop-blur-md">
-                            Low stock: {Number(listing.quantity)} left
+                            {isOwner ? `Low stock: ${Number(listing.quantity)} left` : '🔥 Stok tükeniyor!'}
                         </span>
                     )}
                 </div>
@@ -146,7 +146,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 {hasStockInfo && (
                     <div className="mb-1">
                         <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                            In stock: {Number(listing.quantity)}
+                            {isLowStock && !isOwner ? '🔥 Stok tükeniyor!' : `In stock: ${Number(listing.quantity)}`}
                         </span>
                     </div>
                 )}
