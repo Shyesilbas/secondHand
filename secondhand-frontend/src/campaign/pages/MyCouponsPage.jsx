@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../../common/constants/routes.js';
-import { campaignService } from '../../listing/services/campaignService.js';
-import { listingService } from '../../listing/services/listingService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {ROUTES} from '../../common/constants/routes.js';
+import {campaignService} from '../../listing/services/campaignService.js';
+import {listingService} from '../../listing/services/listingService.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
+import {formatDateTime} from '../../common/formatters.js';
+import {ArrowLeft, Clock, Edit2, Plus, RefreshCw, Tag, Trash2} from 'lucide-react';
 
 const MyCouponsPage = () => {
   const { showError, showSuccess } = useNotification();
@@ -58,27 +60,37 @@ const MyCouponsPage = () => {
     }
   };
 
+  const stats = useMemo(() => {
+    const active = campaigns.filter(c => c.active).length;
+    const inactive = campaigns.filter(c => !c.active).length;
+    return {
+      total: campaigns.length,
+      active,
+      inactive
+    };
+  }, [campaigns]);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Kuponlarım</h1>
-            <p className="text-sm text-gray-600 mt-1">Create and manage seller campaigns. Public coupons will be added later.</p>
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Link to={ROUTES.DASHBOARD} className="text-gray-500 hover:text-gray-700">
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <h1 className="text-sm font-semibold text-gray-900">Campaigns</h1>
+            {campaigns.length > 0 && (
+              <span className="text-xs text-gray-500">({stats.total})</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              to={ROUTES.DASHBOARD}
-              className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 font-semibold hover:bg-gray-50"
-            >
-              Back
-            </Link>
             <button
               type="button"
               onClick={load}
-              className="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 font-semibold hover:bg-gray-50"
+              disabled={isLoading}
+              className="p-1.5 text-gray-500 hover:text-gray-700 disabled:opacity-50"
             >
-              Refresh
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
             <button
               type="button"
@@ -86,96 +98,126 @@ const MyCouponsPage = () => {
                 setEditingCampaign(null);
                 setIsModalOpen(true);
               }}
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
+              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5"
             >
-              Create Campaign
+              <Plus className="w-3.5 h-3.5" />
+              New
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-            <div className="text-sm font-semibold text-gray-900">Campaigns</div>
-            {isLoading && <div className="text-xs text-gray-500">Loading…</div>}
+        {isLoading ? (
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-12 bg-white border border-gray-200 rounded animate-pulse"></div>
+            ))}
           </div>
-
-          {campaigns.length === 0 && !isLoading ? (
-            <div className="p-10 text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 mb-3">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8" />
-                </svg>
-              </div>
-              <div className="text-lg font-semibold text-gray-900">No campaigns yet</div>
-              <div className="text-sm text-gray-600 mt-1">Create your first campaign to show discounted prices on your listings.</div>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingCampaign(null);
-                  setIsModalOpen(true);
-                }}
-                className="mt-5 px-5 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
-              >
-                Create Campaign
-              </button>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {campaigns.map((c) => (
-                <div key={c.id} className="p-6 flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="text-base font-semibold text-gray-900 truncate">{c.name}</div>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${c.active ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                        {c.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600 mt-1">
-                      {c.discountKind === 'PERCENT' ? `${c.value}%` : `${c.value}`} discount
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {(c.startsAt || c.endsAt) ? `${c.startsAt || 'Any'} → ${c.endsAt || 'Any'}` : 'No date limit'}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {(c.eligibleListingIds && c.eligibleListingIds.length > 0)
-                        ? `Selected listings (${c.eligibleListingIds.length})`
-                        : (c.eligibleTypes && c.eligibleTypes.length > 0)
-                          ? `Types: ${c.eligibleTypes.join(', ')}`
-                          : 'All my listings'}
-                    </div>
-                    {c.eligibleListingIds && c.eligibleListingIds.length > 0 && (
-                      <div className="text-xs text-gray-700 mt-2">
-                        <span className="font-semibold text-gray-900">Applied to:</span>{' '}
-                        {c.eligibleListingIds
-                          .map((id) => listingTitleById[id] || id)
-                          .join(', ')}
+        ) : campaigns.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+            <Tag className="w-8 h-8 text-gray-300 mx-auto mb-3" />
+            <p className="text-xs text-gray-600 mb-4">No campaigns yet</p>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingCampaign(null);
+                setIsModalOpen(true);
+              }}
+              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5 mx-auto"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create Campaign
+            </button>
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Campaign Name</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Discount</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Period</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Apply to Future Listings</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Scope</th>
+                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {campaigns.map((c) => (
+                  <tr key={c.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-medium text-gray-900">{c.name}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                          c.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {c.active ? 'Active' : 'Inactive'}
+                        </span>
+                        {c.applyToFutureListings && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 flex items-center gap-0.5">
+                            <Clock className="w-3 h-3" />
+                            Future
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingCampaign(c);
-                        setIsModalOpen(true);
-                      }}
-                      className="px-3 py-2 rounded-lg bg-white border border-gray-300 text-gray-800 text-sm font-semibold hover:bg-gray-50"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteCampaign(c.id)}
-                      className="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs font-semibold text-indigo-600">
+                        {c.discountKind === 'PERCENT' ? `${c.value}%` : `₺${c.value}`}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs text-gray-600">
+                        {c.startsAt || c.endsAt 
+                          ? `${c.startsAt ? formatDateTime(c.startsAt) : 'Any'} → ${c.endsAt ? formatDateTime(c.endsAt) : 'Any'}`
+                          : 'No limit'}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs text-gray-600">
+                        {c.applyToFutureListings ? 'Yes' : 'No'}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs text-gray-600">
+                        {c.eligibleListingIds && c.eligibleListingIds.length > 0
+                          ? `${c.eligibleListingIds.length} listing${c.eligibleListingIds.length > 1 ? 's' : ''}`
+                          : c.eligibleTypes && c.eligibleTypes.length > 0
+                            ? c.eligibleTypes.join(', ')
+                            : 'All listings'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCampaign(c);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-1 text-gray-400 hover:text-gray-600"
+                          title="Edit"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteCampaign(c.id)}
+                          className="p-1 text-gray-400 hover:text-red-600"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <CreateCampaignModal

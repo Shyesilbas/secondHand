@@ -67,6 +67,10 @@ public class Campaign {
     @Column(name = "listing_id")
     private Set<UUID> eligibleListingIds;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean applyToFutureListings = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

@@ -121,9 +121,23 @@ public class ListingCampaignPricingUtil {
         if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) {
             return false;
         }
+        
         boolean hasListingFilter = campaign.getEligibleListingIds() != null && !campaign.getEligibleListingIds().isEmpty();
         boolean hasTypeFilter = campaign.getEligibleTypes() != null && !campaign.getEligibleTypes().isEmpty();
+        boolean applyToFuture = campaign.isApplyToFutureListings();
 
+        // If applyToFutureListings is true, we can apply to new listings (future listings)
+        // In this case, we ignore eligibleListingIds filter and only check type filter
+        if (applyToFuture) {
+            // If there's a type filter, check if type matches
+            if (hasTypeFilter) {
+                return campaign.getEligibleTypes().contains(type);
+            }
+            // If no type filter, apply to all (ignore listing filter when applyToFuture is true)
+            return true;
+        }
+
+        // Original logic for applyToFutureListings = false (only apply to existing listings)
         if (hasListingFilter && campaign.getEligibleListingIds().contains(listingId)) {
             return true;
         }

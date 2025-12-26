@@ -26,6 +26,7 @@ public class CampaignDto {
     private BigDecimal value;
     private Set<ListingType> eligibleTypes;
     private Set<UUID> eligibleListingIds;
+    private boolean applyToFutureListings;
 }
 
 

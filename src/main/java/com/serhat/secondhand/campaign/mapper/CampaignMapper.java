@@ -21,6 +21,7 @@ public class CampaignMapper {
                 .value(campaign.getValue())
                 .eligibleTypes(campaign.getEligibleTypes())
                 .eligibleListingIds(campaign.getEligibleListingIds())
+                .applyToFutureListings(campaign.isApplyToFutureListings())
                 .build();
     }
 
@@ -49,6 +50,9 @@ public class CampaignMapper {
         if (request.getEligibleListingIds() != null) {
             campaign.setEligibleListingIds(request.getEligibleListingIds());
         }
+        if (request.getApplyToFutureListings() != null) {
+            campaign.setApplyToFutureListings(request.getApplyToFutureListings());
+        }
     }
 
     public Campaign fromCreateRequest(CreateCampaignRequest request, User seller) {
@@ -62,6 +66,7 @@ public class CampaignMapper {
                 .value(request.getValue())
                 .eligibleTypes(request.getEligibleTypes())
                 .eligibleListingIds(request.getEligibleListingIds())
+                .applyToFutureListings(request.getApplyToFutureListings() != null ? request.getApplyToFutureListings() : false)
                 .build();
     }
 
