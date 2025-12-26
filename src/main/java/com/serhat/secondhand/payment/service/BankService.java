@@ -3,10 +3,12 @@ package com.serhat.secondhand.payment.service;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.entity.Bank;
-import com.serhat.secondhand.payment.helper.IbanGenerator;
+import com.serhat.secondhand.payment.entity.PaymentResult;
+import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.validator.BankValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class BankService {
     private final BankRepository bankRepository;
     private final UserService userService;
     private final BankMapper bankMapper;
+    private final BankValidator bankValidator;
 
 
     public BankDto getBankInfo(Authentication authentication) {
@@ -40,18 +42,9 @@ public class BankService {
 
     public BankDto createBankAccount(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
+        bankValidator.validateForCreate(user);
 
-        if (bankRepository.existsByAccountHolder(user)) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_EXISTS);
-        }
-
-        Bank bank = Bank.builder()
-                .accountHolder(user)
-                .balance(BigDecimal.ZERO)
-                .createdAt(LocalDateTime.now())
-                .IBAN(IbanGenerator.generateIban())
-                .build();
-
+        Bank bank = bankMapper.fromCreateRequest(user);
         bank = bankRepository.save(bank);
         log.info("Bank account created for user: {} with ID: {}", user.getEmail(), bank.getId());
 
@@ -79,12 +72,8 @@ public class BankService {
 
     public void deleteBankAccount(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-
         Bank bank = findByUserMandatory(user);
-
-        if (bank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_EMPTY);
-        }
+        bankValidator.validateAccountNotEmpty(bank);
 
         bankRepository.delete(bank);
         log.info("Bank account deleted for user: {}", user.getEmail());
@@ -101,9 +90,7 @@ public class BankService {
     }
 
     public void credit(User user, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_CREDIT_AMOUNT);
-        }
+        bankValidator.validateCreditAmount(amount);
         Bank bank = findByUserMandatory(user);
         bank.setBalance(bank.getBalance().add(amount));
         bankRepository.save(bank);
@@ -111,13 +98,9 @@ public class BankService {
     }
 
     public void debit(User user, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_DEBIT_AMOUNT);
-        }
+        bankValidator.validateDebitAmount(amount);
         Bank bank = findByUserMandatory(user);
-        if (bank.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS);
-        }
+        bankValidator.validateSufficientBalance(bank, amount);
         bank.setBalance(bank.getBalance().subtract(amount));
         bankRepository.save(bank);
         log.info("Debited {} from user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
@@ -130,6 +113,34 @@ public class BankService {
         }
         Bank bank = findByUserMandatory(user);
         return bank.getBalance().compareTo(amount) >= 0;
+    }
+
+    @Transactional
+    public PaymentResult processBankPayment(User fromUser, User toUser, BigDecimal amount, java.util.UUID listingId) {
+        if (fromUser == null) {
+            return PaymentResult.failure("User not found", amount, PaymentType.TRANSFER, listingId, null, toUser != null ? toUser.getId() : null);
+        }
+
+        try {
+            debit(fromUser, amount);
+            log.info("Bank transfer processed successfully for user: {}, amount: {}", fromUser.getEmail(), amount);
+            return PaymentResult.success(
+                    java.util.UUID.randomUUID().toString(),
+                    amount,
+                    PaymentType.TRANSFER,
+                    listingId,
+                    fromUser.getId(),
+                    toUser != null ? toUser.getId() : null);
+        } catch (Exception e) {
+            log.error("Error processing bank transfer for user: {}", fromUser.getEmail(), e);
+            return PaymentResult.failure(
+                    e.getMessage(),
+                    amount,
+                    PaymentType.TRANSFER,
+                    listingId,
+                    fromUser.getId(),
+                    toUser != null ? toUser.getId() : null);
+        }
     }
 
 }

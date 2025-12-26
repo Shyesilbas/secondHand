@@ -6,7 +6,7 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.ListingFeeService;
-import com.serhat.secondhand.payment.service.PurchaseService;
+import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.payment.service.PaymentStatsService;
 import com.serhat.secondhand.payment.service.PaymentVerificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Tag(name = "Payment Management", description = "Payment processing operations")
 public class PaymentController {
 
-    private final PurchaseService purchaseService;
+    private final PaymentProcessor paymentProcessor;
     private final PaymentStatsService paymentStatsService;
     private final ListingFeeService listingFeeService;
     private final PaymentVerificationService paymentVerificationService;
@@ -35,7 +35,7 @@ public class PaymentController {
     @PostMapping("/pay")
     public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
         log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
-        PaymentDto paymentDto = purchaseService.createPayment(paymentRequest, authentication);
+        PaymentDto paymentDto = paymentProcessor.process(paymentRequest, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
     }
 

@@ -5,10 +5,9 @@ import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.BankService;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
-import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,6 +15,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BankPaymentStrategy implements PaymentStrategy {
     private final BankService bankService;
 
@@ -26,22 +26,11 @@ public class BankPaymentStrategy implements PaymentStrategy {
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        if (bankService.findByUser(fromUser).isEmpty()) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND);
-        }
-        if (!bankService.hasSufficientBalance(fromUser, amount)) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS);
-        }
-        return true;
+        return bankService.hasSufficientBalance(fromUser, amount);
     }
 
     @Override
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
-        try {
-            bankService.debit(fromUser, amount); // balance checked here
-            return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.TRANSFER, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
-        } catch (Exception e) {
-            return PaymentResult.failure(e.getMessage(), amount, PaymentType.TRANSFER, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
-        }
+        return bankService.processBankPayment(fromUser, toUser, amount, listingId);
     }
 }

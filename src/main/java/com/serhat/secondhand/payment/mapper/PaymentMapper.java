@@ -1,7 +1,10 @@
 package com.serhat.secondhand.payment.mapper;
 
 import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
+import com.serhat.secondhand.payment.entity.PaymentResult;
+import com.serhat.secondhand.user.domain.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -22,6 +25,20 @@ public interface PaymentMapper {
     @Mapping(target = "createdAt", source = "processedAt")
     @Mapping(target = "isSuccess", source = "success")
     PaymentDto toDto(Payment payment);
+
+    default Payment fromPaymentRequest(PaymentRequest paymentRequest, User fromUser, User toUser, PaymentResult result) {
+        return Payment.builder()
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .amount(paymentRequest.amount())
+                .paymentType(paymentRequest.paymentType())
+                .transactionType(paymentRequest.transactionType())
+                .paymentDirection(paymentRequest.paymentDirection())
+                .listingId(paymentRequest.listingId())
+                .processedAt(result.processedAt())
+                .isSuccess(result.success())
+                .build();
+    }
 }
 
 

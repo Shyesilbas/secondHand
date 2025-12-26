@@ -5,10 +5,12 @@ import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
+import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
+import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.Getter;
@@ -35,7 +37,8 @@ public class ShowcaseService {
     private final ListingService listingService;
     private final PaymentProcessor paymentProcessor;
     private final UserService userService;
-    private final com.serhat.secondhand.showcase.validator.ShowcaseValidator showcaseValidator;
+    private final ShowcaseValidator showcaseValidator;
+    private final PaymentRequestMapper paymentRequestMapper;
 
     @Getter
     @Value("${app.showcase.daily.cost}")
@@ -55,7 +58,7 @@ public class ShowcaseService {
         BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
         
-        PaymentRequest paymentRequest = showcaseMapper.buildPaymentRequest(request, user, listing, totalCost);
+        PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
         paymentProcessor.process(paymentRequest, authentication);
         
         LocalDateTime startDate = LocalDateTime.now();
