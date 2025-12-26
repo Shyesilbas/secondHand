@@ -7,8 +7,7 @@ import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -28,6 +27,7 @@ public class ListingFeeService {
     private final UserService userService;
     private final ListingService listingService;
     private final PaymentProcessor paymentProcessor;
+    private final PaymentRequestMapper paymentRequestMapper;
 
     @Value("${app.listing.creation.fee}")
     private BigDecimal listingCreationFee;
@@ -37,12 +37,6 @@ public class ListingFeeService {
 
     @Transactional
     public PaymentDto payListingCreationFee(ListingFeePaymentRequest request, Authentication authentication) {
-        PaymentRequest builtRequest = buildListingFeePaymentRequest(request, authentication);
-        return paymentProcessor.process(builtRequest, authentication);
-    }
-
-    @Transactional(readOnly = true)
-    public PaymentRequest buildListingFeePaymentRequest(ListingFeePaymentRequest request, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(request.listingId())
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.LISTING_NOT_FOUND));
@@ -50,21 +44,9 @@ public class ListingFeeService {
         listingService.validateOwnership(request.listingId(), user);
 
         BigDecimal totalFee = calculateTotalListingFee();
-
-        return PaymentRequest.builder()
-                .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName("System")
-                .receiverSurname("Payment")
-                .listingId(listing.getId())
-                .amount(totalFee)
-                .paymentType(request.paymentType())
-                .transactionType(PaymentTransactionType.LISTING_CREATION)
-                .paymentDirection(PaymentDirection.OUTGOING)
-                .verificationCode(request.verificationCode())
-                .agreementsAccepted(request.agreementsAccepted())
-                .acceptedAgreementIds(request.acceptedAgreementIds())
-                .build();
+        PaymentRequest paymentRequest = paymentRequestMapper.buildListingFeePaymentRequest(user, listing, request, totalFee);
+        
+        return paymentProcessor.process(paymentRequest, authentication);
     }
 
     @Transactional(readOnly = true)

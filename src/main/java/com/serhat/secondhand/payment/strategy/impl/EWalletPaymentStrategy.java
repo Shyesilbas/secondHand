@@ -37,16 +37,6 @@ public class EWalletPaymentStrategy implements PaymentStrategy {
 
     @Override
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
-        try {
-            eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
-            return PaymentResult.success(
-                    UUID.randomUUID().toString(),
-                    amount,
-                    PaymentType.EWALLET,
-                    listingId,
-                    fromUser.getId(), toUser != null ? toUser.getId() : null);
-        } catch (Exception e) {
-            return PaymentResult.failure(e.getMessage(), amount, PaymentType.EWALLET, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
-        }
+        return eWalletService.processEWalletPayment(fromUser, toUser, amount, listingId);
     }
 }

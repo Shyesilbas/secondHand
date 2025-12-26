@@ -2,7 +2,7 @@ package com.serhat.secondhand.order.api;
 
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.order.service.CheckoutService;
+import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.order.service.OrderCancellationService;
 import com.serhat.secondhand.order.service.OrderQueryService;
 import com.serhat.secondhand.user.domain.entity.User;

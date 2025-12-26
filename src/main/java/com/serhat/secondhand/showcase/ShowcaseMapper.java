@@ -3,9 +3,6 @@ package com.serhat.secondhand.showcase;
 import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
@@ -68,22 +65,6 @@ public class ShowcaseMapper {
         return dailyCostWithTax.multiply(new BigDecimal(days));
     }
 
-    public PaymentRequest buildPaymentRequest(ShowcasePaymentRequest request, User user, Listing listing, BigDecimal totalCost) {
-        return PaymentRequest.builder()
-                .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName(user.getName())
-                .receiverSurname(user.getSurname())
-                .listingId(listing.getId())
-                .amount(totalCost)
-                .paymentType(request.paymentType())
-                .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
-                .paymentDirection(PaymentDirection.OUTGOING)
-                .verificationCode(request.verificationCode())
-                .agreementsAccepted(request.agreementsAccepted())
-                .acceptedAgreementIds(request.acceptedAgreementIds())
-                .build();
-    }
 
     public ShowcasePricingDto toPricingDto(BigDecimal dailyCost, BigDecimal taxPercentage) {
         BigDecimal dailyCostTax = dailyCost

@@ -7,6 +7,8 @@ import com.serhat.secondhand.ewallet.repository.EWalletRepository;
 import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.entity.Bank;
+import com.serhat.secondhand.payment.entity.PaymentResult;
+import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.service.BankService;
 import com.serhat.secondhand.user.application.UserService;
@@ -151,26 +153,49 @@ public class EWalletService {
     }
 
     @Transactional
-    public void processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
-        log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",
-                fromUser != null ? fromUser.getEmail() : "SYSTEM",
-                toUser != null ? toUser.getEmail() : "SYSTEM",
-                amount != null ? amount : BigDecimal.ZERO,
-                listingId != null ? listingId : "N/A");
+    public PaymentResult processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
+        if (fromUser == null) {
+            return PaymentResult.failure("User not found", amount, PaymentType.EWALLET, listingId, null, toUser != null ? toUser.getId() : null);
+        }
 
-        EWallet fromWallet = getEWalletOrThrow(fromUser);
-        log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
+        try {
+            log.info("Starting eWallet payment processing: {} -> {} amount: {} for listing: {}",
+                    fromUser.getEmail(),
+                    toUser != null ? toUser.getEmail() : "SYSTEM",
+                    amount,
+                    listingId);
 
-        eWalletValidator.validateSufficientBalance(fromWallet, amount);
+            EWallet fromWallet = getEWalletOrThrow(fromUser);
+            log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
 
-        fromWallet.setBalance(EWalletBalanceUtil.subtract(fromWallet.getBalance(), amount));
-        eWalletRepository.save(fromWallet);
+            eWalletValidator.validateSufficientBalance(fromWallet, amount);
 
-        log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
-        log.info("eWallet payment completed successfully: {} -> {} amount: {}",
-                fromUser != null ? fromUser.getEmail() : "SYSTEM",
-                toUser != null ? toUser.getEmail() : "SYSTEM",
-                amount != null ? amount : BigDecimal.ZERO);
+            fromWallet.setBalance(EWalletBalanceUtil.subtract(fromWallet.getBalance(), amount));
+            eWalletRepository.save(fromWallet);
+
+            log.info("Deducted {} from payer wallet. New balance: {}", amount, fromWallet.getBalance());
+            log.info("eWallet payment completed successfully: {} -> {} amount: {}",
+                    fromUser.getEmail(),
+                    toUser != null ? toUser.getEmail() : "SYSTEM",
+                    amount);
+
+            return PaymentResult.success(
+                    UUID.randomUUID().toString(),
+                    amount,
+                    PaymentType.EWALLET,
+                    listingId,
+                    fromUser.getId(),
+                    toUser != null ? toUser.getId() : null);
+        } catch (Exception e) {
+            log.error("Error processing eWallet payment for user: {}", fromUser.getEmail(), e);
+            return PaymentResult.failure(
+                    e.getMessage(),
+                    amount,
+                    PaymentType.EWALLET,
+                    listingId,
+                    fromUser.getId(),
+                    toUser != null ? toUser.getId() : null);
+        }
     }
 
     @Transactional
