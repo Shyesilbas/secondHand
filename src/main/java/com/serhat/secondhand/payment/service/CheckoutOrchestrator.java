@@ -2,8 +2,8 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
-import com.serhat.secondhand.coupon.service.CouponService;
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.coupon.service.CouponService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.offer.entity.Offer;
@@ -22,11 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -96,7 +92,7 @@ public class CheckoutOrchestrator {
             }
             effectiveCartItems.add(ci);
         }
-        effectiveCartItems.add(com.serhat.secondhand.cart.entity.Cart.builder()
+        effectiveCartItems.add(Cart.builder()
                 .user(user)
                 .listing(acceptedOffer.getListing())
                 .quantity(acceptedOffer.getQuantity())

@@ -59,7 +59,11 @@ public class ShowcaseService {
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
         
         PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
-        paymentProcessor.process(paymentRequest, authentication);
+        var paymentResult = paymentProcessor.process(paymentRequest, authentication);
+        
+        if (!paymentResult.isSuccess()) {
+            throw new BusinessException(ShowcaseErrorCodes.PAYMENT_FAILED);
+        }
         
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
