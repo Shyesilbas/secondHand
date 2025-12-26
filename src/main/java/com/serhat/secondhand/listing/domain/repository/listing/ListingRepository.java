@@ -65,4 +65,15 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Modifying
     @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
     int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
+    
+    // Dashboard queries
+    @Query("SELECT COUNT(l) FROM Listing l WHERE l.seller = :seller AND l.createdAt BETWEEN :startDate AND :endDate")
+    long countBySellerAndCreatedAtBetween(@Param("seller") User seller, 
+                                          @Param("startDate") java.time.LocalDateTime startDate, 
+                                          @Param("endDate") java.time.LocalDateTime endDate);
+
+    @Query("SELECT l.status, COUNT(l) FROM Listing l WHERE l.seller = :seller AND l.createdAt BETWEEN :startDate AND :endDate GROUP BY l.status")
+    List<Object[]> countBySellerAndStatusGrouped(@Param("seller") User seller,
+                                                  @Param("startDate") java.time.LocalDateTime startDate,
+                                                  @Param("endDate") java.time.LocalDateTime endDate);
 }

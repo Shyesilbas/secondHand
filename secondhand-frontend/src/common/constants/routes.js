@@ -10,6 +10,8 @@ export const ROUTES = {
     CHANGE_PASSWORD: '/change-password',
     VERIFY_ACCOUNT: '/verify-account',
     DASHBOARD: '/dashboard',
+    SELLER_DASHBOARD: '/dashboard/seller',
+    BUYER_DASHBOARD: '/dashboard/buyer',
     PROFILE: '/profile',
     LISTINGS: '/listings',
     MY_LISTINGS: '/my-listings',

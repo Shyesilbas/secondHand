@@ -17,7 +17,9 @@ import {
   Receipt,
   Heart,
   Mail,
-  TrendingUp
+  TrendingUp,
+  BarChart3,
+  LineChart
 } from 'lucide-react';
 
 const DashboardPage = () => {
@@ -158,6 +160,27 @@ const DashboardPage = () => {
           icon: AlertTriangle,
           color: "bg-red-500",
           hoverColor: "hover:bg-red-600"
+        }
+      ]
+    },
+    {
+      title: 'Analytics & Insights',
+      items: [
+        {
+          title: "Seller Analytics",
+          description: "View sales performance and statistics",
+          route: ROUTES.SELLER_DASHBOARD,
+          icon: BarChart3,
+          color: "bg-indigo-500",
+          hoverColor: "hover:bg-indigo-600"
+        },
+        {
+          title: "Buyer Analytics",
+          description: "Track your purchases and spending",
+          route: ROUTES.BUYER_DASHBOARD,
+          icon: LineChart,
+          color: "bg-blue-500",
+          hoverColor: "hover:bg-blue-600"
         }
       ]
     }

@@ -28,7 +28,9 @@ import {
     Tag,
     HandCoins,
     ChevronDown,
-    X
+    X,
+    BarChart3,
+    LineChart
 } from 'lucide-react';
 
 const Header = () => {
@@ -198,6 +200,9 @@ const Header = () => {
         { to: ROUTES.FAVORITES, label: 'Favorites', icon: Heart },
         { to: ROUTES.OFFERS, label: 'Offers', icon: HandCoins },
         { to: ROUTES.MY_COUPONS, label: 'My Coupons', icon: Tag },
+        { divider: true },
+        { to: ROUTES.SELLER_DASHBOARD, label: 'Seller Analytics', icon: BarChart3 },
+        { to: ROUTES.BUYER_DASHBOARD, label: 'Buyer Analytics', icon: LineChart },
         { divider: true },
         { to: ROUTES.PAYMENT_METHODS, label: 'Payment Methods', icon: CreditCard },
         { to: ROUTES.PAYMENTS, label: 'Payment History', icon: Receipt },
