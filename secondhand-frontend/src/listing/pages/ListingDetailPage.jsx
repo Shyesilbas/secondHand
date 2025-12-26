@@ -178,11 +178,6 @@ const ListingDetailPage = () => {
                    {listing.campaignName || 'Campaign'}
                  </div>
                )}
-               {isLowStock && (
-                 <div className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
-                   Low stock: {Number(listing.quantity)} left
-                 </div>
-               )}
             </div>
 
             {/* Tabs & Content */}
@@ -263,11 +258,6 @@ const ListingDetailPage = () => {
                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
                          {listing.campaignName || 'Campaign'}
                        </span>
-                     </div>
-                   )}
-                   {isLowStock && (
-                     <div className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
-                       Low stock: {Number(listing.quantity)} left
                      </div>
                    )}
                 </div>
