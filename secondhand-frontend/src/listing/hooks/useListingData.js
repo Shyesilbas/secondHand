@@ -21,13 +21,14 @@ export const useListingData = (listingId, autoFetch = true) => {
       console.log('🔍 useListingData: Fetching listing', listingId);
       return listingService.getListingById(listingId);
     },
-    enabled: autoFetch && !!listingId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    enabled: Boolean(autoFetch && listingId),
+    staleTime: Infinity, // Never consider data stale - prevent automatic refetches
+    gcTime: 30 * 60 * 1000, // 30 minutes - keep in cache longer
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    retry: 2,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    refetchOnReconnect: false,
+    retry: 1, // Reduce retries
+    retryDelay: 1000,
   });
 
   const error = isError ? (queryError?.response?.data?.message || queryError?.message || ERROR_MESSAGES.NETWORK_ERROR) : null;

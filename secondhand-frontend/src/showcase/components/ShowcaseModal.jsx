@@ -15,7 +15,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const { enums, isLoading: isPricingLoading } = useEnums();
     const paymentAgreements = usePaymentAgreements();
-    const { listing, isLoading: isListingLoading, error: listingError } = useListingData(listingId);
+    const { listing, isLoading: isListingLoading, error: listingError } = useListingData(listingId, isOpen);
     
     const showcasePricing = enums.showcasePricingConfig;
 

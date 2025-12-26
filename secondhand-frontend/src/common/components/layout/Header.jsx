@@ -25,7 +25,7 @@ const icons = {
     payListingFee: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
     paymentMethods: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
     paymentHistory: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
-    cart: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" /></svg>,
+    cart: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>,
     orders: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>,
     coupons: () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l2 2 4-4M7 7h10a2 2 0 012 2v2a2 2 0 010 4v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2a2 2 0 010-4V9a2 2 0 012-2z" /></svg>,
     more: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>,
@@ -117,12 +117,19 @@ const Header = () => {
             return;
         }
 
+        // Don't poll if we're on the emails page
+        if (locationRef.current === ROUTES.EMAILS) {
+            setUnreadEmailCount(0);
+            return;
+        }
+
         let cancelled = false;
         let intervalId = null;
 
         const load = async () => {
             if (cancelled) return;
             
+            // Skip if we're on emails page
             if (locationRef.current === ROUTES.EMAILS) {
                 setUnreadEmailCount(0);
                 return;
@@ -130,7 +137,7 @@ const Header = () => {
 
             try {
                 const count = await emailService.getUnreadCount();
-                if (!cancelled) {
+                if (!cancelled && locationRef.current !== ROUTES.EMAILS) {
                     setUnreadEmailCount(Number(count) || 0);
                 }
             } catch {
@@ -140,8 +147,16 @@ const Header = () => {
             }
         };
 
+        // Initial load
         load();
-        intervalId = setInterval(load, 120_000);
+        
+        // Set up polling interval (2 minutes)
+        intervalId = setInterval(() => {
+            // Skip if we're on emails page
+            if (locationRef.current !== ROUTES.EMAILS) {
+                load();
+            }
+        }, 120_000);
 
         return () => {
             cancelled = true;
