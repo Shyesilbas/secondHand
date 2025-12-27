@@ -160,6 +160,16 @@ public class ListingService {
         );
     }
 
+    public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
+        User user = userService.findById(userId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
+        return enrichPage(
+                listingsPage.map(listingMapper::toDynamicDto),
+                null
+        );
+    }
+
     public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
         return enrichList(
                 listingRepository.findBySellerAndStatus(user, status)

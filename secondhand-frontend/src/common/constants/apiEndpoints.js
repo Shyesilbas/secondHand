@@ -259,6 +259,7 @@ export const API_ENDPOINTS = {
     REVIEWS: {
         CREATE_REVIEW: '/v1/reviews',                                                        // POST - Create review
         GET_REVIEWS_RECEIVED: '/v1/reviews/received',                                        // GET - Reviews received by me
+        GET_REVIEWS_RECEIVED_BY: (userId) => `/v1/reviews/received-by/${userId}`,           // GET - Reviews received by user
         GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/reviews/written-by/${userId}`,            // GET - Reviews written by user
         GET_USER_REVIEW_STATS: (userId) => `/v1/reviews/user-stats/${userId}`,             // GET - User review stats
         GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews/by-order-items',                          // GET - Reviews for order items

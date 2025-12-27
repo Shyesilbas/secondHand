@@ -8,6 +8,7 @@ import ListingCard from '../listing/components/ListingCard.jsx';
 import UserProfileHeader from './components/UserProfileHeader.jsx';
 import UserStats from './components/UserStats.jsx';
 import UserReviews from './components/UserReviews.jsx';
+import Pagination from '../common/components/ui/Pagination.jsx';
 
 const TABS = [
     { key: 'overview', label: 'Overview' },
@@ -48,18 +49,25 @@ const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState('overview');
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
-    const { listings, isLoading: listingsLoading, error: listingsError } = useUserListings(userId, {
-        enabled: activeTab === 'listings'
+    const { listings, isLoading: listingsLoading, error: listingsError, pagination, loadPage, handlePageSizeChange } = useUserListings(userId, {
+        enabled: activeTab === 'listings',
+        page: 0,
+        size: 10
     });
-    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, hasMore, loadMore } = useReviews(userId, {
-        enabled: activeTab === 'reviews'
+    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, pagination: reviewsPagination, loadPage: loadReviewsPage, handlePageSizeChange: handleReviewsPageSizeChange } = useReviews(userId, {
+        enabled: activeTab === 'reviews',
+        page: 0,
+        size: 10
     });
     const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId, { 
         enabled: true // Always load for header display
     });
 
-    const formatDate = (dateString) => formatDateTime(dateString);
     const isOwnProfile = currentUser?.id === userId;
+
+    const handlePageChange = (page) => {
+        loadPage(page);
+    };
 
     if (userLoading || !user) return <div className="text-center py-16 text-text-muted">Loading...</div>;
 
@@ -119,8 +127,29 @@ const UserProfilePage = () => {
                         {/* Header */}
                         <div className="bg-white border border-gray-200 rounded-lg">
                             <div className="p-6">
-                                <h2 className="text-lg font-medium text-gray-900">Listings ({listings.length})</h2>
-                                <p className="text-sm text-gray-600 mt-1">All active listings by this user</p>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h2 className="text-lg font-medium text-gray-900">
+                                            Listings {pagination.totalElements > 0 && `(${pagination.totalElements})`}
+                                        </h2>
+                                        <p className="text-sm text-gray-600 mt-1">All active listings by this user</p>
+                                    </div>
+                                    {!listingsLoading && pagination.totalElements > 0 && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm text-gray-600">Show:</span>
+                                            <select 
+                                                value={pagination.size} 
+                                                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                                                className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value={10}>10</option>
+                                                <option value={15}>15</option>
+                                                <option value={20}>20</option>
+                                            </select>
+                                            <span className="text-sm text-gray-600">per page</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -161,15 +190,26 @@ const UserProfilePage = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                {listings.map(listing => (
-                                    <ListingCard
-                                        key={listing.id}
-                                        listing={listing}
-                                        showActions={false} // Don't show edit/delete actions on other users' profiles
-                                    />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    {listings.map(listing => (
+                                        <ListingCard
+                                            key={listing.id}
+                                            listing={listing}
+                                            showActions={false} // Don't show edit/delete actions on other users' profiles
+                                        />
+                                    ))}
+                                </div>
+                                {!listingsLoading && pagination.totalPages > 1 && (
+                                    <div className="mt-6 bg-white border border-gray-200 rounded-lg">
+                                        <Pagination
+                                            page={pagination.number}
+                                            totalPages={pagination.totalPages}
+                                            onPageChange={handlePageChange}
+                                        />
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 )}
@@ -179,8 +219,9 @@ const UserProfilePage = () => {
                     receivedReviews={receivedReviews}
                     receivedReviewsLoading={receivedReviewsLoading}
                     receivedReviewsError={receivedReviewsError}
-                    hasMore={hasMore}
-                    loadMore={loadMore}
+                    pagination={reviewsPagination}
+                    loadPage={loadReviewsPage}
+                    handlePageSizeChange={handleReviewsPageSizeChange}
                     reviewStats={reviewStats}
                   />
                 )}
