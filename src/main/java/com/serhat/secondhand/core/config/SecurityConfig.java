@@ -63,7 +63,8 @@ public class SecurityConfig {
             "/api/v1/listings/byUser/{id}",
             "/api/v1/listings/type/{listingType}",
             "/api/v1/listings/type/{listingType}/active",
-            "/api/v1/listings/type/{listingType}/ordered"
+            "/api/v1/listings/type/{listingType}/ordered",
+            "/api/v1/listings/{id}/view"
     );
 
     private static final List<String> CATEGORY_LISTING_PUBLIC_ENDPOINTS = Arrays.asList(

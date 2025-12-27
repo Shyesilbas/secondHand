@@ -16,6 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class ListingService {
     private final UserService userService;
     private final ListingEnrichmentService enrichmentService;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
+    private final ListingViewService listingViewService;
 
     public ListingService(
             ListingRepository listingRepository,
@@ -43,12 +45,14 @@ public class ListingService {
             RealEstateListingFilterService realEstateListingFilterService,
             SportsListingFilterService sportsListingFilterService,
             UserService userService,
-            ListingEnrichmentService enrichmentService
+            ListingEnrichmentService enrichmentService,
+            ListingViewService listingViewService
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
         this.userService = userService;
         this.enrichmentService = enrichmentService;
+        this.listingViewService = listingViewService;
 
         this.filterStrategyMap = Map.of(
                 VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f),
@@ -65,9 +69,39 @@ public class ListingService {
     }
 
     public Optional<ListingDto> findByIdAsDto(UUID id, String userEmail) {
-        return listingRepository.findById(id)
-                .map(listingMapper::toDynamicDto)
-                .map(dto -> enrichmentService.enrich(dto, userEmail));
+        Optional<Listing> listingOpt = listingRepository.findById(id);
+        if (listingOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        Listing listing = listingOpt.get();
+        ListingDto dto = listingMapper.toDynamicDto(listing);
+        dto = enrichmentService.enrich(dto, userEmail);
+        
+        // Enrich with view stats if user is the seller
+        if (userEmail != null) {
+            try {
+                User user = userService.findByEmail(userEmail);
+                if (user != null && listing.getSeller().getId().equals(user.getId())) {
+                    log.debug("Enriching view stats for listing {} for seller {}", id, userEmail);
+                    // Default to last 7 days
+                    LocalDateTime endDate = LocalDateTime.now();
+                    LocalDateTime startDate = endDate.minusDays(7);
+                    ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
+                    dto.setViewStats(viewStats);
+                    log.debug("View stats enriched for listing {}: totalViews={}, uniqueViews={}", 
+                            id, viewStats.getTotalViews(), viewStats.getUniqueViews());
+                } else {
+                    log.debug("User {} is not the seller of listing {}", userEmail, id);
+                }
+            } catch (Exception e) {
+                log.warn("Could not enrich view stats for listing {}: {}", id, e.getMessage(), e);
+            }
+        } else {
+            log.debug("No user email provided, skipping view stats enrichment for listing {}", id);
+        }
+        
+        return Optional.of(dto);
     }
 
     public Optional<ListingDto> findByListingNo(String listingNo) {

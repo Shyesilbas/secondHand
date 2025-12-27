@@ -62,6 +62,7 @@ public abstract class ListingDto {
     
     private FavoriteStatsDto favoriteStats;
     private ReviewStatsDto reviewStats;
+    private ListingViewStatsDto viewStats;
 
     private BigDecimal campaignPrice;
     private BigDecimal campaignDiscountAmount;

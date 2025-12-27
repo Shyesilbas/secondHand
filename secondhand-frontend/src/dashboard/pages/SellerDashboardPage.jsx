@@ -122,7 +122,7 @@ const SellerDashboardPage = () => {
             title="Total Views"
             value={dashboard.totalViews || 0}
             icon={Eye}
-            subtitle="Estimated from favorites"
+            subtitle={`${dashboard.uniqueViews || 0} unique viewers`}
             color="gray"
           />
           <MetricCard
