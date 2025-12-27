@@ -1,21 +1,24 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -28,6 +31,7 @@ import org.springframework.data.domain.Page;
 public class ListingController {
     
     private final ListingService listingService;
+    private final ListingViewService listingViewService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -195,5 +199,24 @@ public class ListingController {
             @AuthenticationPrincipal User currentUser) {
         listingService.deleteListing(id, currentUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/my-listings/view-stats")
+    @Operation(summary = "Get aggregated view statistics for all seller's listings", description = "Get total view statistics across all listings owned by the current user")
+    public ResponseEntity<ListingViewStatsDto> getMyListingsViewStats(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @AuthenticationPrincipal User currentUser) {
+        
+        // Default to last 7 days if not specified
+        if (endDate == null) {
+            endDate = LocalDateTime.now();
+        }
+        if (startDate == null) {
+            startDate = endDate.minusDays(7);
+        }
+
+        ListingViewStatsDto stats = listingViewService.getAggregatedViewStatisticsForSeller(currentUser, startDate, endDate);
+        return ResponseEntity.ok(stats);
     }
 }

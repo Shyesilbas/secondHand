@@ -37,6 +37,9 @@ export const API_ENDPOINTS = {
         STATISTICS: '/v1/listings/statistics',
         BY_USER: (userId) => `/v1/listings/byUser/${userId}`,
         FILTER: '/v1/listings/filter',
+        TRACK_VIEW: (id) => `/v1/listings/${id}/view`,
+        VIEW_STATS: (id) => `/v1/listings/${id}/view-stats`,
+        MY_LISTINGS_VIEW_STATS: '/v1/listings/my-listings/view-stats',
     },
     PAYMENTS: {
         CREATE: '/v1/payments/pay',

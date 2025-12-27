@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
@@ -8,9 +8,12 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
 import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
+import ViewStatisticsCard from '../components/ViewStatisticsCard.jsx';
 import { listingTypeRegistry } from '../components/typeRegistry.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { trackView } from '../services/viewTrackingService.js';
+import { getOrCreateSessionId } from '../../common/utils/sessionId.js';
 import { 
   Share2, 
   ShieldCheck, 
@@ -31,6 +34,17 @@ const ListingDetailPage = () => {
   const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
   const [activeTab, setActiveTab] = useState('about');
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const viewTrackedRef = useRef(false);
+
+  // Track view when listing is loaded (but not if user is the owner)
+  useEffect(() => {
+    if (listing && !viewTrackedRef.current && !isOwner) {
+      viewTrackedRef.current = true;
+      const sessionId = getOrCreateSessionId();
+      const userAgent = navigator.userAgent;
+      trackView(listing.id, sessionId, userAgent);
+    }
+  }, [listing, isOwner]);
 
   if (isLoading) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
@@ -70,6 +84,12 @@ const ListingDetailPage = () => {
   const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
   const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
   const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
+
+  // Debug: Log view stats for owner
+  if (isOwner) {
+    console.log('Listing viewStats:', listing.viewStats);
+    console.log('Is owner:', isOwner, 'User ID:', user?.id, 'Seller ID:', listing?.sellerId);
+  }
 
   const tabs = [
     { id: 'about', label: 'About' },
@@ -138,6 +158,14 @@ const ListingDetailPage = () => {
           
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
+            
+            {/* View Statistics (Owner Only) */}
+            {isOwner && (
+              <ViewStatisticsCard 
+                viewStats={listing.viewStats || { totalViews: 0, uniqueViews: 0, periodDays: 7, viewsByDate: {} }}
+                periodDays={listing.viewStats?.periodDays || 7}
+              />
+            )}
             
             {/* Image Gallery - Smaller Height */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group h-[400px]">

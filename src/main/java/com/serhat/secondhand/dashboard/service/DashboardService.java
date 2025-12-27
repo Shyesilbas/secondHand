@@ -4,6 +4,8 @@ import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.dashboard.mapper.DashboardMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
+import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
@@ -37,6 +39,7 @@ public class DashboardService {
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
     private final DashboardMapper dashboardMapper;
+    private final ListingViewService listingViewService;
 
     public SellerDashboardDto getSellerDashboard(User seller, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Getting seller dashboard for user: {} from {} to {}", seller.getEmail(), startDate, endDate);
@@ -149,6 +152,11 @@ public class DashboardService {
             ratingDistribution = dashboardMapper.mapRatingDistribution(reviewStats);
         }
 
+        // View statistics
+        ListingViewStatsDto viewStats = listingViewService.getAggregatedViewStatisticsForSeller(seller, startDate, endDate);
+        Long totalViews = viewStats.getTotalViews();
+        Long uniqueViews = viewStats.getUniqueViews();
+
         return SellerDashboardDto.builder()
                 .totalRevenue(totalRevenue)
                 .revenueGrowth(revenueGrowth)
@@ -163,7 +171,8 @@ public class DashboardService {
                 .activeListings(activeListings)
                 .soldListings(soldListings)
                 .deactivatedListings(deactivatedListings)
-                .totalViews(totalFavorites) // Using favorites as proxy for views
+                .totalViews(totalViews)
+                .uniqueViews(uniqueViews)
                 .totalFavorites(totalFavorites)
                 .categoryRevenue(categoryRevenueMap)
                 .categoryOrderCount(categoryOrderCountMap)

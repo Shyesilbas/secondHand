@@ -34,7 +34,8 @@ public class SellerDashboardDto {
     private Long activeListings;
     private Long soldListings;
     private Long deactivatedListings;
-    private Long totalViews; // Via favorites count as proxy
+    private Long totalViews; // Total views across all listings (from view tracking)
+    private Long uniqueViews; // Unique viewers across all listings
     private Long totalFavorites;
     
     // Category Distribution
