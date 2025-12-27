@@ -99,8 +99,12 @@ public class ListingController {
    }
 
    @GetMapping("/byUser/{id}")
-   public ResponseEntity<List<ListingDto>> getListingsByUser(@PathVariable Long id) {
-        return ResponseEntity.ok(listingService.getListingsByUser(id));
+   @Operation(summary = "Get listings by user ID with pagination")
+   public ResponseEntity<Page<ListingDto>> getListingsByUser(
+           @PathVariable Long id,
+           @RequestParam(defaultValue = "0") int page,
+           @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(listingService.getListingsByUser(id, page, size));
    }
    
    @GetMapping("/type/{listingType}")

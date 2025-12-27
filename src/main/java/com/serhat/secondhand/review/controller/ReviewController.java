@@ -36,6 +36,16 @@ public class ReviewController {
         return ResponseEntity.ok(review);
     }
 
+    @GetMapping("/received-by/{userId}")
+    public ResponseEntity<Page<ReviewDto>> getReviewsReceivedByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        
+        log.info("Getting reviews received by user ID: {}", userId);
+        Page<ReviewDto> reviews = reviewService.getReviewsForUser(userId, pageable);
+        return ResponseEntity.ok(reviews);
+    }
+
     @GetMapping("/received")
     public ResponseEntity<Page<ReviewDto>> getReviewsForUser(
             @PageableDefault(size = 10) Pageable pageable,

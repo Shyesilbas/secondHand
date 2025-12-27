@@ -42,6 +42,8 @@ public class ClothingListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         clothing.setSeller(seller);
+        clothing.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
+        clothing.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
         return saved.getId();

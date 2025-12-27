@@ -10,6 +10,10 @@ export const reviewService = {
         return get(`${API_ENDPOINTS.REVIEWS.GET_REVIEWS_RECEIVED}?page=${page}&size=${size}`);
     },
 
+    getReviewsReceivedByUser: async (userId, page = 0, size = 10) => {
+        return get(`${API_ENDPOINTS.REVIEWS.GET_REVIEWS_RECEIVED_BY(userId)}?page=${page}&size=${size}`);
+    },
+
     getReviewsByUser: async (userId, page = 0, size = 10) => {
         return get(`${API_ENDPOINTS.REVIEWS.GET_REVIEWS_WRITTEN_BY(userId)}?page=${page}&size=${size}`);
     },
