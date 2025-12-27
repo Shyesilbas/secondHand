@@ -36,6 +36,9 @@ const ListingDetailPage = () => {
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const viewTrackedRef = useRef(false);
 
+  // Calculate isOwner after listing is loaded
+  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
+
   // Track view when listing is loaded (but not if user is the owner)
   useEffect(() => {
     if (listing && !viewTrackedRef.current && !isOwner) {
@@ -75,7 +78,6 @@ const ListingDetailPage = () => {
 
   if (!listing) return null;
 
-  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
   const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
   const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
   const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
