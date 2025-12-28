@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/v1/listings")
@@ -48,7 +48,12 @@ public class ListingController {
     @PostMapping("/filter")
     public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
             @RequestBody ListingFilterDto filters,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal User currentUser) {
+               filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
+        filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
+        
         String userEmail = currentUser != null ? currentUser.getEmail() : null;
         Page<ListingDto> filteredListings = listingService.filterByCategory(filters, userEmail);
         return ResponseEntity.ok(filteredListings);
