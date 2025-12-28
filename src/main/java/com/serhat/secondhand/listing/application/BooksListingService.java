@@ -39,6 +39,8 @@ public class BooksListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         books.setSeller(seller);
+        books.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
+        books.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
         BooksListing saved = booksRepository.save(books);
         log.info("Books listing created: {}", saved.getId());
         return saved.getId();

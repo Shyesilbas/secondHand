@@ -79,11 +79,6 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                             Featured
                         </span>
                     )}
-                    {isLowStock && (
-                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider backdrop-blur-md">
-                            {isOwner ? `Low stock: ${Number(listing.quantity)} left` : '🔥 Stok tükeniyor!'}
-                        </span>
-                    )}
                 </div>
                 
                 {/* Action Buttons Overlay (Top Right) */}

@@ -55,6 +55,8 @@ public class ElectronicListingService {
             electronicListing.setScreenSize(null);
         }
         electronicListing.setSeller(seller);
+        electronicListing.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
+        electronicListing.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
         ElectronicListing saved = repository.save(electronicListing);
         log.info("Electronic listing created: {}", saved.getId());
         return saved.getId();

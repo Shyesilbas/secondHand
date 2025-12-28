@@ -156,6 +156,9 @@ public class SecurityConfig {
                         // WebSocket endpoints
                         .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()
                         .requestMatchers("/api/v1/listings/clothing/generator/**").permitAll()
+                        .requestMatchers("/api/v1/listings/electronics/generator/**").permitAll()
+                        .requestMatchers("/api/v1/listings/sports/generator/**").permitAll()
+                        .requestMatchers("/api/v1/listings/books/generator/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
