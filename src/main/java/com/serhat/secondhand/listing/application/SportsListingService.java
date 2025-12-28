@@ -39,6 +39,8 @@ public class SportsListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         entity.setSeller(seller);
+        entity.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
+        entity.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
         SportsListing saved = sportsRepository.save(entity);
         log.info("Sports listing created: {}", saved.getId());
         return saved.getId();
