@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { XMarkIcon, PrinterIcon, ShareIcon } from '@heroicons/react/24/outline';
-import { formatCurrency, formatDateTime, resolveEnumLabel, replaceEnumCodesInHtml } from '../../formatters.js';
-import { useEnums } from '../../hooks/useEnums.js';
-import { useNotification } from '../../../notification/NotificationContext.jsx';
+import React, {useEffect} from 'react';
+import {createPortal} from 'react-dom';
+import {
+  ArrowDownLeftIcon,
+  ArrowUpRightIcon,
+  CheckBadgeIcon,
+  DocumentDuplicateIcon,
+  PrinterIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
+import {formatCurrency, formatDateTime, replaceEnumCodesInHtml, resolveEnumLabel} from '../../formatters.js';
+import {useEnums} from '../../hooks/useEnums.js';
+import {useNotification} from '../../../notification/NotificationContext.jsx';
 
 const useModalBodyOverflow = (isOpen) => {
   useEffect(() => {
@@ -12,23 +19,18 @@ const useModalBodyOverflow = (isOpen) => {
   }, [isOpen]);
 };
 
-const ActionButton = ({ onClick, children, variant = 'primary' }) => {
-  const base = "flex-1 px-4 py-2.5 text-sm font-medium rounded-2xl transition-colors";
+// --- Modern Aksiyon Butonu ---
+const ActionButton = ({ onClick, children, variant = 'primary', icon: Icon }) => {
+  const base = "flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl transition-all duration-200";
   const styles = variant === 'primary'
-      ? 'text-white bg-btn-primary hover:bg-btn-primary-hover'
-      : 'text-text-secondary bg-app-bg hover:bg-gray-100';
-  return <button onClick={onClick} className={`${base} ${styles}`}>{children}</button>;
-};
+      ? 'text-white bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-200 active:scale-[0.98]'
+      : 'text-slate-600 bg-slate-50 hover:bg-slate-100 active:scale-[0.98]';
 
-const PaymentStatusBadge = ({ isSuccess }) => {
-  const bg = isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700';
-  const dot = isSuccess ? 'bg-emerald-500' : 'bg-alert-error';
-  const label = isSuccess ? 'Successful' : 'Failed';
   return (
-      <div className={`inline-flex items-center gap-2 mt-3 px-3 py-1 rounded-full text-sm font-medium ${bg}`}>
-        <div className={`w-2 h-2 rounded-full ${dot}`} />
-        {label}
-      </div>
+      <button onClick={onClick} className={`${base} ${styles}`}>
+        {Icon && <Icon className="w-4 h-4" />}
+        {children}
+      </button>
   );
 };
 
@@ -39,97 +41,136 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
 
   if (!isOpen || !payment) return null;
 
-  const formatAmount = (amount) => formatCurrency(amount, 'TRY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatAmount = (amount) => formatCurrency(amount, 'TRY');
   const formatDate = (dateString) => formatDateTime(dateString);
 
   const handlePrint = () => window.print();
 
-  const handleShare = async () => {
-    let receiptText = `SecondHand Payment Receipt\n\nReceipt: ${payment.paymentId}\nDate: ${formatDate(payment.createdAt)}\nAmount: ${formatAmount(payment.amount)}\nStatus: ${payment.isSuccess ? 'Successful' : 'Failed'}`;
-    
-    if (payment.listingTitle) {
-      receiptText += `\nListing: ${payment.listingTitle}`;
-    }
-    if (payment.listingNo) {
-      receiptText += `\nListing No: ${payment.listingNo}`;
-    }
-    
-    try {
-      if (navigator.share) await navigator.share({ title: 'Payment Receipt', text: receiptText });
-      else {
-        await navigator.clipboard.writeText(receiptText);
-        notification.showSuccess('Receipt copied to clipboard');
-      }
-    } catch (error) { console.error('Share/copy failed:', error); }
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(payment.paymentId);
+    notification.showSuccess('Transaction ID copied');
   };
 
   const isIncoming = payment.paymentDirection === 'INCOMING';
-  const amountColor = isIncoming ? 'text-emerald-600' : 'text-text-primary';
 
-  const paymentFields = [
-    { label: 'Receipt No', value: payment.paymentId, mono: true },
-    { label: 'Date', value: formatDate(payment.createdAt) },
-    { label: 'Method', value: resolveEnumLabel(enums, 'paymentTypes', payment.paymentType) },
-    { label: 'Type', value: replaceEnumCodesInHtml(payment.transactionType, enums, ['paymentTypes']) },
-    payment.senderName && { label: 'From', value: `${payment.senderName} ${payment.senderSurname || ''}` },
-    payment.receiverName && { label: 'To', value: `${payment.receiverName} ${payment.receiverSurname || ''}` },
-    payment.listingTitle && { label: 'Listing', value: payment.listingTitle },
-    payment.listingNo && { label: 'Listing No', value: payment.listingNo, mono: true },
-    payment.listingId && { label: 'Listing ID', value: payment.listingId, mono: true },
+  const details = [
+    { label: 'Payment Date', value: formatDate(payment.createdAt) },
+    { label: 'Payment Method', value: resolveEnumLabel(enums, 'paymentTypes', payment.paymentType) },
+    { label: 'Transaction', value: replaceEnumCodesInHtml(payment.transactionType, enums, ['paymentTypes']) },
+    { label: 'Reference', value: payment.listingTitle || 'General Payment' },
   ].filter(Boolean);
 
   return createPortal(
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:p-0 overflow-y-auto">
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm print:hidden" onClick={onClose} />
-        <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl print:shadow-none print:rounded-none overflow-hidden">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity print:hidden" onClick={onClose} />
 
-          <div className="flex items-center justify-between p-6 pb-0 print:hidden">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-btn-primary rounded-2xl flex items-center justify-center">
-                <span className="text-white text-sm font-bold">S</span>
-              </div>
-              <div>
-                <h2 className="font-semibold text-text-primary">Payment Receipt</h2>
-                <p className="text-xs text-text-muted">SecondHand</p>
-              </div>
+        {/* Modal Container */}
+        <div className="relative w-full max-w-[440px] max-h-[90vh] bg-white rounded-[2.5rem] sm:rounded-[2.5rem] rounded-2xl shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] print:shadow-none print:rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+
+          {/* Header Controls */}
+          <div className="flex items-center justify-between p-4 sm:p-8 pb-0 print:hidden flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Verified Receipt</span>
             </div>
-            <div className="flex items-center gap-1">
-              {[{icon: PrinterIcon, onClick: handlePrint},{icon: ShareIcon, onClick: handleShare},{icon: XMarkIcon, onClick: onClose}].map((btn, i) => {
-                const Icon = btn.icon;
-                return (
-                    <button key={i} onClick={btn.onClick} className="p-2 text-text-muted hover:text-text-secondary hover:bg-app-bg rounded-xl transition-colors">
-                      <Icon className="w-5 h-5" />
-                    </button>
-                );
-              })}
+            <div className="flex items-center gap-2">
+              <button onClick={handlePrint} className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors" title="Print">
+                <PrinterIcon className="w-5 h-5" />
+              </button>
+              <button onClick={onClose} className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors">
+                <XMarkIcon className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          <div className="p-6 space-y-8 max-h-[80vh] overflow-y-auto">
-            <div className="text-center py-8">
-              <p className="text-sm text-text-muted mb-2">Transaction Amount</p>
-              <p className={`text-4xl font-bold ${amountColor}`}>{isIncoming ? '+' : ''}{formatAmount(payment.amount)}</p>
-              <PaymentStatusBadge isSuccess={payment.isSuccess} />
-            </div>
+          {/* Receipt Content */}
+          <div className="p-4 sm:p-8 pt-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1">
 
-            <div className="space-y-4">
-              {paymentFields.map(({ label, value, mono }) => (
-                  <div key={label} className="text-sm">
-                    <p className="text-text-muted mb-1">{label}</p>
-                    <p className={`text-text-primary ${mono ? 'font-mono' : ''}`}>{value}</p>
+            {/* Main Visual: Amount & Status */}
+            <div className="relative flex flex-col items-center py-6">
+              <div className={`mb-4 w-16 h-16 rounded-3xl flex items-center justify-center shadow-inner ${isIncoming ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-900'}`}>
+                {isIncoming ? <ArrowDownLeftIcon className="w-8 h-8" /> : <ArrowUpRightIcon className="w-8 h-8" />}
+              </div>
+
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
+              <h2 className={`text-4xl font-black tracking-tighter ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
+                {isIncoming ? '+' : ''}{formatAmount(payment.amount)}
+              </h2>
+
+              {payment.isSuccess ? (
+                  <div className="mt-4 px-3 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-full border border-emerald-100 flex items-center gap-1.5">
+                    <CheckBadgeIcon className="w-4 h-4" /> Transaction Successful
                   </div>
-              ))}
+              ) : (
+                  <div className="mt-4 px-3 py-1 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-full border border-rose-100">
+                    Transaction Failed
+                  </div>
+              )}
             </div>
 
-            <div className="pt-6 border-t border-gray-100 text-center text-xs text-text-muted">
-              <p>Digital receipt • No signature required</p>
-              <p className="mt-1">SecondHand © 2025</p>
+            {/* Info Sections */}
+            <div className="space-y-6">
+              {/* Transaction ID Card */}
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Transaction ID</p>
+                <div className="flex items-center justify-between">
+                  <code className="text-xs font-mono text-slate-600 truncate">{payment.paymentId}</code>
+                  <button onClick={handleCopyId} className="p-1 text-slate-400 hover:text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <DocumentDuplicateIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Field Grid */}
+              <div className="grid grid-cols-2 gap-y-5 gap-x-4 px-1">
+                {details.map((field) => (
+                    <div key={field.label}>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">{field.label}</p>
+                      <p className="text-sm font-semibold text-slate-900 leading-tight">{field.value}</p>
+                    </div>
+                ))}
+              </div>
+
+              {/* Sender/Receiver (Dynamic) */}
+              {(payment.senderName || payment.receiverName) && (
+                  <div className="pt-4 border-t border-slate-100">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Sender</p>
+                        <p className="text-sm font-semibold text-slate-900">{payment.senderName || 'Anonymous'}</p>
+                      </div>
+                      <div className="w-px h-8 bg-slate-100" />
+                      <div className="flex-1">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Receiver</p>
+                        <p className="text-sm font-semibold text-slate-900">{payment.receiverName || 'SecondHand User'}</p>
+                      </div>
+                    </div>
+                  </div>
+              )}
+            </div>
+
+            {/* Footer Branding */}
+            <div className="pt-4 flex flex-col items-center gap-2">
+              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+              <div className="flex items-center gap-2 mt-4 opacity-30">
+                <div className="w-6 h-6 bg-slate-900 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-[10px] font-black">S</span>
+                </div>
+                <span className="text-xs font-black tracking-tighter text-slate-900">SecondHand Inc.</span>
+              </div>
+              <p className="text-[9px] text-slate-400 font-medium">© 2026 Digital Document • No Physical Signature Required</p>
             </div>
           </div>
 
-          <div className="flex gap-3 p-6 pt-0 print:hidden">
-            <ActionButton onClick={onClose} variant="secondary">Close</ActionButton>
-            <ActionButton onClick={handlePrint}>Print Receipt</ActionButton>
+          {/* Footer Actions */}
+          <div className="p-4 sm:p-8 pt-0 flex gap-3 print:hidden flex-shrink-0 border-t border-slate-100">
+            <ActionButton variant="secondary" onClick={onClose}>
+              Close
+            </ActionButton>
+            <ActionButton variant="primary" onClick={handlePrint} icon={PrinterIcon}>
+              Print Document
+            </ActionButton>
           </div>
 
         </div>

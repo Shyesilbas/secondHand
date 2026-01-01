@@ -41,7 +41,7 @@ public class DashboardController {
         if (endDate == null) {
             endDate = LocalDateTime.now();
         } else {
-            endDate = endDate.toLocalDate().atTime(LocalTime.MAX);
+            endDate = endDate.toLocalDate().atTime(23, 59, 59, 999999999);
         }
         if (startDate == null) {
             startDate = endDate.toLocalDate().minusDays(30).atStartOfDay();

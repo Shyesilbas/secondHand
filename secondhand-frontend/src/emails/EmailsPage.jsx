@@ -146,9 +146,16 @@ const EmailsPage = () => {
 
     const handleDelete = async ({ id, title, deleteFunc, onSuccess }) => {
         notification.showConfirmation(`Delete ${title}`, `Are you sure you want to delete "${title}"?`, async () => {
-            try { setIsDeleting(true); await deleteFunc(); notification.showSuccess('Success', `${title} deleted successfully.`); onSuccess?.(); }
-            catch (err) { notification.showError('Error', err.response?.data?.message || `Failed to delete ${title.toLowerCase()}.`); }
-            finally { setIsDeleting(false); }
+            try {
+                setIsDeleting(true);
+                await deleteFunc();
+                notification.showSuccess('Success', `${title} deleted successfully.`);
+                onSuccess?.();
+            } catch (err) {
+                notification.showError('Error', err.response?.data?.message || `Failed to delete ${title.toLowerCase()}.`);
+            } finally {
+                setIsDeleting(false);
+            }
         });
     };
 
@@ -159,13 +166,6 @@ const EmailsPage = () => {
             title: 'Email',
             deleteFunc: () => emailService.deleteEmail(emailId),
             onSuccess: () => {
-                // Invalidate query or update cache manually if needed, 
-                // but for simple delete we often just refetch or rely on React Query optimistic updates logic
-                // For now we can just rely on the next fetch or manually remove from list via queryClient.setQueryData
-                // if we want immediate UI update without refetch.
-                // However, since we are using useQuery, we can't directly set state 'emails'.
-                // To keep it simple, we'll let invalidation handle it or simple force refetch.
-                // Or better, let's just make the list derive from query data.
                 if (selectedEmail?.id === emailId) setSelectedEmail(null);
             }
         });

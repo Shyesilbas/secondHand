@@ -66,8 +66,8 @@ public class DashboardService {
                 .collect(Collectors.toList());
 
         // Order statistics
-        long totalOrders = orderRepository.countByUserAndCreatedAtBetween(seller, startDate, endDate);
-        List<Object[]> ordersByStatus = orderRepository.countByUserAndStatusGrouped(seller, startDate, endDate);
+        long totalOrders = orderItemRepository.countDistinctOrdersBySellerAndDateRange(seller, startDate, endDate);
+        List<Object[]> ordersByStatus = orderItemRepository.countDistinctOrdersBySellerAndStatusGrouped(seller, startDate, endDate);
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
         
         long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L);

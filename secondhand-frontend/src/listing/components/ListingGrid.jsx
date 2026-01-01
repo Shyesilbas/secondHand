@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 import ListingCard from './ListingCard.jsx';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import { PhotoIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     if (isLoading) {
@@ -29,32 +31,26 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
 
     if (error) {
         return (
-            <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h3 className="text-lg font-medium text-text-primary mb-2">Listings did not load</h3>
-                <p className="text-text-secondary mb-4">{error}</p>
-                <button onClick={() => window.location.reload()} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
-                    Try Again
-                </button>
-            </div>
+            <EmptyState
+                icon={ExclamationCircleIcon}
+                title="Listings did not load"
+                description={error}
+                primaryAction={{
+                    label: 'Try Again',
+                    onClick: () => window.location.reload()
+                }}
+                variant="error"
+            />
         );
     }
 
     if (!listings || listings.length === 0) {
         return (
-            <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                </div>
-                <h3 className="text-lg font-medium text-text-primary mb-2">No listings yet</h3>
-                <p className="text-text-secondary">No Listing found for the criteria.</p>
-            </div>
+            <EmptyState
+                icon={PhotoIcon}
+                title="No listings found"
+                description="No listings found for the criteria."
+            />
         );
     }
 

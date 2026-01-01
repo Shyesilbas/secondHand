@@ -17,7 +17,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     // Dashboard queries for seller revenue
     @Query("SELECT SUM(oi.totalPrice) FROM OrderItem oi " +
            "WHERE oi.listing.seller = :seller " +
-           "AND oi.order.paymentStatus != 'FAILED' " +
+           "AND oi.order.paymentStatus = 'PAID' " +
            "AND oi.order.status != 'CANCELLED' " +
            "AND oi.order.status != 'REFUNDED' " +
            "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
@@ -27,7 +27,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT oi.listing.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
            "WHERE oi.listing.seller = :seller " +
-           "AND oi.order.paymentStatus != 'FAILED' " +
+           "AND oi.order.paymentStatus = 'PAID' " +
            "AND oi.order.status != 'CANCELLED' " +
            "AND oi.order.status != 'REFUNDED' " +
            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
@@ -36,8 +36,26 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
                                                   @Param("startDate") LocalDateTime startDate,
                                                   @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT COUNT(DISTINCT oi.order) FROM OrderItem oi " +
+           "WHERE oi.listing.seller = :seller " +
+           "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
+    long countDistinctOrdersBySellerAndDateRange(@Param("seller") User seller,
+                                                 @Param("startDate") LocalDateTime startDate,
+                                                 @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT oi.order.status, COUNT(DISTINCT oi.order) FROM OrderItem oi " +
+           "WHERE oi.listing.seller = :seller " +
+           "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
+           "GROUP BY oi.order.status")
+    List<Object[]> countDistinctOrdersBySellerAndStatusGrouped(@Param("seller") User seller,
+                                                               @Param("startDate") LocalDateTime startDate,
+                                                               @Param("endDate") LocalDateTime endDate);
+
     @Query("SELECT oi.listing.listingType, COUNT(DISTINCT oi.order) FROM OrderItem oi " +
            "WHERE oi.listing.seller = :seller " +
+           "AND oi.order.paymentStatus = 'PAID' " +
+           "AND oi.order.status != 'CANCELLED' " +
+           "AND oi.order.status != 'REFUNDED' " +
            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
            "GROUP BY oi.listing.listingType")
     List<Object[]> countOrdersBySellerAndCategory(@Param("seller") User seller,
@@ -47,7 +65,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("SELECT oi.listing.id, SUM(oi.totalPrice) as revenue, COUNT(DISTINCT oi.order) as orderCount " +
            "FROM OrderItem oi " +
            "WHERE oi.listing.seller = :seller " +
-           "AND oi.order.paymentStatus != 'FAILED' " +
+           "AND oi.order.paymentStatus = 'PAID' " +
            "AND oi.order.status != 'CANCELLED' " +
            "AND oi.order.status != 'REFUNDED' " +
            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
@@ -62,7 +80,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
            "JOIN orders o ON oi.order_id = o.id " +
            "JOIN listings l ON oi.listing_id = l.id " +
            "WHERE l.seller_id = :sellerId " +
-           "AND o.payment_status != 'FAILED' " +
+           "AND o.payment_status = 'PAID' " +
            "AND o.status != 'CANCELLED' " +
            "AND o.status != 'REFUNDED' " +
            "AND o.created_at BETWEEN :startDate AND :endDate " +

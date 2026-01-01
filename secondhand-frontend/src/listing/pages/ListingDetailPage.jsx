@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { useListingData } from '../hooks/useListingData.js';
+import React, {useEffect, useRef, useState} from 'react';
+import {Link, useParams} from 'react-router-dom';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
@@ -9,22 +9,13 @@ import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
 import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import ViewStatisticsCard from '../components/ViewStatisticsCard.jsx';
-import { listingTypeRegistry } from '../components/typeRegistry.js';
-import { ROUTES } from '../../common/constants/routes.js';
-import { formatCurrency, formatDateTime } from '../../common/formatters.js';
-import { trackView } from '../services/viewTrackingService.js';
-import { getOrCreateSessionId } from '../../common/utils/sessionId.js';
-import { 
-  Share2, 
-  ShieldCheck, 
-  Flag, 
-  ArrowLeft,
-  ChevronRight,
-  AlertTriangle,
-  ShoppingBag,
-  HandCoins
-} from 'lucide-react';
-import { useCart } from '../../cart/hooks/useCart.js';
+import {listingTypeRegistry} from '../components/typeRegistry.js';
+import {ROUTES} from '../../common/constants/routes.js';
+import {formatCurrency, formatDateTime} from '../../common/formatters.js';
+import {trackView} from '../services/viewTrackingService.js';
+import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
+import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldCheck, ShoppingBag} from 'lucide-react';
+import {useCart} from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 
 const ListingDetailPage = () => {
@@ -65,7 +56,7 @@ const ListingDetailPage = () => {
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">Unavailable</h3>
         <p className="text-gray-500 mb-6">{error || "This listing could not be found."}</p>
-        <Link 
+        <Link
           to={ROUTES.LISTINGS}
           className="inline-flex items-center text-sm font-medium text-gray-900 hover:underline"
         >
@@ -87,11 +78,6 @@ const ListingDetailPage = () => {
   const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
   const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
-  // Debug: Log view stats for owner
-  if (isOwner) {
-    console.log('Listing viewStats:', listing.viewStats);
-    console.log('Is owner:', isOwner, 'User ID:', user?.id, 'Seller ID:', listing?.sellerId);
-  }
 
   const tabs = [
     { id: 'about', label: 'About' },
@@ -109,10 +95,10 @@ const ListingDetailPage = () => {
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
             <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
           </nav>
-          
+
           <div className="flex items-center gap-3">
             {canAddToCart && (
-              <button 
+              <button
                 onClick={() => addToCart(listing.id)}
                 disabled={isAddingToCart}
                 className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -131,10 +117,10 @@ const ListingDetailPage = () => {
               </button>
             )}
             {!isOwner && (
-              <FavoriteButton 
-                listingId={listing.id} 
-                listing={listing} 
-                size="md" 
+              <FavoriteButton
+                listingId={listing.id}
+                listing={listing}
+                size="md"
                 showCount={false}
                 className="hover:bg-gray-100 rounded-full p-2 border-0 text-gray-400 hover:text-red-500 transition-colors"
               />
@@ -157,23 +143,20 @@ const ListingDetailPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-12 gap-8">
-          
-          {/* Main Content */}
+
           <div className="lg:col-span-8 space-y-6">
-            
-            {/* View Statistics (Owner Only) */}
+
             {isOwner && (
-              <ViewStatisticsCard 
+              <ViewStatisticsCard
                 viewStats={listing.viewStats || { totalViews: 0, uniqueViews: 0, periodDays: 7, viewsByDate: {} }}
                 periodDays={listing.viewStats?.periodDays || 7}
               />
             )}
-            
-            {/* Image Gallery - Smaller Height */}
+
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group h-[400px]">
               {listing.imageUrl ? (
-                <img 
-                  src={listing.imageUrl} 
+                <img
+                  src={listing.imageUrl}
                   alt={listing.title}
                   className="w-full h-full object-contain bg-gray-50"
                   onError={(e) => {
@@ -299,21 +282,25 @@ const ListingDetailPage = () => {
                         {listing.sellerName?.[0]?.toUpperCase() || 'U'}
                      </div>
                      <div>
-                        <Link 
+                        <Link
                           to={ROUTES.USER_PROFILE(listing.sellerId)}
                           className="font-semibold text-sm text-gray-900 hover:underline block"
                         >
                            {listing.sellerName} {listing.sellerSurname}
                         </Link>
-                        <div className="text-xs text-gray-500">Joined 2024</div>
+                        {listing.sellerAccountCreationDate && (
+                          <div className="text-xs text-gray-500">
+                            Joined {new Date(listing.sellerAccountCreationDate).getFullYear()}
+                          </div>
+                        )}
                      </div>
                   </div>
-                  
+
                   {!isOwner ? (
                     <div className="space-y-3">
-                      <ContactSellerButton 
-                          listing={listing} 
-                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors" 
+                      <ContactSellerButton
+                          listing={listing}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors"
                       >
                           Contact Seller
                       </ContactSellerButton>

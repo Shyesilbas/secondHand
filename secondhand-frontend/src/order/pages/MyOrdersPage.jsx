@@ -11,7 +11,7 @@ import {useOrdersSearch} from '../hooks/useOrdersSearch.js';
 import {useOrdersModal} from '../hooks/useOrdersModal.js';
 import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
 import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
-import {getEstimatedDeliveryTime, getStatusColor} from '../utils/orderUtils.js';
+import {getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
 import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle} from 'lucide-react';
 
@@ -178,7 +178,6 @@ const MyOrdersPage = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {orders.map((order) => {
-                    const deliveryTime = getEstimatedDeliveryTime(order);
                     const itemsCount = order.orderItems?.length || 0;
                     const firstItem = order.orderItems?.[0];
                     

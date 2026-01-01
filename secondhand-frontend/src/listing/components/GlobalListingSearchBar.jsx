@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const GlobalListingSearchBar = ({ className = "" }) => {
     const [query, setQuery] = useState('');
@@ -210,12 +212,14 @@ const GlobalListingSearchBar = ({ className = "" }) => {
                             </div>
                         </>
                     ) : query.trim().length >= 2 && !isLoading ? (
-                        <div className="px-4 py-8 text-center text-gray-500">
-                            <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.467-.881-6.08-2.33" />
-                            </svg>
-                            <div className="text-sm">No listings found</div>
-                            <div className="text-xs text-gray-400 mt-1">Try different keywords</div>
+                        <div className="p-4">
+                            <EmptyState
+                                icon={MagnifyingGlassIcon}
+                                title="No listings found"
+                                description="Try different keywords"
+                                size="compact"
+                                className="border-0 shadow-none bg-transparent"
+                            />
                         </div>
                     ) : null}
                 </div>

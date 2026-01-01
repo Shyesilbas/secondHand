@@ -33,6 +33,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
@@ -40,6 +41,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
@@ -47,6 +49,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
@@ -54,6 +57,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract ClothingListingDto toClothingDto(ClothingListing clothingListing);
@@ -61,6 +65,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract BooksListingDto toBooksDto(BooksListing booksListing);
@@ -68,6 +73,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "sellerName", source = "seller.name")
     @Mapping(target = "sellerSurname", source = "seller.surname")
     @Mapping(target = "sellerId", source = "seller.id")
+    @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "imageUrl", source = "imageUrl")
     public abstract SportsListingDto toSportsDto(SportsListing sportsListing);
