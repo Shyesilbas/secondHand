@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
@@ -37,12 +38,15 @@ public class DashboardController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         
-        // Default to last 30 days if not specified
         if (endDate == null) {
             endDate = LocalDateTime.now();
+        } else {
+            endDate = endDate.toLocalDate().atTime(LocalTime.MAX);
         }
         if (startDate == null) {
-            startDate = endDate.minusDays(30);
+            startDate = endDate.toLocalDate().minusDays(30).atStartOfDay();
+        } else {
+            startDate = startDate.toLocalDate().atStartOfDay();
         }
         
         log.info("API request for seller dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
@@ -61,12 +65,15 @@ public class DashboardController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         
-        // Default to last 30 days if not specified
         if (endDate == null) {
             endDate = LocalDateTime.now();
+        } else {
+            endDate = endDate.toLocalDate().atTime(LocalTime.MAX);
         }
         if (startDate == null) {
-            startDate = endDate.minusDays(30);
+            startDate = endDate.toLocalDate().minusDays(30).atStartOfDay();
+        } else {
+            startDate = startDate.toLocalDate().atStartOfDay();
         }
         
         log.info("API request for buyer dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
