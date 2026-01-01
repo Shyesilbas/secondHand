@@ -5,13 +5,12 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
-import com.serhat.secondhand.shipping.ShippingService;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,6 @@ public class OrderCreationService {
 
     private final OrderRepository orderRepository;
     private final AddressService addressService;
-    private final ShippingService shippingService;
 
         public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         log.info("Creating order for user: {}", user.getEmail());
@@ -62,10 +59,12 @@ public class OrderCreationService {
         order.setCouponDiscount(couponDiscount);
         order.setDiscountTotal(discountTotal);
 
+        Shipping shipping = buildShipping(order);
+        order.setShipping(shipping);
+
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
         Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
-        Map<UUID, AppliedCampaignDto> campaignByListingId = buildCampaignByListingId(pricing);
-        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId, campaignByListingId);
+        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
@@ -109,23 +108,19 @@ public class OrderCreationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
+        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         return cartItems.stream()
-                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId, campaignByListingId))
+                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId))
                 .collect(Collectors.toList());
     }
 
-        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId, Map<UUID, AppliedCampaignDto> campaignByListingId) {
+        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         BigDecimal unitPrice = cart.getListing() != null ? cart.getListing().getPrice() : BigDecimal.ZERO;
         BigDecimal lineSubtotal = unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity()));
-        AppliedCampaignDto campaign = null;
         if (cart.getListing() != null && unitPriceByListingId != null) {
             unitPrice = unitPriceByListingId.getOrDefault(cart.getListing().getId(), unitPrice);
             if (lineSubtotalByListingId != null) {
                 lineSubtotal = lineSubtotalByListingId.getOrDefault(cart.getListing().getId(), lineSubtotal);
-            }
-            if (campaignByListingId != null) {
-                campaign = campaignByListingId.get(cart.getListing().getId());
             }
         }
         return OrderItem.builder()
@@ -134,9 +129,6 @@ public class OrderCreationService {
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
                 .totalPrice(lineSubtotal)
-                .campaignId(campaign != null ? campaign.getCampaignId() : null)
-                .campaignName(campaign != null ? campaign.getName() : null)
-                .campaignDiscountAmount(campaign != null ? campaign.getDiscountAmount() : null)
                 .currency("TRY")
                 .notes(cart.getNotes())
                 .build();
@@ -150,19 +142,6 @@ public class OrderCreationService {
         for (PricedCartItemDto item : pricing.getItems()) {
             if (item.getListingId() != null && item.getCampaignUnitPrice() != null) {
                 map.put(item.getListingId(), item.getCampaignUnitPrice());
-            }
-        }
-        return map;
-    }
-
-    private Map<UUID, AppliedCampaignDto> buildCampaignByListingId(PricingResultDto pricing) {
-        if (pricing == null || pricing.getItems() == null) {
-            return Map.of();
-        }
-        Map<UUID, AppliedCampaignDto> map = new HashMap<>();
-        for (PricedCartItemDto item : pricing.getItems()) {
-            if (item.getListingId() != null && item.getAppliedCampaign() != null) {
-                map.put(item.getListingId(), item.getAppliedCampaign());
             }
         }
         return map;
@@ -183,10 +162,6 @@ public class OrderCreationService {
 
         private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
                            BigDecimal totalAmount, String orderNumber, String notes) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime estimatedTransitDate = now.plusMinutes(Math.round(shippingService.getPickupDurationHours() * 60));
-        LocalDateTime estimatedDeliveryDate = now.plusMinutes(Math.round(shippingService.getDeliveryDurationHours() * 60));
-        
         return Order.builder()
                 .orderNumber(orderNumber)
                 .user(user)
@@ -195,11 +170,15 @@ public class OrderCreationService {
                 .currency("TRY")
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
-                .shippingStatus(ShippingStatus.PENDING)
-                .estimatedTransitDate(estimatedTransitDate)
-                .estimatedDeliveryDate(estimatedDeliveryDate)
                 .notes(notes)
                 .paymentStatus(Order.PaymentStatus.PENDING)
+                .build();
+    }
+
+    private Shipping buildShipping(Order order) {
+        return Shipping.builder()
+                .order(order)
+                .status(ShippingStatus.PENDING)
                 .build();
     }
 

@@ -55,6 +55,8 @@ export const API_ENDPOINTS = {
         GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`, // GET - Get by order number
         GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
+        REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,                                // POST - Refund order
+        COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,                             // PUT - Complete order
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard
@@ -119,6 +121,7 @@ export const API_ENDPOINTS = {
         SPORT_CONDITIONS: '/v1/enums/sport-conditions',
         PAYMENT_TYPES: '/v1/enums/payment-types',
         SHIPPING_STATUSES: '/v1/enums/shipping-statuses',
+        ORDER_STATUSES: '/v1/enums/order-statuses',
         EMAIL_TYPES: '/v1/enums/email-types',
         AUDIT_EVENT_TYPES: '/v1/enums/audit-event-types',
         AUDIT_EVENT_STATUSES: '/v1/enums/audit-event-statuses',

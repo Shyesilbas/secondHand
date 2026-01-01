@@ -9,14 +9,12 @@ export const useOrdersReviews = () => {
         
         setReviewsLoading(true);
         try {
-            const deliveredItems = order.orderItems.filter(item => item.shippingStatus === 'DELIVERED');
-            
-            if (deliveredItems.length === 0) {
+            if (order.status !== 'DELIVERED' && order.status !== 'COMPLETED') {
                 setOrderReviews({});
                 return;
             }
 
-            const orderItemIds = deliveredItems.map(item => item.id);
+            const orderItemIds = order.orderItems.map(item => item.id);
             
             const { reviewService } = await import('../../reviews/services/reviewService.js');
             const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);

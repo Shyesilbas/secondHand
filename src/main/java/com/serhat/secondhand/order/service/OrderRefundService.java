@@ -2,14 +2,14 @@ package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.service.EWalletService;
-import com.serhat.secondhand.order.dto.OrderCancelRequest;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.order.dto.OrderDto;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.entity.OrderItemCancel;
+import com.serhat.secondhand.order.entity.OrderItemRefund;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
+import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,62 +33,62 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class OrderCancellationService {
+public class OrderRefundService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final OrderItemCancelRepository orderItemCancelRepository;
+    private final OrderItemRefundRepository orderItemRefundRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final EWalletService eWalletService;
     private final OrderStatusValidator orderStatusValidator;
 
-    public OrderDto cancelOrder(Long orderId, OrderCancelRequest request, User user) {
+    public OrderDto refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
 
-        validateOrderCanBeCancelled(order);
+        validateOrderCanBeRefunded(order);
         orderStatusValidator.validateStatusConsistency(order);
 
-        List<OrderItem> itemsToCancel = determineItemsToCancel(order, request.getOrderItemIds());
-        validateItemsCanBeCancelled(itemsToCancel, order);
+        List<OrderItem> itemsToRefund = determineItemsToRefund(order, request.getOrderItemIds());
+        validateItemsCanBeRefunded(itemsToRefund, order);
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
-        List<OrderItemCancel> cancelRecords = new ArrayList<>();
+        List<OrderItemRefund> refundRecords = new ArrayList<>();
 
-        for (OrderItem item : itemsToCancel) {
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            int availableToCancel = item.getQuantity() - (alreadyCancelled != null ? alreadyCancelled : 0);
+        for (OrderItem item : itemsToRefund) {
+            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
+            int availableToRefund = item.getQuantity() - (alreadyRefunded != null ? alreadyRefunded : 0);
             
-            if (availableToCancel <= 0) {
+            if (availableToRefund <= 0) {
                 continue;
             }
 
             BigDecimal refundAmount = item.getTotalPrice();
             totalRefundAmount = totalRefundAmount.add(refundAmount);
 
-            OrderItemCancel cancelRecord = OrderItemCancel.builder()
+            OrderItemRefund refundRecord = OrderItemRefund.builder()
                     .orderItem(item)
                     .reason(request.getReason())
                     .reasonText(request.getReasonText())
-                    .cancelledQuantity(availableToCancel)
+                    .refundedQuantity(availableToRefund)
                     .refundAmount(refundAmount)
                     .build();
-            cancelRecords.add(cancelRecord);
+            refundRecords.add(refundRecord);
         }
 
-        if (cancelRecords.isEmpty()) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
+        if (refundRecords.isEmpty()) {
+            throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
         }
 
-        orderItemCancelRepository.saveAll(cancelRecords);
+        orderItemRefundRepository.saveAll(refundRecords);
         orderRepository.flush();
 
         try {
-            UUID firstListingId = itemsToCancel.isEmpty() ? null : itemsToCancel.get(0).getListing().getId();
+            UUID firstListingId = itemsToRefund.isEmpty() ? null : itemsToRefund.get(0).getListing().getId();
             eWalletService.creditToUser(user, totalRefundAmount, firstListingId, PaymentTransactionType.REFUND);
             log.info("Refunded {} to eWallet for user: {} for order: {}", totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
-            Map<com.serhat.secondhand.user.domain.entity.User, BigDecimal> sellerRefunds = itemsToCancel.stream()
+            Map<com.serhat.secondhand.user.domain.entity.User, BigDecimal> sellerRefunds = itemsToRefund.stream()
                     .collect(Collectors.groupingBy(
                             item -> item.getListing().getSeller(),
                             Collectors.reducing(BigDecimal.ZERO, OrderItem::getTotalPrice, BigDecimal::add)
@@ -95,7 +97,7 @@ public class OrderCancellationService {
             for (Map.Entry<com.serhat.secondhand.user.domain.entity.User, BigDecimal> entry : sellerRefunds.entrySet()) {
                 com.serhat.secondhand.user.domain.entity.User seller = entry.getKey();
                 BigDecimal sellerAmount = entry.getValue();
-                UUID sellerListingId = itemsToCancel.stream()
+                UUID sellerListingId = itemsToRefund.stream()
                         .filter(item -> item.getListing().getSeller().getId().equals(seller.getId()))
                         .findFirst()
                         .map(item -> item.getListing().getId())
@@ -116,16 +118,14 @@ public class OrderCancellationService {
         order = orderRepository.findByIdWithOrderItems(order.getId())
                 .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
 
-        boolean allItemsCancelled = areAllItemsCancelled(order);
-        if (allItemsCancelled) {
-            order.setStatus(Order.OrderStatus.CANCELLED);
-            if (order.getShipping() != null && order.getShipping().getStatus() != com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED) {
-                order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.CANCELLED);
-            }
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
-        } else {
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+        boolean allItemsRefunded = areAllItemsRefunded(order);
+        if (allItemsRefunded) {
+            order.setStatus(Order.OrderStatus.REFUNDED);
         }
+        if (order.getShipping() != null && order.getShipping().getStatus() != com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED) {
+            order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED);
+        }
+        order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
 
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
@@ -133,9 +133,9 @@ public class OrderCancellationService {
         savedOrder = orderRepository.findByIdWithOrderItems(savedOrder.getId())
                 .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
         
-        orderNotificationService.sendOrderCancellationNotification(user, savedOrder);
+        orderNotificationService.sendOrderRefundNotification(user, savedOrder);
 
-        log.info("Order cancelled: {} (partial: {})", order.getOrderNumber(), !allItemsCancelled);
+        log.info("Order refunded: {} (partial: {})", order.getOrderNumber(), !allItemsRefunded);
         return orderMapper.toDto(savedOrder);
     }
 
@@ -150,16 +150,28 @@ public class OrderCancellationService {
         return order;
     }
 
-    private void validateOrderCanBeCancelled(Order order) {
-        if (order.getStatus() != Order.OrderStatus.CONFIRMED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
+    private void validateOrderCanBeRefunded(Order order) {
+        if (order.getStatus() != Order.OrderStatus.DELIVERED) {
+            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
             throw new BusinessException(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
+
+        if (order.getShipping() == null || order.getShipping().getDeliveredAt() == null) {
+            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(order.getShipping().getDeliveredAt(), now);
+        long hoursPassed = duration.toHours();
+
+        if (hoursPassed >= 48) {
+            throw new BusinessException(OrderErrorCodes.REFUND_TIME_EXPIRED);
+        }
     }
 
-    private List<OrderItem> determineItemsToCancel(Order order, List<Long> orderItemIds) {
+    private List<OrderItem> determineItemsToRefund(Order order, List<Long> orderItemIds) {
         if (orderItemIds == null || orderItemIds.isEmpty()) {
             return order.getOrderItems();
         }
@@ -170,22 +182,22 @@ public class OrderCancellationService {
                 .collect(Collectors.toList());
     }
 
-    private void validateItemsCanBeCancelled(List<OrderItem> items, Order order) {
+    private void validateItemsCanBeRefunded(List<OrderItem> items, Order order) {
         for (OrderItem item : items) {
             if (!item.getOrder().getId().equals(order.getId())) {
                 throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
             }
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (alreadyCancelled != null && alreadyCancelled >= item.getQuantity()) {
-                throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
+            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
+            if (alreadyRefunded != null && alreadyRefunded >= item.getQuantity()) {
+                throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
             }
         }
     }
 
-    private boolean areAllItemsCancelled(Order order) {
+    private boolean areAllItemsRefunded(Order order) {
         for (OrderItem item : order.getOrderItems()) {
-            Integer cancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (cancelled == null || cancelled < item.getQuantity()) {
+            Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
+            if (refunded == null || refunded < item.getQuantity()) {
                 return false;
             }
         }

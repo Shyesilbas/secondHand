@@ -70,12 +70,12 @@ public class DashboardService {
         List<Object[]> ordersByStatus = orderRepository.countByUserAndStatusGrouped(seller, startDate, endDate);
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
         
-        // For seller: DELIVERED orders are completed
-        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
+        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L);
         long pendingOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.PENDING.name(), 0L) +
                             ordersByStatusMap.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L) +
                             ordersByStatusMap.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L) +
-                            ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L);
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
         long cancelledOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.CANCELLED.name(), 0L);
         long refundedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.REFUNDED.name(), 0L);
 
@@ -219,12 +219,12 @@ public class DashboardService {
         List<Object[]> ordersByStatus = orderRepository.countByUserAndStatusGrouped(buyer, startDate, endDate);
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
         
-        // For buyer: CONFIRMED, PROCESSING, SHIPPED, DELIVERED are all "completed" (payment made)
-        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L) +
-                              ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L) +
-                              ordersByStatusMap.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L) +
-                              ordersByStatusMap.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L);
-        long pendingOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.PENDING.name(), 0L);
+        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L);
+        long pendingOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.PENDING.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
         long cancelledOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.CANCELLED.name(), 0L);
         long refundedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.REFUNDED.name(), 0L);
 

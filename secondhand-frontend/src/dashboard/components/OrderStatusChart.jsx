@@ -24,6 +24,7 @@ const OrderStatusChart = ({ data, title = 'Order Status Distribution' }) => {
     PROCESSING: 'rgb(139, 92, 246)',  // violet
     SHIPPED: 'rgb(14, 165, 233)',      // cyan
     DELIVERED: 'rgb(16, 185, 129)',    // green
+    COMPLETED: 'rgb(34, 197, 94)',     // emerald green
     CANCELLED: 'rgb(239, 68, 68)',     // red
     REFUNDED: 'rgb(156, 163, 175)',    // gray
   };

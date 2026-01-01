@@ -70,5 +70,33 @@ public class EWalletMapper {
                 .isSuccess(true)
                 .build();
     }
+
+    public Payment buildRefundPayment(User user, BigDecimal amount, java.util.UUID listingId) {
+        return Payment.builder()
+                .fromUser(user)
+                .toUser(user)
+                .amount(amount)
+                .paymentType(PaymentType.EWALLET)
+                .transactionType(PaymentTransactionType.REFUND)
+                .paymentDirection(PaymentDirection.INCOMING)
+                .listingId(listingId)
+                .processedAt(LocalDateTime.now())
+                .isSuccess(true)
+                .build();
+    }
+
+    public Payment buildRefundDebitPayment(User seller, BigDecimal amount, java.util.UUID listingId) {
+        return Payment.builder()
+                .fromUser(seller)
+                .toUser(null)
+                .amount(amount)
+                .paymentType(PaymentType.EWALLET)
+                .transactionType(PaymentTransactionType.REFUND)
+                .paymentDirection(PaymentDirection.OUTGOING)
+                .listingId(listingId)
+                .processedAt(LocalDateTime.now())
+                .isSuccess(true)
+                .build();
+    }
 }
 

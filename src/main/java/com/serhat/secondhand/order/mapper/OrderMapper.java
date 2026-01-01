@@ -18,6 +18,7 @@ public class OrderMapper {
 
     private final ListingMapper listingMapper;
     private final AddressMapper addressMapper;
+    private final ShippingMapper shippingMapper;
 
     public OrderDto toDto(Order order) {
         if (order == null) {
@@ -45,9 +46,7 @@ public class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .orderItems(orderItemsToDtoList(order.getOrderItems()))
-                .shippingStatus(order.getShippingStatus())
-                .estimatedTransitDate(order.getEstimatedTransitDate())
-                .estimatedDeliveryDate(order.getEstimatedDeliveryDate())
+                .shipping(shippingMapper.toDto(order.getShipping()))
                 .build();
     }
 
@@ -83,13 +82,9 @@ public class OrderMapper {
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())
                 .totalPrice(orderItem.getTotalPrice())
-                .campaignId(orderItem.getCampaignId())
-                .campaignName(orderItem.getCampaignName())
-                .campaignDiscountAmount(orderItem.getCampaignDiscountAmount())
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())
-                .shippingStatus(orderItem.getOrder().getShippingStatus())
                 .build();
     }
 }

@@ -13,7 +13,7 @@ import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
 import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
 import {getEstimatedDeliveryTime, getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
-import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown} from 'lucide-react';
+import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle} from 'lucide-react';
 
 const MyOrdersPage = () => {
   const { enums } = useEnums();
@@ -49,6 +49,19 @@ const MyOrdersPage = () => {
       const updatedOrder = await orderService.getById(selectedOrder.id);
       setSelectedOrder(updatedOrder);
       await fetchReviewsData(updatedOrder);
+    }
+  };
+
+  const handleCompleteOrder = async (orderId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to complete this order? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await orderService.completeOrder(orderId);
+      refresh();
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || 'Failed to complete order');
     }
   };
 
@@ -131,7 +144,6 @@ const MyOrdersPage = () => {
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Order</th>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Status</th>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Payment</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Shipping</th>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Items</th>
                     <th 
                       className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none"
@@ -177,23 +189,13 @@ const MyOrdersPage = () => {
                         </td>
                         <td className="px-4 py-2.5">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.status)}`}>
-                            {resolveEnumLabel(enums, 'listingStatuses', order.status) || order.status}
+                            {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
                           </span>
                         </td>
                         <td className="px-4 py-2.5">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.paymentStatus)}`}>
                             {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
                           </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <div className="flex flex-col gap-0.5">
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.shippingStatus)}`}>
-                              {resolveEnumLabel(enums, 'shippingStatuses', order.shippingStatus) || order.shippingStatus}
-                            </span>
-                            {deliveryTime && (
-                              <span className="text-[10px] text-gray-500">{deliveryTime}</span>
-                            )}
-                          </div>
                         </td>
                         <td className="px-4 py-2.5">
                           <div className="flex items-center gap-2">
@@ -238,6 +240,16 @@ const MyOrdersPage = () => {
                         </td>
                         <td className="px-4 py-2.5">
                           <div className="flex items-center justify-end gap-1">
+                            {order.status === 'DELIVERED' && (
+                              <button
+                                type="button"
+                                onClick={(e) => handleCompleteOrder(order.id, e)}
+                                className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+                                title="Complete Order"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
                             <button
                               type="button"
                               onClick={(e) => {

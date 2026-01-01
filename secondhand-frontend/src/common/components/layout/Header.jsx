@@ -192,14 +192,6 @@ const Header = () => {
         { to: ROUTES.DASHBOARD, label: 'Dashboard', icon: Settings },
         { to: ROUTES.PROFILE, label: 'My Profile', icon: User },
         { to: ROUTES.CHANGE_PASSWORD, label: 'Change Password', icon: Settings },
-        { to: ROUTES.MY_ORDERS, label: 'My Orders', icon: Package },
-        { divider: true },
-        { to: ROUTES.MY_LISTINGS, label: 'My Listings', icon: Package },
-        { to: ROUTES.CREATE_LISTING, label: 'Create Listing', icon: Plus },
-        { divider: true },
-        { to: ROUTES.FAVORITES, label: 'Favorites', icon: Heart },
-        { to: ROUTES.OFFERS, label: 'Offers', icon: HandCoins },
-        { to: ROUTES.MY_COUPONS, label: 'My Coupons', icon: Tag },
         { divider: true },
         { to: ROUTES.SELLER_DASHBOARD, label: 'Seller Analytics', icon: BarChart3 },
         { to: ROUTES.BUYER_DASHBOARD, label: 'Buyer Analytics', icon: LineChart },
@@ -340,6 +332,33 @@ const Header = () => {
                                         )}
                                     </Link>
 
+                                    {/* My Orders */}
+                                    <Link
+                                        to={ROUTES.MY_ORDERS}
+                                        className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                        title="My Orders"
+                                    >
+                                        <Receipt className="w-5 h-5" />
+                                    </Link>
+
+                                    {/* Favorites */}
+                                    <Link
+                                        to={ROUTES.FAVORITES}
+                                        className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                        title="Favorites"
+                                    >
+                                        <Heart className="w-5 h-5" />
+                                    </Link>
+
+                                    {/* My Listings */}
+                                    <Link
+                                        to={ROUTES.MY_LISTINGS}
+                                        className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                                        title="My Listings"
+                                    >
+                                        <Package className="w-5 h-5" />
+                                    </Link>
+
                                     {/* User Menu */}
                                     <div className="ml-2 pl-2 border-l border-gray-200">
                                         <DropdownMenu 
@@ -352,7 +371,6 @@ const Header = () => {
                                                     <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-sm">
                                                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                                                     </div>
-                                                    <ChevronDown className="w-4 h-4 text-gray-500 hidden sm:block" />
                                                 </button>
                                             }
                                         >

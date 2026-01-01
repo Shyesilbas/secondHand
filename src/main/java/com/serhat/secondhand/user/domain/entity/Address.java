@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Data
+@EqualsAndHashCode(exclude = {"user"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

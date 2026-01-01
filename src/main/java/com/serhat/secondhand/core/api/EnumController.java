@@ -20,6 +20,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.ListingFeeService;
@@ -308,6 +309,20 @@ public class EnumController {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", status.name());
                     map.put("label", status.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/order-statuses")
+    @Operation(summary = "Get all order statuses")
+    public ResponseEntity<List<Map<String, Object>>> getOrderStatuses() {
+        List<Map<String, Object>> list = Arrays.stream(Order.OrderStatus.values())
+                .map(status -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", status.name());
+                    map.put("label", status.getDisplayName());
                     return map;
                 })
                 .toList();

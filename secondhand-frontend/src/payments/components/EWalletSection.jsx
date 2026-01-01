@@ -4,7 +4,6 @@ import { paymentService } from '../services/paymentService.js';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import EWalletBalance from './EWalletBalance.jsx';
 import EWalletActions from './EWalletActions.jsx';
-import EWalletTransactionHistory from './EWalletTransactionHistory.jsx';
 
 const EWalletSection = () => {
     const { eWallet, loading, error, createEWallet, updateLimits, updateSpendingWarningLimit, deposit, withdraw } = useEWallet({ enabled: true });
@@ -26,7 +25,7 @@ const EWalletSection = () => {
     }, [statisticsLoaded]);
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen">
+        <div>
             <div className="flex items-start justify-between mb-6">
                 <div>
                     <h2 className="text-xl font-semibold text-gray-900">eWallet</h2>
@@ -64,19 +63,12 @@ const EWalletSection = () => {
                     }}
                 />
             ) : (
-                <div className="space-y-6">
-                    <EWalletBalance
-                        eWallet={eWallet}
-                        totalSpent={totalSpent}
-                        statisticsLoaded={statisticsLoaded}
-                        onLoadStatistics={fetchStatistics}
-                    />
-                    <EWalletTransactionHistory
-                        transactions={[]}
-                        loading={false}
-                        error={null}
-                    />
-                </div>
+                <EWalletBalance
+                    eWallet={eWallet}
+                    totalSpent={totalSpent}
+                    statisticsLoaded={statisticsLoaded}
+                    onLoadStatistics={fetchStatistics}
+                />
             )}
 
         </div>

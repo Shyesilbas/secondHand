@@ -24,7 +24,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
         Optional<Order> findByOrderNumber(String orderNumber);
 
+        @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.id = :id")
+        Optional<Order> findByIdWithOrderItems(@Param("id") Long id);
+
         List<Order> findByStatusOrderByCreatedAtDesc(Order.OrderStatus status);
+
+        @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping WHERE o.status = :status ORDER BY o.updatedAt ASC")
+        List<Order> findByStatusWithShipping(@Param("status") Order.OrderStatus status);
 
         List<Order> findByPaymentStatusOrderByCreatedAtDesc(Order.PaymentStatus paymentStatus);
 

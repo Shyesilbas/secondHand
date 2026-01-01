@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, EnvelopeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { emailService } from './services/emailService.js';
@@ -123,6 +123,7 @@ const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail
 const EmailsPage = () => {
     const navigate = useNavigate();
     const notification = useNotification();
+    const queryClient = useQueryClient();
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [filterType, setFilterType] = useState('ALL');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -173,7 +174,10 @@ const EmailsPage = () => {
     const handleDeleteAllEmails = () => handleDelete({
         title: 'All Emails',
         deleteFunc: () => emailService.deleteAll(),
-        onSuccess: () => { setSelectedEmail(null); }
+        onSuccess: () => {
+            setSelectedEmail(null);
+            queryClient.invalidateQueries({ queryKey: ['myEmails'] });
+        }
     });
 
     const filteredEmails = useMemo(() => {
