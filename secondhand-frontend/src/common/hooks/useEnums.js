@@ -72,7 +72,6 @@ export const useEnums = () => {
           }
         }
         
-        console.log('Fetching enums from API...');
         const [vehicleEnumsData, listingEnumsData, paymentEnumsData] = await Promise.all([
           fetchVehicleEnums(),
           fetchListingEnums(),
@@ -104,7 +103,6 @@ export const useEnums = () => {
     setError(null);
     
     try {
-      console.log('Force refreshing enums from API...');
       const [vehicleEnumsData, listingEnumsData, paymentEnumsData] = await Promise.all([
         fetchVehicleEnums(),
         fetchListingEnums(),

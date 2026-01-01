@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
 import {ROUTES} from '../../constants/routes.js';
@@ -7,6 +7,7 @@ import {useNotification} from '../../../notification/NotificationContext.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
+import {useEnums} from '../../hooks/useEnums.js';
 import {
     ChevronDown,
     Heart,
@@ -31,16 +32,30 @@ const Header = () => {
     const [cartCount, setCartCount] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
+    const categoriesMenuRef = useRef(null);
     const { totalUnread, setTotalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
     const [unreadEmailCount, setUnreadEmailCount] = useState(0);
     const { countsByCategory } = useListingStatistics();
+    const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
 
-    // Scroll effect for modern feel
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (categoriesMenuRef.current && !categoriesMenuRef.current.contains(event.target)) {
+                setCategoriesMenuOpen(false);
+            }
+        };
+        if (categoriesMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [categoriesMenuOpen]);
 
     const handleLogout = async () => {
         notification.showConfirmation('Sign Out', 'Are you sure you want to exit your session?', async () => {
@@ -102,9 +117,49 @@ const Header = () => {
                             <NavLink to={ROUTES.LISTINGS}>Marketplace</NavLink>
                             <NavLink to={ROUTES.CREATE_LISTING}>Sell Item</NavLink>
                             <div className="h-4 w-[1px] bg-slate-200 mx-2" />
-                            <button className="text-sm font-medium text-slate-600 px-3 py-2 hover:text-slate-900 flex items-center gap-1">
-                                Categories <ChevronDown className="w-4 h-4 opacity-50" />
-                            </button>
+                            <div className="relative" ref={categoriesMenuRef}>
+                                <button 
+                                    onClick={() => setCategoriesMenuOpen(!categoriesMenuOpen)}
+                                    className={`text-sm font-medium px-3 py-2 flex items-center gap-1 transition-colors ${
+                                        categoriesMenuOpen 
+                                            ? 'text-slate-900' 
+                                            : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                >
+                                    Categories 
+                                    <ChevronDown className={`w-4 h-4 opacity-50 transition-transform ${categoriesMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {categoriesMenuOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 max-h-[500px] overflow-y-auto">
+                                        {enums?.listingTypes?.map((category) => {
+                                            const count = countsByCategory[category.value] ?? 0;
+                                            const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
+                                            return (
+                                                <Link
+                                                    key={category.value}
+                                                    to={ROUTES.LISTINGS}
+                                                    state={{ listingType: category.value }}
+                                                    onClick={() => setCategoriesMenuOpen(false)}
+                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors group"
+                                                >
+                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
+                                                            <span className="text-base">{iconText}</span>
+                                                        </div>
+                                                        <span className="text-sm font-medium text-slate-900 truncate">
+                                                            {getListingTypeLabel(category.value, enums?.listingTypes) || category.label || category.value}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-500 ml-3 flex-shrink-0">
+                                                        {count}
+                                                    </span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         </nav>
                     )}
 

@@ -18,6 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -52,6 +53,10 @@ public abstract class ListingDto {
     private String sellerName;
     private String sellerSurname;
     private Long sellerId;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate sellerAccountCreationDate;
+    
     private ListingType type;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
