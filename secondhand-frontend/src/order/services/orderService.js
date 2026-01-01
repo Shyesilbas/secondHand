@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { get, post } from '../../common/services/api/request.js';
+import { get, post, put } from '../../common/services/api/request.js';
 
 export const orderService = {
   checkout: async (payload) => {
@@ -20,6 +20,15 @@ export const orderService = {
   },
   getById: async (id) => {
     return get(API_ENDPOINTS.ORDERS.GET_ORDER_DETAILS(id));
+  },
+  cancelOrder: async (id, payload) => {
+    return put(API_ENDPOINTS.ORDERS.CANCEL_ORDER(id), payload);
+  },
+  refundOrder: async (id, payload) => {
+    return post(API_ENDPOINTS.ORDERS.REFUND_ORDER(id), payload);
+  },
+  completeOrder: async (id) => {
+    return put(API_ENDPOINTS.ORDERS.COMPLETE_ORDER(id));
   },
 };
 

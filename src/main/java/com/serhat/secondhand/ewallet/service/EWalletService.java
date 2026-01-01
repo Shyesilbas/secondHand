@@ -8,6 +8,7 @@ import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.PaymentResult;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.service.BankService;
@@ -195,6 +196,11 @@ public class EWalletService {
 
     @Transactional
     public void creditToUser(User user, BigDecimal amount) {
+        creditToUser(user, amount, null, null);
+    }
+
+    @Transactional
+    public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
         
         EWallet eWallet = eWalletRepository.findByUser(user)
@@ -207,7 +213,33 @@ public class EWalletService {
         eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), amount));
         eWalletRepository.save(eWallet);
 
+        if (transactionType == PaymentTransactionType.REFUND) {
+            var payment = eWalletMapper.buildRefundPayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            log.info("Refund payment record created for user: {} amount: {}", user.getEmail(), amount);
+        }
+
         log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());
+    }
+
+    @Transactional
+    public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
+        log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
+        
+        EWallet eWallet = getEWalletOrThrow(user);
+        
+        eWalletValidator.validateSufficientBalance(eWallet, amount);
+        
+        eWallet.setBalance(EWalletBalanceUtil.subtract(eWallet.getBalance(), amount));
+        eWalletRepository.save(eWallet);
+
+        if (transactionType == PaymentTransactionType.REFUND) {
+            var payment = eWalletMapper.buildRefundDebitPayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            log.info("Refund debit payment record created for seller: {} amount: {}", user.getEmail(), amount);
+        }
+
+        log.info("Successfully debited {} from user's e-wallet. New balance: {}", amount, eWallet.getBalance());
     }
 
     private EWallet getEWalletOrThrow(User user) {

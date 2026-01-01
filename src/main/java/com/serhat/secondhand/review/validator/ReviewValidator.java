@@ -5,7 +5,6 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
-import com.serhat.secondhand.shipping.ShippingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,15 +14,16 @@ import org.springframework.stereotype.Component;
 public class ReviewValidator {
 
     private final ReviewRepository reviewRepository;
-    private final ShippingService shippingService;
 
     public void validateForCreate(User reviewer, OrderItem orderItem) {
         if (!orderItem.getOrder().getUser().getId().equals(reviewer.getId())) {
             throw new BusinessException(ReviewErrorCodes.ORDER_ITEM_NOT_BELONG_TO_USER);
         }
 
-        ShippingStatus currentStatus = shippingService.calculateShippingStatus(orderItem.getOrder());
-        if (currentStatus != ShippingStatus.DELIVERED) {
+        ShippingStatus currentStatus = orderItem.getOrder().getShipping() != null 
+                ? orderItem.getOrder().getShipping().getStatus() 
+                : null;
+        if (currentStatus == null || currentStatus != ShippingStatus.DELIVERED) {
             throw new BusinessException(ReviewErrorCodes.ORDER_NOT_DELIVERED);
         }
 

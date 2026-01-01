@@ -29,6 +29,9 @@ public class OrderPaymentMapper {
         order.setPaymentStatus(allSuccessful ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
         order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
         order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
+        if (allSuccessful && order.getShipping() != null) {
+            order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.PENDING);
+        }
     }
 
     public void markOrderAsFailed(Order order) {

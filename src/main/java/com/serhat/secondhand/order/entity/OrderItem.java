@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -42,15 +41,6 @@ public class OrderItem {
 
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
-
-    @Column(name = "campaign_id")
-    private UUID campaignId;
-
-    @Column(name = "campaign_name")
-    private String campaignName;
-
-    @Column(name = "campaign_discount_amount", precision = 10, scale = 2)
-    private BigDecimal campaignDiscountAmount;
 
     @Column(name = "currency", length = 3, nullable = false)
     @Builder.Default

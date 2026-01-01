@@ -16,8 +16,8 @@ import org.mapstruct.ReportingPolicy;
 public interface PaymentMapper {
 
     @Mapping(target = "paymentId", source = "id")
-    @Mapping(target = "senderName", source = "fromUser.name")
-    @Mapping(target = "senderSurname", source = "fromUser.surname")
+    @Mapping(target = "senderName", expression = "java(payment.getFromUser() != null ? payment.getFromUser().getName() : \"SYSTEM\")")
+    @Mapping(target = "senderSurname", expression = "java(payment.getFromUser() != null ? payment.getFromUser().getSurname() : \"\")")
     @Mapping(target = "receiverName", expression = "java(payment.getToUser() != null ? payment.getToUser().getName() : \"SYSTEM\")")
     @Mapping(target = "receiverSurname", expression = "java(payment.getToUser() != null ? payment.getToUser().getSurname() : \"\")")
     @Mapping(target = "listingTitle", ignore = true)

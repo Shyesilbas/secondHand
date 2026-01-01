@@ -8,6 +8,7 @@ export const useEnums = () => {
   const [enums, setEnums] = useState({
     listingTypes: [],
     listingStatuses: [],
+    orderStatuses: [],
     carBrands: [],
     fuelTypes: [],
     colors: [],

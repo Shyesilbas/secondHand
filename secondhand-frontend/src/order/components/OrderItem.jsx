@@ -20,7 +20,7 @@ const OrderItem = React.memo(({
                         <div className="flex items-center gap-3 mb-2">
                             <h3 className="font-semibold text-gray-900">#{order.orderNumber}</h3>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                                {resolveEnumLabel(enums, 'listingStatuses', order.status)}
+                                {resolveEnumLabel(enums, 'orderStatuses', order.status)}
                             </span>
                         </div>
                         <p className="text-sm text-gray-500">{formatDateTime(order.createdAt)}</p>
@@ -43,12 +43,6 @@ const OrderItem = React.memo(({
                         <span className="text-gray-500">Payment:</span>
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.paymentStatus)}`}>
                             {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-gray-500">Shipping:</span>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.shippingStatus)}`}>
-                            {resolveEnumLabel(enums, 'shippingStatuses', order.shippingStatus)}
                         </span>
                     </div>
                     {getEstimatedDeliveryTime(order) && (

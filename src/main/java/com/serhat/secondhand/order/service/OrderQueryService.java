@@ -6,7 +6,6 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.shipping.ShippingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ public class OrderQueryService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final ShippingService shippingService;
 
     public Page<OrderDto> getUserOrders(User user, Pageable pageable) {
         log.info("Getting orders for user: {}", user.getEmail());
@@ -41,22 +39,17 @@ public class OrderQueryService {
         }
 
         Page<Order> orders = orderRepository.findByUser(user, finalPageable);
-        shippingService.updateShippingStatusesForOrders(orders.getContent());
 
         return orders.map(orderMapper::toDto);
     }
 
     public OrderDto getOrderById(Long orderId, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
-        shippingService.calculateShippingStatus(order);
-
         return orderMapper.toDto(order);
     }
 
     public OrderDto getOrderByOrderNumber(String orderNumber, User user) {
         Order order = findOrderByNumberAndValidateOwnership(orderNumber, user);
-        shippingService.calculateShippingStatus(order);
-
         return orderMapper.toDto(order);
     }
 

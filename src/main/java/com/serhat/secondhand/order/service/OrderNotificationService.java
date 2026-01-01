@@ -192,4 +192,29 @@ public class OrderNotificationService {
         sb.append("Best regards,\nSecondHand Team\n");
         return sb.toString();
     }
+
+    public void sendOrderRefundNotification(User user, com.serhat.secondhand.order.entity.Order order) {
+        try {
+            String subject = "SecondHand - Order Refunded";
+            String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been refunded. The refund amount has been credited to your eWallet.\n";
+            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
+            log.info("Order refund notification sent for order: {}", order.getOrderNumber());
+        } catch (Exception e) {
+            log.warn("Failed to send refund notification for order {}: {}", 
+                    order.getOrderNumber(), e.getMessage());
+        }
+    }
+
+    public void sendOrderCompletionNotification(User user, com.serhat.secondhand.order.entity.Order order, boolean isAutomatic) {
+        try {
+            String subject = "SecondHand - Order Completed";
+            String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been " + 
+                    (isAutomatic ? "automatically completed" : "completed") + ".\n";
+            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
+            log.info("Order completion notification sent for order: {}", order.getOrderNumber());
+        } catch (Exception e) {
+            log.warn("Failed to send completion notification for order {}: {}", 
+                    order.getOrderNumber(), e.getMessage());
+        }
+    }
 }

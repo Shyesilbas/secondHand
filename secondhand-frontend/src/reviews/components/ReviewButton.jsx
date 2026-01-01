@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
 
-const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null }) => {
+const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, orderStatus, shippingStatus }) => {
     const [showModal, setShowModal] = useState(false);
     const [review, setReview] = useState(existingReview);
     const [loading, setLoading] = useState(false);
@@ -11,7 +11,6 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null }) => 
         setReview(existingReview);
     }, [existingReview]);
 
-    // Eğer existingReview prop olarak gelmediyse, API'den çek
     React.useEffect(() => {
         if (!existingReview && orderItem && orderItem.id) {
             const checkExistingReview = async () => {
@@ -19,7 +18,6 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null }) => 
                     const reviewData = await reviewService.getReviewByOrderItem(orderItem.id);
                     setReview(reviewData);
                 } catch (error) {
-                    // 404 is expected if no review exists yet - suppress the error
                     if (error?.response?.status !== 404) {
                         console.error('Error checking review:', error);
                     }
@@ -30,13 +28,7 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null }) => 
         }
     }, [orderItem, existingReview]);
 
-    const canReview = orderItem?.shippingStatus === 'DELIVERED';
-    
-        console.log('ReviewButton Debug:', {
-        orderItemId: orderItem?.id,
-        shippingStatus: orderItem?.shippingStatus,
-        canReview
-    });
+    const canReview = orderStatus === 'COMPLETED' || orderStatus === 'DELIVERED' || shippingStatus === 'DELIVERED' || orderItem?.shippingStatus === 'DELIVERED';
 
     if (!canReview) {
         return null;

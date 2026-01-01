@@ -64,6 +64,7 @@ export const fetchListingEnums = async () => {
       processors,
       drivetrains,
       bodyTypes,
+      orderStatuses,
     ] = await Promise.all([
       enumService.getListingTypes(),
       enumService.getListingStatuses(),
@@ -94,11 +95,13 @@ export const fetchListingEnums = async () => {
       enumService.getProcessors(),
       enumService.getDrivetrains(),
       enumService.getBodyTypes(),
+      enumService.getOrderStatuses(),
     ]);
 
     return {
       listingTypes,
       listingStatuses,
+      orderStatuses,
       electronicTypes,
       electronicBrands,
       realEstateTypes,

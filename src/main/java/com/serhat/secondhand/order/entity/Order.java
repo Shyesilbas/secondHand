@@ -1,9 +1,8 @@
 package com.serhat.secondhand.order.entity;
 
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.Address;
+import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(exclude = {"shipping", "orderItems"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -98,15 +98,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "shipping_status")
-    private ShippingStatus shippingStatus;
-
-    @Column(name = "estimated_transit_date")
-    private LocalDateTime estimatedTransitDate;
-
-    @Column(name = "estimated_delivery_date")
-    private LocalDateTime estimatedDeliveryDate;
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Shipping shipping;
 
     @Getter
     public enum OrderStatus {
@@ -115,6 +108,7 @@ public class Order {
         PROCESSING("Processing"),
         SHIPPED("Shipped"),
         DELIVERED("Delivered"),
+        COMPLETED("Completed"),
         CANCELLED("Cancelled"),
         REFUNDED("Refunded");
 

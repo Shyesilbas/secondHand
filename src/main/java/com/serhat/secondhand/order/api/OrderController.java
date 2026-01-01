@@ -1,10 +1,14 @@
 package com.serhat.secondhand.order.api;
 
 import com.serhat.secondhand.order.dto.CheckoutRequest;
+import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
+import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.order.service.OrderCancellationService;
+import com.serhat.secondhand.order.service.OrderCompletionService;
 import com.serhat.secondhand.order.service.OrderQueryService;
+import com.serhat.secondhand.order.service.OrderRefundService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +34,8 @@ public class OrderController {
     private final CheckoutService checkoutService;
     private final OrderQueryService orderQueryService;
     private final OrderCancellationService orderCancellationService;
+    private final OrderRefundService orderRefundService;
+    private final OrderCompletionService orderCompletionService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -92,7 +98,7 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/cancel")
-    @Operation(summary = "Cancel order", description = "Cancel a pending or confirmed order")
+    @Operation(summary = "Cancel order", description = "Cancel a confirmed order (partial or full)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
         @ApiResponse(responseCode = "400", description = "Order cannot be cancelled"),
@@ -101,9 +107,43 @@ public class OrderController {
     })
     public ResponseEntity<OrderDto> cancelOrder(
             @PathVariable Long orderId,
+            @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to cancel order: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderCancellationService.cancelOrder(orderId, currentUser);
+        OrderDto order = orderCancellationService.cancelOrder(orderId, request, currentUser);
+        return ResponseEntity.ok(order);
+    }
+
+    @PostMapping("/{orderId}/refund")
+    @Operation(summary = "Refund order", description = "Refund a delivered order within 48 hours (partial or full)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order refunded successfully"),
+        @ApiResponse(responseCode = "400", description = "Order cannot be refunded"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    public ResponseEntity<OrderDto> refundOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderRefundRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to refund order: {} for user: {}", orderId, currentUser.getEmail());
+        OrderDto order = orderRefundService.refundOrder(orderId, request, currentUser);
+        return ResponseEntity.ok(order);
+    }
+
+    @PutMapping("/{orderId}/complete")
+    @Operation(summary = "Complete order", description = "Manually complete a delivered order")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order completed successfully"),
+        @ApiResponse(responseCode = "400", description = "Order cannot be completed"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    public ResponseEntity<OrderDto> completeOrder(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to complete order: {} for user: {}", orderId, currentUser.getEmail());
+        OrderDto order = orderCompletionService.completeOrder(orderId, currentUser);
         return ResponseEntity.ok(order);
     }
 }

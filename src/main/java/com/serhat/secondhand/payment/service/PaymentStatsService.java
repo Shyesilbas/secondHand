@@ -88,11 +88,12 @@ public class PaymentStatsService {
 
         if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION ||
                 payment.getTransactionType() == PaymentTransactionType.SHOWCASE_PAYMENT ||
+                payment.getTransactionType() == PaymentTransactionType.REFUND ||
                 isEwalletFlow) {
             direction = payment.getPaymentDirection();
             transactionType = payment.getTransactionType();
         } else {
-            if (payment.getFromUser().getId().equals(currentUser.getId())) {
+            if (payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUser.getId())) {
                 direction = PaymentDirection.OUTGOING;
                 transactionType = PaymentTransactionType.ITEM_PURCHASE;
             } else {
