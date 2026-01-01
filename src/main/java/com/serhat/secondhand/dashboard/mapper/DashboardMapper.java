@@ -76,14 +76,13 @@ public class DashboardMapper {
         Map<Integer, Long> distribution = new HashMap<>();
         if (reviewStats != null && !reviewStats.isEmpty()) {
             Object[] stats = reviewStats.get(0);
-            // Stats format: [count, avg, count5, count4, count3, count2, count1, count0]
             if (stats.length >= 8) {
-                distribution.put(5, ((Number) stats[2]).longValue());
-                distribution.put(4, ((Number) stats[3]).longValue());
-                distribution.put(3, ((Number) stats[4]).longValue());
-                distribution.put(2, ((Number) stats[5]).longValue());
-                distribution.put(1, ((Number) stats[6]).longValue());
-                distribution.put(0, ((Number) stats[7]).longValue());
+                distribution.put(5, stats[2] != null ? ((Number) stats[2]).longValue() : 0L);
+                distribution.put(4, stats[3] != null ? ((Number) stats[3]).longValue() : 0L);
+                distribution.put(3, stats[4] != null ? ((Number) stats[4]).longValue() : 0L);
+                distribution.put(2, stats[5] != null ? ((Number) stats[5]).longValue() : 0L);
+                distribution.put(1, stats[6] != null ? ((Number) stats[6]).longValue() : 0L);
+                distribution.put(0, stats[7] != null ? ((Number) stats[7]).longValue() : 0L);
             }
         }
         return distribution;

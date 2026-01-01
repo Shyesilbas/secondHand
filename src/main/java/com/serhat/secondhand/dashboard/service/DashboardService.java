@@ -199,10 +199,23 @@ public class DashboardService {
         previousSpending = previousSpending != null ? previousSpending : BigDecimal.ZERO;
         BigDecimal spendingGrowth = calculateGrowthPercentage(previousSpending, totalSpending);
 
-        // Average order value
+        // Order statistics
+        List<Object[]> ordersByStatus = orderRepository.countByUserAndStatusGrouped(buyer, startDate, endDate);
+        Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
+        
         long totalOrders = orderRepository.countByUserAndCreatedAtBetween(buyer, startDate, endDate);
-        BigDecimal averageOrderValue = totalOrders > 0 
-                ? totalSpending.divide(BigDecimal.valueOf(totalOrders), 2, RoundingMode.HALF_UP)
+        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L);
+        long pendingOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.PENDING.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L) +
+                            ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
+        long cancelledOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.CANCELLED.name(), 0L);
+        long refundedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.REFUNDED.name(), 0L);
+
+        long paidOrdersCount = totalOrders - cancelledOrders - refundedOrders;
+        BigDecimal averageOrderValue = paidOrdersCount > 0 
+                ? totalSpending.divide(BigDecimal.valueOf(paidOrdersCount), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
         // Spending trend (daily)
@@ -214,19 +227,6 @@ public class DashboardService {
                     return dashboardMapper.toSpendingDataPoint(date, spending);
                 })
                 .collect(Collectors.toList());
-
-        // Order statistics
-        List<Object[]> ordersByStatus = orderRepository.countByUserAndStatusGrouped(buyer, startDate, endDate);
-        Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
-        
-        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L);
-        long pendingOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.PENDING.name(), 0L) +
-                            ordersByStatusMap.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L) +
-                            ordersByStatusMap.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L) +
-                            ordersByStatusMap.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L) +
-                            ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
-        long cancelledOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.CANCELLED.name(), 0L);
-        long refundedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.REFUNDED.name(), 0L);
 
         // Category spending distribution
         List<Object[]> categorySpending = orderItemRepository.sumSpendingByBuyerAndCategory(buyer, startDate, endDate);
