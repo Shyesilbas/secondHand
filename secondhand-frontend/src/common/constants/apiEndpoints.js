@@ -194,7 +194,7 @@ export const API_ENDPOINTS = {
     },
     CHAT: {
         CREATE_ROOM: '/chat/rooms',
-        USER_ROOMS: (userId) => `/chat/rooms/user/${userId}`,
+        USER_ROOMS: '/chat/rooms/user',
         DIRECT_ROOM: '/chat/rooms/direct',
         CREATE_LISTING_ROOM: (listingId) => `/chat/rooms/listing/${listingId}`,
         
@@ -202,7 +202,7 @@ export const API_ENDPOINTS = {
         ROOM_MESSAGES: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages`,
         MARK_READ: (chatRoomId) => `/chat/rooms/${chatRoomId}/messages/read`,
         
-        ALL_USER_MESSAGES: (userId) => `/chat/messages/user/${userId}`,
+        ALL_USER_MESSAGES: '/chat/messages/user',
         TOTAL_UNREAD_COUNT: `/chat/messages/unread-count`,
         
         DELETE_CONVERSATION: (chatRoomId) => `/chat/rooms/${chatRoomId}`,

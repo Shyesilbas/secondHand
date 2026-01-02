@@ -180,7 +180,8 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ChatMessageDto> getChatMessages(Long roomId, Pageable pageable) {
+    public Page<ChatMessageDto> getChatMessages(Long roomId, Long userId, Pageable pageable) {
+        chatAuthorizationService.validateRoomParticipant(roomId, userId);
         return messageRepository
                 .findByChatRoomIdOrderByCreatedAtAsc(roomId, pageable)
                 .map(chatMessageMapper::toDto);

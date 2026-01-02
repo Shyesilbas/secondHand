@@ -3,17 +3,17 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
 export const chatService = {
 
-    getUserChatRooms: async (userId) => {
-        return request('GET', API_ENDPOINTS.CHAT.USER_ROOMS(userId));
+    getUserChatRooms: async () => {
+        return request('GET', API_ENDPOINTS.CHAT.USER_ROOMS);
     },
     
 
-    createOrGetDirectChat: async (userId1, userId2) => {
-        return requestWithParams('POST', API_ENDPOINTS.CHAT.DIRECT_ROOM, { userId1, userId2 });
+    createOrGetDirectChat: async (otherUserId) => {
+        return requestWithParams('POST', API_ENDPOINTS.CHAT.DIRECT_ROOM, { userId2: otherUserId });
     },
 
-    createOrGetListingChat: async (userId, listingId, listingTitle) => {
-        return requestWithParams('POST', API_ENDPOINTS.CHAT.CREATE_LISTING_ROOM(listingId), { userId, listingTitle });
+    createOrGetListingChat: async (listingId, listingTitle) => {
+        return requestWithParams('POST', API_ENDPOINTS.CHAT.CREATE_LISTING_ROOM(listingId), { listingTitle });
     },
 
     sendMessage: async (messageData) => {
@@ -28,8 +28,8 @@ export const chatService = {
         return request('PUT', API_ENDPOINTS.CHAT.MARK_READ(chatRoomId));
     },
 
-    getAllUserMessages: async (userId, page = 0, size = 20) => {
-        return requestWithParams('GET', API_ENDPOINTS.CHAT.ALL_USER_MESSAGES(userId), { page, size });
+    getAllUserMessages: async (page = 0, size = 20) => {
+        return requestWithParams('GET', API_ENDPOINTS.CHAT.ALL_USER_MESSAGES, { page, size });
     },
 
     getTotalUnreadMessageCount: async () => {
@@ -37,12 +37,12 @@ export const chatService = {
     },
 
 
-    deleteConversation: async (chatRoomId, userId) => {
-        return requestWithParams('DELETE', API_ENDPOINTS.CHAT.DELETE_CONVERSATION(chatRoomId), { userId });
+    deleteConversation: async (chatRoomId) => {
+        return request('DELETE', API_ENDPOINTS.CHAT.DELETE_CONVERSATION(chatRoomId));
     },
 
-    deleteMessage: async (messageId, userId) => {
-        return requestWithParams('DELETE', API_ENDPOINTS.CHAT.DELETE_MESSAGE(messageId), { userId });
+    deleteMessage: async (messageId) => {
+        return request('DELETE', API_ENDPOINTS.CHAT.DELETE_MESSAGE(messageId));
     }
 
 };
