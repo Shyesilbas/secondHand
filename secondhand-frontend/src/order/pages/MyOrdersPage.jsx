@@ -90,13 +90,13 @@ const MyOrdersPage = () => {
   };
 
   return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background-secondary">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-sm font-semibold text-gray-900">My Orders</h1>
+              <h1 className="text-sm font-semibold text-text-primary">My Orders</h1>
               {orders.length > 0 && (
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-text-secondary mt-0.5">
                   {pagination?.totalElements || orders.length} total
                 </p>
               )}
@@ -106,7 +106,7 @@ const MyOrdersPage = () => {
                 type="button"
                 onClick={refresh}
                 disabled={loading}
-                className="p-1.5 text-gray-500 hover:text-gray-700 disabled:opacity-50"
+                className="p-1.5 text-text-secondary hover:text-text-primary disabled:opacity-50"
                 title="Refresh"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -160,7 +160,7 @@ const MyOrdersPage = () => {
                       </div>
                     </th>
                     <th 
-                      className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-4 py-2 text-left text-xs font-semibold text-text-secondary cursor-pointer hover:bg-secondary-100 select-none"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSort('createdAt');
@@ -173,18 +173,18 @@ const MyOrdersPage = () => {
                         )}
                       </div>
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700">Actions</th>
+                    <th className="px-4 py-2 text-right text-xs font-semibold text-text-secondary">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-border-light">
                   {orders.map((order) => {
                     const itemsCount = order.orderItems?.length || 0;
                     const firstItem = order.orderItems?.[0];
                     
                     return (
-                      <tr key={order.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => openOrderModal(order)}>
+                      <tr key={order.id} className="hover:bg-secondary-50 cursor-pointer" onClick={() => openOrderModal(order)}>
                         <td className="px-4 py-2.5">
-                          <span className="text-xs font-medium text-gray-900">#{order.orderNumber}</span>
+                          <span className="text-xs font-medium text-text-primary">#{order.orderNumber}</span>
                         </td>
                         <td className="px-4 py-2.5">
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.status)}`}>

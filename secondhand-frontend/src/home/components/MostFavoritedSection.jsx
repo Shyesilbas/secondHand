@@ -6,14 +6,18 @@ import { get } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 
-const RecentListingsSection = () => {
+const MostFavoritedSection = () => {
   const { data: listings = [], isLoading, error } = useQuery({
-    queryKey: ['recentListings'],
+    queryKey: ['mostFavoritedListings'],
     queryFn: async () => {
       const allListings = await get(API_ENDPOINTS.LISTINGS.ALL);
       return (Array.isArray(allListings) ? allListings : [])
         .filter(listing => listing.status === 'ACTIVE')
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .sort((a, b) => {
+          const aCount = a.favoriteStats?.favoriteCount || 0;
+          const bCount = b.favoriteStats?.favoriteCount || 0;
+          return bCount - aCount;
+        })
         .slice(0, 10);
     },
     staleTime: 2 * 60 * 1000,
@@ -21,18 +25,18 @@ const RecentListingsSection = () => {
   });
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="py-16" style={{ backgroundColor: '#fff8f0' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Recently Added</h2>
-            <p className="text-gray-600">
-              Discover the latest items just added to our marketplace
+            <h2 className="text-2xl font-semibold text-text-primary mb-2">Most Favorited</h2>
+            <p className="text-text-secondary">
+              Discover the most loved items in our marketplace
             </p>
           </div>
           <Link
             to={ROUTES.LISTINGS}
-            className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+            className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-background-primary rounded-lg transition-colors"
           >
             View All
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +55,7 @@ const RecentListingsSection = () => {
           <div className="text-center mt-8 sm:hidden">
             <Link
               to={ROUTES.LISTINGS}
-              className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-white transition-colors"
+              className="inline-flex items-center px-6 py-3 border border-border-DEFAULT text-text-secondary font-medium rounded-lg hover:bg-background-primary transition-colors"
             >
               View All Listings
               <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,5 +69,5 @@ const RecentListingsSection = () => {
   );
 };
 
-export default RecentListingsSection;
+export default MostFavoritedSection;
 

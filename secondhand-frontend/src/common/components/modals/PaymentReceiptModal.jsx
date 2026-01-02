@@ -23,8 +23,8 @@ const useModalBodyOverflow = (isOpen) => {
 const ActionButton = ({ onClick, children, variant = 'primary', icon: Icon }) => {
   const base = "flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl transition-all duration-200";
   const styles = variant === 'primary'
-      ? 'text-white bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-200 active:scale-[0.98]'
-      : 'text-slate-600 bg-slate-50 hover:bg-slate-100 active:scale-[0.98]';
+      ? 'text-button-primary-text bg-button-primary-bg hover:bg-button-primary-hover shadow-lg shadow-secondary-200 active:scale-[0.98]'
+      : 'text-text-secondary bg-secondary-50 hover:bg-secondary-100 active:scale-[0.98]';
 
   return (
       <button onClick={onClick} className={`${base} ${styles}`}>

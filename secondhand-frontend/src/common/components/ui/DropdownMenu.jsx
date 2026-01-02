@@ -46,7 +46,7 @@ const DropdownMenu = ({
 
             {isOpen && (
                 <div
-                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-white rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName}`}
+                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-background-primary rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName}`}
                 >
                     {children}
                 </div>

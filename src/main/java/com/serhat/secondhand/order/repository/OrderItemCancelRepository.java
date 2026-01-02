@@ -22,3 +22,4 @@ public interface OrderItemCancelRepository extends JpaRepository<OrderItemCancel
     Integer sumCancelledQuantityByOrderItem(@Param("orderItem") OrderItem orderItem);
 }
 
+

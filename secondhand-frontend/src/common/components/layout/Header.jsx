@@ -69,8 +69,8 @@ const Header = () => {
             to={to}
             className={`text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full ${
                 primary
-                    ? "bg-slate-900 text-white hover:bg-slate-800 shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    ? "bg-button-primary-bg text-button-primary-text hover:bg-button-primary-hover shadow-sm"
+                    : "text-text-secondary hover:text-text-primary hover:bg-secondary-50"
             }`}
         >
             {children}
@@ -82,13 +82,13 @@ const Header = () => {
             to={to}
             onClick={onClick}
             title={title}
-            className="group relative p-2 text-slate-500 hover:text-slate-900 transition-all duration-200"
+            className="group relative p-2 text-text-tertiary hover:text-text-primary transition-all duration-200"
         >
             <Icon className="w-[21px] h-[21px] stroke-[1.5px]" />
             {badge > 0 && (
                 <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-indigo-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-indigo-500"></span>
                 </span>
             )}
         </Link>
@@ -96,18 +96,18 @@ const Header = () => {
 
     return (
         <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-            scrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200/60 py-2" : "bg-white border-b border-transparent py-4"
+            scrolled ? "bg-background-primary/80 backdrop-blur-md border-b border-border-light/60 py-2" : "bg-background-primary border-b border-transparent py-4"
         }`}>
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
                 <div className="flex items-center justify-between gap-8">
 
                     {/* Brand Logo */}
                     <Link to={ROUTES.HOME} className="flex items-center gap-2.5 group flex-shrink-0">
-                        <div className="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
-                            <ShoppingBag className="w-5 h-5 text-white stroke-[2.5px]" />
+                        <div className="w-9 h-9 bg-button-primary-bg rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
+                            <ShoppingBag className="w-5 h-5 text-text-inverse stroke-[2.5px]" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-slate-900">
-                            SH<span className="text-indigo-600">.</span>
+                        <span className="text-xl font-bold tracking-tight text-text-primary">
+                            SH<span className="text-accent-indigo-600">.</span>
                         </span>
                     </Link>
 
@@ -116,14 +116,14 @@ const Header = () => {
                         <nav className="hidden lg:flex items-center gap-1">
                             <NavLink to={ROUTES.LISTINGS}>Marketplace</NavLink>
                             <NavLink to={ROUTES.CREATE_LISTING}>Sell Item</NavLink>
-                            <div className="h-4 w-[1px] bg-slate-200 mx-2" />
+                            <div className="h-4 w-[1px] bg-border-light mx-2" />
                             <div className="relative" ref={categoriesMenuRef}>
                                 <button 
                                     onClick={() => setCategoriesMenuOpen(!categoriesMenuOpen)}
                                     className={`text-sm font-medium px-3 py-2 flex items-center gap-1 transition-colors ${
                                         categoriesMenuOpen 
-                                            ? 'text-slate-900' 
-                                            : 'text-slate-600 hover:text-slate-900'
+                                            ? 'text-text-primary' 
+                                            : 'text-text-secondary hover:text-text-primary'
                                     }`}
                                 >
                                     Categories 
@@ -131,7 +131,7 @@ const Header = () => {
                                 </button>
                                 
                                 {categoriesMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 max-h-[500px] overflow-y-auto">
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-background-primary rounded-xl shadow-lg border border-border-light py-2 z-50 max-h-[500px] overflow-y-auto">
                                         {enums?.listingTypes?.map((category) => {
                                             const count = countsByCategory[category.value] ?? 0;
                                             const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
@@ -141,17 +141,17 @@ const Header = () => {
                                                     to={ROUTES.LISTINGS}
                                                     state={{ listingType: category.value }}
                                                     onClick={() => setCategoriesMenuOpen(false)}
-                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors group"
+                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-secondary-50 transition-colors group"
                                                 >
                                                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:bg-slate-200 transition-colors">
+                                                        <div className="w-8 h-8 rounded-lg bg-secondary-100 flex items-center justify-center flex-shrink-0 group-hover:bg-secondary-200 transition-colors">
                                                             <span className="text-base">{iconText}</span>
                                                         </div>
-                                                        <span className="text-sm font-medium text-slate-900 truncate">
+                                                        <span className="text-sm font-medium text-text-primary truncate">
                                                             {getListingTypeLabel(category.value, enums?.listingTypes) || category.label || category.value}
                                                         </span>
                                                     </div>
-                                                    <span className="text-xs font-medium text-slate-500 ml-3 flex-shrink-0">
+                                                    <span className="text-xs font-medium text-text-tertiary ml-3 flex-shrink-0">
                                                         {count}
                                                     </span>
                                                 </Link>
@@ -167,7 +167,7 @@ const Header = () => {
                     {isAuthenticated && (
                         <div className="hidden md:block flex-1 max-w-md">
                             <div className="relative group">
-                                <UnifiedSearchBar className="w-full bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+                                <UnifiedSearchBar className="w-full bg-secondary-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500/20 transition-all" />
                             </div>
                         </div>
                     )}
@@ -185,25 +185,25 @@ const Header = () => {
                                     <IconButton to={ROUTES.MY_LISTINGS} icon={Package} title="My Listings" />
                                 </div>
 
-                                <div className="h-8 w-[1px] bg-slate-200 mx-2 hidden sm:block" />
+                                <div className="h-8 w-[1px] bg-border-light mx-2 hidden sm:block" />
 
                                 <DropdownMenu
                                     trigger={
                                         <button className="flex items-center gap-2 pl-2 group">
-                                            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden group-hover:border-indigo-300 transition-colors">
+                                            <div className="w-9 h-9 rounded-full bg-secondary-100 border border-border-light flex items-center justify-center overflow-hidden group-hover:border-primary-300 transition-colors">
                                                 {user?.avatar ? (
                                                     <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <User className="w-5 h-5 text-slate-500" />
+                                                    <User className="w-5 h-5 text-text-tertiary" />
                                                 )}
                                             </div>
-                                            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                                            <ChevronDown className="w-4 h-4 text-text-muted group-hover:text-text-secondary transition-colors" />
                                         </button>
                                     }
                                 >
-                                    <div className="px-4 py-3 border-b border-slate-100">
-                                        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Account</p>
-                                        <p className="text-sm font-semibold text-slate-900 truncate">{user?.name || 'User'}</p>
+                                    <div className="px-4 py-3 border-b border-border-light">
+                                        <p className="text-xs font-medium text-text-muted uppercase tracking-wider">Account</p>
+                                        <p className="text-sm font-semibold text-text-primary truncate">{user?.name || 'User'}</p>
                                     </div>
                                     <DropdownItem to={ROUTES.DASHBOARD} icon={<Settings className="w-4 h-4" />}>Dashboard</DropdownItem>
                                     <DropdownItem to={ROUTES.MY_LISTINGS} icon={<Package className="w-4 h-4" />}>Inventory</DropdownItem>
@@ -225,10 +225,10 @@ const Header = () => {
                             </>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-slate-600 hover:text-slate-900 px-4">
+                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-text-secondary hover:text-text-primary px-4">
                                     Sign In
                                 </Link>
-                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-slate-900 text-white px-5 py-2.5 rounded-full hover:bg-slate-800 transition-all shadow-sm">
+                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-button-primary-bg text-button-primary-text px-5 py-2.5 rounded-full hover:bg-button-primary-hover transition-all shadow-sm">
                                     Join Now
                                 </Link>
                             </div>
