@@ -10,6 +10,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -20,7 +21,7 @@ public class CampaignValidator {
 
     public void validate(Campaign campaign, User seller) {
         validateBasics(campaign);
-        validateDates(campaign);
+        validateCampaignDates(campaign);
         validateEligibleTypes(campaign);
         validateEligibleListings(campaign, seller);
     }
@@ -34,12 +35,19 @@ public class CampaignValidator {
         }
     }
 
-    private void validateDates(Campaign campaign) {
+    private void validateCampaignDates(Campaign campaign) {
+        LocalDateTime now = LocalDateTime.now();
+
         if (campaign.getStartsAt() != null && campaign.getEndsAt() != null
                 && campaign.getStartsAt().isAfter(campaign.getEndsAt())) {
             throw new BusinessException(CampaignErrorCodes.CAMPAIGN_INVALID);
         }
+
+        if (campaign.getEndsAt() != null && campaign.getEndsAt().isBefore(now)) {
+            throw new BusinessException(CampaignErrorCodes.CAMPAIGN_EXPIRED);
+        }
     }
+
 
     private void validateEligibleTypes(Campaign campaign) {
         if (campaign.getEligibleTypes() == null) {
