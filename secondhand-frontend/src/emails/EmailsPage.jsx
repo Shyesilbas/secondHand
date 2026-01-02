@@ -10,44 +10,44 @@ import EmailFilterTabs from '../emails/components/EmailFilterTabs';
 import EmptyState from '../common/components/ui/EmptyState.jsx';
 
 const EmailsPageLoader = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="animate-pulse space-y-8">
                 {/* Header skeleton */}
                 <div className="space-y-4">
-                    <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-8 bg-secondary-200 rounded w-1/4"></div>
+                    <div className="h-4 bg-secondary-200 rounded w-1/2"></div>
                 </div>
                 
                 {/* Search and filters skeleton */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-background-primary rounded-lg border border-border-light p-6">
                     <div className="flex items-center space-x-4">
-                        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-                        <div className="h-10 bg-gray-200 rounded w-32"></div>
+                        <div className="h-10 bg-secondary-200 rounded w-1/3"></div>
+                        <div className="h-10 bg-secondary-200 rounded w-32"></div>
                     </div>
                 </div>
                 
                 {/* Main content skeleton */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <div className="p-4 border-b border-gray-200">
-                            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                    <div className="lg:col-span-1 bg-background-primary rounded-lg border border-border-light overflow-hidden">
+                        <div className="p-4 border-b border-border-light">
+                            <div className="h-6 bg-secondary-200 rounded w-1/3"></div>
                         </div>
                         <div className="p-4 space-y-4">
                             {[...Array(5)].map((_, i) => (
                                 <div key={i} className="space-y-2">
-                                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                                    <div className="h-4 bg-secondary-200 rounded w-3/4"></div>
+                                    <div className="h-3 bg-secondary-200 rounded w-full"></div>
+                                    <div className="h-3 bg-secondary-200 rounded w-1/2"></div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="lg:col-span-2 bg-background-primary rounded-lg border border-border-light p-6">
                         <div className="space-y-4">
-                            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                            <div className="h-6 bg-secondary-200 rounded w-1/2"></div>
                             {[...Array(8)].map((_, i) => (
-                                <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                                <div key={i} className="h-4 bg-secondary-200 rounded"></div>
                             ))}
                         </div>
                     </div>
@@ -59,22 +59,22 @@ const EmailsPageLoader = () => (
 
 const EmailsPageFeedback = ({ error, emails, filterType }) => {
     if (error) return (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mb-6 bg-status-error-bg border border-status-error-border rounded-lg p-4">
             <div className="flex items-center">
                 <div className="flex-shrink-0">
-                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-status-error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Error loading emails</h3>
-                    <p className="text-sm text-red-600 mt-1">{error}</p>
+                    <h3 className="text-sm font-medium text-status-error-text">Error loading emails</h3>
+                    <p className="text-sm text-status-error-text mt-1">{error}</p>
                 </div>
             </div>
         </div>
     );
     if (!emails.length) return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="bg-background-primary rounded-lg border border-border-light shadow-sm">
             <EmptyState
                 title="No Emails Found"
                 description={filterType === 'ALL'
@@ -89,13 +89,13 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
 const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail, isDeleting }) => (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Email List */}
-        <div className="lg:col-span-1 bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div className="lg:col-span-1 bg-background-primary rounded-lg border border-border-light shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-border-light bg-secondary-50">
                 <div className="flex items-center space-x-3">
-                    <EnvelopeIcon className="w-5 h-5 text-gray-500" />
+                    <EnvelopeIcon className="w-5 h-5 text-text-tertiary" />
                     <div>
-                        <h3 className="text-lg font-medium text-gray-900">Email Inbox</h3>
-                        <p className="text-sm text-gray-600">{emails.length} {emails.length === 1 ? 'email' : 'emails'}</p>
+                        <h3 className="text-lg font-medium text-text-primary">Email Inbox</h3>
+                        <p className="text-sm text-text-secondary">{emails.length} {emails.length === 1 ? 'email' : 'emails'}</p>
                     </div>
                 </div>
             </div>
@@ -203,14 +203,14 @@ const EmailsPage = () => {
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                            className="flex items-center text-text-secondary hover:text-text-primary transition-colors"
                         >
                             <ArrowLeftIcon className="w-5 h-5 mr-2" />
                             <span className="text-sm font-medium">Back</span>
                         </button>
-                        <div className="h-6 w-px bg-gray-300"></div>
+                        <div className="h-6 w-px bg-border-DEFAULT"></div>
                         <div>
-                            <h1 className="text-2xl font-semibold text-gray-900">
+                            <h1 className="text-2xl font-semibold text-text-primary">
                                 Email History
                             </h1>
                             <p className="text-sm text-gray-600 mt-1">
@@ -221,11 +221,11 @@ const EmailsPage = () => {
                 </div>
 
                 {/* Search and Filters Section */}
-                <div className="mb-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="mb-6 bg-background-primary rounded-lg border border-border-light shadow-sm">
+                    <div className="px-6 py-4 border-b border-border-light bg-secondary-50">
                         <div className="flex items-center space-x-3">
-                            <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
-                            <h2 className="text-lg font-medium text-gray-900">Search & Filter</h2>
+                            <MagnifyingGlassIcon className="w-5 h-5 text-text-tertiary" />
+                            <h2 className="text-lg font-medium text-text-primary">Search & Filter</h2>
                         </div>
                     </div>
                     <div className="p-6">
@@ -237,9 +237,9 @@ const EmailsPage = () => {
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         placeholder="Search emails by subject, sender, recipient, or content"
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-sm"
+                                        className="w-full pl-10 pr-4 py-3 border border-border-DEFAULT rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                                     />
-                                    <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    <MagnifyingGlassIcon className="w-5 h-5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                                 </div>
                             </div>
                             <div className="flex-none">

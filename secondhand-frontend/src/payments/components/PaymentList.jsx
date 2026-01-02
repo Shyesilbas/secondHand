@@ -28,14 +28,29 @@ const PaymentList = React.memo(({ payments, onShowReceipt, hasActiveFilters, onC
     }
 
     return (
-        <div className="bg-card-bg rounded-card shadow-card border overflow-hidden">
-            <div className="px-6 py-4 border-b border-sidebar-border">
-                <h3 className="text-lg font-semibold text-text-primary">
+        <div 
+            className="rounded-card shadow-card border overflow-hidden"
+            style={{
+                backgroundColor: 'var(--page-card-background, #ffffff)',
+                borderColor: 'var(--page-card-border, #e2e8f0)'
+            }}
+        >
+            <div 
+                className="px-6 py-4 border-b"
+                style={{ borderColor: 'var(--page-table-border, #e2e8f0)' }}
+            >
+                <h3 
+                    className="text-lg font-semibold"
+                    style={{ color: 'var(--page-table-header-text, #1e293b)' }}
+                >
                     Recent Transactions ({payments.length})
                 </h3>
             </div>
 
-            <div className="divide-y divide-gray-200">
+            <div 
+                className="divide-y"
+                style={{ borderColor: 'var(--page-table-border, #e2e8f0)' }}
+            >
                 {payments.map((payment, index) => (
                     <PaymentItem
                         key={payment.paymentId || index}

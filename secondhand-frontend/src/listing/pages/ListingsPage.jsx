@@ -74,7 +74,7 @@ const ListingsPage = () => {
     }, [updateFilters]);
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
+        <div className="min-h-screen bg-background-secondary/50">
             <ListingsHeader
                 totalElements={totalElements}
                 selectedCategory={selectedCategory}

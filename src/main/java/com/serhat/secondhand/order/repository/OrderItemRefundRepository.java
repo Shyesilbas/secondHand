@@ -22,3 +22,4 @@ public interface OrderItemRefundRepository extends JpaRepository<OrderItemRefund
     Integer sumRefundedQuantityByOrderItem(@Param("orderItem") OrderItem orderItem);
 }
 
+

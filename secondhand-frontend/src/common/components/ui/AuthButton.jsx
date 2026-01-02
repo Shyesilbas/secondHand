@@ -18,12 +18,12 @@ const AuthButton = ({
 
     const variants = {
         primary: `
-      text-white bg-gray-900 hover:bg-gray-800 
-      focus:ring-gray-500 active:bg-gray-700
+      text-button-primary-text bg-button-primary-bg hover:bg-button-primary-hover 
+      focus:ring-primary-500 active:bg-secondary-800
     `,
         secondary: `
-      text-gray-700 bg-gray-100 hover:bg-gray-200 
-      focus:ring-gray-500 active:bg-gray-300
+      text-button-secondary-text bg-button-secondary-bg hover:bg-button-secondary-hover 
+      focus:ring-primary-500 active:bg-secondary-200
     `
     };
 

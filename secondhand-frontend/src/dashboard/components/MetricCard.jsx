@@ -3,12 +3,12 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue' }) => {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    purple: 'bg-purple-50 text-purple-600',
-    amber: 'bg-amber-50 text-amber-600',
-    red: 'bg-red-50 text-red-600',
-    gray: 'bg-gray-50 text-gray-600',
+    blue: 'bg-primary-50 text-primary-600',
+    green: 'bg-status-success-bg text-status-success-text',
+    purple: 'bg-accent-indigo-50 text-accent-indigo-600',
+    amber: 'bg-status-warning-bg text-status-warning-text',
+    red: 'bg-status-error-bg text-status-error-text',
+    gray: 'bg-secondary-50 text-text-secondary',
   };
 
   const formatValue = (val) => {
@@ -31,13 +31,13 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
   };
 
   const getTrendColor = () => {
-    if (trend > 0) return 'text-green-600';
-    if (trend < 0) return 'text-red-600';
-    return 'text-gray-500';
+    if (trend > 0) return 'text-status-success-text';
+    if (trend < 0) return 'text-status-error-text';
+    return 'text-text-tertiary';
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div className="bg-background-primary rounded-lg border border-border-light p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -46,10 +46,10 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
                 <Icon className="w-4 h-4" />
               </div>
             )}
-            <span className="text-xs font-medium text-gray-600">{title}</span>
+            <span className="text-xs font-medium text-text-secondary">{title}</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-gray-900">{formatValue(value)}</span>
+            <span className="text-2xl font-bold text-text-primary">{formatValue(value)}</span>
             {trend !== undefined && trend !== null && (
               <div className={`flex items-center gap-1 ${getTrendColor()}`}>
                 {getTrendIcon()}
@@ -60,10 +60,10 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+            <p className="text-xs text-text-secondary mt-1">{subtitle}</p>
           )}
           {trendLabel && (
-            <p className="text-xs text-gray-400 mt-1">{trendLabel}</p>
+            <p className="text-xs text-text-muted mt-1">{trendLabel}</p>
           )}
         </div>
       </div>

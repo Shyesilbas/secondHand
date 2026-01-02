@@ -62,7 +62,18 @@ const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
 
     return (
-        <div className="p-6 hover:bg-app-bg transition-colors">
+        <div 
+            className="p-6 transition-colors"
+            style={{
+                backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--page-table-row-hover, #f8fafc)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+        >
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 flex-1">
                     <div className={`p-3 rounded-lg ${
@@ -131,7 +142,7 @@ const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
 
                     <button
                         onClick={() => onShowReceipt(payment)}
-                        className="flex items-center px-3 py-2 text-sm font-medium text-btn-primary bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                        className="flex items-center px-3 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
                         title="Show Receipt"
                     >
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
