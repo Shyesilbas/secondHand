@@ -3,6 +3,7 @@ package com.serhat.secondhand.campaign.repository;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,12 @@ public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
           and (c.endsAt is null or c.endsAt >= :now)
         """)
     List<Campaign> findActiveCampaignsForSellers(@Param("sellerIds") List<Long> sellerIds, @Param("now") LocalDateTime now);
+
+
+    @Modifying
+    @Query("UPDATE Campaign c SET c.active = false WHERE c.active = true AND c.endsAt < :now")
+    void deactivateAllExpired(@Param("now") LocalDateTime now);
+
 }
 
 
