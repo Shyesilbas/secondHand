@@ -38,12 +38,8 @@ const ShowcaseSection = () => {
   return (
     <section 
       ref={sectionRef} 
-      className="py-16 border-b border-transparent relative overflow-hidden"
-      style={{ 
-        backgroundColor: '#F1F5F9'
-      }}
+      className="py-16 border-b border-transparent relative overflow-hidden bg-white"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-indigo-600/10"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center mb-4">
