@@ -2,13 +2,14 @@ import React, {useEffect, useState, useRef} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
 import {ROUTES} from '../../constants/routes.js';
-import {DropdownDivider, DropdownItem, DropdownMenu} from '../ui/DropdownMenu.jsx';
+import {DropdownDivider, DropdownDividerWhite, DropdownItem, DropdownMenu} from '../ui/DropdownMenu.jsx';
 import {useNotification} from '../../../notification/NotificationContext.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {useEnums} from '../../hooks/useEnums.js';
 import {
+    Bell,
     ChevronDown,
     Heart,
     LogOut,
@@ -33,7 +34,11 @@ const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
+    const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
+    const [listingsMenuOpen, setListingsMenuOpen] = useState(false);
     const categoriesMenuRef = useRef(null);
+    const notificationMenuRef = useRef(null);
+    const listingsMenuRef = useRef(null);
     const { totalUnread, setTotalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
     const [unreadEmailCount, setUnreadEmailCount] = useState(0);
     const { countsByCategory } = useListingStatistics();
@@ -50,12 +55,18 @@ const Header = () => {
             if (categoriesMenuRef.current && !categoriesMenuRef.current.contains(event.target)) {
                 setCategoriesMenuOpen(false);
             }
+            if (notificationMenuRef.current && !notificationMenuRef.current.contains(event.target)) {
+                setNotificationMenuOpen(false);
+            }
+            if (listingsMenuRef.current && !listingsMenuRef.current.contains(event.target)) {
+                setListingsMenuOpen(false);
+            }
         };
-        if (categoriesMenuOpen) {
+        if (categoriesMenuOpen || notificationMenuOpen || listingsMenuOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [categoriesMenuOpen]);
+    }, [categoriesMenuOpen, notificationMenuOpen, listingsMenuOpen]);
 
     const handleLogout = async () => {
         notification.showConfirmation('Sign Out', 'Are you sure you want to exit your session?', async () => {
@@ -69,8 +80,8 @@ const Header = () => {
             to={to}
             className={`text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full ${
                 primary
-                    ? "bg-button-primary-bg text-button-primary-text hover:bg-button-primary-hover shadow-sm"
-                    : "text-text-secondary hover:text-text-primary hover:bg-secondary-50"
+                    ? "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
             }`}
         >
             {children}
@@ -82,13 +93,13 @@ const Header = () => {
             to={to}
             onClick={onClick}
             title={title}
-            className="group relative p-2 text-text-tertiary hover:text-text-primary transition-all duration-200"
+            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-lg hover:bg-gray-100"
         >
-            <Icon className="w-[21px] h-[21px] stroke-[1.5px]" />
+            <Icon className="w-[20px] h-[20px] stroke-[1.5px]" />
             {badge > 0 && (
-                <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-indigo-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-indigo-500"></span>
+                <span className="absolute top-1 right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                 </span>
             )}
         </Link>
@@ -96,18 +107,18 @@ const Header = () => {
 
     return (
         <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-            scrolled ? "bg-background-primary/80 backdrop-blur-md border-b border-border-light/60 py-2" : "bg-background-primary border-b border-transparent py-4"
+            scrolled ? "bg-white/95 backdrop-blur-xl border-b border-gray-200/60 py-2 shadow-sm" : "bg-white/90 backdrop-blur-xl border-b border-gray-200/40 py-4"
         }`}>
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
                 <div className="flex items-center justify-between gap-8">
 
                     {/* Brand Logo */}
                     <Link to={ROUTES.HOME} className="flex items-center gap-2.5 group flex-shrink-0">
-                        <div className="w-9 h-9 bg-button-primary-bg rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
-                            <ShoppingBag className="w-5 h-5 text-text-inverse stroke-[2.5px]" />
+                        <div className="w-9 h-9 bg-gray-900 rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
+                            <ShoppingBag className="w-5 h-5 text-white stroke-[2.5px]" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-text-primary">
-                            SH<span className="text-accent-indigo-600">.</span>
+                        <span className="text-xl font-bold tracking-tight text-gray-900">
+                            SH<span className="text-gray-500">.</span>
                         </span>
                     </Link>
 
@@ -116,14 +127,14 @@ const Header = () => {
                         <nav className="hidden lg:flex items-center gap-1">
                             <NavLink to={ROUTES.LISTINGS}>Marketplace</NavLink>
                             <NavLink to={ROUTES.CREATE_LISTING}>Sell Item</NavLink>
-                            <div className="h-4 w-[1px] bg-border-light mx-2" />
+                            <div className="h-4 w-[1px] bg-gray-300 mx-2" />
                             <div className="relative" ref={categoriesMenuRef}>
                                 <button 
                                     onClick={() => setCategoriesMenuOpen(!categoriesMenuOpen)}
-                                    className={`text-sm font-medium px-3 py-2 flex items-center gap-1 transition-colors ${
+                                    className={`text-sm font-medium px-3 py-2 flex items-center gap-1 transition-colors rounded-full ${
                                         categoriesMenuOpen 
-                                            ? 'text-text-primary' 
-                                            : 'text-text-secondary hover:text-text-primary'
+                                            ? 'text-gray-900 bg-gray-100' 
+                                            : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                                     }`}
                                 >
                                     Categories 
@@ -131,7 +142,7 @@ const Header = () => {
                                 </button>
                                 
                                 {categoriesMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-64 bg-background-primary rounded-xl shadow-lg border border-border-light py-2 z-50 max-h-[500px] overflow-y-auto">
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 max-h-[500px] overflow-y-auto">
                                         {enums?.listingTypes?.map((category) => {
                                             const count = countsByCategory[category.value] ?? 0;
                                             const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
@@ -141,17 +152,17 @@ const Header = () => {
                                                     to={ROUTES.LISTINGS}
                                                     state={{ listingType: category.value }}
                                                     onClick={() => setCategoriesMenuOpen(false)}
-                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-secondary-50 transition-colors group"
+                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors group"
                                                 >
                                                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                        <div className="w-8 h-8 rounded-lg bg-secondary-100 flex items-center justify-center flex-shrink-0 group-hover:bg-secondary-200 transition-colors">
+                                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 transition-colors">
                                                             <span className="text-base">{iconText}</span>
                                                         </div>
-                                                        <span className="text-sm font-medium text-text-primary truncate">
+                                                        <span className="text-sm font-medium text-gray-900 truncate">
                                                             {getListingTypeLabel(category.value, enums?.listingTypes) || category.label || category.value}
                                                         </span>
                                                     </div>
-                                                    <span className="text-xs font-medium text-text-tertiary ml-3 flex-shrink-0">
+                                                    <span className="text-xs font-medium text-gray-500 ml-3 flex-shrink-0">
                                                         {count}
                                                     </span>
                                                 </Link>
@@ -167,57 +178,148 @@ const Header = () => {
                     {isAuthenticated && (
                         <div className="hidden md:block flex-1 max-w-md">
                             <div className="relative group">
-                                <UnifiedSearchBar className="w-full bg-secondary-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500/20 transition-all" />
+                                <UnifiedSearchBar className="w-full bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400/30 transition-all text-gray-900 placeholder:text-gray-500" />
                             </div>
                         </div>
                     )}
 
                     {/* Actions Area */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         {isAuthenticated ? (
                             <>
-                                <div className="flex items-center gap-0.5 mr-2">
-                                    <IconButton to={ROUTES.CHAT} icon={MessageSquare} badge={totalUnread} title="Messages" />
-                                    <IconButton to={ROUTES.EMAILS} icon={Mail} badge={unreadEmailCount} title="Inquiries" />
-                                    <IconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />
-                                    <IconButton to={ROUTES.MY_ORDERS} icon={Receipt} title="My Orders" />
+                                <div className="flex items-center gap-1 mr-2">
+                                    <div className="relative" ref={notificationMenuRef}>
+                                        <button
+                                            onClick={() => setNotificationMenuOpen(!notificationMenuOpen)}
+                                            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-lg hover:bg-gray-100"
+                                            title="Notifications"
+                                        >
+                                            <Bell className="w-[20px] h-[20px] stroke-[1.5px]" />
+                                            {(totalUnread > 0 || unreadEmailCount > 0) && (
+                                                <span className="absolute top-1 right-1 flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                                </span>
+                                            )}
+                                        </button>
+                                        
+                                        {notificationMenuOpen && (
+                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50">
+                                                <Link
+                                                    to={ROUTES.EMAILS}
+                                                    onClick={() => setNotificationMenuOpen(false)}
+                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
+                                                >
+                                                    <Mail className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                                                    <span className="text-sm font-medium text-gray-900">Mails</span>
+                                                    {unreadEmailCount > 0 && (
+                                                        <span className="ml-auto text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                                                            {unreadEmailCount}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                                <Link
+                                                    to={ROUTES.CHAT}
+                                                    onClick={() => setNotificationMenuOpen(false)}
+                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
+                                                >
+                                                    <MessageSquare className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                                                    <span className="text-sm font-medium text-gray-900">Chats</span>
+                                                    {totalUnread > 0 && (
+                                                        <span className="ml-auto text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                                                            {totalUnread}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="h-6 w-[1px] bg-gray-300 mx-1" />
+                                    
                                     <IconButton to={ROUTES.FAVORITES} icon={Heart} title="Favorites" />
-                                    <IconButton to={ROUTES.MY_LISTINGS} icon={Package} title="My Listings" />
+                                    <IconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />
+                                    <IconButton to={ROUTES.PAYMENTS} icon={Receipt} title="Payment History" />
+                                    
+                                    <div className="relative" ref={listingsMenuRef}>
+                                        <button
+                                            onClick={() => setListingsMenuOpen(!listingsMenuOpen)}
+                                            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-lg hover:bg-gray-100"
+                                            title="Listings & Orders"
+                                        >
+                                            <Package className="w-[20px] h-[20px] stroke-[1.5px]" />
+                                        </button>
+                                        
+                                        {listingsMenuOpen && (
+                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50">
+                                                <Link
+                                                    to={ROUTES.MY_ORDERS}
+                                                    onClick={() => setListingsMenuOpen(false)}
+                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
+                                                >
+                                                    <Receipt className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                                                    <span className="text-sm font-medium text-gray-900">My Orders</span>
+                                                </Link>
+                                                <Link
+                                                    to={ROUTES.MY_LISTINGS}
+                                                    onClick={() => setListingsMenuOpen(false)}
+                                                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors group"
+                                                >
+                                                    <Package className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                                                    <span className="text-sm font-medium text-gray-900">My Listings</span>
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="h-8 w-[1px] bg-border-light mx-2 hidden sm:block" />
+                                <div className="h-8 w-[1px] bg-gray-300 mx-2 hidden sm:block" />
 
                                 <DropdownMenu
+                                    align="right"
                                     trigger={
                                         <button className="flex items-center gap-2 pl-2 group">
-                                            <div className="w-9 h-9 rounded-full bg-secondary-100 border border-border-light flex items-center justify-center overflow-hidden group-hover:border-primary-300 transition-colors">
+                                            <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden group-hover:border-gray-300 transition-colors">
                                                 {user?.avatar ? (
                                                     <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <User className="w-5 h-5 text-text-tertiary" />
+                                                    <User className="w-5 h-5 text-gray-600" />
                                                 )}
                                             </div>
-                                            <ChevronDown className="w-4 h-4 text-text-muted group-hover:text-text-secondary transition-colors" />
+                                            <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
                                         </button>
                                     }
+                                    menuClassName="bg-white border-gray-200"
                                 >
-                                    <div className="px-4 py-3 border-b border-border-light">
-                                        <p className="text-xs font-medium text-text-muted uppercase tracking-wider">Account</p>
-                                        <p className="text-sm font-semibold text-text-primary truncate">{user?.name || 'User'}</p>
+                                    <div className="px-4 py-3 border-b border-gray-200">
+                                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Account</p>
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'User'}</p>
                                     </div>
-                                    <DropdownItem to={ROUTES.DASHBOARD} icon={<Settings className="w-4 h-4" />}>Dashboard</DropdownItem>
-                                    <DropdownItem to={ROUTES.MY_LISTINGS} icon={<Package className="w-4 h-4" />}>Inventory</DropdownItem>
+                                    <Link
+                                        to={ROUTES.DASHBOARD}
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                                    >
+                                        <Settings className="w-4 h-4 mr-3" />
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        to={ROUTES.MY_LISTINGS}
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                                    >
+                                        <Package className="w-4 h-4 mr-3" />
+                                        Inventory
+                                    </Link>
                                     <DropdownDivider />
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                     >
                                         <LogOut className="w-4 h-4" /> Sign Out
                                     </button>
                                 </DropdownMenu>
 
                                 <button
-                                    className="lg:hidden p-2 ml-2 text-slate-600"
+                                    className="lg:hidden p-2 ml-2 text-gray-600 hover:text-gray-900"
                                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                                 >
                                     {mobileMenuOpen ? <X /> : <Menu />}
@@ -225,10 +327,10 @@ const Header = () => {
                             </>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-text-secondary hover:text-text-primary px-4">
+                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-gray-700 hover:text-gray-900 px-4">
                                     Sign In
                                 </Link>
-                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-button-primary-bg text-button-primary-text px-5 py-2.5 rounded-full hover:bg-button-primary-hover transition-all shadow-sm">
+                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-gray-900 text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-all shadow-sm">
                                     Join Now
                                 </Link>
                             </div>

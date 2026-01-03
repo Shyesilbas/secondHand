@@ -177,11 +177,59 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
     const getBrowserInfo = (userAgent) => {
         if (!userAgent) return 'Unknown Browser';
         
-        if (userAgent.includes('Chrome')) return 'Chrome';
-        if (userAgent.includes('Firefox')) return 'Firefox';
-        if (userAgent.includes('Safari')) return 'Safari';
-        if (userAgent.includes('Edge')) return 'Edge';
-        return 'Unknown Browser';
+        let browser = 'Unknown';
+        let browserVersion = '';
+        let device = 'Unknown';
+        let os = 'Unknown';
+        
+        if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) {
+            browser = 'Chrome';
+            const match = userAgent.match(/Chrome\/([\d.]+)/);
+            if (match) browserVersion = match[1];
+        } else if (userAgent.includes('Firefox')) {
+            browser = 'Firefox';
+            const match = userAgent.match(/Firefox\/([\d.]+)/);
+            if (match) browserVersion = match[1];
+        } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+            browser = 'Safari';
+            const match = userAgent.match(/Version\/([\d.]+)/);
+            if (match) browserVersion = match[1];
+        } else if (userAgent.includes('Edg')) {
+            browser = 'Edge';
+            const match = userAgent.match(/Edg\/([\d.]+)/);
+            if (match) browserVersion = match[1];
+        }
+        
+        if (userAgent.includes('Macintosh')) {
+            device = 'Mac';
+            const match = userAgent.match(/Mac OS X ([\d_]+)/);
+            if (match) os = `macOS ${match[1].replace(/_/g, '.')}`;
+        } else if (userAgent.includes('Windows')) {
+            device = 'Windows';
+            if (userAgent.includes('Windows NT 10.0')) os = 'Windows 10/11';
+            else if (userAgent.includes('Windows NT 6.3')) os = 'Windows 8.1';
+            else if (userAgent.includes('Windows NT 6.2')) os = 'Windows 8';
+            else if (userAgent.includes('Windows NT 6.1')) os = 'Windows 7';
+            else os = 'Windows';
+        } else if (userAgent.includes('Linux')) {
+            device = 'Linux';
+            os = 'Linux';
+        } else if (userAgent.includes('iPhone')) {
+            device = 'iPhone';
+            const match = userAgent.match(/OS ([\d_]+)/);
+            if (match) os = `iOS ${match[1].replace(/_/g, '.')}`;
+        } else if (userAgent.includes('iPad')) {
+            device = 'iPad';
+            const match = userAgent.match(/OS ([\d_]+)/);
+            if (match) os = `iPadOS ${match[1].replace(/_/g, '.')}`;
+        } else if (userAgent.includes('Android')) {
+            device = 'Android';
+            const match = userAgent.match(/Android ([\d.]+)/);
+            if (match) os = `Android ${match[1]}`;
+        }
+        
+        const browserText = browserVersion ? `${browser} ${browserVersion}` : browser;
+        return `${device} • ${browserText}`;
     };
 
     const getLocationFromIP = (ipAddress) => {

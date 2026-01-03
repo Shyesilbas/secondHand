@@ -11,6 +11,7 @@ const DropdownMenu = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const menuRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -19,11 +20,22 @@ const DropdownMenu = ({
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            if (menuRef.current && align === 'right') {
+                const rect = menuRef.current.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                if (rect.right > viewportWidth) {
+                    menuRef.current.style.right = '0';
+                    menuRef.current.style.left = 'auto';
+                }
+            }
+        }
+        
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [isOpen, align]);
 
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
@@ -46,7 +58,11 @@ const DropdownMenu = ({
 
             {isOpen && (
                 <div
-                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-background-primary rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName}`}
+                    ref={menuRef}
+                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-background-primary rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName || ''}`}
+                    style={{
+                        maxWidth: 'min(100vw - 2rem, 14rem)'
+                    }}
                 >
                     {children}
                 </div>
@@ -83,5 +99,9 @@ const DropdownDivider = () => (
     <div className="border-t border-sidebar-border my-1" />
 );
 
-export { DropdownMenu, DropdownItem, DropdownDivider };
+const DropdownDividerWhite = () => (
+    <div className="border-t border-white/10 my-1" />
+);
+
+export { DropdownMenu, DropdownItem, DropdownDivider, DropdownDividerWhite };
 export default DropdownMenu;

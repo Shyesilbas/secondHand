@@ -2,44 +2,43 @@ import React from 'react';
 import { ShieldCheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 const SecuritySummary = ({ totalElements, auditLogs }) => {
+    const successfulLogins = auditLogs.filter(log => log.eventType === 'LOGIN_SUCCESS').length;
+    const failedAttempts = auditLogs.filter(log => log.eventType === 'LOGIN_FAILURE').length;
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                        <ShieldCheckIcon className="w-6 h-6 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Total Events</p>
+                        <p className="text-3xl font-bold text-gray-900">{totalElements}</p>
                     </div>
-                    <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Total Events</p>
-                        <p className="text-2xl font-bold text-gray-900">{totalElements}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                        <ShieldCheckIcon className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Successful Logins</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {auditLogs.filter(log => log.eventType === 'LOGIN_SUCCESS').length}
-                        </p>
+                    <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+                        <ShieldCheckIcon className="w-6 h-6 text-white" />
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="flex items-center">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                        <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Successful Logins</p>
+                        <p className="text-3xl font-bold text-gray-900">{successfulLogins}</p>
                     </div>
-                    <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Failed Attempts</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                            {auditLogs.filter(log => log.eventType === 'LOGIN_FAILURE').length}
-                        </p>
+                    <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center">
+                        <ShieldCheckIcon className="w-6 h-6 text-white" />
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">Failed Attempts</p>
+                        <p className="text-3xl font-bold text-gray-900">{failedAttempts}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+                        <ExclamationTriangleIcon className="w-6 h-6 text-white" />
                     </div>
                 </div>
             </div>

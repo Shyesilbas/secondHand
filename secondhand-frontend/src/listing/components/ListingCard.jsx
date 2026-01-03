@@ -47,7 +47,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
 
     return (
         <div className="group bg-background-primary rounded-md border border-border-light shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative">
-            <div className="aspect-square bg-secondary-50 relative border-b border-border-light rounded-t-md">
+            <div className="aspect-[4/3] bg-secondary-50 relative border-b border-border-light rounded-t-md">
                 <div className="absolute inset-0 overflow-hidden rounded-t-md">
                     {listing.imageUrl ? (
                         <img 
