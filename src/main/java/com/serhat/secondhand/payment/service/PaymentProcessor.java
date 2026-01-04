@@ -37,6 +37,18 @@ public class PaymentProcessor {
     @Transactional
     public PaymentDto process(PaymentRequest paymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
+        
+        if (paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank()) {
+            Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUser(
+                    paymentRequest.idempotencyKey(), fromUser)
+                    .orElse(null);
+            
+            if (existingPayment != null) {
+                validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
+                return paymentMapper.toDto(existingPayment);
+            }
+        }
+        
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
         paymentValidator.validatePaymentAgreements(paymentRequest);
@@ -59,5 +71,17 @@ public class PaymentProcessor {
         }
 
         return paymentMapper.toDto(payment);
+    }
+    
+    private void validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, User fromUser) {
+        boolean amountMatches = existingPayment.getAmount().compareTo(paymentRequest.amount()) == 0;
+        boolean listingMatches = (existingPayment.getListingId() == null && paymentRequest.listingId() == null) ||
+                (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
+        boolean paymentTypeMatches = existingPayment.getPaymentType() == paymentRequest.paymentType();
+        boolean fromUserMatches = existingPayment.getFromUser().getId().equals(fromUser.getId());
+        
+        if (!amountMatches || !listingMatches || !paymentTypeMatches || !fromUserMatches) {
+            throw new BusinessException(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT);
+        }
     }
 }

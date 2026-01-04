@@ -10,6 +10,7 @@ public record ListingFeePaymentRequest(
         UUID listingId,
         String verificationCode,
         boolean agreementsAccepted,
-        List<UUID> acceptedAgreementIds
+        List<UUID> acceptedAgreementIds,
+        String idempotencyKey
 ) {
 }

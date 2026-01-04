@@ -57,6 +57,7 @@ export const API_ENDPOINTS = {
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
         REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,                                // POST - Refund order
         COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,                             // PUT - Complete order
+        UPDATE_ORDER_NAME: (id) => `/v1/orders/${id}/name`,                             // PUT - Update order name
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard

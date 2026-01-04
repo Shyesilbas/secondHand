@@ -233,6 +233,8 @@ const CheckoutPage = () => {
                             setPaymentVerificationCode={checkout.setPaymentVerificationCode}
                             notes={checkout.notes}
                             setNotes={checkout.setNotes}
+                            orderName={checkout.orderName}
+                            setOrderName={checkout.setOrderName}
                             emails={checkout.emails}
                             isEmailsLoading={checkout.isEmailsLoading}
                             fetchEmails={checkout.fetchEmails}

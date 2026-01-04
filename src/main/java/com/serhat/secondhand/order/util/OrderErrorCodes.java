@@ -17,7 +17,8 @@ public enum OrderErrorCodes implements ErrorCode {
     ORDER_ALREADY_COMPLETED("ORDER_ALREADY_COMPLETED", "Order is already completed", HttpStatus.BAD_REQUEST),
     ORDER_ITEM_ALREADY_CANCELLED("ORDER_ITEM_ALREADY_CANCELLED", "Order item is already cancelled", HttpStatus.BAD_REQUEST),
     ORDER_ITEM_ALREADY_REFUNDED("ORDER_ITEM_ALREADY_REFUNDED", "Order item is already refunded", HttpStatus.BAD_REQUEST),
-    REFUND_TIME_EXPIRED("REFUND_TIME_EXPIRED", "Refund time has expired (48 hours passed)", HttpStatus.BAD_REQUEST);
+    REFUND_TIME_EXPIRED("REFUND_TIME_EXPIRED", "Refund time has expired (48 hours passed)", HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_NAME("INVALID_ORDER_NAME", "Order name must be 100 characters or less", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

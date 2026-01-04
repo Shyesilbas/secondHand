@@ -41,7 +41,7 @@ public class OrderPaymentService {
         log.info("Processing payments for order: {}", order.getOrderNumber());
 
         try {
-            List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing);
+            List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing, order);
             List<PaymentDto> paymentResults = processBatchPayments(paymentRequests);
                         
             boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
@@ -60,8 +60,8 @@ public class OrderPaymentService {
         }
     }
 
-    private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
-        List<PaymentRequest> paymentRequests = orderPaymentMapper.buildPaymentRequests(user, cartItems, request, pricing, paymentRequestMapper);
+    private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing, Order order) {
+        List<PaymentRequest> paymentRequests = orderPaymentMapper.buildPaymentRequests(user, cartItems, request, pricing, paymentRequestMapper, order.getOrderNumber());
         log.debug("Created {} payment requests for order", paymentRequests.size());
         return paymentRequests;
     }

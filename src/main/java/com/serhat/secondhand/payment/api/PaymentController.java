@@ -33,10 +33,36 @@ public class PaymentController {
     private final PaymentVerificationService paymentVerificationService;
 
     @PostMapping("/pay")
-    public ResponseEntity<PaymentDto> createPayment(@RequestBody PaymentRequest paymentRequest, Authentication authentication) {
+    public ResponseEntity<PaymentDto> createPayment(
+            @RequestBody PaymentRequest paymentRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            Authentication authentication) {
         log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
-        PaymentDto paymentDto = paymentProcessor.process(paymentRequest, authentication);
+        PaymentRequest requestWithKey = mergeIdempotencyKey(paymentRequest, idempotencyKey);
+        PaymentDto paymentDto = paymentProcessor.process(requestWithKey, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
+    }
+    
+    private PaymentRequest mergeIdempotencyKey(PaymentRequest paymentRequest, String idempotencyKey) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank() && 
+            (paymentRequest.idempotencyKey() == null || paymentRequest.idempotencyKey().isBlank())) {
+            return PaymentRequest.builder()
+                    .fromUserId(paymentRequest.fromUserId())
+                    .toUserId(paymentRequest.toUserId())
+                    .receiverName(paymentRequest.receiverName())
+                    .receiverSurname(paymentRequest.receiverSurname())
+                    .listingId(paymentRequest.listingId())
+                    .amount(paymentRequest.amount())
+                    .paymentType(paymentRequest.paymentType())
+                    .transactionType(paymentRequest.transactionType())
+                    .paymentDirection(paymentRequest.paymentDirection())
+                    .verificationCode(paymentRequest.verificationCode())
+                    .agreementsAccepted(paymentRequest.agreementsAccepted())
+                    .acceptedAgreementIds(paymentRequest.acceptedAgreementIds())
+                    .idempotencyKey(idempotencyKey)
+                    .build();
+        }
+        return paymentRequest;
     }
 
     @PostMapping("/initiate-verification")
@@ -56,10 +82,27 @@ public class PaymentController {
     @PostMapping("/listings/pay-fee")
     public ResponseEntity<PaymentDto> payListingCreationFee(
             @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             Authentication authentication) {
         log.info("Processing listing fee payment for listing {} by user {}", listingFeePaymentRequest.listingId(), authentication.getName());
-        PaymentDto paymentDto = listingFeeService.payListingCreationFee(listingFeePaymentRequest, authentication);
+        ListingFeePaymentRequest requestWithKey = mergeIdempotencyKeyForListingFee(listingFeePaymentRequest, idempotencyKey);
+        PaymentDto paymentDto = listingFeeService.payListingCreationFee(requestWithKey, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
+    }
+    
+    private ListingFeePaymentRequest mergeIdempotencyKeyForListingFee(ListingFeePaymentRequest request, String idempotencyKey) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank() && 
+            (request.idempotencyKey() == null || request.idempotencyKey().isBlank())) {
+            return new ListingFeePaymentRequest(
+                    request.paymentType(),
+                    request.listingId(),
+                    request.verificationCode(),
+                    request.agreementsAccepted(),
+                    request.acceptedAgreementIds(),
+                    idempotencyKey
+            );
+        }
+        return request;
     }
 
 

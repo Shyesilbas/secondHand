@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "payment", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "idempotencyKey")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -54,6 +56,7 @@ public class Payment {
     @JoinColumn(name = "to_user_id", nullable = true)
     private User toUser;
 
-
+    @Column(name = "idempotency_key", unique = true, nullable = true, length = 255)
+    private String idempotencyKey;
 
 }

@@ -52,7 +52,7 @@ public class OrderCreationService {
         String couponCode = pricing != null ? pricing.getCouponCode() : null;
         String orderNumber = generateOrderNumber();
         
-        Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes());
+        Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes(), request.getName());
         order.setSubtotal(subtotal);
         order.setCampaignDiscount(campaignDiscount);
         order.setCouponCode(couponCode);
@@ -161,9 +161,10 @@ public class OrderCreationService {
     }
 
         private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
-                           BigDecimal totalAmount, String orderNumber, String notes) {
+                           BigDecimal totalAmount, String orderNumber, String notes, String name) {
         return Order.builder()
                 .orderNumber(orderNumber)
+                .name(name)
                 .user(user)
                 .status(Order.OrderStatus.PENDING)
                 .totalAmount(totalAmount)

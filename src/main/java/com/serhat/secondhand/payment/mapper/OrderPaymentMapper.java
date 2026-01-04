@@ -17,8 +17,8 @@ public class OrderPaymentMapper {
 
     public List<PaymentRequest> buildPaymentRequests(User user, List<Cart> cartItems, 
                                                     CheckoutRequest request, PricingResultDto pricing,
-                                                    PaymentRequestMapper paymentRequestMapper) {
-        return paymentRequestMapper.buildOrderPaymentRequests(user, cartItems, request, pricing);
+                                                    PaymentRequestMapper paymentRequestMapper, String orderNumber) {
+        return paymentRequestMapper.buildOrderPaymentRequests(user, cartItems, request, pricing, orderNumber);
     }
 
     public void updateOrderPaymentStatus(Order order, List<PaymentDto> paymentResults, 

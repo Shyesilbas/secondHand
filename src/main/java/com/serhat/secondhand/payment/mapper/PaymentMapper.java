@@ -37,6 +37,7 @@ public interface PaymentMapper {
                 .listingId(paymentRequest.listingId())
                 .processedAt(result.processedAt())
                 .isSuccess(result.success())
+                .idempotencyKey(paymentRequest.idempotencyKey())
                 .build();
     }
 }

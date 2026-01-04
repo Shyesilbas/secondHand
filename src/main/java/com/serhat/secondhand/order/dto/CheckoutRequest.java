@@ -21,6 +21,7 @@ public class CheckoutRequest {
 
     private Long billingAddressId; 
     private String notes;
+    private String name;
 
     private PaymentType paymentType;
     private String paymentVerificationCode;

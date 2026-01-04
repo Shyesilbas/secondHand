@@ -26,6 +26,8 @@ const CheckoutStep = ({
     setPaymentVerificationCode,
     notes,
     setNotes,
+    orderName,
+    setOrderName,
     emails,
     isEmailsLoading,
     fetchEmails,
@@ -60,6 +62,8 @@ const CheckoutStep = ({
                         setSelectedBillingAddressId={setSelectedBillingAddressId}
                         notes={notes}
                         setNotes={setNotes}
+                        orderName={orderName}
+                        setOrderName={setOrderName}
                         onNext={onNext}
                         onBack={onBack}
                     />

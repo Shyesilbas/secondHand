@@ -30,6 +30,9 @@ export const orderService = {
   completeOrder: async (id) => {
     return put(API_ENDPOINTS.ORDERS.COMPLETE_ORDER(id));
   },
+  updateOrderName: async (id, name) => {
+    return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NAME(id), { name });
+  },
 };
 
 
