@@ -121,11 +121,13 @@ public class OrderRefundService {
         boolean allItemsRefunded = areAllItemsRefunded(order);
         if (allItemsRefunded) {
             order.setStatus(Order.OrderStatus.REFUNDED);
+            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+        } else {
+            order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
         }
         if (order.getShipping() != null && order.getShipping().getStatus() != com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED) {
             order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED);
         }
-        order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
 
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();

@@ -176,6 +176,40 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
         setIsEditingName(false)
     }
 
+    const handleCancelOrder = async (payload) => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+        try {
+            await orderService.cancelOrder(selectedOrder.id, payload);
+            notification.showSuccess('Success', 'Order cancelled successfully');
+            if (onReviewSuccess) {
+                onReviewSuccess();
+            }
+        } catch (error) {
+            notification.showError('Error', error?.response?.data?.message || 'Failed to cancel order');
+            throw error;
+        } finally {
+            setIsProcessing(false);
+        }
+    }
+
+    const handleRefundOrder = async (payload) => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+        try {
+            await orderService.refundOrder(selectedOrder.id, payload);
+            notification.showSuccess('Success', 'Refund requested successfully');
+            if (onReviewSuccess) {
+                onReviewSuccess();
+            }
+        } catch (error) {
+            notification.showError('Error', error?.response?.data?.message || 'Failed to request refund');
+            throw error;
+        } finally {
+            setIsProcessing(false);
+        }
+    }
+
     if (!isOpen || !selectedOrder) return null
 
     return (
@@ -265,7 +299,25 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                 )}
                                 {selectedOrder.status === 'DELIVERED' && (
                                     <>
-                                        <button onClick={() => {}} className="flex items-center gap-2 px-8 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-lg shadow-slate-200">
+                                        <button 
+                                            onClick={async () => {
+                                                if (isProcessing) return;
+                                                setIsProcessing(true);
+                                                try {
+                                                    await orderService.completeOrder(selectedOrder.id);
+                                                    notification.showSuccess('Success', 'Order completed successfully');
+                                                    if (onReviewSuccess) {
+                                                        onReviewSuccess();
+                                                    }
+                                                } catch (error) {
+                                                    notification.showError('Error', error?.response?.data?.message || 'Failed to complete order');
+                                                } finally {
+                                                    setIsProcessing(false);
+                                                }
+                                            }}
+                                            disabled={isProcessing}
+                                            className="flex items-center gap-2 px-8 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-lg shadow-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
                                             <CheckCircle className="w-4 h-4" /> Approve & Complete
                                         </button>
                                         <button onClick={() => setRefundModalOpen(true)} className="flex items-center gap-2 px-6 py-3 text-sm font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all">
@@ -289,27 +341,71 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                         <span className="text-xs text-slate-400 font-normal">{selectedOrder.orderItems?.length} items</span>
                                     </div>
                                     <div className="divide-y divide-slate-50">
-                                        {selectedOrder.orderItems?.map((item, idx) => (
-                                            <div key={idx} className="py-5 first:pt-0 last:pb-0 flex gap-4">
-                                                <div className="w-20 h-20 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 flex-shrink-0">
-                                                    <img src={item.listing?.imageUrl} className="w-full h-full object-cover" />
+                                        {selectedOrder.orderItems?.map((item, idx) => {
+                                            const isCancelled = item.cancelledQuantity && item.cancelledQuantity > 0;
+                                            const isRefunded = item.refundedQuantity && item.refundedQuantity > 0;
+                                            const isFullyCancelled = isCancelled && item.cancelledQuantity >= item.quantity;
+                                            const isFullyRefunded = isRefunded && item.refundedQuantity >= item.quantity;
+                                            const isPartiallyCancelled = isCancelled && item.cancelledQuantity < item.quantity;
+                                            const isPartiallyRefunded = isRefunded && item.refundedQuantity < item.quantity;
+                                            
+                                            return (
+                                                <div key={idx} className={`py-5 first:pt-0 last:pb-0 flex gap-4 ${isFullyCancelled || isFullyRefunded ? 'opacity-60' : ''}`}>
+                                                    <div className="w-20 h-20 bg-slate-50 rounded-xl overflow-hidden border border-slate-100 flex-shrink-0 relative">
+                                                        <img src={item.listing?.imageUrl} className="w-full h-full object-cover" />
+                                                        {(isFullyCancelled || isFullyRefunded) && (
+                                                            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
+                                                                <X className="w-6 h-6 text-white" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <h4 className="text-sm font-semibold text-slate-900 line-clamp-1">{item.listing?.title}</h4>
+                                                            {isFullyCancelled && (
+                                                                <span className="px-2 py-0.5 text-[10px] font-semibold text-rose-600 bg-rose-50 rounded-md border border-rose-200">
+                                                                    Cancelled
+                                                                </span>
+                                                            )}
+                                                            {isFullyRefunded && (
+                                                                <span className="px-2 py-0.5 text-[10px] font-semibold text-amber-600 bg-amber-50 rounded-md border border-amber-200">
+                                                                    Refunded
+                                                                </span>
+                                                            )}
+                                                            {isPartiallyCancelled && (
+                                                                <span className="px-2 py-0.5 text-[10px] font-semibold text-rose-600 bg-rose-50 rounded-md border border-rose-200">
+                                                                    Partially Cancelled
+                                                                </span>
+                                                            )}
+                                                            {isPartiallyRefunded && (
+                                                                <span className="px-2 py-0.5 text-[10px] font-semibold text-amber-600 bg-amber-50 rounded-md border border-amber-200">
+                                                                    Partially Refunded
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-slate-500 mt-1 font-normal">
+                                                            Qty: {item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}
+                                                            {isCancelled && (
+                                                                <span className="ml-2 text-rose-600">({item.cancelledQuantity} cancelled)</span>
+                                                            )}
+                                                            {isRefunded && (
+                                                                <span className="ml-2 text-amber-600">({item.refundedQuantity} refunded)</span>
+                                                            )}
+                                                        </p>
+                                                        {item.campaignName && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-600 font-semibold rounded-md">PROMO: {item.campaignName}</span>}
+                                                    </div>
+                                                    <div className="text-right flex flex-col justify-between items-end">
+                                                        <span className="text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</span>
+                                                        <ReviewButton
+                                                            orderItem={item}
+                                                            existingReview={orderReviews[item.id]}
+                                                            onReviewCreated={onReviewSuccess}
+                                                            orderStatus={selectedOrder.status}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h4 className="text-sm font-semibold text-slate-900 line-clamp-1">{item.listing?.title}</h4>
-                                                    <p className="text-xs text-slate-500 mt-1 font-normal">Qty: {item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}</p>
-                                                    {item.campaignName && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-600 font-semibold rounded-md">PROMO: {item.campaignName}</span>}
-                                                </div>
-                                                <div className="text-right flex flex-col justify-between items-end">
-                                                    <span className="text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</span>
-                                                    <ReviewButton
-                                                        orderItem={item}
-                                                        existingReview={orderReviews[item.id]}
-                                                        onReviewCreated={onReviewSuccess}
-                                                        orderStatus={selectedOrder.status}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
@@ -348,6 +444,26 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                             <div className="space-y-6">
                                 <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl shadow-slate-200">
                                     <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Payment Summary</h3>
+                                    {selectedOrder.paymentStatus && (
+                                        <div className="mb-4 pb-4 border-b border-white/10">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs font-medium text-slate-400">Payment Status</span>
+                                                <span className={`px-2 py-1 text-[10px] font-semibold rounded-md ${
+                                                    selectedOrder.paymentStatus === 'PAID' ? 'bg-emerald-500/20 text-emerald-400' :
+                                                    selectedOrder.paymentStatus === 'PARTIALLY_REFUNDED' ? 'bg-amber-500/20 text-amber-400' :
+                                                    selectedOrder.paymentStatus === 'REFUNDED' ? 'bg-rose-500/20 text-rose-400' :
+                                                    selectedOrder.paymentStatus === 'PENDING' ? 'bg-slate-500/20 text-slate-400' :
+                                                    'bg-red-500/20 text-red-400'
+                                                }`}>
+                                                    {selectedOrder.paymentStatus === 'PARTIALLY_REFUNDED' ? 'Partially Refunded' :
+                                                     selectedOrder.paymentStatus === 'REFUNDED' ? 'Refunded' :
+                                                     selectedOrder.paymentStatus === 'PAID' ? 'Paid' :
+                                                     selectedOrder.paymentStatus === 'PENDING' ? 'Pending' :
+                                                     selectedOrder.paymentStatus}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="space-y-4">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-slate-400">Subtotal</span>
@@ -402,9 +518,8 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                 </div>
             </div>
 
-            {/* Modals remain the same logic */}
-            <CancelRefundModal isOpen={cancelModalOpen} onClose={() => setCancelModalOpen(false)} onSubmit={() => {}} type="cancel" order={selectedOrder} />
-            <CancelRefundModal isOpen={refundModalOpen} onClose={() => setRefundModalOpen(false)} onSubmit={() => {}} type="refund" order={selectedOrder} />
+            <CancelRefundModal isOpen={cancelModalOpen} onClose={() => setCancelModalOpen(false)} onSubmit={handleCancelOrder} type="cancel" order={selectedOrder} />
+            <CancelRefundModal isOpen={refundModalOpen} onClose={() => setRefundModalOpen(false)} onSubmit={handleRefundOrder} type="refund" order={selectedOrder} />
         </div>
     )
 })

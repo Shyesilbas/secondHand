@@ -124,7 +124,7 @@ public class OrderCancellationService {
             }
             order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
         } else {
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+            order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
         }
 
         Order savedOrder = orderRepository.save(order);

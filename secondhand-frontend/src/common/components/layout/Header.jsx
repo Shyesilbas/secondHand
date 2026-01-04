@@ -8,6 +8,7 @@ import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {useEnums} from '../../hooks/useEnums.js';
+import {usePendingCompletionOrders} from '../../../order/hooks/usePendingCompletionOrders.js';
 import {
     Bell,
     ChevronDown,
@@ -43,6 +44,7 @@ const Header = () => {
     const [unreadEmailCount, setUnreadEmailCount] = useState(0);
     const { countsByCategory } = useListingStatistics();
     const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
+    const { hasPendingOrders } = usePendingCompletionOrders();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -213,9 +215,14 @@ const Header = () => {
                                                     <Mail className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
                                                     <span className="text-sm font-medium text-gray-900">Mails</span>
                                                     {unreadEmailCount > 0 && (
-                                                        <span className="ml-auto text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
-                                                            {unreadEmailCount}
-                                                        </span>
+                                                        <>
+                                                            <span className="ml-auto flex items-center gap-1">
+                                                                <span className="flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-red-500 rounded-full">!</span>
+                                                                <span className="text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                                                                    {unreadEmailCount}
+                                                                </span>
+                                                            </span>
+                                                        </>
                                                     )}
                                                 </Link>
                                                 <Link
@@ -226,9 +233,14 @@ const Header = () => {
                                                     <MessageSquare className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
                                                     <span className="text-sm font-medium text-gray-900">Chats</span>
                                                     {totalUnread > 0 && (
-                                                        <span className="ml-auto text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
-                                                            {totalUnread}
-                                                        </span>
+                                                        <>
+                                                            <span className="ml-auto flex items-center gap-1">
+                                                                <span className="flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-red-500 rounded-full">!</span>
+                                                                <span className="text-xs font-semibold text-white bg-red-500 px-2 py-0.5 rounded-full">
+                                                                    {totalUnread}
+                                                                </span>
+                                                            </span>
+                                                        </>
                                                     )}
                                                 </Link>
                                             </div>
@@ -248,6 +260,12 @@ const Header = () => {
                                             title="Listings & Orders"
                                         >
                                             <Package className="w-[20px] h-[20px] stroke-[1.5px]" />
+                                            {hasPendingOrders && (
+                                                <span className="absolute top-1 right-1 flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                                </span>
+                                            )}
                                         </button>
                                         
                                         {listingsMenuOpen && (
@@ -259,6 +277,9 @@ const Header = () => {
                                                 >
                                                     <Receipt className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
                                                     <span className="text-sm font-medium text-gray-900">My Orders</span>
+                                                    {hasPendingOrders && (
+                                                        <span className="flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-red-500 rounded-full">!</span>
+                                                    )}
                                                 </Link>
                                                 <Link
                                                     to={ROUTES.MY_LISTINGS}
