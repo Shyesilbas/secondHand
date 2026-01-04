@@ -4,6 +4,8 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
+import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ public class OrderMapper {
     private final ListingMapper listingMapper;
     private final AddressMapper addressMapper;
     private final ShippingMapper shippingMapper;
+    private final OrderItemCancelRepository orderItemCancelRepository;
+    private final OrderItemRefundRepository orderItemRefundRepository;
 
     public OrderDto toDto(Order order) {
         if (order == null) {
@@ -76,6 +80,9 @@ public class OrderMapper {
             return null;
         }
 
+        Integer cancelledQuantity = orderItemCancelRepository.sumCancelledQuantityByOrderItem(orderItem);
+        Integer refundedQuantity = orderItemRefundRepository.sumRefundedQuantityByOrderItem(orderItem);
+
         return OrderItemDto.builder()
                 .id(orderItem.getId())
                 .orderId(orderItem.getOrder().getId())
@@ -86,6 +93,8 @@ public class OrderMapper {
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())
+                .cancelledQuantity(cancelledQuantity != null && cancelledQuantity > 0 ? cancelledQuantity : null)
+                .refundedQuantity(refundedQuantity != null && refundedQuantity > 0 ? refundedQuantity : null)
                 .build();
     }
 }

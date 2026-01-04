@@ -128,7 +128,8 @@ public class Order {
         PENDING("Pending"),
         PAID("Paid"),
         FAILED("Failed"),
-        REFUNDED("Refunded");
+        REFUNDED("Refunded"),
+        PARTIALLY_REFUNDED("Partially Refunded");
 
         private final String displayName;
 

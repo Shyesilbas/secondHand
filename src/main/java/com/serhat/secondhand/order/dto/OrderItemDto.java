@@ -24,4 +24,6 @@ public class OrderItemDto {
     private String currency;
     private String notes;
     private LocalDateTime createdAt;
+    private Integer cancelledQuantity;
+    private Integer refundedQuantity;
 }

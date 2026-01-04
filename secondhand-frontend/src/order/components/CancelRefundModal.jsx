@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { CANCEL_REFUND_REASONS, CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
 
@@ -8,6 +8,12 @@ const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen && order?.orderItems) {
+      setSelectedItems(order.orderItems.map(item => item.id));
+    }
+  }, [isOpen, order]);
 
   if (!isOpen || !order) return null;
 
@@ -40,14 +46,18 @@ const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
       return;
     }
 
+    if (selectedItems.length === 0) {
+      setError('Please select at least one item');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      const allItemsSelected = selectedItems.length === order.orderItems?.length;
       const payload = {
         reason,
         reasonText: reasonText.trim() || null,
-        orderItemIds: selectedItems.length > 0 && selectedItems.length < order.orderItems?.length 
-          ? selectedItems 
-          : null,
+        orderItemIds: allItemsSelected ? null : selectedItems,
       };
 
       await onSubmit(payload);
@@ -67,7 +77,6 @@ const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
     onClose();
   };
 
-  const hasMultipleItems = order.orderItems && order.orderItems.length > 1;
   const allItemsSelected = selectedItems.length === order.orderItems?.length;
 
   return (
@@ -92,19 +101,21 @@ const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
-          {hasMultipleItems && (
+          {order.orderItems && order.orderItems.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-slate-700">
                   Select Items ({selectedItems.length} of {order.orderItems.length} selected)
                 </label>
-                <button
-                  type="button"
-                  onClick={handleSelectAll}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700"
-                >
-                  {allItemsSelected ? 'Deselect All' : 'Select All'}
-                </button>
+                {order.orderItems.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleSelectAll}
+                    className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    {allItemsSelected ? 'Deselect All' : 'Select All'}
+                  </button>
+                )}
               </div>
               <div className="border border-slate-200 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
                 {order.orderItems.map((item) => (

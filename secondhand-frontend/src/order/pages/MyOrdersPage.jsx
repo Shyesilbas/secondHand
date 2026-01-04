@@ -13,7 +13,7 @@ import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
 import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
 import {getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
-import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle, Pencil, X, Sparkles} from 'lucide-react';
+import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle, Pencil, X, Sparkles, AlertCircle} from 'lucide-react';
 
 const MyOrdersPage = () => {
   const { enums } = useEnums();
@@ -97,7 +97,12 @@ const MyOrdersPage = () => {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-sm font-semibold text-text-primary">My Orders</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm font-semibold text-text-primary">My Orders</h1>
+                {orders.some(order => order.status === 'DELIVERED' && order.status !== 'COMPLETED') && (
+                  <span className="flex items-center justify-center w-4 h-4 text-[10px] font-semibold text-white bg-red-500 rounded-full">!</span>
+                )}
+              </div>
               {orders.length > 0 && (
                 <p className="text-xs text-text-secondary mt-0.5">
                   {pagination?.totalElements || orders.length} total
@@ -252,12 +257,12 @@ const MyOrdersPage = () => {
                           )}
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`px-2 py-0.5 text-[10px] font-medium border rounded ${getStatusColor(order.status)}`}>
+                          <span className={`text-xs font-medium ${getStatusColor(order.status)}`}>
                             {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
                           </span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`px-2 py-0.5 text-[10px] font-medium border rounded ${getStatusColor(order.paymentStatus)}`}>
+                          <span className={`text-xs font-medium ${getStatusColor(order.paymentStatus)}`}>
                             {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
                           </span>
                         </td>
