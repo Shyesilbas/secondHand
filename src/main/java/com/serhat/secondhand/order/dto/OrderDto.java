@@ -20,6 +20,7 @@ public class OrderDto {
 
     private Long id;
     private String orderNumber;
+    private String name;
     private Long userId;
     private Order.OrderStatus status;
     private BigDecimal totalAmount;

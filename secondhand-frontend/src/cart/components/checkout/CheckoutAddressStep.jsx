@@ -8,6 +8,8 @@ const CheckoutAddressStep = ({
     setSelectedBillingAddressId,
     notes,
     setNotes,
+    orderName,
+    setOrderName,
     onNext,
     onBack
 }) => {
@@ -22,6 +24,19 @@ const CheckoutAddressStep = ({
             </div>
 
             <div className="space-y-8">
+                {/* Order Name */}
+                <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Order Name (Optional)</h3>
+                    <input
+                        type="text"
+                        className="w-full p-4 border-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Give your order a name (e.g., Birthday Gift, Office Order)"
+                        value={orderName || ''}
+                        onChange={(e) => setOrderName(e.target.value)}
+                        maxLength={100}
+                    />
+                    <p className="text-sm text-gray-500 mt-2">You can easily identify this order later with a custom name.</p>
+                </div>
                 {/* Shipping Address */}
                 <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Address</h3>

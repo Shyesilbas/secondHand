@@ -7,6 +7,7 @@ import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.order.service.OrderCancellationService;
 import com.serhat.secondhand.order.service.OrderCompletionService;
+import com.serhat.secondhand.order.service.OrderNameService;
 import com.serhat.secondhand.order.service.OrderQueryService;
 import com.serhat.secondhand.order.service.OrderRefundService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -36,6 +37,7 @@ public class OrderController {
     private final OrderCancellationService orderCancellationService;
     private final OrderRefundService orderRefundService;
     private final OrderCompletionService orderCompletionService;
+    private final OrderNameService orderNameService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -145,5 +147,34 @@ public class OrderController {
         log.info("API request to complete order: {} for user: {}", orderId, currentUser.getEmail());
         OrderDto order = orderCompletionService.completeOrder(orderId, currentUser);
         return ResponseEntity.ok(order);
+    }
+
+    @PutMapping("/{orderId}/name")
+    @Operation(summary = "Update order name", description = "Update the name of an order")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order name updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid order name"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    public ResponseEntity<OrderDto> updateOrderName(
+            @PathVariable Long orderId,
+            @RequestBody UpdateOrderNameRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
+        OrderDto order = orderNameService.updateOrderName(orderId, request.getName(), currentUser);
+        return ResponseEntity.ok(order);
+    }
+
+    public static class UpdateOrderNameRequest {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

@@ -12,6 +12,7 @@ public record ShowcasePaymentRequest(
         PaymentType paymentType,
         String verificationCode,
         boolean agreementsAccepted,
-        List<UUID> acceptedAgreementIds
+        List<UUID> acceptedAgreementIds,
+        String idempotencyKey
 ) {
 }

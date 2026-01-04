@@ -33,6 +33,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
     const [notes, setNotes] = useState('');
+    const [orderName, setOrderName] = useState('');
 
     // Payment agreements
     const {
@@ -117,6 +118,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
                 notes: notes?.trim() || null,
+                name: orderName?.trim() || null,
                 paymentType: selectedPaymentType,
                 paymentVerificationCode: paymentVerificationCode?.trim() || null,
                 agreementsAccepted: true,
@@ -204,6 +206,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 shippingAddressId: selectedShippingAddressId,
                 billingAddressId: selectedBillingAddressId,
                 notes: notes?.trim() || null,
+                name: orderName?.trim() || null,
                 paymentType: selectedPaymentType,
                 paymentVerificationCode: paymentVerificationCode?.trim() || null,
                 agreementsAccepted: true,
@@ -260,6 +263,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         setPaymentVerificationCode,
         notes,
         setNotes,
+        orderName,
+        setOrderName,
 
         handleCheckout,
         proceedDisabled,

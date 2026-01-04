@@ -13,12 +13,15 @@ import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
 import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
 import {getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
-import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle} from 'lucide-react';
+import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle, Pencil, X, Sparkles} from 'lucide-react';
 
 const MyOrdersPage = () => {
   const { enums } = useEnums();
   const [sortField, setSortField] = useState(null); // 'createdAt' or 'totalAmount'
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
+  const [editingOrderId, setEditingOrderId] = useState(null);
+  const [editingOrderName, setEditingOrderName] = useState('');
+  const [showNameBanner, setShowNameBanner] = useState(true);
   
   const {
     orders,
@@ -114,6 +117,27 @@ const MyOrdersPage = () => {
             </div>
           </div>
 
+          {showNameBanner && (
+            <div className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Sparkles className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Now you can name your orders!</p>
+                  <p className="text-xs text-blue-700 mt-0.5">Give your orders custom names to easily identify them later. Click the edit icon next to any order name to get started.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowNameBanner(false)}
+                className="p-1 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           <div className="mb-4">
             <OrdersSearch
               searchTerm={searchTerm}
@@ -141,12 +165,12 @@ const MyOrdersPage = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Order</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Status</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Payment</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Items</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Order</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Status</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Payment</th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Items</th>
                     <th 
-                      className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none"
+                      className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none border-r border-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSort('totalAmount');
@@ -160,7 +184,7 @@ const MyOrdersPage = () => {
                       </div>
                     </th>
                     <th 
-                      className="px-4 py-2 text-left text-xs font-semibold text-text-secondary cursor-pointer hover:bg-secondary-100 select-none"
+                      className="px-4 py-2 text-left text-xs font-semibold text-text-secondary cursor-pointer hover:bg-secondary-100 select-none border-r border-gray-200"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSort('createdAt');
@@ -184,15 +208,56 @@ const MyOrdersPage = () => {
                     return (
                       <tr key={order.id} className="hover:bg-secondary-50 cursor-pointer" onClick={() => openOrderModal(order)}>
                         <td className="px-4 py-2.5">
-                          <span className="text-xs font-medium text-text-primary">#{order.orderNumber}</span>
+                          {editingOrderId === order.id ? (
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <input
+                                type="text"
+                                value={editingOrderName}
+                                onChange={(e) => setEditingOrderName(e.target.value)}
+                                className="flex-1 px-2 py-1 text-xs font-medium text-text-primary border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                placeholder="Order name"
+                                maxLength={100}
+                                autoFocus
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <button
+                                onClick={(e) => handleSaveOrderName(order.id, e)}
+                                className="p-1 hover:bg-blue-50 rounded text-blue-600"
+                              >
+                                <CheckCircle className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={handleCancelEditName}
+                                className="p-1 hover:bg-slate-50 rounded text-slate-600"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium text-text-primary">
+                                {order.name || `Order #${order.orderNumber}`}
+                              </span>
+                              {order.name && (
+                                <span className="text-[10px] text-text-secondary">#{order.orderNumber}</span>
+                              )}
+                              <button
+                                onClick={(e) => handleStartEditName(order, e)}
+                                className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 transition-colors"
+                                title="Edit order name"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.status)}`}>
+                          <span className={`px-2 py-0.5 text-[10px] font-medium border rounded ${getStatusColor(order.status)}`}>
                             {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
                           </span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusColor(order.paymentStatus)}`}>
+                          <span className={`px-2 py-0.5 text-[10px] font-medium border rounded ${getStatusColor(order.paymentStatus)}`}>
                             {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
                           </span>
                         </td>

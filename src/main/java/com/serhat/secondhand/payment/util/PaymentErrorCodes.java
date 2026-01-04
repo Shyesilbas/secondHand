@@ -35,7 +35,8 @@ public enum PaymentErrorCodes implements ErrorCode {
     AGREEMENTS_NOT_ACCEPTED("AGREEMENTS_NOT_ACCEPTED", "Payment agreements must be accepted", HttpStatus.BAD_REQUEST),
     INVALID_AGREEMENT_COUNT("INVALID_AGREEMENT_COUNT", "All required agreements must be accepted", HttpStatus.BAD_REQUEST),
     REQUIRED_AGREEMENTS_NOT_ACCEPTED("REQUIRED_AGREEMENTS_NOT_ACCEPTED", "Required payment agreements are not accepted", HttpStatus.BAD_REQUEST),
-    PAYMENT_ERROR("PAYMENT_ERROR","There is a problem with your payment method." , HttpStatus.BAD_REQUEST );
+    PAYMENT_ERROR("PAYMENT_ERROR","There is a problem with your payment method." , HttpStatus.BAD_REQUEST ),
+    IDEMPOTENCY_KEY_CONFLICT("IDEMPOTENCY_KEY_CONFLICT", "Idempotency key conflict: same key used with different payment parameters", HttpStatus.CONFLICT);
 
     private final String code;
     private final String message;

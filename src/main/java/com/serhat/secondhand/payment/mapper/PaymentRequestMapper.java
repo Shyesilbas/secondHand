@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class PaymentRequestMapper {
 
     public List<PaymentRequest> buildOrderPaymentRequests(User user, List<Cart> cartItems, 
-                                                         CheckoutRequest request, PricingResultDto pricing) {
+                                                         CheckoutRequest request, PricingResultDto pricing, String orderNumber) {
         Map<Long, List<Cart>> paymentsBySeller = groupCartItemsBySeller(cartItems);
         
         return paymentsBySeller.entrySet().stream()
@@ -30,13 +30,18 @@ public class PaymentRequestMapper {
                     Long sellerId = entry.getKey();
                     List<Cart> sellerItems = entry.getValue();
                     BigDecimal sellerTotal = resolveSellerTotal(sellerId, sellerItems, pricing);
-                    return buildOrderPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request);
+                    String idempotencyKey = generateIdempotencyKey(orderNumber, sellerId);
+                    return buildOrderPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request, idempotencyKey);
                 })
                 .collect(Collectors.toList());
     }
+    
+    private String generateIdempotencyKey(String orderNumber, Long sellerId) {
+        return orderNumber + "-" + sellerId + "-" + System.currentTimeMillis();
+    }
 
     public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, 
-                                                           BigDecimal sellerTotal, CheckoutRequest request) {
+                                                           BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey) {
         var seller = sellerItems.get(0).getListing().getSeller();
         PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
 
@@ -53,6 +58,7 @@ public class PaymentRequestMapper {
                 .verificationCode(request.getPaymentVerificationCode())
                 .agreementsAccepted(request.isAgreementsAccepted())
                 .acceptedAgreementIds(request.getAcceptedAgreementIds())
+                .idempotencyKey(idempotencyKey)
                 .build();
     }
 
@@ -71,6 +77,7 @@ public class PaymentRequestMapper {
                 .verificationCode(request.verificationCode())
                 .agreementsAccepted(request.agreementsAccepted())
                 .acceptedAgreementIds(request.acceptedAgreementIds())
+                .idempotencyKey(request.idempotencyKey())
                 .build();
     }
 
@@ -89,6 +96,7 @@ public class PaymentRequestMapper {
                 .verificationCode(request.verificationCode())
                 .agreementsAccepted(request.agreementsAccepted())
                 .acceptedAgreementIds(request.acceptedAgreementIds())
+                .idempotencyKey(request.idempotencyKey())
                 .build();
     }
 
@@ -98,7 +106,7 @@ public class PaymentRequestMapper {
                                                      PaymentTransactionType transactionType,
                                                      PaymentDirection paymentDirection,
                                                      String verificationCode, boolean agreementsAccepted,
-                                                     List<java.util.UUID> acceptedAgreementIds) {
+                                                     List<java.util.UUID> acceptedAgreementIds, String idempotencyKey) {
         return PaymentRequest.builder()
                 .fromUserId(fromUserId)
                 .toUserId(toUserId)
@@ -112,6 +120,7 @@ public class PaymentRequestMapper {
                 .verificationCode(verificationCode)
                 .agreementsAccepted(agreementsAccepted)
                 .acceptedAgreementIds(acceptedAgreementIds)
+                .idempotencyKey(idempotencyKey)
                 .build();
     }
 

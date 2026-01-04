@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react'
 import {formatCurrency, formatDateTime} from '../../common/formatters.js'
 import {ReviewButton} from '../../reviews/index.js'
 import {getEstimatedDeliveryTime, getStatusColor} from '../utils/orderUtils.js'
+import {orderService} from '../services/orderService.js'
+import {useNotification} from '../../notification/NotificationContext.jsx'
 import {
     AlertCircle,
     Check,
@@ -14,8 +16,10 @@ import {
     MapPin,
     Package,
     Package2,
+    Pencil,
     Receipt,
     RotateCcw,
+    Tag,
     Timer,
     Truck,
     X
@@ -56,18 +60,18 @@ const DeliveryCountdown = ({ deliveredAt }) => {
                         <Timer className={`w-5 h-5 ${timeRemaining.expired ? "text-slate-600" : "text-indigo-600"}`} />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-slate-900">Confirmation Window</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-sm font-semibold text-slate-900">Confirmation Window</p>
+                        <p className="text-xs text-slate-500 font-normal">
                             {timeRemaining.expired ? "Window closed. Order finalizing..." : "Verify your items before the timer ends"}
                         </p>
                     </div>
                 </div>
                 {!timeRemaining.expired && (
                     <div className="flex gap-2 items-baseline">
-                        <span className="text-xl font-mono font-bold text-indigo-600">{String(timeRemaining.h).padStart(2, '0')}</span>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase">h</span>
-                        <span className="text-xl font-mono font-bold text-indigo-600">{String(timeRemaining.m).padStart(2, '0')}</span>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase">m</span>
+                        <span className="text-xl font-mono font-semibold text-indigo-600">{String(timeRemaining.h).padStart(2, '0')}</span>
+                        <span className="text-[10px] font-semibold text-indigo-400 uppercase">h</span>
+                        <span className="text-xl font-mono font-semibold text-indigo-600">{String(timeRemaining.m).padStart(2, '0')}</span>
+                        <span className="text-[10px] font-semibold text-indigo-400 uppercase">m</span>
                     </div>
                 )}
             </div>
@@ -113,7 +117,7 @@ const OrderProgressStepper = ({ currentStatus }) => {
                             } ${isCurrent && !isDone ? "border-indigo-500 text-indigo-500 ring-4 ring-indigo-50" : ""}`}>
                                 <Icon className="w-5 h-5 stroke-[2.5px]" />
                             </div>
-                            <span className={`mt-3 text-[11px] font-bold uppercase tracking-tight ${isDone ? "text-slate-900" : "text-slate-400"}`}>
+                            <span className={`mt-3 text-[11px] font-semibold uppercase tracking-tight ${isDone ? "text-slate-900" : "text-slate-400"}`}>
                                 {step.label}
                             </span>
                         </div>
@@ -122,7 +126,7 @@ const OrderProgressStepper = ({ currentStatus }) => {
             </div>
             {isFailed && (
                 <div className="mt-4 flex justify-center">
-                    <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-bold rounded-full border border-rose-100 flex items-center gap-1">
+                    <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-semibold rounded-full border border-rose-100 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" /> Status: {currentStatus}
                     </span>
                 </div>
@@ -136,11 +140,46 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
     const [refundModalOpen, setRefundModalOpen] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [isEditingName, setIsEditingName] = useState(false)
+    const [orderName, setOrderName] = useState(selectedOrder?.name || '')
+    const [isSavingName, setIsSavingName] = useState(false)
+    const notification = useNotification()
+
+    useEffect(() => {
+        if (selectedOrder) {
+            setOrderName(selectedOrder.name || '')
+        }
+    }, [selectedOrder])
+
+    const handleSaveName = async () => {
+        if (orderName.length > 100) {
+            notification.showError('Error', 'Order name must be 100 characters or less')
+            return
+        }
+        setIsSavingName(true)
+        try {
+            await orderService.updateOrderName(selectedOrder.id, orderName)
+            setIsEditingName(false)
+            notification.showSuccess('Success', 'Order name updated successfully')
+            if (onReviewSuccess) {
+                onReviewSuccess()
+            }
+        } catch (error) {
+            notification.showError('Error', error?.response?.data?.message || 'Failed to update order name')
+        } finally {
+            setIsSavingName(false)
+        }
+    }
+
+    const handleCancelEdit = () => {
+        setOrderName(selectedOrder?.name || '')
+        setIsEditingName(false)
+    }
 
     if (!isOpen || !selectedOrder) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
             <div className="w-full max-w-5xl max-h-[92vh] bg-white rounded-3xl shadow-2xl shadow-slate-900/20 overflow-hidden flex flex-col border border-white/20">
 
                 {/* Header: Modern & Clean */}
@@ -149,14 +188,56 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                         <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center">
                             <Package className="text-slate-700 w-6 h-6" />
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-xl font-bold text-slate-900">Order #{selectedOrder.orderNumber}</h2>
-                                <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md border ${getStatusColor(selectedOrder.status)}`}>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                {isEditingName ? (
+                                    <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                                        <input
+                                            type="text"
+                                            value={orderName}
+                                            onChange={(e) => setOrderName(e.target.value)}
+                                            className="flex-1 px-3 py-1 text-xl font-semibold text-slate-900 border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                            placeholder="Order name"
+                                            maxLength={100}
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={handleSaveName}
+                                            disabled={isSavingName}
+                                            className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-blue-600 disabled:opacity-50"
+                                        >
+                                            <Check className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={handleCancelEdit}
+                                            disabled={isSavingName}
+                                            className="p-1.5 hover:bg-slate-50 rounded-lg transition-colors text-slate-600 disabled:opacity-50"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h2 className="text-xl font-semibold text-slate-900">
+                                            {selectedOrder.name || `Order #${selectedOrder.orderNumber}`}
+                                        </h2>
+                                        <button
+                                            onClick={() => setIsEditingName(true)}
+                                            className="p-1 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+                                            title="Edit order name"
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                        </button>
+                                        {selectedOrder.name && (
+                                            <span className="text-sm text-slate-400 font-normal">#{selectedOrder.orderNumber}</span>
+                                        )}
+                                    </>
+                                )}
+                                <span className={`px-2 py-0.5 text-[10px] font-semibold uppercase rounded-md border ${getStatusColor(selectedOrder.status)}`}>
                                     {selectedOrder.status}
                                 </span>
                             </div>
-                            <p className="text-sm text-slate-500 font-medium">{formatDateTime(selectedOrder.createdAt)}</p>
+                            <p className="text-sm text-slate-500 font-normal">{formatDateTime(selectedOrder.createdAt)}</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all border border-transparent hover:border-slate-200">
@@ -168,7 +249,7 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                     <div className="p-8">
                         {/* Status & Stepper Card */}
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Tracking Progress</h3>
+                            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Tracking Progress</h3>
                             <OrderProgressStepper currentStatus={selectedOrder.status} />
 
                             {selectedOrder.status === 'DELIVERED' && selectedOrder.shipping?.deliveredAt && (
@@ -178,16 +259,16 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                             {/* Action Buttons: Context Aware */}
                             <div className="mt-8 flex justify-center gap-4">
                                 {selectedOrder.status === 'CONFIRMED' && (
-                                    <button onClick={() => setCancelModalOpen(true)} className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-rose-600 bg-white border border-rose-100 hover:bg-rose-50 rounded-xl transition-all">
+                                    <button onClick={() => setCancelModalOpen(true)} className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-rose-600 bg-white border border-rose-100 hover:bg-rose-50 rounded-xl transition-all">
                                         <X className="w-4 h-4" /> Cancel Order
                                     </button>
                                 )}
                                 {selectedOrder.status === 'DELIVERED' && (
                                     <>
-                                        <button onClick={() => {}} className="flex items-center gap-2 px-8 py-3 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-lg shadow-slate-200">
+                                        <button onClick={() => {}} className="flex items-center gap-2 px-8 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-lg shadow-slate-200">
                                             <CheckCircle className="w-4 h-4" /> Approve & Complete
                                         </button>
-                                        <button onClick={() => setRefundModalOpen(true)} className="flex items-center gap-2 px-6 py-3 text-sm font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all">
+                                        <button onClick={() => setRefundModalOpen(true)} className="flex items-center gap-2 px-6 py-3 text-sm font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all">
                                             <RotateCcw className="w-4 h-4" /> Request Refund
                                         </button>
                                     </>
@@ -202,10 +283,10 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="bg-white rounded-2xl border border-slate-100 p-6">
                                     <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                        <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                                             <Package2 className="w-4 h-4 text-indigo-500" /> Order Items
                                         </h3>
-                                        <span className="text-xs text-slate-400 font-medium">{selectedOrder.orderItems?.length} items</span>
+                                        <span className="text-xs text-slate-400 font-normal">{selectedOrder.orderItems?.length} items</span>
                                     </div>
                                     <div className="divide-y divide-slate-50">
                                         {selectedOrder.orderItems?.map((item, idx) => (
@@ -214,12 +295,12 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                                     <img src={item.listing?.imageUrl} className="w-full h-full object-cover" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{item.listing?.title}</h4>
-                                                    <p className="text-xs text-slate-500 mt-1">Qty: {item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}</p>
-                                                    {item.campaignName && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-600 font-bold rounded-md">PROMO: {item.campaignName}</span>}
+                                                    <h4 className="text-sm font-semibold text-slate-900 line-clamp-1">{item.listing?.title}</h4>
+                                                    <p className="text-xs text-slate-500 mt-1 font-normal">Qty: {item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}</p>
+                                                    {item.campaignName && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-600 font-semibold rounded-md">PROMO: {item.campaignName}</span>}
                                                 </div>
                                                 <div className="text-right flex flex-col justify-between items-end">
-                                                    <span className="text-sm font-bold text-slate-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</span>
+                                                    <span className="text-sm font-semibold text-slate-900">{formatCurrency(item.totalPrice, selectedOrder.currency)}</span>
                                                     <ReviewButton
                                                         orderItem={item}
                                                         existingReview={orderReviews[item.id]}
@@ -235,28 +316,38 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                 {/* Delivery & Address Section */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                                             <MapPin className="w-3 h-3" /> Shipping Address
                                         </h4>
-                                        <p className="text-xs font-bold text-slate-900">{selectedOrder.shippingAddress?.addressLine}</p>
-                                        <p className="text-[11px] text-slate-500 mt-1">
+                                        <p className="text-xs font-semibold text-slate-900">{selectedOrder.shippingAddress?.addressLine}</p>
+                                        <p className="text-[11px] text-slate-500 mt-1 font-normal">
                                             {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}
                                         </p>
                                     </div>
                                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                                             <Receipt className="w-3 h-3" /> Billing Details
                                         </h4>
-                                        <p className="text-xs font-bold text-slate-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
-                                        <p className="text-[11px] text-slate-500 mt-1">TR VAT: {selectedOrder.orderNumber}</p>
+                                        <p className="text-xs font-semibold text-slate-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
+                                        <p className="text-[11px] text-slate-500 mt-1 font-normal">TR VAT: {selectedOrder.orderNumber}</p>
                                     </div>
                                 </div>
+
+                                {/* Notes Section */}
+                                {selectedOrder.notes && (
+                                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                            <FileText className="w-3 h-3" /> Order Notes
+                                        </h4>
+                                        <p className="text-xs text-slate-900 font-normal leading-relaxed whitespace-pre-wrap">{selectedOrder.notes}</p>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Right: Summary & Info (1/3 width) */}
                             <div className="space-y-6">
                                 <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-xl shadow-slate-200">
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Payment Summary</h3>
+                                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-6">Payment Summary</h3>
                                     <div className="space-y-4">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-slate-400">Subtotal</span>
@@ -270,8 +361,8 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                         )}
                                         <div className="h-px bg-white/10 my-2" />
                                         <div className="flex justify-between items-end">
-                                            <span className="text-xs font-medium text-slate-400">Total Amount</span>
-                                            <span className="text-2xl font-bold font-mono tracking-tighter">
+                                            <span className="text-xs font-normal text-slate-400">Total Amount</span>
+                                            <span className="text-2xl font-semibold font-mono tracking-tighter">
                                                 {formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}
                                             </span>
                                         </div>
@@ -279,7 +370,7 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                     {selectedOrder.paymentReference && (
                                         <button
                                             onClick={() => onOpenReceipt(selectedOrder.paymentReference)}
-                                            className="w-full mt-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border border-white/10"
+                                            className="w-full mt-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 border border-white/10"
                                         >
                                             <FileText className="w-4 h-4" /> View Digital Receipt
                                         </button>
@@ -287,20 +378,20 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                 </div>
 
                                 <div className="bg-white rounded-2xl border border-slate-100 p-6">
-                                    <h4 className="text-xs font-bold text-slate-900 mb-4">Support & Info</h4>
+                                    <h4 className="text-xs font-semibold text-slate-900 mb-4">Support & Info</h4>
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                                             <CreditCard className="w-4 h-4 text-slate-400" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Reference ID</p>
-                                                <p className="text-[11px] font-mono text-slate-700 mt-1 truncate max-w-[140px]">{selectedOrder.paymentReference || 'N/A'}</p>
+                                                <p className="text-[10px] font-semibold text-slate-400 uppercase leading-none">Reference ID</p>
+                                                <p className="text-[11px] font-mono text-slate-700 mt-1 truncate max-w-[140px] font-normal">{selectedOrder.paymentReference || 'N/A'}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                                             <Truck className="w-4 h-4 text-slate-400" />
                                             <div>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase leading-none">Est. Delivery</p>
-                                                <p className="text-[11px] text-slate-700 mt-1 font-bold">{getEstimatedDeliveryTime(selectedOrder) || 'TBD'}</p>
+                                                <p className="text-[10px] font-semibold text-slate-400 uppercase leading-none">Est. Delivery</p>
+                                                <p className="text-[11px] text-slate-700 mt-1 font-semibold">{getEstimatedDeliveryTime(selectedOrder) || 'TBD'}</p>
                                             </div>
                                         </div>
                                     </div>
