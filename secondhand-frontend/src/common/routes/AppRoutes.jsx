@@ -37,6 +37,7 @@ import SecurityPage from '../../audit/pages/SecurityPage.jsx';
 import ShoppingCartPage from '../../cart/pages/ShoppingCartPage.jsx';
 import CheckoutPage from '../../cart/pages/CheckoutPage.jsx';
 import MyOrdersPage from '../../order/pages/MyOrdersPage.jsx';
+import ISoldPage from '../../order/pages/ISoldPage.jsx';
 import UserReviewsPage from '../../reviews/pages/UserReviewsPage.jsx';
 import MyCouponsPage from '../../campaign/pages/MyCouponsPage.jsx';
 import OffersPage from '../../offer/pages/OffersPage.jsx';
@@ -162,6 +163,7 @@ const AppRoutes = () => {
                         <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
                         <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
                         <Route path={ROUTES.MY_ORDERS} element={<MyOrdersPage />} />
+                        <Route path={ROUTES.I_SOLD} element={<ISoldPage />} />
                         <Route path={ROUTES.SECURITY} element={<SecurityPage />} />
                         <Route path={ROUTES.SHOPPING_CART} element={<ShoppingCartPage />} />
                         <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />

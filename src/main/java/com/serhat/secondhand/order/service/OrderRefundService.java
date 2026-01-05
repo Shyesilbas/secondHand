@@ -7,6 +7,7 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
@@ -42,6 +43,7 @@ public class OrderRefundService {
     private final OrderMapper orderMapper;
     private final EWalletService eWalletService;
     private final OrderStatusValidator orderStatusValidator;
+    private final OrderEscrowService orderEscrowService;
 
     public OrderDto refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
@@ -82,6 +84,8 @@ public class OrderRefundService {
 
         orderItemRefundRepository.saveAll(refundRecords);
         orderRepository.flush();
+
+        refundEscrowsForItems(itemsToRefund, user, order);
 
         try {
             UUID firstListingId = itemsToRefund.isEmpty() ? null : itemsToRefund.get(0).getListing().getId();
@@ -204,5 +208,26 @@ public class OrderRefundService {
             }
         }
         return true;
+    }
+
+    private void refundEscrowsForItems(List<OrderItem> itemsToRefund, User buyer, Order order) {
+        for (OrderItem item : itemsToRefund) {
+            orderEscrowService.findEscrowByOrderItem(item).ifPresent(escrow -> {
+                try {
+                    if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
+                        UUID listingId = item.getListing().getId();
+                        eWalletService.debitFromUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.REFUND);
+                        log.info("Debited {} from seller's eWallet: {} for refunded order item {}", 
+                                escrow.getAmount(), escrow.getSeller().getEmail(), item.getId());
+                    }
+                    orderEscrowService.refundEscrowToBuyer(escrow, buyer);
+                    log.info("Refunded escrow {} for order item {} in order {}", 
+                            escrow.getId(), item.getId(), order.getOrderNumber());
+                } catch (Exception e) {
+                    log.error("Failed to refund escrow {} for order item {}: {}", 
+                            escrow.getId(), item.getId(), e.getMessage());
+                }
+            });
+        }
     }
 }

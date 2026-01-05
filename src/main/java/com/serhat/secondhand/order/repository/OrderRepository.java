@@ -51,4 +51,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
         @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.user = :user AND o.createdAt BETWEEN :startDate AND :endDate AND o.paymentStatus = 'PAID' AND o.status != 'CANCELLED' AND o.status != 'REFUNDED'")
         BigDecimal sumTotalAmountByUserAndDateRange(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+        @Query("SELECT DISTINCT o FROM Order o JOIN o.orderItems oi WHERE oi.listing.seller = :seller ORDER BY o.createdAt DESC")
+        Page<Order> findOrdersBySeller(@Param("seller") User seller, Pageable pageable);
 }

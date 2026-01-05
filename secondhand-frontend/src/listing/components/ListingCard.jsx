@@ -22,8 +22,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     if (!listing) return null;
 
     const isOwner = user?.id === listing.sellerId;
-    const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
-    const canMakeOffer = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+    const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
+    const canAddToCart = user && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
+    const canMakeOffer = user && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -46,7 +47,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
     return (
-        <div className="group bg-background-primary rounded-md border border-border-light shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative">
+        <div className={`group bg-background-primary rounded-md border border-border-light shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? 'opacity-60' : ''}`}>
             <div className="aspect-[4/3] bg-secondary-50 relative border-b border-border-light rounded-t-md">
                 <div className="absolute inset-0 overflow-hidden rounded-t-md">
                     {listing.imageUrl ? (
@@ -134,7 +135,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
             {/* Content */}
             <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 p-2.5 flex flex-col">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="text-xs font-semibold text-text-primary line-clamp-2 leading-snug group-hover:text-accent-indigo-600 transition-colors">
+                    <h3 className={`text-xs font-semibold text-text-primary line-clamp-2 leading-snug group-hover:text-accent-indigo-600 transition-colors ${isOutOfStock ? 'line-through' : ''}`}>
                         {listing.title}
                     </h3>
                 </div>
@@ -155,7 +156,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
 
                 <div className="mt-1">
                     <div className="flex items-end gap-1.5 flex-wrap">
-                        <p className="text-sm font-bold text-text-primary tracking-tight">
+                        <p className={`text-sm font-bold text-text-primary tracking-tight ${isOutOfStock ? 'line-through' : ''}`}>
                             {formatCurrency(displayPrice, listing.currency)}
                         </p>
                         {hasCampaign && (
@@ -164,8 +165,8 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                             </p>
                         )}
                         {hasStockInfo && (
-                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold border ${isLowStock ? 'bg-status-warning-bg text-status-warning-text border-status-warning-border' : 'bg-secondary-50 text-text-secondary border-border-light'}`}>
-                                {isLowStock && !isOwner ? '🔥 Low stock!' : `Stock: ${Number(listing.quantity)}`}
+                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold border ${isOutOfStock ? 'bg-status-error-bg text-status-error-text border-status-error-border' : isLowStock ? 'bg-status-warning-bg text-status-warning-text border-status-warning-border' : 'bg-secondary-50 text-text-secondary border-border-light'}`}>
+                                {isOutOfStock ? 'Şu an stokta yok' : isLowStock && !isOwner ? '🔥 Low stock!' : `Stock: ${Number(listing.quantity)}`}
                             </span>
                         )}
                     </div>

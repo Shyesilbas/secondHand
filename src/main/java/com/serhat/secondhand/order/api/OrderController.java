@@ -7,6 +7,7 @@ import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.order.service.OrderCancellationService;
 import com.serhat.secondhand.order.service.OrderCompletionService;
+import com.serhat.secondhand.order.service.OrderEscrowService;
 import com.serhat.secondhand.order.service.OrderNameService;
 import com.serhat.secondhand.order.service.OrderQueryService;
 import com.serhat.secondhand.order.service.OrderRefundService;
@@ -38,6 +39,7 @@ public class OrderController {
     private final OrderRefundService orderRefundService;
     private final OrderCompletionService orderCompletionService;
     private final OrderNameService orderNameService;
+    private final OrderEscrowService orderEscrowService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -67,6 +69,33 @@ public class OrderController {
         log.info("API request to get orders for user: {}", currentUser.getEmail());
         Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser, pageable);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/seller")
+    @Operation(summary = "Get seller orders", description = "Retrieve paginated list of orders where current user is a seller")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Seller orders retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<Page<OrderDto>> getSellerOrders(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 5) Pageable pageable) {
+        log.info("API request to get seller orders for user: {}", currentUser.getEmail());
+        Page<OrderDto> orders = orderQueryService.getSellerOrders(currentUser, pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/seller/pending-escrow-amount")
+    @Operation(summary = "Get pending escrow amount", description = "Get total pending escrow amount for seller")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pending escrow amount retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<java.util.Map<String, java.math.BigDecimal>> getPendingEscrowAmount(
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to get pending escrow amount for seller: {}", currentUser.getEmail());
+        java.math.BigDecimal amount = orderEscrowService.getPendingEscrowAmount(currentUser);
+        return ResponseEntity.ok(java.util.Map.of("amount", amount));
     }
 
     @GetMapping("/details/{orderId}")

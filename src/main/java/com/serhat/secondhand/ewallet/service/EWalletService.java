@@ -217,6 +217,10 @@ public class EWalletService {
             var payment = eWalletMapper.buildRefundPayment(user, amount, listingId);
             paymentRepository.save(payment);
             log.info("Refund payment record created for user: {} amount: {}", user.getEmail(), amount);
+        } else if (transactionType == PaymentTransactionType.ITEM_SALE) {
+            var payment = eWalletMapper.buildItemSalePayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            log.info("Item sale payment record created for seller: {} amount: {}", user.getEmail(), amount);
         }
 
         log.info("Successfully credited {} to user's e-wallet. New balance: {}", amount, eWallet.getBalance());

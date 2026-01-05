@@ -16,7 +16,7 @@ public class PaymentValidationHelper {
         if (paymentRequest.transactionType() == PaymentTransactionType.ITEM_PURCHASE ||
             paymentRequest.transactionType() == PaymentTransactionType.ITEM_SALE) {
             if (paymentRequest.toUserId() == null) {
-                throw new BusinessException(PaymentErrorCodes.NULL_RECIPIENT.getMessage(), HttpStatus.BAD_REQUEST, PaymentErrorCodes.NULL_RECIPIENT.getCode());
+                return null;
             }
             return userService.findById(paymentRequest.toUserId());
         }
@@ -29,6 +29,7 @@ public class PaymentValidationHelper {
         }
         if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION
                 && paymentRequest.transactionType() != PaymentTransactionType.SHOWCASE_PAYMENT
+                && toUser != null
                 && fromUser.getId().equals(toUser.getId())) {
             throw new BusinessException(PaymentErrorCodes.SELF_PAYMENT.getMessage(), HttpStatus.BAD_REQUEST, PaymentErrorCodes.SELF_PAYMENT.getCode());
         }

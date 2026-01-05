@@ -1,29 +1,26 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {useNavigate} from 'react-router-dom';
 import {orderService} from '../services/orderService.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import {useEnums} from '../../common/hooks/useEnums.js';
-import {useOrders} from '../hooks/useOrders.js';
+import {useSellerOrders} from '../hooks/useSellerOrders.js';
 import OrdersSearch from '../components/OrdersSearch.jsx';
 import OrdersPagination from '../components/OrdersPagination.jsx';
-import OrderModal from '../components/OrderModal.jsx';
+import ISoldModal from '../components/ISoldModal.jsx';
 import {useOrdersSearch} from '../hooks/useOrdersSearch.js';
-import {useOrdersModal} from '../hooks/useOrdersModal.js';
 import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
-import {useOrdersReviews} from '../hooks/useOrdersReviews.js';
 import {getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
 import {ROUTES} from '../../common/constants/routes.js';
-import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, CheckCircle, Pencil, X, Sparkles, AlertCircle, BarChart3} from 'lucide-react';
+import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, Wallet, Info, BarChart3} from 'lucide-react';
 
-const MyOrdersPage = () => {
+const ISoldPage = () => {
   const { enums } = useEnums();
-  const [sortField, setSortField] = useState(null); // 'createdAt' or 'totalAmount'
-  const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
-  const [editingOrderId, setEditingOrderId] = useState(null);
-  const [editingOrderName, setEditingOrderName] = useState('');
-  const [showNameBanner, setShowNameBanner] = useState(true);
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [pendingEscrowAmount, setPendingEscrowAmount] = useState(null);
+  const [loadingEscrow, setLoadingEscrow] = useState(true);
   
   const {
     orders,
@@ -33,11 +30,28 @@ const MyOrdersPage = () => {
     loadPage,
     refresh,
     setSearchOrder
-  } = useOrders(0, 5, sortField, sortDirection);
+  } = useSellerOrders(0, 5, sortField, sortDirection);
 
-  const { orderReviews, reviewsLoading, fetchReviewsData, clearReviews } = useOrdersReviews();
-  const { selectedOrder, setSelectedOrder, orderModalOpen, openOrderModal, closeOrderModal } = useOrdersModal(fetchReviewsData);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
   const { receiptOpen, receiptPayment, openReceipt, closeReceipt } = useOrdersReceipt();
+  
+  const openOrderModal = async (order) => {
+    try {
+      const freshOrder = await orderService.getById(order.id);
+      setSelectedOrder(freshOrder);
+      setOrderModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      setSelectedOrder(order);
+      setOrderModalOpen(true);
+    }
+  };
+  
+  const closeOrderModal = () => {
+    setOrderModalOpen(false);
+    setSelectedOrder(null);
+  };
   const { 
     searchTerm, 
     setSearchTerm, 
@@ -48,27 +62,26 @@ const MyOrdersPage = () => {
     clearSearch 
   } = useOrdersSearch(setSearchOrder, refresh);
 
-  const handleReviewSuccess = async () => {
-    refresh();
-    if (selectedOrder) {
-      const updatedOrder = await orderService.getById(selectedOrder.id);
-      setSelectedOrder(updatedOrder);
-      await fetchReviewsData(updatedOrder);
-    }
-  };
+  const navigate = useNavigate();
 
-  const handleCompleteOrder = async (orderId, e) => {
-    e.stopPropagation();
-    if (!window.confirm('Are you sure you want to complete this order? This action cannot be undone.')) {
-      return;
-    }
-    try {
-      await orderService.completeOrder(orderId);
-      refresh();
-    } catch (err) {
-      alert(err.response?.data?.message || err.message || 'Failed to complete order');
-    }
-  };
+  useEffect(() => {
+    const fetchPendingEscrowAmount = async () => {
+      try {
+        setLoadingEscrow(true);
+        const response = await orderService.getPendingEscrowAmount();
+        setPendingEscrowAmount(response.amount || 0);
+      } catch (err) {
+        console.error('Error fetching pending escrow amount:', err);
+        setPendingEscrowAmount(0);
+      } finally {
+        setLoadingEscrow(false);
+      }
+    };
+    fetchPendingEscrowAmount();
+    const interval = setInterval(fetchPendingEscrowAmount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
 
   const handlePageChange = (page) => {
     if (!isSearchMode) {
@@ -82,31 +95,28 @@ const MyOrdersPage = () => {
 
   const handleSort = (field) => {
     if (sortField === field) {
-      // Toggle direction if same field
       const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
       setSortDirection(newDirection);
     } else {
-      // New field, default to desc
       setSortField(field);
       setSortDirection('desc');
     }
-    // Reset to first page when sorting changes
     loadPage(0);
   };
 
-  const navigate = useNavigate();
+  const handleRefresh = () => {
+    refresh();
+    orderService.getPendingEscrowAmount()
+      .then(response => setPendingEscrowAmount(response.amount || 0))
+      .catch(err => console.error('Error fetching pending escrow amount:', err));
+  };
 
   return (
       <div className="min-h-screen bg-background-secondary">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold text-text-primary">My Orders</h1>
-                {orders.some(order => order.status === 'DELIVERED' && order.status !== 'COMPLETED') && (
-                  <span className="flex items-center justify-center w-4 h-4 text-[10px] font-semibold text-white bg-red-500 rounded-full">!</span>
-                )}
-              </div>
+              <h1 className="text-sm font-semibold text-text-primary">I Sold</h1>
               {orders.length > 0 && (
                 <p className="text-xs text-text-secondary mt-0.5">
                   {pagination?.totalElements || orders.length} total
@@ -116,7 +126,7 @@ const MyOrdersPage = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => navigate(ROUTES.BUYER_DASHBOARD)}
+                onClick={() => navigate(ROUTES.SELLER_DASHBOARD)}
                 className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <BarChart3 className="w-4 h-4" />
@@ -124,7 +134,7 @@ const MyOrdersPage = () => {
               </button>
               <button
                 type="button"
-                onClick={refresh}
+                onClick={handleRefresh}
                 disabled={loading}
                 className="p-1.5 text-text-secondary hover:text-text-primary disabled:opacity-50"
                 title="Refresh"
@@ -134,57 +144,152 @@ const MyOrdersPage = () => {
             </div>
           </div>
 
-          {showNameBanner && (
-            <div className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Sparkles className="w-5 h-5 text-blue-600" />
+          {!loadingEscrow && pendingEscrowAmount !== null && (
+            <div className={`mb-6 p-5 rounded-xl border-2 ${
+              pendingEscrowAmount > 0 
+                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 shadow-md' 
+                : 'bg-gray-50 border-gray-200'
+            }`}>
+              <div className="flex items-start gap-4">
+                <div className={`p-3 rounded-lg ${
+                  pendingEscrowAmount > 0 ? 'bg-blue-100' : 'bg-gray-200'
+                }`}>
+                  <Wallet className={`w-6 h-6 ${
+                    pendingEscrowAmount > 0 ? 'text-blue-600' : 'text-gray-500'
+                  }`} />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-blue-900">Now you can name your orders!</p>
-                  <p className="text-xs text-blue-700 mt-0.5">Give your orders custom names to easily identify them later. Click the edit icon next to any order name to get started.</p>
+                <div className="flex-1">
+                  <div className={`text-sm font-semibold mb-1 ${
+                    pendingEscrowAmount > 0 ? 'text-blue-900' : 'text-gray-700'
+                  }`}>
+                    Escrow Amount
+                  </div>
+                  <div className={`text-2xl font-bold mb-2 ${
+                    pendingEscrowAmount > 0 ? 'text-blue-700' : 'text-gray-600'
+                  }`}>
+                    {formatCurrency(pendingEscrowAmount)}
+                  </div>
+                  <div className={`text-xs mb-3 ${
+                    pendingEscrowAmount > 0 ? 'text-blue-700' : 'text-gray-500'
+                  }`}>
+                    {pendingEscrowAmount > 0 
+                      ? 'This amount will be released to your wallet when orders are completed'
+                      : 'No pending escrow amount at the moment'
+                    }
+                  </div>
+                  {pendingEscrowAmount > 0 && orders.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-blue-200">
+                      <div className="text-xs font-semibold text-blue-900 mb-2">Pending by Order:</div>
+                      <div className="space-y-1.5">
+                        {orders
+                          .filter(order => {
+                            const escrowAmt = parseFloat(order.escrowAmount) || 0;
+                            return escrowAmt > 0;
+                          })
+                          .map(order => {
+                            const escrowAmt = parseFloat(order.escrowAmount) || 0;
+                            const deliveredAt = order.shipping?.deliveredAt;
+                            const autoReleaseDate = deliveredAt ? new Date(new Date(deliveredAt).getTime() + 48 * 60 * 60 * 1000) : null;
+                            const now = new Date();
+                            const isAutoReleased = autoReleaseDate && now >= autoReleaseDate;
+                            
+                            let tooltipText = '';
+                            if (!deliveredAt) {
+                              tooltipText = 'The escrow amount will be automatically released 48 hours after the order is delivered.';
+                            } else if (isAutoReleased) {
+                              tooltipText = 'The escrow amount has been automatically released (48 hours after delivery).';
+                            } else {
+                              const diffMs = autoReleaseDate - now;
+                              const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                              const daysLeft = Math.floor(totalMinutes / (24 * 60));
+                              const remainingMinutes = totalMinutes % (24 * 60);
+                              const hoursLeft = Math.floor(remainingMinutes / 60);
+                              const minutesLeft = remainingMinutes % 60;
+                              
+                              const parts = [];
+                              if (daysLeft > 0) {
+                                parts.push(`${daysLeft} day${daysLeft !== 1 ? 's' : ''}`);
+                              }
+                              if (hoursLeft > 0) {
+                                parts.push(`${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''}`);
+                              }
+                              if (minutesLeft > 0) {
+                                parts.push(`${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}`);
+                              }
+                              
+                              if (parts.length > 0) {
+                                const timeString = parts.join(', ');
+                                tooltipText = `The escrow amount will be automatically released in ${timeString} (48 hours after delivery), if not confirmed earlier by the buyer.`;
+                              } else {
+                                tooltipText = 'The escrow amount will be automatically released soon (48 hours after delivery), if not confirmed earlier by the buyer.';
+                              }
+                            }
+                            
+                            return (
+                              <div key={order.id} className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    onClick={() => openOrderModal(order)}
+                                    className="text-blue-800 hover:text-blue-900 hover:underline cursor-pointer text-left"
+                                  >
+                                    Order #{order.orderNumber}
+                                  </button>
+                                  <div className="relative group">
+                                    <Info className="w-3.5 h-3.5 text-blue-600 cursor-help hover:text-blue-700 transition-colors" />
+                                    <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-xl">
+                                      <div className="space-y-1.5">
+                                        <div className="font-semibold text-white">Escrow Release Information</div>
+                                        <div className="text-slate-300 leading-relaxed">
+                                          {tooltipText}
+                                        </div>
+                                      </div>
+                                      <div className="absolute left-4 bottom-0 transform translate-y-full">
+                                        <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <span className="font-semibold text-blue-700">{formatCurrency(escrowAmt, order.currency)}</span>
+                              </div>
+                            );
+                          })
+                        }
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <button
-                onClick={() => setShowNameBanner(false)}
-                className="p-1 hover:bg-blue-100 rounded-lg text-blue-600 transition-colors"
-                aria-label="Dismiss"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           )}
 
-          <div className="mb-4">
-            <OrdersSearch
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              searchLoading={searchLoading}
-              searchError={searchError}
-              isSearchMode={isSearchMode}
-              onSearch={handleSearch}
-              onClearSearch={clearSearch}
-            />
-          </div>
+          <OrdersSearch
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onSearch={handleSearch}
+            onClear={clearSearch}
+            loading={searchLoading}
+            error={searchError}
+          />
 
-          {loading ? (
-            <div className="space-y-2">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-12 bg-white border border-gray-200 rounded animate-pulse"></div>
-              ))}
+          {loading && !searchLoading && (
+            <div className="flex justify-center items-center py-12">
+              <LoadingIndicator />
             </div>
-          ) : !orders.length && !isSearchMode ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-              <p className="text-xs text-gray-600">No orders yet</p>
+          )}
+
+          {!loading && !searchLoading && orders.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-text-secondary">No sales found</p>
             </div>
-          ) : (
+          )}
+
+          {!loading && !searchLoading && orders.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Order</th>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Status</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Payment</th>
                     <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Items</th>
                     <th 
                       className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none border-r border-gray-200"
@@ -220,64 +325,24 @@ const MyOrdersPage = () => {
                 </thead>
                 <tbody className="divide-y divide-border-light">
                   {orders.map((order) => {
-                    const itemsCount = order.orderItems?.length || 0;
-                    const firstItem = order.orderItems?.[0];
+                    const sellerOrderItems = order.orderItems || [];
+                    const sellerTotalAmount = sellerOrderItems.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
+                    const itemsCount = sellerOrderItems.length;
+                    const firstItem = sellerOrderItems?.[0];
                     const isCompleted = order.status === 'COMPLETED';
                     
                     return (
                       <tr key={order.id} className={`cursor-pointer ${isCompleted ? 'bg-gradient-to-r from-emerald-50 to-green-50/80 hover:from-emerald-100 hover:to-green-100' : 'hover:bg-secondary-50'}`} onClick={() => openOrderModal(order)}>
                         <td className="px-4 py-2.5">
-                          {editingOrderId === order.id ? (
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                              <input
-                                type="text"
-                                value={editingOrderName}
-                                onChange={(e) => setEditingOrderName(e.target.value)}
-                                className="flex-1 px-2 py-1 text-xs font-medium text-text-primary border-2 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                placeholder="Order name"
-                                maxLength={100}
-                                autoFocus
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <button
-                                onClick={(e) => handleSaveOrderName(order.id, e)}
-                                className="p-1 hover:bg-blue-50 rounded text-blue-600"
-                              >
-                                <CheckCircle className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={handleCancelEditName}
-                                className="p-1 hover:bg-slate-50 rounded text-slate-600"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-medium text-text-primary">
-                                {order.name || `Order #${order.orderNumber}`}
-                              </span>
-                              {order.name && (
-                                <span className="text-[10px] text-text-secondary">#{order.orderNumber}</span>
-                              )}
-                              <button
-                                onClick={(e) => handleStartEditName(order, e)}
-                                className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 transition-colors"
-                                title="Edit order name"
-                              >
-                                <Pencil className="w-3 h-3" />
-                              </button>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-text-primary">
+                              Order #{order.orderNumber}
+                            </span>
+                          </div>
                         </td>
                         <td className="px-4 py-2.5">
                           <span className={`text-xs font-medium ${getStatusColor(order.status)}`}>
                             {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span className={`text-xs font-medium ${getStatusColor(order.paymentStatus)}`}>
-                            {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
                           </span>
                         </td>
                         <td className="px-4 py-2.5">
@@ -307,7 +372,7 @@ const MyOrdersPage = () => {
                           }}
                         >
                           <span className="text-xs font-semibold text-gray-900">
-                            {formatCurrency(order.totalAmount, order.currency)}
+                            {formatCurrency(sellerTotalAmount, order.currency)}
                           </span>
                         </td>
                         <td 
@@ -328,16 +393,6 @@ const MyOrdersPage = () => {
                         </td>
                         <td className="px-4 py-2.5">
                           <div className="flex items-center justify-end gap-1">
-                            {order.status === 'DELIVERED' && (
-                              <button
-                                type="button"
-                                onClick={(e) => handleCompleteOrder(order.id, e)}
-                                className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
-                                title="Complete Order"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                              </button>
-                            )}
                             <button
                               type="button"
                               onClick={(e) => {
@@ -387,16 +442,15 @@ const MyOrdersPage = () => {
 
         <PaymentReceiptModal isOpen={receiptOpen} onClose={closeReceipt} payment={receiptPayment} />
         
-        <OrderModal
+        <ISoldModal
             isOpen={orderModalOpen}
             selectedOrder={selectedOrder}
-            orderReviews={orderReviews}
             onClose={closeOrderModal}
             onOpenReceipt={openReceipt}
-            onReviewSuccess={handleReviewSuccess}
         />
       </div>
   );
 };
 
-export default MyOrdersPage;
+export default ISoldPage;
+

@@ -8,11 +8,14 @@ import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class OrderCompletionService {
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
+    private final OrderEscrowService orderEscrowService;
 
     public OrderDto completeOrder(Long orderId, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
@@ -36,6 +40,8 @@ public class OrderCompletionService {
             order.getShipping().setStatus(ShippingStatus.DELIVERED);
         }
         Order savedOrder = orderRepository.save(order);
+
+        releaseEscrowsForOrder(savedOrder);
 
         orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
 
@@ -60,6 +66,25 @@ public class OrderCompletionService {
         }
         if (order.getStatus() != Order.OrderStatus.DELIVERED) {
             throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
+        }
+    }
+
+    private void releaseEscrowsForOrder(Order order) {
+        List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
+        
+        for (OrderItemEscrow escrow : pendingEscrows) {
+            try {
+                orderEscrowService.releaseEscrowToSeller(escrow);
+                log.info("Released escrow {} for order item {} to seller {}", 
+                        escrow.getId(), escrow.getOrderItem().getId(), escrow.getSeller().getEmail());
+            } catch (Exception e) {
+                log.error("Failed to release escrow {} for order {}: {}", 
+                        escrow.getId(), order.getOrderNumber(), e.getMessage());
+            }
+        }
+        
+        if (!pendingEscrows.isEmpty()) {
+            log.info("Released {} escrow(s) for order {}", pendingEscrows.size(), order.getOrderNumber());
         }
     }
 }

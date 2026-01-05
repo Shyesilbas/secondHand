@@ -45,6 +45,17 @@ public class ListingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/bulk")
+    @Operation(summary = "Get listings by IDs", description = "Get multiple listings by their IDs in bulk")
+    public ResponseEntity<List<ListingDto>> getListingsByIds(
+            @RequestBody List<UUID> ids,
+            @AuthenticationPrincipal User currentUser) {
+        
+        String email = currentUser != null ? currentUser.getEmail() : null;
+        List<ListingDto> listings = listingService.findByIds(ids, email);
+        return ResponseEntity.ok(listings);
+    }
+
     @PostMapping("/filter")
     public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
             @RequestBody ListingFilterDto filters,

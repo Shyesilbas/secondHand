@@ -23,6 +23,7 @@ public class OrderCompletionScheduler {
     private final OrderRepository orderRepository;
     private final ShippingRepository shippingRepository;
     private final OrderNotificationService orderNotificationService;
+    private final OrderEscrowService orderEscrowService;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
     private static final int COMPLETION_HOURS = 48;
@@ -94,8 +95,9 @@ public class OrderCompletionScheduler {
 
             if (hoursPassed >= COMPLETION_HOURS) {
                 order.setStatus(Order.OrderStatus.COMPLETED);
-                orderRepository.save(order);
-                orderNotificationService.sendOrderCompletionNotification(order.getUser(), order, true);
+                Order savedOrder = orderRepository.save(order);
+                orderEscrowService.releaseEscrowsForOrder(savedOrder);
+                orderNotificationService.sendOrderCompletionNotification(order.getUser(), savedOrder, true);
                 updatedCount++;
                 log.info("Auto-completed order: {} ({} hours after delivery)", order.getOrderNumber(), hoursPassed);
             }

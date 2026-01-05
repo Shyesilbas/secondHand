@@ -33,6 +33,16 @@ export const orderService = {
   updateOrderName: async (id, name) => {
     return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NAME(id), { name });
   },
+  sellerOrders: async (page = 0, size = 10, sort = null, direction = 'desc') => {
+    let url = `${API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS}?page=${page}&size=${size}`;
+    if (sort) {
+      url += `&sort=${sort},${direction}`;
+    }
+    return get(url);
+  },
+  getPendingEscrowAmount: async () => {
+    return get(API_ENDPOINTS.ORDERS.GET_PENDING_ESCROW_AMOUNT);
+  },
 };
 
 
