@@ -1,11 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { orderService } from '../services/orderService.js';
 
-export const usePendingCompletionOrders = () => {
+export const usePendingCompletionOrders = (options = {}) => {
   const [hasPendingOrders, setHasPendingOrders] = useState(false);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const intervalRef = useRef(null);
+  const enabled = options.enabled !== false;
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const checkPendingOrders = async () => {
       try {
         setLoading(true);
@@ -26,12 +34,24 @@ export const usePendingCompletionOrders = () => {
       }
     };
 
+    const isRelevantPage = location.pathname.includes('/orders') || 
+                           location.pathname.includes('/dashboard') ||
+                           location.pathname === '/';
+
     checkPendingOrders();
     
-    const interval = setInterval(checkPendingOrders, 30000);
+    if (isRelevantPage) {
+      intervalRef.current = setInterval(checkPendingOrders, 120000);
+    } else {
+      intervalRef.current = setInterval(checkPendingOrders, 300000);
+    }
     
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [location.pathname, enabled]);
 
   return { hasPendingOrders, loading };
 };

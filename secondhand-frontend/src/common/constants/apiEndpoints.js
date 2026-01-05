@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
         ALL: '/v1/listings/allListings',
         MY_LISTINGS: '/v1/listings/my-listings',
         BY_ID: (id) => `/v1/listings/${id}`,
+        BULK: '/v1/listings/bulk',
         BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
         SEARCH: '/v1/listings/search',
         CREATE: '/v1/listings',
@@ -52,6 +53,8 @@ export const API_ENDPOINTS = {
     ORDERS: {
         CHECKOUT: '/v1/orders/checkout',                                                 // POST - Checkout
         LIST_MY_ORDERS: '/v1/orders',                                                    // GET - List all orders
+        LIST_SELLER_ORDERS: '/v1/orders/seller',                                         // GET - List seller orders
+        GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',           // GET - Get pending escrow amount
         GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`, // GET - Get by order number
         GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
@@ -176,7 +179,7 @@ export const API_ENDPOINTS = {
         TOGGLE: '/favorites/toggle',
         MY_FAVORITES: '/favorites',
         CHECK: (listingId) => `/favorites/check/${listingId}`,
-
+        TOP: '/favorites/top',
     },
     AGREEMENTS: {
         INITIALIZE: '/agreements/initialize',

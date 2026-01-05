@@ -47,9 +47,9 @@ public class PaymentRequestMapper {
 
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(sellerId)
-                .receiverName(seller.getName())
-                .receiverSurname(seller.getSurname())
+                .toUserId(null)
+                .receiverName("System")
+                .receiverSurname("Escrow")
                 .listingId(sellerItems.get(0).getListing().getId())
                 .amount(sellerTotal)
                 .paymentType(paymentType)

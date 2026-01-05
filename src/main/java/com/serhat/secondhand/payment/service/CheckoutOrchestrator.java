@@ -13,6 +13,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.service.OrderCreationService;
+import com.serhat.secondhand.order.service.OrderEscrowService;
 import com.serhat.secondhand.order.service.OrderNotificationService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
@@ -38,6 +39,7 @@ public class CheckoutOrchestrator {
     private final CouponService couponService;
     private final OfferService offerService;
     private final ListingRepository listingRepository;
+    private final OrderEscrowService orderEscrowService;
 
     @Transactional
     public OrderDto executeCheckout(User user, CheckoutRequest request) {
@@ -57,6 +59,7 @@ public class CheckoutOrchestrator {
             orderNotificationService.sendOrderNotifications(user, order, paymentResult.allSuccessful());
 
             if (paymentResult.allSuccessful()) {
+                orderEscrowService.createEscrowsForOrder(order);
                 handleSuccessfulCheckout(user, order, pricing, acceptedOffer);
                 log.info("Checkout completed successfully for order: {} with {} payments",
                         order.getOrderNumber(), paymentResult.paymentResults().size());

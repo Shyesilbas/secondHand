@@ -38,6 +38,7 @@ export const ROUTES = {
     CHECKOUT: '/checkout',
     OFFERS: '/offers',
     MY_ORDERS: '/profile/orders',
+    I_SOLD: '/profile/i-sold',
     USER_REVIEWS: (userId) => `/users/${userId}/reviews`,
     REVIEWS_RECEIVED: (userId) => `/reviews/received/${userId}`,
     REVIEWS_GIVEN: (userId) => `/reviews/given/${userId}`,

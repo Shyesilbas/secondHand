@@ -108,6 +108,9 @@ export const listingService = {
   getListingById: async (id) => {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
   },
+  getListingsByIds: async (ids) => {
+    return post(API_ENDPOINTS.LISTINGS.BULK, ids);
+  },
   getListingByUserId: async (userId, page = 0, size = 10) => {
     return get(`${API_ENDPOINTS.LISTINGS.BY_USER(userId)}?page=${page}&size=${size}`);
   },

@@ -111,6 +111,17 @@ public class ListingService {
                 .map(dto -> enrichmentService.enrich(dto, null));
     }
 
+    public List<ListingDto> findByIds(List<UUID> ids, String userEmail) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        List<Listing> listings = listingRepository.findAllById(ids);
+        List<ListingDto> dtos = listings.stream()
+                .map(listingMapper::toDynamicDto)
+                .collect(Collectors.toList());
+        return enrichList(dtos, userEmail);
+    }
+
     public Page<ListingDto> filterByCategory(ListingFilterDto filters, String userEmail) {
         Function<ListingFilterDto, Page<ListingDto>> strategy = filterStrategyMap.get(filters.getClass());
         if (strategy == null) return Page.empty();

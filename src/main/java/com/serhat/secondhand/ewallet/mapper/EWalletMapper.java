@@ -98,5 +98,19 @@ public class EWalletMapper {
                 .isSuccess(true)
                 .build();
     }
+
+    public Payment buildItemSalePayment(User seller, BigDecimal amount, java.util.UUID listingId) {
+        return Payment.builder()
+                .fromUser(seller)
+                .toUser(seller)
+                .amount(amount)
+                .paymentType(PaymentType.EWALLET)
+                .transactionType(PaymentTransactionType.ITEM_SALE)
+                .paymentDirection(PaymentDirection.INCOMING)
+                .listingId(listingId)
+                .processedAt(LocalDateTime.now())
+                .isSuccess(true)
+                .build();
+    }
 }
 

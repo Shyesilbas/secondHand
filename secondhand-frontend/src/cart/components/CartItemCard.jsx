@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { PlusIcon, MinusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Star } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
-import { reviewService } from '../../reviews/services/reviewService.js';
+import { useSellerReviewStatsCache } from '../../reviews/hooks/useSellerReviewStatsCache.js';
 
 const CartItemCard = ({ 
     item, 
@@ -40,16 +40,7 @@ const CartItemCard = ({
     const averageRating = reviewStats?.averageRating || 0;
     const totalReviews = reviewStats?.totalReviews || 0;
 
-    // Seller Review Info
-    const [sellerStats, setSellerStats] = useState(null);
-
-    useEffect(() => {
-        if (sellerId) {
-            reviewService.getUserReviewStats(sellerId)
-                .then(data => setSellerStats(data))
-                .catch(err => console.error("Failed to fetch seller stats", err));
-        }
-    }, [sellerId]);
+    const { stats: sellerStats } = useSellerReviewStatsCache(sellerId);
 
     const sellerRating = sellerStats?.averageRating || 0;
     const sellerTotalReviews = sellerStats?.totalReviews || 0;

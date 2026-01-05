@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
@@ -79,7 +79,7 @@ const CheckoutPage = () => {
         ];
     }, [cartItems, offerContext]);
     
-    const calculateTotal = () => {
+    const calculateTotal = useCallback(() => {
         if (pricing?.total != null) {
             return parseFloat(pricing.total) || 0;
         }
@@ -90,13 +90,20 @@ const CheckoutPage = () => {
             const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
             return total + (price * item.quantity);
         }, 0);
-    };
+    }, [pricing, displayCartItems]);
     
     const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
     const checkout = useCheckout(effectiveCartCount, calculateTotal, clearCart, appliedCouponCode, offerId);
     const [currentStep, setCurrentStep] = useState(1);
 
-    const refreshPreview = async (code) => {
+    const refreshPreviewRef = useRef(null);
+    const isRefreshingRef = useRef(false);
+
+    const refreshPreview = useCallback(async (code) => {
+        if (isRefreshingRef.current) {
+            return;
+        }
+        isRefreshingRef.current = true;
         setIsPreviewLoading(true);
         try {
             const data = await couponService.preview(code, offerId);
@@ -110,11 +117,16 @@ const CheckoutPage = () => {
             setPricing(data);
         } finally {
             setIsPreviewLoading(false);
+            isRefreshingRef.current = false;
         }
-    };
+    }, [offerId]);
+
+    refreshPreviewRef.current = refreshPreview;
 
     useEffect(() => {
-        refreshPreview(appliedCouponCode);
+        if (refreshPreviewRef.current) {
+            refreshPreviewRef.current(appliedCouponCode);
+        }
     }, [cartKey, appliedCouponCode]);
 
     const onApplyCoupon = async () => {

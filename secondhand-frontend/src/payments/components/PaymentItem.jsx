@@ -11,6 +11,7 @@ import {
 } from '../payments.js';
 
 const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
+    const orderItems = payment.orderItems || [];
     const getPaymentTypeIcon = (type) => {
         switch (type) {
             case PAYMENT_TYPES.CREDIT_CARD:
@@ -99,22 +100,19 @@ const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
                         <p className="text-sm text-text-muted mt-1">
                             {getPaymentTypeLabel(payment.paymentType)} • {formatDate(payment.createdAt)}
                         </p>
-                        {payment.listingId && (
-                            <p className="text-xs text-text-muted mt-1">
-                                Listing : {payment.listingId}
+                        {orderItems.length > 0 ? (
+                            <div className="mt-2 space-y-1">
+                                {orderItems.map((title, index) => (
+                                    <p key={index} className="text-sm font-medium text-text-primary">
+                                        {title}
+                                    </p>
+                                ))}
+                            </div>
+                        ) : payment.listingTitle ? (
+                            <p className="text-sm font-medium text-text-primary mt-2">
+                                {payment.listingTitle}
                             </p>
-                        )}
-
-                        {payment.receiverName && payment.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING && (
-                            <p className="text-xs text-text-muted mt-1">
-                                To: {payment.receiverName} {payment.receiverSurname}
-                            </p>
-                        )}
-                        {payment.senderName && payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING && (
-                            <p className="text-xs text-text-muted mt-1">
-                                From: {payment.senderName} {payment.senderSurname}
-                            </p>
-                        )}
+                        ) : null}
                     </div>
                 </div>
 

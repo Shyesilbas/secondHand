@@ -27,7 +27,6 @@ public class ListingEventListener {
     private final ListingRepository listingRepository;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
-    private final EWalletService eWalletService;
 
     @EventListener
     @Transactional
@@ -53,16 +52,7 @@ public class ListingEventListener {
         } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
             if (listing.getStatus() == ListingStatus.ACTIVE) {
                 log.info("Purchase completed for listing {}. Status change disabled; keeping {}.", listing.getId(), listing.getStatus());
-                
-                // Transfer earnings to seller's e-wallet
-                if (payment.getToUser() != null) {
-                    try {
-                        eWalletService.creditToUser(payment.getToUser(), payment.getAmount());
-                        log.info("Transferred {} to seller's e-wallet for listing {}", payment.getAmount(), listing.getId());
-                    } catch (Exception e) {
-                        log.error("Failed to transfer earnings to seller's e-wallet: {}", e.getMessage());
-                    }
-                }
+                log.info("Payment amount {} held in escrow until order completion.", payment.getAmount());
             } else {
                 log.warn("Received item purchase payment for listing {} which is not in ACTIVE status (current: {}).", 
                          listing.getId(), listing.getStatus());

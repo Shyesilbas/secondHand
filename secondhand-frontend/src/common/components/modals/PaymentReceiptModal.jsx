@@ -4,7 +4,6 @@ import {
   ArrowDownLeftIcon,
   ArrowUpRightIcon,
   CheckBadgeIcon,
-  DocumentDuplicateIcon,
   PrinterIcon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
@@ -46,10 +45,6 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
 
   const handlePrint = () => window.print();
 
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(payment.paymentId);
-    notification.showSuccess('Transaction ID copied');
-  };
 
   const isIncoming = payment.paymentDirection === 'INCOMING';
 
@@ -57,7 +52,6 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
     { label: 'Payment Date', value: formatDate(payment.createdAt) },
     { label: 'Payment Method', value: resolveEnumLabel(enums, 'paymentTypes', payment.paymentType) },
     { label: 'Transaction', value: replaceEnumCodesInHtml(payment.transactionType, enums, ['paymentTypes']) },
-    { label: 'Reference', value: payment.listingTitle || 'General Payment' },
   ].filter(Boolean);
 
   return createPortal(
@@ -111,17 +105,6 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
 
             {/* Info Sections */}
             <div className="space-y-6">
-              {/* Transaction ID Card */}
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Transaction ID</p>
-                <div className="flex items-center justify-between">
-                  <code className="text-xs font-mono text-slate-600 truncate">{payment.paymentId}</code>
-                  <button onClick={handleCopyId} className="p-1 text-slate-400 hover:text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <DocumentDuplicateIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
               {/* Field Grid */}
               <div className="grid grid-cols-2 gap-y-5 gap-x-4 px-1">
                 {details.map((field) => (
@@ -132,19 +115,14 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
                 ))}
               </div>
 
-              {/* Sender/Receiver (Dynamic) */}
-              {(payment.senderName || payment.receiverName) && (
+              {/* Created For */}
+              {payment.senderName && (
                   <div className="pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Sender</p>
-                        <p className="text-sm font-semibold text-slate-900">{payment.senderName || 'Anonymous'}</p>
-                      </div>
-                      <div className="w-px h-8 bg-slate-100" />
-                      <div className="flex-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Receiver</p>
-                        <p className="text-sm font-semibold text-slate-900">{payment.receiverName || 'SecondHand User'}</p>
-                      </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Created For</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {payment.senderName}{payment.senderSurname ? ` ${payment.senderSurname}` : ''}
+                      </p>
                     </div>
                   </div>
               )}

@@ -1,11 +1,11 @@
 import React from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
-import { useUserReviewStats } from '../../../reviews/hooks/useReviews.js';
+import { useSellerReviewStatsCache } from '../../../reviews/hooks/useSellerReviewStatsCache.js';
 import { StarIcon } from '@heroicons/react/24/solid';
 
 const SellerRating = ({ sellerId }) => {
-    const { stats, loading } = useUserReviewStats(sellerId);
+    const { stats, loading } = useSellerReviewStatsCache(sellerId);
     
     if (loading || !stats || stats.totalReviews === 0) {
         return null;

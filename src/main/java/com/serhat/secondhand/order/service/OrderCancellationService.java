@@ -40,6 +40,7 @@ public class OrderCancellationService {
     private final OrderMapper orderMapper;
     private final EWalletService eWalletService;
     private final OrderStatusValidator orderStatusValidator;
+    private final OrderEscrowService orderEscrowService;
 
     public OrderDto cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Order order = findOrderByIdAndValidateOwnership(orderId, user);
@@ -80,6 +81,8 @@ public class OrderCancellationService {
 
         orderItemCancelRepository.saveAll(cancelRecords);
         orderRepository.flush();
+
+        cancelEscrowsForItems(itemsToCancel, user, order);
 
         try {
             UUID firstListingId = itemsToCancel.isEmpty() ? null : itemsToCancel.get(0).getListing().getId();
@@ -190,5 +193,20 @@ public class OrderCancellationService {
             }
         }
         return true;
+    }
+
+    private void cancelEscrowsForItems(List<OrderItem> itemsToCancel, User buyer, Order order) {
+        for (OrderItem item : itemsToCancel) {
+            orderEscrowService.findEscrowByOrderItem(item).ifPresent(escrow -> {
+                try {
+                    orderEscrowService.cancelEscrow(escrow, buyer);
+                    log.info("Cancelled escrow {} for order item {} in order {}", 
+                            escrow.getId(), item.getId(), order.getOrderNumber());
+                } catch (Exception e) {
+                    log.error("Failed to cancel escrow {} for order item {}: {}", 
+                            escrow.getId(), item.getId(), e.getMessage());
+                }
+            });
+        }
     }
 }

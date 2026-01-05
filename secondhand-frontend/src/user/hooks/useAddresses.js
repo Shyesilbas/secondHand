@@ -24,7 +24,7 @@ const useAddresses = (options = {}) => {
     if (enabled) {
       fetchAddresses();
     }
-  }, [fetchAddresses, enabled]);
+  }, [enabled]);
 
   const addAddress = async (address) => {
     const newAddress = await userService.addAddress(address);
