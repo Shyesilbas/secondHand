@@ -47,9 +47,7 @@ public class EnumController {
     private final ListingFeeService paymentService;
     private final ShowcaseService showcaseService;
 
-    @GetMapping("/listing-types")
-    @Operation(summary = "Get all listing types", description = "Returns all available listing types with labels")
-    public ResponseEntity<List<Map<String, Object>>> getListingTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getListingTypes() {
         List<Map<String, Object>> listingTypes = Arrays.stream(ListingType.values())
                 .map(type -> {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
@@ -62,9 +60,7 @@ public class EnumController {
         return ResponseEntity.ok(listingTypes);
     }
 
-    @GetMapping("/listing-statuses")
-    @Operation(summary = "Get all listing statuses")
-    public ResponseEntity<List<Map<String, Object>>> getListingStatuses() {
+    private ResponseEntity<List<Map<String, Object>>> getListingStatuses() {
         List<Map<String, Object>> statuses = Arrays.stream(ListingStatus.values())
                 .map(status -> {
                     Map<String, Object> statusMap = new LinkedHashMap<>();
@@ -76,9 +72,7 @@ public class EnumController {
         return ResponseEntity.ok(statuses);
     }
 
-    @GetMapping("/car-brands")
-    @Operation(summary = "Get all car brands")
-    public ResponseEntity<List<Map<String, Object>>> getCarBrands() {
+    private ResponseEntity<List<Map<String, Object>>> getCarBrands() {
         List<Map<String, Object>> brands = Arrays.stream(CarBrand.values())
                 .map(brand -> {
                     Map<String, Object> brandMap = new LinkedHashMap<>();
@@ -90,9 +84,7 @@ public class EnumController {
         return ResponseEntity.ok(brands);
     }
 
-    @GetMapping("/fuel-types")
-    @Operation(summary = "Get all fuel types")
-    public ResponseEntity<List<Map<String, Object>>> getFuelTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getFuelTypes() {
         List<Map<String, Object>> fuelTypes = Arrays.stream(FuelType.values())
                 .map(fuel -> {
                     Map<String, Object> fuelMap = new LinkedHashMap<>();
@@ -104,9 +96,7 @@ public class EnumController {
         return ResponseEntity.ok(fuelTypes);
     }
 
-    @GetMapping("/colors")
-    @Operation(summary = "Get all colors")
-    public ResponseEntity<List<Map<String, Object>>> getColors() {
+    private ResponseEntity<List<Map<String, Object>>> getColors() {
         List<Map<String, Object>> colors = Arrays.stream(Color.values())
                 .map(color -> {
                     Map<String, Object> colorMap = new LinkedHashMap<>();
@@ -118,9 +108,7 @@ public class EnumController {
         return ResponseEntity.ok(colors);
     }
 
-    @GetMapping("/processors")
-    @Operation(summary = "Get all processors")
-    public ResponseEntity<List<Map<String, Object>>> getProcessors() {
+    private ResponseEntity<List<Map<String, Object>>> getProcessors() {
         List<Map<String, Object>> processors = Arrays.stream(Processor.values())
                 .map(proc -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -132,9 +120,7 @@ public class EnumController {
         return ResponseEntity.ok(processors);
     }
 
-    @GetMapping("/genders")
-    @Operation(summary = "Get all genders")
-    public ResponseEntity<List<Map<String, Object>>> getGenders() {
+    private ResponseEntity<List<Map<String, Object>>> getGenders() {
         List<Map<String, Object>> genders = Arrays.stream(Gender.values())
                 .map(gender -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -146,9 +132,7 @@ public class EnumController {
         return ResponseEntity.ok(genders);
     }
 
-    @GetMapping("/doors")
-    @Operation(summary = "Get all door options")
-    public ResponseEntity<List<Map<String, Object>>> getDoors() {
+    private ResponseEntity<List<Map<String, Object>>> getDoors() {
         List<Map<String, Object>> doors = Arrays.stream(Doors.values())
                 .map(door -> {
                     Map<String, Object> doorMap = new LinkedHashMap<>();
@@ -160,9 +144,7 @@ public class EnumController {
         return ResponseEntity.ok(doors);
     }
 
-    @GetMapping("/currencies")
-    @Operation(summary = "Get all currencies")
-    public ResponseEntity<List<Map<String, Object>>> getCurrencies() {
+    private ResponseEntity<List<Map<String, Object>>> getCurrencies() {
         List<Map<String, Object>> currencies = Arrays.stream(Currency.values())
                 .map(currency -> {
                     Map<String, Object> currencyMap = new LinkedHashMap<>();
@@ -175,9 +157,7 @@ public class EnumController {
         return ResponseEntity.ok(currencies);
     }
 
-    @GetMapping("/gear-types")
-    @Operation(summary = "Get all gear types")
-    public ResponseEntity<List<Map<String, Object>>> getGearTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getGearTypes() {
         List<Map<String, Object>> gearTypes = Arrays.stream(GearType.values())
                 .map(gearType -> {
                     Map<String, Object> gearTypeMap = new LinkedHashMap<>();
@@ -189,9 +169,7 @@ public class EnumController {
         return ResponseEntity.ok(gearTypes);
     }
 
-    @GetMapping("/seat-counts")
-    @Operation(summary = "Get all seat count options")
-    public ResponseEntity<List<Map<String, Object>>> getSeatCounts() {
+    private ResponseEntity<List<Map<String, Object>>> getSeatCounts() {
         List<Map<String, Object>> seatCounts = Arrays.stream(SeatCount.values())
                 .map(seatCount -> {
                     Map<String, Object> seatCountMap = new LinkedHashMap<>();
@@ -203,9 +181,7 @@ public class EnumController {
         return ResponseEntity.ok(seatCounts);
     }
 
-    @GetMapping("/electronic-types")
-    @Operation(summary = "Get all electronic types")
-    public ResponseEntity<List<Map<String, Object>>> getElectronicTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getElectronicTypes() {
         List<Map<String, Object>> types = Arrays.stream(ElectronicType.values())
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -217,9 +193,7 @@ public class EnumController {
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/electronic-brands")
-    @Operation(summary = "Get all electronic brands")
-    public ResponseEntity<List<Map<String, Object>>> getElectronicBrands() {
+    private ResponseEntity<List<Map<String, Object>>> getElectronicBrands() {
         List<Map<String, Object>> brands = Arrays.stream(ElectronicBrand.values())
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -231,9 +205,7 @@ public class EnumController {
         return ResponseEntity.ok(brands);
     }
 
-    @GetMapping("/real-estate-types")
-    @Operation(summary = "Get all real estate types")
-    public ResponseEntity<List<Map<String, Object>>> getRealEstateTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getRealEstateTypes() {
         List<Map<String, Object>> types = Arrays.stream(RealEstateType.values())
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -245,9 +217,7 @@ public class EnumController {
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/real-estate-ad-types")
-    @Operation(summary = "Get all real estate ad types")
-    public ResponseEntity<List<Map<String, Object>>> getRealEstateAdTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getRealEstateAdTypes() {
         List<Map<String, Object>> adTypes = Arrays.stream(RealEstateAdType.values())
                 .map(adType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -259,9 +229,7 @@ public class EnumController {
         return ResponseEntity.ok(adTypes);
     }
 
-    @GetMapping("/heating-types")
-    @Operation(summary = "Get all heating types")
-    public ResponseEntity<List<Map<String, Object>>> getHeatingTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getHeatingTypes() {
         List<Map<String, Object>> heatingTypes = Arrays.stream(HeatingType.values())
                 .map(heatingType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -273,9 +241,7 @@ public class EnumController {
         return ResponseEntity.ok(heatingTypes);
     }
 
-    @GetMapping("/owner-types")
-    @Operation(summary = "Get all owner types")
-    public ResponseEntity<List<Map<String, Object>>> getOwnerTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getOwnerTypes() {
         List<Map<String, Object>> ownerTypes = Arrays.stream(ListingOwnerType.values())
                 .map(ownerType -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -287,9 +253,7 @@ public class EnumController {
         return ResponseEntity.ok(ownerTypes);
     }
 
-    @GetMapping("/payment-types")
-    @Operation(summary = "Get all payment types")
-    public ResponseEntity<List<Map<String, Object>>> getPaymentTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getPaymentTypes() {
         List<Map<String, Object>> types = Arrays.stream(PaymentType.values())
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -301,9 +265,7 @@ public class EnumController {
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/shipping-statuses")
-    @Operation(summary = "Get all shipping statuses")
-    public ResponseEntity<List<Map<String, Object>>> getShippingStatuses() {
+    private ResponseEntity<List<Map<String, Object>>> getShippingStatuses() {
         List<Map<String, Object>> list = Arrays.stream(ShippingStatus.values())
                 .map(status -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -315,9 +277,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/order-statuses")
-    @Operation(summary = "Get all order statuses")
-    public ResponseEntity<List<Map<String, Object>>> getOrderStatuses() {
+    private ResponseEntity<List<Map<String, Object>>> getOrderStatuses() {
         List<Map<String, Object>> list = Arrays.stream(Order.OrderStatus.values())
                 .map(status -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -329,9 +289,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/email-types")
-    @Operation(summary = "Get all email types")
-    public ResponseEntity<List<Map<String, Object>>> getEmailTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getEmailTypes() {
         List<Map<String, Object>> list = Arrays.stream(EmailType.values())
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -343,9 +301,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/clothing-brands")
-    @Operation(summary = "Get all clothing brands")
-    public ResponseEntity<List<Map<String, Object>>> getClothingBrands() {
+    private ResponseEntity<List<Map<String, Object>>> getClothingBrands() {
         List<Map<String, Object>> brands = Arrays.stream(ClothingBrand.values())
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -357,9 +313,7 @@ public class EnumController {
         return ResponseEntity.ok(brands);
     }
 
-    @GetMapping("/clothing-types")
-    @Operation(summary = "Get all clothing types")
-    public ResponseEntity<List<Map<String, Object>>> getClothingTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getClothingTypes() {
         List<Map<String, Object>> types = Arrays.stream(ClothingType.values())
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -371,9 +325,7 @@ public class EnumController {
         return ResponseEntity.ok(types);
     }
 
-    @GetMapping("/clothing-conditions")
-    @Operation(summary = "Get all clothing conditions")
-    public ResponseEntity<List<Map<String, Object>>> getClothingConditions() {
+    private ResponseEntity<List<Map<String, Object>>> getClothingConditions() {
         List<Map<String, Object>> conditions = Arrays.stream(ClothingCondition.values())
                 .map(condition -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -385,9 +337,7 @@ public class EnumController {
         return ResponseEntity.ok(conditions);
     }
 
-    @GetMapping("/clothing-genders")
-    @Operation(summary = "Get all clothing genders")
-    public ResponseEntity<List<Map<String, Object>>> getClothingGenders() {
+    private ResponseEntity<List<Map<String, Object>>> getClothingGenders() {
         List<Map<String, Object>> genders = Arrays.stream(ClothingGender.values())
                 .map(gender -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -399,9 +349,7 @@ public class EnumController {
         return ResponseEntity.ok(genders);
     }
 
-    @GetMapping("/clothing-categories")
-    @Operation(summary = "Get all clothing categories")
-    public ResponseEntity<List<Map<String, Object>>> getClothingCategories() {
+    private ResponseEntity<List<Map<String, Object>>> getClothingCategories() {
         List<Map<String, Object>> categories = Arrays.stream(ClothingCategory.values())
                 .map(category -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -413,9 +361,7 @@ public class EnumController {
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/book-genres")
-    @Operation(summary = "Get all book genres")
-    public ResponseEntity<List<Map<String, Object>>> getBookGenres() {
+    private ResponseEntity<List<Map<String, Object>>> getBookGenres() {
         List<Map<String, Object>> genres = Arrays.stream(BookGenre.values())
                 .map(genre -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -427,9 +373,7 @@ public class EnumController {
         return ResponseEntity.ok(genres);
     }
 
-    @GetMapping("/book-languages")
-    @Operation(summary = "Get all book languages")
-    public ResponseEntity<List<Map<String, Object>>> getBookLanguages() {
+    private ResponseEntity<List<Map<String, Object>>> getBookLanguages() {
         List<Map<String, Object>> langs = Arrays.stream(BookLanguage.values())
                 .map(lang -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -441,9 +385,7 @@ public class EnumController {
         return ResponseEntity.ok(langs);
     }
 
-    @GetMapping("/book-formats")
-    @Operation(summary = "Get all book formats")
-    public ResponseEntity<List<Map<String, Object>>> getBookFormats() {
+    private ResponseEntity<List<Map<String, Object>>> getBookFormats() {
         List<Map<String, Object>> formats = Arrays.stream(BookFormat.values())
                 .map(fmt -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -455,9 +397,7 @@ public class EnumController {
         return ResponseEntity.ok(formats);
     }
 
-    @GetMapping("/book-conditions")
-    @Operation(summary = "Get all book conditions")
-    public ResponseEntity<List<Map<String, Object>>> getBookConditions() {
+    private ResponseEntity<List<Map<String, Object>>> getBookConditions() {
         List<Map<String, Object>> conditions = Arrays.stream(BookCondition.values())
                 .map(cond -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -469,9 +409,7 @@ public class EnumController {
         return ResponseEntity.ok(conditions);
     }
 
-    @GetMapping("/sport-disciplines")
-    @Operation(summary = "Get all sport disciplines")
-    public ResponseEntity<List<Map<String, Object>>> getSportDisciplines() {
+    private ResponseEntity<List<Map<String, Object>>> getSportDisciplines() {
         List<Map<String, Object>> list = Arrays.stream(SportDiscipline.values())
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -483,9 +421,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/sport-equipment-types")
-    @Operation(summary = "Get all sport equipment types")
-    public ResponseEntity<List<Map<String, Object>>> getSportEquipmentTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getSportEquipmentTypes() {
         List<Map<String, Object>> list = Arrays.stream(SportEquipmentType.values())
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -497,9 +433,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/sport-conditions")
-    @Operation(summary = "Get all sport conditions")
-    public ResponseEntity<List<Map<String, Object>>> getSportConditions() {
+    private ResponseEntity<List<Map<String, Object>>> getSportConditions() {
         List<Map<String, Object>> list = Arrays.stream(SportCondition.values())
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -511,9 +445,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/drivetrains")
-    @Operation(summary = "Get all drivetrains")
-    public ResponseEntity<List<Map<String, Object>>> getDrivetrains() {
+    private ResponseEntity<List<Map<String, Object>>> getDrivetrains() {
         List<Map<String, Object>> list = Arrays.stream(Drivetrain.values())
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -525,9 +457,7 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/body-types")
-    @Operation(summary = "Get all vehicle body types")
-    public ResponseEntity<List<Map<String, Object>>> getBodyTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getBodyTypes() {
         List<Map<String, Object>> list = Arrays.stream(BodyType.values())
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -594,13 +524,7 @@ public class EnumController {
 
     private String getGenderLabel(Gender gender) { return gender.getLabel(); }
 
-    private String getClothingGenderLabel(ClothingGender gender) { return gender.getLabel(); }
-
-    private String getClothingCategoryLabel(ClothingCategory category) { return category.getLabel(); }
-
-    @GetMapping("/audit-event-types")
-    @Operation(summary = "Get audit event types", description = "Returns all available audit event types with display names")
-    public ResponseEntity<List<Map<String, Object>>> getAuditEventTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getAuditEventTypes() {
         List<Map<String, Object>> eventTypes = Arrays.stream(AuditLog.AuditEventType.values())
                 .map(eventType -> {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
@@ -612,9 +536,7 @@ public class EnumController {
         return ResponseEntity.ok(eventTypes);
     }
 
-    @GetMapping("/audit-event-statuses")
-    @Operation(summary = "Get audit event statuses", description = "Returns all available audit event statuses with display names")
-    public ResponseEntity<List<Map<String, Object>>> getAuditEventStatuses() {
+    private ResponseEntity<List<Map<String, Object>>> getAuditEventStatuses() {
         List<Map<String, Object>> eventStatuses = Arrays.stream(AuditLog.AuditEventStatus.values())
                 .map(eventStatus -> {
                     Map<String, Object> statusMap = new LinkedHashMap<>();
@@ -626,9 +548,7 @@ public class EnumController {
         return ResponseEntity.ok(eventStatuses);
     }
 
-    @GetMapping("/listing-fee-config")
-    @Operation(summary = "Get listing fee configuration", description = "Returns listing fee configuration for caching")
-    public ResponseEntity<Map<String, Object>> getListingFeeConfig() {
+    private ResponseEntity<Map<String, Object>> getListingFeeConfig() {
         var config = paymentService.getListingFeeConfig();
         Map<String, Object> configMap = new LinkedHashMap<>();
         configMap.put("creationFee", config.getCreationFee());
@@ -646,9 +566,7 @@ public class EnumController {
         return ResponseEntity.ok(configMap);
     }
 
-    @GetMapping("/showcase-pricing-config")
-    @Operation(summary = "Get showcase pricing configuration", description = "Returns showcase pricing configuration for caching")
-    public ResponseEntity<Map<String, Object>> getShowcasePricingConfig() {
+    private ResponseEntity<Map<String, Object>> getShowcasePricingConfig() {
         var config = showcaseService.getShowcasePricingConfig();
         Map<String, Object> configMap = new LinkedHashMap<>();
         configMap.put("dailyCost", config.getDailyCost());
@@ -666,9 +584,7 @@ public class EnumController {
         return ResponseEntity.ok(configMap);
     }
 
-    @GetMapping("/agreement-groups")
-    @Operation(summary = "Get agreement groups", description = "Returns all available agreement groups")
-    public ResponseEntity<List<Map<String, Object>>> getAgreementGroups() {
+    private ResponseEntity<List<Map<String, Object>>> getAgreementGroups() {
         List<Map<String, Object>> agreementGroups = Arrays.stream(AgreementGroup.values())
                 .map(group -> {
                     Map<String, Object> groupMap = new LinkedHashMap<>();
@@ -680,9 +596,7 @@ public class EnumController {
         return ResponseEntity.ok(agreementGroups);
     }
 
-    @GetMapping("/agreement-types")
-    @Operation(summary = "Get agreement types", description = "Returns all available agreement types")
-    public ResponseEntity<List<Map<String, Object>>> getAgreementTypes() {
+    private ResponseEntity<List<Map<String, Object>>> getAgreementTypes() {
         List<Map<String, Object>> agreementTypes = Arrays.stream(AgreementType.values())
                 .map(type -> {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
@@ -692,5 +606,55 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(agreementTypes);
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all enums", description = "Returns all enum values in a single response for efficient loading")
+    public ResponseEntity<Map<String, Object>> getAllEnums() {
+        Map<String, Object> allEnums = new LinkedHashMap<>();
+        
+        allEnums.put("listingTypes", getListingTypes().getBody());
+        allEnums.put("listingStatuses", getListingStatuses().getBody());
+        allEnums.put("carBrands", getCarBrands().getBody());
+        allEnums.put("fuelTypes", getFuelTypes().getBody());
+        allEnums.put("colors", getColors().getBody());
+        allEnums.put("doors", getDoors().getBody());
+        allEnums.put("currencies", getCurrencies().getBody());
+        allEnums.put("gearTypes", getGearTypes().getBody());
+        allEnums.put("seatCounts", getSeatCounts().getBody());
+        allEnums.put("electronicTypes", getElectronicTypes().getBody());
+        allEnums.put("electronicBrands", getElectronicBrands().getBody());
+        allEnums.put("processors", getProcessors().getBody());
+        allEnums.put("drivetrains", getDrivetrains().getBody());
+        allEnums.put("bodyTypes", getBodyTypes().getBody());
+        allEnums.put("realEstateTypes", getRealEstateTypes().getBody());
+        allEnums.put("realEstateAdTypes", getRealEstateAdTypes().getBody());
+        allEnums.put("heatingTypes", getHeatingTypes().getBody());
+        allEnums.put("ownerTypes", getOwnerTypes().getBody());
+        allEnums.put("clothingBrands", getClothingBrands().getBody());
+        allEnums.put("clothingTypes", getClothingTypes().getBody());
+        allEnums.put("clothingConditions", getClothingConditions().getBody());
+        allEnums.put("clothingGenders", getClothingGenders().getBody());
+        allEnums.put("clothingCategories", getClothingCategories().getBody());
+        allEnums.put("bookGenres", getBookGenres().getBody());
+        allEnums.put("bookLanguages", getBookLanguages().getBody());
+        allEnums.put("bookFormats", getBookFormats().getBody());
+        allEnums.put("bookConditions", getBookConditions().getBody());
+        allEnums.put("sportDisciplines", getSportDisciplines().getBody());
+        allEnums.put("sportEquipmentTypes", getSportEquipmentTypes().getBody());
+        allEnums.put("sportConditions", getSportConditions().getBody());
+        allEnums.put("genders", getGenders().getBody());
+        allEnums.put("paymentTypes", getPaymentTypes().getBody());
+        allEnums.put("shippingStatuses", getShippingStatuses().getBody());
+        allEnums.put("orderStatuses", getOrderStatuses().getBody());
+        allEnums.put("emailTypes", getEmailTypes().getBody());
+        allEnums.put("auditEventTypes", getAuditEventTypes().getBody());
+        allEnums.put("auditEventStatuses", getAuditEventStatuses().getBody());
+        allEnums.put("listingFeeConfig", getListingFeeConfig().getBody());
+        allEnums.put("showcasePricingConfig", getShowcasePricingConfig().getBody());
+        allEnums.put("agreementGroups", getAgreementGroups().getBody());
+        allEnums.put("agreementTypes", getAgreementTypes().getBody());
+        
+        return ResponseEntity.ok(allEnums);
     }
 }

@@ -37,7 +37,7 @@ public class PaymentRequestMapper {
     }
     
     private String generateIdempotencyKey(String orderNumber, Long sellerId) {
-        return orderNumber + "-" + sellerId + "-" + System.currentTimeMillis();
+        return orderNumber + "-" + sellerId;
     }
 
     public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, 

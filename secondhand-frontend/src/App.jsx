@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './auth/AuthContext.jsx';
 import { NotificationProvider } from './notification/NotificationContext.jsx';
+import { EnumProvider } from './common/contexts/EnumContext.jsx';
 import AppRoutes from './common/routes/AppRoutes';
 import './common/services/api/interceptors';
 
@@ -23,11 +24,13 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <Router>
                 <AuthProvider>
-                    <NotificationProvider>
-                        <div className="App">
-                            <AppRoutes />
-                        </div>
-                    </NotificationProvider>
+                    <EnumProvider>
+                        <NotificationProvider>
+                            <div className="App">
+                                <AppRoutes />
+                            </div>
+                        </NotificationProvider>
+                    </EnumProvider>
                 </AuthProvider>
             </Router>
         </QueryClientProvider>

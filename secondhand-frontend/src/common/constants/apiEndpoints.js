@@ -133,6 +133,7 @@ export const API_ENDPOINTS = {
         SHOWCASE_PRICING_CONFIG: '/v1/enums/showcase-pricing-config',
         AGREEMENT_GROUPS: '/v1/enums/agreement-groups',
         AGREEMENT_TYPES: '/v1/enums/agreement-types',
+        ALL: '/v1/enums/all',
     },
     VEHICLES: {
         CREATE: '/v1/vehicles/create-listing',

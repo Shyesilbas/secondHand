@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState, useCallback} from 'react';
 import {Link} from 'react-router-dom';
 import {useAuth} from '../auth/AuthContext.jsx';
 import {ROUTES} from '../common/constants/routes.js';
@@ -12,18 +12,27 @@ import {
   LineChart,
   Package,
   Receipt,
+  Search,
   Settings,
   ShoppingBag,
   Shield,
   Star,
   Tag,
-  TrendingUp
+  TrendingUp,
+  User
 } from 'lucide-react';
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const sections = useMemo(() => [
+  const allSections = useMemo(() => [
+    {
+      title: 'Profile',
+      items: [
+        { title: "Profile", desc: "Manage your account", route: ROUTES.PROFILE, icon: User }
+      ]
+    },
     {
       title: 'Sales & Listings',
       items: [
@@ -66,18 +75,66 @@ const DashboardPage = () => {
     }
   ], [user?.id]);
 
+  const filteredSections = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return allSections;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return allSections
+      .map(section => ({
+        ...section,
+        items: section.items.filter(item => 
+          item.title.toLowerCase().startsWith(query) ||
+          item.title.toLowerCase().includes(query) ||
+          item.desc.toLowerCase().includes(query)
+        )
+      }))
+      .filter(section => section.items.length > 0);
+  }, [allSections, searchQuery]);
+
+  const handleSearchChange = useCallback((e) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16">
         <div className="pt-12 pb-24">
-          <div className="mb-16">
+          <div className="mb-16 flex items-center justify-between">
             <p className="text-xl text-gray-600 font-light">
               Welcome back, <span className="font-medium text-black">{user?.name}</span>
             </p>
+            <div className="relative w-full max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search dashboard items..."
+                className="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl bg-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-sm">Clear</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-20">
-            {sections.map((section, idx) => (
+          {filteredSections.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-gray-500 text-lg">No results found for "{searchQuery}"</p>
+              <p className="text-gray-400 text-sm mt-2">Try a different search term</p>
+            </div>
+          ) : (
+            <div className="space-y-20">
+              {filteredSections.map((section, idx) => (
               <section key={idx} className="opacity-0 animate-fade-in" style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'forwards' }}>
                 <h2 className="text-xs font-medium text-gray-500 uppercase tracking-[0.3em] mb-8">
                   {section.title}
@@ -111,8 +168,9 @@ const DashboardPage = () => {
                   })}
                 </div>
               </section>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <style>{`

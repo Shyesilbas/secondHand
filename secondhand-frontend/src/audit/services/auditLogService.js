@@ -1,6 +1,5 @@
 import { request } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { enumService } from '../../common/services/enumService.js';
 
 export const auditLogService = {
         getUserAuditLogsByEmail: async (userEmail, page = 0, size = 10, filters = {}) => {
@@ -46,13 +45,5 @@ export const auditLogService = {
         return request('GET', API_ENDPOINTS.AUDIT_LOGS.FAILED_ATTEMPTS_BY_IP(ipAddress), {
             since: since.toISOString()
         });
-    },
-
-        getEventTypes: async () => {
-        return enumService.getAuditEventTypes();
-    },
-
-        getEventStatuses: async () => {
-        return enumService.getAuditEventStatuses();
     }
 };
