@@ -1,19 +1,10 @@
-import { useState, useEffect } from 'react';
-import { enumService } from '../services/enumService.js';
+import { useEnumContext } from '../contexts/EnumContext.jsx';
 
 export const useGenderEnum = () => {
-  const [genders, setGenders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { enums, isLoading } = useEnumContext();
 
-  useEffect(() => {
-    let mounted = true;
-    enumService.getGenders().then((data) => {
-      if (mounted) setGenders(Array.isArray(data) ? data : []);
-    }).finally(() => {
-      if (mounted) setIsLoading(false);
-    });
-    return () => { mounted = false; };
-  }, []);
-
-  return { genders, isLoading };
+  return { 
+    genders: enums.genders || [], 
+    isLoading 
+  };
 };
