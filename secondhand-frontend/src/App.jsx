@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './auth/AuthContext.jsx';
 import { NotificationProvider } from './notification/NotificationContext.jsx';
 import { EnumProvider } from './common/contexts/EnumContext.jsx';
+import { ComparisonProvider, CompareFloatingBar, CompareModal } from './comparison/index.js';
 import AppRoutes from './common/routes/AppRoutes';
 import './common/services/api/interceptors';
 
@@ -26,9 +27,13 @@ function App() {
                 <AuthProvider>
                     <EnumProvider>
                         <NotificationProvider>
-                            <div className="App">
-                                <AppRoutes />
-                            </div>
+                            <ComparisonProvider>
+                                <div className="App">
+                                    <AppRoutes />
+                                    <CompareFloatingBar />
+                                    <CompareModal />
+                                </div>
+                            </ComparisonProvider>
                         </NotificationProvider>
                     </EnumProvider>
                 </AuthProvider>
