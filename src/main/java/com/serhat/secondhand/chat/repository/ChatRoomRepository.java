@@ -15,8 +15,13 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
         @Query("SELECT cr FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC")
     List<ChatRoom> findByParticipantIdOrderByLastMessageTimeDesc(@Param("userId") Long userId);
     
-        @Query("SELECT cr FROM ChatRoom cr WHERE cr.roomType = 'DIRECT' AND :userId1 MEMBER OF cr.participantIds AND :userId2 MEMBER OF cr.participantIds")
-    Optional<ChatRoom> findDirectChatRoom(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+    @Query("SELECT cr FROM ChatRoom cr WHERE cr.roomType = 'DIRECT' AND :userId1 MEMBER OF cr.participantIds AND :userId2 MEMBER OF cr.participantIds ORDER BY cr.createdAt ASC")
+    List<ChatRoom> findDirectChatRooms(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+    
+    default Optional<ChatRoom> findDirectChatRoom(Long userId1, Long userId2) {
+        List<ChatRoom> rooms = findDirectChatRooms(userId1, userId2);
+        return rooms.isEmpty() ? Optional.empty() : Optional.of(rooms.get(0));
+    }
     
         @Query("SELECT COUNT(m) FROM Message m WHERE m.chatRoomId = :chatRoomId AND m.recipient.id = :userId AND m.isRead = false")
     Long countUnreadMessagesByChatRoomAndUser(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
@@ -28,5 +33,7 @@ where :userId member of r.participantIds
 """)
     List<Long> findRoomIdsByParticipantId(@Param("userId") Long userId);
 
+    @Query("SELECT cr FROM ChatRoom cr WHERE cr.roomType = 'LISTING' AND cr.listingId = :listingId AND :userId MEMBER OF cr.participantIds ORDER BY cr.createdAt ASC")
+    List<ChatRoom> findListingChatRooms(@Param("listingId") String listingId, @Param("userId") Long userId);
 
 }
