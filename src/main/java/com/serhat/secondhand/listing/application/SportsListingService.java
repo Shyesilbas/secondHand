@@ -8,12 +8,14 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFi
 import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class SportsListingService {
     private final ListingMapper listingMapper;
     private final SportsListingFilterService sportsListingFilterService;
     private final PriceHistoryService priceHistoryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UUID createSportsListing(SportsCreateRequest request, User seller) {
@@ -39,10 +42,13 @@ public class SportsListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         entity.setSeller(seller);
-        entity.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
-        entity.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
+        entity.setListingFeePaid(true);
+        entity.setStatus(ListingStatus.ACTIVE);
         SportsListing saved = sportsRepository.save(entity);
         log.info("Sports listing created: {}", saved.getId());
+        
+        eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
+        
         return saved.getId();
     }
 

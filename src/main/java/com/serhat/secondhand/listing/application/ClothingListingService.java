@@ -10,12 +10,14 @@ import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class ClothingListingService {
     private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
     private final PriceHistoryService priceHistoryService;
+    private final ApplicationEventPublisher eventPublisher;
     
     @Transactional
     public UUID createClothingListing(ClothingCreateRequest request, User seller) {
@@ -42,10 +45,13 @@ public class ClothingListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         clothing.setSeller(seller);
-        clothing.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
-        clothing.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
+        clothing.setListingFeePaid(true);
+        clothing.setStatus(ListingStatus.ACTIVE);
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
+        
+        eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
+        
         return saved.getId();
     }
     

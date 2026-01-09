@@ -45,6 +45,7 @@ const sanitizeLogData = (data) => {
 export const get = (url, config) => request('get', url, undefined, config);
 export const post = (url, data, config) => request('post', url, data, config);
 export const put = (url, data, config) => request('put', url, data, config);
+export const patch = (url, data, config) => request('patch', url, data, config);
 export const del = (url, config) => request('delete', url, undefined, config);
 
 export const requestWithParams = async (method, url, params = {}, data, config = {}) => {

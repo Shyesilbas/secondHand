@@ -8,12 +8,14 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFil
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class BooksListingService {
     private final ListingMapper listingMapper;
     private final BooksListingFilterService booksListingFilterService;
     private final PriceHistoryService priceHistoryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UUID createBooksListing(BooksCreateRequest request, User seller) {
@@ -39,10 +42,13 @@ public class BooksListingService {
             throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
         }
         books.setSeller(seller);
-        books.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
-        books.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
+        books.setListingFeePaid(true);
+        books.setStatus(ListingStatus.ACTIVE);
         BooksListing saved = booksRepository.save(books);
         log.info("Books listing created: {}", saved.getId());
+        
+        eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
+        
         return saved.getId();
     }
 

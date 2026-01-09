@@ -16,6 +16,7 @@ public enum EmailType {
     OFFER_COMPLETED("Offer Completed"),
     PROMOTIONAL("Promotional"),
     PAYMENT_VERIFICATION("Payment Verification"),
+    NEW_LISTING_NOTIFICATION("New Listing Notification"),
     SYSTEM("System");
 
     private final String label;

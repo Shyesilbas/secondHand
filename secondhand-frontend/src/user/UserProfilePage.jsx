@@ -6,12 +6,10 @@ import { useUserListings } from './hooks/useUserListings.js';
 import { useReviews, useUserReviewStats } from '../reviews/index.js';
 import ListingCard from '../listing/components/ListingCard.jsx';
 import UserProfileHeader from './components/UserProfileHeader.jsx';
-import UserStats from './components/UserStats.jsx';
 import UserReviews from './components/UserReviews.jsx';
 import Pagination from '../common/components/ui/Pagination.jsx';
 
 const TABS = [
-    { key: 'overview', label: 'Overview' },
     { key: 'listings', label: 'Listings' },
     { key: 'reviews', label: 'Reviews' },
 ];
@@ -46,7 +44,7 @@ const UserProfilePage = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
-    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTab, setActiveTab] = useState('listings');
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
     const { listings, isLoading: listingsLoading, error: listingsError, pagination, loadPage, handlePageSizeChange } = useUserListings(userId, {
@@ -59,11 +57,11 @@ const UserProfilePage = () => {
         page: 0,
         size: 10
     });
-    const { stats: reviewStats, loading: reviewStatsLoading } = useUserReviewStats(userId, { 
-        enabled: true // Always load for header display
+    const { stats: reviewStats } = useUserReviewStats(userId, { 
+        enabled: true
     });
 
-    const isOwnProfile = currentUser?.id === userId;
+    const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
 
     const handlePageChange = (page) => {
         loadPage(page);
@@ -114,14 +112,6 @@ const UserProfilePage = () => {
                 </div>
 
                 {/* Tab Content */}
-                {activeTab === 'overview' && (
-                  <UserStats
-                    user={user}
-                    reviewStats={reviewStats}
-                    reviewStatsLoading={reviewStatsLoading}
-                  />
-                )}
-
                 {activeTab === 'listings' && (
                     <div className="space-y-6">
                         {/* Header */}

@@ -17,6 +17,8 @@ import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
 import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldCheck, ShoppingBag} from 'lucide-react';
 import {useCart} from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
+import CompareButton from '../../comparison/components/CompareButton.jsx';
+import { FollowButton } from '../../follow/index.js';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -96,7 +98,7 @@ const ListingDetailPage = () => {
             <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {canAddToCart && (
               <button
                 onClick={() => addToCart(listing.id)}
@@ -115,6 +117,12 @@ const ListingDetailPage = () => {
               >
                 <HandCoins className="w-5 h-5" />
               </button>
+            )}
+            {!isOwner && (
+              <CompareButton
+                listing={listing}
+                size="md"
+              />
             )}
             {!isOwner && (
               <FavoriteButton
@@ -277,23 +285,28 @@ const ListingDetailPage = () => {
 
                 {/* Seller Info */}
                 <div className="border-t border-b border-gray-100 py-6 mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
-                        {listing.sellerName?.[0]?.toUpperCase() || 'U'}
+                  <div className="flex items-center justify-between mb-4">
+                     <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                          {listing.sellerName?.[0]?.toUpperCase() || 'U'}
+                       </div>
+                       <div>
+                          <Link
+                            to={ROUTES.USER_PROFILE(listing.sellerId)}
+                            className="font-semibold text-sm text-gray-900 hover:underline block"
+                          >
+                             {listing.sellerName} {listing.sellerSurname}
+                          </Link>
+                          {listing.sellerAccountCreationDate && (
+                            <div className="text-xs text-gray-500">
+                              Joined {new Date(listing.sellerAccountCreationDate).getFullYear()}
+                            </div>
+                          )}
+                       </div>
                      </div>
-                     <div>
-                        <Link
-                          to={ROUTES.USER_PROFILE(listing.sellerId)}
-                          className="font-semibold text-sm text-gray-900 hover:underline block"
-                        >
-                           {listing.sellerName} {listing.sellerSurname}
-                        </Link>
-                        {listing.sellerAccountCreationDate && (
-                          <div className="text-xs text-gray-500">
-                            Joined {new Date(listing.sellerAccountCreationDate).getFullYear()}
-                          </div>
-                        )}
-                     </div>
+                     {!isOwner && (
+                       <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />
+                     )}
                   </div>
 
                   {!isOwner ? (
