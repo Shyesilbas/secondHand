@@ -8,6 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,7 @@ public class PaymentNotificationService {
     @Value("${app.verification.code.expiry.minutes:3}")
     private int verificationExpiryMinutes;
 
+    @Async("notificationExecutor")
     public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto, String listingTitle) {
         try {
             String subject = emailConfig.getPaymentSuccessSubject();

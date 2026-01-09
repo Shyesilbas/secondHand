@@ -10,6 +10,7 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class OrderNotificationService {
     private final OrderMapper orderMapper;
     private final UserService userService;
 
+    @Async("notificationExecutor")
     public void sendOrderNotifications(User user, com.serhat.secondhand.order.entity.Order order, boolean paymentSuccessful) {
         if (!paymentSuccessful) {
             log.info("Skipping notifications for failed order: {}", order.getOrderNumber());
@@ -92,6 +94,7 @@ public class OrderNotificationService {
         }
     }
 
+    @Async("notificationExecutor")
     public void sendOrderCancellationNotification(User user, com.serhat.secondhand.order.entity.Order order) {
         try {
             String subject = "SecondHand - Order Cancelled";
@@ -104,6 +107,7 @@ public class OrderNotificationService {
         }
     }
 
+    @Async("notificationExecutor")
     public void sendOrderStatusUpdateNotification(User user, com.serhat.secondhand.order.entity.Order order) {
         try {
             String subject = "SecondHand - Order Status Updated";
@@ -193,6 +197,7 @@ public class OrderNotificationService {
         return sb.toString();
     }
 
+    @Async("notificationExecutor")
     public void sendOrderRefundNotification(User user, com.serhat.secondhand.order.entity.Order order) {
         try {
             String subject = "SecondHand - Order Refunded";
@@ -205,6 +210,7 @@ public class OrderNotificationService {
         }
     }
 
+    @Async("notificationExecutor")
     public void sendOrderCompletionNotification(User user, com.serhat.secondhand.order.entity.Order order, boolean isAutomatic) {
         try {
             String subject = "SecondHand - Order Completed";

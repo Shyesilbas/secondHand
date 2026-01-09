@@ -8,6 +8,7 @@ import com.serhat.secondhand.listing.domain.repository.listing.ListingViewReposi
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ListingViewService {
     private final ListingViewRepository listingViewRepository;
     private final ListingRepository listingRepository;
 
+    @Async("viewTrackingExecutor")
     @Transactional
     public void trackView(UUID listingId, User user, String sessionId, String ipAddress, String userAgent) {
         try {

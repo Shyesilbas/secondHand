@@ -6,6 +6,7 @@ import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class UserNotificationService {
     private final EmailService emailService;
     private final EmailConfig emailConfig;
 
+    @Async("notificationExecutor")
     public void sendWelcomeNotification(User user) {
         try {
             String subject = emailConfig.getWelcomeSubject();
@@ -38,6 +40,7 @@ public class UserNotificationService {
         }
     }
 
+    @Async("notificationExecutor")
     public void sendPhoneNumberUpdatedNotification(User user) {
         try {
             String subject = emailConfig.getPhoneUpdateSubject();
@@ -49,6 +52,7 @@ public class UserNotificationService {
         }
     }
 
+    @Async("notificationExecutor")
     public void sendPriceChangeNotification(User user, String listingTitle, String oldPriceStr, String newPriceStr) {
         try {
             String subject = emailConfig.getPriceChangeSubject();

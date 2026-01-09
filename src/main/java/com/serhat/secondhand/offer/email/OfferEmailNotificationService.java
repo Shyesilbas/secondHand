@@ -6,17 +6,19 @@ import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OfferEmailNotificationService {
 
     private final EmailService emailService;
     private final OfferEmailTemplateService templateService;
 
+    @Async("notificationExecutor")
     public void notifyOfferReceived(Offer offer) {
         User recipient = offer != null ? offer.getSeller() : null;
         if (recipient == null) {
@@ -26,6 +28,7 @@ public class OfferEmailNotificationService {
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_RECEIVED);
     }
 
+    @Async("notificationExecutor")
     public void notifyCounterReceived(Offer offer) {
         OfferActor actor = offer != null ? offer.getCreatedBy() : null;
         User recipient = actor == OfferActor.BUYER ? offer.getSeller() : actor == OfferActor.SELLER ? offer.getBuyer() : null;
@@ -36,6 +39,7 @@ public class OfferEmailNotificationService {
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_COUNTER_RECEIVED);
     }
 
+    @Async("notificationExecutor")
     public void notifyAcceptedToCreator(Offer offer) {
         OfferActor actor = offer != null ? offer.getCreatedBy() : null;
         User recipient = actor == OfferActor.BUYER ? offer.getBuyer() : actor == OfferActor.SELLER ? offer.getSeller() : null;
@@ -46,6 +50,7 @@ public class OfferEmailNotificationService {
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_ACCEPTED);
     }
 
+    @Async("notificationExecutor")
     public void notifyRejectedToCreator(Offer offer) {
         OfferActor actor = offer != null ? offer.getCreatedBy() : null;
         User recipient = actor == OfferActor.BUYER ? offer.getBuyer() : actor == OfferActor.SELLER ? offer.getSeller() : null;
@@ -56,7 +61,7 @@ public class OfferEmailNotificationService {
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_REJECTED);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async("notificationExecutor")
     public void notifyExpiredToBoth(Offer offer) {
         if (offer == null) {
             return;
@@ -70,7 +75,7 @@ public class OfferEmailNotificationService {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async("notificationExecutor")
     public void notifyCompletedToBoth(Offer offer) {
         if (offer == null) {
             return;

@@ -61,13 +61,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             String jwt = null;
             String userEmail = null;
 
-                        final String authHeader = request.getHeader("Authorization");
+            final String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 jwt = authHeader.substring(7);
                 userEmail = jwtUtils.extractUsername(jwt);
                 log.debug("Token extracted from Authorization header");
-            } 
-                        else {
+            } else {
                 jwt = cookieUtils.getAccessTokenFromCookies(request).orElse(null);
                 if (jwt != null) {
                     userEmail = jwtUtils.extractUsername(jwt);
@@ -75,28 +74,30 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-                        if (jwt == null || userEmail == null) {
+            if (jwt == null || userEmail == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userDetails = userDetailsService.loadUserByUsername(userEmail);
+                
                 TokenStatus status = tokenService.getTokenStatus(jwt).orElse(TokenStatus.REVOKED);
 
-                                if (!jwtUtils.isTokenValid(jwt, userDetailsService.loadUserByUsername(userEmail))) {
+                if (!jwtUtils.isTokenValid(jwt, userDetails)) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
                     return;
                 }
 
-                                if (status != TokenStatus.ACTIVE) {
+                if (status != TokenStatus.ACTIVE) {
                     sendTokenError(response, request, status);
                     return;
                 }
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetailsService.loadUserByUsername(userEmail),
+                        userDetails,
                         null,
-                        userDetailsService.loadUserByUsername(userEmail).getAuthorities()
+                        userDetails.getAuthorities()
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

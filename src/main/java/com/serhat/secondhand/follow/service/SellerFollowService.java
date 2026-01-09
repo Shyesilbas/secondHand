@@ -173,7 +173,7 @@ public class SellerFollowService {
         return sellerFollowRepository.isFollowing(currentUser.getId(), userId);
     }
 
-    @Async
+    @Async("notificationExecutor")
     public void notifyFollowersOfNewListing(Listing listing) {
         User seller = listing.getSeller();
         List<SellerFollow> followers = sellerFollowRepository.findByFollowedAndNotifyOnNewListingTrue(seller);
