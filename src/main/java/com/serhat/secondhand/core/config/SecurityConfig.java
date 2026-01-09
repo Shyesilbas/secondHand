@@ -114,6 +114,12 @@ public class SecurityConfig {
             "/ws/**"
     );
 
+    private static final List<String> FOLLOW_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/follow/stats/*",
+            "/api/follow/user/*/followers",
+            "/api/follow/user/*/following"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -159,6 +165,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/listings/electronics/generator/**").permitAll()
                         .requestMatchers("/api/v1/listings/sports/generator/**").permitAll()
                         .requestMatchers("/api/v1/listings/books/generator/**").permitAll()
+                        
+                        // Follow public endpoints (stats can be viewed by anyone)
+                        .requestMatchers(FOLLOW_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )

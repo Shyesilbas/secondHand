@@ -301,4 +301,15 @@ export const API_ENDPOINTS = {
         UPLOAD: '/images/upload',
         DELETE: '/images/delete',
     },
+    FOLLOW: {
+        FOLLOW: (userId) => `/follow/${userId}`,
+        UNFOLLOW: (userId) => `/follow/${userId}`,
+        TOGGLE_NOTIFICATIONS: (userId) => `/follow/${userId}/notifications`,
+        FOLLOWING: '/follow/following',
+        FOLLOWERS: '/follow/followers',
+        STATS: (userId) => `/follow/stats/${userId}`,
+        CHECK: (userId) => `/follow/check/${userId}`,
+        USER_FOLLOWERS: (userId) => `/follow/user/${userId}/followers`,
+        USER_FOLLOWING: (userId) => `/follow/user/${userId}/following`,
+    },
 };

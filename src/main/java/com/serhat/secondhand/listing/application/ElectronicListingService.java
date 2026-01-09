@@ -9,12 +9,14 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicListingRepository;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class ElectronicListingService {
     private final ListingMapper listingMapper;
     private final ElectronicListingFilterService electronicListingFilterService;
     private final PriceHistoryService priceHistoryService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional
@@ -55,10 +58,13 @@ public class ElectronicListingService {
             electronicListing.setScreenSize(null);
         }
         electronicListing.setSeller(seller);
-        electronicListing.setListingFeePaid(true); // Otomatik olarak listing fee ödendi olarak işaretle
-        electronicListing.setStatus(ListingStatus.ACTIVE); // Otomatik olarak ACTIVE olarak ayarla
+        electronicListing.setListingFeePaid(true);
+        electronicListing.setStatus(ListingStatus.ACTIVE);
         ElectronicListing saved = repository.save(electronicListing);
         log.info("Electronic listing created: {}", saved.getId());
+        
+        eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
+        
         return saved.getId();
     }
 

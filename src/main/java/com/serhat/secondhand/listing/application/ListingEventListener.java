@@ -5,6 +5,7 @@ import com.serhat.secondhand.payment.service.PaymentNotificationService;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
@@ -13,6 +14,7 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class ListingEventListener {
     private final ListingRepository listingRepository;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @EventListener
     @Transactional
@@ -48,6 +51,9 @@ public class ListingEventListener {
             listing.setStatus(ListingStatus.ACTIVE);
             listingRepository.save(listing);
             log.info("Listing {} fee marked as paid.", listing.getId());
+            
+            eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
+            log.info("Published NewListingCreatedEvent for listing {}", listing.getId());
 
         } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
             if (listing.getStatus() == ListingStatus.ACTIVE) {
