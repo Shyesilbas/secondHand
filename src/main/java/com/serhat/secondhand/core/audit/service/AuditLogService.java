@@ -20,7 +20,7 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
-    @Async
+    @Async("taskExecutor")
     @Transactional
     public void logLogin(String userEmail, String ipAddress, String userAgent, boolean success, String errorMessage) {
         try {
@@ -41,7 +41,7 @@ public class AuditLogService {
         }
     }
 
-    @Async
+    @Async("taskExecutor")
     @Transactional
     public void logLogout(String userEmail, Long userId, String ipAddress, String userAgent) {
         try {
@@ -62,7 +62,7 @@ public class AuditLogService {
         }
     }
 
-    @Async
+    @Async("taskExecutor")
     @Transactional
     public void logPasswordChange(String userEmail, Long userId, String ipAddress, String userAgent, boolean success, String errorMessage) {
         try {

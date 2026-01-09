@@ -1,6 +1,7 @@
 package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
+import com.serhat.secondhand.core.security.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,6 +40,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationFilter authenticationFilter;
+    private final RateLimitingFilter rateLimitingFilter;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
@@ -120,6 +123,10 @@ public class SecurityConfig {
             "/api/follow/user/*/following"
     );
 
+    private static final List<String> RATE_LIMIT_TEST_ENDPOINTS = Arrays.asList(
+            "/api/test/rate-limit/**"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -168,6 +175,9 @@ public class SecurityConfig {
                         
                         // Follow public endpoints (stats can be viewed by anyone)
                         .requestMatchers(FOLLOW_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Rate limit test endpoints (for testing rate limiting)
+                        .requestMatchers(RATE_LIMIT_TEST_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -184,6 +194,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler())
                 )
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(rateLimitingFilter, SecurityContextHolderFilter.class)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -16,7 +16,7 @@ public class NewListingNotificationListener {
     private final SellerFollowService sellerFollowService;
 
     @EventListener
-    @Async
+    @Async("notificationExecutor")
     public void handleNewListingCreated(NewListingCreatedEvent event) {
         Listing listing = event.getListing();
         log.info("Handling NewListingCreatedEvent for listing: {} by seller: {}", 
