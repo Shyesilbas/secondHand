@@ -11,6 +11,8 @@ import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
+import CompareButton from '../../comparison/components/CompareButton.jsx';
+import { useComparison } from '../../comparison/hooks/useComparison.js';
 
 const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const [showInfo, setShowInfo] = useState(false);
@@ -18,8 +20,11 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const { user } = useAuth();
     const { showcases } = useShowcase();
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
+    const { isInComparison } = useComparison();
 
     if (!listing) return null;
+
+    const isInCompare = isInComparison(listing.id);
 
     const isOwner = user?.id === listing.sellerId;
     const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
@@ -47,7 +52,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
     return (
-        <div className={`group bg-background-primary rounded-md border border-border-light shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? 'opacity-60' : ''}`}>
+        <div className={`group bg-background-primary rounded-md border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? 'opacity-60' : ''} ${isInCompare ? 'border-accent-indigo-400 ring-2 ring-accent-indigo-100' : 'border-border-light'}`}>
             <div className="aspect-[4/3] bg-secondary-50 relative border-b border-border-light rounded-t-md">
                 <div className="absolute inset-0 overflow-hidden rounded-t-md">
                     {listing.imageUrl ? (
@@ -120,6 +125,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                         size="sm"
                         className="bg-background-primary/90 backdrop-blur hover:bg-background-primary text-text-secondary hover:text-status-error-DEFAULT border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center"
                     />
+                    <CompareButton listing={listing} size="sm" />
                 </div>
 
                  {/* Quick View Button (Bottom Center) */}
