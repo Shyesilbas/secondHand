@@ -23,8 +23,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("UPDATE Message m SET m.isRead = true WHERE m.chatRoomId = :chatRoomId AND m.recipient.id = :userId AND m.isRead = false")
     void markMessagesAsRead(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
     
-        @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC")
-    java.util.Optional<Message> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId") Long chatRoomId);
+    @Query("SELECT m FROM Message m WHERE m.chatRoomId = :chatRoomId ORDER BY m.createdAt DESC")
+    List<Message> findAllByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId") Long chatRoomId);
+    
+    default java.util.Optional<Message> findTopByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId) {
+        List<Message> messages = findAllByChatRoomIdOrderByCreatedAtDesc(chatRoomId);
+        return messages.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(messages.get(0));
+    }
 
     @Query("""
 select m.chatRoomId, count(m)

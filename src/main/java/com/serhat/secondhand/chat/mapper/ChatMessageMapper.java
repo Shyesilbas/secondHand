@@ -15,6 +15,7 @@ public class ChatMessageMapper {
         message.setRecipient(recipient);
         message.setContent(dto.getContent());
         message.setIsRead(false);
+        message.setMessageType(Message.MessageType.TEXT);
         return message;
     }
 

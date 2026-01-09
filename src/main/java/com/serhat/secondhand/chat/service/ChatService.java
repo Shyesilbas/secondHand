@@ -120,6 +120,14 @@ public class ChatService {
         Listing listing =
                 listingRepository.findById(UUID.fromString(listingId)).orElseThrow();
 
+        List<ChatRoom> existingRooms = chatRoomRepository.findListingChatRooms(listingId, userId);
+        if (!existingRooms.isEmpty()) {
+            ChatRoom existingRoom = existingRooms.get(0);
+            if (existingRoom.getParticipantIds().contains(listing.getSeller().getId())) {
+                return chatRoomMapper.toDto(existingRoom);
+            }
+        }
+
         ChatRoom room =
                 chatRoomMapper.toEntity(
                         "Chat about: " + listingTitle,
