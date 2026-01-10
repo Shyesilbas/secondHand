@@ -6,9 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.PostConstruct;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -25,68 +23,37 @@ public class CookieUtils {
     @Value("${app.auth.cookie.same-site:Strict}")
     private String cookieSameSite;
 
-        @Value("${jwt.accessToken.expiration}")
+    @Value("${jwt.accessToken.expiration}")
     private long jwtAccessTokenExpiration;
 
     @Value("${jwt.refreshToken.expiration}")
     private long jwtRefreshTokenExpiration;
 
-        public static final String ACCESS_TOKEN_COOKIE = "sh_at";     public static final String REFRESH_TOKEN_COOKIE = "sh_rt";
-        @Value("${app.auth.cookie.encryption.key:SecondHandApp2024CookieEncryption}")
-    private String encryptionKey;
+    public static final String ACCESS_TOKEN_COOKIE = "sh_at";
+    public static final String REFRESH_TOKEN_COOKIE = "sh_rt";
 
-        private byte[] processedEncryptionKey;
-
-        @PostConstruct
-    private void initializeEncryptionKey() {
-        try {
-                        byte[] keyBytes = encryptionKey.getBytes(StandardCharsets.UTF_8);
-            
-            if (keyBytes.length == 32) {
-                                processedEncryptionKey = keyBytes;
-            } else if (keyBytes.length < 32) {
-                                processedEncryptionKey = new byte[32];
-                System.arraycopy(keyBytes, 0, processedEncryptionKey, 0, keyBytes.length);
-                log.warn("Encryption key was padded to 32 bytes. Consider using a 32-character key for better security.");
-            } else {
-                                processedEncryptionKey = new byte[32];
-                System.arraycopy(keyBytes, 0, processedEncryptionKey, 0, 32);
-                log.warn("Encryption key was truncated to 32 bytes. Consider using exactly a 32-character key.");
-            }
-            
-            log.info("Cookie encryption initialized successfully with {}-byte key", processedEncryptionKey.length);
-            
-        } catch (Exception e) {
-            log.error("Failed to initialize encryption key: {}", e.getMessage());
-                        processedEncryptionKey = "secondhand_default_key_32_bytes".getBytes(StandardCharsets.UTF_8);
-            log.warn("Using fallback encryption key. This is not secure for production!");
-        }
-    }
-
-        public void setAccessTokenCookie(HttpServletResponse response, String token) {
-        String encryptedToken = encryptToken(token);
-        int accessTokenMaxAge = (int) (jwtAccessTokenExpiration / 1000);         Cookie cookie = createSecureCookie(ACCESS_TOKEN_COOKIE, encryptedToken, accessTokenMaxAge, "/");
+    public void setAccessTokenCookie(HttpServletResponse response, String token) {
+        int accessTokenMaxAge = (int) (jwtAccessTokenExpiration / 1000);
+        Cookie cookie = createSecureCookie(ACCESS_TOKEN_COOKIE, token, accessTokenMaxAge, "/");
         response.addCookie(cookie);
         addSameSiteAttribute(response, ACCESS_TOKEN_COOKIE, cookieSameSite);
-        log.debug("Encrypted access token cookie set with SameSite={}, maxAge={}s", cookieSameSite, accessTokenMaxAge);
+        log.debug("Access token cookie set with SameSite={}, maxAge={}s", cookieSameSite, accessTokenMaxAge);
     }
 
-        public void setRefreshTokenCookie(HttpServletResponse response, String token) {
-        String encryptedToken = encryptToken(token);
-        int refreshTokenMaxAge = (int) (jwtRefreshTokenExpiration / 1000);         Cookie cookie = createSecureCookie(REFRESH_TOKEN_COOKIE, encryptedToken, refreshTokenMaxAge, "/");
+    public void setRefreshTokenCookie(HttpServletResponse response, String token) {
+        int refreshTokenMaxAge = (int) (jwtRefreshTokenExpiration / 1000);
+        Cookie cookie = createSecureCookie(REFRESH_TOKEN_COOKIE, token, refreshTokenMaxAge, "/");
         response.addCookie(cookie);
         addSameSiteAttribute(response, REFRESH_TOKEN_COOKIE, cookieSameSite);
-        log.debug("Encrypted refresh token cookie set with SameSite={}, maxAge={}s and path=/", cookieSameSite, refreshTokenMaxAge);
+        log.debug("Refresh token cookie set with SameSite={}, maxAge={}s", cookieSameSite, refreshTokenMaxAge);
     }
 
-        public Optional<String> getAccessTokenFromCookies(HttpServletRequest request) {
-        return getCookieValue(request, ACCESS_TOKEN_COOKIE)
-                .map(this::decryptToken);
+    public Optional<String> getAccessTokenFromCookies(HttpServletRequest request) {
+        return getCookieValue(request, ACCESS_TOKEN_COOKIE);
     }
 
-        public Optional<String> getRefreshTokenFromCookies(HttpServletRequest request) {
-        return getCookieValue(request, REFRESH_TOKEN_COOKIE)
-                .map(this::decryptToken);
+    public Optional<String> getRefreshTokenFromCookies(HttpServletRequest request) {
+        return getCookieValue(request, REFRESH_TOKEN_COOKIE);
     }
 
         public void clearAuthCookies(HttpServletResponse response) {
@@ -157,48 +124,18 @@ public class CookieUtils {
         log.debug("Cookie '{}' cleared with path '{}'", cookieName, path);
     }
 
-        public void addSameSiteAttribute(HttpServletResponse response, String cookieName, String sameSite) {
-                java.util.Collection<String> cookieHeaders = response.getHeaders("Set-Cookie");
+    public void addSameSiteAttribute(HttpServletResponse response, String cookieName, String sameSite) {
+        java.util.Collection<String> cookieHeaders = response.getHeaders("Set-Cookie");
         
         if (cookieHeaders != null && !cookieHeaders.isEmpty()) {
-                        response.setHeader("Set-Cookie", null);
+            response.setHeader("Set-Cookie", null);
             
-                        for (String cookieHeader : cookieHeaders) {
+            for (String cookieHeader : cookieHeaders) {
                 if (cookieHeader.contains(cookieName + "=") && !cookieHeader.contains("SameSite=")) {
                     cookieHeader = cookieHeader + "; SameSite=" + sameSite;
                 }
                 response.addHeader("Set-Cookie", cookieHeader);
             }
-        }
-    }
-
-        private String encryptToken(String token) {
-        try {
-            javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding");
-            javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(
-                    processedEncryptionKey, "AES");
-            cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey);
-            
-            byte[] encryptedBytes = cipher.doFinal(token.getBytes(StandardCharsets.UTF_8));
-            return java.util.Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (Exception e) {
-            log.error("Token encryption failed: {}", e.getMessage());
-                        return token;
-        }
-    }
-
-        private String decryptToken(String encryptedToken) {
-        try {
-            javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding");
-            javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(
-                    processedEncryptionKey, "AES");
-            cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey);
-            
-            byte[] decryptedBytes = cipher.doFinal(java.util.Base64.getDecoder().decode(encryptedToken));
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("Token decryption failed: {}", e.getMessage());
-                        return encryptedToken;
         }
     }
 }

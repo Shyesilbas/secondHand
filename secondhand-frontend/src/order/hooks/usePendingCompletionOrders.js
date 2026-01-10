@@ -4,6 +4,7 @@ import { orderService } from '../services/orderService.js';
 
 export const usePendingCompletionOrders = (options = {}) => {
   const [hasPendingOrders, setHasPendingOrders] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const intervalRef = useRef(null);
@@ -11,24 +12,20 @@ export const usePendingCompletionOrders = (options = {}) => {
 
   useEffect(() => {
     if (!enabled) {
+      setLoading(false);
       return;
     }
 
     const checkPendingOrders = async () => {
       try {
         setLoading(true);
-        const response = await orderService.myOrders(0, 100);
-        const data = response.data || response;
-        const orders = data.content || [];
-        
-        const hasDeliveredNotCompleted = orders.some(
-          order => order.status === 'DELIVERED'
-        );
-        
-        setHasPendingOrders(hasDeliveredNotCompleted);
+        const response = await orderService.getPendingCompletionStatus();
+        setHasPendingOrders(response.hasPendingOrders || false);
+        setPendingCount(response.pendingCount || 0);
       } catch (error) {
         console.error('Error checking pending completion orders:', error);
         setHasPendingOrders(false);
+        setPendingCount(0);
       } finally {
         setLoading(false);
       }
@@ -40,11 +37,8 @@ export const usePendingCompletionOrders = (options = {}) => {
 
     checkPendingOrders();
     
-    if (isRelevantPage) {
-      intervalRef.current = setInterval(checkPendingOrders, 120000);
-    } else {
-      intervalRef.current = setInterval(checkPendingOrders, 300000);
-    }
+    const interval = isRelevantPage ? 120000 : 300000;
+    intervalRef.current = setInterval(checkPendingOrders, interval);
     
     return () => {
       if (intervalRef.current) {
@@ -53,6 +47,6 @@ export const usePendingCompletionOrders = (options = {}) => {
     };
   }, [location.pathname, enabled]);
 
-  return { hasPendingOrders, loading };
+  return { hasPendingOrders, pendingCount, loading };
 };
 

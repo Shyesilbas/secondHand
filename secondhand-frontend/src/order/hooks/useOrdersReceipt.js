@@ -7,7 +7,7 @@ export const useOrdersReceipt = () => {
 
     const openReceipt = useCallback(async (paymentReference) => {
         try {
-            const payments = await paymentService.getMyPayments(0, 100);
+            const payments = await paymentService.getMyPayments(0, 50);
             const list = payments.content || [];
             const payment = list.find(p => String(p.paymentId) === String(paymentReference));
             if (payment) {

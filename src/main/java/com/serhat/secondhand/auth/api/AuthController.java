@@ -110,6 +110,8 @@ public class AuthController {
     }
 
 
+    @Deprecated
+    @Operation(summary = "Validate token (DEPRECATED)", description = "This endpoint is deprecated. JWT validation happens automatically via AuthenticationFilter. Use /api/v1/users/me instead.")
     @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validateToken(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

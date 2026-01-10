@@ -43,6 +43,7 @@ import MyCouponsPage from '../../campaign/pages/MyCouponsPage.jsx';
 import OffersPage from '../../offer/pages/OffersPage.jsx';
 import SellerDashboardPage from '../../dashboard/pages/SellerDashboardPage.jsx';
 import BuyerDashboardPage from '../../dashboard/pages/BuyerDashboardPage.jsx';
+import FavoriteListDetailPage from '../../favoritelist/pages/FavoriteListDetailPage.jsx';
 
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
@@ -130,6 +131,7 @@ const AppRoutes = () => {
                 <Route path={ROUTES.HOME} element={<HomePage />} />
                 <Route path={ROUTES.LISTINGS} element={<ListingsPage />} />
                 <Route path={ROUTES.LISTING_DETAIL(':id')} element={<ListingDetailPage />} />
+                <Route path={ROUTES.FAVORITE_LIST_DETAIL(':listId')} element={<FavoriteListDetailPage />} />
             </Route>
 
             {/* Protected Routes with Main Layout */}

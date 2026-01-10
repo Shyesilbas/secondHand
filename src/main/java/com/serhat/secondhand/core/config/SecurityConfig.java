@@ -127,6 +127,11 @@ public class SecurityConfig {
             "/api/test/rate-limit/**"
     );
 
+    private static final List<String> FAVORITE_LIST_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/favorite-lists/user/*",
+            "/api/favorite-lists/popular"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -178,6 +183,9 @@ public class SecurityConfig {
                         
                         // Rate limit test endpoints (for testing rate limiting)
                         .requestMatchers(RATE_LIMIT_TEST_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Favorite list public endpoints
+                        .requestMatchers(FAVORITE_LIST_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )

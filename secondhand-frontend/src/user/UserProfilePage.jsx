@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Plus, List } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { userService } from './services/userService.js';
 import { useUserListings } from './hooks/useUserListings.js';
 import { useReviews, useUserReviewStats } from '../reviews/index.js';
+import { useUserFavoriteLists, FavoriteListCard, FavoriteListModal } from '../favoritelist/index.js';
 import ListingCard from '../listing/components/ListingCard.jsx';
 import UserProfileHeader from './components/UserProfileHeader.jsx';
 import UserReviews from './components/UserReviews.jsx';
@@ -11,6 +13,7 @@ import Pagination from '../common/components/ui/Pagination.jsx';
 
 const TABS = [
     { key: 'listings', label: 'Listings' },
+    { key: 'lists', label: 'Lists' },
     { key: 'reviews', label: 'Reviews' },
 ];
 
@@ -45,6 +48,7 @@ const UserProfilePage = () => {
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState('listings');
+    const [showCreateListModal, setShowCreateListModal] = useState(false);
 
     const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
     const { listings, isLoading: listingsLoading, error: listingsError, pagination, loadPage, handlePageSizeChange } = useUserListings(userId, {
@@ -62,6 +66,10 @@ const UserProfilePage = () => {
     });
 
     const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
+    
+    const { data: favoriteLists = [], isLoading: listsLoading, refetch: refetchLists } = useUserFavoriteLists(userId, isOwnProfile, {
+        enabled: activeTab === 'lists'
+    });
 
     const handlePageChange = (page) => {
         loadPage(page);
@@ -204,6 +212,77 @@ const UserProfilePage = () => {
                     </div>
                 )}
 
+                {activeTab === 'lists' && (
+                    <div className="space-y-6">
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h2 className="text-lg font-medium text-gray-900">
+                                            Lists {favoriteLists.length > 0 && `(${favoriteLists.length})`}
+                                        </h2>
+                                        <p className="text-sm text-gray-600 mt-1">
+                                            {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
+                                        </p>
+                                    </div>
+                                    {isOwnProfile && (
+                                        <button
+                                            onClick={() => setShowCreateListModal(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            New List
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {listsLoading ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {[...Array(3)].map((_, i) => (
+                                    <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
+                                        <div className="aspect-[4/3] bg-gray-200"></div>
+                                        <div className="p-4 space-y-3">
+                                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : favoriteLists.length === 0 ? (
+                            <div className="bg-white border border-gray-200 rounded-lg">
+                                <div className="text-center text-gray-500 py-12">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <List className="w-8 h-8 text-gray-400" />
+                                    </div>
+                                    <p className="text-lg font-medium mb-2">No lists yet</p>
+                                    <p className="text-sm text-gray-400 mb-4">
+                                        {isOwnProfile 
+                                            ? "You haven't created any lists yet" 
+                                            : "This user hasn't shared any public lists yet"}
+                                    </p>
+                                    {isOwnProfile && (
+                                        <button
+                                            onClick={() => setShowCreateListModal(true)}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Create Your First List
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {favoriteLists.map(list => (
+                                    <FavoriteListCard key={list.id} list={list} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {activeTab === 'reviews' && (
                   <UserReviews
                     receivedReviews={receivedReviews}
@@ -216,6 +295,15 @@ const UserProfilePage = () => {
                   />
                 )}
             </div>
+            
+            <FavoriteListModal
+                isOpen={showCreateListModal}
+                onClose={() => setShowCreateListModal(false)}
+                onSuccess={() => {
+                    refetchLists();
+                    setShowCreateListModal(false);
+                }}
+            />
         </div>
     );
 };

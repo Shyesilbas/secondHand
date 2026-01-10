@@ -48,52 +48,23 @@ export const AuthProvider = ({ children }) => {
                     setIsAuthenticated(true);
                 }
 
-                                if (isCookieAuth) {
+                                if (isCookieAuth || hasValidTokens()) {
                     try {
-                        console.debug('Attempting cookie-based validation...');
-                        // Cache validation for 5 minutes to prevent duplicate calls
-                        const validationResult = await authService.validateToken();
-                        
-                        if (validationResult.valid) {
-                            console.debug('Session is valid');
-                                                        if (!userData) {
-                                const userProfile = await authService.getCurrentUser();
-                                const newUserData = {
-                                    ...UserDTO,
-                                    ...userProfile
-                                };
-                                setUser(newUserData);
-                                setUserState(newUserData);
-                                setIsAuthenticated(true);
-                            }
-                        } else {
-                            console.debug('Session validation failed:', validationResult);
-                            throw new Error('Session invalid');
-                        }
+                        console.debug('Attempting session validation via getCurrentUser...');
+                        const userProfile = await authService.getCurrentUser();
+                        console.debug('Session is valid, user profile fetched');
+                        const newUserData = {
+                            ...UserDTO,
+                            ...userProfile
+                        };
+                        setUser(newUserData);
+                        setUserState(newUserData);
+                        setIsAuthenticated(true);
                     } catch (error) {
-                        console.debug('Cookie-based validation failed:', error.message);
-                                                setUserState(null);
-                        setIsAuthenticated(false);
-                        clearTokens();
-                    }
-                } else if (hasValidTokens()) {
-                    try {
-                        await authService.validateToken();
-                        if (!userData) {
-                            const userProfile = await authService.getCurrentUser();
-                            const newUserData = {
-                                ...UserDTO,
-                                ...userProfile
-                            };
-                            setUser(newUserData);
-                            setUserState(newUserData);
-                            setIsAuthenticated(true);
-                        }
-                    } catch (error) {
-                        console.debug('Token validation failed, user not authenticated');
-                        clearTokens();
+                        console.debug('Session validation failed:', error.message);
                         setUserState(null);
                         setIsAuthenticated(false);
+                        clearTokens();
                     }
                 } else {
                                         console.debug('No valid authentication found');
