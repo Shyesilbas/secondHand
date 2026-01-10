@@ -32,8 +32,8 @@ export const usePayments = () => {
             setError(null);
             
             const [paymentsData, ordersData] = await Promise.all([
-                paymentService.getMyPayments(0, 1000),
-                orderService.myOrders(0, 100)
+                paymentService.getMyPayments(0, 100),
+                orderService.myOrders(0, 20)
             ]);
             
             const payments = paymentsData.content || [];

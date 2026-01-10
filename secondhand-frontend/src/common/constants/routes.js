@@ -44,4 +44,6 @@ export const ROUTES = {
     REVIEWS_GIVEN: (userId) => `/reviews/given/${userId}`,
     MY_SHOWCASES: '/my-showcases',
     MY_COUPONS: '/my-coupons',
+    MY_LISTS: '/my-lists',
+    FAVORITE_LIST_DETAIL: (listId) => `/lists/${listId}`,
 };

@@ -10,7 +10,6 @@ export const API_ENDPOINTS = {
         FORGOT_PASSWORD: '/auth/password/forgot',
         RESET_PASSWORD: '/auth/password/reset',
         CHANGE_PASSWORD: '/auth/password/change',
-        VALIDATE: '/auth/validate',
         REVOKE_ALL_SESSIONS: '/auth/revoke-all-sessions',
     },
     USER: {
@@ -51,16 +50,17 @@ export const API_ENDPOINTS = {
         INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
     },
     ORDERS: {
-        CHECKOUT: '/v1/orders/checkout',                                                 // POST - Checkout
-        LIST_MY_ORDERS: '/v1/orders',                                                    // GET - List all orders
-        LIST_SELLER_ORDERS: '/v1/orders/seller',                                         // GET - List seller orders
-        GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',           // GET - Get pending escrow amount
-        GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`, // GET - Get by order number
-        GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,                          // GET - Get order details by ID
-        CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,                                // PUT - Cancel order
-        REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,                                // POST - Refund order
-        COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,                             // PUT - Complete order
-        UPDATE_ORDER_NAME: (id) => `/v1/orders/${id}/name`,                             // PUT - Update order name
+        CHECKOUT: '/v1/orders/checkout',
+        LIST_MY_ORDERS: '/v1/orders',
+        LIST_SELLER_ORDERS: '/v1/orders/seller',
+        GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',
+        PENDING_COMPLETION: '/v1/orders/pending-completion',
+        GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`,
+        GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,
+        CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,
+        REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,
+        COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,
+        UPDATE_ORDER_NAME: (id) => `/v1/orders/${id}/name`,
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard
@@ -311,5 +311,19 @@ export const API_ENDPOINTS = {
         CHECK: (userId) => `/follow/check/${userId}`,
         USER_FOLLOWERS: (userId) => `/follow/user/${userId}/followers`,
         USER_FOLLOWING: (userId) => `/follow/user/${userId}/following`,
+    },
+    FAVORITE_LISTS: {
+        CREATE: '/favorite-lists',
+        MY_LISTS: '/favorite-lists/my',
+        USER_LISTS: (userId) => `/favorite-lists/user/${userId}`,
+        POPULAR: '/favorite-lists/popular',
+        BY_ID: (listId) => `/favorite-lists/${listId}`,
+        UPDATE: (listId) => `/favorite-lists/${listId}`,
+        DELETE: (listId) => `/favorite-lists/${listId}`,
+        ADD_ITEM: (listId) => `/favorite-lists/${listId}/items`,
+        REMOVE_ITEM: (listId, listingId) => `/favorite-lists/${listId}/items/${listingId}`,
+        LIKE: (listId) => `/favorite-lists/${listId}/like`,
+        UNLIKE: (listId) => `/favorite-lists/${listId}/like`,
+        LISTING_LISTS: (listingId) => `/favorite-lists/listing/${listingId}/lists`,
     },
 };

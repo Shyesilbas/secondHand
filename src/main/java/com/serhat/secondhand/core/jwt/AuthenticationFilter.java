@@ -1,6 +1,5 @@
 package com.serhat.secondhand.core.jwt;
 
-import com.serhat.secondhand.auth.application.TokenService;
 import com.serhat.secondhand.auth.application.UserDetailsServiceImpl;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenStatus;
 import com.serhat.secondhand.core.security.CookieUtils;
@@ -27,7 +26,6 @@ import java.util.List;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final CookieUtils cookieUtils;
 
@@ -82,15 +80,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 var userDetails = userDetailsService.loadUserByUsername(userEmail);
                 
-                TokenStatus status = tokenService.getTokenStatus(jwt).orElse(TokenStatus.REVOKED);
-
+                // JWT signature + expiration validation only - NO DB call for access tokens
+                // Access tokens are stateless, only refresh tokens are stored in DB
                 if (!jwtUtils.isTokenValid(jwt, userDetails)) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
-                    return;
-                }
-
-                if (status != TokenStatus.ACTIVE) {
-                    sendTokenError(response, request, status);
                     return;
                 }
 

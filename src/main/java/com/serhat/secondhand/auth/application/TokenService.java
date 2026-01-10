@@ -49,6 +49,22 @@ public class TokenService {
         return tokenRepository.findByUserAndTokenStatus(user, TokenStatus.ACTIVE);
     }
 
+    public Optional<Token> findActiveRefreshTokenByUser(User user) {
+        return tokenRepository.findByUserAndTokenTypeAndTokenStatus(user, TokenType.REFRESH_TOKEN, TokenStatus.ACTIVE)
+                .stream().findFirst();
+    }
+
+    @Transactional
+    public void revokeUserRefreshTokens(User user) {
+        List<Token> activeRefreshTokens = tokenRepository.findByUserAndTokenTypeAndTokenStatus(
+                user, TokenType.REFRESH_TOKEN, TokenStatus.ACTIVE);
+        if (!activeRefreshTokens.isEmpty()) {
+            activeRefreshTokens.forEach(token -> token.setTokenStatus(TokenStatus.REVOKED));
+            tokenRepository.saveAll(activeRefreshTokens);
+            log.info("Revoked {} active refresh tokens for user: {}", activeRefreshTokens.size(), user.getUsername());
+        }
+    }
+
     @Transactional
     public void revokeToken(String tokenValue) {
         tokenRepository.findByToken(tokenValue)

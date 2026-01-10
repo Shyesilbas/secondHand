@@ -43,6 +43,9 @@ export const orderService = {
   getPendingEscrowAmount: async () => {
     return get(API_ENDPOINTS.ORDERS.GET_PENDING_ESCROW_AMOUNT);
   },
+  getPendingCompletionStatus: async () => {
+    return get(API_ENDPOINTS.ORDERS.PENDING_COMPLETION);
+  },
 };
 
 

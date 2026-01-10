@@ -107,7 +107,7 @@ export const useReviewsByUser = (userId, options = {}) => {
         setError(null);
         
         try {
-            const response = await reviewService.getReviewsByUser(userId, 0, 100);
+            const response = await reviewService.getReviewsByUser(userId, 0, 20);
             setReviews(response.content || []);
             setHasBeenFetched(true);
         } catch (err) {

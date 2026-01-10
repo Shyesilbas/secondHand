@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,10 +105,21 @@ public class OrderQueryService {
                         .collect(Collectors.toList());
                 orderDto.setOrderItems(sellerOrderItems);
             }
-            // Calculate escrow amount for seller items in this order
             java.math.BigDecimal escrowAmount = orderEscrowService.getPendingEscrowAmountByOrder(order, seller);
             orderDto.setEscrowAmount(escrowAmount);
             return orderDto;
         });
+    }
+
+    public Map<String, Object> getPendingCompletionStatus(User user) {
+        boolean hasPending = orderRepository.existsByUserAndStatus(user, Order.OrderStatus.DELIVERED);
+        long count = hasPending ? orderRepository.countByUserAndStatus(user, Order.OrderStatus.DELIVERED) : 0;
+        
+        log.debug("User {} has {} pending completion orders", user.getEmail(), count);
+        
+        return Map.of(
+            "hasPendingOrders", hasPending,
+            "pendingCount", count
+        );
     }
 }

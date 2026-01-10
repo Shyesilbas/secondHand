@@ -40,7 +40,7 @@ export const useListingsSearch = (listings, filters, selectedCategory) => {
                     ...filters,
                     listingType: selectedCategory || filters.listingType,
                     page: currentPage,
-                    size: 100
+                    size: 24
                 });
                 
                 if (response.content && response.content.length > 0) {

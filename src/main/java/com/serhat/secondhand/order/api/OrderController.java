@@ -98,6 +98,19 @@ public class OrderController {
         return ResponseEntity.ok(java.util.Map.of("amount", amount));
     }
 
+    @GetMapping("/pending-completion")
+    @Operation(summary = "Check pending completion orders", description = "Check if user has any orders waiting for completion (DELIVERED status)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<java.util.Map<String, Object>> getPendingCompletionStatus(
+            @AuthenticationPrincipal User currentUser) {
+        log.debug("API request to check pending completion orders for user: {}", currentUser.getEmail());
+        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser);
+        return ResponseEntity.ok(status);
+    }
+
     @GetMapping("/details/{orderId}")
     @Operation(summary = "Get order by ID", description = "Retrieve specific order details")
     @ApiResponses(value = {

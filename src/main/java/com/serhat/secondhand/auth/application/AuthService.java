@@ -121,24 +121,15 @@ public class AuthService {
         user.setLastLoginDate(LocalDateTime.now());
         userService.update(user);
 
-        Token oldRefreshToken = tokenService.findActiveTokensByUser(user).stream()
-                .filter(t -> t.getTokenType() == TokenType.REFRESH_TOKEN)
-                .findFirst()
-                .orElse(null);
-
-        tokenService.revokeAllUserTokens(user);
+        Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(user).orElse(null);
+        
+        // Only revoke refresh tokens - access tokens are stateless
+        tokenService.revokeUserRefreshTokens(user);
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);
 
-        tokenService.saveToken(
-                accessToken,
-                TokenType.ACCESS_TOKEN,
-                user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
-                null
-        );
-
+        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
         tokenService.saveToken(
                 refreshToken,
                 TokenType.REFRESH_TOKEN,
@@ -157,16 +148,13 @@ public class AuthService {
 
         User user = userService.findByEmail(username);
 
-        if (tokenService.findActiveTokensByUser(user).isEmpty()) {
+        // Only check for active refresh tokens - access tokens are stateless
+        if (tokenService.findActiveRefreshTokenByUser(user).isEmpty()) {
             throw UserAlreadyLoggedOutException.defaultMessage();
         }
 
-        if (accessToken != null) {
-            tokenService.revokeToken(accessToken);
-            log.info("Access token revoked during logout.");
-        }
-
-        tokenService.revokeAllUserTokens(user);
+        // Only revoke refresh tokens - access tokens are not stored in DB
+        tokenService.revokeUserRefreshTokens(user);
 
         log.info("User logged out successfully: {}", user.getEmail());
         return "Logout successful";
@@ -196,16 +184,10 @@ public class AuthService {
         String newAccessToken = jwtUtils.generateAccessToken(user);
         String newRefreshToken = jwtUtils.generateRefreshToken(user);
 
+        // Revoke old refresh token
         tokenService.revokeToken(refreshTokenValue);
 
-        tokenService.saveToken(
-                newAccessToken,
-                TokenType.ACCESS_TOKEN,
-                user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
-                null
-        );
-
+        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
         tokenService.saveToken(
                 newRefreshToken,
                 TokenType.REFRESH_TOKEN,
@@ -249,25 +231,17 @@ public class AuthService {
     public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request) {
         User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
 
-        Token oldRefreshToken = null;
         if (existing != null) {
             existing.setLastLoginDate(LocalDateTime.now());
             userService.update(existing);
 
-            tokenService.revokeAllUserTokens(existing);
+            Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(existing).orElse(null);
+            tokenService.revokeUserRefreshTokens(existing);
 
             String accessToken = jwtUtils.generateAccessToken(existing);
             String refreshToken = jwtUtils.generateRefreshToken(existing);
 
-            oldRefreshToken = tokenService.findByUserAndType(existing, TokenType.REFRESH_TOKEN).orElse(null);
-
-            tokenService.saveToken(
-                    accessToken,
-                    TokenType.ACCESS_TOKEN,
-                    existing,
-                    LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
-                    null
-            );
+            // Only save REFRESH_TOKEN to DB
             tokenService.saveToken(
                     refreshToken,
                     TokenType.REFRESH_TOKEN,
@@ -279,7 +253,7 @@ public class AuthService {
             return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
         }
 
-                User user = User.builder()
+        User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
                 .email(request.getEmail())
@@ -299,15 +273,7 @@ public class AuthService {
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);
 
-        tokenService.revokeAllUserTokens(user);
-
-        tokenService.saveToken(
-                accessToken,
-                TokenType.ACCESS_TOKEN,
-                user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000),
-                null
-        );
+        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
         tokenService.saveToken(
                 refreshToken,
                 TokenType.REFRESH_TOKEN,
@@ -325,9 +291,10 @@ public class AuthService {
         
         log.info("Revoking all sessions for user: {}", username);
         
-                tokenService.revokeAllUserTokens(user);
+        // Only revoke refresh tokens - access tokens are stateless
+        tokenService.revokeUserRefreshTokens(user);
         
-                String ipAddress = getClientIpAddress(request);
+        String ipAddress = getClientIpAddress(request);
         String userAgent = getClientUserAgent(request);
         auditLogService.logLogout(username, user.getId(), ipAddress, userAgent);
         

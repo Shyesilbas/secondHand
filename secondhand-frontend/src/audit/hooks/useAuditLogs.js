@@ -23,7 +23,7 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
         refetch
     } = useQuery({
         queryKey: ['auditLogs', user?.email],
-        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email, 0, 1000), // Get all logs
+        queryFn: () => auditLogService.getUserAuditLogsByEmail(user?.email, 0, 50),
         enabled: !!user?.email,
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,

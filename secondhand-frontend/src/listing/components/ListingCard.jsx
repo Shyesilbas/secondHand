@@ -13,6 +13,7 @@ import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
+import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 
 const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     const [showInfo, setShowInfo] = useState(false);
@@ -123,8 +124,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                         initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
                         initialCount={listing.favoriteStats?.favoriteCount ?? 0}
                         size="sm"
-                        className="bg-background-primary/90 backdrop-blur hover:bg-background-primary text-text-secondary hover:text-status-error-DEFAULT border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center"
+                        showCount={false}
                     />
+                    <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
                     <CompareButton listing={listing} size="sm" />
                 </div>
 
