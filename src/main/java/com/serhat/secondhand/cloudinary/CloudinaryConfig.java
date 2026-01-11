@@ -2,33 +2,27 @@ package com.serhat.secondhand.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import org.springframework.beans.factory.annotation.Value;
+import com.serhat.secondhand.core.config.CloudinaryConfigProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class CloudinaryConfig {
 
-
-    @Value("${cloudinary.cloud-name}")
-    private String cloudName;
-
-    @Value("${cloudinary.api-key}")
-    private String apiKey;
-
-    @Value("${cloudinary.api-secret}")
-    private String apiSecret;
+    private final CloudinaryConfigProperties cloudinaryConfigProperties;
 
     @Bean
     public Cloudinary cloudinary() {
-        System.out.println("Cloudinary Config - Cloud Name: " + (cloudName != null ? "SET" : "NULL"));
-        System.out.println("Cloudinary Config - API Key: " + (apiKey != null ? "SET" : "NULL"));
-        System.out.println("Cloudinary Config - API Secret: " + (apiSecret != null ? "SET" : "NULL"));
+        System.out.println("Cloudinary Config - Cloud Name: " + (cloudinaryConfigProperties.getCloudName() != null ? "SET" : "NULL"));
+        System.out.println("Cloudinary Config - API Key: " + (cloudinaryConfigProperties.getApiKey() != null ? "SET" : "NULL"));
+        System.out.println("Cloudinary Config - API Secret: " + (cloudinaryConfigProperties.getApiSecret() != null ? "SET" : "NULL"));
         
         return new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", cloudName,
-                "api_key", apiKey,
-                "api_secret", apiSecret
+                "cloud_name", cloudinaryConfigProperties.getCloudName(),
+                "api_key", cloudinaryConfigProperties.getApiKey(),
+                "api_secret", cloudinaryConfigProperties.getApiSecret()
         ));
     }
 

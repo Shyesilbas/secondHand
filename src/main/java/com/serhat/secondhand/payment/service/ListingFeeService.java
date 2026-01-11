@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.service;
 
+import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -12,7 +13,6 @@ import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +24,11 @@ import java.math.RoundingMode;
 @RequiredArgsConstructor
 public class ListingFeeService {
 
+    private final ListingConfig listingConfig;
     private final UserService userService;
     private final ListingService listingService;
     private final PaymentProcessor paymentProcessor;
     private final PaymentRequestMapper paymentRequestMapper;
-
-    @Value("${app.listing.creation.fee}")
-    private BigDecimal listingCreationFee;
-
-    @Value("${app.listing.fee.tax}")
-    private BigDecimal listingFeeTax;
 
     @Transactional
     public PaymentDto payListingCreationFee(ListingFeePaymentRequest request, Authentication authentication) {
@@ -53,13 +48,15 @@ public class ListingFeeService {
     public ListingFeeConfigDto getListingFeeConfig() {
         BigDecimal totalFee = calculateTotalListingFee();
         return ListingFeeConfigDto.builder()
-                .creationFee(listingCreationFee)
-                .taxPercentage(listingFeeTax)
+                .creationFee(listingConfig.getCreation().getFee())
+                .taxPercentage(listingConfig.getFee().getTax())
                 .totalCreationFee(totalFee)
                 .build();
     }
 
     protected BigDecimal calculateTotalListingFee() {
+        BigDecimal listingCreationFee = listingConfig.getCreation().getFee();
+        BigDecimal listingFeeTax = listingConfig.getFee().getTax();
         BigDecimal taxAmount = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         return listingCreationFee.add(taxAmount);
     }

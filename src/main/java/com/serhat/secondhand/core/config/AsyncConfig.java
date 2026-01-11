@@ -1,8 +1,8 @@
 package com.serhat.secondhand.core.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -15,27 +15,18 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableAsync
 @Slf4j
+@RequiredArgsConstructor
 public class AsyncConfig implements AsyncConfigurer {
 
-    @Value("${app.async.core-pool-size:4}")
-    private int corePoolSize;
-
-    @Value("${app.async.max-pool-size:10}")
-    private int maxPoolSize;
-
-    @Value("${app.async.queue-capacity:100}")
-    private int queueCapacity;
-
-    @Value("${app.async.thread-name-prefix:async-}")
-    private String threadNamePrefix;
+    private final AsyncConfigProperties asyncConfigProperties;
 
     @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setQueueCapacity(queueCapacity);
-        executor.setThreadNamePrefix(threadNamePrefix);
+        executor.setCorePoolSize(asyncConfigProperties.getCorePoolSize());
+        executor.setMaxPoolSize(asyncConfigProperties.getMaxPoolSize());
+        executor.setQueueCapacity(asyncConfigProperties.getQueueCapacity());
+        executor.setThreadNamePrefix(asyncConfigProperties.getThreadNamePrefix());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
         executor.setRejectedExecutionHandler((r, e) -> 
@@ -43,7 +34,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.initialize();
         
         log.info("Async executor initialized - Core: {}, Max: {}, Queue: {}", 
-            corePoolSize, maxPoolSize, queueCapacity);
+            asyncConfigProperties.getCorePoolSize(), asyncConfigProperties.getMaxPoolSize(), asyncConfigProperties.getQueueCapacity());
         return executor;
     }
 

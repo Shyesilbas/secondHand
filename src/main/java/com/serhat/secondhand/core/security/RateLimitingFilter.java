@@ -1,13 +1,14 @@
 package com.serhat.secondhand.core.security;
 
+import com.serhat.secondhand.core.config.RateLimitConfig;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
@@ -27,22 +28,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
+@RequiredArgsConstructor
 public class RateLimitingFilter extends OncePerRequestFilter {
 
-    @Value("${app.rate-limit.auth.requests-per-second:3}")
-    private int authRequestsPerSecond;
-
-    @Value("${app.rate-limit.payment.requests-per-second:3}")
-    private int paymentRequestsPerSecond;
-
-    @Value("${app.rate-limit.general.requests-per-second:10}")
-    private int generalRequestsPerSecond;
-
-    @Value("${app.rate-limit.window-size-seconds:60}")
-    private int windowSizeSeconds;
-
-    @Value("${app.rate-limit.enabled:true}")
-    private boolean rateLimitingEnabled;
+    private final RateLimitConfig rateLimitConfig;
 
     private final ConcurrentHashMap<String, RateLimitData> rateLimitMap = new ConcurrentHashMap<>();
     private ScheduledExecutorService cleanupExecutor;
@@ -57,7 +46,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         cleanupExecutor.scheduleAtFixedRate(this::cleanupOldEntries, 60, 60, TimeUnit.SECONDS);
         
         log.info("RateLimitingFilter initialized - Enabled: {}, Auth: {}/s, Payment: {}/s, General: {}/s, Window: {}s",
-                rateLimitingEnabled, authRequestsPerSecond, paymentRequestsPerSecond, generalRequestsPerSecond, windowSizeSeconds);
+                rateLimitConfig.isEnabled(), rateLimitConfig.getAuth().getRequestsPerSecond(), 
+                rateLimitConfig.getPayment().getRequestsPerSecond(), rateLimitConfig.getGeneral().getRequestsPerSecond(), 
+                rateLimitConfig.getWindowSizeSeconds());
     }
 
     @PreDestroy
@@ -78,7 +69,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        if (!rateLimitingEnabled) {
+        if (!rateLimitConfig.isEnabled()) {
             return true;
         }
         
@@ -108,7 +99,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         int requestsPerSecond = determineRateLimit(requestURI);
-        int maxRequestsPerWindow = requestsPerSecond * windowSizeSeconds;
+        int maxRequestsPerWindow = requestsPerSecond * rateLimitConfig.getWindowSizeSeconds();
 
         String rateLimitKey = clientIp + ":" + getRateLimitCategory(requestURI);
 
@@ -123,13 +114,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private int determineRateLimit(String requestURI) {
         if (requestURI.startsWith("/api/auth/")) {
-            return authRequestsPerSecond;
+            return rateLimitConfig.getAuth().getRequestsPerSecond();
         } else if (requestURI.startsWith("/api/payment/") || 
                    requestURI.startsWith("/api/v1/payments/") || 
                    requestURI.contains("payment")) {
-            return paymentRequestsPerSecond;
+            return rateLimitConfig.getPayment().getRequestsPerSecond();
         } else {
-            return generalRequestsPerSecond;
+            return rateLimitConfig.getGeneral().getRequestsPerSecond();
         }
     }
 
@@ -152,7 +143,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
         synchronized (rateLimitData) {
             rateLimitData.requests.removeIf(timestamp ->
-                    ChronoUnit.SECONDS.between(timestamp, now) >= windowSizeSeconds);
+                    ChronoUnit.SECONDS.between(timestamp, now) >= rateLimitConfig.getWindowSizeSeconds());
 
             if (rateLimitData.requests.size() >= maxRequestsPerWindow) {
                 rateLimitData.lastRateLimitTime = now;
@@ -173,10 +164,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         response.setStatus(429);
         response.setContentType("application/json;charset=UTF-8");
 
-        response.setHeader("X-RateLimit-Limit", String.valueOf(requestsPerSecond * windowSizeSeconds));
+        int windowSize = rateLimitConfig.getWindowSizeSeconds();
+        response.setHeader("X-RateLimit-Limit", String.valueOf(requestsPerSecond * windowSize));
         response.setHeader("X-RateLimit-Remaining", "0");
-        response.setHeader("X-RateLimit-Reset", String.valueOf(System.currentTimeMillis() + (windowSizeSeconds * 1000L)));
-        response.setHeader("Retry-After", String.valueOf(windowSizeSeconds));
+        response.setHeader("X-RateLimit-Reset", String.valueOf(System.currentTimeMillis() + (windowSize * 1000L)));
+        response.setHeader("Retry-After", String.valueOf(windowSize));
 
         String errorResponse = String.format(
                 """
@@ -190,15 +182,15 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                 }
                 """,
                 LocalDateTime.now(),
-                requestsPerSecond * windowSizeSeconds,
-                windowSizeSeconds,
+                requestsPerSecond * windowSize,
+                windowSize,
                 requestURI,
-                windowSizeSeconds
+                windowSize
         );
 
         response.getWriter().write(errorResponse);
         log.warn("Rate limit exceeded - IP: {}, URI: {}, Limit: {}/{}s",
-                clientIp, requestURI, requestsPerSecond * windowSizeSeconds, windowSizeSeconds);
+                clientIp, requestURI, requestsPerSecond * windowSize, windowSize);
     }
 
     private void addRateLimitHeaders(HttpServletResponse response, String key,
@@ -207,7 +199,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         if (rateLimitData != null) {
             synchronized (rateLimitData) {
                 int remaining = Math.max(0, maxRequestsPerWindow - rateLimitData.requests.size());
-                long resetTime = System.currentTimeMillis() + (windowSizeSeconds * 1000L);
+                long resetTime = System.currentTimeMillis() + (rateLimitConfig.getWindowSizeSeconds() * 1000L);
 
                 response.setHeader("X-RateLimit-Limit", String.valueOf(maxRequestsPerWindow));
                 response.setHeader("X-RateLimit-Remaining", String.valueOf(remaining));
@@ -236,7 +228,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private void cleanupOldEntries() {
-        LocalDateTime cutoff = LocalDateTime.now().minusSeconds(windowSizeSeconds * 2L);
+        LocalDateTime cutoff = LocalDateTime.now().minusSeconds(rateLimitConfig.getWindowSizeSeconds() * 2L);
         int removedCount = 0;
 
         var iterator = rateLimitMap.entrySet().iterator();
@@ -245,7 +237,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             RateLimitData data = entry.getValue();
             synchronized (data) {
                 data.requests.removeIf(timestamp ->
-                        ChronoUnit.SECONDS.between(timestamp, LocalDateTime.now()) >= windowSizeSeconds);
+                        ChronoUnit.SECONDS.between(timestamp, LocalDateTime.now()) >= rateLimitConfig.getWindowSizeSeconds());
                 
                 if (data.requests.isEmpty() &&
                         (data.lastRateLimitTime == null || data.lastRateLimitTime.isBefore(cutoff))) {

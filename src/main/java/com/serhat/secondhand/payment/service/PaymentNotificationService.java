@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.service;
 
+import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
@@ -7,7 +8,6 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PaymentNotificationService {
 
+    private final VerificationConfig verificationConfig;
     private final EmailService emailService;
     private final EmailConfig emailConfig;
-
-    @Value("${app.verification.code.expiry.minutes:3}")
-    private int verificationExpiryMinutes;
 
     @Async("notificationExecutor")
     public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto, String listingTitle) {
@@ -40,7 +38,7 @@ public class PaymentNotificationService {
         try {
             String subject = emailConfig.getPaymentVerificationSubject();
             String base = String.format(emailConfig.getPaymentVerificationContent(), 
-                    user.getName(), code, verificationExpiryMinutes);
+                    user.getName(), code, verificationConfig.getExpiryMinutes());
             String content = base + (extraDetails != null ? ("\n" + extraDetails) : "");
 
             log.info("Attempting to send payment verification email to user: {}, code: {}", user.getEmail(), code);

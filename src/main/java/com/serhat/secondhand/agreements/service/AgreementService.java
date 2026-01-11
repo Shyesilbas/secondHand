@@ -5,9 +5,9 @@ import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.util.AgreementErrorCodes;
+import com.serhat.secondhand.core.config.AgreementConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,21 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AgreementService {
 
-    @Value("${app.agreements.termsOfService.content}")
-    private String termsOfServiceContent;
-
-    @Value("${app.agreements.kvkk.content}")
-    private String kvkkContent;
-
-    @Value("${app.agreements.privacyPolicy.content}")
-    private String privacyPolicyContent;
-
-    @Value("${app.agreements.distanceSelling.content}")
-    private String distanceSellingContent;
-
-    @Value("${app.agreements.paymentTerms.content}")
-    private String paymentTermsContent;
-
+    private final AgreementConfig agreementConfig;
     private final AgreementRepository agreementRepository;
     private final AgreementVersionHelper agreementVersionHelper;
 
@@ -78,11 +64,11 @@ public class AgreementService {
     private String getContentForType(AgreementType agreementType) {
         if (agreementType instanceof AgreementType) {
             return switch (agreementType) {
-                case TERMS_OF_SERVICE -> termsOfServiceContent;
-                case PRIVACY_POLICY -> privacyPolicyContent;
-                case KVKK -> kvkkContent;
-                case DISTANCE_SELLING -> distanceSellingContent;
-                case PAYMENT_TERMS -> paymentTermsContent;
+                case TERMS_OF_SERVICE -> agreementConfig.getTermsOfService().getContent();
+                case PRIVACY_POLICY -> agreementConfig.getPrivacyPolicy().getContent();
+                case KVKK -> agreementConfig.getKvkk().getContent();
+                case DISTANCE_SELLING -> agreementConfig.getDistanceSelling().getContent();
+                case PAYMENT_TERMS -> agreementConfig.getPaymentTerms().getContent();
                 default -> throw new IllegalArgumentException("Unknown agreement type: " + agreementType);
             };
         }
