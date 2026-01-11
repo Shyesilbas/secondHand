@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { listingService } from '../services/listingService';
 
-export const useMyListings = (statusFilter = null, initialPage = 0, initialSize = 10) => {
+export const useMyListings = (statusFilter = null, initialPage = 0, initialSize = 10, listingTypeFilter = null) => {
     const [page, setPage] = useState(initialPage);
     const [size, setSize] = useState(initialSize);
 
@@ -12,10 +12,10 @@ export const useMyListings = (statusFilter = null, initialPage = 0, initialSize 
         error, 
         refetch 
     } = useQuery({
-        queryKey: ['myListings', page, size],
-        queryFn: () => listingService.getMyListings(page, size),
+        queryKey: ['myListings', page, size, listingTypeFilter],
+        queryFn: () => listingService.getMyListings(page, size, listingTypeFilter),
         placeholderData: keepPreviousData,
-        staleTime: 1000 * 60, // 1 minute
+        staleTime: 1000 * 60,
     });
 
     const filteredListings = useMemo(() => {

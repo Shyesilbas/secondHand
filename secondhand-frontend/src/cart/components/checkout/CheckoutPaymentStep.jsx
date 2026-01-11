@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CreditCardIcon, BanknotesIcon, WalletIcon } from '@heroicons/react/24/outline';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
+import { formatCurrency } from '../../../common/formatters.js';
 
 const CheckoutPaymentStep = ({
     selectedPaymentType,
@@ -13,6 +14,7 @@ const CheckoutPaymentStep = ({
     setSelectedBankAccountIban,
     eWallet,
     calculateTotal,
+    currency,
     onNext,
     onBack,
     sendVerificationCode,
@@ -41,7 +43,7 @@ const CheckoutPaymentStep = ({
             id: 'EWALLET',
             name: 'E-Wallet',
             icon: WalletIcon,
-            description: `Pay with e-wallet (Balance: $${eWallet?.balance || 0})`
+            description: `Pay with e-wallet (Balance: ${formatCurrency(eWallet?.balance || 0, currency || 'TRY')})`
         }
     ];
 
@@ -177,13 +179,13 @@ const CheckoutPaymentStep = ({
                         <div className="flex items-center justify-between">
                             <span className="text-gray-600">Available Balance</span>
                             <span className="text-lg font-medium text-gray-900">
-                                ${eWallet?.balance || 0}
+                                {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
                             </span>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                             <span className="text-gray-600">Order Total</span>
                             <span className="text-lg font-medium text-gray-900">
-                                ${calculateTotal()}
+                                {formatCurrency(calculateTotal(), currency || 'TRY')}
                             </span>
                         </div>
                         {calculateTotal() > eWallet?.balance && (

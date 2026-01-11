@@ -12,8 +12,8 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const OrderStatusChart = ({ data, title = 'Order Status Distribution' }) => {
   if (!data || Object.keys(data).length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-center h-64">
-        <p className="text-gray-500 text-sm">No data available</p>
+      <div className="bg-white rounded-lg border border-gray-200/60 p-6 flex items-center justify-center h-64">
+        <p className="text-gray-500 text-xs font-medium">No data available</p>
       </div>
     );
   }
@@ -53,9 +53,9 @@ const OrderStatusChart = ({ data, title = 'Order Status Distribution' }) => {
       legend: {
         position: 'right',
         labels: {
-          padding: 15,
+          padding: 12,
           font: {
-            size: 11,
+            size: 10,
           },
           usePointStyle: true,
         },
@@ -64,10 +64,13 @@ const OrderStatusChart = ({ data, title = 'Order Status Distribution' }) => {
         display: true,
         text: title,
         font: {
-          size: 14,
-          weight: 'bold',
+          size: 12,
+          weight: '600',
         },
-        color: '#374151',
+        color: '#111827',
+        padding: {
+          bottom: 20,
+        },
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -92,8 +95,8 @@ const OrderStatusChart = ({ data, title = 'Order Status Distribution' }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div style={{ height: '300px' }}>
+    <div className="bg-white rounded-lg border border-gray-200/60 p-6">
+      <div style={{ height: '320px' }}>
         <Doughnut data={chartData} options={options} />
       </div>
     </div>

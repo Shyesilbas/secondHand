@@ -26,8 +26,8 @@ ChartJS.register(
 const RevenueChart = ({ data, title = 'Revenue Trend', label = 'Revenue' }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-center h-64">
-        <p className="text-gray-500 text-sm">No data available</p>
+      <div className="bg-white rounded-lg border border-gray-200/60 p-6 flex items-center justify-center h-64">
+        <p className="text-gray-500 text-xs font-medium">No data available</p>
       </div>
     );
   }
@@ -62,10 +62,13 @@ const RevenueChart = ({ data, title = 'Revenue Trend', label = 'Revenue' }) => {
         display: true,
         text: title,
         font: {
-          size: 14,
-          weight: 'bold',
+          size: 12,
+          weight: '600',
         },
-        color: '#374151',
+        color: '#111827',
+        padding: {
+          bottom: 20,
+        },
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -94,17 +97,17 @@ const RevenueChart = ({ data, title = 'Revenue Trend', label = 'Revenue' }) => {
             return value.toLocaleString('tr-TR') + ' TRY';
           },
           font: {
-            size: 11,
+            size: 10,
           },
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
+          color: 'rgba(0, 0, 0, 0.04)',
         },
       },
       x: {
         ticks: {
           font: {
-            size: 11,
+            size: 10,
           },
         },
         grid: {
@@ -115,8 +118,8 @@ const RevenueChart = ({ data, title = 'Revenue Trend', label = 'Revenue' }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div style={{ height: '300px' }}>
+    <div className="bg-white rounded-lg border border-gray-200/60 p-6">
+      <div style={{ height: '320px' }}>
         <Line data={chartData} options={options} />
       </div>
     </div>

@@ -2,13 +2,14 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue' }) => {
-  const colorClasses = {
-    blue: 'bg-primary-50 text-primary-600',
-    green: 'bg-status-success-bg text-status-success-text',
-    purple: 'bg-accent-indigo-50 text-accent-indigo-600',
-    amber: 'bg-status-warning-bg text-status-warning-text',
-    red: 'bg-status-error-bg text-status-error-text',
-    gray: 'bg-secondary-50 text-text-secondary',
+  const iconColorClasses = {
+    blue: 'bg-blue-50 text-blue-600',
+    green: 'bg-emerald-50 text-emerald-600',
+    purple: 'bg-indigo-50 text-indigo-600',
+    amber: 'bg-amber-50 text-amber-600',
+    red: 'bg-rose-50 text-rose-600',
+    gray: 'bg-gray-50 text-gray-600',
+    pink: 'bg-pink-50 text-pink-600',
   };
 
   const formatValue = (val) => {
@@ -31,39 +32,39 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
   };
 
   const getTrendColor = () => {
-    if (trend > 0) return 'text-status-success-text';
-    if (trend < 0) return 'text-status-error-text';
-    return 'text-text-tertiary';
+    if (trend > 0) return 'text-emerald-600';
+    if (trend < 0) return 'text-rose-600';
+    return 'text-gray-500';
   };
 
   return (
-    <div className="bg-background-primary rounded-lg border border-border-light p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+    <div className="bg-white rounded-lg border border-gray-200/60 p-5 hover:border-gray-300/60 transition-all">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-3">
             {Icon && (
-              <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
-                <Icon className="w-4 h-4" />
+              <div className={`p-1.5 rounded-md ${iconColorClasses[color] || iconColorClasses.blue}`}>
+                <Icon className="w-3.5 h-3.5" />
               </div>
             )}
-            <span className="text-xs font-medium text-text-secondary">{title}</span>
+            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{title}</span>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-text-primary">{formatValue(value)}</span>
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="text-xl font-semibold text-gray-900 tracking-tight">{formatValue(value)}</span>
             {trend !== undefined && trend !== null && (
               <div className={`flex items-center gap-1 ${getTrendColor()}`}>
                 {getTrendIcon()}
-                <span className="text-xs font-medium">
+                <span className="text-[10px] font-semibold">
                   {Math.abs(trend).toFixed(1)}%
                 </span>
               </div>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-text-secondary mt-1">{subtitle}</p>
+            <p className="text-[11px] text-gray-500 font-medium">{subtitle}</p>
           )}
           {trendLabel && (
-            <p className="text-xs text-text-muted mt-1">{trendLabel}</p>
+            <p className="text-[10px] text-gray-400 font-medium mt-1">{trendLabel}</p>
           )}
         </div>
       </div>

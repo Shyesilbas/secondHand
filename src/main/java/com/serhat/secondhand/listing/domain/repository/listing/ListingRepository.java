@@ -36,6 +36,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     
     List<Listing> findBySellerAndStatus(User seller, ListingStatus status);
     
+    Page<Listing> findBySellerAndListingType(User seller, ListingType listingType, Pageable pageable);
+    
     Page<Listing> findByTitleContainingIgnoreCaseOrListingNoContainingIgnoreCaseAndStatus(
         String title, String listingNo, ListingStatus status, Pageable pageable
     );

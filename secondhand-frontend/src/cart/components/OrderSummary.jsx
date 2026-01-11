@@ -33,7 +33,18 @@ const OrderSummary = ({
                 <div className="space-y-3">
                     {cartItems.map((item) => (
                         <div key={item.id} className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0">
+                            {item.listing.imageUrl ? (
+                                <img
+                                    src={item.listing.imageUrl}
+                                    alt={item.listing.title}
+                                    className="w-10 h-10 object-cover rounded-md border border-gray-200 flex-shrink-0"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                            ) : null}
+                            <div className={`w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center flex-shrink-0 border border-gray-200 ${item.listing.imageUrl ? 'hidden' : 'flex'}`}>
                                 <span className="text-sm font-medium text-gray-600">
                                     {item.listing.title.charAt(0).toUpperCase()}
                                 </span>

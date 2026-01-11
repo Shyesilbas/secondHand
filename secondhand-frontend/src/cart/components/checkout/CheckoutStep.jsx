@@ -69,6 +69,7 @@ const CheckoutStep = ({
                     />
                 );
             case 3:
+                const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
                 return (
                     <CheckoutPaymentStep
                         selectedPaymentType={selectedPaymentType}
@@ -81,6 +82,7 @@ const CheckoutStep = ({
                         setSelectedBankAccountIban={setSelectedBankAccountIban}
                         eWallet={eWallet}
                         calculateTotal={calculateTotal}
+                        currency={currency}
                         onNext={onNext}
                         onBack={onBack}
                         sendVerificationCode={sendVerificationCode}
