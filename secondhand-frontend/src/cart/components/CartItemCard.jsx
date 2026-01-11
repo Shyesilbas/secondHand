@@ -50,9 +50,19 @@ const CartItemCard = ({
     return (
         <div className="p-6 hover:bg-gray-50 transition-colors">
             <div className="flex items-start space-x-4">
-                {/* Product Image Placeholder */}
                 <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
+                    {item.listing.imageUrl ? (
+                        <img
+                            src={item.listing.imageUrl}
+                            alt={item.listing.title}
+                            className="w-16 h-16 object-cover rounded-md border border-gray-200"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
+                    <div className={`w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 ${item.listing.imageUrl ? 'hidden' : 'flex'}`}>
                         <span className="text-sm font-medium text-gray-600">
                             {item.listing.title.charAt(0).toUpperCase()}
                         </span>

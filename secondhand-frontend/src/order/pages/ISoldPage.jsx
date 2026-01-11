@@ -14,7 +14,7 @@ import {useOrdersReceipt} from '../hooks/useOrdersReceipt.js';
 import {getStatusColor} from '../utils/orderUtils.js';
 import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
 import {ROUTES} from '../../common/constants/routes.js';
-import {RefreshCw, Eye, Receipt, ArrowUp, ArrowDown, Wallet, Info, BarChart3} from 'lucide-react';
+import {RefreshCw, Eye, Receipt, Wallet, Info, BarChart3, Package, Calendar, CreditCard, ChevronRight} from 'lucide-react';
 
 const ISoldPage = () => {
   const { enums } = useEnums();
@@ -97,64 +97,69 @@ const ISoldPage = () => {
   };
 
   return (
-      <div className="min-h-screen bg-background-secondary">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-sm font-semibold text-text-primary">I Sold</h1>
-              {orders.length > 0 && (
-                <p className="text-xs text-text-secondary mt-0.5">
-                  {pagination?.totalElements || orders.length} total
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.SELLER_DASHBOARD)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                <BarChart3 className="w-4 h-4" />
-                <span>Check Your Analytics</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleRefresh}
-                disabled={loading}
-                className="p-1.5 text-text-secondary hover:text-text-primary disabled:opacity-50"
-                title="Refresh"
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              </button>
+      <div className="min-h-screen bg-gray-50/50">
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-base font-semibold text-gray-900 tracking-tight mb-0.5">I Sold</h1>
+                {orders.length > 0 && (
+                  <p className="text-xs text-gray-500 font-medium">
+                    {pagination?.totalElements || orders.length} {pagination?.totalElements === 1 ? 'sale' : 'sales'}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.SELLER_DASHBOARD)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>Analytics</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50"
+                  title="Refresh"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 py-6">
 
           {!loadingEscrow && (
-            <div className={`mb-6 p-5 rounded-xl border-2 ${
+            <div className={`mb-6 p-4 rounded-lg border ${
               pendingEscrowAmount > 0 
-                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 shadow-md' 
-                : 'bg-gray-50 border-gray-200'
+                ? 'bg-blue-50/80 border-blue-200/60' 
+                : 'bg-gray-50 border-gray-200/60'
             }`}>
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${
+              <div className="flex items-start gap-3">
+                <div className={`p-1.5 rounded-md flex-shrink-0 ${
                   pendingEscrowAmount > 0 ? 'bg-blue-100' : 'bg-gray-200'
                 }`}>
-                  <Wallet className={`w-6 h-6 ${
+                  <Wallet className={`w-3.5 h-3.5 ${
                     pendingEscrowAmount > 0 ? 'text-blue-600' : 'text-gray-500'
                   }`} />
                 </div>
-                <div className="flex-1">
-                  <div className={`text-sm font-semibold mb-1 ${
+                <div className="flex-1 min-w-0">
+                  <div className={`text-xs font-semibold mb-1 ${
                     pendingEscrowAmount > 0 ? 'text-blue-900' : 'text-gray-700'
                   }`}>
                     Escrow Amount
                   </div>
-                  <div className={`text-2xl font-bold mb-2 ${
+                  <div className={`text-lg font-semibold font-mono mb-2 ${
                     pendingEscrowAmount > 0 ? 'text-blue-700' : 'text-gray-600'
                   }`}>
                     {formatCurrency(pendingEscrowAmount)}
                   </div>
-                  <div className={`text-xs mb-3 ${
+                  <div className={`text-[11px] mb-3 ${
                     pendingEscrowAmount > 0 ? 'text-blue-700' : 'text-gray-500'
                   }`}>
                     {pendingEscrowAmount > 0 
@@ -163,8 +168,8 @@ const ISoldPage = () => {
                     }
                   </div>
                   {pendingEscrowAmount > 0 && orders.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-blue-200">
-                      <div className="text-xs font-semibold text-blue-900 mb-2">Pending by Order:</div>
+                    <div className="mt-3 pt-3 border-t border-blue-200/60">
+                      <div className="text-[10px] font-semibold text-blue-900 mb-2">Pending by Order:</div>
                       <div className="space-y-1.5">
                         {orders
                           .filter(order => {
@@ -211,16 +216,16 @@ const ISoldPage = () => {
                             }
                             
                             return (
-                              <div key={order.id} className="flex items-center justify-between text-xs">
+                              <div key={order.id} className="flex items-center justify-between text-[11px]">
                                 <div className="flex items-center gap-1.5">
                                   <button
                                     onClick={() => openOrderModal(order)}
-                                    className="text-blue-800 hover:text-blue-900 hover:underline cursor-pointer text-left"
+                                    className="text-blue-800 hover:text-blue-900 hover:underline cursor-pointer text-left font-medium"
                                   >
                                     Order #{order.orderNumber}
                                   </button>
                                   <div className="relative group">
-                                    <Info className="w-3.5 h-3.5 text-blue-600 cursor-help hover:text-blue-700 transition-colors" />
+                                    <Info className="w-3 h-3 text-blue-600 cursor-help hover:text-blue-700 transition-colors" />
                                     <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-xl">
                                       <div className="space-y-1.5">
                                         <div className="font-semibold text-white">Escrow Release Information</div>
@@ -234,7 +239,7 @@ const ISoldPage = () => {
                                     </div>
                                   </div>
                                 </div>
-                                <span className="font-semibold text-blue-700">{formatCurrency(escrowAmt, order.currency)}</span>
+                                <span className="font-semibold font-mono text-blue-700">{formatCurrency(escrowAmt, order.currency)}</span>
                               </div>
                             );
                           })
@@ -247,181 +252,155 @@ const ISoldPage = () => {
             </div>
           )}
 
-          <OrdersSearch
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            onSearch={handleSearch}
-            onClear={clearSearch}
-            loading={searchLoading}
-            error={searchError}
-          />
+          <div className="mb-6">
+            <OrdersSearch
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              searchLoading={searchLoading}
+              searchError={searchError}
+              isSearchMode={isSearchMode}
+              onSearch={handleSearch}
+              onClearSearch={clearSearch}
+            />
+          </div>
 
-          {loading && !searchLoading && (
-            <div className="flex justify-center items-center py-12">
-              <LoadingIndicator />
+          {loading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-20 bg-white border border-gray-200/60 rounded-lg animate-pulse"></div>
+              ))}
             </div>
-          )}
-
-          {!loading && !searchLoading && orders.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-text-secondary">No sales found</p>
+          ) : !orders.length && !isSearchMode ? (
+            <div className="bg-white border border-gray-200/60 rounded-lg p-12 text-center">
+              <Package className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+              <p className="text-xs font-medium text-gray-500">No sales yet</p>
             </div>
-          )}
+          ) : (
+            <div className="space-y-3">
+              {orders.map((order) => {
+                const sellerOrderItems = order.orderItems || [];
+                const sellerTotalAmount = sellerOrderItems.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
+                const itemsCount = sellerOrderItems.length;
+                const firstItem = sellerOrderItems?.[0];
+                const isCompleted = order.status === 'COMPLETED';
+                
+                return (
+                  <div
+                    key={order.id}
+                    onClick={() => openOrderModal(order)}
+                    className={`group bg-white border border-gray-200/60 rounded-lg p-5 cursor-pointer transition-all hover:border-gray-300 hover:shadow-sm ${
+                      isCompleted ? 'bg-gradient-to-br from-emerald-50/50 to-white border-emerald-200/60' : ''
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5 mb-3">
+                          <h3 className="text-sm font-semibold text-gray-900">
+                            Order #{order.orderNumber}
+                          </h3>
+                        </div>
 
-          {!loading && !searchLoading && orders.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Order</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Status</th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Items</th>
-                    <th 
-                      className="px-4 py-2 text-left text-xs font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 select-none border-r border-gray-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSort('totalAmount');
-                      }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Total</span>
-                        {sortField === 'totalAmount' && (
-                          sortDirection === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
-                        )}
-                      </div>
-                    </th>
-                    <th 
-                      className="px-4 py-2 text-left text-xs font-semibold text-text-secondary cursor-pointer hover:bg-secondary-100 select-none border-r border-gray-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSort('createdAt');
-                      }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Date</span>
-                        {sortField === 'createdAt' && (
-                          sortDirection === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />
-                        )}
-                      </div>
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-text-secondary border-r border-gray-200">Last Update</th>
-                    <th className="px-4 py-2 text-right text-xs font-semibold text-text-secondary">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-light">
-                  {orders.map((order) => {
-                    const sellerOrderItems = order.orderItems || [];
-                    const sellerTotalAmount = sellerOrderItems.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
-                    const itemsCount = sellerOrderItems.length;
-                    const firstItem = sellerOrderItems?.[0];
-                    const isCompleted = order.status === 'COMPLETED';
-                    
-                    return (
-                      <tr key={order.id} className={`cursor-pointer ${isCompleted ? 'bg-gradient-to-r from-emerald-50 to-green-50/80 hover:from-emerald-100 hover:to-green-100' : 'hover:bg-secondary-50'}`} onClick={() => openOrderModal(order)}>
-                        <td className="px-4 py-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-text-primary">
-                              Order #{order.orderNumber}
+                        <div className="flex items-center gap-4 flex-wrap">
+                          <div className="flex items-center gap-1.5">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              order.status === 'COMPLETED' ? 'bg-emerald-500' :
+                              order.status === 'DELIVERED' ? 'bg-blue-500' :
+                              order.status === 'SHIPPED' ? 'bg-indigo-500' :
+                              order.status === 'PROCESSING' ? 'bg-amber-500' :
+                              order.status === 'CONFIRMED' ? 'bg-green-500' :
+                              'bg-gray-400'
+                            }`}></div>
+                            <span className={`text-xs font-medium ${getStatusColor(order.status)}`}>
+                              {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
                             </span>
                           </div>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span className={`text-xs font-medium ${getStatusColor(order.status)}`}>
-                            {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <div className="flex items-center gap-2">
+
+                          <div className="flex items-center gap-1.5 text-gray-500">
+                            <CreditCard className="w-3 h-3" />
+                            <span className={`text-xs font-medium ${getStatusColor(order.paymentStatus)}`}>
+                              {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-gray-500">
+                            <Package className="w-3 h-3" />
+                            <span className="text-xs text-gray-600">{itemsCount} {itemsCount === 1 ? 'item' : 'items'}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-gray-500">
+                            <Calendar className="w-3 h-3" />
+                            <span className="text-xs text-gray-600">{formatDateTime(order.createdAt)}</span>
+                          </div>
+                        </div>
+
+                        {firstItem && (
+                          <div className="mt-3 flex items-center gap-2.5 pt-3 border-t border-gray-100">
                             {firstItem?.listing?.imageUrl && (
                               <img 
                                 src={firstItem.listing.imageUrl} 
                                 alt={firstItem.listing.title}
-                                className="w-6 h-6 rounded object-cover"
+                                className="w-8 h-8 rounded-md object-cover border border-gray-200"
                               />
                             )}
                             <div className="flex-1 min-w-0">
-                              <span className="text-xs text-gray-600 truncate block">
+                              <p className="text-xs font-medium text-gray-900 truncate">
                                 {firstItem?.listing?.title || 'Item'}
-                              </span>
+                              </p>
                               {itemsCount > 1 && (
-                                <span className="text-[10px] text-gray-500">+{itemsCount - 1} more</span>
+                                <p className="text-[10px] text-gray-500 mt-0.5">+{itemsCount - 1} more {itemsCount === 2 ? 'item' : 'items'}</p>
                               )}
                             </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-gray-900 font-mono">
+                                {formatCurrency(sellerTotalAmount, order.currency)}
+                              </p>
+                            </div>
                           </div>
-                        </td>
-                        <td 
-                          className="px-4 py-2.5 cursor-pointer"
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSort('totalAmount');
+                            openOrderModal(order);
                           }}
+                          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                          title="View Details"
                         >
-                          <span className="text-xs font-semibold text-gray-900">
-                            {formatCurrency(sellerTotalAmount, order.currency)}
-                          </span>
-                        </td>
-                        <td 
-                          className="px-4 py-2.5 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSort('createdAt');
-                          }}
-                        >
-                          <span className="text-xs text-gray-600">
-                            {formatDateTime(order.createdAt)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span className="text-xs text-gray-600">
-                            {formatDateTime(order.updatedAt)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openOrderModal(order);
-                              }}
-                              className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-                              title="View Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            {order.paymentReference && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openReceipt(order.paymentReference);
-                                }}
-                                className="p-1.5 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                                title="View Receipt"
-                              >
-                                <Receipt className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {order.paymentReference && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openReceipt(order.paymentReference);
+                            }}
+                            className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                            title="View Receipt"
+                          >
+                            <Receipt className="w-4 h-4" />
+                          </button>
+                        )}
+                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
-          {orders.length > 0 && (
-            <div className="mt-4">
-              <OrdersPagination
-                pagination={pagination}
-                isSearchMode={isSearchMode}
-                loading={loading}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            </div>
+          {!loading && !isSearchMode && (
+            <OrdersPagination
+              pagination={pagination}
+              isSearchMode={isSearchMode}
+              loading={loading}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
           )}
         </div>
 

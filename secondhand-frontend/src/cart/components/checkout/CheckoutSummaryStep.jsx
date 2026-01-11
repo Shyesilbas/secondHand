@@ -2,6 +2,7 @@ import React from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 
 const CheckoutSummaryStep = ({ cartItems, calculateTotal }) => {
+    const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
     return (
         <div className="space-y-6">
             {/* Modern Header */}
@@ -80,7 +81,7 @@ const CheckoutSummaryStep = ({ cartItems, calculateTotal }) => {
                             <span className="text-base font-semibold text-gray-900">Order Total</span>
                         </div>
                         <span className="text-2xl font-bold text-gray-900">
-                            {formatCurrency(calculateTotal())}
+                            {formatCurrency(calculateTotal(), currency)}
                         </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">Including free shipping</p>

@@ -18,7 +18,7 @@ import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldC
 import {useCart} from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
-import { FollowButton } from '../../follow/index.js';
+import {FollowButton} from '../../follow/index.js';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -88,34 +88,33 @@ const ListingDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <nav className="flex items-center text-sm text-gray-500">
-            <Link to={ROUTES.LISTINGS} className="hover:text-gray-900 transition-colors">Listings</Link>
-            <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-            <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
+    <div className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+          <nav className="flex items-center text-xs text-gray-500 font-medium">
+            <Link to={ROUTES.LISTINGS} className="hover:text-gray-900 transition-colors duration-200">Listings</Link>
+            <ChevronRight className="w-3.5 h-3.5 mx-2 text-gray-400" />
+            <span className="text-gray-900 font-semibold truncate max-w-[240px]">{listing.title}</span>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {canAddToCart && (
               <button
                 onClick={() => addToCart(listing.id)}
                 disabled={isAddingToCart}
-                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200"
                 title="Add to Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4" />
               </button>
             )}
             {canMakeOffer && (
               <button
                 onClick={() => setIsOfferModalOpen(true)}
-                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200"
                 title="Make Offer"
               >
-                <HandCoins className="w-5 h-5" />
+                <HandCoins className="w-4 h-4" />
               </button>
             )}
             {!isOwner && (
@@ -130,11 +129,11 @@ const ListingDetailPage = () => {
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="hover:bg-gray-100 rounded-full p-2 border-0 text-gray-400 hover:text-red-500 transition-colors"
+                className="hover:bg-gray-100/80 rounded-lg p-2 border-0 text-gray-500 hover:text-red-600 transition-all duration-200"
               />
             )}
-            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors">
-              <Share2 className="w-5 h-5" />
+            <button className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200">
+              <Share2 className="w-4 h-4" />
             </button>
             {isOwner && (
                <ListingCardActions listing={listing} onChanged={fetchListing} />
@@ -149,10 +148,10 @@ const ListingDetailPage = () => {
         listing={listing}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid lg:grid-cols-12 gap-6">
 
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-5">
 
             {isOwner && (
               <ViewStatisticsCard
@@ -161,56 +160,58 @@ const ListingDetailPage = () => {
               />
             )}
 
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group h-[400px]">
+            <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] relative group h-[280px] flex items-center justify-center">
               {listing.imageUrl ? (
                 <img
                   src={listing.imageUrl}
                   alt={listing.title}
-                  className="w-full h-full object-contain bg-gray-50"
+                  className="max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'flex';
                   }}
                 />
               ) : null}
-              <div className={`w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                  <p className="font-medium">No photos</p>
+              <div className={`w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50/30 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+                  <p className="text-sm font-medium text-gray-400">No image available</p>
               </div>
             </div>
 
-            {/* Title & Price (Mobile Only) */}
-            <div className="lg:hidden bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-               <h1 className="text-xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+            <div className="lg:hidden bg-white p-5 rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]">
+               <h1 className="text-xl font-semibold text-gray-900 mb-2 leading-tight tracking-tight">{listing.title}</h1>
+               <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 font-medium">
+                 <span>{listing.district}, {listing.city}</span>
+                 <span>•</span>
+                 <span>{formatDateTime(listing.createdAt)}</span>
+               </div>
                {hasStockInfo && (
-                 <div className="mb-2">
-                   <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                     In stock: {Number(listing.quantity)}
+                 <div className="mb-3">
+                   <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium border ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-gray-50/80 text-gray-600 border-gray-200/60'}`}>
+                     Stock: {Number(listing.quantity)}
                    </span>
                  </div>
                )}
-               <div className="flex items-end gap-3 flex-wrap">
-                 <p className="text-2xl font-bold text-gray-900">{formatCurrency(displayPrice, listing.currency)}</p>
+               <div className="flex items-baseline gap-3 flex-wrap mb-2">
+                 <p className="text-2xl font-semibold text-gray-900 tracking-tight">{formatCurrency(displayPrice, listing.currency)}</p>
                  {hasCampaign && (
-                   <p className="text-base font-semibold text-gray-500 line-through">{formatCurrency(listing.price, listing.currency)}</p>
+                   <p className="text-base font-medium text-gray-400 line-through">{formatCurrency(listing.price, listing.currency)}</p>
                  )}
                </div>
                {hasCampaign && (
-                 <div className="mt-2 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-                   {listing.campaignName || 'Campaign'}
+                 <div className="inline-flex items-center rounded-md bg-emerald-50/80 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200/60">
+                   {listing.campaignName || 'Special Offer'}
                  </div>
                )}
             </div>
 
-            {/* Tabs & Content */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
-              {/* Tab Headers */}
-              <div className="flex items-center border-b border-gray-100 px-6">
+            <div className="bg-white rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] overflow-hidden">
+              <div className="flex items-center border-b border-gray-200/60 px-5 bg-gray-50/30">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      relative py-4 px-4 text-sm font-medium transition-colors
+                      relative py-3 px-4 text-sm font-medium transition-all duration-200
                       ${activeTab === tab.id 
                         ? 'text-gray-900' 
                         : 'text-gray-500 hover:text-gray-700'
@@ -219,32 +220,31 @@ const ListingDetailPage = () => {
                   >
                     {tab.label}
                     {activeTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-t-full" />
+                      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900" />
                     )}
                   </button>
                 ))}
               </div>
 
-              {/* Tab Panels */}
-              <div className="p-6 sm:p-8">
+              <div className="p-6">
                 {activeTab === 'about' && (
-                  <div className="animate-fade-in">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">About this item</h2>
-                    <div className="prose prose-slate max-w-none prose-p:text-gray-600 prose-headings:font-bold">
-                      <p className="whitespace-pre-wrap leading-relaxed">{listing.description}</p>
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900 mb-4 tracking-tight">Description</h2>
+                    <div className="prose prose-slate max-w-none prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-3 prose-headings:font-semibold prose-headings:text-gray-900">
+                      <p className="whitespace-pre-wrap text-sm leading-6 text-gray-700">{listing.description}</p>
                     </div>
                   </div>
                 )}
 
                 {activeTab === 'details' && DetailsComponent && (
-                  <div className="animate-fade-in">
-                    <h2 className="text-lg font-bold text-gray-900 mb-6">Technical Details</h2>
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900 mb-4 tracking-tight">Specifications</h2>
                     <DetailsComponent listing={listing} />
                   </div>
                 )}
 
                 {activeTab === 'reviews' && hasReviews && (
-                  <div className="animate-fade-in">
+                  <div>
                     <ListingReviewsSection listingId={listing.id} listing={listing} />
                   </div>
                 )}
@@ -252,54 +252,53 @@ const ListingDetailPage = () => {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-4 space-y-6">
-             {/* Sticky Info Card */}
-             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
-                <div className="mb-6 hidden lg:block">
-                   <h1 className="text-xl font-bold text-gray-900 leading-snug mb-2">{listing.title}</h1>
-                   {hasStockInfo && (
-                     <div className="mb-3">
-                       <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${isLowStock ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-gray-50 text-gray-700 border-gray-200'}`}>
-                         In stock: {Number(listing.quantity)}
-                       </span>
-                     </div>
-                   )}
-                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+          <div className="lg:col-span-4 space-y-5">
+             <div className="bg-white rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] p-5 lg:sticky lg:top-16">
+                <div className="mb-5 hidden lg:block">
+                   <h1 className="text-xl font-semibold text-gray-900 leading-tight mb-3 tracking-tight">{listing.title}</h1>
+                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 font-medium">
                       <span>{listing.district}, {listing.city}</span>
                       <span>•</span>
                       <span>{formatDateTime(listing.createdAt)}</span>
                    </div>
-                   <p className="text-3xl font-bold text-gray-900 tracking-tight">
-                      {formatCurrency(displayPrice, listing.currency)}
-                   </p>
+                   {hasStockInfo && (
+                     <div className="mb-3">
+                       <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium border ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-gray-50/80 text-gray-600 border-gray-200/60'}`}>
+                         Stock: {Number(listing.quantity)}
+                       </span>
+                     </div>
+                   )}
+                   <div className="mb-1">
+                     <p className="text-2xl font-semibold text-gray-900 tracking-tight">
+                        {formatCurrency(displayPrice, listing.currency)}
+                     </p>
+                   </div>
                    {hasCampaign && (
                      <div className="mt-2 flex items-center gap-3">
-                       <p className="text-sm font-medium text-gray-500 line-through">{formatCurrency(listing.price, listing.currency)}</p>
-                       <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-                         {listing.campaignName || 'Campaign'}
+                       <p className="text-sm font-medium text-gray-400 line-through">{formatCurrency(listing.price, listing.currency)}</p>
+                       <span className="inline-flex items-center rounded-md bg-emerald-50/80 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200/60">
+                         {listing.campaignName || 'Special Offer'}
                        </span>
                      </div>
                    )}
                 </div>
 
-                {/* Seller Info */}
-                <div className="border-t border-b border-gray-100 py-6 mb-6">
+                <div className="border-t border-b border-gray-200/60 py-4 mb-4">
                   <div className="flex items-center justify-between mb-4">
                      <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                       <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center text-sm font-semibold text-white shadow-sm">
                           {listing.sellerName?.[0]?.toUpperCase() || 'U'}
                        </div>
                        <div>
                           <Link
                             to={ROUTES.USER_PROFILE(listing.sellerId)}
-                            className="font-semibold text-sm text-gray-900 hover:underline block"
+                            className="font-semibold text-sm text-gray-900 hover:text-gray-700 block transition-colors duration-200"
                           >
                              {listing.sellerName} {listing.sellerSurname}
                           </Link>
                           {listing.sellerAccountCreationDate && (
-                            <div className="text-xs text-gray-500">
-                              Joined {new Date(listing.sellerAccountCreationDate).getFullYear()}
+                            <div className="text-xs text-gray-500 mt-0.5 font-medium">
+                              Member since {new Date(listing.sellerAccountCreationDate).getFullYear()}
                             </div>
                           )}
                        </div>
@@ -310,10 +309,10 @@ const ListingDetailPage = () => {
                   </div>
 
                   {!isOwner ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <ContactSellerButton
                           listing={listing}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-black text-white rounded-lg text-sm font-medium transition-colors"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow"
                       >
                           Contact Seller
                       </ContactSellerButton>
@@ -322,7 +321,7 @@ const ListingDetailPage = () => {
                           targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
                           listingId={listing.id}
                           listingTitle={listing.title}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200/60 text-gray-700 hover:bg-gray-100 hover:border-gray-300/60 rounded-lg text-sm font-medium transition-all duration-200"
                       >
                           <Flag className="w-4 h-4" />
                           Report
@@ -333,24 +332,23 @@ const ListingDetailPage = () => {
                   )}
                 </div>
 
-                {/* Safety */}
-                <div className="bg-blue-50/50 rounded-xl p-4">
-                  <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4" />
-                    Safety tips
+                <div className="bg-gray-50/80 rounded-lg p-3.5 border border-gray-200/40">
+                  <h3 className="text-xs font-semibold text-gray-900 mb-2.5 flex items-center gap-2 uppercase tracking-wide">
+                    <ShieldCheck className="w-3.5 h-3.5 text-gray-600" />
+                    Safety Guidelines
                   </h3>
-                  <ul className="space-y-1.5 text-xs text-blue-800/70">
-                    <li className="flex items-center gap-2">
-                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
-                      Meet in public places
+                  <ul className="space-y-1.5 text-xs text-gray-600 leading-relaxed">
+                    <li className="flex items-start gap-2.5">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span>Meet in public, well-lit locations</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
-                      Check before paying
+                    <li className="flex items-start gap-2.5">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span>Inspect items thoroughly before purchase</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
-                      Don't pay in advance
+                    <li className="flex items-start gap-2.5">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span>Avoid advance payments or wire transfers</span>
                     </li>
                   </ul>
                 </div>

@@ -150,8 +150,11 @@ public class ListingController {
     public ResponseEntity<Page<ListingDto>> getMyListings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) ListingType listingType,
             @AuthenticationPrincipal User currentUser) {
-        Page<ListingDto> myListings = listingService.getMyListings(currentUser, page, size);
+        Page<ListingDto> myListings = listingType != null 
+                ? listingService.getMyListings(currentUser, page, size, listingType)
+                : listingService.getMyListings(currentUser, page, size);
         return ResponseEntity.ok(myListings);
     }
 

@@ -162,6 +162,15 @@ public class ListingService {
         );
     }
 
+    public Page<ListingDto> getMyListings(User user, int page, int size, ListingType listingType) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Listing> listingsPage = listingRepository.findBySellerAndListingType(user, listingType, pageable);
+        return enrichPage(
+                listingsPage.map(listingMapper::toDynamicDto),
+                user.getEmail()
+        );
+    }
+
     public List<ListingDto> getListingsByUser(Long userId) {
         User user = userService.findById(userId);
         return enrichList(

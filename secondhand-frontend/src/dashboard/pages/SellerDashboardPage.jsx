@@ -57,15 +57,19 @@ const SellerDashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Seller Dashboard</h1>
-          <p className="text-sm text-gray-600 mt-1">Analytics and insights for your listings and sales</p>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-base font-semibold text-gray-900 tracking-tight mb-0.5">Dashboard</h1>
+              <p className="text-xs text-gray-500 font-medium">Analytics and insights for your listings and sales</p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Time Range Selector */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="mb-6">
           <TimeRangeSelector
             startDate={startDate}
@@ -76,7 +80,6 @@ const SellerDashboardPage = () => {
           />
         </div>
 
-        {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <MetricCard
             title="Total Revenue"
@@ -109,8 +112,7 @@ const SellerDashboardPage = () => {
           />
         </div>
 
-        {/* Additional Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <MetricCard
             title="Total Favorites"
             value={dashboard.totalFavorites || 0}
@@ -134,8 +136,7 @@ const SellerDashboardPage = () => {
           />
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <RevenueChart
             data={dashboard.revenueTrend || []}
             title="Revenue Trend"
@@ -147,7 +148,6 @@ const SellerDashboardPage = () => {
           />
         </div>
 
-        {/* Order Status and Top Listings */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <OrderStatusChart
             data={dashboard.ordersByStatus || {}}
