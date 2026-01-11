@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -110,9 +111,23 @@ public class PaymentController {
     public ResponseEntity<Page<PaymentDto>> getMyPayments(
             Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        log.info("Getting paginated payments for user: {}", authentication.getName());
-        Page<PaymentDto> payments = paymentStatsService.getMyPayments(authentication, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentTransactionType transactionType,
+            @RequestParam(required = false) PaymentType paymentType,
+            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentDirection paymentDirection,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateTo,
+            @RequestParam(required = false) java.math.BigDecimal amountMin,
+            @RequestParam(required = false) java.math.BigDecimal amountMax,
+            @RequestParam(required = false) String sellerName) {
+        log.info("Getting paginated payments for user: {} with filters", authentication.getName());
+        
+        java.time.LocalDateTime dateToEndOfDay = dateTo != null ? dateTo.with(java.time.LocalTime.MAX) : null;
+        
+        Page<PaymentDto> payments = paymentStatsService.getMyPayments(
+                authentication, page, size,
+                transactionType, paymentType, paymentDirection,
+                dateFrom, dateToEndOfDay, amountMin, amountMax, sellerName);
         return ResponseEntity.ok(payments);
     }
 

@@ -4,30 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import { ROUTES } from '../../common/constants/routes.js';
 import { get } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { listingService } from '../../listing/services/listingService.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 
 const MostFavoritedSection = () => {
   const { data: listings = [], isLoading, error } = useQuery({
     queryKey: ['mostFavoritedListings'],
     queryFn: async () => {
-      const response = await get(`${API_ENDPOINTS.FAVORITES.TOP}?page=0&size=10`);
-      if (response?.content && Array.isArray(response.content) && response.content.length > 0) {
-        const listingIds = response.content
-          .filter(item => Array.isArray(item) && item.length >= 2)
-          .map(item => item[0]);
-        
-        if (listingIds.length === 0) {
-          return [];
-        }
-
-        const listingDetails = await listingService.getListingsByIds(listingIds);
-        
-        return (listingDetails || [])
-          .filter(listing => listing !== null && listing.status === 'ACTIVE')
-          .slice(0, 10);
-      }
-      return [];
+      const response = await get(`${API_ENDPOINTS.FAVORITES.TOP_LISTINGS}?size=10`);
+      return Array.isArray(response) ? response : [];
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

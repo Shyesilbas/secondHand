@@ -372,16 +372,14 @@ const MyOrdersPage = () => {
             </div>
           )}
 
-          {orders.length > 0 && (
-            <div className="mt-4">
-              <OrdersPagination
-                pagination={pagination}
-                isSearchMode={isSearchMode}
-                loading={loading}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            </div>
+          {!loading && !isSearchMode && (
+            <OrdersPagination
+              pagination={pagination}
+              isSearchMode={isSearchMode}
+              loading={loading}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
           )}
         </div>
 

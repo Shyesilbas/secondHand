@@ -132,6 +132,11 @@ public class SecurityConfig {
             "/api/favorite-lists/popular"
     );
 
+    private static final List<String> FAVORITE_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/favorites/top",
+            "/api/favorites/top-listings"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -186,6 +191,9 @@ public class SecurityConfig {
                         
                         // Favorite list public endpoints
                         .requestMatchers(FAVORITE_LIST_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+                        
+                        // Favorite public endpoints (top favorites can be viewed by anyone)
+                        .requestMatchers(FAVORITE_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )

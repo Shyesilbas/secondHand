@@ -8,7 +8,7 @@ export const orderService = {
   initiatePaymentVerification: async (payload) => {
     return post(API_ENDPOINTS.PAYMENTS.INITIATE_VERIFICATION, payload);
   },
-  myOrders: async (page = 0, size = 10, sort = null, direction = 'desc') => {
+  myOrders: async (page = 0, size = 5, sort = null, direction = 'desc') => {
     let url = `${API_ENDPOINTS.ORDERS.LIST_MY_ORDERS}?page=${page}&size=${size}`;
     if (sort) {
       url += `&sort=${sort},${direction}`;
@@ -33,7 +33,7 @@ export const orderService = {
   updateOrderName: async (id, name) => {
     return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NAME(id), { name });
   },
-  sellerOrders: async (page = 0, size = 10, sort = null, direction = 'desc') => {
+  sellerOrders: async (page = 0, size = 5, sort = null, direction = 'desc') => {
     let url = `${API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS}?page=${page}&size=${size}`;
     if (sort) {
       url += `&sort=${sort},${direction}`;

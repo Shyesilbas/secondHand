@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
 import {orderService} from '../services/orderService.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import {useSellerOrders} from '../hooks/useSellerOrders.js';
+import {usePendingEscrowAmount} from '../hooks/usePendingEscrowAmount.js';
 import OrdersSearch from '../components/OrdersSearch.jsx';
 import OrdersPagination from '../components/OrdersPagination.jsx';
 import ISoldModal from '../components/ISoldModal.jsx';
@@ -19,8 +20,6 @@ const ISoldPage = () => {
   const { enums } = useEnums();
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('desc');
-  const [pendingEscrowAmount, setPendingEscrowAmount] = useState(null);
-  const [loadingEscrow, setLoadingEscrow] = useState(true);
   
   const {
     orders,
@@ -31,6 +30,12 @@ const ISoldPage = () => {
     refresh,
     setSearchOrder
   } = useSellerOrders(0, 5, sortField, sortDirection);
+
+  const { 
+    pendingEscrowAmount, 
+    isLoading: loadingEscrow, 
+    refetch: refetchEscrow 
+  } = usePendingEscrowAmount();
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -64,24 +69,6 @@ const ISoldPage = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPendingEscrowAmount = async () => {
-      try {
-        setLoadingEscrow(true);
-        const response = await orderService.getPendingEscrowAmount();
-        setPendingEscrowAmount(response.amount || 0);
-      } catch (err) {
-        console.error('Error fetching pending escrow amount:', err);
-        setPendingEscrowAmount(0);
-      } finally {
-        setLoadingEscrow(false);
-      }
-    };
-    fetchPendingEscrowAmount();
-    const interval = setInterval(fetchPendingEscrowAmount, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
 
   const handlePageChange = (page) => {
     if (!isSearchMode) {
@@ -106,9 +93,7 @@ const ISoldPage = () => {
 
   const handleRefresh = () => {
     refresh();
-    orderService.getPendingEscrowAmount()
-      .then(response => setPendingEscrowAmount(response.amount || 0))
-      .catch(err => console.error('Error fetching pending escrow amount:', err));
+    refetchEscrow();
   };
 
   return (
@@ -144,7 +129,7 @@ const ISoldPage = () => {
             </div>
           </div>
 
-          {!loadingEscrow && pendingEscrowAmount !== null && (
+          {!loadingEscrow && (
             <div className={`mb-6 p-5 rounded-xl border-2 ${
               pendingEscrowAmount > 0 
                 ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 shadow-md' 
