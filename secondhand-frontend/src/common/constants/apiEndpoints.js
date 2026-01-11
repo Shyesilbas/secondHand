@@ -181,6 +181,7 @@ export const API_ENDPOINTS = {
         MY_FAVORITES: '/favorites',
         CHECK: (listingId) => `/favorites/check/${listingId}`,
         TOP: '/favorites/top',
+        TOP_LISTINGS: '/favorites/top-listings',
     },
     AGREEMENTS: {
         INITIALIZE: '/agreements/initialize',

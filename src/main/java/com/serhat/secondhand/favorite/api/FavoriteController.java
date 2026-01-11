@@ -4,6 +4,7 @@ import com.serhat.secondhand.favorite.application.FavoriteService;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteDto;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteRequest;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 
@@ -160,5 +161,17 @@ public class FavoriteController {
         
         Page<Object[]> topFavorites = favoriteService.getTopFavoritedListings(pageable);
         return ResponseEntity.ok(topFavorites);
+    }
+
+    @GetMapping("/top-listings")
+    @Operation(summary = "Get top favorited listings with details", description = "Get most favorited listings with full listing details")
+    @ApiResponse(responseCode = "200", description = "Top favorites with details retrieved successfully")
+    public ResponseEntity<List<ListingDto>> getTopFavoritedListingsWithDetails(
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        
+        String userEmail = authentication != null ? authentication.getName() : null;
+        List<ListingDto> listings = favoriteService.getTopFavoritedListingsWithDetails(size, userEmail);
+        return ResponseEntity.ok(listings);
     }
 }

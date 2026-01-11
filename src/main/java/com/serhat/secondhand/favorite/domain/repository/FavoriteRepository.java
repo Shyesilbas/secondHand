@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -45,6 +44,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
            "GROUP BY f.listing.id " +
            "ORDER BY favoriteCount DESC")
     Page<Object[]> findTopFavoritedListings(Pageable pageable);
+
+    @Query("SELECT f.listing.id FROM Favorite f " +
+           "JOIN f.listing l " +
+           "WHERE l.status = 'ACTIVE' " +
+           "GROUP BY f.listing.id " +
+           "ORDER BY COUNT(f) DESC")
+    List<UUID> findTopFavoritedListingIds(Pageable pageable);
     
         @Query("SELECT f.listing.id FROM Favorite f WHERE f.user = :user")
     List<UUID> findListingIdsByUser(@Param("user") User user);

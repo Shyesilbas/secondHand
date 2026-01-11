@@ -15,8 +15,19 @@ export const paymentService = {
         return response.data;
     },
 
-    getMyPayments: async (page = 0, size = 5) => {
-        const data = await get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params: { page, size } });
+    getMyPayments: async (page = 0, size = 5, filters = {}) => {
+        const params = { page, size };
+        
+        if (filters.transactionType) params.transactionType = filters.transactionType;
+        if (filters.paymentType) params.paymentType = filters.paymentType;
+        if (filters.paymentDirection) params.paymentDirection = filters.paymentDirection;
+        if (filters.dateFrom) params.dateFrom = new Date(filters.dateFrom).toISOString();
+        if (filters.dateTo) params.dateTo = new Date(filters.dateTo).toISOString();
+        if (filters.amountMin) params.amountMin = parseFloat(filters.amountMin);
+        if (filters.amountMax) params.amountMax = parseFloat(filters.amountMax);
+        if (filters.seller && filters.seller.trim()) params.sellerName = filters.seller.trim();
+        
+        const data = await get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params });
         if (data.content && Array.isArray(data.content)) {
             data.content = data.content.map(PaymentDto);
         }

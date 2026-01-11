@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 
@@ -24,7 +25,7 @@ export const useListingStatistics = (options = {}) => {
         retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     });
 
-    const getCountsByCategory = () => {
+    const countsByCategory = useMemo(() => {
         if (!statistics) return {};
         
         return {
@@ -35,13 +36,13 @@ export const useListingStatistics = (options = {}) => {
             BOOKS: Number(statistics?.booksCount ?? 0),
             SPORTS: Number(statistics?.sportsCount ?? 0),
         };
-    };
+    }, [statistics]);
 
     return {
         statistics,
         isLoading,
         error,
         refetch,
-        countsByCategory: getCountsByCategory(),
+        countsByCategory,
     };
 };

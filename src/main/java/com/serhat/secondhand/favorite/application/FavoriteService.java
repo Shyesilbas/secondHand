@@ -9,18 +9,24 @@ import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +38,9 @@ public class FavoriteService {
     private final ListingAccessService listingAccessService;
     private final FavoriteMapper favoriteMapper;
     private final FavoriteStatsService favoriteStatsService;
+    private final ListingRepository listingRepository;
+    private final ListingMapper listingMapper;
+    private final ListingEnrichmentService listingEnrichmentService;
     
 
     @Transactional
@@ -162,7 +171,29 @@ public class FavoriteService {
     public Page<Object[]> getTopFavoritedListings(Pageable pageable) {
         return favoriteRepository.findTopFavoritedListings(pageable);
     }
-    
+
+    public List<ListingDto> getTopFavoritedListingsWithDetails(int size, String userEmail) {
+        Pageable pageable = PageRequest.of(0, size);
+        List<UUID> topIds = favoriteRepository.findTopFavoritedListingIds(pageable);
+        
+        if (topIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Listing> listings = listingRepository.findAllById(topIds);
+        
+        Map<UUID, Listing> listingMap = listings.stream()
+                .collect(Collectors.toMap(Listing::getId, l -> l, (a, b) -> a, LinkedHashMap::new));
+        
+        List<ListingDto> orderedDtos = topIds.stream()
+                .filter(listingMap::containsKey)
+                .map(listingMap::get)
+                .map(listingMapper::toDynamicDto)
+                .filter(dto -> dto != null)
+                .collect(Collectors.toList());
+
+        return listingEnrichmentService.enrich(orderedDtos, userEmail);
+    }
 
     public List<UUID> getUserFavoriteIds(User user) {
         return favoriteRepository.findListingIdsByUser(user);

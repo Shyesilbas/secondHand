@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -60,10 +61,62 @@ public class PaymentStatsService {
     }
 
     public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size) {
+        return getMyPayments(authentication, page, size, null, null, null, null, null, null, null, null);
+    }
+
+    public Page<PaymentDto> getMyPayments(
+            Authentication authentication,
+            int page,
+            int size,
+            PaymentTransactionType transactionType,
+            PaymentType paymentType,
+            PaymentDirection paymentDirection,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            BigDecimal amountMin,
+            BigDecimal amountMax,
+            String sellerName) {
         User user = userService.getAuthenticatedUser(authentication);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "processedAt"));
-        Page<Payment> payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
+        
+        Page<Payment> payments;
+        if (hasFilters(transactionType, paymentType, paymentDirection, dateFrom, dateTo, amountMin, amountMax, sellerName)) {
+            payments = paymentRepository.findByFilters(
+                    user, user,
+                    transactionType,
+                    paymentType,
+                    paymentDirection,
+                    dateFrom,
+                    dateTo,
+                    amountMin,
+                    amountMax,
+                    sellerName != null && !sellerName.trim().isEmpty() ? sellerName.trim() : null,
+                    pageable
+            );
+        } else {
+            payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
+        }
+        
         return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, user));
+    }
+
+    private boolean hasFilters(
+            PaymentTransactionType transactionType,
+            PaymentType paymentType,
+            PaymentDirection paymentDirection,
+            LocalDateTime dateFrom,
+            LocalDateTime dateTo,
+            BigDecimal amountMin,
+            BigDecimal amountMax,
+            String sellerName) {
+        return transactionType != null ||
+               paymentType != null ||
+               paymentDirection != null ||
+               dateFrom != null ||
+               dateTo != null ||
+               amountMin != null ||
+               amountMax != null ||
+               (sellerName != null && !sellerName.trim().isEmpty());
     }
 
     private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment, User currentUser) {

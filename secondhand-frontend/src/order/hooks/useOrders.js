@@ -1,65 +1,75 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '../services/orderService.js';
+import { useAuth } from '../../auth/AuthContext.jsx';
+
+const ORDERS_KEYS = {
+  all: ['orders'],
+  myOrders: (page, size, sort, direction) => [...ORDERS_KEYS.all, 'my', { page, size, sort, direction }],
+};
 
 export const useOrders = (initialPage = 0, initialSize = 10, sortField = null, sortDirection = 'desc') => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  const [page, setPage] = useState(initialPage);
+  const [size] = useState(initialSize);
+  const [sort, setSort] = useState(sortField);
+  const [direction, setDirection] = useState(sortDirection);
   const [searchResult, setSearchResult] = useState(null);
-  const [pagination, setPagination] = useState({
-    number: initialPage,
-    size: initialSize,
-    totalPages: 0,
-    totalElements: 0,
-    first: true,
-    last: false
+
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+    refetch
+  } = useQuery({
+    queryKey: ORDERS_KEYS.myOrders(page, size, sort, direction),
+    queryFn: async () => {
+      const response = await orderService.myOrders(page, size, sort, direction);
+      return response.data || response;
+    },
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
-  const fetchOrders = useCallback(async (page = pagination.number, size = pagination.size, sort = sortField, direction = sortDirection) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await orderService.myOrders(page, size, sort, direction);
-      
-            const data = response.data || response;
-      
-      setOrders(data.content || []);
-      setPagination({
-        number: data.pageable?.pageNumber || data.number || page,
-        size: data.pageable?.pageSize || data.size || size,
-        totalPages: data.totalPages || 0,
-        totalElements: data.totalElements || 0,
-        first: data.first || false,
-        last: data.last || false
-      });
-    } catch (err) {
-      setError(err.message || 'Failed to fetch orders');
-      console.error('Error fetching orders:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.number, pagination.size, sortField, sortDirection]);
+  const orders = useMemo(() => data?.content || [], [data]);
+  
+  const pagination = useMemo(() => ({
+    number: data?.pageable?.pageNumber ?? data?.number ?? page,
+    size: data?.pageable?.pageSize ?? data?.size ?? size,
+    totalPages: data?.totalPages ?? 0,
+    totalElements: data?.totalElements ?? 0,
+    first: data?.first ?? true,
+    last: data?.last ?? false,
+  }), [data, page, size]);
 
-  const loadPage = useCallback((page) => {
-    fetchOrders(page, pagination.size, sortField, sortDirection);
-  }, [fetchOrders, pagination.size, sortField, sortDirection]);
+  const error = queryError?.message || null;
+
+  const loadPage = useCallback((newPage) => {
+    setPage(newPage);
+  }, []);
+
+  const fetchOrders = useCallback((newPage, newSize, newSort, newDirection) => {
+    setPage(newPage);
+    if (newSort !== undefined) setSort(newSort);
+    if (newDirection !== undefined) setDirection(newDirection);
+  }, []);
 
   const refresh = useCallback(() => {
     setSearchResult(null);
-    fetchOrders(pagination.number, pagination.size, sortField, sortDirection);
-  }, [fetchOrders, pagination.number, pagination.size, sortField, sortDirection]);
+    queryClient.invalidateQueries({ queryKey: ORDERS_KEYS.all });
+    refetch();
+  }, [queryClient, refetch]);
 
   const setSearchOrder = useCallback((order) => {
     setSearchResult(order);
   }, []);
 
-  useEffect(() => {
-    fetchOrders(initialPage, initialSize, sortField, sortDirection);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortField, sortDirection]);
-
-    const displayOrders = searchResult ? [searchResult] : orders;
+  const displayOrders = searchResult ? [searchResult] : orders;
 
   return {
     orders: displayOrders,
