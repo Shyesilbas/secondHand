@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
+import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
@@ -17,7 +18,6 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,7 @@ import java.util.List;
 @Slf4j
 public class PaymentVerificationService {
 
+    private final ListingConfig listingConfig;
     private final IVerificationService verificationService;
     private final UserService userService;
     private final ListingService listingService;
@@ -38,12 +39,6 @@ public class PaymentVerificationService {
     private final PaymentNotificationService paymentNotificationService;
     private final PricingService pricingService;
     private final OfferService offerService;
-
-    @Value("${app.listing.creation.fee}")
-    private BigDecimal listingCreationFee;
-
-    @Value("${app.listing.fee.tax}")
-    private BigDecimal listingFeeTax;
 
     public void initiatePaymentVerification(Authentication authentication, InitiateVerificationRequest req) {
         User user = userService.getAuthenticatedUser(authentication);
@@ -178,6 +173,8 @@ public class PaymentVerificationService {
     }
 
     private BigDecimal calculateTotalListingFee() {
+        BigDecimal listingCreationFee = listingConfig.getCreation().getFee();
+        BigDecimal listingFeeTax = listingConfig.getFee().getTax();
         BigDecimal taxAmount = listingCreationFee.multiply(listingFeeTax).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         return listingCreationFee.add(taxAmount);
     }

@@ -99,42 +99,62 @@ const EditListingPage = ({
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const fetchingRef = useRef(false);
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            // First generic fetch to get the type if not provided
-            let initialData = null;
-            if (!type) {
-                initialData = await listingService.getListingById(id);
-            }
-
-            const currentType = type || initialData?.type;
-            const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
-
-            // If we have a specific service provided via props, use that
-            const activeService = service || strategy.service;
-            const activeMethod = serviceMethod || strategy.serviceMethod;
-
-            // Fetch full details using the specific service
-            // If initialData was already fetched and it's the generic one, we might need the specific one now
-            // But usually getListingById returns enough. However, specific endpoints might return more details.
-            // Let's rely on the strategy.
-            const fullData = await activeService[activeMethod](id);
-            setData(fullData);
-            
-        } catch (err) {
-            console.error('Failed to fetch listing:', err);
-            setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
-        } finally {
-            setIsLoading(false);
+    const serviceConfig = useMemo(() => {
+        if (service && serviceMethod) {
+            return { service, method: serviceMethod };
         }
-    }, [id, type, service, serviceMethod]);
+        if (type) {
+            const strategy = SERVICE_STRATEGIES[type] || DEFAULT_SERVICE_STRATEGY;
+            return { service: strategy.service, method: strategy.serviceMethod };
+        }
+        return null;
+    }, [type, service, serviceMethod]);
 
     useEffect(() => {
+        if (!id || fetchingRef.current) {
+            return;
+        }
+
+        fetchingRef.current = true;
+        
+        const fetchData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                let initialData = null;
+                let activeService, activeMethod;
+
+                if (serviceConfig) {
+                    activeService = serviceConfig.service;
+                    activeMethod = serviceConfig.method;
+                } else {
+                    initialData = await listingService.getListingById(id);
+                    const currentType = initialData?.type;
+                    const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
+                    activeService = strategy.service;
+                    activeMethod = strategy.serviceMethod;
+                }
+
+                const fullData = await activeService[activeMethod](id);
+                setData(fullData);
+                
+            } catch (err) {
+                console.error('Failed to fetch listing:', err);
+                setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
+            } finally {
+                setIsLoading(false);
+                fetchingRef.current = false;
+            }
+        };
+
         fetchData();
-    }, [fetchData]);
+
+        return () => {
+            fetchingRef.current = false;
+        };
+    }, [id, serviceConfig]);
 
     // 2. Authorization Check
     useEffect(() => {

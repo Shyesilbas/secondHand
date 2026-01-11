@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.verification;
 
+import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.user.application.UserNotificationService;
@@ -10,7 +11,6 @@ import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +24,13 @@ import java.util.Optional;
 @Slf4j
 public class VerificationService implements IVerificationService {
 
+    private final VerificationConfig verificationConfig;
     private final VerificationRepository verificationRepository;
     private final UserNotificationService userNotificationService;
     private final UserService userService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
-
-    @Value("${app.verification.code.expiry.minutes:3}")
-    private int verificationExpiryMinutes;
 
    @Override
     public String generateCode() {
@@ -52,7 +50,7 @@ public class VerificationService implements IVerificationService {
         verification.setCode(code);
         verification.setCodeType(codeType);
         verification.setCreatedAt(LocalDateTime.now());
-        verification.setCodeExpiresAt(LocalDateTime.now().plusMinutes(verificationExpiryMinutes));
+        verification.setCodeExpiresAt(LocalDateTime.now().plusMinutes(verificationConfig.getExpiryMinutes()));
         verification.setVerificationAttemptLeft(3);
         verification.setVerified(false);
         verificationRepository.save(verification);

@@ -1,8 +1,8 @@
 package com.serhat.secondhand.exchange;
 
+import com.serhat.secondhand.core.config.ExchangeConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,16 +11,14 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class ExchangeRateService {
 
-    @Value("${exchange.api.key}")
-    private String apiKey;
-
+    private final ExchangeConfig exchangeConfig;
     private final RestTemplate restTemplate = new RestTemplate();
 
     private static final String API_URL = "https://v6.exchangerate-api.com/v6/{apiKey}/pair/{base}/{target}";
 
     public ExchangeRateDto getRate(String from, String to) {
         String url = API_URL
-                .replace("{apiKey}", apiKey)
+                .replace("{apiKey}", exchangeConfig.getKey())
                 .replace("{base}", from)
                 .replace("{target}", to);
 

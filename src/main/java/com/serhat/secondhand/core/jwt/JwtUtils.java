@@ -1,11 +1,11 @@
 package com.serhat.secondhand.core.jwt;
 
+import com.serhat.secondhand.core.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,18 +17,18 @@ import java.util.function.Function;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtils {
 
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+    private final JwtConfig jwtConfig;
 
-    @Getter
-    @Value("${jwt.accessToken.expiration}")
-    private long accessTokenExpiration;
+    public long getAccessTokenExpiration() {
+        return jwtConfig.getAccessToken().getExpiration();
+    }
 
-    @Getter
-    @Value("${jwt.refreshToken.expiration}")
-    private long refreshTokenExpiration;
+    public long getRefreshTokenExpiration() {
+        return jwtConfig.getRefreshToken().getExpiration();
+    }
 
 
     public String extractUsername(String token) {
@@ -45,11 +45,11 @@ public class JwtUtils {
     }
 
     public String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, accessTokenExpiration);
+        return buildToken(extraClaims, userDetails, getAccessTokenExpiration());
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
+        return buildToken(new HashMap<>(), userDetails, getRefreshTokenExpiration());
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
@@ -84,7 +84,7 @@ public class JwtUtils {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
