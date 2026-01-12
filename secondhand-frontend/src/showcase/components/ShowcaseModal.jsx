@@ -6,6 +6,7 @@ import {useListingData} from '../../listing/hooks/useListingData.js';
 import PaymentAgreementsSection from '../../payments/components/PaymentAgreementsSection.jsx';
 import NotificationModal from '../../notification/NotificationModal.jsx';
 import ShowcasePayment from './ShowcasePayment.jsx';
+import { Zap, ShieldCheck, X } from 'lucide-react';
 
 const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSuccess }) => {
     const [step, setStep] = useState(1);
@@ -82,68 +83,82 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
     const renderStepContent = useCallback(() => {
         if (step === 1) {
+            const durationOptions = [7, 14, 21, 30];
+            
             return (
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div className="text-center">
-                        <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                        <div className="w-14 h-14 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+                            <Zap className="w-7 h-7 text-white" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">Boost Your Listing</h3>
-                        <p className="text-sm text-gray-600">Make your listing stand out with showcase promotion</p>
+                        <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2">Boost Your Listing</h3>
+                        <p className="text-sm text-slate-600 tracking-tight">Make your listing stand out with showcase promotion</p>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg p-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Showcase Duration</label>
-                        <div className="space-y-3">
+                    <div className="rounded-3xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-6">
+                        <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-4">Showcase Duration</label>
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                            {durationOptions.map((option) => (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    onClick={() => setDays(option)}
+                                    className={`px-6 py-4 rounded-3xl font-semibold tracking-tight text-sm transition-all duration-300 ${
+                                        days === option
+                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
+                                            : 'bg-white text-slate-700 border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'
+                                    }`}
+                                >
+                                    {option} {option === 1 ? 'Day' : 'Days'}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-slate-200">
                             <input
                                 type="number"
                                 min="1"
                                 max="30"
                                 value={days}
                                 onChange={handleDaysChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium"
+                                className="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 font-mono text-slate-900 tracking-tight"
                                 required
                             />
-                            <div className="flex items-center justify-between text-xs text-gray-600">
+                            <div className="flex items-center justify-between mt-3 text-xs text-slate-500 tracking-tight">
                                 <span>Duration: {days} day{days !== 1 ? 's' : ''}</span>
-                                {showcasePricing ? (
-                                    <span>Per Day: <span className="font-semibold text-emerald-600">{showcasePricing.dailyCost}₺</span></span>
-                                ) : (
-                                    <span>Per Day: <span className="font-semibold text-emerald-600">10₺</span></span>
+                                {showcasePricing && (
+                                    <span>Per Day: <span className="font-mono font-semibold text-indigo-600">{showcasePricing.dailyCost}₺</span></span>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {showcasePricing && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">
-                            <h4 className="font-medium text-gray-900 text-sm">Cost Breakdown</h4>
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-gray-600">Subtotal ({days} days):</span>
-                                    <span className="font-medium">{calculateSubtotal().toFixed(2)}₺</span>
+                        <div className="rounded-3xl border border-slate-200/60 bg-gradient-to-br from-indigo-50/30 to-white p-6">
+                            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-5">Investment Summary</h4>
+                            <div className="space-y-3 mb-5">
+                                <div className="flex justify-between text-sm tracking-tight">
+                                    <span className="text-slate-600">Subtotal ({days} days):</span>
+                                    <span className="font-mono font-semibold text-slate-900">{calculateSubtotal().toFixed(2)}₺</span>
                                 </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-gray-600">Tax ({showcasePricing.taxPercentage}%):</span>
-                                    <span className="font-medium">{calculateTax().toFixed(2)}₺</span>
+                                <div className="flex justify-between text-sm tracking-tight">
+                                    <span className="text-slate-600">Tax ({showcasePricing.taxPercentage}%):</span>
+                                    <span className="font-mono font-semibold text-slate-900">{calculateTax().toFixed(2)}₺</span>
                                 </div>
-                                <div className="border-t pt-1">
-                                    <div className="flex justify-between font-bold text-base">
-                                        <span>Total:</span>
-                                        <span className="text-emerald-600">{totalCost.toFixed(2)}₺</span>
-                                    </div>
+                            </div>
+                            <div className="pt-4 border-t border-slate-200">
+                                <div className="flex justify-between items-baseline">
+                                    <span className="text-sm font-semibold tracking-tight text-slate-700">Total Investment:</span>
+                                    <span className="text-5xl font-black font-mono tracking-tighter text-indigo-600">{totalCost.toFixed(2)}₺</span>
                                 </div>
                             </div>
                         </div>
                     )}
                     
                     {!showcasePricing && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-900">Total Cost:</span>
-                                <span className="text-xl font-bold text-emerald-600">{totalCost}₺</span>
+                        <div className="rounded-3xl border border-slate-200/60 bg-white p-6">
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-sm font-semibold tracking-tight text-slate-700">Total Investment:</span>
+                                <span className="text-5xl font-black font-mono tracking-tighter text-indigo-600">{totalCost}₺</span>
                             </div>
                         </div>
                     )}
@@ -151,18 +166,16 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             );
         } else if (step === 2) {
             return (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <div className="text-center">
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                        <div className="w-14 h-14 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+                            <ShieldCheck className="w-7 h-7 text-white" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">Payment Agreements</h3>
-                        <p className="text-sm text-gray-600">Please review and accept the payment agreements to proceed</p>
+                        <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2">Security & Agreements</h3>
+                        <p className="text-sm text-slate-600 tracking-tight">Please review and accept the payment agreements to proceed</p>
                     </div>
                     
-                    <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="rounded-3xl border border-slate-200/60 bg-white/50 backdrop-blur-xl p-6">
                         <PaymentAgreementsSection 
                             acceptedAgreements={paymentAgreements.acceptedAgreements}
                             onToggle={paymentAgreements.handleAgreementToggle}
@@ -200,10 +213,10 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const renderModalContent = () => {
         if (isListingLoading) {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                        <p>Loading listing information...</p>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50">
+                    <div className="bg-slate-50/50 rounded-[2.5rem] shadow-2xl shadow-slate-900/40 w-full max-w-md mx-4 p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                        <p className="text-sm text-slate-600 tracking-tight">Loading listing information...</p>
                     </div>
                 </div>
             );
@@ -211,11 +224,11 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         
         if (!listingId || listingError) {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                        <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-                        <p>{listingError || 'Listing Information Not Found.'}</p>
-                        <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50">
+                    <div className="bg-slate-50/50 rounded-[2.5rem] shadow-2xl shadow-slate-900/40 w-full max-w-md mx-4 p-8 text-center">
+                        <h2 className="text-xl font-bold tracking-tight text-rose-600 mb-4">Error</h2>
+                        <p className="text-sm text-slate-600 tracking-tight">{listingError || 'Listing Information Not Found.'}</p>
+                        <button className="mt-6 px-6 py-3 bg-slate-900 text-white rounded-2xl font-semibold tracking-tight transition-all hover:shadow-lg" onClick={onClose}>Close</button>
                     </div>
                 </div>
             );
@@ -223,11 +236,11 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         
         if (!listing) {
             return (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-8 text-center">
-                        <h2 className="text-xl font-bold text-red-600 mb-4">Error</h2>
-                        <p>Listing not found.</p>
-                        <button className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded" onClick={onClose}>Close</button>
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50">
+                    <div className="bg-slate-50/50 rounded-[2.5rem] shadow-2xl shadow-slate-900/40 w-full max-w-md mx-4 p-8 text-center">
+                        <h2 className="text-xl font-bold tracking-tight text-rose-600 mb-4">Error</h2>
+                        <p className="text-sm text-slate-600 tracking-tight">Listing not found.</p>
+                        <button className="mt-6 px-6 py-3 bg-slate-900 text-white rounded-2xl font-semibold tracking-tight transition-all hover:shadow-lg" onClick={onClose}>Close</button>
                     </div>
                 </div>
             );
@@ -235,50 +248,32 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
         return (
             <>
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto overflow-hidden max-h-[90vh] flex flex-col">
-                        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-50/50 rounded-[2.5rem] shadow-2xl shadow-slate-900/40 w-full max-w-2xl mx-auto overflow-hidden max-h-[90vh] flex flex-col">
+                        <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-5 flex items-center justify-between flex-shrink-0">
                             <div>
-                                <h3 className="text-xl font-semibold text-white">Showcase Promotion</h3>
-                                <p className="text-emerald-100 text-sm">Boost your listing visibility</p>
+                                <h3 className="text-xl font-bold tracking-tight text-white">Showcase Promotion</h3>
+                                <p className="text-indigo-100 text-sm tracking-tight">Boost your listing visibility</p>
                             </div>
                             <button 
-                                className="p-2 hover:bg-emerald-600 rounded-lg transition-colors" 
+                                className="p-2 hover:bg-white/10 rounded-xl transition-colors" 
                                 onClick={onClose}
                             >
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-5 h-5 text-white" />
                             </button>
                         </div>
 
-                        <div className="px-6 py-4 bg-gray-50 flex-shrink-0">
-                            <div className="flex items-center space-x-3">
-                                {[1, 2, 3].map(s => (
-                                    <div key={s} className="flex items-center">
-                                        <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                                step >= s 
-                                                    ? 'bg-emerald-600 text-white' 
-                                                    : 'bg-gray-300 text-gray-600'
-                                            }`}
-                                        >
-                                            {s}
-                                        </div>
-                                        {s < 3 && (
-                                            <div
-                                                className={`w-8 h-0.5 mx-2 ${
-                                                    step > s ? 'bg-emerald-600' : 'bg-gray-300'
-                                                }`}
-                                            />
-                                        )}
-                                    </div>
-                                ))}
+                        <div className="px-6 py-4 bg-white/30 backdrop-blur-sm flex-shrink-0 border-b border-white/10">
+                            <div className="relative h-1 bg-slate-200/50 rounded-full overflow-hidden">
+                                <div 
+                                    className="absolute inset-y-0 left-0 bg-indigo-500 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                                    style={{ width: `${(step / 3) * 100}%` }}
+                                />
                             </div>
-                            <div className="mt-2 text-xs text-gray-600">
-                                {step === 1 && 'Duration & Pricing'}
-                                {step === 2 && 'Payment Agreements'}
-                                {step === 3 && 'Payment & Confirmation'}
+                            <div className="mt-3 flex items-center justify-between text-xs text-slate-500 tracking-tight">
+                                <span className={step >= 1 ? 'font-semibold text-indigo-600' : ''}>Duration & Pricing</span>
+                                <span className={step >= 2 ? 'font-semibold text-indigo-600' : ''}>Agreements</span>
+                                <span className={step >= 3 ? 'font-semibold text-indigo-600' : ''}>Payment</span>
                             </div>
                         </div>
 
@@ -286,16 +281,16 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                             {renderStepContent()}
                         </div>
 
-                        <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-between flex-shrink-0">
+                        <div className="px-6 py-5 bg-white/30 backdrop-blur-sm border-t border-white/10 flex items-center justify-between flex-shrink-0">
                             <button
-                                className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                                className="px-5 py-2.5 text-sm font-semibold tracking-tight text-slate-600 hover:text-slate-900 transition-colors"
                                 onClick={handlePrevStep}
                             >
                                 {step > 1 ? 'Back' : 'Cancel'}
                             </button>
                             {step < 3 && (
                                 <button
-                                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-8 py-5 bg-slate-900 text-white rounded-2xl hover:shadow-2xl hover:shadow-indigo-500/20 font-bold tracking-tight transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={handleNextStep}
                                     disabled={
                                         (step === 1 && (days < 1 || days > 30)) ||
