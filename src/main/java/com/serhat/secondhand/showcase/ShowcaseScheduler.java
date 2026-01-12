@@ -10,7 +10,7 @@ public class ShowcaseScheduler {
     
     private final ShowcaseService showcaseService;
     
-    @Scheduled(cron = "0 0 0 * * ?")     public void expireShowcases() {
+    @Scheduled(cron = "0 0 * * * ?")     public void expireShowcases() {
         showcaseService.expireShowcases();
     }
 }

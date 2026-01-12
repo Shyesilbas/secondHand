@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,7 @@ public class OrderRefundService {
         validateItemsCanBeRefunded(itemsToRefund, order);
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
+        BigDecimal escrowRefundAmount = BigDecimal.ZERO;
         List<OrderItemRefund> refundRecords = new ArrayList<>();
 
         for (OrderItem item : itemsToRefund) {
@@ -67,6 +69,11 @@ public class OrderRefundService {
 
             BigDecimal refundAmount = item.getTotalPrice();
             totalRefundAmount = totalRefundAmount.add(refundAmount);
+
+            Optional<OrderItemEscrow> escrowOpt = orderEscrowService.findEscrowByOrderItem(item);
+            if (escrowOpt.isPresent() && escrowOpt.get().getStatus() != OrderItemEscrow.EscrowStatus.REFUNDED) {
+                escrowRefundAmount = escrowRefundAmount.add(escrowOpt.get().getAmount());
+            }
 
             OrderItemRefund refundRecord = OrderItemRefund.builder()
                     .orderItem(item)
@@ -88,9 +95,14 @@ public class OrderRefundService {
         refundEscrowsForItems(itemsToRefund, user, order);
 
         try {
-            UUID firstListingId = itemsToRefund.isEmpty() ? null : itemsToRefund.get(0).getListing().getId();
-            eWalletService.creditToUser(user, totalRefundAmount, firstListingId, PaymentTransactionType.REFUND);
-            log.info("Refunded {} to eWallet for user: {} for order: {}", totalRefundAmount, user.getEmail(), order.getOrderNumber());
+            BigDecimal nonEscrowRefundAmount = totalRefundAmount.subtract(escrowRefundAmount);
+            if (nonEscrowRefundAmount.compareTo(BigDecimal.ZERO) > 0) {
+                UUID firstListingId = itemsToRefund.isEmpty() ? null : itemsToRefund.get(0).getListing().getId();
+                eWalletService.creditToUser(user, nonEscrowRefundAmount, firstListingId, PaymentTransactionType.REFUND);
+                log.info("Refunded {} to eWallet for user: {} for order: {} (non-escrow amount)", nonEscrowRefundAmount, user.getEmail(), order.getOrderNumber());
+            } else {
+                log.info("All refund amount handled via escrow refund for user: {} for order: {}", user.getEmail(), order.getOrderNumber());
+            }
 
             Map<com.serhat.secondhand.user.domain.entity.User, BigDecimal> sellerRefunds = itemsToRefund.stream()
                     .collect(Collectors.groupingBy(

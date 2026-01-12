@@ -1,34 +1,30 @@
 package com.serhat.secondhand.review.service;
 
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
-import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
+import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.review.validator.ReviewValidator;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.http.HttpStatus;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +95,7 @@ public class ReviewService {
         log.info("Getting reviews for order items: {}", orderItemIds);
         
         List<OrderItem> orderItems = orderItemIds.stream()
-                .map(id -> orderItemRepository.findById(id))
+                .map(orderItemRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
