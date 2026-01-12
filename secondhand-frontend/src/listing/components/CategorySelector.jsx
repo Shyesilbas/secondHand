@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEnums } from '../../common/hooks/useEnums';
 
-const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
+const CategorySelector = ({ selectedCategory, onCategoryChange, compact = false }) => {
     const { enums, isLoading: enumsLoading } = useEnums();
 
     if (enumsLoading) {
@@ -20,6 +20,52 @@ const CategorySelector = ({ selectedCategory, onCategoryChange }) => {
     const handleCategoryChange = (categoryValue) => {
         onCategoryChange(categoryValue);
     };
+
+    if (compact) {
+        return (
+            <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-900">Category</h3>
+                <div className="space-y-2">
+                    {enums.listingTypes.map((type) => (
+                        <button
+                            key={type.value}
+                            onClick={() => handleCategoryChange(type.value)}
+                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left hover:shadow-sm ${
+                                selectedCategory === type.value
+                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                            }`}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <span className="text-base">{type.icon || '📦'}</span>
+                                <div className="flex-1">
+                                    <div className="text-sm font-medium">{type.label}</div>
+                                </div>
+                                {selectedCategory === type.value && (
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                )}
+                            </div>
+                        </button>
+                    ))}
+                </div>
+                {selectedCategory && (
+                    <div className="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs text-emerald-700">
+                                {enums.listingTypes.find(type => type.value === selectedCategory)?.label}
+                            </span>
+                            <button
+                                onClick={() => handleCategoryChange(null)}
+                                className="text-xs text-emerald-600 hover:text-emerald-800 underline"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">

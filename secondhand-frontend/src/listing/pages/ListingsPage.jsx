@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAdvancedListingsQuery } from '../hooks/useAdvancedListingsQuery.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
-import FilterModal from '../components/FilterModal.jsx';
+import FilterSidebar from '../components/FilterSidebar.jsx';
 import ListingsHeader from '../components/ListingsHeader.jsx';
 import ListingsSearch from '../components/ListingsSearch.jsx';
 import ListingsContent from '../components/ListingsContent.jsx';
@@ -29,7 +29,7 @@ const ListingsPage = () => {
     } = useAdvancedListingsQuery(initialListingType ? { listingType: initialListingType } : { listingType: 'VEHICLE' });
 
     const { getListingTypeLabel } = useEnums();
-    const { showFilterModal, hasActiveFilters, openFilterModal, closeFilterModal } = useListingsFilters(filters);
+    const { showFilterSidebar, hasActiveFilters, toggleFilterSidebar, closeFilterSidebar } = useListingsFilters(filters);
     const { 
         titleSearchTerm, 
         setTitleSearchTerm, 
@@ -73,50 +73,53 @@ const ListingsPage = () => {
         updateFilters(newFilters);
     }, [updateFilters]);
 
+
     return (
-        <div className="min-h-screen bg-background-secondary/50">
-            <ListingsHeader
-                totalElements={totalElements}
-                selectedCategory={selectedCategory}
-                filters={filters}
-                getListingTypeLabel={getListingTypeLabel}
-                hasActiveFilters={hasActiveFilters}
-                onOpenFilterModal={openFilterModal}
-            />
-
-            <ListingsSearch
-                titleSearchTerm={titleSearchTerm}
-                setTitleSearchTerm={setTitleSearchTerm}
-                filteredListings={filteredListings}
-                allPagesLoaded={allPagesLoaded}
-                loadingAllPages={loadingAllPages}
-                loadAllPages={loadAllPages}
-            />
-
-            <ListingsContent
-                isLoading={isLoading}
-                filteredListings={filteredListings}
-                error={error}
-                totalPages={totalPages}
-                currentPage={currentPage}
-                onPageChange={handlePageChange}
-                totalElements={totalElements}
-                filters={filters}
-                getListingTypeLabel={getListingTypeLabel}
-                onResetFilters={resetFilters}
-                updateFilters={handleFiltersChange}
-                titleSearchTerm={titleSearchTerm}
-            />
-
-            <FilterModal
-                isOpen={showFilterModal}
-                onClose={closeFilterModal}
+        <div className="min-h-screen bg-background-secondary/50 relative">
+            <FilterSidebar
+                isOpen={showFilterSidebar}
+                onClose={closeFilterSidebar}
                 filters={filters}
                 onFiltersChange={handleFiltersChange}
                 onReset={handleResetFilters}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
             />
+
+            <div className={`flex flex-col min-w-0 transition-all duration-300 ${showFilterSidebar ? 'lg:ml-80' : ''}`}>
+                <ListingsHeader
+                    totalElements={totalElements}
+                    selectedCategory={selectedCategory}
+                    filters={filters}
+                    getListingTypeLabel={getListingTypeLabel}
+                    hasActiveFilters={hasActiveFilters}
+                    onToggleFilterSidebar={toggleFilterSidebar}
+                />
+
+                <ListingsSearch
+                    titleSearchTerm={titleSearchTerm}
+                    setTitleSearchTerm={setTitleSearchTerm}
+                    filteredListings={filteredListings}
+                    allPagesLoaded={allPagesLoaded}
+                    loadingAllPages={loadingAllPages}
+                    loadAllPages={loadAllPages}
+                />
+
+                <ListingsContent
+                    isLoading={isLoading}
+                    filteredListings={filteredListings}
+                    error={error}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                    totalElements={totalElements}
+                    filters={filters}
+                    getListingTypeLabel={getListingTypeLabel}
+                    onResetFilters={resetFilters}
+                    updateFilters={handleFiltersChange}
+                    titleSearchTerm={titleSearchTerm}
+                />
+            </div>
         </div>
     );
 };
