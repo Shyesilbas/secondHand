@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useMyListings } from '../hooks/useMyListings.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
@@ -6,6 +7,8 @@ import { ROUTES } from '../../common/constants/routes.js';
 import PageHeader from '../../listing/components/PageHeader.jsx';
 import { listingService } from '../services/listingService.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
+import MyListingsFilterSidebar from '../components/MyListingsFilterSidebar.jsx';
+import { Menu } from 'lucide-react';
 
 const MyListingsPage = () => {
     const [selectedStatus, setSelectedStatus] = useState(null);
@@ -16,6 +19,7 @@ const MyListingsPage = () => {
     const [allListings, setAllListings] = useState([]);
     const [loadingAllPages, setLoadingAllPages] = useState(false);
     const [isLowStockOpen, setIsLowStockOpen] = useState(false);
+    const [showFilterSidebar, setShowFilterSidebar] = useState(false);
     const { enums } = useEnums();
     const { 
         listings, 
@@ -35,10 +39,33 @@ const MyListingsPage = () => {
         handleSizeChange(newSize);
     };
 
-    const handleCategoryChange = (category) => {
+    const handleCategoryChange = useCallback((category) => {
         setSelectedCategory(category === selectedCategory ? null : category);
         handlePageChange(0);
-    };
+    }, [selectedCategory, handlePageChange]);
+
+    const handleStatusChange = useCallback((status) => {
+        setSelectedStatus(status);
+        handlePageChange(0);
+    }, [handlePageChange]);
+
+    const toggleFilterSidebar = useCallback(() => {
+        setShowFilterSidebar(prev => !prev);
+    }, []);
+
+    const closeFilterSidebar = useCallback(() => {
+        setShowFilterSidebar(false);
+    }, []);
+
+    const handleResetFilters = useCallback(() => {
+        setSelectedCategory(null);
+        setSelectedStatus(null);
+        handlePageChange(0);
+    }, [handlePageChange]);
+
+    const hasActiveFilters = useMemo(() => {
+        return selectedCategory !== null || selectedStatus !== null;
+    }, [selectedCategory, selectedStatus]);
 
     // Frontend filtering for title and listingNo
     const filteredListings = useMemo(() => {
@@ -111,15 +138,64 @@ const MyListingsPage = () => {
     }, [allPagesLoaded, allListings, listings]);
 
     return (
-        <div className="min-h-screen bg-slate-50/50">
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                <PageHeader
-                    title="My Listings"
-                    subtitle="You can manage your listings here."
-                    onRefresh={refetch}
-                    createButtonText="New Listing"
-                    createButtonRoute={ROUTES.CREATE_LISTING}
-                />
+        <div className="min-h-screen bg-slate-50/50 relative">
+            <MyListingsFilterSidebar
+                isOpen={showFilterSidebar}
+                onClose={closeFilterSidebar}
+                selectedCategory={selectedCategory}
+                selectedStatus={selectedStatus}
+                onCategoryChange={handleCategoryChange}
+                onStatusChange={handleStatusChange}
+                onReset={handleResetFilters}
+            />
+
+            <div className={`flex flex-col min-w-0 transition-all duration-300 ${showFilterSidebar ? 'lg:ml-80' : ''}`}>
+                <div className="max-w-7xl mx-auto px-6 py-8 w-full">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={toggleFilterSidebar}
+                                className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900 relative"
+                            >
+                                <Menu className="w-6 h-6" />
+                                {hasActiveFilters && (
+                                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-900"></span>
+                                )}
+                            </button>
+                            <div>
+                                <h1 className="text-3xl font-semibold text-gray-900">
+                                    My Listings
+                                </h1>
+                                <p className="text-gray-600 mt-1">
+                                    You can manage your listings here.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            {refetch && (
+                                <button
+                                    onClick={refetch}
+                                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                                    title="Refresh"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                </button>
+                            )}
+                            {ROUTES.CREATE_LISTING && (
+                                <Link
+                                    to={ROUTES.CREATE_LISTING}
+                                    className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors flex items-center space-x-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    <span>New Listing</span>
+                                </Link>
+                            )}
+                        </div>
+                    </div>
 
                 <div className="mb-6 space-y-4">
                     <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
@@ -192,37 +268,6 @@ const MyListingsPage = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden mb-6">
-                    <div className="p-4">
-                        <h3 className="text-xs font-semibold text-slate-900 mb-3 tracking-tight uppercase">Filter by Category</h3>
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => handleCategoryChange(null)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all tracking-tight ${
-                                    selectedCategory === null
-                                        ? 'bg-indigo-600 text-white shadow-sm'
-                                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
-                                }`}
-                            >
-                                All Categories
-                            </button>
-                            {enums?.listingTypes?.map((type) => (
-                                <button
-                                    key={type.value}
-                                    onClick={() => handleCategoryChange(type.value)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 tracking-tight ${
-                                        selectedCategory === type.value
-                                            ? 'bg-indigo-600 text-white shadow-sm'
-                                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
-                                    }`}
-                                >
-                                    <span className="text-[10px]">{type.icon || '📦'}</span>
-                                    <span>{type.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
 
             {lowStockListings.length > 0 && (
                 <div className="mb-8">
@@ -357,6 +402,7 @@ const MyListingsPage = () => {
                     />
                 </div>
             )}
+                </div>
             </div>
         </div>
     );

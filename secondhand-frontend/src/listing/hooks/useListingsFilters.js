@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 
 export const useListingsFilters = (filters) => {
-    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [showFilterSidebar, setShowFilterSidebar] = useState(false);
 
     const hasActiveFilters = useMemo(() => {
         if (!filters) return false;
@@ -18,18 +18,23 @@ export const useListingsFilters = (filters) => {
         });
     }, [filters]);
 
-    const openFilterModal = useCallback(() => {
-        setShowFilterModal(true);
+    const toggleFilterSidebar = useCallback(() => {
+        setShowFilterSidebar(prev => !prev);
     }, []);
 
-    const closeFilterModal = useCallback(() => {
-        setShowFilterModal(false);
+    const openFilterSidebar = useCallback(() => {
+        setShowFilterSidebar(true);
+    }, []);
+
+    const closeFilterSidebar = useCallback(() => {
+        setShowFilterSidebar(false);
     }, []);
 
     return {
-        showFilterModal,
+        showFilterSidebar,
         hasActiveFilters,
-        openFilterModal,
-        closeFilterModal
+        toggleFilterSidebar,
+        openFilterSidebar,
+        closeFilterSidebar
     };
 };

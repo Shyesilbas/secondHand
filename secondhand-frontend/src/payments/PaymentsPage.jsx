@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {useNavigate} from 'react-router-dom';
-import { ArrowLeftIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Menu } from 'lucide-react';
 import PaymentReceiptModal from '../common/components/modals/PaymentReceiptModal.jsx';
-import PaymentFilters from './components/PaymentFilters.jsx';
+import PaymentFilterSidebar from './components/PaymentFilterSidebar.jsx';
 import PaymentList from './components/PaymentList.jsx';
 import PaymentPagination from './components/PaymentPagination.jsx';
 import PaymentInfo from './components/PaymentInfo.jsx';
@@ -33,6 +34,14 @@ const PaymentsPage = () => {
         handlePageSizeChange,
         setShowFilters
     } = usePayments();
+
+    const toggleFilterSidebar = useCallback(() => {
+        setShowFilters(!showFilters);
+    }, [showFilters, setShowFilters]);
+
+    const closeFilterSidebar = useCallback(() => {
+        setShowFilters(false);
+    }, [setShowFilters]);
 
     if (isLoading) {
         return (
@@ -77,37 +86,40 @@ const PaymentsPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
-            <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-base font-semibold text-gray-900 tracking-tight mb-0.5">Payment History</h1>
-                            <p className="text-xs text-gray-500 font-medium">Track and manage your payment transactions</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                                    showFilters || hasActiveFilters
-                                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-200/60'
-                                }`}
-                            >
-                                <FunnelIcon className="w-3.5 h-3.5" />
-                                Filters
-                                {hasActiveFilters && (
-                                    <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-white/20 text-white rounded-full">
-                                        !
-                                    </span>
-                                )}
-                            </button>
+        <div className="min-h-screen bg-gray-50/50 relative">
+            <PaymentFilterSidebar
+                isOpen={showFilters}
+                onClose={closeFilterSidebar}
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onReset={clearFilters}
+                hasActiveFilters={hasActiveFilters}
+            />
+
+            <div className={`flex flex-col min-w-0 transition-all duration-300 ${showFilters ? 'lg:ml-80' : ''}`}>
+                <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
+                    <div className="max-w-7xl mx-auto px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={toggleFilterSidebar}
+                                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900 relative"
+                                >
+                                    <Menu className="w-6 h-6" />
+                                    {hasActiveFilters && (
+                                        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-900"></span>
+                                    )}
+                                </button>
+                                <div>
+                                    <h1 className="text-base font-semibold text-gray-900 tracking-tight mb-0.5">Payment History</h1>
+                                    <p className="text-xs text-gray-500 font-medium">Track and manage your payment transactions</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-6">
+                <div className="max-w-7xl mx-auto px-6 py-6 w-full">
 
                 <div className="mb-6">
                     <PaymentInfo />
@@ -122,21 +134,6 @@ const PaymentsPage = () => {
                                 <p className="text-[11px] text-red-600 mt-0.5">{error}</p>
                             </div>
                         </div>
-                    </div>
-                )}
-
-                {showFilters && (
-                    <div className="mb-6 bg-white border border-gray-200/60 rounded-lg overflow-hidden">
-                        <PaymentFilters
-                            filters={filters}
-                            showFilters={showFilters}
-                            hasActiveFilters={hasActiveFilters}
-                            onFilterChange={handleFilterChange}
-                            onClearFilters={clearFilters}
-                            onToggleFilters={() => setShowFilters(!showFilters)}
-                            filteredPayments={filteredPayments}
-                            allPayments={allPayments}
-                        />
                     </div>
                 )}
 
@@ -185,6 +182,7 @@ const PaymentsPage = () => {
                     onClose={closeReceipt}
                     payment={selectedPayment}
                 />
+                </div>
             </div>
         </div>
     );
