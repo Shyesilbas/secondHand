@@ -192,36 +192,32 @@ const CheckoutPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200">
+        <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
+            <div className="bg-white border-b border-slate-200/60">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => navigate('/cart')}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md"
                         >
-                            <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+                            <ArrowLeftIcon className="w-5 h-5" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-medium text-gray-900">Checkout</h1>
-                            <p className="text-gray-600 mt-1">Complete your purchase securely</p>
+                            <h1 className="text-2xl font-bold text-slate-900 tracking-tighter">Checkout</h1>
+                            <p className="text-slate-500 mt-1 tracking-tight">Complete your purchase securely</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Progress Bar */}
             <CheckoutProgressBar 
                 currentStep={currentStep} 
                 steps={steps}
                 onStepChange={handleStepChange}
             />
 
-            {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column - Checkout Steps */}
                     <div className="lg:col-span-2">
                         <CheckoutStep
                             step={currentStep}

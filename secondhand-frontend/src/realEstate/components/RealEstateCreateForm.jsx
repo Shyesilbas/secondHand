@@ -47,54 +47,76 @@ const RealEstateCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
         return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} showQuantity={false} />;
       case 2:
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {['adType', 'realEstateType', 'heatingType', 'ownerType'].map((field) => (
-                  <div key={field}>
-                    <EnumDropdown
-                        label={`${field.replace(/([A-Z])/g, ' $1')} *`}
-                        enumKey={field === 'adType' ? 'realEstateAdTypes' :
-                            field === 'realEstateType' ? 'realEstateTypes' :
-                                field === 'heatingType' ? 'heatingTypes' : 'ownerTypes'}
-                        value={formData[field]}
-                        onChange={(v) => handleDropdownChange(field, v)}
-                    />
-                    {errors[field] && <p className="mt-1 text-sm text-red-600">{errors[field]}</p>}
-                  </div>
-              ))}
+            <div className="space-y-10">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+                <div className="pb-4 border-b border-slate-100 mb-6">
+                  <h3 className="text-base font-semibold text-slate-900 tracking-tight">Temel Bilgiler</h3>
+                  <p className="text-xs text-slate-500 mt-1 tracking-tight">İlan tipi, gayrimenkul tipi ve sahiplik durumu</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {['adType', 'realEstateType', 'heatingType', 'ownerType'].map((field) => (
+                      <div key={field}>
+                        <EnumDropdown
+                            label={`${field.replace(/([A-Z])/g, ' $1')} *`}
+                            enumKey={field === 'adType' ? 'realEstateAdTypes' :
+                                field === 'realEstateType' ? 'realEstateTypes' :
+                                    field === 'heatingType' ? 'heatingTypes' : 'ownerTypes'}
+                            value={formData[field]}
+                            onChange={(v) => handleDropdownChange(field, v)}
+                        />
+                        {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
+                      </div>
+                  ))}
+                </div>
+              </div>
 
-              {['squareMeters', 'roomCount', 'bathroomCount', 'floor', 'buildingAge'].map((field) => (
-                  <div key={field}>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">{field.replace(/([A-Z])/g, ' $1')} *</label>
-                    <input
-                        type="number"
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleInputChange}
-                        min="0"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                            errors[field] ? 'border-red-500' : 'border-slate-200'
-                        }`}
-                    />
-                    {errors[field] && <p className="mt-1 text-sm text-red-600">{errors[field]}</p>}
-                  </div>
-              ))}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+                <div className="pb-4 border-b border-slate-100 mb-6">
+                  <h3 className="text-base font-semibold text-slate-900 tracking-tight">Fiziksel Özellikler</h3>
+                  <p className="text-xs text-slate-500 mt-1 tracking-tight">Metrekare, oda sayısı ve diğer detaylar</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {['squareMeters', 'roomCount', 'bathroomCount', 'floor', 'buildingAge'].map((field) => (
+                      <div key={field}>
+                        <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{field.replace(/([A-Z])/g, ' $1')} *</label>
+                        <input
+                            type="number"
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            min="0"
+                            className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${
+                                errors[field] ? 'border-red-300' : 'border-slate-200'
+                            }`}
+                        />
+                        {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
+                      </div>
+                  ))}
+                </div>
+              </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                    id="furnished"
-                    type="checkbox"
-                    name="furnished"
-                    checked={Boolean(formData.furnished)}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-btn-primary border-slate-300 rounded"
-                />
-                <label htmlFor="furnished" className="text-sm font-medium text-slate-700">Furnished</label>
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+                <div className="pb-4 border-b border-slate-100 mb-6">
+                  <h3 className="text-base font-semibold text-slate-900 tracking-tight">Ek Bilgiler</h3>
+                  <p className="text-xs text-slate-500 mt-1 tracking-tight">Eşyalı durumu</p>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer" onClick={() => handleInputChange({ target: { name: 'furnished', checked: !formData.furnished, type: 'checkbox' } })}>
+                  <input
+                      id="furnished"
+                      type="checkbox"
+                      name="furnished"
+                      checked={Boolean(formData.furnished)}
+                      onChange={handleInputChange}
+                      className="h-5 w-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+                  />
+                  <label htmlFor="furnished" className="text-sm font-semibold text-slate-900 tracking-tight cursor-pointer">Eşyalı</label>
+                </div>
               </div>
             </div>
         );
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-10">
             <ImageUpload
               onImageUpload={handleImageUpload}
               onImageRemove={handleImageRemove}

@@ -88,13 +88,13 @@ const ListingDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <nav className="flex items-center text-xs text-gray-500 font-medium">
-            <Link to={ROUTES.LISTINGS} className="hover:text-gray-900 transition-colors duration-200">Listings</Link>
-            <ChevronRight className="w-3.5 h-3.5 mx-2 text-gray-400" />
-            <span className="text-gray-900 font-semibold truncate max-w-[240px]">{listing.title}</span>
+    <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="bg-white/70 backdrop-blur-xl border-b border-slate-200/40 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+          <nav className="flex items-center text-xs text-slate-500 font-medium tracking-tight">
+            <Link to={ROUTES.LISTINGS} className="hover:text-slate-900 transition-all duration-300 ease-in-out">Listings</Link>
+            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-400" />
+            <span className="text-slate-900 font-semibold truncate max-w-[240px] tracking-tight">{listing.title}</span>
           </nav>
 
           <div className="flex items-center gap-1">
@@ -102,7 +102,7 @@ const ListingDetailPage = () => {
               <button
                 onClick={() => addToCart(listing.id)}
                 disabled={isAddingToCart}
-                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200"
+                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
                 title="Add to Cart"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -111,7 +111,7 @@ const ListingDetailPage = () => {
             {canMakeOffer && (
               <button
                 onClick={() => setIsOfferModalOpen(true)}
-                className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200"
+                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
                 title="Make Offer"
               >
                 <HandCoins className="w-4 h-4" />
@@ -129,10 +129,10 @@ const ListingDetailPage = () => {
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="hover:bg-gray-100/80 rounded-lg p-2 border-0 text-gray-500 hover:text-red-600 transition-all duration-200"
+                className="hover:bg-slate-100/50 rounded-xl p-2.5 border-0 text-slate-500 hover:text-red-600 transition-all duration-300 ease-in-out"
               />
             )}
-            <button className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100/80 rounded-lg transition-all duration-200">
+            <button className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out">
               <Share2 className="w-4 h-4" />
             </button>
             {isOwner && (
@@ -160,85 +160,85 @@ const ListingDetailPage = () => {
               />
             )}
 
-            <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] relative group h-[280px] flex items-center justify-center">
+            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm relative group min-h-[500px] flex items-center justify-center p-12">
               {listing.imageUrl ? (
                 <img
                   src={listing.imageUrl}
                   alt={listing.title}
-                  className="max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="max-w-full max-h-[600px] w-auto h-auto object-contain transition-transform duration-500 ease-in-out group-hover:scale-[1.01]"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'flex';
                   }}
                 />
               ) : null}
-              <div className={`w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50/30 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                  <p className="text-sm font-medium text-gray-400">No image available</p>
+              <div className={`w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50/30 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+                  <p className="text-sm font-medium text-slate-400 tracking-tight">No image available</p>
               </div>
             </div>
 
-            <div className="lg:hidden bg-white p-5 rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]">
-               <h1 className="text-xl font-semibold text-gray-900 mb-2 leading-tight tracking-tight">{listing.title}</h1>
-               <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 font-medium">
+            <div className="lg:hidden bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm">
+               <h1 className="text-2xl font-bold text-slate-900 mb-3 leading-tight tracking-tight">{listing.title}</h1>
+               <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium tracking-tight">
                  <span>{listing.district}, {listing.city}</span>
                  <span>•</span>
                  <span>{formatDateTime(listing.createdAt)}</span>
                </div>
                {hasStockInfo && (
-                 <div className="mb-3">
-                   <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium border ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-gray-50/80 text-gray-600 border-gray-200/60'}`}>
+                 <div className="mb-4">
+                   <span className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold border tracking-tight ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-slate-50/80 text-slate-600 border-slate-200/60'}`}>
                      Stock: {Number(listing.quantity)}
                    </span>
                  </div>
                )}
-               <div className="flex items-baseline gap-3 flex-wrap mb-2">
-                 <p className="text-2xl font-semibold text-gray-900 tracking-tight">{formatCurrency(displayPrice, listing.currency)}</p>
+               <div className="flex items-baseline gap-4 flex-wrap mb-3">
+                 <p className="text-3xl font-bold text-slate-900 tracking-tighter">{formatCurrency(displayPrice, listing.currency)}</p>
                  {hasCampaign && (
-                   <p className="text-base font-medium text-gray-400 line-through">{formatCurrency(listing.price, listing.currency)}</p>
+                   <p className="text-lg font-medium text-slate-400 line-through tracking-tight">{formatCurrency(listing.price, listing.currency)}</p>
                  )}
                </div>
                {hasCampaign && (
-                 <div className="inline-flex items-center rounded-md bg-emerald-50/80 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200/60">
+                 <div className="inline-flex items-center rounded-lg bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60 tracking-tight">
                    {listing.campaignName || 'Special Offer'}
                  </div>
                )}
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] overflow-hidden">
-              <div className="flex items-center border-b border-gray-200/60 px-5 bg-gray-50/30">
+            <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+              <div className="flex items-center border-b border-slate-200/60 px-6 bg-slate-50/30">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
-                      relative py-3 px-4 text-sm font-medium transition-all duration-200
+                      relative py-4 px-5 text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight
                       ${activeTab === tab.id 
-                        ? 'text-gray-900' 
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'text-slate-900' 
+                        : 'text-slate-500 hover:text-slate-700'
                       }
                     `}
                   >
                     {tab.label}
                     {activeTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900" />
+                      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900" />
                     )}
                   </button>
                 ))}
               </div>
 
-              <div className="p-6">
+              <div className="p-8">
                 {activeTab === 'about' && (
                   <div>
-                    <h2 className="text-base font-semibold text-gray-900 mb-4 tracking-tight">Description</h2>
-                    <div className="prose prose-slate max-w-none prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-3 prose-headings:font-semibold prose-headings:text-gray-900">
-                      <p className="whitespace-pre-wrap text-sm leading-6 text-gray-700">{listing.description}</p>
+                    <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Description</h2>
+                    <div className="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4 prose-headings:font-bold prose-headings:text-slate-900 tracking-tight">
+                      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 tracking-tight">{listing.description}</p>
                     </div>
                   </div>
                 )}
 
                 {activeTab === 'details' && DetailsComponent && (
                   <div>
-                    <h2 className="text-base font-semibold text-gray-900 mb-4 tracking-tight">Specifications</h2>
+                    <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Specifications</h2>
                     <DetailsComponent listing={listing} />
                   </div>
                 )}
@@ -252,102 +252,105 @@ const ListingDetailPage = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-4 space-y-5">
-             <div className="bg-white rounded-xl border border-gray-200/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] p-5 lg:sticky lg:top-16">
-                <div className="mb-5 hidden lg:block">
-                   <h1 className="text-xl font-semibold text-gray-900 leading-tight mb-3 tracking-tight">{listing.title}</h1>
-                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 font-medium">
+          <div className="lg:col-span-4 space-y-6">
+             <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 lg:sticky lg:top-20">
+                <div className="mb-6 hidden lg:block">
+                   <h1 className="text-2xl font-bold text-slate-900 leading-tight mb-4 tracking-tight">{listing.title}</h1>
+                   <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium tracking-tight">
                       <span>{listing.district}, {listing.city}</span>
                       <span>•</span>
                       <span>{formatDateTime(listing.createdAt)}</span>
                    </div>
                    {hasStockInfo && (
-                     <div className="mb-3">
-                       <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium border ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-gray-50/80 text-gray-600 border-gray-200/60'}`}>
+                     <div className="mb-4">
+                       <span className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold border tracking-tight ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-slate-50/80 text-slate-600 border-slate-200/60'}`}>
                          Stock: {Number(listing.quantity)}
                        </span>
                      </div>
                    )}
-                   <div className="mb-1">
-                     <p className="text-2xl font-semibold text-gray-900 tracking-tight">
+                   <div className="mb-2">
+                     <p className="text-3xl font-bold text-slate-900 tracking-tighter">
                         {formatCurrency(displayPrice, listing.currency)}
                      </p>
                    </div>
                    {hasCampaign && (
-                     <div className="mt-2 flex items-center gap-3">
-                       <p className="text-sm font-medium text-gray-400 line-through">{formatCurrency(listing.price, listing.currency)}</p>
-                       <span className="inline-flex items-center rounded-md bg-emerald-50/80 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200/60">
+                     <div className="mt-3 flex items-center gap-3">
+                       <p className="text-lg font-medium text-slate-400 line-through tracking-tight">{formatCurrency(listing.price, listing.currency)}</p>
+                       <span className="inline-flex items-center rounded-lg bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60 tracking-tight">
                          {listing.campaignName || 'Special Offer'}
                        </span>
                      </div>
                    )}
                 </div>
 
-                <div className="border-t border-b border-gray-200/60 py-4 mb-4">
-                  <div className="flex items-center justify-between mb-4">
-                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center text-sm font-semibold text-white shadow-sm">
-                          {listing.sellerName?.[0]?.toUpperCase() || 'U'}
+                <div className="border-t border-b border-slate-200/60 py-6 mb-6">
+                  <div className="mb-6">
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Seller</h3>
+                    <div className="flex items-center justify-between mb-5">
+                       <div className="flex items-center gap-4">
+                         <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-base font-bold text-white shadow-sm">
+                            {listing.sellerName?.[0]?.toUpperCase() || 'U'}
+                         </div>
+                         <div>
+                            <Link
+                              to={ROUTES.USER_PROFILE(listing.sellerId)}
+                              className="font-bold text-base text-slate-900 hover:text-slate-700 block transition-all duration-300 ease-in-out tracking-tight"
+                            >
+                               {listing.sellerName} {listing.sellerSurname}
+                            </Link>
+                            {listing.sellerAccountCreationDate && (
+                              <div className="text-xs text-slate-500 mt-1 font-medium tracking-tight">
+                                Member since {new Date(listing.sellerAccountCreationDate).getFullYear()}
+                              </div>
+                            )}
+                         </div>
                        </div>
-                       <div>
-                          <Link
-                            to={ROUTES.USER_PROFILE(listing.sellerId)}
-                            className="font-semibold text-sm text-gray-900 hover:text-gray-700 block transition-colors duration-200"
-                          >
-                             {listing.sellerName} {listing.sellerSurname}
-                          </Link>
-                          {listing.sellerAccountCreationDate && (
-                            <div className="text-xs text-gray-500 mt-0.5 font-medium">
-                              Member since {new Date(listing.sellerAccountCreationDate).getFullYear()}
-                            </div>
-                          )}
-                       </div>
-                     </div>
-                     {!isOwner && (
-                       <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />
-                     )}
-                  </div>
-
-                  {!isOwner ? (
-                    <div className="space-y-2">
-                      <ContactSellerButton
-                          listing={listing}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow"
-                      >
-                          Contact Seller
-                      </ContactSellerButton>
-                      <ComplaintButton
-                          targetUserId={listing.sellerId}
-                          targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
-                          listingId={listing.id}
-                          listingTitle={listing.title}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200/60 text-gray-700 hover:bg-gray-100 hover:border-gray-300/60 rounded-lg text-sm font-medium transition-all duration-200"
-                      >
-                          <Flag className="w-4 h-4" />
-                          Report
-                      </ComplaintButton>
+                       {!isOwner && (
+                         <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />
+                       )}
                     </div>
-                  ) : (
-                    <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
-                  )}
+
+                    {!isOwner ? (
+                      <div className="space-y-3">
+                        <ContactSellerButton
+                            listing={listing}
+                            className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all duration-300 ease-in-out shadow-lg hover:shadow-xl tracking-tight"
+                        >
+                            Contact Seller
+                        </ContactSellerButton>
+                        <ComplaintButton
+                            targetUserId={listing.sellerId}
+                            targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
+                            listingId={listing.id}
+                            listingTitle={listing.title}
+                            className="w-full flex items-center justify-center gap-2 py-3 border border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-slate-300/60 rounded-xl text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight"
+                        >
+                            <Flag className="w-4 h-4" />
+                            Report
+                        </ComplaintButton>
+                      </div>
+                    ) : (
+                      <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-gray-50/80 rounded-lg p-3.5 border border-gray-200/40">
-                  <h3 className="text-xs font-semibold text-gray-900 mb-2.5 flex items-center gap-2 uppercase tracking-wide">
-                    <ShieldCheck className="w-3.5 h-3.5 text-gray-600" />
+                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-200/40">
+                  <h3 className="text-xs font-bold text-slate-900 mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    <ShieldCheck className="w-4 h-4 text-indigo-600" />
                     Safety Guidelines
                   </h3>
-                  <ul className="space-y-1.5 text-xs text-gray-600 leading-relaxed">
-                    <li className="flex items-start gap-2.5">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                  <ul className="space-y-2 text-xs text-slate-600 leading-relaxed tracking-tight">
+                    <li className="flex items-start gap-3">
+                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
                       <span>Meet in public, well-lit locations</span>
                     </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                    <li className="flex items-start gap-3">
+                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
                       <span>Inspect items thoroughly before purchase</span>
                     </li>
-                    <li className="flex items-start gap-2.5">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                    <li className="flex items-start gap-3">
+                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
                       <span>Avoid advance payments or wire transfers</span>
                     </li>
                   </ul>

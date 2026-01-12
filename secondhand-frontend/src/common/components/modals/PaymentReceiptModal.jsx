@@ -20,7 +20,7 @@ const useModalBodyOverflow = (isOpen) => {
 
 // --- Modern Aksiyon Butonu ---
 const ActionButton = ({ onClick, children, variant = 'primary', icon: Icon }) => {
-  const base = "flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl transition-all duration-200";
+  const base = "flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl transition-all duration-200 shadow-md";
   const styles = variant === 'primary'
       ? 'text-button-primary-text bg-button-primary-bg hover:bg-button-primary-hover shadow-lg shadow-secondary-200 active:scale-[0.98]'
       : 'text-text-secondary bg-secondary-50 hover:bg-secondary-100 active:scale-[0.98]';
@@ -60,7 +60,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity print:hidden" onClick={onClose} />
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[440px] max-h-[90vh] bg-white rounded-[2.5rem] sm:rounded-[2.5rem] rounded-2xl shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] print:shadow-none print:rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+        <div className="relative w-full max-w-[440px] max-h-[90vh] bg-white rounded-[2.5rem] sm:rounded-[2.5rem] rounded-2xl shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(0,0,0,0.03)] print:shadow-none print:rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
 
           {/* Header Controls */}
           <div className="flex items-center justify-between p-4 sm:p-8 pb-0 print:hidden flex-shrink-0">
@@ -88,7 +88,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
               </div>
 
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
-              <h2 className={`text-4xl font-black tracking-tighter ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
+              <h2 className={`text-5xl font-black font-mono tracking-tighter ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
                 {isIncoming ? '+' : ''}{formatAmount(payment.amount)}
               </h2>
 
@@ -106,11 +106,11 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
             {/* Info Sections */}
             <div className="space-y-6">
               {/* Field Grid */}
-              <div className="grid grid-cols-2 gap-y-5 gap-x-4 px-1">
+              <div className="grid grid-cols-2 gap-y-6 gap-x-6 px-1">
                 {details.map((field) => (
-                    <div key={field.label}>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">{field.label}</p>
-                      <p className="text-sm font-semibold text-slate-900 leading-tight">{field.value}</p>
+                    <div key={field.label} className="space-y-1.5">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.05em] mb-1">{field.label}</p>
+                      <p className="text-sm font-semibold text-slate-900 leading-relaxed tracking-tight">{field.value}</p>
                     </div>
                 ))}
               </div>
@@ -128,9 +128,20 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
               )}
             </div>
 
+            {/* Receipt Divider */}
+            <div className="relative py-6">
+              <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+              <div className="relative flex items-center justify-center">
+                <div className="flex gap-0.5">
+                  {[...Array(24)].map((_, i) => (
+                    <div key={i} className="w-0.5 h-0.5 rounded-full bg-slate-300/60"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Footer Branding */}
-            <div className="pt-4 flex flex-col items-center gap-2">
-              <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+            <div className="pt-2 flex flex-col items-center gap-2">
               <div className="flex items-center gap-2 mt-4 opacity-30">
                 <div className="w-6 h-6 bg-slate-900 rounded-lg flex items-center justify-center">
                   <span className="text-white text-[10px] font-black">S</span>

@@ -50,45 +50,51 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
     if (stepId === 2) {
       const fields = formConfig.fieldGroups.step2;
       return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {fields.map((field) => {
-              if (['genre', 'language', 'format', 'condition'].includes(field)) {
-                return (
-                    <div key={field}>
-                      <EnumDropdown
-                          label={field.charAt(0).toUpperCase() + field.slice(1) + ' *'}
-                          enumKey={`book${field.charAt(0).toUpperCase() + field.slice(1)}s`}
-                          value={formData[field]}
-                          onChange={(v) => handleDropdownChange(field, v)}
-                      />
-                      {errors[field] && <p className="mt-1 text-sm text-red-600">{errors[field]}</p>}
-                    </div>
-                );
-              } else {
-                return (
-                    <div key={field}>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">{field.charAt(0).toUpperCase() + field.slice(1)} *</label>
-                      <input
-                          type={['publicationYear', 'pageCount', 'price'].includes(field) ? 'number' : 'text'}
-                          name={field}
-                          value={formData[field]}
-                          onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                              errors[field] ? 'border-red-500' : 'border-slate-200'
-                          }`}
-                      />
-                      {errors[field] && <p className="mt-1 text-sm text-red-600">{errors[field]}</p>}
-                    </div>
-                );
-              }
-            })}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+            <div className="pb-4 border-b border-slate-100 mb-6">
+              <h3 className="text-base font-semibold text-slate-900 tracking-tight">Kitap Detayları</h3>
+              <p className="text-xs text-slate-500 mt-1 tracking-tight">Kitap bilgileri ve özellikleri</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {fields.map((field) => {
+                if (['genre', 'language', 'format', 'condition'].includes(field)) {
+                  return (
+                      <div key={field}>
+                        <EnumDropdown
+                            label={field.charAt(0).toUpperCase() + field.slice(1) + ' *'}
+                            enumKey={`book${field.charAt(0).toUpperCase() + field.slice(1)}s`}
+                            value={formData[field]}
+                            onChange={(v) => handleDropdownChange(field, v)}
+                        />
+                        {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
+                      </div>
+                  );
+                } else {
+                  return (
+                      <div key={field}>
+                        <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{field.charAt(0).toUpperCase() + field.slice(1)} *</label>
+                        <input
+                            type={['publicationYear', 'pageCount', 'price'].includes(field) ? 'number' : 'text'}
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${
+                                errors[field] ? 'border-red-300' : 'border-slate-200'
+                            }`}
+                        />
+                        {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
+                      </div>
+                  );
+                }
+              })}
+            </div>
           </div>
       );
     }
 
     if (stepId === 3) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-10">
           <ImageUpload
             onImageUpload={handleImageUpload}
             onImageRemove={handleImageRemove}

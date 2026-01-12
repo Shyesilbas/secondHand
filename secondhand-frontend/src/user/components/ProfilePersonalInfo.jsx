@@ -42,17 +42,7 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate }) => {
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">
-            Personal Information
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Your basic account details and contact information
-          </p>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InfoField
               label="Full Name"
               value={`${user?.name || 'Not provided'} ${
@@ -66,33 +56,16 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate }) => {
             <InfoField
               label="Phone Number"
               value={user?.phoneNumber ? formatPhoneForDisplay(user.phoneNumber) : 'Not provided'}
-              action={
-                <button
-                  onClick={() => {
-                    setPhoneFormData({
-                      ...UpdatePhoneRequestDTO,
-                      newPhone: user?.phoneNumber || '',
-                    });
-                    setShowPhoneModal(true);
-                  }}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Update phone number"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                </button>
-              }
+              action={{
+                onClick: () => {
+                  setPhoneFormData({
+                    ...UpdatePhoneRequestDTO,
+                    newPhone: user?.phoneNumber || '',
+                  });
+                  setShowPhoneModal(true);
+                },
+                title: "Update phone number"
+              }}
             />
             <InfoField
               label="Gender"
@@ -103,8 +76,6 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate }) => {
               label="Member Since"
               value={formatDate(user?.accountCreationDate)}
             />
-          </div>
-        </div>
       </div>
 
       {/* Phone Update Modal */}
@@ -125,11 +96,33 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate }) => {
 };
 
 const InfoField = ({ label, value, action }) => (
-  <div className="space-y-1">
-    <label className="text-sm font-medium text-gray-700">{label}</label>
+  <div className="space-y-2 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200">
+    <label className="text-xs font-semibold text-slate-500 uppercase tracking-[0.05em]">{label}</label>
     <div className="flex items-center justify-between">
-      <p className="text-gray-900">{value}</p>
-      {action}
+      <p className="text-sm font-semibold text-slate-900 tracking-tight">{value}</p>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200"
+          title={action.title || "Edit"}
+        >
+          {action.icon || (
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          )}
+        </button>
+      )}
     </div>
   </div>
 );

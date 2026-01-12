@@ -53,13 +53,13 @@ const ChatHeader = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-900 text-white">
-      <div className="flex items-center space-x-3">
-        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+    <div className="flex items-center justify-between p-4 border-b border-slate-200/60 bg-white/80 backdrop-blur-md text-slate-900 flex-shrink-0">
+      <div className="flex items-center space-x-4">
+        <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>
         <div>
           <button
             onClick={handleUserClick}
-            className="font-semibold text-sm hover:underline"
+            className="font-bold text-base hover:text-slate-700 transition-all duration-300 ease-in-out tracking-tight"
             title="View user profile"
           >
             {getHeaderName()}
@@ -67,13 +67,13 @@ const ChatHeader = ({
           {selectedChatRoom?.listingTitle && (
             <button
               onClick={handleListingTitleClick}
-              className="block text-xs opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-colors"
+              className="block text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer transition-all duration-300 ease-in-out mt-0.5 tracking-tight"
               title={`View listing: ${selectedChatRoom.listingTitle}`}
             >
               📦 {selectedChatRoom.listingTitle.length > 10 ? `${selectedChatRoom.listingTitle.substring(0, 10)}...` : selectedChatRoom.listingTitle}
             </button>
           )}
-          <p className="text-xs opacity-90">
+          <p className="text-xs font-medium text-slate-500 mt-1 tracking-tight">
             {isConnected ? 'Online' : 'Offline'}
           </p>
         </div>
@@ -82,16 +82,16 @@ const ChatHeader = ({
         <div className="relative">
           <button
             onClick={() => setShowOptions(!showOptions)}
-            className="text-white hover:text-gray-200 transition-colors p-1"
+            className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl"
             title="Options"
           >
             <EllipsisVerticalIcon className="w-5 h-5" />
           </button>
           {showOptions && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-[150px]">
+            <div className="absolute right-0 top-full mt-1 bg-white/95 backdrop-blur-md border border-slate-200/60 rounded-xl shadow-2xl z-10 min-w-[150px]">
               <button
                 onClick={handleDeleteConversation}
-                className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight"
               >
                 <TrashIcon className="w-4 h-4" />
                 <span>Delete Chat</span>
@@ -101,7 +101,7 @@ const ChatHeader = ({
         </div>
         <button
           onClick={onClose}
-          className="text-white hover:text-gray-200 transition-colors"
+          className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl"
         >
           <XMarkIcon className="w-5 h-5" />
         </button>

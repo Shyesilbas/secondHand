@@ -111,7 +111,7 @@ const CheckoutStep = ({
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="transition-all duration-300 ease-in-out">
                 {renderStepContent()}
             </div>

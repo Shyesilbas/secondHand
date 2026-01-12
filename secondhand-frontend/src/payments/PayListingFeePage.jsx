@@ -60,97 +60,107 @@ const PayListingFeePage = () => {
         }
     }, [showConfirmModal]);
 
-    if (isLoading) {
-        return <LoadingIndicator />;
-    }
-
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="mb-8">
-                <BackButton onClick={() => navigate(-1)} />
-                <h1 className="text-3xl font-bold text-text-primary">
-                    Listing Fee Payment
-                </h1>
-                <p className="text-text-secondary mt-2">
-                    You can pay the listing fee for your draft listings here.
-                </p>
-            </div>
+        <div className="min-h-screen bg-[#F8FAFC]">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <BackButton onClick={() => navigate(-1)} />
+                        <h1 className="mt-4 text-3xl font-bold tracking-tighter text-slate-900">
+                            Listing Fee Payment
+                        </h1>
+                        <p className="mt-2 text-sm text-slate-500">
+                            Complete a secure payment to publish your draft listing to the marketplace.
+                        </p>
+                    </div>
+                </div>
 
-            {error && <ErrorMessage message={error} />}
+                {isLoading && (
+                    <div className="mt-6">
+                        <LoadingIndicator />
+                    </div>
+                )}
 
-            {draftListings.length === 0 ? (
-                <EmptyState
-                    title="No Draft Listings"
-                    description={
-                        <>
-                            No draft listings found. You can create a new listing by{' '}
-                            <button
-                                onClick={() => navigate('/listings/create')}
-                                className="text-blue-600 hover:text-blue-800 underline font-medium transition-colors"
-                            >
-                                clicking here
-                            </button>
-                            .
-                        </>
-                    }
-                />
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <DraftListingsList
-                        listings={draftListings}
-                        selectedListing={selectedListing}
-                        onSelectListing={setSelectedListing}
-                        onListingChanged={refetchListings}
-                    />
+                {!isLoading && error && <ErrorMessage message={error} />}
 
-                    <PaymentPanel
+                {!isLoading && (draftListings.length === 0 ? (
+                    <div className="mt-6 rounded-[2rem] border border-slate-200/60 bg-white/80 px-6 py-10 shadow-[0_18px_45px_rgba(15,23,42,0.05)]">
+                        <EmptyState
+                            title="No Draft Listings"
+                            description={
+                                <>
+                                    No draft listings found. You can create a new listing by{' '}
+                                    <button
+                                        onClick={() => navigate('/listings/create')}
+                                        className="font-medium text-indigo-600 underline transition-colors hover:text-indigo-700"
+                                    >
+                                        clicking here
+                                    </button>
+                                    .
+                                </>
+                            }
+                        />
+                    </div>
+                ) : (
+                    <div className="mt-6 rounded-[2rem] border border-slate-200/60 bg-white/90 px-4 py-5 shadow-[0_22px_60px_rgba(15,23,42,0.06)] sm:px-6 sm:py-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                            <DraftListingsList
+                                listings={draftListings}
+                                selectedListing={selectedListing}
+                                onSelectListing={setSelectedListing}
+                                onListingChanged={refetchListings}
+                            />
+
+                            <PaymentPanel
+                                selectedListing={selectedListing}
+                                feeConfig={feeConfig}
+                                paymentType={paymentType}
+                                onPaymentTypeChange={setPaymentType}
+                                isProcessingPayment={isProcessingPayment}
+                                onPayment={async () => {
+                                    await refetchPaymentMethods();
+                                    handlePayment();
+                                }}
+                                agreementsAccepted={agreementsAccepted}
+                                acceptedAgreementIds={acceptedAgreements}
+                                onAgreementToggle={onAgreementToggle}
+                            />
+                        </div>
+                    </div>
+                ))}
+
+                {showConfirmModal && (
+                    <ConfirmationModal
                         selectedListing={selectedListing}
                         feeConfig={feeConfig}
                         paymentType={paymentType}
-                        onPaymentTypeChange={setPaymentType}
-                        isProcessingPayment={isProcessingPayment}
-                        onPayment={async () => {
-                            await refetchPaymentMethods();
-                            handlePayment();
+                        paymentMethods={paymentMethods}
+                        isLoadingPaymentMethods={isPaymentMethodsLoading}
+                        onConfirm={confirmPayment}
+                        onCancel={() => setShowConfirmModal(false)}
+                        onNavigateToPaymentMethods={(type) => {
+                            setShowConfirmModal(false);
+                            navigate(`/payments/${type === 'CREDIT_CARD' ? 'credit-cards' : 'bank-accounts'}`);
                         }}
-                        agreementsAccepted={agreementsAccepted}
-                        acceptedAgreementIds={acceptedAgreements}
-                        onAgreementToggle={onAgreementToggle}
+                        step={modalStep}
+                        isProcessing={isProcessingPayment}
+                        verificationCode={verificationCode}
+                        onChangeVerificationCode={setVerificationCode}
+                        codeExpiryTime={codeExpiryTime}
+                        countdown={countdown}
+                        onShowEmails={fetchEmails}
+                        onResendCode={resendVerificationCode}
+                        isResendingCode={isResendingCode}
                     />
-                </div>
-            )}
+                )}
 
-            {showConfirmModal && (
-                <ConfirmationModal
-                    selectedListing={selectedListing}
-                    feeConfig={feeConfig}
-                    paymentType={paymentType}
-                    paymentMethods={paymentMethods}
-                    isLoadingPaymentMethods={isPaymentMethodsLoading}
-                    onConfirm={confirmPayment}
-                    onCancel={() => setShowConfirmModal(false)}
-                    onNavigateToPaymentMethods={(type) => {
-                        setShowConfirmModal(false);
-                        navigate(`/payments/${type === 'CREDIT_CARD' ? 'credit-cards' : 'bank-accounts'}`);
-                    }}
-                    step={modalStep}
-                    isProcessing={isProcessingPayment}
-                    verificationCode={verificationCode}
-                    onChangeVerificationCode={setVerificationCode}
-                    codeExpiryTime={codeExpiryTime}
-                    countdown={countdown}
-                    onShowEmails={fetchEmails}
-                    onResendCode={resendVerificationCode}
-                    isResendingCode={isResendingCode}
-                />
-            )}
-
-            {emails.length > 0 && (
-                <EmailDisplayModal
-                    emails={emails}
-                    onClose={clearEmails}
-                />
-            )}
+                {emails.length > 0 && (
+                    <EmailDisplayModal
+                        emails={emails}
+                        onClose={clearEmails}
+                    />
+                )}
+            </div>
         </div>
     );
 };

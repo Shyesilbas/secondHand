@@ -41,10 +41,9 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
 
     return (
         <div className="p-8">
-            {/* Header */}
             <div className="mb-8">
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Review Your Order</h2>
-                <p className="text-gray-600">Please review your items and quantities before proceeding.</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tighter">Review Your Order</h2>
+                <p className="text-slate-500 tracking-tight">Please review your items and quantities before proceeding.</p>
             </div>
 
             {/* Items List */}
@@ -59,7 +58,7 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                         ? (parseFloat(item.offerTotalPrice) || 0)
                         : (parseFloat(unitPrice) * item.quantity);
                     return (
-                        <div key={item.id} className="p-5 bg-gray-50 rounded-lg border border-gray-200">
+                        <div key={item.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
                             <div className="flex items-start space-x-4">
                                 <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <span className="text-lg font-medium text-gray-600">
@@ -107,14 +106,14 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                                     </div>
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                    <div className="text-lg font-medium text-gray-900">
+                                    <div className="text-lg font-semibold font-mono text-slate-900 tracking-tight">
                                         {formatCurrency(lineTotal, item.listing.currency)}
                                     </div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-slate-500 tracking-tight">
                                         <div className="flex flex-col items-end">
                                             <span>{item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}</span>
                                             {hasCampaign && (
-                                                <span className="text-xs text-emerald-700 font-medium">{item.listing.campaignName || 'Campaign applied'}</span>
+                                                <span className="text-xs text-emerald-600 font-semibold tracking-tight">{item.listing.campaignName || 'Campaign applied'}</span>
                                             )}
                                         </div>
                                     </div>
@@ -125,17 +124,16 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                 })}
             </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                 <button
                     onClick={onBack}
-                    className="px-6 py-3 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                    className="px-6 py-3 text-slate-600 hover:text-slate-900 font-semibold transition-colors tracking-tight"
                 >
                     Back to Cart
                 </button>
                 <button
                     onClick={onNext}
-                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-bold transition-all duration-200 shadow-md hover:shadow-lg tracking-tight"
                 >
                     Continue to Address
                 </button>

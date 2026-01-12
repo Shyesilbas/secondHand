@@ -62,8 +62,8 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                 to={ROUTES.FAVORITE_LIST_DETAIL(list.id)}
                 className="block group"
             >
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200">
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-200">
                         {list.previewImageUrl || list.coverImageUrl ? (
                             <img
                                 src={list.previewImageUrl || list.coverImageUrl}

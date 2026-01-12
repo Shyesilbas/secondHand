@@ -5,22 +5,22 @@ import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
-import {RefreshCw, CheckCircle2, XCircle, Clock, ShoppingCart} from 'lucide-react';
+import {RefreshCw, CheckCircle2, XCircle, Clock, ShoppingCart, Handshake} from 'lucide-react';
 
 const statusBadge = (status) => {
   switch (status) {
     case 'PENDING':
-      return 'bg-amber-50 text-amber-700 border-amber-200';
+      return 'bg-amber-50/60 text-amber-700 border-amber-200/60';
     case 'ACCEPTED':
-      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      return 'bg-emerald-50/60 text-emerald-700 border-emerald-200/60';
     case 'REJECTED':
-      return 'bg-red-50 text-red-700 border-red-200';
+      return 'bg-red-50/60 text-red-700 border-red-200/60';
     case 'EXPIRED':
-      return 'bg-gray-50 text-gray-700 border-gray-200';
+      return 'bg-slate-50/70 text-slate-600 border-slate-200/70';
     case 'COMPLETED':
-      return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+      return 'bg-indigo-50/60 text-indigo-700 border-indigo-200/60';
     default:
-      return 'bg-gray-50 text-gray-700 border-gray-200';
+      return 'bg-slate-50/60 text-slate-600 border-slate-200/60';
   }
 };
 
@@ -83,169 +83,216 @@ const OffersPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-sm font-semibold text-gray-900">Offers</h1>
+            <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">Offers</h1>
             {items.length > 0 && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
                 {activeTab === 'made' ? 'Offers you made' : 'Offers you received'} • {items.length} total
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={refresh}
-              disabled={isLoading}
-              className="p-1.5 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 mb-4">
           <button
             type="button"
-            onClick={() => setActiveTab('made')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md ${
-              activeTab === 'made' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
+            onClick={refresh}
+            disabled={isLoading}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-60"
           >
-            Made ({made.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('received')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md ${
-              activeTab === 'received' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            Received ({received.length})
+            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
           </button>
         </div>
 
-        {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-white border border-gray-200 rounded animate-pulse"></div>
-            ))}
+        <div className="mb-5 rounded-3xl bg-white/80 p-3 shadow-[0_18px_45px_rgba(15,23,42,0.05)] border border-slate-100">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="inline-flex items-center rounded-2xl bg-slate-100 p-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('made')}
+                className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
+                  activeTab === 'made'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
+                Made
+                <span className="ml-1.5 text-[11px] text-slate-400">{made.length}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('received')}
+                className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
+                  activeTab === 'received'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
+                Received
+                <span className="ml-1.5 text-[11px] text-slate-400">{received.length}</span>
+              </button>
+            </div>
+            <div className="text-[11px] text-slate-500 tracking-tight">
+              {activeTab === 'made'
+                ? 'Track offers you send to other sellers.'
+                : 'Review and respond to incoming offers.'}
+            </div>
           </div>
-        ) : error ? (
-          <div className="bg-white border border-red-200 rounded-lg p-4">
-            <p className="text-xs text-red-600 font-medium">{error}</p>
-          </div>
-        ) : items.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-            <p className="text-xs text-gray-600">No {activeTab === 'made' ? 'offers made' : 'offers received'} yet.</p>
-          </div>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Listing</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Status</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Quantity</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Unit Price</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Total</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">{activeTab === 'made' ? 'Seller' : 'Buyer'}</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Created</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Expires</th>
-                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {items.map((o) => {
-                  const currency = 'TRY';
-                  const isExpired = o.status === 'EXPIRED';
-                  const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
-                  const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
-                  const personName = activeTab === 'made' 
-                    ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
-                    : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
+        </div>
 
-                  return (
-                    <tr key={o.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs font-medium text-gray-900">{o.listingTitle || 'Listing'}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${statusBadge(o.status)}`}>
-                          {o.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs text-gray-600">{o.quantity}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs text-gray-600">{formatCurrency(o.listingUnitPrice, currency)}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs font-semibold text-gray-900">{formatCurrency(o.totalPrice, currency)}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs text-gray-600">{personName}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className="text-xs text-gray-600">{o.createdAt ? formatDateTime(o.createdAt) : '—'}</span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <span className={`text-xs ${isExpired ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
-                          {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center justify-end gap-1">
-                          {isExpired ? (
-                            <span className="text-[10px] text-amber-600 font-medium">Expired</span>
-                          ) : canCheckout ? (
+        <div className="rounded-[2rem] bg-white/90 p-4 sm:p-6 border border-slate-100 shadow-[0_22px_60px_rgba(15,23,42,0.05)]">
+          {isLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-24 rounded-2xl bg-slate-100/60 border border-slate-100 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-red-200/80 bg-red-50/70 px-4 py-3">
+              <p className="text-xs font-medium text-red-700 tracking-tight">{error}</p>
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500/10 via-sky-500/10 to-emerald-500/10">
+                <Handshake className="h-7 w-7 text-indigo-500" />
+              </div>
+              <h2 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
+                No {activeTab === 'made' ? 'offers made' : 'offers received'} yet
+              </h2>
+              <p className="mt-2 max-w-sm text-xs sm:text-sm text-slate-500 tracking-tight">
+                Start negotiating prices to unlock better deals on high quality items.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {items.map((o) => {
+                const currency = 'TRY';
+                const isExpired = o.status === 'EXPIRED';
+                const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
+                const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
+                const personName = activeTab === 'made'
+                  ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
+                  : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
+
+                return (
+                  <div
+                    key={o.id}
+                    className={`rounded-3xl border border-slate-200/60 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm transition-all hover:shadow-[0_24px_70px_rgba(15,23,42,0.07)] ${
+                      isExpired ? 'opacity-60 grayscale' : ''
+                    }`}
+                  >
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold tracking-tight text-slate-900">
+                              {o.listingTitle || 'Listing'}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
+                              {activeTab === 'made' ? 'To' : 'From'} {personName}
+                            </p>
+                          </div>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tracking-tight ${statusBadge(
+                              o.status
+                            )}`}
+                          >
+                            <Clock className="h-3 w-3" />
+                            {o.status}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                              Total offer
+                            </div>
+                            <div className="mt-1 flex items-baseline gap-1.5">
+                              <span className="font-mono text-2xl font-black tracking-tighter text-indigo-600">
+                                {formatCurrency(o.totalPrice, currency)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                              Quantity and unit
+                            </div>
+                            <div className="mt-1 text-xs text-slate-600">
+                              {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
+                            </div>
+                          </div>
+                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                              Timeline
+                            </div>
+                            <div className="mt-1 text-xs text-slate-600">
+                              <span>
+                                {o.createdAt ? formatDateTime(o.createdAt) : '—'}
+                              </span>
+                              <span className="mx-1 text-slate-400">→</span>
+                              <span className={isExpired ? 'text-red-600 font-medium' : ''}>
+                                {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5 md:flex-col md:items-end md:gap-2">
+                        {isExpired ? (
+                          <span className="text-[11px] font-medium text-slate-500 tracking-tight">
+                            Offer expired
+                          </span>
+                        ) : canCheckout ? (
+                          <button
+                            type="button"
+                            onClick={() => handleCheckout(o.id)}
+                            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold tracking-tight text-white shadow-sm hover:bg-indigo-700"
+                          >
+                            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
+                            Checkout
+                          </button>
+                        ) : canActAsSeller ? (
+                          <>
                             <button
                               type="button"
-                              onClick={() => handleCheckout(o.id)}
-                              className="px-2 py-1 text-[10px] font-medium bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center gap-1"
+                              onClick={() => handleAccept(o.id)}
+                              className="inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold tracking-tight text-emerald-700 hover:bg-emerald-500/15"
                             >
-                              <ShoppingCart className="w-3 h-3" />
-                              Checkout
+                              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                              Accept
                             </button>
-                          ) : canActAsSeller ? (
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() => setCounterTarget(o)}
-                                className="px-2 py-1 text-[10px] font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                              >
-                                Counter
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleReject(o.id)}
-                                className="p-1 text-red-600 hover:bg-red-50 rounded"
-                                title="Reject"
-                              >
-                                <XCircle className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleAccept(o.id)}
-                                className="p-1 text-emerald-600 hover:bg-emerald-50 rounded"
-                                title="Accept"
-                              >
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                            <button
+                              type="button"
+                              onClick={() => setCounterTarget(o)}
+                              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-700 hover:border-slate-300"
+                            >
+                              Counter
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleReject(o.id)}
+                              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            >
+                              <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                              Reject
+                            </button>
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       <CounterOfferModal
