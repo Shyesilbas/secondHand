@@ -6,7 +6,7 @@ import {listingService} from '../../listing/services/listingService.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
 import {formatDateTime} from '../../common/formatters.js';
-import {ArrowLeft, Clock, Edit2, Plus, RefreshCw, Tag, Trash2} from 'lucide-react';
+import {ArrowLeft, CalendarDays, Clock, Edit2, Layers, Plus, RefreshCw, Tag, Target, Trash2} from 'lucide-react';
 
 const MyCouponsPage = () => {
   const { showError, showSuccess } = useNotification();
@@ -71,151 +71,260 @@ const MyCouponsPage = () => {
   }, [campaigns]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Link to={ROUTES.DASHBOARD} className="text-gray-500 hover:text-gray-700">
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-            <h1 className="text-sm font-semibold text-gray-900">Campaigns</h1>
-            {campaigns.length > 0 && (
-              <span className="text-xs text-gray-500">({stats.total})</span>
-            )}
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="max-w-7xl mx-auto px-4 pb-8">
+        <div className="sticky top-0 z-20 -mx-4 mb-4 bg-[#F8FAFC]/80 backdrop-blur-md border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Link to={ROUTES.DASHBOARD} className="text-slate-500 hover:text-slate-700">
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
+                    Marketing Campaigns
+                  </h1>
+                  {campaigns.length > 0 && (
+                    <span className="text-[11px] font-medium text-slate-500">
+                      {stats.total} total
+                    </span>
+                  )}
+                </div>
+                <p className="hidden sm:block text-[11px] text-slate-500 tracking-tight">
+                  Design and monitor your discount strategy for your shop.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={load}
+                disabled={isLoading}
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-60"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCampaign(null);
+                  setIsModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs sm:text-sm font-semibold tracking-tight text-white shadow-sm hover:bg-slate-800"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                New Campaign
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={load}
-              disabled={isLoading}
-              className="p-1.5 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingCampaign(null);
-                setIsModalOpen(true);
-              }}
-              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New
-            </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
+          <div className="rounded-2xl bg-white border border-slate-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(15,23,42,0.03)]">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                Total
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+            </div>
+            <div className="mt-2 flex items-end justify-between">
+              <span className="text-2xl font-semibold tracking-tight text-slate-900">
+                {stats.total}
+              </span>
+              <span className="text-[11px] text-slate-500">
+                All campaigns
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white border border-emerald-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(16,185,129,0.08)]">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-emerald-700">
+                Active
+              </span>
+              <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_0_4px_rgba(16,185,129,0.35)]" />
+                <span className="text-[10px] font-medium text-emerald-700">Live</span>
+              </span>
+            </div>
+            <div className="mt-2 flex items-end justify-between">
+              <span className="text-2xl font-semibold tracking-tight text-slate-900">
+                {stats.active}
+              </span>
+              <span className="text-[11px] text-emerald-700">
+                Boosting visibility
+              </span>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white border border-slate-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(15,23,42,0.04)]">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                Inactive
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+            </div>
+            <div className="mt-2 flex items-end justify-between">
+              <span className="text-2xl font-semibold tracking-tight text-slate-900">
+                {stats.inactive}
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Ready to relaunch
+              </span>
+            </div>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-12 bg-white border border-gray-200 rounded animate-pulse"></div>
+              <div
+                key={i}
+                className="h-24 rounded-2xl bg-white/60 border border-slate-100 animate-pulse"
+              />
             ))}
           </div>
         ) : campaigns.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-            <Tag className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-xs text-gray-600 mb-4">No campaigns yet</p>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingCampaign(null);
-                setIsModalOpen(true);
-              }}
-              className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5 mx-auto"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Create Campaign
-            </button>
+          <div className="mt-6 rounded-3xl border border-dashed border-slate-200 bg-white/70 px-6 py-10 sm:px-10 sm:py-14 text-center">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500/10 via-sky-500/10 to-emerald-500/10">
+              <Tag className="w-7 h-7 text-indigo-500" />
+            </div>
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">
+              No campaigns yet
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+              Create your first campaign to launch time-limited discounts and smart pricing rules for your listings.
+            </p>
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCampaign(null);
+                  setIsModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold tracking-tight text-white shadow-sm hover:bg-slate-800"
+              >
+                <Plus className="w-4 h-4 mr-1.5" />
+                Create your first campaign
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Campaign Name</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Discount</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Period</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Apply to Future Listings</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700">Scope</th>
-                  <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {campaigns.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-medium text-gray-900">{c.name}</span>
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                          c.active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {c.active ? 'Active' : 'Inactive'}
-                        </span>
-                        {c.applyToFutureListings && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 flex items-center gap-0.5">
-                            <Clock className="w-3 h-3" />
-                            Future
-                          </span>
-                        )}
+          <div className="mt-4 space-y-3">
+            {campaigns.map((c) => {
+              const hasListings = c.eligibleListingIds && c.eligibleListingIds.length > 0;
+              const hasTypes = c.eligibleTypes && c.eligibleTypes.length > 0;
+
+              return (
+                <div
+                  key={c.id}
+                  className="rounded-3xl border border-slate-100 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm/50 shadow-[0_22px_60px_rgba(15,23,42,0.04)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.07)] transition-shadow"
+                >
+                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="truncate text-lg font-bold tracking-tight text-slate-900">
+                              {c.name}
+                            </span>
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                                c.active
+                                  ? 'bg-emerald-50 text-emerald-700'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              <span
+                                className={`h-1.5 w-1.5 rounded-full ${
+                                  c.active
+                                    ? 'bg-emerald-500 animate-pulse shadow-[0_0_0_4px_rgba(16,185,129,0.35)]'
+                                    : 'bg-slate-400'
+                                }`}
+                              />
+                              {c.active ? 'Active' : 'Inactive'}
+                            </span>
+                            {c.applyToFutureListings && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-600">
+                                <Clock className="w-3 h-3" />
+                                Future listings
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <span className="text-xs font-semibold text-indigo-600">
-                        {c.discountKind === 'PERCENT' ? `${c.value}%` : `₺${c.value}`}
-                      </span>
-                    </td>
 
-                    <td className="px-4 py-2.5">
-                      <span className="text-xs text-gray-600">
-                        {c.startsAt || c.endsAt 
-                          ? `${c.startsAt ? formatDateTime(c.startsAt) : 'Any'} → ${c.endsAt ? formatDateTime(c.endsAt) : 'Any'}`
-                          : 'No limit'}
-                      </span>
-                    </td>
+                      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                          <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                            Discount
+                          </div>
+                          <div className="mt-1 flex items-baseline gap-1.5">
+                            <span className="text-2xl font-semibold tracking-tight text-indigo-600">
+                              {c.discountKind === 'PERCENT' ? `${c.value}%` : `₺${c.value}`}
+                            </span>
+                            <span className="text-[11px] text-slate-500">
+                              {c.discountKind === 'PERCENT' ? 'off' : 'per item'}
+                            </span>
+                          </div>
+                        </div>
 
-                    <td className="px-4 py-2.5">
-                      <span className="text-xs text-gray-600">
-                        {c.applyToFutureListings ? 'Yes' : 'No'}
-                      </span>
-                    </td>
+                        <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                            <CalendarDays className="w-3 h-3" />
+                            <span>Period</span>
+                          </div>
+                          <div className="mt-1 text-xs text-slate-600">
+                            {c.startsAt || c.endsAt
+                              ? `${c.startsAt ? formatDateTime(c.startsAt) : 'Anytime'} → ${c.endsAt ? formatDateTime(c.endsAt) : 'Anytime'}`
+                              : 'No time limit'}
+                          </div>
+                        </div>
 
-                    <td className="px-4 py-2.5">
-                      <span className="text-xs text-gray-600">
-                        {c.eligibleListingIds && c.eligibleListingIds.length > 0
-                          ? `${c.eligibleListingIds.length} listing${c.eligibleListingIds.length > 1 ? 's' : ''}`
-                          : c.eligibleTypes && c.eligibleTypes.length > 0
-                            ? c.eligibleTypes.join(', ')
-                            : 'All listings'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingCampaign(c);
-                            setIsModalOpen(true);
-                          }}
-                          className="p-1 text-gray-400 hover:text-gray-600"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteCampaign(c.id)}
-                          className="p-1 text-gray-400 hover:text-red-600"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                            {hasListings ? (
+                              <Target className="w-3 h-3" />
+                            ) : (
+                              <Layers className="w-3 h-3" />
+                            )}
+                            <span>Scope</span>
+                          </div>
+                          <div className="mt-1 text-xs text-slate-600">
+                            {hasListings
+                              ? `${c.eligibleListingIds.length} listing${c.eligibleListingIds.length > 1 ? 's' : ''}`
+                              : hasTypes
+                                ? c.eligibleTypes.join(', ')
+                                : 'All listings'}
+                          </div>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-1.5 md:flex-col md:items-end md:gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingCampaign(c);
+                          setIsModalOpen(true);
+                        }}
+                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCampaign(c.id)}
+                        className="inline-flex items-center justify-center rounded-xl border border-red-100 bg-white px-2.5 py-1.5 text-xs font-medium text-red-600 hover:border-red-200 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

@@ -186,14 +186,14 @@ const ConfirmationModal = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
-                <div className="px-6 py-5 border-b bg-white/60 backdrop-blur supports-[backdrop-filter]:bg-white/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xl">
+            <div className="w-full max-w-lg mx-4 overflow-hidden rounded-[2.5rem] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.38)] animate-in fade-in zoom-in-95">
+                <div className="px-6 py-5 border-b border-slate-100 bg-white/70">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-text-primary">
+                        <h3 className="text-lg font-semibold tracking-tight text-slate-900">
                             {step === 'REVIEW' ? 'Ödeme Onayı' : 'Doğrulama'}
                         </h3>
-                        <button onClick={onCancel} className="text-text-muted hover:text-text-secondary">
+                        <button onClick={onCancel} className="text-slate-400 hover:text-slate-600">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -202,33 +202,32 @@ const ConfirmationModal = ({
                 </div>
 
                 <div className="px-6 py-5">
-                    {/* Listing Summary */}
-                    <div className="mb-5 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                    <div className="mb-5 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-slate-50 to-slate-50 px-4 py-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-blue-700/70">İlan</p>
-                                <p className="text-sm font-medium text-blue-900">{selectedListing?.title}</p>
+                                <p className="text-[11px] text-indigo-700/70">İlan</p>
+                                <p className="text-sm font-medium tracking-tight text-slate-900">{selectedListing?.title}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-xs text-blue-700/70">Tutar</p>
-                                <p className="text-sm font-semibold text-blue-900">{feeConfig ? formatPrice(feeConfig.totalCreationFee) : ''}</p>
+                                <p className="text-[11px] text-indigo-700/70">Tutar</p>
+                                <p className="font-mono text-sm font-semibold tracking-tight text-slate-900">
+                                    {feeConfig ? formatPrice(feeConfig.totalCreationFee) : ''}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     {step === 'REVIEW' ? (
                         <>
-                            {/* Payment Method Details */}
                             <div className="mb-6">
-                                <p className="text-sm font-medium text-text-secondary mb-3">Ödeme Yöntemi</p>
+                                <p className="mb-3 text-sm font-medium text-slate-700">Ödeme Yöntemi</p>
                                 {renderPaymentMethodDetails()}
                             </div>
                         </>
                     ) : (
                         <>
-                            {/* Verification Step */}
                             <div className="space-y-3">
-                                <label className="block text-sm font-medium text-text-secondary">Doğrulama Kodu</label>
+                                <label className="block text-sm font-medium text-slate-700">Doğrulama Kodu</label>
                                 <div className="flex items-center gap-3">
                                     <input
                                         type="text"
@@ -237,27 +236,27 @@ const ConfirmationModal = ({
                                             const value = e.target.value.replace(/\D/g, '').slice(0, 6);
                                             onChangeVerificationCode(value);
                                         }}
-                                        className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="flex-1 rounded-2xl border border-slate-300 px-3 py-2 text-center font-mono text-lg tracking-[0.3em] text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         placeholder="6 haneli kod"
                                         maxLength={6}
                                     />
                                     <button
                                         onClick={onResendCode}
                                         disabled={isResendingCode}
-                                        className="px-3 py-2 rounded-lg border text-sm hover:bg-app-bg disabled:opacity-50"
+                                        className="rounded-2xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
                                     >
                                         {isResendingCode ? 'Gönderiliyor...' : 'Kodu Yenile'}
                                     </button>
                                 </div>
                                 {codeExpiryTime && (
-                                    <div className="text-xs text-text-muted">
+                                    <div className="text-xs text-slate-500">
                                         Expires in: {countdown || ''}
                                     </div>
                                 )}
                                 <div>
                                     <button
                                         onClick={onShowEmails}
-                                        className="text-xs text-btn-primary hover:text-blue-700"
+                                        className="text-xs text-indigo-600 hover:text-indigo-700"
                                     >
                                         E-postaları göster
                                     </button>
@@ -267,13 +266,15 @@ const ConfirmationModal = ({
                     )}
                 </div>
 
-                <div className="px-6 py-4 border-t bg-app-bg flex items-center gap-3">
-                    <button onClick={onCancel} className="px-4 py-2 rounded-lg border text-text-secondary hover:bg-white">İptal</button>
+                <div className="flex items-center gap-3 border-t border-slate-100 bg-slate-50/80 px-6 py-4">
+                    <button onClick={onCancel} className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-white">
+                        İptal
+                    </button>
                     {step === 'REVIEW' ? (
                         <button
                             onClick={onConfirm}
                             disabled={!isPaymentMethodAvailable() || isProcessing}
-                            className="ml-auto px-4 py-2 rounded-lg bg-btn-primary text-white hover:bg-btn-primary-hover disabled:opacity-50"
+                            className="ml-auto rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold tracking-tight text-white shadow-md hover:bg-slate-800 disabled:opacity-60"
                         >
                             {isProcessing ? 'İşleniyor...' : 'Ödemeyi Başlat'}
                         </button>
@@ -281,7 +282,7 @@ const ConfirmationModal = ({
                         <button
                             onClick={onConfirm}
                             disabled={isProcessing || (verificationCode || '').length !== 6}
-                            className="ml-auto px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                            className="ml-auto rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold tracking-tight text-white shadow-md hover:bg-emerald-700 disabled:opacity-60"
                         >
                             {isProcessing ? 'Doğrulanıyor...' : 'Doğrula ve Öde'}
                         </button>

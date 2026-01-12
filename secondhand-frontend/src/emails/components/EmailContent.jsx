@@ -18,17 +18,17 @@ const EmailContent = ({ email }) => {
 
     if (!email) {
         return (
-            <div className="bg-white rounded-lg border border-gray-200 flex items-center justify-center h-96">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="h-full flex items-center justify-center bg-white">
+                <div className="text-center px-8">
+                    <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.2a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2 tracking-tight">
                         Select an Email
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-slate-500 tracking-tight">
                         Choose an email from the list to view its content
                     </p>
                 </div>
@@ -37,53 +37,45 @@ const EmailContent = ({ email }) => {
     }
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            {/* Modern Email Header */}
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                        <div className={`w-3 h-3 rounded-full mt-2 ${dotClass}`}></div>
+        <div className="h-full bg-white flex flex-col">
+            {/* Email Header - Mektup Kağıdı Üst Kısmı */}
+            <div className="px-12 pt-12 pb-8 border-b border-slate-200/60">
+                <div className="max-w-3xl">
+                    <div className="flex items-start gap-3 mb-6">
+                        <div className={`w-2.5 h-2.5 rounded-full mt-2 ${dotClass}`}></div>
                         <div className="flex-1">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-6 tracking-tight">
                                 {email.subject}
                             </h2>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                                <div className="flex items-center gap-1">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                    </svg>
-                                    <span className="font-medium">From:</span>
-                                    <span>{email.senderEmail}</span>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="font-semibold text-slate-900 w-16 tracking-tight">From:</span>
+                                    <span className="tracking-tight">{email.senderEmail}</span>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                    </svg>
-                                    <span className="font-medium">To:</span>
-                                    <span>{email.recipientEmail}</span>
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="font-semibold text-slate-900 w-16 tracking-tight">To:</span>
+                                    <span className="tracking-tight">{email.recipientEmail}</span>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>{formatDate(email.sentAt)}</span>
+                                <div className="flex items-center gap-3 text-sm text-slate-600">
+                                    <span className="font-semibold text-slate-900 w-16 tracking-tight">Date:</span>
+                                    <span className="tracking-tight">{formatDate(email.sentAt)}</span>
                                 </div>
-                            </div>
-                            <div className="mt-2">
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {email.emailType || 'EMAIL'}
-                                </span>
+                                <div className="pt-2">
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 tracking-tight">
+                                        {email.emailType || 'EMAIL'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Modern Email Content */}
-            <div className="px-6 py-6">
-                <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+            {/* Email Content - Prose Typography */}
+            <div className="flex-1 overflow-y-auto px-12 py-10">
+                <div className="max-w-3xl">
                     <div 
-                        className="text-gray-800 leading-relaxed prose prose-sm max-w-none prose-gray"
+                        className="prose prose-slate max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-700 prose-p:leading-relaxed prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-ul:text-slate-700 prose-ol:text-slate-700 prose-li:text-slate-700 tracking-tight"
                         dangerouslySetInnerHTML={{ 
                             __html: formatPricesInHtml(
                                 replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>'),

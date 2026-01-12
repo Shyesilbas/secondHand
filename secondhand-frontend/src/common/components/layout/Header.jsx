@@ -80,7 +80,7 @@ const Header = () => {
     const NavLink = ({ to, children }) => (
         <Link
             to={to}
-            className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 px-3 py-2 rounded-full"
+            className="text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out px-4 py-2.5 rounded-xl"
         >
             {children}
         </Link>
@@ -91,11 +91,11 @@ const Header = () => {
             to={to}
             onClick={onClick}
             title={title}
-            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all duration-200 rounded-lg hover:bg-gray-100"
+            className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
         >
             <Icon className="w-[20px] h-[20px] stroke-[1.5px]" />
             {badge > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[10px] font-semibold text-white bg-red-500 rounded-full border-2 border-white">
+                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[10px] font-semibold text-white bg-red-500 rounded-full border-2 border-white shadow-sm shadow-red-500/30">
                     {badge > 99 ? '99+' : badge}
                 </span>
             )}
@@ -103,8 +103,8 @@ const Header = () => {
     );
 
     return (
-        <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-            scrolled ? "bg-white/95 backdrop-blur-xl border-b border-gray-200/60 py-2 shadow-sm" : "bg-white/90 backdrop-blur-xl border-b border-gray-200/40 py-4"
+        <header className={`sticky top-0 z-50 w-full transition-all duration-300 ease-in-out ${
+            scrolled ? "bg-white/80 backdrop-blur-2xl border-b border-slate-200/30 py-2 shadow-sm" : "bg-white/70 backdrop-blur-2xl border-b border-slate-200/20 py-4"
         }`}>
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
                 <div className="flex items-center justify-between gap-8">
@@ -130,16 +130,16 @@ const Header = () => {
                             <div className="relative" ref={categoriesMenuRef}>
                                 <button
                                     onClick={() => setCategoriesMenuOpen(!categoriesMenuOpen)}
-                                    className={`text-sm font-medium px-3 py-2 flex items-center gap-1 transition-colors rounded-full ${
-                                        categoriesMenuOpen ? 'text-gray-900 bg-gray-100' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                                    className={`text-sm font-medium px-4 py-2.5 flex items-center gap-1.5 transition-all duration-300 ease-in-out rounded-xl ${
+                                        categoriesMenuOpen ? 'text-slate-900 bg-slate-100/50' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/50'
                                     }`}
                                 >
                                     Categories
-                                    <ChevronDown className={`w-4 h-4 opacity-50 transition-transform ${categoriesMenuOpen ? 'rotate-180' : ''}`} />
+                                    <ChevronDown className={`w-4 h-4 opacity-60 transition-all duration-300 ease-in-out ${categoriesMenuOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {categoriesMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 max-h-[500px] overflow-y-auto">
+                                    <div className="absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50 max-h-[500px] overflow-y-auto">
                                         {enums?.listingTypes?.map((category) => {
                                             const count = countsByCategory[category.value] ?? 0;
                                             const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
@@ -149,17 +149,17 @@ const Header = () => {
                                                     to={ROUTES.LISTINGS}
                                                     state={{ listingType: category.value }}
                                                     onClick={() => setCategoriesMenuOpen(false)}
-                                                    className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors group"
+                                                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl group"
                                                 >
                                                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
                                                             <span className="text-base">{iconText}</span>
                                                         </div>
-                                                        <span className="text-sm font-medium text-gray-900 truncate">
+                                                        <span className="text-sm font-medium text-slate-900 truncate">
                                                             {getListingTypeLabel(category.value, enums?.listingTypes) || category.label}
                                                         </span>
                                                     </div>
-                                                    <span className="text-xs font-medium text-gray-500 ml-3">{count}</span>
+                                                    <span className="text-xs font-medium text-slate-500 ml-3">{count}</span>
                                                 </Link>
                                             );
                                         })}
@@ -185,28 +185,28 @@ const Header = () => {
                                     <div className="relative" ref={notificationMenuRef}>
                                         <button
                                             onClick={() => setNotificationMenuOpen(!notificationMenuOpen)}
-                                            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all rounded-lg hover:bg-gray-100"
+                                            className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
                                         >
                                             <Bell className="w-[20px] h-[20px] stroke-[1.5px]" />
                                             {(totalUnread > 0 || unreadEmailCount > 0) && (
-                                                <span className="absolute top-1 right-1 flex h-2 w-2">
+                                                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
                                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 shadow-sm shadow-red-500/50"></span>
                                                 </span>
                                             )}
                                         </button>
 
                                         {notificationMenuOpen && (
-                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50">
-                                                <Link to={ROUTES.EMAILS} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                                                    <Mail className="w-4 h-4 text-gray-600" />
-                                                    <span className="text-sm font-medium text-gray-900">Mails</span>
-                                                    {unreadEmailCount > 0 && <span className="ml-auto text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{unreadEmailCount}</span>}
+                                            <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50">
+                                                <Link to={ROUTES.EMAILS} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
+                                                    <Mail className="w-4 h-4 text-slate-600" />
+                                                    <span className="text-sm font-medium text-slate-900">Mails</span>
+                                                    {unreadEmailCount > 0 && <span className="ml-auto text-xs font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full shadow-sm shadow-red-500/30">{unreadEmailCount}</span>}
                                                 </Link>
-                                                <Link to={ROUTES.CHAT} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                                                    <MessageSquare className="w-4 h-4 text-gray-600" />
-                                                    <span className="text-sm font-medium text-gray-900">Chats</span>
-                                                    {totalUnread > 0 && <span className="ml-auto text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{totalUnread}</span>}
+                                                <Link to={ROUTES.CHAT} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
+                                                    <MessageSquare className="w-4 h-4 text-slate-600" />
+                                                    <span className="text-sm font-medium text-slate-900">Chats</span>
+                                                    {totalUnread > 0 && <span className="ml-auto text-xs font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full shadow-sm shadow-red-500/30">{totalUnread}</span>}
                                                 </Link>
                                             </div>
                                         )}
@@ -222,28 +222,28 @@ const Header = () => {
                                     <div className="relative" ref={listingsMenuRef}>
                                         <button
                                             onClick={() => setListingsMenuOpen(!listingsMenuOpen)}
-                                            className="group relative p-2.5 text-gray-600 hover:text-gray-900 transition-all rounded-lg hover:bg-gray-100"
+                                            className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
                                         >
                                             <Package className="w-[20px] h-[20px] stroke-[1.5px]" />
                                             {hasPendingOrders && (
-                                                <span className="absolute top-1 right-1 flex h-2 w-2 bg-red-500 rounded-full border border-white"></span>
+                                                <span className="absolute top-1 right-1 flex h-2.5 w-2.5 bg-red-500 rounded-full border border-white shadow-sm shadow-red-500/30"></span>
                                             )}
                                         </button>
 
                                         {listingsMenuOpen && (
-                                            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50">
-                                                <Link to={ROUTES.MY_ORDERS} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                                                    <Receipt className="w-4 h-4 text-gray-600" />
-                                                    <span className="text-sm font-medium text-gray-900">My Orders</span>
-                                                    {hasPendingOrders && <span className="ml-auto text-[10px] bg-red-500 text-white w-4 h-4 flex items-center justify-center rounded-full">!</span>}
+                                            <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50">
+                                                <Link to={ROUTES.MY_ORDERS} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
+                                                    <Receipt className="w-4 h-4 text-slate-600" />
+                                                    <span className="text-sm font-medium text-slate-900">My Orders</span>
+                                                    {hasPendingOrders && <span className="ml-auto text-[10px] font-semibold bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>}
                                                 </Link>
-                                                <Link to={ROUTES.I_SOLD} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                                                    <TrendingUp className="w-4 h-4 text-gray-600" />
-                                                    <span className="text-sm font-medium text-gray-900">I Sold</span>
+                                                <Link to={ROUTES.I_SOLD} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
+                                                    <TrendingUp className="w-4 h-4 text-slate-600" />
+                                                    <span className="text-sm font-medium text-slate-900">I Sold</span>
                                                 </Link>
-                                                <Link to={ROUTES.MY_LISTINGS} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                                                    <Package className="w-4 h-4 text-gray-600" />
-                                                    <span className="text-sm font-medium text-gray-900">My Listings</span>
+                                                <Link to={ROUTES.MY_LISTINGS} onClick={() => setListingsMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
+                                                    <Package className="w-4 h-4 text-slate-600" />
+                                                    <span className="text-sm font-medium text-slate-900">My Listings</span>
                                                 </Link>
                                             </div>
                                         )}
@@ -256,39 +256,39 @@ const Header = () => {
                                 <DropdownMenu
                                     align="right"
                                     trigger={
-                                        <button className="flex items-center gap-2 pl-2 group">
-                                            <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden group-hover:border-gray-300 transition-colors">
-                                                {user?.avatar ? <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" /> : <User className="w-5 h-5 text-gray-600" />}
+                                        <button className="flex items-center gap-2.5 pl-2 group">
+                                            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200/60 flex items-center justify-center overflow-hidden group-hover:border-slate-300/60 transition-all duration-300 ease-in-out">
+                                                {user?.avatar ? <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" /> : <User className="w-5 h-5 text-slate-600" />}
                                             </div>
-                                            <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
+                                            <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-all duration-300 ease-in-out" />
                                         </button>
                                     }
                                 >
-                                    <div className="px-4 py-3 border-b border-gray-200">
-                                        <p className="text-xs font-medium text-gray-500 uppercase">Account</p>
-                                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name || 'User'}</p>
+                                    <div className="px-4 py-3 border-b border-slate-200/60">
+                                        <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">Account</p>
+                                        <p className="text-sm font-semibold text-slate-900 truncate tracking-tight">{user?.name || 'User'}</p>
                                     </div>
-                                    <Link to={ROUTES.DASHBOARD} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <Link to={ROUTES.DASHBOARD} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
                                         <Settings className="w-4 h-4 mr-3" /> Dashboard
                                     </Link>
-                                    <Link to={ROUTES.MY_LISTINGS} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <Link to={ROUTES.MY_LISTINGS} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
                                         <Package className="w-4 h-4 mr-3" /> Inventory
                                     </Link>
                                     <DropdownDivider />
-                                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
                                         <LogOut className="w-4 h-4" /> Sign Out
                                     </button>
                                 </DropdownMenu>
 
                                 {/* Mobile Menu Toggle */}
-                                <button className="lg:hidden p-2 ml-2 text-gray-600 hover:text-gray-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                                <button className="lg:hidden p-2.5 ml-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out rounded-xl" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                                     {mobileMenuOpen ? <X /> : <Menu />}
                                 </button>
                             </>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-gray-700 hover:text-gray-900 px-4">Sign In</Link>
-                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-gray-900 text-white px-5 py-2.5 rounded-full hover:bg-gray-800 transition-all shadow-sm">Join Now</Link>
+                                <Link to={ROUTES.LOGIN} className="text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 px-4 py-2.5 rounded-xl transition-all duration-300 ease-in-out">Sign In</Link>
+                                <Link to={ROUTES.REGISTER} className="text-sm font-semibold bg-slate-900 text-white px-6 py-2.5 rounded-xl hover:bg-slate-800 transition-all duration-300 ease-in-out shadow-sm">Join Now</Link>
                             </div>
                         )}
                     </div>

@@ -12,8 +12,8 @@ public class ComplaintMapper {
     public ComplaintDto mapComplaintToDto(Complaint complaint) {
         return new ComplaintDto(
                 complaint.getId(),
-                complaint.getComplainer().getEmail(),
-                complaint.getComplainedUser().getEmail(),
+                complaint.getComplainer().getName() + " " + complaint.getComplainer().getSurname(),
+                complaint.getComplainedUser().getName() + " " + complaint.getComplainedUser().getSurname(),
                 complaint.getListing() != null ? complaint.getListing().getId() : null,
                 complaint.getListing() != null ? complaint.getListing().getTitle() : null,
                 complaint.getReason(),

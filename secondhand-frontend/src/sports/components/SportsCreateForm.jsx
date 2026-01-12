@@ -54,39 +54,45 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
         );
       case 2:
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <EnumDropdown
-                    label="Sport Type *"
-                    enumKey="sportDisciplines"
-                    value={formData.sportType}
-                    onChange={(v) => handleDropdownChange('sportType', v)}
-                />
-                {errors.sportType && <p className="mt-1 text-sm text-red-600">{errors.sportType}</p>}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+              <div className="pb-4 border-b border-slate-100 mb-6">
+                <h3 className="text-base font-semibold text-slate-900 tracking-tight">Spor Ekipmanı Detayları</h3>
+                <p className="text-xs text-slate-500 mt-1 tracking-tight">Spor tipi, ekipman tipi ve durum</p>
               </div>
-              <div>
-                <EnumDropdown
-                    label="Equipment Type *"
-                    enumKey="sportEquipmentTypes"
-                    value={formData.equipmentType}
-                    onChange={(v) => handleDropdownChange('equipmentType', v)}
-                />
-                {errors.equipmentType && <p className="mt-1 text-sm text-red-600">{errors.equipmentType}</p>}
-              </div>
-              <div>
-                <EnumDropdown
-                    label="Condition *"
-                    enumKey="sportConditions"
-                    value={formData.condition}
-                    onChange={(v) => handleDropdownChange('condition', v)}
-                />
-                {errors.condition && <p className="mt-1 text-sm text-red-600">{errors.condition}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                  <EnumDropdown
+                      label="Spor Tipi *"
+                      enumKey="sportDisciplines"
+                      value={formData.sportType}
+                      onChange={(v) => handleDropdownChange('sportType', v)}
+                  />
+                  {errors.sportType && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.sportType}</p>}
+                </div>
+                <div>
+                  <EnumDropdown
+                      label="Ekipman Tipi *"
+                      enumKey="sportEquipmentTypes"
+                      value={formData.equipmentType}
+                      onChange={(v) => handleDropdownChange('equipmentType', v)}
+                  />
+                  {errors.equipmentType && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.equipmentType}</p>}
+                </div>
+                <div>
+                  <EnumDropdown
+                      label="Durum *"
+                      enumKey="sportConditions"
+                      value={formData.condition}
+                      onChange={(v) => handleDropdownChange('condition', v)}
+                  />
+                  {errors.condition && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.condition}</p>}
+                </div>
               </div>
             </div>
         );
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-10">
             <ImageUpload
               onImageUpload={handleImageUpload}
               onImageRemove={handleImageRemove}

@@ -27,16 +27,16 @@ import FilterRenderer from '../components/filters/FilterRenderer.jsx';
 
 export const listingTypeConfig = {
   [LISTING_TYPES.VEHICLE]: {
-        label: 'Vehicle',
+    label: 'Vehicle',
     icon: '🚗',
     description: 'Cars, motorcycles, bicycles and other vehicles',
     
-        detailsComponent: VehicleDetails,
+    detailsComponent: VehicleDetails,
     createComponent: VehicleCreateForm,
     
-        filterConfig: createVehicleFilterConfig(),
+    filterConfig: createVehicleFilterConfig(),
     
-        sortOptions: [
+    sortOptions: [
       { value: 'year', label: 'Year' },
       { value: 'mileage', label: 'Mileage' },
       { value: 'brand', label: 'Brand' },
@@ -44,7 +44,7 @@ export const listingTypeConfig = {
       { value: 'createdAt', label: 'Date Added' }
     ],
     
-        compactBadges: (listing) => [
+    compactBadges: (listing) => [
       { label: listing.brand, icon: '🚗', show: !!listing.brand },
       { label: listing.year, icon: '📅', show: !!listing.year },
       { 
@@ -55,7 +55,7 @@ export const listingTypeConfig = {
       { label: listing.fuelType, icon: '⛽', show: !!listing.fuelType },
     ].filter(badge => badge.show),
     
-        defaultFilters: {
+    defaultFilters: {
       minYear: 1980,
       maxYear: new Date().getFullYear(),
     }

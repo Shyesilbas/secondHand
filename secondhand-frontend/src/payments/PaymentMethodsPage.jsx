@@ -43,30 +43,29 @@ const PaymentMethodsPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background-secondary">
+        <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <button
                         onClick={() => navigate(-1)}
-                        className="inline-flex items-center text-sm text-text-secondary hover:text-text-primary transition-colors mb-6 group"
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md mb-6 group"
                     >
-                        <ArrowLeftIcon className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-0.5" />
-                        Back
+                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
                     </button>
 
                     <div className="mb-8">
-                        <h1 className="text-3xl font-semibold text-text-primary mb-2">
+                        <h1 className="text-3xl font-semibold text-slate-900 mb-2 tracking-tight">
                             Payment Methods
                         </h1>
-                        <p className="text-sm text-text-secondary">
+                        <p className="text-sm text-slate-500 tracking-tight">
                             Manage your payment methods and financial information
                         </p>
                     </div>
                 </div>
 
-                <div className="bg-background-primary rounded-lg shadow-sm border border-border-light">
-                    <div className="border-b border-border-light">
-                        <nav className="flex -mb-px" aria-label="Tabs">
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
+                    <div className="p-4">
+                        <nav className="relative flex bg-slate-100 rounded-2xl p-1.5" aria-label="Tabs">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -75,14 +74,14 @@ const PaymentMethodsPage = () => {
                                         key={tab.id}
                                         onClick={() => handleTabChange(tab.id)}
                                         className={`
-                                            flex-1 flex items-center justify-center py-4 px-6 text-sm font-medium transition-colors
+                                            relative flex-1 flex items-center justify-center py-3 px-4 text-sm font-semibold rounded-xl transition-all duration-200 tracking-tight
                                             ${isActive
-                                                ? 'text-text-primary border-b-2 border-button-primary-bg'
-                                                : 'text-text-tertiary hover:text-text-secondary hover:border-b-2 hover:border-border-DEFAULT'
+                                                ? 'text-indigo-600 bg-white shadow-sm'
+                                                : 'text-slate-500 hover:text-slate-700'
                                             }
                                         `}
                                     >
-                                        <Icon className={`w-5 h-5 mr-2 ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`} />
+                                        <Icon className={`w-5 h-5 mr-2 ${isActive ? 'text-indigo-600' : 'text-slate-500'}`} />
                                         <span>{tab.label}</span>
                                     </button>
                                 );
@@ -90,13 +89,25 @@ const PaymentMethodsPage = () => {
                         </nav>
                     </div>
 
-                    <div className="p-6">
-                        {activeTab === 'bank-accounts' && <BankAccountsSection />}
-                        {activeTab === 'credit-cards' && <CreditCardsSection />}
-                        {activeTab === 'ewallet' && <EWalletSection />}
+                    <div className="px-6 pb-6">
+                        <div key={activeTab} className="opacity-0 animate-[fadeIn_0.25s_ease-in-out_forwards]">
+                            {activeTab === 'bank-accounts' && <BankAccountsSection />}
+                            {activeTab === 'credit-cards' && <CreditCardsSection />}
+                            {activeTab === 'ewallet' && <EWalletSection />}
+                        </div>
                     </div>
                 </div>
             </div>
+            <style>{`
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 1;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

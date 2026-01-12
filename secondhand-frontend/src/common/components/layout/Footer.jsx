@@ -5,10 +5,7 @@ import {useEnums} from '../../hooks/useEnums.js';
 import {useAgreements} from '../../../agreements/hooks/useAgreements.js';
 import {formatCurrency} from '../../formatters.js';
 import {ROUTES} from '../../constants/routes.js';
-import {
-    ChevronDown,
-    ChevronUp
-} from 'lucide-react';
+import {ChevronDown, ChevronUp} from 'lucide-react';
 
 const Footer = () => {
     const { enums, isLoading } = useEnums();
@@ -26,111 +23,106 @@ const Footer = () => {
     const showcasePricing = enums.showcasePricingConfig;
     const isLoadingPricing = isLoading;
 
-    const patternUrl = "data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E";
-
     return (
-        <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white border-t border-gray-700/50">
-            <div 
-                className="absolute inset-0 opacity-40" 
-                style={{ backgroundImage: `url("${patternUrl}")` }}
-            ></div>
-            
+        <footer className="relative bg-slate-950 text-slate-300 border-t border-white/5">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-indigo-500/20 via-transparent to-transparent" />
+
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
                             About
                         </h3>
                         <ul className="space-y-3">
-                            <li className="text-sm text-gray-300 hover:text-white transition-colors">
+                            <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">
                                 No membership fees
                             </li>
-                            <li className="text-sm text-gray-300 hover:text-white transition-colors">
+                            <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">
                                 Free to browse and search
                             </li>
-                            <li className="text-sm text-gray-300 hover:text-white transition-colors">
+                            <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">
                                 Secure transactions
                             </li>
-                            <li className="text-sm text-gray-300 hover:text-white transition-colors">
+                            <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">
                                 Trusted marketplace
                             </li>
                         </ul>
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
                             Pricing
                         </h3>
                         <button
                             onClick={() => setShowPricing(!showPricing)}
-                            className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group font-medium"
+                            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight group font-medium"
                         >
                             {showPricing ? (
                                 <>
-                                    <ChevronUp className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                                    <ChevronUp className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
                                     Hide Pricing
                                 </>
                             ) : (
                                 <>
-                                    <ChevronDown className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                                    <ChevronDown className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                                     Show Pricing
                                 </>
                             )}
                         </button>
                         {showPricing && (
-                            <div className="mt-4 p-4 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                            <div className="mt-4 space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl transition-all duration-300">
                                 {isLoadingPricing ? (
                                     <div className="space-y-3">
                                         {[...Array(4)].map((_, i) => (
-                                            <div key={i} className="h-4 bg-gray-700/50 rounded animate-pulse"></div>
+                                            <div key={i} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>
                                         ))}
                                     </div>
                                 ) : (
                                     <>
                                         <div className="space-y-2">
-                                            <div className="font-semibold text-white">
+                                            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                                                 Listing Fee
                                             </div>
                                             {feeConfig && (
-                                                <div className="ml-6 space-y-1.5 text-sm text-gray-300">
-                                                    <div className="flex justify-between">
-                                                        <span>Creation:</span>
-                                                        <span className="text-white font-medium">{formatCurrency(feeConfig.creationFee, 'TRY')}</span>
+                                                <div className="ml-4 space-y-1.5 text-sm text-slate-300">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="tracking-tight">Creation</span>
+                                                        <span className="font-mono text-sm tracking-tight text-slate-100">{formatCurrency(feeConfig.creationFee, 'TRY')}</span>
                                                     </div>
-                                                    <div className="flex justify-between">
-                                                        <span>Tax ({feeConfig.taxPercentage}%):</span>
-                                                        <span className="text-white font-medium">{formatCurrency(feeConfig.totalCreationFee - feeConfig.creationFee, 'TRY')}</span>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="tracking-tight">Tax ({feeConfig.taxPercentage}%):</span>
+                                                        <span className="font-mono text-sm tracking-tight text-slate-100">{formatCurrency(feeConfig.totalCreationFee - feeConfig.creationFee, 'TRY')}</span>
                                                     </div>
-                                                    <div className="flex justify-between pt-1.5 border-t border-gray-700/50">
-                                                        <span className="font-semibold text-white">Total:</span>
-                                                        <span className="text-green-400 font-bold">{formatCurrency(feeConfig.totalCreationFee, 'TRY')}</span>
+                                                    <div className="mt-2 flex items-baseline justify-between border-t border-white/10 pt-2">
+                                                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Total</span>
+                                                        <span className="font-mono text-base font-semibold tracking-tight text-emerald-400">{formatCurrency(feeConfig.totalCreationFee, 'TRY')}</span>
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="space-y-2 pt-2 border-t border-gray-700/50">
-                                            <div className="font-semibold text-white">
+                                        <div className="space-y-2 border-t border-white/10 pt-3">
+                                            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                                                 Showcase
                                             </div>
                                             {showcasePricing && (
-                                                <div className="ml-6 space-y-1.5 text-sm text-gray-300">
-                                                    <div className="flex justify-between">
-                                                        <span>Daily Cost:</span>
-                                                        <span className="text-white font-medium">{formatCurrency(showcasePricing.dailyCost, 'TRY')}</span>
+                                                <div className="ml-4 space-y-1.5 text-sm text-slate-300">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="tracking-tight">Daily Cost</span>
+                                                        <span className="font-mono text-sm tracking-tight text-slate-100">{formatCurrency(showcasePricing.dailyCost, 'TRY')}</span>
                                                     </div>
-                                                    <div className="flex justify-between">
-                                                        <span>Tax ({showcasePricing.taxPercentage}%):</span>
-                                                        <span className="text-white font-medium">{formatCurrency(showcasePricing.totalDailyCost - showcasePricing.dailyCost, 'TRY')}</span>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="tracking-tight">Tax ({showcasePricing.taxPercentage}%):</span>
+                                                        <span className="font-mono text-sm tracking-tight text-slate-100">{formatCurrency(showcasePricing.totalDailyCost - showcasePricing.dailyCost, 'TRY')}</span>
                                                     </div>
-                                                    <div className="flex justify-between pt-1.5 border-t border-gray-700/50">
-                                                        <span className="font-semibold text-white">Total per Day:</span>
-                                                        <span className="text-yellow-400 font-bold">{formatCurrency(showcasePricing.totalDailyCost, 'TRY')}</span>
+                                                    <div className="mt-2 flex items-baseline justify-between border-t border-white/10 pt-2">
+                                                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Total per Day</span>
+                                                        <span className="font-mono text-base font-semibold tracking-tight text-amber-300">{formatCurrency(showcasePricing.totalDailyCost, 'TRY')}</span>
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
                                         {(!feeConfig && !showcasePricing) && (
-                                            <div className="text-sm text-gray-400 italic">Pricing information unavailable</div>
+                                            <div className="text-sm italic text-slate-500">Pricing information unavailable</div>
                                         )}
                                     </>
                                 )}
@@ -139,31 +131,30 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
                             Support
                         </h3>
                         <ul className="space-y-3">
                             {['Help Center', 'Contact Us', 'Safety Tips'].map((item, index) => (
                                 <li key={index}>
-                                    <button className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                                        <span className="group-hover:translate-x-1 transition-transform">{item}</span>
+                                    <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">
+                                        {item}
                                     </button>
                                 </li>
                             ))}
                             <li>
                                 <button
                                     onClick={() => setShowReportIssues(!showReportIssues)}
-                                    className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group font-medium"
+                                    className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight font-medium"
                                 >
                                     {showReportIssues ? (
                                         <>
-                                            <ChevronUp className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                                            <ChevronUp className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
                                             Hide Report Issues
                                         </>
                                     ) : (
                                         <>
-                                            <ChevronDown className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                                            <ChevronDown className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
                                             Show Report Issues
                                         </>
                                     )}
@@ -171,8 +162,8 @@ const Footer = () => {
                             </li>
                         </ul>
                         {showReportIssues && (
-                            <div className="mt-4 p-4 bg-blue-500/10 backdrop-blur-sm rounded-lg border border-blue-500/20 text-sm text-gray-300 animate-in slide-in-from-top-2 duration-200">
-                                <p className="leading-relaxed">
+                            <div className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/60 p-4 text-sm text-slate-300">
+                                <p className="leading-relaxed tracking-tight">
                                     To report an issue, go to the listing or person's page you want to report, click the Report button, and create your complaint by filling in the necessary information.
                                 </p>
                             </div>
@@ -180,19 +171,18 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
                             Legal
                         </h3>
                         {isAuthenticated ? (
                             <div className="space-y-3">
                                 <button
                                     onClick={() => navigate(ROUTES.AGREEMENTS_ALL)}
-                                    className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group font-medium w-full text-left"
+                                    className="flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight font-medium w-full text-left"
                                 >
-                                    <span className="group-hover:translate-x-1 transition-transform">My Agreements</span>
-                                    <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                    <span>My Agreements</span>
                                 </button>
-                                <p className="text-xs text-gray-400 leading-relaxed pl-6">
+                                <p className="pl-0 text-xs leading-relaxed tracking-tight text-slate-500">
                                     View your accepted agreements and status
                                 </p>
                             </div>
@@ -201,15 +191,14 @@ const Footer = () => {
                                 {!loadAgreements ? (
                                     <button
                                         onClick={() => setLoadAgreements(true)}
-                                        className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group font-medium"
+                                        className="inline-flex items-center gap-2 rounded-xl border border-slate-500/60 px-4 py-2 text-sm font-medium tracking-tight text-slate-200 transition-all duration-300 hover:border-slate-300 hover:bg-slate-800/60"
                                     >
                                         <span>Load Legal Documents</span>
-                                        <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                     </button>
                                 ) : agreementsLoading ? (
                                     <div className="space-y-2">
                                         {[...Array(3)].map((_, i) => (
-                                            <div key={i} className="h-4 bg-gray-700/50 rounded animate-pulse"></div>
+                                            <div key={i} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>
                                         ))}
                                     </div>
                                 ) : agreements && agreements.length > 0 ? (
@@ -239,11 +228,9 @@ const Footer = () => {
                                                         `);
                                                         newWindow.document.close();
                                                     }}
-                                                    className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition-all duration-200 group w-full text-left"
+                                                    className="w-full text-left text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight"
                                                 >
-                                                    <span className="group-hover:translate-x-1 transition-transform">
-                                                        {agreement.agreementType.replace(/_/g, ' ')}
-                                                    </span>
+                                                    <span>{agreement.agreementType.replace(/_/g, ' ')}</span>
                                                 </button>
                                             </li>
                                         ))}
@@ -252,8 +239,8 @@ const Footer = () => {
                                     <ul className="space-y-2">
                                         {['Terms of Service', 'Privacy Policy', 'KVKK'].map((item, index) => (
                                             <li key={index}>
-                                                <button className="text-sm text-gray-300 hover:text-white transition-all duration-200 group">
-                                                    <span className="group-hover:translate-x-1 transition-transform inline-block">{item}</span>
+                                                <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">
+                                                    <span className="inline-block">{item}</span>
                                                 </button>
                                             </li>
                                         ))}
@@ -264,14 +251,11 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-700/50 pt-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p className="text-sm text-gray-400">
-                            &copy; {new Date().getFullYear()} <span className="font-semibold text-gray-300">SecondHand Market Place</span>. All rights reserved.
+                <div className="mt-10 border-t border-white/5 pt-6">
+                    <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
+                        <p className="text-xs text-slate-500 tracking-tight">
+                            &copy; {new Date().getFullYear()} <span className="font-bold tracking-tighter text-white">SecondHand</span>. All rights reserved.
                         </p>
-                        <div className="text-xs text-gray-500">
-                            <span>Made with ❤️ for sustainable shopping</span>
-                        </div>
                     </div>
                 </div>
             </div>

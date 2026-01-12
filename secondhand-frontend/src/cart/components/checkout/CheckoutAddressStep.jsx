@@ -17,10 +17,9 @@ const CheckoutAddressStep = ({
 
     return (
         <div className="p-8">
-            {/* Header */}
             <div className="mb-8">
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Address & Note</h2>
-                <p className="text-gray-600">Select your shipping and billing addresses for this order.</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tighter">Address & Note</h2>
+                <p className="text-slate-500 tracking-tight">Select your shipping and billing addresses for this order.</p>
             </div>
 
             <div className="space-y-8">
@@ -49,10 +48,10 @@ const CheckoutAddressStep = ({
                         {addresses?.map((address) => (
                             <label
                                 key={address.id}
-                                className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                className={`relative p-5 border-2 rounded-2xl cursor-pointer transition-all ${
                                     String(selectedShippingAddressId) === String(address.id)
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-indigo-500 bg-indigo-50/50 shadow-sm'
+                                        : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
                                 }`}
                             >
                                 <input
@@ -64,23 +63,23 @@ const CheckoutAddressStep = ({
                                     className="sr-only"
                                 />
                                 <div className="flex items-start space-x-3">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                                         String(selectedShippingAddressId) === String(address.id)
-                                            ? 'border-blue-500 bg-blue-500'
-                                            : 'border-gray-300'
+                                            ? 'border-indigo-500 bg-indigo-500'
+                                            : 'border-slate-300'
                                     }`}>
                                         {String(selectedShippingAddressId) === String(address.id) && (
                                             <div className="w-2 h-2 bg-white rounded-full"></div>
                                         )}
                                     </div>
                                     <div className="flex-1">
-                                        <div className="font-medium text-gray-900">{address.addressLine}</div>
-                                        <div className="text-sm text-gray-600 mt-1">
+                                        <div className="font-semibold text-slate-900 tracking-tight">{address.addressLine}</div>
+                                        <div className="text-sm text-slate-600 mt-1 tracking-tight">
                                             {address.addressLine}, {address.city}, {address.state} {address.postalCode}
                                         </div>
-                                        <div className="text-sm text-gray-500">{address.country}</div>
+                                        <div className="text-sm text-slate-500 tracking-tight">{address.country}</div>
                                         {address.mainAddress && (
-                                            <div className="text-xs text-blue-600 mt-1 font-medium">Main Address</div>
+                                            <div className="text-xs text-indigo-600 mt-1 font-semibold tracking-tight">Main Address</div>
                                         )}
                                     </div>
                                 </div>
@@ -102,10 +101,10 @@ const CheckoutAddressStep = ({
                         {addresses?.map((address) => (
                             <label
                                 key={address.id}
-                                className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                className={`relative p-5 border-2 rounded-2xl cursor-pointer transition-all ${
                                     String(selectedBillingAddressId) === String(address.id)
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                        ? 'border-indigo-500 bg-indigo-50/50 shadow-sm'
+                                        : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
                                 }`}
                             >
                                 <input
@@ -117,23 +116,23 @@ const CheckoutAddressStep = ({
                                     className="sr-only"
                                 />
                                 <div className="flex items-start space-x-3">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                                         String(selectedBillingAddressId) === String(address.id)
-                                            ? 'border-blue-500 bg-blue-500'
-                                            : 'border-gray-300'
+                                            ? 'border-indigo-500 bg-indigo-500'
+                                            : 'border-slate-300'
                                     }`}>
                                         {String(selectedBillingAddressId) === String(address.id) && (
                                             <div className="w-2 h-2 bg-white rounded-full"></div>
                                         )}
                                     </div>
                                     <div className="flex-1">
-                                        <div className="font-medium text-gray-900">{address.addressLine}</div>
-                                        <div className="text-sm text-gray-600 mt-1">
+                                        <div className="font-semibold text-slate-900 tracking-tight">{address.addressLine}</div>
+                                        <div className="text-sm text-slate-600 mt-1 tracking-tight">
                                             {address.addressLine}, {address.city}, {address.state} {address.postalCode}
                                         </div>
-                                        <div className="text-sm text-gray-500">{address.country}</div>
+                                        <div className="text-sm text-slate-500 tracking-tight">{address.country}</div>
                                         {address.mainAddress && (
-                                            <div className="text-xs text-blue-600 mt-1 font-medium">Main Address</div>
+                                            <div className="text-xs text-indigo-600 mt-1 font-semibold tracking-tight">Main Address</div>
                                         )}
                                     </div>
                                 </div>
@@ -159,13 +158,13 @@ const CheckoutAddressStep = ({
             <div className="flex justify-end space-x-4 mt-8">
                 <button
                     onClick={onBack}
-                    className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="px-6 py-3 text-slate-600 hover:text-slate-900 font-semibold transition-colors tracking-tight"
                 >
                     Back
                 </button>
                 <button
                     onClick={onNext}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-8 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-200 font-bold shadow-md hover:shadow-lg tracking-tight disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!isStepValid}
                 >
                     Next

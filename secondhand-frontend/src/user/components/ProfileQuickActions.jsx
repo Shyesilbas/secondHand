@@ -33,16 +33,7 @@ const ProfileQuickActions = ({ user }) => {
   }, []);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-900">
-          Quick Actions
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
-          Access frequently used features and settings
-        </p>
-      </div>
-      <div className="p-6 space-y-2">
+    <div className="space-y-3">
         <ProfileLink
           to={ROUTES.MY_ORDERS}
           label="My Orders"
@@ -50,11 +41,11 @@ const ProfileQuickActions = ({ user }) => {
           iconPath="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
         />
 
-        <div ref={reviewsSectionRef} className="border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+        <div ref={reviewsSectionRef} className="border border-slate-200 rounded-xl p-5 hover:border-slate-300 hover:shadow-sm transition-all duration-200">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-amber-600"
+                className="w-5 h-5 text-amber-600"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -62,10 +53,10 @@ const ProfileQuickActions = ({ user }) => {
               </svg>
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">
+              <h3 className="font-semibold text-slate-900 tracking-tight">
                 Reviews & Ratings
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500 tracking-tight mt-0.5">
                 {reviewStatsLoading ? 'Loading review data...' : 
                  reviewStats ? `${reviewStats.totalReviews || 0} reviews, ${(reviewStats.averageRating || 0).toFixed(1)} avg rating` :
                  'Manage your review activity'}
@@ -75,11 +66,11 @@ const ProfileQuickActions = ({ user }) => {
           <div className="space-y-2">
             <Link
               to={ROUTES.REVIEWS_RECEIVED(user?.id)}
-              className="flex items-center justify-between p-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="flex items-center justify-between p-3 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-all duration-200 hover:-translate-y-0.5 tracking-tight"
             >
-              <span>Reviews I Received</span>
+              <span className="font-medium">Reviews I Received</span>
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="w-4 h-4 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -94,11 +85,11 @@ const ProfileQuickActions = ({ user }) => {
             </Link>
             <Link
               to={ROUTES.REVIEWS_GIVEN(user?.id)}
-              className="flex items-center justify-between p-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="flex items-center justify-between p-3 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-all duration-200 hover:-translate-y-0.5 tracking-tight"
             >
-              <span>Reviews I Gave</span>
+              <span className="font-medium">Reviews I Gave</span>
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="w-4 h-4 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -134,7 +125,6 @@ const ProfileQuickActions = ({ user }) => {
           description="Manage password and security options"
           iconPath="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
         />
-      </div>
     </div>
   );
 };
@@ -142,11 +132,11 @@ const ProfileQuickActions = ({ user }) => {
 const ProfileLink = ({ to, label, description, iconPath }) => (
   <Link
     to={to}
-    className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors group"
+    className="flex items-center p-5 border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all duration-200 hover:-translate-y-1 shadow-sm hover:shadow-md group"
   >
-    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-gray-200 transition-colors">
+    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-4 group-hover:bg-indigo-100 transition-colors">
       <svg
-        className="w-4 h-4 text-gray-600"
+        className="w-5 h-5 text-indigo-600"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -159,12 +149,12 @@ const ProfileLink = ({ to, label, description, iconPath }) => (
         />
       </svg>
     </div>
-    <div>
-      <h3 className="font-medium text-gray-900">{label}</h3>
-      <p className="text-sm text-gray-600">{description}</p>
+    <div className="flex-1">
+      <h3 className="font-semibold text-slate-900 tracking-tight">{label}</h3>
+      <p className="text-sm text-slate-500 tracking-tight mt-0.5">{description}</p>
     </div>
     <svg
-      className="w-4 h-4 text-gray-400 ml-auto"
+      className="w-5 h-5 text-slate-400 ml-auto"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
