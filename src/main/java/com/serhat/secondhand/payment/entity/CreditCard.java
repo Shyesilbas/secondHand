@@ -46,6 +46,9 @@ public class CreditCard {
     @Column(name = "credit_limit", nullable = false)
     private BigDecimal limit;
 
+    @Version
+    private Long version;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

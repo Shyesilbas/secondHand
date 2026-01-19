@@ -59,11 +59,10 @@ public class CreditCardService {
             return PaymentResult.failure("User not found", amount, PaymentType.CREDIT_CARD, listingId, null, toUser != null ? toUser.getId() : null);
         }
 
-        CreditCard card = findByUserMandatory(fromUser);
+        CreditCard card = findByUserMandatoryWithLock(fromUser);
         creditCardValidator.validateSufficientCredit(card, amount);
 
         try {
-            // Simulate payment processing (95% success rate)
             boolean isSuccessful = Math.random() > 0.05;
             if (!isSuccessful) {
                 return PaymentResult.failure("Payment processing failed", amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
@@ -85,6 +84,11 @@ public class CreditCardService {
 
     public CreditCard findByUserMandatory(User user) {
         return findByUser(user)
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND));
+    }
+
+    public CreditCard findByUserMandatoryWithLock(User user) {
+        return creditCardRepository.findByCardHolderWithLock(user)
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND));
     }
     

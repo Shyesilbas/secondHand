@@ -1,8 +1,9 @@
 import React from 'react';
-import { PlusIcon, MinusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, MinusIcon, XMarkIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Star } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 import { useSellerReviewStatsCache } from '../../reviews/hooks/useSellerReviewStatsCache.js';
+import { useReservationTimer } from '../hooks/useReservationTimer.js';
 
 const CartItemCard = ({ 
     item, 
@@ -46,6 +47,9 @@ const CartItemCard = ({
     const sellerTotalReviews = sellerStats?.totalReviews || 0;
     const maxStock = item?.listing?.quantity;
     const isLowStock = maxStock != null && Number.isFinite(Number(maxStock)) && Number(maxStock) > 0 && Number(maxStock) < 10;
+    
+    const { timeRemaining, isExpired, isReserved } = useReservationTimer(item.reservedAt);
+    const isReservationExpiring = timeRemaining && timeRemaining.minutes < 3;
 
     return (
         <div className="p-6">
@@ -79,6 +83,23 @@ const CartItemCard = ({
                             {isLowStock && (
                                 <div className="mt-1.5 text-[11px] font-bold text-amber-600 tracking-tight">
                                     Only {Number(maxStock)} left in stock
+                                </div>
+                            )}
+                            
+                            {isReserved && !isExpired && (
+                                <div className={`mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold tracking-tight ${
+                                    isReservationExpiring ? 'text-red-600' : 'text-blue-600'
+                                }`}>
+                                    <ClockIcon className="w-3 h-3" />
+                                    <span>
+                                        Reserved: {timeRemaining?.minutes || 0}:{(timeRemaining?.seconds || 0).toString().padStart(2, '0')} remaining
+                                    </span>
+                                </div>
+                            )}
+                            
+                            {isReserved && isExpired && (
+                                <div className="mt-1.5 text-[11px] font-bold text-red-600 tracking-tight">
+                                    Reservation expired - Please update your cart
                                 </div>
                             )}
                             

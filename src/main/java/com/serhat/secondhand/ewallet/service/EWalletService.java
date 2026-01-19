@@ -84,7 +84,7 @@ public class EWalletService {
     @Transactional
     public void deposit(DepositRequest request) {
         User user = getAuthenticatedUser();
-        EWallet eWallet = getEWalletOrThrow(user);
+        EWallet eWallet = getEWalletOrThrowWithLock(user);
 
         eWalletValidator.validateDeposit(eWallet, request.getAmount());
 
@@ -105,7 +105,7 @@ public class EWalletService {
     @Transactional
     public void withdraw(WithdrawRequest request) {
         User user = getAuthenticatedUser();
-        EWallet eWallet = getEWalletOrThrow(user);
+        EWallet eWallet = getEWalletOrThrowWithLock(user);
 
         eWalletValidator.validateWithdraw(eWallet, request.getAmount());
 
@@ -161,7 +161,7 @@ public class EWalletService {
                     amount,
                     listingId);
 
-        EWallet fromWallet = getEWalletOrThrow(fromUser);
+        EWallet fromWallet = getEWalletOrThrowWithLock(fromUser);
         log.info("Found payer wallet with balance: {}", fromWallet.getBalance());
 
             eWalletValidator.validateSufficientBalance(fromWallet, amount);
@@ -203,7 +203,7 @@ public class EWalletService {
     public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
         
-        EWallet eWallet = eWalletRepository.findByUser(user)
+        EWallet eWallet = eWalletRepository.findByUserWithLock(user)
                 .orElseGet(() -> {
                     log.info("Creating new e-wallet for user: {}", user.getEmail());
                     EWallet newWallet = eWalletMapper.createDefaultEWallet(user, new BigDecimal("10000.00"));
@@ -230,7 +230,7 @@ public class EWalletService {
     public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
         
-        EWallet eWallet = getEWalletOrThrow(user);
+        EWallet eWallet = getEWalletOrThrowWithLock(user);
         
         eWalletValidator.validateSufficientBalance(eWallet, amount);
         
@@ -248,6 +248,12 @@ public class EWalletService {
 
     private EWallet getEWalletOrThrow(User user) {
         return eWalletRepository.findByUser(user)
+                .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(
+                        com.serhat.secondhand.payment.util.PaymentErrorCodes.EWALLET_NOT_FOUND));
+    }
+
+    private EWallet getEWalletOrThrowWithLock(User user) {
+        return eWalletRepository.findByUserWithLock(user)
                 .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(
                         com.serhat.secondhand.payment.util.PaymentErrorCodes.EWALLET_NOT_FOUND));
     }

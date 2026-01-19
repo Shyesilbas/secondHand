@@ -73,13 +73,16 @@ public class PriceHistoryService {
             
             priceHistoryRepository.save(priceHistory);
 
-            List<User> users = favoriteRepository.findUsersByListingId(listing.getId());
+            if (newPrice.compareTo(oldPrice) < 0) {
+                List<User> users = favoriteRepository.findUsersByListingId(listing.getId());
 
-            for (User user : users) {
-                userNotificationService.sendPriceChangeNotification(user,
-                        listing.getTitle(),
-                        oldPrice.toPlainString(),
-                        newPrice.toPlainString());
+                for (User user : users) {
+                    userNotificationService.sendPriceChangeNotification(user,
+                            listing.getTitle(),
+                            oldPrice.toPlainString(),
+                            newPrice.toPlainString(),
+                            listing.getId());
+                }
             }
             log.info("Price change recorded for listing: {}, from: {} to: {}", 
                     listing.getId(), oldPrice, newPrice);

@@ -9,8 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
@@ -37,4 +39,10 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
         @Modifying
     @Query("UPDATE Cart c SET c.quantity = :quantity WHERE c.user = :user AND c.listing = :listing")
     void updateQuantityByUserAndListing(@Param("user") User user, @Param("listing") Listing listing, @Param("quantity") Integer quantity);
+
+    @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.listing.id = :listingId AND c.reservedAt > :expirationTime")
+    int countReservedQuantityByListing(@Param("listingId") UUID listingId, @Param("expirationTime") LocalDateTime expirationTime);
+
+    @Query("SELECT c FROM Cart c WHERE c.reservedAt IS NOT NULL AND c.reservedAt < :expirationTime")
+    List<Cart> findExpiredReservations(@Param("expirationTime") LocalDateTime expirationTime);
 }

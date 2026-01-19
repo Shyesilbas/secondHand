@@ -5,6 +5,7 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.coupon.service.CouponService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.service.OfferService;
@@ -50,9 +51,10 @@ public class CheckoutOrchestrator {
         var effectiveCartItems = buildEffectiveCartItems(cartItems, acceptedOffer, user);
 
         PricingResultDto pricing = calculatePricing(user, effectiveCartItems, request, acceptedOffer);
-        Order order = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
-
+        
         Map<UUID, Integer> reserved = reserveStockOrThrow(effectiveCartItems);
+        
+        Order order = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
 
         try {
             var paymentResult = orderPaymentService.processOrderPayments(user, effectiveCartItems, request, order, pricing);
@@ -121,20 +123,27 @@ public class CheckoutOrchestrator {
             if (item == null || item.getListing() == null || item.getListing().getId() == null) {
                 continue;
             }
-            Integer stock = item.getListing().getQuantity();
-            if (stock == null) {
-                continue;
-            }
+            
             int qty = item.getQuantity() != null ? item.getQuantity() : 1;
             if (qty < 1) {
                 throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
             }
-            int updated = listingRepository.decrementQuantityIfEnough(item.getListing().getId(), qty);
-            if (updated != 1) {
+            
+            Listing listing = listingRepository.findByIdWithLock(item.getListing().getId())
+                    .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+            
+            if (listing.getQuantity() == null) {
+                continue;
+            }
+            
+            if (listing.getQuantity() < qty) {
                 releaseReservedStock(reserved);
                 throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
-            reserved.put(item.getListing().getId(), qty);
+            
+            listing.setQuantity(listing.getQuantity() - qty);
+            listingRepository.save(listing);
+            reserved.put(listing.getId(), qty);
         }
         return reserved;
     }
@@ -158,7 +167,18 @@ public class CheckoutOrchestrator {
         if (acceptedOffer != null) {
             offerService.markCompleted(acceptedOffer);
         }
+        clearCartReservations(user);
         cartRepository.deleteByUser(user);
+    }
+
+    private void clearCartReservations(User user) {
+        var cartItems = cartRepository.findByUserWithListing(user);
+        for (var cartItem : cartItems) {
+            if (cartItem.getReservedAt() != null) {
+                cartItem.setReservedAt(null);
+                cartRepository.save(cartItem);
+            }
+        }
     }
 }
 

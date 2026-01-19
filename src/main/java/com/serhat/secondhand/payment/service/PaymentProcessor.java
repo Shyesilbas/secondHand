@@ -14,14 +14,18 @@ import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import com.serhat.secondhand.payment.validator.PaymentValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentProcessor {
 
     private final PaymentStrategyFactory paymentStrategyFactory;
@@ -34,19 +38,52 @@ public class PaymentProcessor {
     private final PaymentValidator paymentValidator;
 
 
-    @Transactional
     public PaymentDto process(PaymentRequest paymentRequest, Authentication authentication) {
-        User fromUser = userService.getAuthenticatedUser(authentication);
+        String idempotencyKey = paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank()
+                ? paymentRequest.idempotencyKey()
+                : generateIdempotencyKey(paymentRequest, authentication);
         
-        if (paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank()) {
-            Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUser(
-                    paymentRequest.idempotencyKey(), fromUser)
-                    .orElse(null);
-            
-            if (existingPayment != null) {
-                validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
-                return paymentMapper.toDto(existingPayment);
+        PaymentRequest requestWithIdempotency = createPaymentRequestWithIdempotency(paymentRequest, idempotencyKey);
+        
+        int maxRetries = 3;
+        int attempt = 0;
+        
+        while (attempt < maxRetries) {
+            try {
+                return executePaymentWithTransaction(requestWithIdempotency, authentication);
+            } catch (OptimisticLockException e) {
+                attempt++;
+                log.warn("Optimistic lock exception during payment processing, attempt {}/{}: {}", 
+                        attempt, maxRetries, e.getMessage());
+                
+                if (attempt >= maxRetries) {
+                    log.error("Payment processing failed after {} retries due to concurrent updates", maxRetries);
+                    throw new BusinessException(PaymentErrorCodes.CONCURRENT_UPDATE);
+                }
+                
+                try {
+                    Thread.sleep(50 * attempt);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
+                }
             }
+        }
+        
+        throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected PaymentDto executePaymentWithTransaction(PaymentRequest paymentRequest, Authentication authentication) {
+        User fromUser = userService.getAuthenticatedUser(authentication);
+        String idempotencyKey = paymentRequest.idempotencyKey();
+        
+        Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUser(idempotencyKey, fromUser)
+                .orElse(null);
+        
+        if (existingPayment != null) {
+            validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
+            return paymentMapper.toDto(existingPayment);
         }
         
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
@@ -71,6 +108,33 @@ public class PaymentProcessor {
         }
 
         return paymentMapper.toDto(payment);
+    }
+    
+    private String generateIdempotencyKey(PaymentRequest paymentRequest, Authentication authentication) {
+        User fromUser = userService.getAuthenticatedUser(authentication);
+        return String.format("payment-%s-%s-%s-%s", 
+                fromUser.getId(), 
+                paymentRequest.amount(), 
+                paymentRequest.listingId() != null ? paymentRequest.listingId() : "null",
+                paymentRequest.paymentType());
+    }
+    
+    private PaymentRequest createPaymentRequestWithIdempotency(PaymentRequest original, String idempotencyKey) {
+        return PaymentRequest.builder()
+                .fromUserId(original.fromUserId())
+                .toUserId(original.toUserId())
+                .receiverName(original.receiverName())
+                .receiverSurname(original.receiverSurname())
+                .listingId(original.listingId())
+                .amount(original.amount())
+                .paymentType(original.paymentType())
+                .transactionType(original.transactionType())
+                .paymentDirection(original.paymentDirection())
+                .verificationCode(original.verificationCode())
+                .agreementsAccepted(original.agreementsAccepted())
+                .acceptedAgreementIds(original.acceptedAgreementIds())
+                .idempotencyKey(idempotencyKey)
+                .build();
     }
     
     private void validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, User fromUser) {

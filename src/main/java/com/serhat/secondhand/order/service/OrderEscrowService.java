@@ -1,7 +1,12 @@
 package com.serhat.secondhand.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.notification.dto.NotificationRequest;
+import com.serhat.secondhand.notification.entity.enums.NotificationType;
+import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
@@ -15,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,6 +33,8 @@ public class OrderEscrowService {
 
     private final OrderItemEscrowRepository orderItemEscrowRepository;
     private final EWalletService eWalletService;
+    private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
 
     public OrderItemEscrow createEscrowForOrderItem(OrderItem orderItem, User seller, BigDecimal amount) {
         if (orderItemEscrowRepository.findByOrderItem(orderItem).isPresent()) {
@@ -58,15 +66,34 @@ public class OrderEscrowService {
                 org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_INVALID_STATUS");
         }
 
-        try {
-            UUID listingId = escrow.getOrderItem().getListing().getId();
-            eWalletService.creditToUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.ITEM_SALE);
+            try {
+                UUID listingId = escrow.getOrderItem().getListing().getId();
+                eWalletService.creditToUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.ITEM_SALE);
             
             escrow.setStatus(OrderItemEscrow.EscrowStatus.COMPLETED);
             orderItemEscrowRepository.save(escrow);
             
             log.info("Released escrow {} amount {} to seller {}", 
                     escrow.getId(), escrow.getAmount(), escrow.getSeller().getEmail());
+            
+            try {
+                String listingTitle = escrow.getOrderItem().getListing().getTitle();
+                String metadata = objectMapper.writeValueAsString(Map.of(
+                        "listingId", listingId.toString(),
+                        "orderId", escrow.getOrder().getId().toString(),
+                        "orderNumber", escrow.getOrder().getOrderNumber()
+                ));
+                notificationService.createAndSend(NotificationRequest.builder()
+                        .userId(escrow.getSeller().getId())
+                        .type(NotificationType.LISTING_SOLD)
+                        .title("İlanınız Satıldı")
+                        .message(String.format("'%s' ilanınız satıldı", listingTitle))
+                        .actionUrl("/listings/" + listingId)
+                        .metadata(metadata)
+                        .build());
+            } catch (JsonProcessingException e) {
+                log.error("Failed to create in-app notification for listing sold", e);
+            }
         } catch (Exception e) {
             log.error("Failed to release escrow {} to seller {}: {}", 
                     escrow.getId(), escrow.getSeller().getEmail(), e.getMessage());

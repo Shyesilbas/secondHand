@@ -42,17 +42,7 @@ public class EWallet {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        if (balance == null) {
-            balance = BigDecimal.ZERO;
-        }
-    }
+    @Version
+    private Long version;
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }
