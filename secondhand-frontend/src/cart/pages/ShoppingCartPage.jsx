@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrashIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, ArrowLeftIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
@@ -26,6 +26,32 @@ const ShoppingCartPage = () => {
     } = useCart();
 
     const [showClearModal, setShowClearModal] = useState(false);
+
+    const checkReservationStatus = (reservedAt) => {
+        if (!reservedAt) return { isExpired: false, timeRemaining: null };
+        const reservedTime = new Date(reservedAt);
+        const expirationTime = new Date(reservedTime.getTime() + (15 * 60 * 1000));
+        const now = new Date();
+        const diff = expirationTime - now;
+        
+        if (diff <= 0) {
+            return { isExpired: true, timeRemaining: null };
+        }
+        
+        const minutes = Math.floor(diff / 60000);
+        return { isExpired: false, timeRemaining: { minutes, seconds: Math.floor((diff % 60000) / 1000) } };
+    };
+
+    const hasExpiredReservations = useMemo(() => {
+        return cartItems.some(item => checkReservationStatus(item.reservedAt).isExpired);
+    }, [cartItems]);
+
+    const hasExpiringReservations = useMemo(() => {
+        return cartItems.some(item => {
+            const { isExpired, timeRemaining } = checkReservationStatus(item.reservedAt);
+            return !isExpired && timeRemaining && timeRemaining.minutes < 5;
+        });
+    }, [cartItems]);
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
@@ -128,6 +154,40 @@ const ShoppingCartPage = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {(hasExpiredReservations || hasExpiringReservations) && (
+                        <div className="lg:col-span-2">
+                            <div className={`mb-4 p-4 rounded-2xl border ${
+                                hasExpiredReservations 
+                                    ? 'bg-red-50 border-red-200' 
+                                    : 'bg-amber-50 border-amber-200'
+                            }`}>
+                                <div className="flex items-start gap-3">
+                                    <ExclamationTriangleIcon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                                        hasExpiredReservations ? 'text-red-600' : 'text-amber-600'
+                                    }`} />
+                                    <div className="flex-1">
+                                        <p className={`text-sm font-semibold ${
+                                            hasExpiredReservations ? 'text-red-900' : 'text-amber-900'
+                                        }`}>
+                                            {hasExpiredReservations 
+                                                ? 'Some items in your cart have expired reservations'
+                                                : 'Some items in your cart are about to expire'
+                                            }
+                                        </p>
+                                        <p className={`text-xs mt-1 ${
+                                            hasExpiredReservations ? 'text-red-700' : 'text-amber-700'
+                                        }`}>
+                                            {hasExpiredReservations
+                                                ? 'Please update your cart quantities or proceed to checkout immediately.'
+                                                : 'Complete your purchase within the next few minutes to secure these items.'
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
                             <div className="px-8 py-5 border-b border-slate-100/50">

@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        log.error("Data integrity violation: {}", ex.getMessage());
+        log.error("Data integrity violation: {}", ex.getRootCause());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 

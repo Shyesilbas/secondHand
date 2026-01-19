@@ -1,5 +1,10 @@
 package com.serhat.secondhand.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serhat.secondhand.notification.dto.NotificationRequest;
+import com.serhat.secondhand.notification.entity.enums.NotificationType;
+import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
@@ -14,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,8 @@ public class OrderCompletionScheduler {
     private final ShippingRepository shippingRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderEscrowService orderEscrowService;
+    private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
     private static final int COMPLETION_HOURS = 48;
@@ -39,9 +47,11 @@ public class OrderCompletionScheduler {
         List<Order> confirmedOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.CONFIRMED);
         for (Order order : confirmedOrders) {
             if (shouldUpdateToProcessing(order, now)) {
+                Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.PROCESSING);
                 order.setUpdatedAt(now);
                 orderRepository.save(order);
+                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.PROCESSING);
                 updatedCount++;
                 log.info("Updated order {} status to PROCESSING", order.getOrderNumber());
             }
@@ -52,6 +62,7 @@ public class OrderCompletionScheduler {
         for (Order order : processingOrders) {
             log.debug("Checking order {} for SHIPPED update. UpdatedAt: {}", order.getOrderNumber(), order.getUpdatedAt());
             if (shouldUpdateToShipped(order, now)) {
+                Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.SHIPPED);
                 order.setUpdatedAt(now);
                 Shipping shipping = order.getShipping();
@@ -61,6 +72,7 @@ public class OrderCompletionScheduler {
                     shippingRepository.save(shipping);
                 }
                 orderRepository.save(order);
+                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.SHIPPED);
                 updatedCount++;
                 log.info("Updated order {} status to SHIPPED (Shipping -> IN_TRANSIT)", order.getOrderNumber());
             }
@@ -69,6 +81,7 @@ public class OrderCompletionScheduler {
         List<Order> shippedOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.SHIPPED);
         for (Order order : shippedOrders) {
             if (shouldUpdateToDelivered(order, now)) {
+                Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.DELIVERED);
                 order.setUpdatedAt(now);
                 Shipping shipping = order.getShipping();
@@ -78,6 +91,7 @@ public class OrderCompletionScheduler {
                     shippingRepository.save(shipping);
                 }
                 orderRepository.save(order);
+                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.DELIVERED);
                 updatedCount++;
                 log.info("Updated order {} status to DELIVERED (Shipping -> DELIVERED)", order.getOrderNumber());
             }
@@ -94,10 +108,12 @@ public class OrderCompletionScheduler {
             long hoursPassed = duration.toHours();
 
             if (hoursPassed >= COMPLETION_HOURS) {
+                Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.COMPLETED);
                 Order savedOrder = orderRepository.save(order);
                 orderEscrowService.releaseEscrowsForOrder(savedOrder);
                 orderNotificationService.sendOrderCompletionNotification(order.getUser(), savedOrder, true);
+                sendStatusChangeNotification(savedOrder, oldStatus, Order.OrderStatus.COMPLETED);
                 updatedCount++;
                 log.info("Auto-completed order: {} ({} hours after delivery)", order.getOrderNumber(), hoursPassed);
             }
@@ -161,6 +177,42 @@ public class OrderCompletionScheduler {
         }
         Duration duration = Duration.between(shipping.getInTransitAt(), now);
         return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+    }
+
+    private void sendStatusChangeNotification(Order order, Order.OrderStatus oldStatus, Order.OrderStatus newStatus) {
+        try {
+            String metadata = objectMapper.writeValueAsString(Map.of(
+                    "orderId", order.getId().toString(),
+                    "orderNumber", order.getOrderNumber(),
+                    "oldStatus", oldStatus != null ? oldStatus.name() : "",
+                    "newStatus", newStatus.name()
+            ));
+            
+            notificationService.createAndSend(NotificationRequest.builder()
+                    .userId(order.getUser().getId())
+                    .type(NotificationType.ORDER_STATUS_CHANGED)
+                    .title("Sipariş Durumu Güncellendi")
+                    .message(String.format("Sipariş #%s durumu '%s' olarak güncellendi",
+                            order.getOrderNumber(), getStatusDisplayName(newStatus)))
+                    .actionUrl("/orders/" + order.getId())
+                    .metadata(metadata)
+                    .build());
+        } catch (JsonProcessingException e) {
+            log.error("Failed to create notification for order status change", e);
+        }
+    }
+
+    private String getStatusDisplayName(Order.OrderStatus status) {
+        return switch (status) {
+            case PENDING -> "Beklemede";
+            case CONFIRMED -> "Onaylandı";
+            case PROCESSING -> "İşleniyor";
+            case SHIPPED -> "Kargoya Verildi";
+            case DELIVERED -> "Teslim Edildi";
+            case COMPLETED -> "Tamamlandı";
+            case CANCELLED -> "İptal Edildi";
+            case REFUNDED -> "İade Edildi";
+        };
     }
 
 }

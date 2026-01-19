@@ -4,6 +4,9 @@ import {useAuth} from '../../../auth/AuthContext.jsx';
 import {ROUTES} from '../../constants/routes.js';
 import {DropdownDivider, DropdownMenu} from '../ui/DropdownMenu.jsx';
 import {useNotification} from '../../../notification/NotificationContext.jsx';
+import {useInAppNotificationsContext} from '../../../notification/InAppNotificationContext.jsx';
+import NotificationBadge from '../../../notification/components/NotificationBadge.jsx';
+import NotificationCenter from '../../../notification/components/NotificationCenter.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
@@ -42,6 +45,7 @@ const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
     const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
+    const [inAppNotificationCenterOpen, setInAppNotificationCenterOpen] = useState(false);
     const [listingsMenuOpen, setListingsMenuOpen] = useState(false);
 
     const categoriesMenuRef = useRef(null);
@@ -53,6 +57,7 @@ const Header = () => {
     const { countsByCategory } = useListingStatistics();
     const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
     const { hasPendingOrders } = usePendingCompletionOrders({ enabled: isAuthenticated });
+    const inAppNotifications = useInAppNotificationsContext();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -181,7 +186,16 @@ const Header = () => {
                         {isAuthenticated ? (
                             <>
                                 <div className="flex items-center gap-1 mr-2">
-                                    {/* Notifications Dropdown */}
+                                    <div className="relative">
+                                        <NotificationBadge
+                                            onClick={() => setInAppNotificationCenterOpen(!inAppNotificationCenterOpen)}
+                                        />
+                                        <NotificationCenter
+                                            isOpen={inAppNotificationCenterOpen}
+                                            onClose={() => setInAppNotificationCenterOpen(false)}
+                                        />
+                                    </div>
+
                                     <div className="relative" ref={notificationMenuRef}>
                                         <button
                                             onClick={() => setNotificationMenuOpen(!notificationMenuOpen)}

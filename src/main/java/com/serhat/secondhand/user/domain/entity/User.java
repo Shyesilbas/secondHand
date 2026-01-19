@@ -6,6 +6,7 @@ import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.core.verification.Verification;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.notification.entity.Notification;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.entity.Payment;
@@ -123,6 +124,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Notification> notifications = new ArrayList<>();
 
 
     @Override

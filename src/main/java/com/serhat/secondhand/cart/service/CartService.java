@@ -1,5 +1,6 @@
 package com.serhat.secondhand.cart.service;
 
+import com.serhat.secondhand.cart.config.CartConfig;
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
 import com.serhat.secondhand.cart.dto.CartDto;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
@@ -10,7 +11,9 @@ import com.serhat.secondhand.cart.util.CartErrorCodes;
 import com.serhat.secondhand.cart.validator.CartValidator;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +37,8 @@ public class CartService {
     private final ListingService listingService;
     private final CartValidator cartValidator;
     private final ListingEnrichmentService enrichmentService;
+    private final ListingRepository listingRepository;
+    private final CartConfig cartConfig;
 
     @Transactional(readOnly = true)
     public List<CartDto> getCartItems(User user) {
@@ -59,18 +65,16 @@ public class CartService {
 
         int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
         cartValidator.validateQuantity(reqQty);
-        cartValidator.validateStock(reqQty, listing.getQuantity());
 
         Optional<Cart> existingCartItemOpt = cartRepository.findByUserAndListing(user, listing);
 
         Cart cartItem;
+        int totalQty;
         if (existingCartItemOpt.isPresent()) {
             cartItem = existingCartItemOpt.get();
-            int nextQty = (cartItem.getQuantity() != null ? cartItem.getQuantity() : 0) + reqQty;
-            cartValidator.validateStock(nextQty, listing.getQuantity());
-            cartItem.setQuantity(nextQty);
-            cartItem.setNotes(request.getNotes());
+            totalQty = (cartItem.getQuantity() != null ? cartItem.getQuantity() : 0) + reqQty;
         } else {
+            totalQty = reqQty;
             cartItem = Cart.builder()
                     .user(user)
                     .listing(listing)
@@ -79,10 +83,47 @@ public class CartService {
                     .build();
         }
 
+        if (cartConfig.getReservation().isEnabled()) {
+            reserveStockForCart(listing, totalQty, existingCartItemOpt.map(Cart::getQuantity).orElse(0));
+            cartItem.setReservedAt(LocalDateTime.now());
+        } else {
+            cartValidator.validateStock(totalQty, listing.getQuantity());
+        }
+
+        if (existingCartItemOpt.isPresent()) {
+            cartItem.setQuantity(totalQty);
+            cartItem.setNotes(request.getNotes());
+        }
+
         Cart savedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(savedCart);
         dto.setListing(enrichmentService.enrich(dto.getListing(), user.getEmail()));
         return dto;
+    }
+
+    private void reserveStockForCart(Listing listing, int requestedQty, int previousQty) {
+        Listing lockedListing = listingRepository.findByIdWithLock(listing.getId())
+                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+
+        if (lockedListing.getQuantity() == null) {
+            return;
+        }
+
+        int qtyDifference = requestedQty - previousQty;
+        if (qtyDifference <= 0) {
+            return;
+        }
+
+        int availableStock = lockedListing.getQuantity() - getReservedQuantityForListing(lockedListing.getId());
+        
+        if (availableStock < qtyDifference) {
+            throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
+        }
+    }
+
+    private int getReservedQuantityForListing(UUID listingId) {
+        LocalDateTime expirationTime = LocalDateTime.now().minus(cartConfig.getReservation().getTimeoutMinutes());
+        return cartRepository.countReservedQuantityByListing(listingId, expirationTime);
     }
 
     public CartDto updateCartItem(User user, UUID listingId, UpdateCartItemRequest request) {
@@ -94,7 +135,15 @@ public class CartService {
 
         int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
         cartValidator.validateQuantity(reqQty);
-        cartValidator.validateStock(reqQty, listing.getQuantity());
+
+        int previousQty = cartItem.getQuantity() != null ? cartItem.getQuantity() : 0;
+
+        if (cartConfig.getReservation().isEnabled()) {
+            reserveStockForCart(listing, reqQty, previousQty);
+            cartItem.setReservedAt(LocalDateTime.now());
+        } else {
+            cartValidator.validateStock(reqQty, listing.getQuantity());
+        }
 
         cartItem.setQuantity(reqQty);
         cartItem.setNotes(request.getNotes());

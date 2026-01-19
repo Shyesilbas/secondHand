@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,9 +31,13 @@ public class Bank {
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Version
+    private Long version;
+
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime createdAt;
 
     private String IBAN;
+
 
 }

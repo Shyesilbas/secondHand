@@ -21,4 +21,5 @@ public class CartDto {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime reservedAt;
 }

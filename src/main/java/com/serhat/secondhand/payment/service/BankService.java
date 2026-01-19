@@ -89,9 +89,14 @@ public class BankService {
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
     }
 
+    public Bank findByUserMandatoryWithLock(User user) {
+        return bankRepository.findByAccountHolderWithLock(user)
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND));
+    }
+
     public void credit(User user, BigDecimal amount) {
         bankValidator.validateCreditAmount(amount);
-        Bank bank = findByUserMandatory(user);
+        Bank bank = findByUserMandatoryWithLock(user);
         bank.setBalance(bank.getBalance().add(amount));
         bankRepository.save(bank);
         log.info("Credited {} to user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
@@ -99,7 +104,7 @@ public class BankService {
 
     public void debit(User user, BigDecimal amount) {
         bankValidator.validateDebitAmount(amount);
-        Bank bank = findByUserMandatory(user);
+        Bank bank = findByUserMandatoryWithLock(user);
         bankValidator.validateSufficientBalance(bank, amount);
         bank.setBalance(bank.getBalance().subtract(amount));
         bankRepository.save(bank);

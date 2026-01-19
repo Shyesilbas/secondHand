@@ -49,6 +49,9 @@ public class Cart {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "reserved_at")
+    private LocalDateTime reservedAt;
+
         @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "listing_id"})
     })

@@ -327,4 +327,10 @@ export const API_ENDPOINTS = {
         UNLIKE: (listId) => `/favorite-lists/${listId}/like`,
         LISTING_LISTS: (listingId) => `/favorite-lists/listing/${listingId}/lists`,
     },
+    NOTIFICATIONS: {
+        ALL: '/v1/notifications',
+        UNREAD_COUNT: '/v1/notifications/unread-count',
+        MARK_AS_READ: (id) => `/v1/notifications/${id}/read`,
+        MARK_ALL_AS_READ: '/v1/notifications/read-all',
+    },
 };

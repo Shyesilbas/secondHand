@@ -3,6 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './auth/AuthContext.jsx';
 import { NotificationProvider } from './notification/NotificationContext.jsx';
+import { InAppNotificationProvider } from './notification/InAppNotificationContext.jsx';
 import { EnumProvider } from './common/contexts/EnumContext.jsx';
 import { ComparisonProvider, CompareFloatingBar, CompareModal } from './comparison/index.js';
 import AppRoutes from './common/routes/AppRoutes';
@@ -27,13 +28,15 @@ function App() {
                 <AuthProvider>
                     <EnumProvider>
                         <NotificationProvider>
-                            <ComparisonProvider>
-                                <div className="App">
-                                    <AppRoutes />
-                                    <CompareFloatingBar />
-                                    <CompareModal />
-                                </div>
-                            </ComparisonProvider>
+                            <InAppNotificationProvider>
+                                <ComparisonProvider>
+                                    <div className="App">
+                                        <AppRoutes />
+                                        <CompareFloatingBar />
+                                        <CompareModal />
+                                    </div>
+                                </ComparisonProvider>
+                            </InAppNotificationProvider>
                         </NotificationProvider>
                     </EnumProvider>
                 </AuthProvider>

@@ -1,9 +1,14 @@
 package com.serhat.secondhand.follow.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
+import com.serhat.secondhand.notification.dto.NotificationRequest;
+import com.serhat.secondhand.notification.entity.enums.NotificationType;
+import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.follow.dto.SellerFollowDto;
 import com.serhat.secondhand.follow.entity.SellerFollow;
 import com.serhat.secondhand.follow.mapper.SellerFollowMapper;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +39,8 @@ public class SellerFollowService {
     private final UserRepository userRepository;
     private final SellerFollowMapper sellerFollowMapper;
     private final EmailService emailService;
+    private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
 
     public SellerFollowDto follow(User currentUser, Long userIdToFollow) {
         if (currentUser.getId().equals(userIdToFollow)) {
@@ -193,6 +201,24 @@ public class SellerFollowService {
                 String content = buildNewListingEmailContent(follow.getFollower(), seller, listing);
                 emailService.sendEmail(follow.getFollower(), subject, content, EmailType.NEW_LISTING_NOTIFICATION);
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
+                
+                try {
+                    String metadata = objectMapper.writeValueAsString(Map.of(
+                            "listingId", listing.getId().toString(),
+                            "sellerId", seller.getId().toString()
+                    ));
+                    notificationService.createAndSend(NotificationRequest.builder()
+                            .userId(follow.getFollower().getId())
+                            .type(NotificationType.LISTING_NEW_FROM_FOLLOWED)
+                            .title("Yeni İlan")
+                            .message(String.format("%s %s yeni bir ilan yayınladı: '%s'",
+                                    seller.getName(), seller.getSurname(), listing.getTitle()))
+                            .actionUrl("/listings/" + listing.getId())
+                            .metadata(metadata)
+                            .build());
+                } catch (JsonProcessingException e) {
+                    log.error("Failed to create in-app notification for new listing from followed seller", e);
+                }
             } catch (Exception e) {
                 log.error("Failed to send new listing notification to user {}: {}", 
                     follow.getFollower().getId(), e.getMessage());

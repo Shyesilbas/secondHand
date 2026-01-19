@@ -166,6 +166,7 @@ public class OfferService {
             offer.setStatus(OfferStatus.EXPIRED);
             offerRepository.save(offer);
             offerEmailNotificationService.notifyExpiredToBoth(offer);
+            
             if (throwIfExpired) {
                 throw new BusinessException(OfferErrorCodes.OFFER_EXPIRED);
             }
