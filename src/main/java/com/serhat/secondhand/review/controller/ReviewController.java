@@ -1,8 +1,8 @@
 package com.serhat.secondhand.review.controller;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.dto.ReviewDto;
-import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,89 +27,123 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<ReviewDto> createReview(
+    public ResponseEntity<?> createReview(
             @Valid @RequestBody CreateReviewRequest request,
             Authentication authentication) {
         
         User user = (User) authentication.getPrincipal();
-        ReviewDto review = reviewService.createReview(user, request);
-        
-        return ResponseEntity.ok(review);
+        var result = reviewService.createReview(user, request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/received-by/{userId}")
-    public ResponseEntity<Page<ReviewDto>> getReviewsReceivedByUser(
+    public ResponseEntity<?> getReviewsReceivedByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         
         log.info("Getting reviews received by user ID: {}", userId);
-        Page<ReviewDto> reviews = reviewService.getReviewsForUser(userId, pageable);
-        return ResponseEntity.ok(reviews);
+        var result = reviewService.getReviewsForUser(userId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/received")
-    public ResponseEntity<Page<ReviewDto>> getReviewsForUser(
+    public ResponseEntity<?> getReviewsForUser(
             @PageableDefault(size = 10) Pageable pageable,
             Authentication authentication) {
         
         User user = (User) authentication.getPrincipal();
         log.info("Getting reviews received by user: {}", user.getEmail());
-        Page<ReviewDto> reviews = reviewService.getReviewsForUser(user.getId(), pageable);
-        return ResponseEntity.ok(reviews);
+        var result = reviewService.getReviewsForUser(user.getId(), pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/written-by/{userId}")
-    public ResponseEntity<Page<ReviewDto>> getReviewsByUser(
+    public ResponseEntity<?> getReviewsByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         
         log.info("Getting reviews written by user ID: {}", userId);
-        Page<ReviewDto> reviews = reviewService.getReviewsByUser(userId, pageable);
-        return ResponseEntity.ok(reviews);
+        var result = reviewService.getReviewsByUser(userId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/user-stats/{userId}")
-    public ResponseEntity<UserReviewStatsDto> getUserReviewStats(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserReviewStats(@PathVariable Long userId) {
         log.info("Getting review stats for user ID: {}", userId);
-        UserReviewStatsDto stats = reviewService.getUserReviewStats(userId);
-        return ResponseEntity.ok(stats);
+        var result = reviewService.getUserReviewStats(userId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/by-order-items")
-    public ResponseEntity<List<ReviewDto>> getReviewsForOrderItems(
+    public ResponseEntity<?> getReviewsForOrderItems(
             @RequestParam List<Long> orderItemIds) {
         
         log.info("Getting reviews for order items: {}", orderItemIds);
-        List<ReviewDto> reviews = reviewService.getReviewsForOrderItems(orderItemIds);
-        return ResponseEntity.ok(reviews);
+        var result = reviewService.getReviewsForOrderItems(orderItemIds);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/by-order-item/{orderItemId}")
-    public ResponseEntity<ReviewDto> getReviewByOrderItem(
+    public ResponseEntity<?> getReviewByOrderItem(
             @PathVariable Long orderItemId,
             Authentication authentication) {
         
         User user = (User) authentication.getPrincipal();
         log.info("Getting review for order item: {} by user: {}", orderItemId, user.getEmail());
-        return reviewService.getReviewByOrderItem(orderItemId, user.getId())
-                .map(review -> ResponseEntity.ok(review))
-                .orElse(ResponseEntity.notFound().build());
+        var result = reviewService.getReviewByOrderItem(orderItemId, user.getId());
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/for-listing/{listingId}")
-    public ResponseEntity<Page<ReviewDto>> getReviewsForListing(
+    public ResponseEntity<?> getReviewsForListing(
             @PathVariable String listingId,
             @PageableDefault(size = 10) Pageable pageable) {
         
         log.info("Getting reviews for listing: {}", listingId);
-        Page<ReviewDto> reviews = reviewService.getReviewsForListing(listingId, pageable);
-        return ResponseEntity.ok(reviews);
+        var result = reviewService.getReviewsForListing(listingId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/listing-stats/{listingId}")
-    public ResponseEntity<UserReviewStatsDto> getListingReviewStats(@PathVariable String listingId) {
+    public ResponseEntity<?> getListingReviewStats(@PathVariable String listingId) {
         log.info("Getting review stats for listing: {}", listingId);
-        UserReviewStatsDto stats = reviewService.getListingReviewStats(listingId);
-        return ResponseEntity.ok(stats);
+        var result = reviewService.getListingReviewStats(listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 }

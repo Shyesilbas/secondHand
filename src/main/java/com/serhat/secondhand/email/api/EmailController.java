@@ -41,8 +41,13 @@ public class EmailController {
     }
 
     @DeleteMapping("/delete/{emailId}")
-    public ResponseEntity<String> delete(@PathVariable UUID emailId) {
-        return ResponseEntity.ok(emailService.deleteEmail(emailId));
+    public ResponseEntity<?> delete(@PathVariable UUID emailId) {
+        var result = emailService.deleteEmail(emailId);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @DeleteMapping("/deleteAll")

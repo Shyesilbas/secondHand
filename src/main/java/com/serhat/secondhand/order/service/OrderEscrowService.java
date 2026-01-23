@@ -2,7 +2,7 @@ package com.serhat.secondhand.order.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.notification.dto.NotificationRequest;
 import com.serhat.secondhand.notification.entity.enums.NotificationType;
@@ -36,10 +36,9 @@ public class OrderEscrowService {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
 
-    public OrderItemEscrow createEscrowForOrderItem(OrderItem orderItem, User seller, BigDecimal amount) {
+    public Result<OrderItemEscrow> createEscrowForOrderItem(OrderItem orderItem, User seller, BigDecimal amount) {
         if (orderItemEscrowRepository.findByOrderItem(orderItem).isPresent()) {
-            throw new BusinessException("Escrow already exists for this order item", 
-                org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_ALREADY_EXISTS");
+            return Result.error("Escrow already exists for this order item", "ESCROW_ALREADY_EXISTS");
         }
 
         OrderItemEscrow escrow = OrderItemEscrow.builder()
@@ -53,23 +52,22 @@ public class OrderEscrowService {
         OrderItemEscrow saved = orderItemEscrowRepository.save(escrow);
         log.info("Created escrow for order item {} with amount {} for seller {}", 
                 orderItem.getId(), amount, seller.getEmail());
-        return saved;
+        return Result.success(saved);
     }
 
-    public void releaseEscrowToSeller(OrderItemEscrow escrow) {
+    public Result<Void> releaseEscrowToSeller(OrderItemEscrow escrow) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
             log.warn("Escrow {} already released", escrow.getId());
-            return;
+            return Result.success();
         }
         if (escrow.getStatus() != OrderItemEscrow.EscrowStatus.PENDING) {
-            throw new BusinessException("Escrow is not in PENDING status", 
-                org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_INVALID_STATUS");
+            return Result.error("Escrow is not in PENDING status", "ESCROW_INVALID_STATUS");
         }
 
-            try {
-                UUID listingId = escrow.getOrderItem().getListing().getId();
-                eWalletService.creditToUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.ITEM_SALE);
-            
+        try {
+            UUID listingId = escrow.getOrderItem().getListing().getId();
+            eWalletService.creditToUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.ITEM_SALE);
+        
             escrow.setStatus(OrderItemEscrow.EscrowStatus.COMPLETED);
             orderItemEscrowRepository.save(escrow);
             
@@ -83,7 +81,7 @@ public class OrderEscrowService {
                         "orderId", escrow.getOrder().getId().toString(),
                         "orderNumber", escrow.getOrder().getOrderNumber()
                 ));
-                notificationService.createAndSend(NotificationRequest.builder()
+                Result<?> notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(escrow.getSeller().getId())
                         .type(NotificationType.LISTING_SOLD)
                         .title("İlanınız Satıldı")
@@ -91,25 +89,27 @@ public class OrderEscrowService {
                         .actionUrl("/listings/" + listingId)
                         .metadata(metadata)
                         .build());
+                if (notificationResult.isError()) {
+                    log.error("Failed to create notification: {}", notificationResult.getMessage());
+                }
             } catch (JsonProcessingException e) {
                 log.error("Failed to create in-app notification for listing sold", e);
             }
+            return Result.success();
         } catch (Exception e) {
             log.error("Failed to release escrow {} to seller {}: {}", 
                     escrow.getId(), escrow.getSeller().getEmail(), e.getMessage());
-            throw new BusinessException("Failed to release escrow: " + e.getMessage(), 
-                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "ESCROW_RELEASE_FAILED");
+            return Result.error("Failed to release escrow: " + e.getMessage(), "ESCROW_RELEASE_FAILED");
         }
     }
 
-    public void refundEscrowToBuyer(OrderItemEscrow escrow, User buyer) {
+    public Result<Void> refundEscrowToBuyer(OrderItemEscrow escrow, User buyer) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.REFUNDED) {
             log.warn("Escrow {} already refunded", escrow.getId());
-            return;
+            return Result.success();
         }
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.CANCELLED) {
-            throw new BusinessException("Cannot refund a cancelled escrow", 
-                org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_CANNOT_REFUND_CANCELLED");
+            return Result.error("Cannot refund a cancelled escrow", "ESCROW_CANNOT_REFUND_CANCELLED");
         }
 
         try {
@@ -121,26 +121,24 @@ public class OrderEscrowService {
             
             log.info("Refunded escrow {} amount {} to buyer {}", 
                     escrow.getId(), escrow.getAmount(), buyer.getEmail());
+            return Result.success();
         } catch (Exception e) {
             log.error("Failed to refund escrow {} to buyer {}: {}", 
                     escrow.getId(), buyer.getEmail(), e.getMessage());
-            throw new BusinessException("Failed to refund escrow: " + e.getMessage(), 
-                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "ESCROW_REFUND_FAILED");
+            return Result.error("Failed to refund escrow: " + e.getMessage(), "ESCROW_REFUND_FAILED");
         }
     }
 
-    public void cancelEscrow(OrderItemEscrow escrow, User buyer) {
+    public Result<Void> cancelEscrow(OrderItemEscrow escrow, User buyer) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.CANCELLED) {
             log.warn("Escrow {} already cancelled", escrow.getId());
-            return;
+            return Result.success();
         }
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
-            throw new BusinessException("Cannot cancel a completed escrow", 
-                org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_CANNOT_CANCEL_COMPLETED");
+            return Result.error("Cannot cancel a completed escrow", "ESCROW_CANNOT_CANCEL_COMPLETED");
         }
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.REFUNDED) {
-            throw new BusinessException("Cannot cancel a refunded escrow", 
-                org.springframework.http.HttpStatus.BAD_REQUEST, "ESCROW_CANNOT_CANCEL_REFUNDED");
+            return Result.error("Cannot cancel a refunded escrow", "ESCROW_CANNOT_CANCEL_REFUNDED");
         }
 
         try {
@@ -152,10 +150,10 @@ public class OrderEscrowService {
             
             log.info("Cancelled escrow {} amount {} refunded to buyer {}", 
                     escrow.getId(), escrow.getAmount(), buyer.getEmail());
+            return Result.success();
         } catch (Exception e) {
             log.error("Failed to cancel escrow {}: {}", escrow.getId(), e.getMessage());
-            throw new BusinessException("Failed to cancel escrow: " + e.getMessage(), 
-                org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "ESCROW_CANCEL_FAILED");
+            return Result.error("Failed to cancel escrow: " + e.getMessage(), "ESCROW_CANCEL_FAILED");
         }
     }
 
@@ -197,14 +195,12 @@ public class OrderEscrowService {
                 continue;
             }
 
-            try {
-                createEscrowForOrderItem(orderItem, seller, amount);
-            } catch (BusinessException e) {
-                if ("ESCROW_ALREADY_EXISTS".equals(e.getErrorCode())) {
+            Result<OrderItemEscrow> escrowResult = createEscrowForOrderItem(orderItem, seller, amount);
+            if (escrowResult.isError()) {
+                if ("ESCROW_ALREADY_EXISTS".equals(escrowResult.getErrorCode())) {
                     log.debug("Escrow already exists for order item {}, skipping", orderItem.getId());
                 } else {
-                    log.error("Failed to create escrow for order item {}: {}", orderItem.getId(), e.getMessage());
-                    throw e;
+                    log.error("Failed to create escrow for order item {}: {}", orderItem.getId(), escrowResult.getMessage());
                 }
             }
         }

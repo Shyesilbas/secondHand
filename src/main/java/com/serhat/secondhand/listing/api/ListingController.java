@@ -19,8 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.serhat.secondhand.core.result.Result;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -217,10 +219,14 @@ public class ListingController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a listing")
-    public ResponseEntity<Void> deleteListing(
+    public ResponseEntity<?> deleteListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.deleteListing(id, currentUser);
+        Result<Void> result = listingService.deleteListing(id, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", result.getMessage(), "errorCode", result.getErrorCode()));
+        }
         return ResponseEntity.noContent().build();
     }
 

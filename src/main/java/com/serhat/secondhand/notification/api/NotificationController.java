@@ -62,10 +62,14 @@ public class NotificationController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Notification not found")
     })
-    public ResponseEntity<Void> markAsRead(@PathVariable UUID id,
+    public ResponseEntity<?> markAsRead(@PathVariable UUID id,
                                           @AuthenticationPrincipal User currentUser) {
         log.info("API request to mark notification {} as read for user: {}", id, currentUser.getEmail());
-        notificationService.markAsRead(id, currentUser.getId());
+        var result = notificationService.markAsRead(id, currentUser.getId());
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
 

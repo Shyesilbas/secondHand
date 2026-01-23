@@ -24,8 +24,8 @@ export const useReviews = (userId, options = {}) => {
         setError(null);
         
         try {
-            const response = await reviewService.getReviewsReceivedByUser(userId, page, size);
-            const data = response.data || response;
+            // request.js already handles Result pattern, returns data directly on success
+            const data = await reviewService.getReviewsReceivedByUser(userId, page, size);
             
             if (data && data.content && Array.isArray(data.content)) {
                 setReviews(data.content);

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -42,14 +42,34 @@ public class OrderCancellationService {
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
 
-    public OrderDto cancelOrder(Long orderId, OrderCancelRequest request, User user) {
-        Order order = findOrderByIdAndValidateOwnership(orderId, user);
+    public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
+        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        if (orderResult.isError()) {
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+        }
 
-        validateOrderCanBeCancelled(order);
-        orderStatusValidator.validateStatusConsistency(order);
+        Order order = orderResult.getData();
 
-        List<OrderItem> itemsToCancel = determineItemsToCancel(order, request.getOrderItemIds());
-        validateItemsCanBeCancelled(itemsToCancel, order);
+        Result<Void> cancelValidationResult = validateOrderCanBeCancelled(order);
+        if (cancelValidationResult.isError()) {
+            return Result.error(cancelValidationResult.getMessage(), cancelValidationResult.getErrorCode());
+        }
+        
+        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
+        if (consistencyResult.isError()) {
+            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
+        }
+
+        Result<List<OrderItem>> itemsResult = determineItemsToCancel(order, request.getOrderItemIds());
+        if (itemsResult.isError()) {
+            return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
+        }
+        
+        List<OrderItem> itemsToCancel = itemsResult.getData();
+        Result<Void> itemsValidationResult = validateItemsCanBeCancelled(itemsToCancel, order);
+        if (itemsValidationResult.isError()) {
+            return Result.error(itemsValidationResult.getMessage(), itemsValidationResult.getErrorCode());
+        }
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
         List<OrderItemCancel> cancelRecords = new ArrayList<>();
@@ -76,7 +96,7 @@ public class OrderCancellationService {
         }
 
         if (cancelRecords.isEmpty()) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
+            return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
         }
 
         orderItemCancelRepository.saveAll(cancelRecords);
@@ -113,11 +133,15 @@ public class OrderCancellationService {
             }
         } catch (Exception e) {
             log.error("Failed to refund to eWallet for user: {} order: {} - {}", user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-            throw new BusinessException("Failed to process refund: " + e.getMessage(), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "REFUND_FAILED");
+            return Result.error("Failed to process refund: " + e.getMessage(), "REFUND_FAILED");
         }
 
         order = orderRepository.findByIdWithOrderItems(order.getId())
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
 
         boolean allItemsCancelled = areAllItemsCancelled(order);
         if (allItemsCancelled) {
@@ -134,55 +158,73 @@ public class OrderCancellationService {
         orderRepository.flush();
         
         savedOrder = orderRepository.findByIdWithOrderItems(savedOrder.getId())
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (savedOrder == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
         
         orderNotificationService.sendOrderCancellationNotification(user, savedOrder);
 
         log.info("Order cancelled: {} (partial: {})", order.getOrderNumber(), !allItemsCancelled);
-        return orderMapper.toDto(savedOrder);
+        return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
+    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
 
-        return order;
+        return Result.success(order);
     }
 
-    private void validateOrderCanBeCancelled(Order order) {
+    private Result<Void> validateOrderCanBeCancelled(Order order) {
         if (order.getStatus() != Order.OrderStatus.CONFIRMED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
         }
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
+        return Result.success();
     }
 
-    private List<OrderItem> determineItemsToCancel(Order order, List<Long> orderItemIds) {
+    private Result<List<OrderItem>> determineItemsToCancel(Order order, List<Long> orderItemIds) {
         if (orderItemIds == null || orderItemIds.isEmpty()) {
-            return order.getOrderItems();
+            return Result.success(order.getOrderItems());
         }
-        return orderItemIds.stream()
-                .map(id -> orderItemRepository.findById(id)
-                        .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND)))
-                .filter(item -> item.getOrder().getId().equals(order.getId()))
-                .collect(Collectors.toList());
+        
+        List<OrderItem> items = new ArrayList<>();
+        for (Long id : orderItemIds) {
+            OrderItem item = orderItemRepository.findById(id).orElse(null);
+            if (item == null) {
+                return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+            }
+            if (!item.getOrder().getId().equals(order.getId())) {
+                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+            }
+            items.add(item);
+        }
+        return Result.success(items);
     }
 
-    private void validateItemsCanBeCancelled(List<OrderItem> items, Order order) {
+    private Result<Void> validateItemsCanBeCancelled(List<OrderItem> items, Order order) {
         for (OrderItem item : items) {
             if (!item.getOrder().getId().equals(order.getId())) {
-                throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
             }
             Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
             if (alreadyCancelled != null && alreadyCancelled >= item.getQuantity()) {
-                throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
+                return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
             }
         }
+        return Result.success();
     }
 
     private boolean areAllItemsCancelled(Order order) {
@@ -198,13 +240,13 @@ public class OrderCancellationService {
     private void cancelEscrowsForItems(List<OrderItem> itemsToCancel, User buyer, Order order) {
         for (OrderItem item : itemsToCancel) {
             orderEscrowService.findEscrowByOrderItem(item).ifPresent(escrow -> {
-                try {
-                    orderEscrowService.cancelEscrow(escrow, buyer);
+                Result<Void> cancelResult = orderEscrowService.cancelEscrow(escrow, buyer);
+                if (cancelResult.isError()) {
+                    log.error("Failed to cancel escrow {} for order item {}: {}", 
+                            escrow.getId(), item.getId(), cancelResult.getMessage());
+                } else {
                     log.info("Cancelled escrow {} for order item {} in order {}", 
                             escrow.getId(), item.getId(), order.getOrderNumber());
-                } catch (Exception e) {
-                    log.error("Failed to cancel escrow {} for order item {}: {}", 
-                            escrow.getId(), item.getId(), e.getMessage());
                 }
             });
         }

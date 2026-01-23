@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +27,15 @@ public class PasswordController {
     private final PasswordService passwordService;
 
     @PutMapping("/change")
-    public ResponseEntity<String> changePassword(
+    public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request) {
 
-        String message = passwordService.changePassword(request);
-        
-        return ResponseEntity.ok(message);
+        var result = passwordService.changePassword(request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PostMapping("/forgot")
@@ -41,15 +45,19 @@ public class PasswordController {
     )
     @ApiResponse(responseCode = "200", description = "Password reset instructions sent (if email exists)")
     @ApiResponse(responseCode = "400", description = "Invalid email format")
-    public ResponseEntity<ForgotPasswordResponse> forgotPassword(
+    public ResponseEntity<?> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
         
-        String code = passwordService.forgotPasswordWithCode(request);
+        var result = passwordService.forgotPasswordWithCode(request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
 
         return ResponseEntity.ok(ForgotPasswordResponse.builder()
                 .message("Check your email account for password reset verification code.")
                 .status("success")
-                .verificationCode(code)
+                .verificationCode(result.getData())
                 .build());
     }
 
@@ -60,13 +68,17 @@ public class PasswordController {
     )
     @ApiResponse(responseCode = "200", description = "Password reset successfully")
     @ApiResponse(responseCode = "400", description = "Invalid or expired token, or password requirements not met")
-    public ResponseEntity<Map<String, String>> resetPassword(
+    public ResponseEntity<?> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
         
-        String message = passwordService.resetPassword(request);
+        var result = passwordService.resetPassword(request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         
         return ResponseEntity.ok(Map.of(
-            "message", message,
+            "message", result.getData(),
             "status", "success"
         ));
     }

@@ -22,12 +22,16 @@ public class ShowcaseController {
     private final ShowcaseMapper showcaseMapper;
     
     @PostMapping
-    public ResponseEntity<ShowcaseDto> createShowcase(
+    public ResponseEntity<?> createShowcase(
             @RequestBody ShowcasePaymentRequest request,
             Authentication authentication) {
         
-        Showcase showcase = showcaseService.createShowcase(request, authentication);
-        return ResponseEntity.ok(showcaseMapper.toDto(showcase));
+        var result = showcaseService.createShowcase(request, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(showcaseMapper.toDto(result.getData()));
     }
     
     @GetMapping("/active")
@@ -42,21 +46,29 @@ public class ShowcaseController {
     }
     
     @PostMapping("/{id}/extend")
-    public ResponseEntity<Showcase> extendShowcase(
+    public ResponseEntity<?> extendShowcase(
             @PathVariable UUID id,
             @RequestParam int days,
             @AuthenticationPrincipal User user) {
         
-        showcaseService.extendShowcase(id, days);
+        var result = showcaseService.extendShowcase(id, days);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
     
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelShowcase(
+    public ResponseEntity<?> cancelShowcase(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {
         
-        showcaseService.cancelShowcase(id);
+        var result = showcaseService.cancelShowcase(id);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
     

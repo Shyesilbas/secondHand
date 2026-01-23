@@ -8,7 +8,7 @@ import com.serhat.secondhand.campaign.mapper.CampaignMapper;
 import com.serhat.secondhand.campaign.repository.CampaignRepository;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.campaign.validator.CampaignValidator;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -30,35 +30,61 @@ public class CampaignService {
     private final CampaignValidator campaignValidator;
     private final CampaignMapper campaignMapper;
 
-    public CampaignDto create(CreateCampaignRequest request, Authentication authentication) {
+    public Result<CampaignDto> create(CreateCampaignRequest request, Authentication authentication) {
         User seller = userService.getAuthenticatedUser(authentication);
 
         Campaign campaign = campaignMapper.fromCreateRequest(request, seller);
 
-        campaignValidator.validate(campaign, seller);
-        return campaignMapper.toDto(campaignRepository.save(campaign));
+        Result<Void> validationResult = campaignValidator.validate(campaign, seller);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+        
+        return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
-    public CampaignDto update(UUID id, UpdateCampaignRequest request, Authentication authentication) {
+    public Result<CampaignDto> update(UUID id, UpdateCampaignRequest request, Authentication authentication) {
         User seller = userService.getAuthenticatedUser(authentication);
 
-        Campaign campaign = findCampaignById(id);
+        Result<Campaign> campaignResult = findCampaignById(id);
+        if (campaignResult.isError()) {
+            return Result.error(campaignResult.getMessage(), campaignResult.getErrorCode());
+        }
 
-        assertOwnedBySeller(campaign, seller);
+        Campaign campaign = campaignResult.getData();
+
+        Result<Void> ownershipResult = assertOwnedBySeller(campaign, seller);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
 
         campaignMapper.applyUpdate(campaign, request);
 
-        campaignValidator.validate(campaign, seller);
-        return campaignMapper.toDto(campaignRepository.save(campaign));
+        Result<Void> validationResult = campaignValidator.validate(campaign, seller);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+        
+        return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
-    public void delete(UUID id, Authentication authentication) {
+    public Result<Void> delete(UUID id, Authentication authentication) {
         User seller = userService.getAuthenticatedUser(authentication);
 
-        Campaign campaign = findCampaignById(id);
+        Result<Campaign> campaignResult = findCampaignById(id);
+        if (campaignResult.isError()) {
+            return Result.error(campaignResult.getMessage(), campaignResult.getErrorCode());
+        }
 
-        assertOwnedBySeller(campaign, seller);
+        Campaign campaign = campaignResult.getData();
+
+        Result<Void> ownershipResult = assertOwnedBySeller(campaign, seller);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
+        
         campaignRepository.delete(campaign);
+        return Result.success();
     }
 
     @Transactional(readOnly = true)
@@ -78,13 +104,16 @@ public class CampaignService {
         return campaignRepository.findActiveCampaignsForSellers(sellerIds, LocalDateTime.now());
     }
 
-    private void assertOwnedBySeller(Campaign campaign, User seller) {
+    private Result<Void> assertOwnedBySeller(Campaign campaign, User seller) {
         if (!campaign.getSeller().getId().equals(seller.getId())) {
-            throw new BusinessException(CampaignErrorCodes.CAMPAIGN_NOT_OWNED);
+            return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_OWNED);
         }
+        return Result.success();
     }
 
-    private Campaign findCampaignById(UUID id) {
-        return campaignRepository.findById(id).orElseThrow(() -> new BusinessException(CampaignErrorCodes.CAMPAIGN_NOT_FOUND));
+    private Result<Campaign> findCampaignById(UUID id) {
+        return campaignRepository.findById(id)
+                .map(Result::success)
+                .orElse(Result.error(CampaignErrorCodes.CAMPAIGN_NOT_FOUND));
     }
 }

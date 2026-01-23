@@ -1,6 +1,6 @@
 package com.serhat.secondhand.offer.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
@@ -36,19 +36,29 @@ public class OfferService {
     private final OfferValidator offerValidator;
     private final OfferMapper offerMapper;
 
-    public OfferDto create(User buyer, CreateOfferRequest request) {
-        offerValidator.validateCreateRequest(request);
+    public Result<OfferDto> create(User buyer, CreateOfferRequest request) {
+        Result<Void> validationResult = offerValidator.validateCreateRequest(request);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         Listing listing = listingService.findById(request.getListingId())
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.LISTING_NOT_FOUND));
+                .orElse(null);
+        
+        if (listing == null) {
+            return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+        }
 
-        offerValidator.validateListingForOffer(listing, buyer);
+        Result<Void> listingValidationResult = offerValidator.validateListingForOffer(listing, buyer);
+        if (listingValidationResult.isError()) {
+            return Result.error(listingValidationResult.getMessage(), listingValidationResult.getErrorCode());
+        }
 
         Offer offer = offerMapper.toOffer(request, buyer, listing);
         Offer saved = offerRepository.save(offer);
 
         offerEmailNotificationService.notifyOfferReceived(saved);
-        return offerMapper.toDto(saved);
+        return Result.success(offerMapper.toDto(saved));
     }
 
     public List<OfferDto> listMade(User buyer) {
@@ -65,53 +75,103 @@ public class OfferService {
                 .toList();
     }
 
-    public OfferDto getByIdForUser(User user, UUID offerId) {
-        Offer offer = findOffer(offerId);
+    public Result<OfferDto> getByIdForUser(User user, UUID offerId) {
+        Result<Offer> offerResult = findOffer(offerId);
+        if (offerResult.isError()) {
+            return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
+        }
+        
+        Offer offer = offerResult.getData();
         if (!offerValidator.isBuyerOrSeller(user, offer)) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
+            return Result.error(OfferErrorCodes.OFFER_NOT_ALLOWED);
         }
         expireIfNeeded(offer, false);
-        return offerMapper.toDto(offer);
+        return Result.success(offerMapper.toDto(offer));
     }
 
-    public OfferDto accept(User seller, UUID offerId) {
-        Offer offer = getOfferForAction(seller, offerId);
+    public Result<OfferDto> accept(User seller, UUID offerId) {
+        Result<Offer> offerResult = getOfferForAction(seller, offerId);
+        if (offerResult.isError()) {
+            return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
+        }
 
-        expireIfNeeded(offer, true);
-        requirePending(offer);
-        offerValidator.validateListingEligibility(offer.getListing());
+        Offer offer = offerResult.getData();
+        Result<Void> expireResult = expireIfNeeded(offer, true);
+        if (expireResult.isError()) {
+            return Result.error(expireResult.getMessage(), expireResult.getErrorCode());
+        }
+        
+        Result<Void> pendingResult = requirePending(offer);
+        if (pendingResult.isError()) {
+            return Result.error(pendingResult.getMessage(), pendingResult.getErrorCode());
+        }
+        
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
+        if (eligibilityResult.isError()) {
+            return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+        }
 
         if (offerRepository.existsByListingAndStatusAndIdNot(
                 offer.getListing(), OfferStatus.ACCEPTED, offer.getId())) {
-            throw new BusinessException(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
+            return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
         }
 
         offer.setStatus(OfferStatus.ACCEPTED);
         Offer saved = offerRepository.save(offer);
         offerEmailNotificationService.notifyAcceptedToCreator(saved);
-        return offerMapper.toDto(saved);
+        return Result.success(offerMapper.toDto(saved));
     }
 
-    public OfferDto reject(User user, UUID offerId) {
-        Offer offer = getOfferForAction(user, offerId);
+    public Result<OfferDto> reject(User user, UUID offerId) {
+        Result<Offer> offerResult = getOfferForAction(user, offerId);
+        if (offerResult.isError()) {
+            return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
+        }
 
-        expireIfNeeded(offer, true);
-        requirePending(offer);
+        Offer offer = offerResult.getData();
+        Result<Void> expireResult = expireIfNeeded(offer, true);
+        if (expireResult.isError()) {
+            return Result.error(expireResult.getMessage(), expireResult.getErrorCode());
+        }
+        
+        Result<Void> pendingResult = requirePending(offer);
+        if (pendingResult.isError()) {
+            return Result.error(pendingResult.getMessage(), pendingResult.getErrorCode());
+        }
 
         offer.setStatus(OfferStatus.REJECTED);
         Offer saved = offerRepository.save(offer);
         offerEmailNotificationService.notifyRejectedToCreator(saved);
-        return offerMapper.toDto(saved);
+        return Result.success(offerMapper.toDto(saved));
     }
 
 
-    public OfferDto counter(User user, UUID offerId, CounterOfferRequest request) {
-        offerValidator.validateCounterRequest(request);
+    public Result<OfferDto> counter(User user, UUID offerId, CounterOfferRequest request) {
+        Result<Void> validationResult = offerValidator.validateCounterRequest(request);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
-        Offer previous = getOfferForAction(user, offerId);
-        expireIfNeeded(previous, true);
-        requirePending(previous);
-        offerValidator.validateListingEligibility(previous.getListing());
+        Result<Offer> previousResult = getOfferForAction(user, offerId);
+        if (previousResult.isError()) {
+            return Result.error(previousResult.getMessage(), previousResult.getErrorCode());
+        }
+        
+        Offer previous = previousResult.getData();
+        Result<Void> expireResult = expireIfNeeded(previous, true);
+        if (expireResult.isError()) {
+            return Result.error(expireResult.getMessage(), expireResult.getErrorCode());
+        }
+        
+        Result<Void> pendingResult = requirePending(previous);
+        if (pendingResult.isError()) {
+            return Result.error(pendingResult.getMessage(), pendingResult.getErrorCode());
+        }
+        
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(previous.getListing());
+        if (eligibilityResult.isError()) {
+            return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+        }
 
         previous.setStatus(OfferStatus.REJECTED);
         offerRepository.save(previous);
@@ -121,19 +181,32 @@ public class OfferService {
         Offer saved = offerRepository.save(counter);
 
         offerEmailNotificationService.notifyCounterReceived(saved);
-        return offerMapper.toDto(saved);
+        return Result.success(offerMapper.toDto(saved));
     }
 
-    public Offer getAcceptedOfferForCheckout(User buyer, UUID offerId) {
+    public Result<Offer> getAcceptedOfferForCheckout(User buyer, UUID offerId) {
         Offer offer = offerRepository.findByIdAndBuyer(offerId, buyer)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
-
-        expireIfNeeded(offer, true);
-        if (offer.getStatus() != OfferStatus.ACCEPTED) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ACCEPTED);
+                .orElse(null);
+        
+        if (offer == null) {
+            return Result.error(OfferErrorCodes.OFFER_NOT_FOUND);
         }
-        offerValidator.validateListingEligibility(offer.getListing());
-        return offer;
+
+        Result<Void> expireResult = expireIfNeeded(offer, true);
+        if (expireResult.isError()) {
+            return Result.error(expireResult.getMessage(), expireResult.getErrorCode());
+        }
+        
+        if (offer.getStatus() != OfferStatus.ACCEPTED) {
+            return Result.error(OfferErrorCodes.OFFER_NOT_ACCEPTED);
+        }
+        
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
+        if (eligibilityResult.isError()) {
+            return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+        }
+        
+        return Result.success(offer);
     }
 
 
@@ -145,22 +218,28 @@ public class OfferService {
         }
     }
 
-    private Offer getOfferForAction(User user, UUID offerId) {
-        Offer offer = findOffer(offerId);
-        if (!offerValidator.isBuyerOrSeller(user, offer) || !offerValidator.isReceiver(user, offer)) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_ALLOWED);
+    private Result<Offer> getOfferForAction(User user, UUID offerId) {
+        Result<Offer> offerResult = findOffer(offerId);
+        if (offerResult.isError()) {
+            return offerResult;
         }
-        return offer;
+        
+        Offer offer = offerResult.getData();
+        if (!offerValidator.isBuyerOrSeller(user, offer) || !offerValidator.isReceiver(user, offer)) {
+            return Result.error(OfferErrorCodes.OFFER_NOT_ALLOWED);
+        }
+        return Result.success(offer);
     }
 
-    private Offer findOffer(UUID offerId) {
+    private Result<Offer> findOffer(UUID offerId) {
         return offerRepository.findById(offerId)
-                .orElseThrow(() -> new BusinessException(OfferErrorCodes.OFFER_NOT_FOUND));
+                .map(Result::success)
+                .orElse(Result.error(OfferErrorCodes.OFFER_NOT_FOUND));
     }
 
-    private boolean expireIfNeeded(Offer offer, boolean throwIfExpired) {
+    private Result<Void> expireIfNeeded(Offer offer, boolean throwIfExpired) {
         if (offer == null || offer.getStatus() != OfferStatus.PENDING) {
-            return false;
+            return Result.success();
         }
         if (offer.getExpiresAt() != null && LocalDateTime.now().isAfter(offer.getExpiresAt())) {
             offer.setStatus(OfferStatus.EXPIRED);
@@ -168,17 +247,18 @@ public class OfferService {
             offerEmailNotificationService.notifyExpiredToBoth(offer);
             
             if (throwIfExpired) {
-                throw new BusinessException(OfferErrorCodes.OFFER_EXPIRED);
+                return Result.error(OfferErrorCodes.OFFER_EXPIRED);
             }
-            return true;
+            return Result.success();
         }
-        return false;
+        return Result.success();
     }
 
 
-    private void requirePending(Offer offer) {
+    private Result<Void> requirePending(Offer offer) {
         if (offer.getStatus() != OfferStatus.PENDING) {
-            throw new BusinessException(OfferErrorCodes.OFFER_NOT_PENDING);
+            return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
         }
+        return Result.success();
     }
 }

@@ -26,8 +26,8 @@ export const useSellerOrders = (initialPage = 0, initialSize = 10, sortField = n
   } = useQuery({
     queryKey: SELLER_ORDERS_KEYS.list(page, size, sort, direction),
     queryFn: async () => {
-      const response = await orderService.sellerOrders(page, size, sort, direction);
-      return response.data || response;
+      // request.js already handles Result pattern, returns data directly on success
+      return await orderService.sellerOrders(page, size, sort, direction);
     },
     enabled: !!user,
     staleTime: 2 * 60 * 1000,

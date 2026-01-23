@@ -41,7 +41,7 @@ public class OfferEmailNotificationService {
                     "offerId", offer.getId().toString(),
                     "listingId", offer.getListing().getId().toString()
             ));
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(recipient.getId())
                     .type(NotificationType.OFFER_RECEIVED)
                     .title("Yeni Teklif Aldınız")
@@ -51,6 +51,9 @@ public class OfferEmailNotificationService {
                     .actionUrl("/offers/received")
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for offer received", e);
         }
@@ -71,7 +74,7 @@ public class OfferEmailNotificationService {
                     "offerId", offer.getId().toString(),
                     "listingId", offer.getListing().getId().toString()
             ));
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(recipient.getId())
                     .type(NotificationType.OFFER_COUNTERED)
                     .title("Karşı Teklif Aldınız")
@@ -80,6 +83,9 @@ public class OfferEmailNotificationService {
                     .actionUrl("/offers/made")
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for offer countered", e);
         }
@@ -100,7 +106,7 @@ public class OfferEmailNotificationService {
                     "offerId", offer.getId().toString(),
                     "listingId", offer.getListing().getId().toString()
             ));
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(recipient.getId())
                     .type(NotificationType.OFFER_ACCEPTED)
                     .title("Teklifiniz Kabul Edildi")
@@ -108,6 +114,9 @@ public class OfferEmailNotificationService {
                     .actionUrl("/offers/made")
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for offer accepted", e);
         }
@@ -128,7 +137,7 @@ public class OfferEmailNotificationService {
                     "offerId", offer.getId().toString(),
                     "listingId", offer.getListing().getId().toString()
             ));
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(recipient.getId())
                     .type(NotificationType.OFFER_REJECTED)
                     .title("Teklifiniz Reddedildi")
@@ -136,6 +145,9 @@ public class OfferEmailNotificationService {
                     .actionUrl("/offers/made")
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for offer rejected", e);
         }
@@ -156,7 +168,7 @@ public class OfferEmailNotificationService {
             
             if (offer.getBuyer() != null) {
                 emailService.sendEmail(offer.getBuyer(), t.subject(), t.content(), EmailType.OFFER_EXPIRED);
-                notificationService.createAndSend(NotificationRequest.builder()
+                var buyerNotificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(offer.getBuyer().getId())
                         .type(NotificationType.OFFER_EXPIRED)
                         .title("Teklif Süresi Doldu")
@@ -164,10 +176,13 @@ public class OfferEmailNotificationService {
                         .actionUrl("/offers/made")
                         .metadata(metadata)
                         .build());
+                if (buyerNotificationResult.isError()) {
+                    log.error("Failed to create notification: {}", buyerNotificationResult.getMessage());
+                }
             }
             if (offer.getSeller() != null) {
                 emailService.sendEmail(offer.getSeller(), t.subject(), t.content(), EmailType.OFFER_EXPIRED);
-                notificationService.createAndSend(NotificationRequest.builder()
+                var sellerNotificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(offer.getSeller().getId())
                         .type(NotificationType.OFFER_EXPIRED)
                         .title("Teklif Süresi Doldu")
@@ -175,6 +190,9 @@ public class OfferEmailNotificationService {
                         .actionUrl("/offers/received")
                         .metadata(metadata)
                         .build());
+                if (sellerNotificationResult.isError()) {
+                    log.error("Failed to create notification: {}", sellerNotificationResult.getMessage());
+                }
             }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for offer expired", e);

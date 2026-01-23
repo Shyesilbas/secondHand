@@ -1,6 +1,6 @@
 package com.serhat.secondhand.notification.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.notification.dto.NotificationDto;
 import com.serhat.secondhand.notification.util.NotificationErrorCodes;
 import com.serhat.secondhand.notification.dto.NotificationRequest;
@@ -30,11 +30,15 @@ public class NotificationService {
     private final NotificationMapper notificationMapper;
     private final NotificationWebSocketService webSocketService;
 
-    public NotificationDto createAndSend(NotificationRequest request) {
+    public Result<NotificationDto> createAndSend(NotificationRequest request) {
         log.info("Creating notification for user: {}, type: {}", request.getUserId(), request.getType());
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new BusinessException(NotificationErrorCodes.USER_NOT_FOUND));
+                .orElse(null);
+
+        if (user == null) {
+            return Result.error(NotificationErrorCodes.USER_NOT_FOUND);
+        }
 
         Notification notification = Notification.builder()
                 .user(user)
@@ -52,7 +56,7 @@ public class NotificationService {
         NotificationDto dto = notificationMapper.toDto(saved);
         webSocketService.sendNotificationToUser(user.getId(), dto);
 
-        return dto;
+        return Result.success(dto);
     }
 
     @Transactional(readOnly = true)
@@ -67,14 +71,18 @@ public class NotificationService {
         return notificationRepository.countByUserIdAndIsReadFalse(userId);
     }
 
-    public void markAsRead(UUID notificationId, Long userId) {
+    public Result<Void> markAsRead(UUID notificationId, Long userId) {
         log.info("Marking notification {} as read for user: {}", notificationId, userId);
 
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new BusinessException(NotificationErrorCodes.NOTIFICATION_NOT_FOUND));
+                .orElse(null);
+
+        if (notification == null) {
+            return Result.error(NotificationErrorCodes.NOTIFICATION_NOT_FOUND);
+        }
 
         if (!notification.getUser().getId().equals(userId)) {
-            throw new BusinessException(NotificationErrorCodes.NOTIFICATION_NOT_BELONGS_TO_USER);
+            return Result.error(NotificationErrorCodes.NOTIFICATION_NOT_BELONGS_TO_USER);
         }
 
         if (!notification.getIsRead()) {
@@ -83,6 +91,8 @@ public class NotificationService {
             notificationRepository.save(notification);
             log.info("Notification {} marked as read", notificationId);
         }
+        
+        return Result.success();
     }
 
     public void markAllAsRead(Long userId) {

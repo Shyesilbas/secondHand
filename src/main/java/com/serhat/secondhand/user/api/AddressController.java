@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/addresses")
@@ -29,21 +28,35 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<AddressDto> addAddress(@RequestBody AddressDto addressDto, Authentication authentication) {
+    public ResponseEntity<?> addAddress(@RequestBody AddressDto addressDto, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        return ResponseEntity.ok(addressService.addAddress(user, addressDto));
+        var result = addressService.addAddress(user, addressDto);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long id, @RequestBody AddressDto addressDto, Authentication authentication) {
+    public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody AddressDto addressDto, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        return ResponseEntity.ok(addressService.updateAddress(id, addressDto, user));
+        var result = addressService.updateAddress(id, addressDto, user);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAddress(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> deleteAddress(@PathVariable Long id, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        addressService.deleteAddress(id, user);
+        var result = addressService.deleteAddress(id, user);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.noContent().build();
     }
 

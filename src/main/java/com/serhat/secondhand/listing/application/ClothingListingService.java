@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
@@ -18,7 +18,6 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +38,10 @@ public class ClothingListingService {
     private final ApplicationEventPublisher eventPublisher;
     
     @Transactional
-    public UUID createClothingListing(ClothingCreateRequest request, User seller) {
+    public Result<UUID> createClothingListing(ClothingCreateRequest request, User seller) {
         ClothingListing clothing = listingMapper.toClothingEntity(request);
         if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         clothing.setSeller(seller);
         clothing.setListingFeePaid(true);
@@ -52,21 +51,27 @@ public class ClothingListingService {
         
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
         
-        return saved.getId();
+        return Result.success(saved.getId());
     }
     
     @Transactional
-    public void updateClothingListing(UUID id, ClothingUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, User currentUser) {
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
 
         ClothingListing existing = clothingRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Clothing listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+                .orElse(null);
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (existing == null) {
+            return Result.error("Clothing listing not found", "LISTING_NOT_FOUND");
+        }
+
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return statusResult;
+        }
 
         var oldPrice = existing.getPrice();
 
@@ -76,7 +81,7 @@ public class ClothingListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
             if (q < 1) {
-                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+                return;
             }
             existing.setQuantity(q);
         });
@@ -92,9 +97,11 @@ public class ClothingListingService {
         request.clothingGender().ifPresent(existing::setClothingGender);
         request.clothingCategory().ifPresent(existing::setClothingCategory);
 
+        if (request.quantity().isPresent() && request.quantity().get() < 1) {
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        }
+
         clothingRepository.save(existing);
-
-
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
@@ -106,6 +113,7 @@ public class ClothingListingService {
             );
         }
         log.info("Clothing listing updated: {}", id);
+        return Result.success();
     }
     
     public List<ClothingListingDto> findByBrandAndClothingType(ClothingBrand brand, ClothingType clothingType) {

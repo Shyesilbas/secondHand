@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -46,14 +46,34 @@ public class OrderRefundService {
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
 
-    public OrderDto refundOrder(Long orderId, OrderRefundRequest request, User user) {
-        Order order = findOrderByIdAndValidateOwnership(orderId, user);
+    public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
+        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        if (orderResult.isError()) {
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+        }
 
-        validateOrderCanBeRefunded(order);
-        orderStatusValidator.validateStatusConsistency(order);
+        Order order = orderResult.getData();
 
-        List<OrderItem> itemsToRefund = determineItemsToRefund(order, request.getOrderItemIds());
-        validateItemsCanBeRefunded(itemsToRefund, order);
+        Result<Void> refundValidationResult = validateOrderCanBeRefunded(order);
+        if (refundValidationResult.isError()) {
+            return Result.error(refundValidationResult.getMessage(), refundValidationResult.getErrorCode());
+        }
+        
+        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
+        if (consistencyResult.isError()) {
+            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
+        }
+
+        Result<List<OrderItem>> itemsResult = determineItemsToRefund(order, request.getOrderItemIds());
+        if (itemsResult.isError()) {
+            return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
+        }
+        
+        List<OrderItem> itemsToRefund = itemsResult.getData();
+        Result<Void> itemsValidationResult = validateItemsCanBeRefunded(itemsToRefund, order);
+        if (itemsValidationResult.isError()) {
+            return Result.error(itemsValidationResult.getMessage(), itemsValidationResult.getErrorCode());
+        }
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
         BigDecimal escrowRefundAmount = BigDecimal.ZERO;
@@ -86,7 +106,7 @@ public class OrderRefundService {
         }
 
         if (refundRecords.isEmpty()) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
+            return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
         }
 
         orderItemRefundRepository.saveAll(refundRecords);
@@ -128,11 +148,15 @@ public class OrderRefundService {
             }
         } catch (Exception e) {
             log.error("Failed to refund to eWallet for user: {} order: {} - {}", user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-            throw new BusinessException("Failed to process refund: " + e.getMessage(), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "REFUND_FAILED");
+            return Result.error("Failed to process refund: " + e.getMessage(), "REFUND_FAILED");
         }
 
         order = orderRepository.findByIdWithOrderItems(order.getId())
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
 
         boolean allItemsRefunded = areAllItemsRefunded(order);
         if (allItemsRefunded) {
@@ -149,35 +173,43 @@ public class OrderRefundService {
         orderRepository.flush();
         
         savedOrder = orderRepository.findByIdWithOrderItems(savedOrder.getId())
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (savedOrder == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
         
         orderNotificationService.sendOrderRefundNotification(user, savedOrder);
 
         log.info("Order refunded: {} (partial: {})", order.getOrderNumber(), !allItemsRefunded);
-        return orderMapper.toDto(savedOrder);
+        return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
+    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
 
-        return order;
+        return Result.success(order);
     }
 
-    private void validateOrderCanBeRefunded(Order order) {
+    private Result<Void> validateOrderCanBeRefunded(Order order) {
         if (order.getStatus() != Order.OrderStatus.DELIVERED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
 
         if (order.getShipping() == null || order.getShipping().getDeliveredAt() == null) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -185,31 +217,41 @@ public class OrderRefundService {
         long hoursPassed = duration.toHours();
 
         if (hoursPassed >= 48) {
-            throw new BusinessException(OrderErrorCodes.REFUND_TIME_EXPIRED);
+            return Result.error(OrderErrorCodes.REFUND_TIME_EXPIRED);
         }
+        return Result.success();
     }
 
-    private List<OrderItem> determineItemsToRefund(Order order, List<Long> orderItemIds) {
+    private Result<List<OrderItem>> determineItemsToRefund(Order order, List<Long> orderItemIds) {
         if (orderItemIds == null || orderItemIds.isEmpty()) {
-            return order.getOrderItems();
+            return Result.success(order.getOrderItems());
         }
-        return orderItemIds.stream()
-                .map(id -> orderItemRepository.findById(id)
-                        .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND)))
-                .filter(item -> item.getOrder().getId().equals(order.getId()))
-                .collect(Collectors.toList());
+        
+        List<OrderItem> items = new ArrayList<>();
+        for (Long id : orderItemIds) {
+            OrderItem item = orderItemRepository.findById(id).orElse(null);
+            if (item == null) {
+                return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+            }
+            if (!item.getOrder().getId().equals(order.getId())) {
+                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+            }
+            items.add(item);
+        }
+        return Result.success(items);
     }
 
-    private void validateItemsCanBeRefunded(List<OrderItem> items, Order order) {
+    private Result<Void> validateItemsCanBeRefunded(List<OrderItem> items, Order order) {
         for (OrderItem item : items) {
             if (!item.getOrder().getId().equals(order.getId())) {
-                throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
             }
             Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
             if (alreadyRefunded != null && alreadyRefunded >= item.getQuantity()) {
-                throw new BusinessException(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
+                return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
             }
         }
+        return Result.success();
     }
 
     private boolean areAllItemsRefunded(Order order) {
@@ -232,9 +274,14 @@ public class OrderRefundService {
                         log.info("Debited {} from seller's eWallet: {} for refunded order item {}", 
                                 escrow.getAmount(), escrow.getSeller().getEmail(), item.getId());
                     }
-                    orderEscrowService.refundEscrowToBuyer(escrow, buyer);
-                    log.info("Refunded escrow {} for order item {} in order {}", 
-                            escrow.getId(), item.getId(), order.getOrderNumber());
+                    Result<Void> refundResult = orderEscrowService.refundEscrowToBuyer(escrow, buyer);
+                    if (refundResult.isError()) {
+                        log.error("Failed to refund escrow {} for order item {}: {}", 
+                                escrow.getId(), item.getId(), refundResult.getMessage());
+                    } else {
+                        log.info("Refunded escrow {} for order item {} in order {}", 
+                                escrow.getId(), item.getId(), order.getOrderNumber());
+                    }
                 } catch (Exception e) {
                     log.error("Failed to refund escrow {} for order item {}: {}", 
                             escrow.getId(), item.getId(), e.getMessage());

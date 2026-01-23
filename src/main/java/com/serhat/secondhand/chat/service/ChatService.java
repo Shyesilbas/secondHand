@@ -11,6 +11,7 @@ import com.serhat.secondhand.chat.mapper.ChatRoomMapper;
 import com.serhat.secondhand.chat.notification.ChatNotificationService;
 import com.serhat.secondhand.chat.repository.ChatRoomRepository;
 import com.serhat.secondhand.chat.repository.MessageRepository;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.application.UserService;
@@ -98,7 +99,10 @@ public class ChatService {
 
     @Transactional
     public ChatRoomDto createOrGetDirectChat(Long user1, Long user2) {
-        chatAuthorizationService.validateUsersExist(user1, user2);
+        Result<Void> validationResult = chatAuthorizationService.validateUsersExist(user1, user2);
+        if (validationResult.isError()) {
+            throw new RuntimeException(validationResult.getMessage());
+        }
 
         return chatRoomRepository
                 .findDirectChatRoom(user1, user2)
@@ -143,22 +147,42 @@ public class ChatService {
     @Transactional
     public ChatMessageDto sendMessage(ChatMessageDto dto) {
 
-        chatAuthorizationService.validateMessageContent(dto.getContent());
+        Result<Void> contentResult = chatAuthorizationService.validateMessageContent(dto.getContent());
+        if (contentResult.isError()) {
+            throw new RuntimeException(contentResult.getMessage());
+        }
 
-        ChatRoom room =
-                chatAuthorizationService.authorizeRoomAccess(
+        Result<ChatRoom> roomResult = chatAuthorizationService.authorizeRoomAccess(
                         dto.getChatRoomId(),
                         dto.getSenderId()
                 );
+        if (roomResult.isError()) {
+            throw new RuntimeException(roomResult.getMessage());
+        }
 
-        chatAuthorizationService.authorizeMessageParticipants(
+        ChatRoom room = roomResult.getData();
+
+        Result<Void> participantsResult = chatAuthorizationService.authorizeMessageParticipants(
                 room,
                 dto.getSenderId(),
                 dto.getRecipientId()
         );
+        if (participantsResult.isError()) {
+            throw new RuntimeException(participantsResult.getMessage());
+        }
 
-        User sender = userService.findById(dto.getSenderId());
-        User recipient = userService.findById(dto.getRecipientId());
+        Result<User> senderResult = userService.findById(dto.getSenderId());
+        if (senderResult.isError()) {
+            throw new RuntimeException(senderResult.getMessage());
+        }
+        
+        Result<User> recipientResult = userService.findById(dto.getRecipientId());
+        if (recipientResult.isError()) {
+            throw new RuntimeException(recipientResult.getMessage());
+        }
+
+        User sender = senderResult.getData();
+        User recipient = recipientResult.getData();
 
         Message saved =
                 messageRepository.save(
@@ -174,22 +198,31 @@ public class ChatService {
 
     @Transactional
     public void deleteMessage(Long messageId, Long userId) {
-        Message msg =
-                chatAuthorizationService.validateMessageOwner(messageId, userId);
+        Result<Message> msgResult = chatAuthorizationService.validateMessageOwner(messageId, userId);
+        if (msgResult.isError()) {
+            throw new RuntimeException(msgResult.getMessage());
+        }
 
+        Message msg = msgResult.getData();
         messageRepository.delete(msg);
         chatRoomUpdater.updateLastMessage(msg.getChatRoomId());
     }
 
     @Transactional
     public void markMessagesAsRead(Long chatRoomId, Long userId) {
-        chatAuthorizationService.validateRoomParticipant(chatRoomId, userId);
+        Result<Void> validationResult = chatAuthorizationService.validateRoomParticipant(chatRoomId, userId);
+        if (validationResult.isError()) {
+            throw new RuntimeException(validationResult.getMessage());
+        }
         messageRepository.markMessagesAsRead(chatRoomId, userId);
     }
 
     @Transactional(readOnly = true)
     public Page<ChatMessageDto> getChatMessages(Long roomId, Long userId, Pageable pageable) {
-        chatAuthorizationService.validateRoomParticipant(roomId, userId);
+        Result<Void> validationResult = chatAuthorizationService.validateRoomParticipant(roomId, userId);
+        if (validationResult.isError()) {
+            throw new RuntimeException(validationResult.getMessage());
+        }
         return messageRepository
                 .findByChatRoomIdOrderByCreatedAtAsc(roomId, pageable)
                 .map(chatMessageMapper::toDto);
@@ -216,10 +249,12 @@ public class ChatService {
 
     @Transactional
     public void deleteConversation(Long chatRoomId, Long userId) {
-        ChatRoom room =
-                chatAuthorizationService
-                        .authorizeRoomAccess(chatRoomId, userId);
+        Result<ChatRoom> roomResult = chatAuthorizationService.authorizeRoomAccess(chatRoomId, userId);
+        if (roomResult.isError()) {
+            throw new RuntimeException(roomResult.getMessage());
+        }
 
+        ChatRoom room = roomResult.getData();
         messageRepository.deleteByChatRoomId(chatRoomId);
         chatRoomRepository.delete(room);
     }

@@ -94,10 +94,20 @@ export const parseError = (error) => {
     const statusCode = response?.status;
     const errorData = response?.data;
 
+    // Handle Result pattern errors (backend now returns { error, message } for business errors)
+    let errorMessage = errorData?.message || error.message;
+    let errorCode = errorData?.error || errorData?.errorCode;
+    
+    // If it's a Result pattern error, use the message directly
+    if (errorData && (errorData.error || errorData.errorCode)) {
+        errorMessage = errorData.message || errorMessage;
+    }
+
     let parsedError = {
         ...defaultError,
         statusCode,
-        originalMessage: errorData?.message || error.message,
+        originalMessage: errorMessage,
+        errorCode: errorCode,
         details: errorData
     };
 
@@ -121,10 +131,14 @@ export const parseError = (error) => {
         message = ERROR_MESSAGES[ERROR_TYPES.SERVER][statusCode] || ERROR_MESSAGES[ERROR_TYPES.SERVER][500];
     }
 
+    // Use Result pattern message if available
+    const finalMessage = errorMessage || message || errorData?.message || 'Unexpected error occurred. Please try again later';
+    
     return {
         ...parsedError,
         type: errorType,
-        message: message || errorData?.message || 'Unexpected error occurred. Please try again later'
+        message: finalMessage,
+        errorCode: errorCode
     };
 };
 

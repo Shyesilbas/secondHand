@@ -34,21 +34,29 @@ public class ClothingListingController {
     
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new clothing listing")
-    public ResponseEntity<Void> createClothingListing(
+    public ResponseEntity<?> createClothingListing(
             @Valid @RequestBody ClothingCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        UUID clothingId = clothingListingService.createClothingListing(request, currentUser);
-        URI location = URI.create("/api/v1/clothing/" + clothingId);
+        var result = clothingListingService.createClothingListing(request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        URI location = URI.create("/api/v1/clothing/" + result.getData());
         return ResponseEntity.created(location).build();
     }
     
     @PutMapping("/{id}")
     @Operation(summary = "Update a clothing listing")
-    public ResponseEntity<Void> updateClothingListing(
+    public ResponseEntity<?> updateClothingListing(
             @PathVariable UUID id,
             @Valid @RequestBody ClothingUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        clothingListingService.updateClothingListing(id, request, currentUser);
+        var result = clothingListingService.updateClothingListing(id, request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
     

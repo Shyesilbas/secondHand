@@ -2,7 +2,7 @@ package com.serhat.secondhand.cart.validator;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.util.CartErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
@@ -15,40 +15,46 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartValidator {
 
-    public void validateListingExists(Listing listing) {
+    public Result<Void> validateListingExists(Listing listing) {
         if (listing == null) {
-            throw new BusinessException(CartErrorCodes.LISTING_NOT_FOUND);
+            return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
         }
+        return Result.success();
     }
 
-    public void validateListingActive(Listing listing) {
+    public Result<Void> validateListingActive(Listing listing) {
         if (!ListingStatus.ACTIVE.equals(listing.getStatus())) {
-            throw new BusinessException(CartErrorCodes.LISTING_NOT_ACTIVE);
+            return Result.error(CartErrorCodes.LISTING_NOT_ACTIVE);
         }
+        return Result.success();
     }
 
-    public void validateListingType(Listing listing) {
+    public Result<Void> validateListingType(Listing listing) {
         if (listing.getListingType() == ListingType.VEHICLE ||
                 listing.getListingType() == ListingType.REAL_ESTATE) {
-            throw new BusinessException(CartErrorCodes.LISTING_TYPE_NOT_ALLOWED);
+            return Result.error(CartErrorCodes.LISTING_TYPE_NOT_ALLOWED);
         }
+        return Result.success();
     }
 
-    public void validateQuantity(int quantity) {
+    public Result<Void> validateQuantity(int quantity) {
         if (quantity < 1) {
-            throw new BusinessException(CartErrorCodes.INVALID_QUANTITY);
+            return Result.error(CartErrorCodes.INVALID_QUANTITY);
         }
+        return Result.success();
     }
 
-    public void validateStock(int requestedQty, Integer availableQty) {
+    public Result<Void> validateStock(int requestedQty, Integer availableQty) {
         if (availableQty != null && requestedQty > availableQty) {
-            throw new BusinessException(CartErrorCodes.INSUFFICIENT_STOCK);
+            return Result.error(CartErrorCodes.INSUFFICIENT_STOCK);
         }
+        return Result.success();
     }
 
-    public void validateCartItemExists(Optional<Cart> cartOpt) {
+    public Result<Void> validateCartItemExists(Optional<Cart> cartOpt) {
         if (cartOpt.isEmpty()) {
-            throw new BusinessException(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
+            return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
         }
+        return Result.success();
     }
 }

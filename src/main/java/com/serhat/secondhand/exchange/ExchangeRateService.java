@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.config.ExchangeConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -24,12 +26,30 @@ public class ExchangeRateService {
 
         log.info("Fetching exchange rate from API: {} -> {}", from, to);
 
-        ExchangeRateResponse response = restTemplate.getForObject(url, ExchangeRateResponse.class);
+        try {
+            ExchangeRateResponse response = restTemplate.getForObject(url, ExchangeRateResponse.class);
 
-        if (response == null || !"success".equalsIgnoreCase(response.result())) {
-            throw new IllegalStateException("Exchange API failed for " + from + " → " + to);
+            if (response == null || !"success".equalsIgnoreCase(response.result())) {
+                log.error("Exchange API returned unsuccessful response for {} -> {}: {}", from, to, 
+                        response != null ? response.result() : "null response");
+                throw new IllegalStateException("Exchange API failed for " + from + " → " + to);
+            }
+
+            log.info("Successfully fetched exchange rate: {} -> {} = {}", from, to, response.conversion_rate());
+            return new ExchangeRateDto(from, to, response.conversion_rate());
+            
+        } catch (ResourceAccessException e) {
+            log.error("Network error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
+            throw new RuntimeException("Failed to connect to exchange rate service. Please try again later.", e);
+            
+        } catch (RestClientException e) {
+
+            log.error("HTTP error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
+            throw new RuntimeException("Exchange rate service returned an error. Please try again later.", e);
+            
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred while fetching exchange rate.", e);
         }
-
-        return new ExchangeRateDto(from, to, response.conversion_rate());
     }
 }

@@ -13,14 +13,22 @@ export const useInAppNotifications = (onNewNotification) => {
         queryKey: ['notifications', user?.id],
         queryFn: () => notificationService.getNotifications(0, 20),
         enabled: !!user?.id,
-        refetchInterval: 30000,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true,
     });
 
     const { data: unreadCountData, refetch: refetchUnreadCount } = useQuery({
         queryKey: ['notifications', 'unread-count', user?.id],
         queryFn: () => notificationService.getUnreadCount(),
         enabled: !!user?.id,
-        refetchInterval: 10000,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true,
     });
 
     useEffect(() => {
@@ -33,7 +41,11 @@ export const useInAppNotifications = (onNewNotification) => {
         mutationFn: (notificationId) => notificationService.markAsRead(notificationId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            refetchUnreadCount();
+            setUnreadCount((prev) => {
+                const newCount = Math.max(0, prev - 1);
+                queryClient.setQueryData(['notifications', 'unread-count', user?.id], newCount);
+                return newCount;
+            });
         },
     });
 
@@ -41,7 +53,8 @@ export const useInAppNotifications = (onNewNotification) => {
         mutationFn: () => notificationService.markAllAsRead(),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            refetchUnreadCount();
+            setUnreadCount(0);
+            queryClient.setQueryData(['notifications', 'unread-count', user?.id], 0);
         },
     });
 
@@ -62,7 +75,11 @@ export const useInAppNotifications = (onNewNotification) => {
                 totalElements: (oldData.totalElements || 0) + 1,
             };
         });
-        setUnreadCount((prev) => prev + 1);
+        setUnreadCount((prev) => {
+            const newCount = prev + 1;
+            queryClient.setQueryData(['notifications', 'unread-count', user?.id], newCount);
+            return newCount;
+        });
         onNewNotification?.(notification);
     }, [user?.id, queryClient, onNewNotification]);
 

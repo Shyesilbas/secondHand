@@ -1,6 +1,6 @@
 package com.serhat.secondhand.favorite.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -25,9 +25,10 @@ public class ListingAccessService {
         return listingRepository.findById(id);
     }
     
-        public void validateActive(Listing listing) {
+        public Result<Void> validateActive(Listing listing) {
         if (listing == null || !listing.getStatus().equals(ListingStatus.ACTIVE)) {
-            throw new BusinessException(FavoriteErrorCodes.INACTIVE_LISTING);
+            return Result.error(FavoriteErrorCodes.INACTIVE_LISTING);
         }
+        return Result.success();
     }
 }

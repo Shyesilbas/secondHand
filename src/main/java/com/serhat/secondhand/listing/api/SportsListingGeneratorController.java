@@ -45,10 +45,15 @@ public class SportsListingGeneratorController {
     @PostMapping("/generate")
     @Operation(summary = "Generate a single random sports listing", 
                description = "Creates a realistic random sports listing for the authenticated user")
-    public ResponseEntity<UUID> generateSingleListing(@AuthenticationPrincipal User seller) {
+    public ResponseEntity<?> generateSingleListing(@AuthenticationPrincipal User seller) {
         User actualSeller = getSellerOrDefault(seller);
         SportsCreateRequest request = generator.generateRandomListing();
-        UUID id = listingService.createSportsListing(request, actualSeller);
+        var result = listingService.createSportsListing(request, actualSeller);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        UUID id = result.getData();
         log.info("Generated listing: {} - {} - {} for seller: {}", id, request.title(), request.price(), actualSeller.getId());
         return ResponseEntity.ok(id);
     }
@@ -67,14 +72,14 @@ public class SportsListingGeneratorController {
         User actualSeller = getSellerOrDefault(seller);
         List<UUID> createdIds = generator.generateListings(count).stream()
                 .map(request -> {
-                    try {
-                        UUID id = listingService.createSportsListing(request, actualSeller);
-                        log.info("Generated listing: {} - {} - {} for seller: {}", id, request.title(), request.price(), actualSeller.getId());
-                        return id;
-                    } catch (Exception e) {
-                        log.error("Error generating listing: {}", e.getMessage());
+                    var result = listingService.createSportsListing(request, actualSeller);
+                    if (result.isError()) {
+                        log.error("Error generating listing: {}", result.getMessage());
                         return null;
                     }
+                    UUID id = result.getData();
+                    log.info("Generated listing: {} - {} - {} for seller: {}", id, request.title(), request.price(), actualSeller.getId());
+                    return id;
                 })
                 .filter(id -> id != null)
                 .toList();
@@ -85,13 +90,18 @@ public class SportsListingGeneratorController {
     @PostMapping("/generate/discipline/{discipline}")
     @Operation(summary = "Generate a listing for a specific discipline",
                description = "Creates a realistic sports listing for the specified discipline")
-    public ResponseEntity<UUID> generateForDiscipline(
+    public ResponseEntity<?> generateForDiscipline(
             @PathVariable SportDiscipline discipline,
             @AuthenticationPrincipal User seller) {
         
         User actualSeller = getSellerOrDefault(seller);
         SportsCreateRequest request = generator.generateForDiscipline(discipline);
-        UUID id = listingService.createSportsListing(request, actualSeller);
+        var result = listingService.createSportsListing(request, actualSeller);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        UUID id = result.getData();
         log.info("Generated listing for discipline {}: {} - {} - {} for seller: {}", discipline, id, request.title(), request.price(), actualSeller.getId());
         return ResponseEntity.ok(id);
     }

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
@@ -49,36 +49,59 @@ public class OrderQueryService {
         return orders.map(orderMapper::toDto);
     }
 
-    public OrderDto getOrderById(Long orderId, User user) {
-        Order order = findOrderByIdAndValidateOwnership(orderId, user);
-        return orderMapper.toDto(order);
-    }
-
-    public OrderDto getOrderByOrderNumber(String orderNumber, User user) {
-        Order order = findOrderByNumberAndValidateOwnership(orderNumber, user);
-        return orderMapper.toDto(order);
-    }
-
-    private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
-
-        validateOwnership(order, user);
-        return order;
-    }
-
-    private Order findOrderByNumberAndValidateOwnership(String orderNumber, User user) {
-        Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
-
-        validateOwnership(order, user);
-        return order;
-    }
-
-    private void validateOwnership(Order order, User user) {
-        if (!order.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+    public Result<OrderDto> getOrderById(Long orderId, User user) {
+        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        if (orderResult.isError()) {
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
+        return Result.success(orderMapper.toDto(orderResult.getData()));
+    }
+
+    public Result<OrderDto> getOrderByOrderNumber(String orderNumber, User user) {
+        Result<Order> orderResult = findOrderByNumberAndValidateOwnership(orderNumber, user);
+        if (orderResult.isError()) {
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+        }
+        return Result.success(orderMapper.toDto(orderResult.getData()));
+    }
+
+    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
+        Order order = orderRepository.findById(orderId)
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
+
+        Result<Void> ownershipResult = validateOwnership(order, user);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
+        
+        return Result.success(order);
+    }
+
+    private Result<Order> findOrderByNumberAndValidateOwnership(String orderNumber, User user) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
+
+        Result<Void> ownershipResult = validateOwnership(order, user);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
+        
+        return Result.success(order);
+    }
+
+    private Result<Void> validateOwnership(Order order, User user) {
+        if (!order.getUser().getId().equals(user.getId())) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+        }
+        return Result.success();
     }
 
     public Page<OrderDto> getSellerOrders(User seller, Pageable pageable) {

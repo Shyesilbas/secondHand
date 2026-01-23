@@ -19,13 +19,23 @@ public class AdminCouponController {
     private final CouponService couponService;
 
     @PostMapping
-    public ResponseEntity<CouponDto> create(@RequestBody CreateCouponRequest request) {
-        return ResponseEntity.ok(couponService.create(request));
+    public ResponseEntity<?> create(@RequestBody CreateCouponRequest request) {
+        var result = couponService.create(request);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CouponDto> update(@PathVariable UUID id, @RequestBody UpdateCouponRequest request) {
-        return ResponseEntity.ok(couponService.update(id, request));
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdateCouponRequest request) {
+        var result = couponService.update(id, request);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping

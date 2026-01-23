@@ -3,16 +3,16 @@ package com.serhat.secondhand.auth.application;
 import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
-import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
-import com.serhat.secondhand.core.exception.VerificationCodeMismatchException;
+import com.serhat.secondhand.auth.util.AuthErrorCodes;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,22 +30,30 @@ public class PasswordService {
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;
 
-    public String changePassword(ChangePasswordRequest request) {
+    public Result<String> changePassword(ChangePasswordRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         log.info("Password change attempt for user: {}", username);
 
-        User user = userService.findByEmail(username);
+        Result<User> userResult = userService.findByEmail(username);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        
+        User user = userResult.getData();
         
         if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
-            throw AccountNotActiveException.withStatus(user.getAccountStatus());
+            return Result.error(AuthErrorCodes.ACCOUNT_NOT_ACTIVE);
         }
         
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
-            throw new BadCredentialsException("Current password is incorrect");
+            return Result.error(AuthErrorCodes.INCORRECT_CURRENT_PASSWORD);
         }
 
-        validateNewPassword(request.getNewPassword(),  user.getPassword());
+        Result<Void> validationResult = validateNewPassword(request.getNewPassword(), user.getPassword());
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
         
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
@@ -53,10 +61,10 @@ public class PasswordService {
         tokenService.revokeAllUserTokens(user);
         
         log.info("Password changed successfully for user: {}", username);
-        return "Password changed successfully. Please login again with your new password.";
+        return Result.success("Password changed successfully. Please login again with your new password.");
     }
     
-    public String forgotPassword(ForgotPasswordRequest request) {
+    public Result<String> forgotPassword(ForgotPasswordRequest request) {
         log.info("Password reset requested for email: {}", request.getEmail());
 
         userService.findOptionalByEmail(request.getEmail())
@@ -71,10 +79,10 @@ public class PasswordService {
                     log.info("Password reset verification code generated: {}", verificationCode);
                 });
 
-        return "Check your email account for password reset verification code.";
+        return Result.success("Check your email account for password reset verification code.");
     }
 
-        public String forgotPasswordWithCode(ForgotPasswordRequest request) {
+    public Result<String> forgotPasswordWithCode(ForgotPasswordRequest request) {
         log.info("Password reset requested (with code response) for email: {}", request.getEmail());
 
         final String[] codeHolder = { null };
@@ -88,23 +96,27 @@ public class PasswordService {
                     log.info("Password reset code: {}", verificationCode);
                 });
 
-        return codeHolder[0];
+        return Result.success(codeHolder[0]);
     }
     
-    public String resetPassword(ResetPasswordRequest request) {
+    public Result<String> resetPassword(ResetPasswordRequest request) {
         log.info("Password reset attempt with verification code for email: {}", request.getEmail());
 
-        User user = userService.findByEmail(request.getEmail());
+        Result<User> userResult = userService.findByEmail(request.getEmail());
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+
+        User user = userResult.getData();
 
         if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
-            throw AccountNotActiveException.withStatus(user.getAccountStatus());
+            return Result.error(AuthErrorCodes.ACCOUNT_NOT_ACTIVE);
         }
 
         var verificationOpt = verificationService.findLatestActiveVerification(user, CodeType.PASSWORD_RESET);
         
         if (verificationOpt.isEmpty()) {
-            throw new VerificationCodeMismatchException("No active verification code found. Please request a new code.",
-                    "BAD_REQUEST");
+            return Result.error(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
         }
 
         var verification = verificationOpt.get();
@@ -114,15 +126,18 @@ public class PasswordService {
             int attemptsLeft = verification.getVerificationAttemptLeft();
             
             if (attemptsLeft <= 0) {
-                throw new VerificationCodeMismatchException("Too many failed attempts. Please request a new code.",
-                        "BAD_REQUEST");
+                return Result.error(AuthErrorCodes.TOO_MANY_VERIFICATION_ATTEMPTS);
             }
             
-            throw new VerificationCodeMismatchException("Incorrect verification code. Attempts left: " + attemptsLeft,
-                    "BAD_REQUEST");
+            return Result.error(
+                    String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), attemptsLeft),
+                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
         }
 
-        validateNewPassword(request.getNewPassword(), user.getPassword());
+        Result<Void> validationResult = validateNewPassword(request.getNewPassword(), user.getPassword());
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
         
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.update(user);
@@ -132,13 +147,13 @@ public class PasswordService {
         tokenService.revokeAllUserTokens(user);
         
         log.info("Password reset completed for user: {}", user.getEmail());
-        return "Password has been reset successfully. Please login with your new password.";
+        return Result.success("Password has been reset successfully. Please login with your new password.");
     }
 
-    private void validateNewPassword(String newPassword, String currentEncodedPassword) {
-
+    private Result<Void> validateNewPassword(String newPassword, String currentEncodedPassword) {
         if (passwordEncoder.matches(newPassword, currentEncodedPassword)) {
-            throw new IllegalArgumentException("New password must be different from current password");
+            return Result.error(AuthErrorCodes.PASSWORD_SAME_AS_CURRENT);
         }
+        return Result.success();
     }
 } 

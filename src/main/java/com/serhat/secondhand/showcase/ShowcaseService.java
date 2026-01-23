@@ -1,7 +1,7 @@
 package com.serhat.secondhand.showcase;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -40,12 +40,19 @@ public class ShowcaseService {
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestMapper paymentRequestMapper;
     
-    public Showcase createShowcase(ShowcasePaymentRequest request, Authentication authentication) {
-        showcaseValidator.validateDaysCount(request.days());
+    public Result<Showcase> createShowcase(ShowcasePaymentRequest request, Authentication authentication) {
+        Result<Void> validationResult = showcaseValidator.validateDaysCount(request.days());
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
         
         User user = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(request.listingId())
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+                .orElse(null);
+        
+        if (listing == null) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+        }
         
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
         BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
@@ -55,15 +62,15 @@ public class ShowcaseService {
         PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
         var paymentResult = paymentProcessor.process(paymentRequest, authentication);
         
-        if (!paymentResult.isSuccess()) {
-            throw new BusinessException(ShowcaseErrorCodes.PAYMENT_FAILED);
+        if (paymentResult.isError()) {
+            return Result.error(ShowcaseErrorCodes.PAYMENT_FAILED);
         }
         
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
 
         Showcase showcase = showcaseMapper.fromCreateRequest(request, user, listing, showcaseDailyCost, totalCost, startDate, endDate);
-        return showcaseRepository.save(showcase);
+        return Result.success(showcaseRepository.save(showcase));
     }
     
     public List<ShowcaseDto> getActiveShowcases() {
@@ -82,11 +89,18 @@ public class ShowcaseService {
                 .toList();
     }
     
-    public void extendShowcase(UUID showcaseId, int additionalDays) {
+    public Result<Void> extendShowcase(UUID showcaseId, int additionalDays) {
         Showcase showcase = showcaseRepository.findById(showcaseId)
-                .orElseThrow(() -> new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
+                .orElse(null);
         
-        showcaseValidator.validateIsActive(showcase);
+        if (showcase == null) {
+            return Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND);
+        }
+        
+        Result<Void> validationResult = showcaseValidator.validateIsActive(showcase);
+        if (validationResult.isError()) {
+            return validationResult;
+        }
         
         showcase.setEndDate(showcase.getEndDate().plusDays(additionalDays));
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
@@ -96,14 +110,20 @@ public class ShowcaseService {
         showcase.setTotalCost(showcase.getTotalCost().add(additionalCost));
         
         showcaseRepository.save(showcase);
+        return Result.success();
     }
     
-    public void cancelShowcase(UUID showcaseId) {
+    public Result<Void> cancelShowcase(UUID showcaseId) {
         Showcase showcase = showcaseRepository.findById(showcaseId)
-                .orElseThrow(() -> new BusinessException(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
+                .orElse(null);
+        
+        if (showcase == null) {
+            return Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND);
+        }
         
         showcase.setStatus(ShowcaseStatus.CANCELLED);
         showcaseRepository.save(showcase);
+        return Result.success();
     }
     
     @Transactional

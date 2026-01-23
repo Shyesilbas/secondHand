@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +35,10 @@ public class BooksListingService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public UUID createBooksListing(BooksCreateRequest request, User seller) {
+    public Result<UUID> createBooksListing(BooksCreateRequest request, User seller) {
         BooksListing books = listingMapper.toBooksEntity(request);
         if (books.getQuantity() == null || books.getQuantity() < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         books.setSeller(seller);
         books.setListingFeePaid(true);
@@ -49,21 +48,27 @@ public class BooksListingService {
         
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
         
-        return saved.getId();
+        return Result.success(saved.getId());
     }
 
     @Transactional
-    public void updateBooksListing(UUID id, BooksUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, User currentUser) {
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
 
         BooksListing existing = booksRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Books listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+                .orElse(null);
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (existing == null) {
+            return Result.error("Books listing not found", "LISTING_NOT_FOUND");
+        }
+
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return statusResult;
+        }
 
         var oldPrice = existing.getPrice();
 
@@ -73,7 +78,7 @@ public class BooksListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
             if (q < 1) {
-                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+                return;
             }
             existing.setQuantity(q);
         });
@@ -90,8 +95,11 @@ public class BooksListingService {
         request.condition().ifPresent(existing::setCondition);
         request.isbn().ifPresent(existing::setIsbn);
 
-        booksRepository.save(existing);
+        if (request.quantity().isPresent() && request.quantity().get() < 1) {
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        }
 
+        booksRepository.save(existing);
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
@@ -103,6 +111,7 @@ public class BooksListingService {
             );
         }
         log.info("Books listing updated: {}", id);
+        return Result.success();
     }
 
     public BooksListingDto getBooksDetails(UUID id) {

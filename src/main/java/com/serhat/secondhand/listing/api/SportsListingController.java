@@ -31,21 +31,29 @@ public class SportsListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new sports listing")
-    public ResponseEntity<Void> createSportsListing(
+    public ResponseEntity<?> createSportsListing(
             @Valid @RequestBody SportsCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        UUID id = sportsListingService.createSportsListing(request, currentUser);
-        URI location = URI.create("/api/v1/sports/" + id);
+        var result = sportsListingService.createSportsListing(request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        URI location = URI.create("/api/v1/sports/" + result.getData());
         return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a sports listing")
-    public ResponseEntity<Void> updateSportsListing(
+    public ResponseEntity<?> updateSportsListing(
             @PathVariable UUID id,
             @Valid @RequestBody SportsUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        sportsListingService.updateSportsListing(id, request, currentUser);
+        var result = sportsListingService.updateSportsListing(id, request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
 

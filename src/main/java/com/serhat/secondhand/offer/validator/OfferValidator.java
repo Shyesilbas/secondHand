@@ -1,6 +1,6 @@
 package com.serhat.secondhand.offer.validator;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
@@ -17,43 +17,46 @@ import java.math.BigDecimal;
 @Component
 public class OfferValidator {
 
-    public void validateCreateRequest(CreateOfferRequest request) {
-        validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
+    public Result<Void> validateCreateRequest(CreateOfferRequest request) {
+        return validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
     }
 
-    public void validateCounterRequest(CounterOfferRequest request) {
-        validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
+    public Result<Void> validateCounterRequest(CounterOfferRequest request) {
+        return validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
     }
 
-    public void validateQuantityAndPrice(Integer quantity, BigDecimal totalPrice) {
+    public Result<Void> validateQuantityAndPrice(Integer quantity, BigDecimal totalPrice) {
         if (quantity == null || quantity < 1) {
-            throw new BusinessException(OfferErrorCodes.INVALID_QUANTITY);
+            return Result.error(OfferErrorCodes.INVALID_QUANTITY);
         }
         if (totalPrice == null || totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(OfferErrorCodes.INVALID_TOTAL_PRICE);
+            return Result.error(OfferErrorCodes.INVALID_TOTAL_PRICE);
         }
+        return Result.success();
     }
 
-    public void validateListingForOffer(Listing listing, User buyer) {
+    public Result<Void> validateListingForOffer(Listing listing, User buyer) {
         if (listing.getStatus() != ListingStatus.ACTIVE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_NOT_ACTIVE);
+            return Result.error(OfferErrorCodes.LISTING_NOT_ACTIVE);
         }
         if (listing.getListingType() == ListingType.VEHICLE || listing.getListingType() == ListingType.REAL_ESTATE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
+            return Result.error(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
         }
         if (listing.getSeller() != null && listing.getSeller().getId() != null
                 && listing.getSeller().getId().equals(buyer.getId())) {
-            throw new BusinessException(OfferErrorCodes.SELF_OFFER_NOT_ALLOWED);
+            return Result.error(OfferErrorCodes.SELF_OFFER_NOT_ALLOWED);
         }
+        return Result.success();
     }
 
-    public void validateListingEligibility(Listing listing) {
+    public Result<Void> validateListingEligibility(Listing listing) {
         if (listing.getStatus() != ListingStatus.ACTIVE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_NOT_ACTIVE);
+            return Result.error(OfferErrorCodes.LISTING_NOT_ACTIVE);
         }
         if (listing.getListingType() == ListingType.VEHICLE || listing.getListingType() == ListingType.REAL_ESTATE) {
-            throw new BusinessException(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
+            return Result.error(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
         }
+        return Result.success();
     }
 
 

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.email.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
@@ -10,7 +10,6 @@ import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,17 +60,13 @@ public class EmailService {
         return emailRepository.countByUserAndReadAtIsNull(user);
     }
 
-    public String deleteEmail(UUID emailId) {
+    public Result<String> deleteEmail(UUID emailId) {
         Email email = emailRepository.findById(emailId).orElse(null);
         if (email != null) {
             emailRepository.delete(email);
-            return "Email deleted" + email.getId();
+            return Result.success("Email deleted" + email.getId());
         } else {
-            throw new BusinessException(
-                    "Email not found",
-                    HttpStatus.NOT_FOUND,
-                    HttpStatus.NOT_FOUND.toString()
-            );
+            return Result.error("Email not found", "EMAIL_NOT_FOUND");
         }
     }
 

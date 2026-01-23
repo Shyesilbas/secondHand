@@ -12,7 +12,10 @@ public enum AuthErrorCodes implements ErrorCode {
     USER_ALREADY_LOGGED_OUT("USER_ALREADY_LOGGED_OUT", "User is already logged out", HttpStatus.BAD_REQUEST),
     INVALID_REFRESH_TOKEN("INVALID_REFRESH_TOKEN", "Invalid or expired refresh token", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_NOT_FOUND("REFRESH_TOKEN_NOT_FOUND", "Refresh token not found", HttpStatus.NOT_FOUND),
-    REFRESH_TOKEN_REVOKED("REFRESH_TOKEN_REVOKED", "Refresh token has been revoked", HttpStatus.UNAUTHORIZED);
+    REFRESH_TOKEN_REVOKED("REFRESH_TOKEN_REVOKED", "Refresh token has been revoked", HttpStatus.UNAUTHORIZED),
+    INCORRECT_CURRENT_PASSWORD("INCORRECT_CURRENT_PASSWORD", "Current password is incorrect", HttpStatus.BAD_REQUEST),
+    PASSWORD_SAME_AS_CURRENT("PASSWORD_SAME_AS_CURRENT", "New password must be different from current password", HttpStatus.BAD_REQUEST),
+    TOO_MANY_VERIFICATION_ATTEMPTS("TOO_MANY_VERIFICATION_ATTEMPTS", "Too many failed attempts. Please request a new code.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

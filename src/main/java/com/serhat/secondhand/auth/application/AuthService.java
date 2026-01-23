@@ -18,6 +18,7 @@ import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -60,24 +61,30 @@ public class AuthService {
     private final AuditLogService auditLogService;
     private final AgreementService agreementService;
 
-    public RegisterResponse register(RegisterRequest request) {
+    public Result<RegisterResponse> register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
 
-        userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
+        Result<Void> validationResult = userService.validateUniqueUser(request.getEmail(), request.getPhoneNumber());
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         if (!request.getAgreementsAccepted()) {
-            throw new BusinessException(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+            return Result.error(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
         User user = userMapper.toEntity(request, passwordEncoder);
-        userService.save(user);
+        Result<Void> saveResult = userService.save(user);
+        if (saveResult.isError()) {
+            return Result.error(saveResult.getMessage(), saveResult.getErrorCode());
+        }
 
         var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.REGISTER);
 
         Set<UUID> requiredIds = requiredAgreements.stream().map(Agreement::getAgreementId).collect(Collectors.toSet());
         Set<UUID> acceptedIds = new HashSet<>(request.getAcceptedAgreementIds());
         if (!acceptedIds.containsAll(requiredIds)) {
-            throw new BusinessException(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+            return Result.error(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
         for (UUID agreementId : acceptedIds) {
@@ -91,14 +98,14 @@ public class AuthService {
 
         userNotificationService.sendWelcomeNotification(user);
 
-        return new RegisterResponse(
+        return Result.success(new RegisterResponse(
                 "Registration Successful.",
                 "Account verification is a must for publish listing. Your account status is "+ user.getAccountStatus(),
                 "Your built in email account also created.",
                 user.getId(),
                 user.getEmail(),
                 user.getName(),
-                user.getSurname());
+                user.getSurname()));
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -108,7 +115,12 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        User user = userService.findByEmail(request.email());
+        Result<User> userResult = userService.findByEmail(request.email());
+        if (userResult.isError()) {
+            throw new BadCredentialsException("Invalid username or password.");
+        }
+
+        User user = userResult.getData();
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid username or password.");
@@ -146,7 +158,12 @@ public class AuthService {
     public String logout(String username, String accessToken) {
         log.info("Logout request: {}", username);
 
-        User user = userService.findByEmail(username);
+        Result<User> userResult = userService.findByEmail(username);
+        if (userResult.isError()) {
+            throw UserAlreadyLoggedOutException.defaultMessage();
+        }
+
+        User user = userResult.getData();
 
         // Only check for active refresh tokens - access tokens are stateless
         if (tokenService.findActiveRefreshTokenByUser(user).isEmpty()) {
@@ -168,7 +185,12 @@ public class AuthService {
         }
 
         String username = jwtUtils.extractUsername(refreshTokenValue);
-        User user = userService.findByEmail(username);
+        Result<User> userResult = userService.findByEmail(username);
+        if (userResult.isError()) {
+            throw InvalidRefreshTokenException.invalid();
+        }
+
+        User user = userResult.getData();
 
         if (!jwtUtils.isTokenValid(refreshTokenValue, user)) {
             throw InvalidRefreshTokenException.invalid();
@@ -287,7 +309,15 @@ public class AuthService {
 
     public Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request) {
         String username = authentication.getName();
-        User user = userService.findByEmail(username);
+        Result<User> userResult = userService.findByEmail(username);
+        if (userResult.isError()) {
+            return Map.of(
+                "message", "User not found",
+                "status", "error"
+            );
+        }
+        
+        User user = userResult.getData();
         
         log.info("Revoking all sessions for user: {}", username);
         

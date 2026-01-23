@@ -2,7 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.service.CouponService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -43,43 +43,66 @@ public class CheckoutOrchestrator {
     private final OrderEscrowService orderEscrowService;
 
     @Transactional
-    public OrderDto executeCheckout(User user, CheckoutRequest request) {
+    public Result<OrderDto> executeCheckout(User user, CheckoutRequest request) {
         log.info("Executing checkout for user: {}", user.getEmail());
 
         var cartItems = cartRepository.findByUserWithListing(user);
-        Offer acceptedOffer = resolveAcceptedOffer(user, request);
+        Result<Offer> offerResult = resolveAcceptedOffer(user, request);
+        if (offerResult.isError()) {
+            return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
+        }
+        
+        Offer acceptedOffer = offerResult.getData();
         var effectiveCartItems = buildEffectiveCartItems(cartItems, acceptedOffer, user);
 
         PricingResultDto pricing = calculatePricing(user, effectiveCartItems, request, acceptedOffer);
         
-        Map<UUID, Integer> reserved = reserveStockOrThrow(effectiveCartItems);
+        Result<Map<UUID, Integer>> reservedResult = reserveStockOrThrow(effectiveCartItems);
+        if (reservedResult.isError()) {
+            return Result.error(reservedResult.getMessage(), reservedResult.getErrorCode());
+        }
         
-        Order order = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
+        Map<UUID, Integer> reserved = reservedResult.getData();
+        
+        Result<Order> orderResult = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
+        if (orderResult.isError()) {
+            releaseReservedStock(reserved);
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+        }
+        
+        Order order = orderResult.getData();
 
         try {
             var paymentResult = orderPaymentService.processOrderPayments(user, effectiveCartItems, request, order, pricing);
-            orderNotificationService.sendOrderNotifications(user, order, paymentResult.allSuccessful());
+            if (paymentResult.isError()) {
+                releaseReservedStock(reserved);
+                return Result.error(paymentResult.getMessage(), paymentResult.getErrorCode());
+            }
+            
+            var paymentProcessingResult = paymentResult.getData();
+            orderNotificationService.sendOrderNotifications(user, order, paymentProcessingResult.allSuccessful());
 
-            if (paymentResult.allSuccessful()) {
+            if (paymentProcessingResult.allSuccessful()) {
                 orderEscrowService.createEscrowsForOrder(order);
                 handleSuccessfulCheckout(user, order, pricing, acceptedOffer);
                 log.info("Checkout completed successfully for order: {} with {} payments",
-                        order.getOrderNumber(), paymentResult.paymentResults().size());
+                        order.getOrderNumber(), paymentProcessingResult.paymentResults().size());
             } else {
                 releaseReservedStock(reserved);
                 log.warn("Checkout completed with failed payments for order: {}", order.getOrderNumber());
             }
 
-            return orderMapper.toDto(order);
+            return Result.success(orderMapper.toDto(order));
         } catch (Exception e) {
             releaseReservedStock(reserved);
+            log.error("Exception during checkout for order: {}", order.getOrderNumber(), e);
             throw e;
         }
     }
 
-    private Offer resolveAcceptedOffer(User user, CheckoutRequest request) {
+    private Result<Offer> resolveAcceptedOffer(User user, CheckoutRequest request) {
         if (request.getOfferId() == null) {
-            return null;
+            return Result.success((Offer) null);
         }
         return offerService.getAcceptedOfferForCheckout(user, request.getOfferId());
     }
@@ -114,10 +137,10 @@ public class CheckoutOrchestrator {
         return pricingService.priceCart(user, effectiveCartItems, request.getCouponCode());
     }
 
-    private Map<UUID, Integer> reserveStockOrThrow(List<Cart> cartItems) {
+    private Result<Map<UUID, Integer>> reserveStockOrThrow(List<Cart> cartItems) {
         Map<UUID, Integer> reserved = new HashMap<>();
         if (cartItems == null || cartItems.isEmpty()) {
-            return reserved;
+            return Result.success(reserved);
         }
         for (var item : cartItems) {
             if (item == null || item.getListing() == null || item.getListing().getId() == null) {
@@ -126,11 +149,17 @@ public class CheckoutOrchestrator {
             
             int qty = item.getQuantity() != null ? item.getQuantity() : 1;
             if (qty < 1) {
-                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+                releaseReservedStock(reserved);
+                return Result.error(ListingErrorCodes.INVALID_QUANTITY);
             }
             
             Listing listing = listingRepository.findByIdWithLock(item.getListing().getId())
-                    .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+                    .orElse(null);
+            
+            if (listing == null) {
+                releaseReservedStock(reserved);
+                return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+            }
             
             if (listing.getQuantity() == null) {
                 continue;
@@ -138,14 +167,14 @@ public class CheckoutOrchestrator {
             
             if (listing.getQuantity() < qty) {
                 releaseReservedStock(reserved);
-                throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
+                return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
             
             listing.setQuantity(listing.getQuantity() - qty);
             listingRepository.save(listing);
             reserved.put(listing.getId(), qty);
         }
-        return reserved;
+        return Result.success(reserved);
     }
 
     private void releaseReservedStock(Map<UUID, Integer> reserved) {

@@ -2,7 +2,7 @@ package com.serhat.secondhand.follow.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,28 +41,20 @@ public class SellerFollowService {
     private final NotificationService notificationService;
     private final ObjectMapper objectMapper;
 
-    public SellerFollowDto follow(User currentUser, Long userIdToFollow) {
+    public Result<SellerFollowDto> follow(User currentUser, Long userIdToFollow) {
         if (currentUser.getId().equals(userIdToFollow)) {
-            throw new BusinessException(
-                "You cannot follow yourself",
-                HttpStatus.BAD_REQUEST,
-                FollowErrorCodes.CANNOT_FOLLOW_SELF
-            );
+            return Result.error(FollowErrorCodes.CANNOT_FOLLOW_SELF);
         }
 
         User userToFollow = userRepository.findById(userIdToFollow)
-            .orElseThrow(() -> new BusinessException(
-                "User not found",
-                HttpStatus.NOT_FOUND,
-                FollowErrorCodes.USER_NOT_FOUND
-            ));
+            .orElse(null);
+
+        if (userToFollow == null) {
+            return Result.error(FollowErrorCodes.USER_NOT_FOUND);
+        }
 
         if (sellerFollowRepository.existsByFollowerAndFollowed(currentUser, userToFollow)) {
-            throw new BusinessException(
-                "You are already following this user",
-                HttpStatus.BAD_REQUEST,
-                FollowErrorCodes.ALREADY_FOLLOWING
-            );
+            return Result.error(FollowErrorCodes.ALREADY_FOLLOWING);
         }
 
         SellerFollow sellerFollow = SellerFollow.builder()
@@ -75,49 +66,50 @@ public class SellerFollowService {
         sellerFollow = sellerFollowRepository.save(sellerFollow);
         log.info("User {} started following user {}", currentUser.getId(), userIdToFollow);
 
-        return sellerFollowMapper.toDto(sellerFollow);
+        return Result.success(sellerFollowMapper.toDto(sellerFollow));
     }
 
-    public void unfollow(User currentUser, Long userIdToUnfollow) {
+    public Result<Void> unfollow(User currentUser, Long userIdToUnfollow) {
         User userToUnfollow = userRepository.findById(userIdToUnfollow)
-            .orElseThrow(() -> new BusinessException(
-                "User not found",
-                HttpStatus.NOT_FOUND,
-                FollowErrorCodes.USER_NOT_FOUND
-            ));
+            .orElse(null);
+
+        if (userToUnfollow == null) {
+            return Result.error(FollowErrorCodes.USER_NOT_FOUND);
+        }
 
         SellerFollow sellerFollow = sellerFollowRepository.findByFollowerAndFollowed(currentUser, userToUnfollow)
-            .orElseThrow(() -> new BusinessException(
-                "You are not following this user",
-                HttpStatus.BAD_REQUEST,
-                FollowErrorCodes.NOT_FOLLOWING
-            ));
+            .orElse(null);
+
+        if (sellerFollow == null) {
+            return Result.error(FollowErrorCodes.NOT_FOLLOWING);
+        }
 
         sellerFollowRepository.delete(sellerFollow);
         log.info("User {} unfollowed user {}", currentUser.getId(), userIdToUnfollow);
+        return Result.success();
     }
 
-    public SellerFollowDto toggleNotifications(User currentUser, Long followedUserId) {
+    public Result<SellerFollowDto> toggleNotifications(User currentUser, Long followedUserId) {
         User followedUser = userRepository.findById(followedUserId)
-            .orElseThrow(() -> new BusinessException(
-                "User not found",
-                HttpStatus.NOT_FOUND,
-                FollowErrorCodes.USER_NOT_FOUND
-            ));
+            .orElse(null);
+
+        if (followedUser == null) {
+            return Result.error(FollowErrorCodes.USER_NOT_FOUND);
+        }
 
         SellerFollow sellerFollow = sellerFollowRepository.findByFollowerAndFollowed(currentUser, followedUser)
-            .orElseThrow(() -> new BusinessException(
-                "You are not following this user",
-                HttpStatus.BAD_REQUEST,
-                FollowErrorCodes.NOT_FOLLOWING
-            ));
+            .orElse(null);
+
+        if (sellerFollow == null) {
+            return Result.error(FollowErrorCodes.NOT_FOLLOWING);
+        }
 
         sellerFollow.setNotifyOnNewListing(!sellerFollow.isNotifyOnNewListing());
         sellerFollow = sellerFollowRepository.save(sellerFollow);
         log.info("User {} toggled notifications for user {} to {}", 
             currentUser.getId(), followedUserId, sellerFollow.isNotifyOnNewListing());
 
-        return sellerFollowMapper.toDto(sellerFollow);
+        return Result.success(sellerFollowMapper.toDto(sellerFollow));
     }
 
     @Transactional(readOnly = true)
@@ -207,7 +199,7 @@ public class SellerFollowService {
                             "listingId", listing.getId().toString(),
                             "sellerId", seller.getId().toString()
                     ));
-                    notificationService.createAndSend(NotificationRequest.builder()
+                    Result<?> notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                             .userId(follow.getFollower().getId())
                             .type(NotificationType.LISTING_NEW_FROM_FOLLOWED)
                             .title("Yeni İlan")
@@ -216,6 +208,9 @@ public class SellerFollowService {
                             .actionUrl("/listings/" + listing.getId())
                             .metadata(metadata)
                             .build());
+                    if (notificationResult.isError()) {
+                        log.error("Failed to create notification: {}", notificationResult.getMessage());
+                    }
                 } catch (JsonProcessingException e) {
                     log.error("Failed to create in-app notification for new listing from followed seller", e);
                 }

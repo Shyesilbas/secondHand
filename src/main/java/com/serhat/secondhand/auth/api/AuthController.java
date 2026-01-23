@@ -6,6 +6,7 @@ import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
+import com.serhat.secondhand.core.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,10 +36,14 @@ public class AuthController {
     private final CookieUtils cookieUtils;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request for email: {}", request.getEmail());
-        RegisterResponse response = authService.register(request);
-        return ResponseEntity.ok(response);
+        Result<RegisterResponse> result = authService.register(request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PostMapping("/login")

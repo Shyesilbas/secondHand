@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
@@ -29,11 +29,23 @@ public class OrderCompletionService {
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
 
-    public OrderDto completeOrder(Long orderId, User user) {
-        Order order = findOrderByIdAndValidateOwnership(orderId, user);
+    public Result<OrderDto> completeOrder(Long orderId, User user) {
+        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        if (orderResult.isError()) {
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+        }
 
-        validateOrderCanBeCompleted(order);
-        orderStatusValidator.validateStatusConsistency(order);
+        Order order = orderResult.getData();
+
+        Result<Void> completionValidationResult = validateOrderCanBeCompleted(order);
+        if (completionValidationResult.isError()) {
+            return Result.error(completionValidationResult.getMessage(), completionValidationResult.getErrorCode());
+        }
+        
+        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
+        if (consistencyResult.isError()) {
+            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
+        }
 
         order.setStatus(Order.OrderStatus.COMPLETED);
         if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
@@ -46,40 +58,45 @@ public class OrderCompletionService {
         orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
 
         log.info("Order completed manually: {}", order.getOrderNumber());
-        return orderMapper.toDto(savedOrder);
+        return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Order findOrderByIdAndValidateOwnership(Long orderId, User user) {
+    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new BusinessException(OrderErrorCodes.ORDER_NOT_FOUND));
+                .orElse(null);
+        
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
         }
 
-        return order;
+        return Result.success(order);
     }
 
-    private void validateOrderCanBeCompleted(Order order) {
+    private Result<Void> validateOrderCanBeCompleted(Order order) {
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
         if (order.getStatus() != Order.OrderStatus.DELIVERED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
         }
+        return Result.success();
     }
 
     private void releaseEscrowsForOrder(Order order) {
         List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
         
         for (OrderItemEscrow escrow : pendingEscrows) {
-            try {
-                orderEscrowService.releaseEscrowToSeller(escrow);
+            Result<Void> releaseResult = orderEscrowService.releaseEscrowToSeller(escrow);
+            if (releaseResult.isError()) {
+                log.error("Failed to release escrow {} for order {}: {}", 
+                        escrow.getId(), order.getOrderNumber(), releaseResult.getMessage());
+            } else {
                 log.info("Released escrow {} for order item {} to seller {}", 
                         escrow.getId(), escrow.getOrderItem().getId(), escrow.getSeller().getEmail());
-            } catch (Exception e) {
-                log.error("Failed to release escrow {} for order {}: {}", 
-                        escrow.getId(), order.getOrderNumber(), e.getMessage());
             }
         }
         

@@ -88,7 +88,7 @@ public class UserNotificationService {
                         "oldPrice", oldPriceStr,
                         "newPrice", newPriceStr
                 ));
-                notificationService.createAndSend(NotificationRequest.builder()
+                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(user.getId())
                         .type(NotificationType.LISTING_PRICE_DROPPED)
                         .title("Fiyat Düştü!")
@@ -97,6 +97,9 @@ public class UserNotificationService {
                         .actionUrl("/listings/" + listingId)
                         .metadata(metadata)
                         .build());
+                if (notificationResult.isError()) {
+                    log.error("Failed to create notification: {}", notificationResult.getMessage());
+                }
             } catch (JsonProcessingException e) {
                 log.error("Failed to create in-app notification for price change", e);
             }

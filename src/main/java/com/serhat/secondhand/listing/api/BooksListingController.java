@@ -31,21 +31,29 @@ public class BooksListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new books listing")
-    public ResponseEntity<Void> createBooksListing(
+    public ResponseEntity<?> createBooksListing(
             @Valid @RequestBody BooksCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        UUID id = booksListingService.createBooksListing(request, currentUser);
-        URI location = URI.create("/api/v1/books/" + id);
+        var result = booksListingService.createBooksListing(request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        URI location = URI.create("/api/v1/books/" + result.getData());
         return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a books listing")
-    public ResponseEntity<Void> updateBooksListing(
+    public ResponseEntity<?> updateBooksListing(
             @PathVariable UUID id,
             @Valid @RequestBody BooksUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        booksListingService.updateBooksListing(id, request, currentUser);
+        var result = booksListingService.updateBooksListing(id, request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
 
