@@ -140,7 +140,10 @@ public class PricingService {
         Coupon coupon = null;
         String normalizedCouponCode = pricingMapper.normalizeCouponCode(couponCode);
         if (normalizedCouponCode != null) {
-            coupon = couponService.getValidCouponOrThrow(normalizedCouponCode, buyer, cartTypes, couponEligibleSubtotal);
+            var couponResult = couponService.getValidCoupon(normalizedCouponCode, buyer, cartTypes, couponEligibleSubtotal);
+            if (couponResult.isSuccess()) {
+                coupon = couponResult.getData();
+            }
         }
 
         BigDecimal couponDiscount = coupon == null ? BigDecimal.ZERO : 

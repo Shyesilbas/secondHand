@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favorite.api;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.favorite.application.FavoriteService;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteDto;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteRequest;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -40,138 +42,210 @@ public class FavoriteController {
     @ApiResponse(responseCode = "200", description = "Listing added to favorites successfully")
     @ApiResponse(responseCode = "400", description = "Listing already in favorites or invalid request")
     @ApiResponse(responseCode = "404", description = "Listing not found")
-    public ResponseEntity<FavoriteDto> addToFavorites(
+    public ResponseEntity<?> addToFavorites(
             @Valid @RequestBody FavoriteRequest request,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        FavoriteDto favorite = favoriteService.addToFavorites(user, request.getListingId());
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
-        return ResponseEntity.ok(favorite);
+        User user = userResult.getData();
+        var result = favoriteService.addToFavorites(user, request.getListingId());
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @DeleteMapping("/{listingId}")
     @Operation(summary = "Remove listing from favorites", description = "Remove a listing from the current user's favorites")
     @ApiResponse(responseCode = "204", description = "Listing removed from favorites successfully")
     @ApiResponse(responseCode = "400", description = "Listing not in favorites")
-    public ResponseEntity<Void> removeFromFavorites(
+    public ResponseEntity<?> removeFromFavorites(
             @PathVariable UUID listingId,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        favoriteService.removeFromFavorites(user, listingId);
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
+        User user = userResult.getData();
+        var result = favoriteService.removeFromFavorites(user, listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping("/toggle")
     @Operation(summary = "Toggle favorite status", description = "Add to favorites if not exists, remove if exists")
     @ApiResponse(responseCode = "200", description = "Favorite status toggled successfully")
-    public ResponseEntity<FavoriteStatsDto> toggleFavorite(
+    public ResponseEntity<?> toggleFavorite(
             @Valid @RequestBody FavoriteRequest request,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        FavoriteStatsDto stats = favoriteService.toggleFavorite(user, request.getListingId());
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
-        return ResponseEntity.ok(stats);
+        User user = userResult.getData();
+        var result = favoriteService.toggleFavorite(user, request.getListingId());
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping
     @Operation(summary = "Get user's favorites", description = "Get current user's favorite listings with pagination")
     @ApiResponse(responseCode = "200", description = "Favorites retrieved successfully")
-    public ResponseEntity<Page<FavoriteDto>> getUserFavorites(
+    public ResponseEntity<?> getUserFavorites(
             @PageableDefault(size = 20) Pageable pageable,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        Page<FavoriteDto> favorites = favoriteService.getUserFavorites(user, pageable);
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
-        return ResponseEntity.ok(favorites);
+        User user = userResult.getData();
+        var result = favoriteService.getUserFavorites(user, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping("/stats/{listingId}")
     @Operation(summary = "Get favorite stats for listing", description = "Get favorite count and user's favorite status for a listing")
     @ApiResponse(responseCode = "200", description = "Stats retrieved successfully")
-    public ResponseEntity<FavoriteStatsDto> getFavoriteStats(
+    public ResponseEntity<?> getFavoriteStats(
             @PathVariable UUID listingId,
             Authentication authentication) {
         
         String userEmail = authentication != null ? authentication.getName() : null;
-        FavoriteStatsDto stats = favoriteService.getFavoriteStats(listingId, userEmail);
-        
-        return ResponseEntity.ok(stats);
+        var result = favoriteService.getFavoriteStats(listingId, userEmail);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @PostMapping("/stats")
     @Operation(summary = "Get favorite stats for multiple listings", description = "Get favorite statistics for multiple listings")
     @ApiResponse(responseCode = "200", description = "Stats retrieved successfully")
-    public ResponseEntity<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(
+    public ResponseEntity<?> getFavoriteStatsForListings(
             @RequestBody List<UUID> listingIds,
             Authentication authentication) {
         
         String userEmail = authentication != null ? authentication.getName() : null;
-        Map<UUID, FavoriteStatsDto> stats = favoriteService.getFavoriteStatsForListings(listingIds, userEmail);
-        
-        return ResponseEntity.ok(stats);
+        var result = favoriteService.getFavoriteStatsForListings(listingIds, userEmail);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping("/check/{listingId}")
     @Operation(summary = "Check if listing is favorited", description = "Check if current user has favorited a specific listing")
     @ApiResponse(responseCode = "200", description = "Check completed successfully")
-    public ResponseEntity<Boolean> isFavorited(
+    public ResponseEntity<?> isFavorited(
             @PathVariable UUID listingId,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        boolean isFavorited = favoriteService.isFavorited(user, listingId);
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
-        return ResponseEntity.ok(isFavorited);
+        User user = userResult.getData();
+        var result = favoriteService.isFavorited(user, listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping("/count/{listingId}")
     @Operation(summary = "Get favorite count", description = "Get total number of users who favorited a listing")
     @ApiResponse(responseCode = "200", description = "Count retrieved successfully")
-    public ResponseEntity<Long> getFavoriteCount(@PathVariable UUID listingId) {
-        long count = favoriteService.getFavoriteCount(listingId);
-        return ResponseEntity.ok(count);
+    public ResponseEntity<?> getFavoriteCount(@PathVariable UUID listingId) {
+        var result = favoriteService.getFavoriteCount(listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping("/ids")
     @Operation(summary = "Get user's favorite listing IDs", description = "Get list of listing IDs that user has favorited")
     @ApiResponse(responseCode = "200", description = "IDs retrieved successfully")
-    public ResponseEntity<List<UUID>> getUserFavoriteIds(Authentication authentication) {
+    public ResponseEntity<?> getUserFavoriteIds(Authentication authentication) {
         String userEmail = authentication.getName();
-        User user = userService.findByEmail(userEmail);
-        List<UUID> favoriteIds = favoriteService.getUserFavoriteIds(user);
+        Result<User> userResult = userService.findByEmail(userEmail);
+        if (userResult.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", userResult.getErrorCode(), "message", userResult.getMessage()));
+        }
         
-        return ResponseEntity.ok(favoriteIds);
+        User user = userResult.getData();
+        var result = favoriteService.getUserFavoriteIds(user);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
     
     @GetMapping("/top")
     @Operation(summary = "Get top favorited listings", description = "Get most favorited listings")
     @ApiResponse(responseCode = "200", description = "Top favorites retrieved successfully")
-    public ResponseEntity<Page<Object[]>> getTopFavoritedListings(
+    public ResponseEntity<?> getTopFavoritedListings(
             @PageableDefault(size = 10) Pageable pageable) {
         
-        Page<Object[]> topFavorites = favoriteService.getTopFavoritedListings(pageable);
-        return ResponseEntity.ok(topFavorites);
+        var result = favoriteService.getTopFavoritedListings(pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/top-listings")
     @Operation(summary = "Get top favorited listings with details", description = "Get most favorited listings with full listing details")
     @ApiResponse(responseCode = "200", description = "Top favorites with details retrieved successfully")
-    public ResponseEntity<List<ListingDto>> getTopFavoritedListingsWithDetails(
+    public ResponseEntity<?> getTopFavoritedListingsWithDetails(
             @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
         
         String userEmail = authentication != null ? authentication.getName() : null;
-        List<ListingDto> listings = favoriteService.getTopFavoritedListingsWithDetails(size, userEmail);
-        return ResponseEntity.ok(listings);
+        var result = favoriteService.getTopFavoritedListingsWithDetails(size, userEmail);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 }

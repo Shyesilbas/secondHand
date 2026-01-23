@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.validator;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OrderStatusValidator {
 
-    public void validateStatusConsistency(Order order) {
+    public Result<Void> validateStatusConsistency(Order order) {
         Order.OrderStatus orderStatus = order.getStatus();
         ShippingStatus shippingStatus = order.getShipping() != null ? order.getShipping().getStatus() : null;
 
@@ -26,20 +26,22 @@ public class OrderStatusValidator {
                 shippingStatus != ShippingStatus.PENDING && shippingStatus != ShippingStatus.IN_TRANSIT) {
             }
         }
+        return Result.success();
     }
 
-    public void validateStatusTransition(Order.OrderStatus currentStatus, Order.OrderStatus newStatus) {
+    public Result<Void> validateStatusTransition(Order.OrderStatus currentStatus, Order.OrderStatus newStatus) {
         if (currentStatus == Order.OrderStatus.COMPLETED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
 
         if (currentStatus == Order.OrderStatus.CANCELLED && newStatus != Order.OrderStatus.CANCELLED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
         }
 
         if (currentStatus == Order.OrderStatus.REFUNDED && newStatus != Order.OrderStatus.REFUNDED) {
-            throw new BusinessException(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
+        return Result.success();
     }
 }
 

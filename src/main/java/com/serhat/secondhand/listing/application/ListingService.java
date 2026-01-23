@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -73,34 +74,38 @@ public class ListingService {
         if (listingOpt.isEmpty()) {
             return Optional.empty();
         }
-        
+
         Listing listing = listingOpt.get();
         ListingDto dto = listingMapper.toDynamicDto(listing);
         dto = enrichmentService.enrich(dto, userEmail);
-        
+
         // Enrich with view stats if user is the seller
         if (userEmail != null) {
             try {
-                User user = userService.findByEmail(userEmail);
-                if (user != null && listing.getSeller().getId().equals(user.getId())) {
-                    log.debug("Enriching view stats for listing {} for seller {}", id, userEmail);
-                    // Default to last 7 days
-                    LocalDateTime endDate = LocalDateTime.now();
-                    LocalDateTime startDate = endDate.minusDays(7);
-                    ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
-                    dto.setViewStats(viewStats);
-                    log.debug("View stats enriched for listing {}: totalViews={}, uniqueViews={}", 
-                            id, viewStats.getTotalViews(), viewStats.getUniqueViews());
-                } else {
-                    log.debug("User {} is not the seller of listing {}", userEmail, id);
+                Result<User> userResult = userService.findByEmail(userEmail);
+                if (userResult.isSuccess() && userResult.getData() != null) {
+                    User user = userResult.getData();
+                    if (listing.getSeller().getId().equals(user.getId())) {
+                        log.debug("Enriching view stats for listing {} for seller {}", id, userEmail);
+                        // Default to last 7 days
+                        LocalDateTime endDate = LocalDateTime.now();
+                        LocalDateTime startDate = endDate.minusDays(7);
+                        ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
+                        dto.setViewStats(viewStats);
+                        log.debug("View stats enriched for listing {}: totalViews={}, uniqueViews={}",
+                                id, viewStats.getTotalViews(), viewStats.getUniqueViews());
+                    } else {
+                        log.debug("User {} is not the seller of listing {}", userEmail, id);
+                    }
                 }
             } catch (Exception e) {
                 log.warn("Could not enrich view stats for listing {}: {}", id, e.getMessage(), e);
             }
+                
         } else {
             log.debug("No user email provided, skipping view stats enrichment for listing {}", id);
         }
-        
+
         return Optional.of(dto);
     }
 
@@ -172,7 +177,12 @@ public class ListingService {
     }
 
     public List<ListingDto> getListingsByUser(Long userId) {
-        User user = userService.findById(userId);
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            log.warn("User not found for ID: {}", userId);
+            return List.of();
+        }
+        User user = userResult.getData();
         return enrichList(
                 listingRepository.findBySeller(user)
                         .stream().map(listingMapper::toDynamicDto).toList(),
@@ -181,12 +191,17 @@ public class ListingService {
     }
 
     public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
-        User user = userService.findById(userId);
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            log.warn("User not found for ID: {}", userId);
+            return Page.empty();
+        }
+        User user = userResult.getData();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
         return enrichPage(
                 listingsPage.map(listingMapper::toDynamicDto),
-                null
+                user.getEmail()
         );
     }
 
@@ -261,19 +276,27 @@ public class ListingService {
         listingRepository.save(listing);
     }
 
-    public void validateOwnership(UUID listingId, User currentUser) {
+    public Result<Void> validateOwnership(UUID listingId, User currentUser) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
-        if (!listing.getSeller().getId().equals(currentUser.getId())) {
-            throw new BusinessException(ListingErrorCodes.NOT_LISTING_OWNER);
+                .orElse(null);
+
+        if (listing == null) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
         }
+
+        if (!listing.getSeller().getId().equals(currentUser.getId())) {
+            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+        return Result.success();
     }
 
-    public void validateStatus(Listing listing, ListingStatus... allowedStatuses) {
+    public Result<Void> validateStatus(Listing listing, ListingStatus... allowedStatuses) {
         for (ListingStatus allowedStatus : allowedStatuses) {
-            if (listing.getStatus() == allowedStatus) return;
+            if (listing.getStatus() == allowedStatus) {
+                return Result.success();
+            }
         }
-        throw new BusinessException(ListingErrorCodes.INVALID_LISTING_STATUS);
+        return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
     }
 
     @Transactional
@@ -287,13 +310,21 @@ public class ListingService {
 
 
     @Transactional
-    public void deleteListing(UUID listingId, User currentUser) {
+    public Result<Void> deleteListing(UUID listingId, User currentUser) {
         Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
-        if (!listing.getSeller().getId().equals(currentUser.getId())) {
-            throw new BusinessException(ListingErrorCodes.NOT_LISTING_OWNER);
+                .orElse(null);
+
+        if (listing == null) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
         }
+
+        Result<Void> ownershipResult = validateOwnership(listingId, currentUser);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
+
         listingRepository.deleteById(listingId);
+        return Result.success();
     }
 
     public long getTotalListingCount() {
@@ -358,3 +389,4 @@ public class ListingService {
         return new PageImpl<>(enrichmentService.enrich(page.getContent(), userEmail), page.getPageable(), page.getTotalElements());
     }
 }
+

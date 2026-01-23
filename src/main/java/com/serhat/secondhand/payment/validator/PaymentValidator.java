@@ -2,7 +2,7 @@ package com.serhat.secondhand.payment.validator;
 
 import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.agreements.service.AgreementService;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentValidationHelper;
@@ -19,16 +19,16 @@ public class PaymentValidator {
     private final PaymentValidationHelper paymentValidationHelper;
     private final UserService userService;
 
-    public void validatePaymentAgreements(PaymentRequest paymentRequest) {
+    public Result<Void> validatePaymentAgreements(PaymentRequest paymentRequest) {
         if (!paymentRequest.agreementsAccepted()) {
-            throw new BusinessException(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+            return Result.error(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
         var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.ONLINE_PAYMENT);
         var acceptedAgreementIds = paymentRequest.acceptedAgreementIds();
 
         if (acceptedAgreementIds == null || acceptedAgreementIds.size() != requiredAgreements.size()) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AGREEMENT_COUNT);
+            return Result.error(PaymentErrorCodes.INVALID_AGREEMENT_COUNT);
         }
 
         var requiredAgreementIds = requiredAgreements.stream()
@@ -36,13 +36,15 @@ public class PaymentValidator {
                 .toList();
 
         if (!acceptedAgreementIds.containsAll(requiredAgreementIds)) {
-            throw new BusinessException(PaymentErrorCodes.REQUIRED_AGREEMENTS_NOT_ACCEPTED);
+            return Result.error(PaymentErrorCodes.REQUIRED_AGREEMENTS_NOT_ACCEPTED);
         }
+
+        return Result.success();
     }
 
-    public void validatePaymentRequest(PaymentRequest paymentRequest, User fromUser) {
+    public Result<Void> validatePaymentRequest(PaymentRequest paymentRequest, User fromUser) {
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
-        paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
+        return paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
     }
 }
 

@@ -1,8 +1,8 @@
 package com.serhat.secondhand.core.verification;
 
 import com.serhat.secondhand.core.config.VerificationConfig;
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
@@ -98,11 +98,11 @@ public class VerificationService implements IVerificationService {
         return verification.isPresent();
     }
 
-    public void sendAccountVerificationCode(Authentication authentication) {
+    public Result<Void> sendAccountVerificationCode(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
 
         if (user.isAccountVerified()) {
-            throw new BusinessException(UserErrorCodes.ACCOUNT_ALREADY_VERIFIED);
+            return Result.error(UserErrorCodes.ACCOUNT_ALREADY_VERIFIED);
         }
 
         String code = generateCode();
@@ -110,9 +110,10 @@ public class VerificationService implements IVerificationService {
         userNotificationService.sendVerificationCodeNotification(user, code);
 
         log.info("Verification code sent to user with email: {}", user.getEmail());
+        return Result.success();
     }
 
-    public void verifyUser(VerificationRequest request, Authentication authentication) {
+    public Result<Void> verifyUser(VerificationRequest request, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         log.info("Verifying user with email: {}", user.getEmail());
         log.info("Code written by user: {}", request.code());
@@ -120,7 +121,7 @@ public class VerificationService implements IVerificationService {
         var verificationOpt = findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);
 
         if (verificationOpt.isEmpty()) {
-            throw new BusinessException(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
+            return Result.error(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
         }
 
         var verification = verificationOpt.get();
@@ -135,9 +136,8 @@ public class VerificationService implements IVerificationService {
                 userService.update(user);
                 throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
             }
-            throw new BusinessException(
+            return Result.error(
                     String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), verificationAttemptLeft),
-                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getHttpStatus(),
                     UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
         }
 
@@ -146,6 +146,7 @@ public class VerificationService implements IVerificationService {
         userService.update(user);
 
         log.info("User verified successfully: {}", user.getEmail());
+        return Result.success();
     }
     
     @Override

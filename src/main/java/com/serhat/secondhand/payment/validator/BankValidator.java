@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.validator;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
@@ -17,40 +17,45 @@ public class BankValidator {
 
     private final BankRepository bankRepository;
 
-    public void validateForCreate(User user) {
+    public Result<Void> validateForCreate(User user) {
         if (bankRepository.existsByAccountHolder(user)) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_EXISTS);
+            return Result.error(PaymentErrorCodes.BANK_ACCOUNT_EXISTS);
         }
+        return Result.success();
     }
 
 
-    public void validateSufficientBalance(Bank bank, BigDecimal amount) {
+    public Result<Void> validateSufficientBalance(Bank bank, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
+            return Result.error(PaymentErrorCodes.INVALID_AMOUNT);
         }
 
         if (bank.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS);
+            return Result.error(PaymentErrorCodes.INSUFFICIENT_FUNDS);
         }
+        return Result.success();
     }
 
 
-    public void validateCreditAmount(BigDecimal amount) {
+    public Result<Void> validateCreditAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_CREDIT_AMOUNT);
+            return Result.error(PaymentErrorCodes.INVALID_CREDIT_AMOUNT);
         }
+        return Result.success();
     }
 
-    public void validateDebitAmount(BigDecimal amount) {
+    public Result<Void> validateDebitAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_DEBIT_AMOUNT);
+            return Result.error(PaymentErrorCodes.INVALID_DEBIT_AMOUNT);
         }
+        return Result.success();
     }
 
-    public void validateAccountNotEmpty(Bank bank) {
+    public Result<Void> validateAccountNotEmpty(Bank bank) {
         if (bank.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-            throw new BusinessException(PaymentErrorCodes.BANK_ACCOUNT_NOT_EMPTY);
+            return Result.error(PaymentErrorCodes.BANK_ACCOUNT_NOT_EMPTY);
         }
+        return Result.success();
     }
 
     public boolean hasSufficientBalance(User user, BigDecimal amount) {

@@ -188,7 +188,7 @@ public class OrderCompletionScheduler {
                     "newStatus", newStatus.name()
             ));
             
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(order.getUser().getId())
                     .type(NotificationType.ORDER_STATUS_CHANGED)
                     .title("Sipariş Durumu Güncellendi")
@@ -197,6 +197,9 @@ public class OrderCompletionScheduler {
                     .actionUrl("/orders/" + order.getId())
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create notification for order status change", e);
         }

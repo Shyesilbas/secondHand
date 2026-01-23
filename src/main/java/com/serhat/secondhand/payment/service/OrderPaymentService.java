@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.repository.OrderRepository;
@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,28 +37,24 @@ public class OrderPaymentService {
     private final PaymentRequestMapper paymentRequestMapper;
     private final OrderPaymentMapper orderPaymentMapper;
 
-    public PaymentProcessingResult processOrderPayments(User user, List<Cart> cartItems,
+    public Result<PaymentProcessingResult> processOrderPayments(User user, List<Cart> cartItems,
                                                       CheckoutRequest request, Order order, PricingResultDto pricing) {
         log.info("Processing payments for order: {}", order.getOrderNumber());
 
-        try {
-            List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing, order);
-            List<PaymentDto> paymentResults = processBatchPayments(paymentRequests);
-                        
-            boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
-            updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful, request.getPaymentType());
-
-            return new PaymentProcessingResult(paymentResults, allPaymentsSuccessful);
-            
-        } catch (BusinessException e) {
-            log.error("Payment failed for order: {} - {}", order.getOrderNumber(), e.getMessage());
-            handlePaymentFailure(order, e);
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected payment error for order: {}", order.getOrderNumber(), e);
-            handlePaymentFailure(order, e);
-            throw new RuntimeException("Payment processing failed: " + e.getMessage());
+        List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing, order);
+        Result<List<PaymentDto>> batchResult = processBatchPayments(paymentRequests);
+        
+        if (batchResult.isError()) {
+            log.error("Payment failed for order: {} - {}", order.getOrderNumber(), batchResult.getMessage());
+            handlePaymentFailure(order);
+            return Result.error(batchResult.getMessage(), batchResult.getErrorCode());
         }
+        
+        List<PaymentDto> paymentResults = batchResult.getData();
+        boolean allPaymentsSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
+        updateOrderPaymentStatus(order, paymentResults, allPaymentsSuccessful, request.getPaymentType());
+
+        return Result.success(new PaymentProcessingResult(paymentResults, allPaymentsSuccessful));
     }
 
     private List<PaymentRequest> createPaymentRequests(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing, Order order) {
@@ -73,35 +70,46 @@ public class OrderPaymentService {
                 order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentMethod());
     }
 
-    private void handlePaymentFailure(Order order, Exception exception) {
+    private void handlePaymentFailure(Order order) {
         orderPaymentMapper.markOrderAsFailed(order);
         orderRepository.save(order);
         log.error("Order {} marked as failed due to payment error", order.getOrderNumber());
     }
 
 
-    private List<PaymentDto> processBatchPayments(List<PaymentRequest> paymentRequests) {
+    @Transactional
+    protected Result<List<PaymentDto>> processBatchPayments(List<PaymentRequest> paymentRequests) {
         if (paymentRequests == null || paymentRequests.isEmpty()) {
-            throw new BusinessException(PaymentErrorCodes.EMPTY_PAYMENT_BATCH);
+            return Result.error(PaymentErrorCodes.EMPTY_PAYMENT_BATCH);
         }
 
         for (PaymentRequest request : paymentRequests) {
-            validatePurchaseRequest(request);
+            Result<Void> validationResult = validatePurchaseRequest(request);
+            if (validationResult.isError()) {
+                return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+            }
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return paymentRequests.stream()
-                .map(request -> paymentProcessor.process(request, authentication))
-                .toList();
+        List<PaymentDto> results = new ArrayList<>();
+        for (PaymentRequest request : paymentRequests) {
+            Result<PaymentDto> result = paymentProcessor.process(request, authentication);
+            if (result.isError()) {
+                return Result.error(result.getMessage(), result.getErrorCode());
+            }
+            results.add(result.getData());
+        }
+        return Result.success(results);
     }
 
-    private void validatePurchaseRequest(PaymentRequest request) {
+    private Result<Void> validatePurchaseRequest(PaymentRequest request) {
         if (request.transactionType() != PaymentTransactionType.ITEM_PURCHASE) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_TXN_TYPE);
+            return Result.error(PaymentErrorCodes.INVALID_TXN_TYPE);
         }
         if (request.paymentDirection() != PaymentDirection.OUTGOING) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_DIRECTION);
+            return Result.error(PaymentErrorCodes.INVALID_DIRECTION);
         }
+        return Result.success();
     }
 
 

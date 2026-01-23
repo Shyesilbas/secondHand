@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +35,10 @@ public class SportsListingService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public UUID createSportsListing(SportsCreateRequest request, User seller) {
+    public Result<UUID> createSportsListing(SportsCreateRequest request, User seller) {
         SportsListing entity = listingMapper.toSportsEntity(request);
         if (entity.getQuantity() == null || entity.getQuantity() < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         entity.setSeller(seller);
         entity.setListingFeePaid(true);
@@ -49,21 +48,27 @@ public class SportsListingService {
         
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
         
-        return saved.getId();
+        return Result.success(saved.getId());
     }
 
     @Transactional
-    public void updateSportsListing(UUID id, SportsUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, User currentUser) {
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
 
         SportsListing existing = sportsRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Sports listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+                .orElse(null);
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (existing == null) {
+            return Result.error("Sports listing not found", "LISTING_NOT_FOUND");
+        }
+
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return statusResult;
+        }
 
         var oldPrice = existing.getPrice();
 
@@ -73,7 +78,7 @@ public class SportsListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
             if (q < 1) {
-                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+                return;
             }
             existing.setQuantity(q);
         });
@@ -83,6 +88,10 @@ public class SportsListingService {
         request.discipline().ifPresent(existing::setDiscipline);
         request.equipmentType().ifPresent(existing::setEquipmentType);
         request.condition().ifPresent(existing::setCondition);
+
+        if (request.quantity().isPresent() && request.quantity().get() < 1) {
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        }
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
@@ -96,8 +105,8 @@ public class SportsListingService {
 
         sportsRepository.save(existing);
 
-
         log.info("Sports listing updated: {}", id);
+        return Result.success();
     }
 
     public SportsListingDto getSportsDetails(UUID id) {

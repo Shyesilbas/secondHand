@@ -1,7 +1,7 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -35,14 +35,21 @@ public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final AddressService addressService;
 
-        public Order createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
+        public Result<Order> createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         log.info("Creating order for user: {}", user.getEmail());
 
-        validateCartItems(cartItems);
+        Result<Void> cartValidationResult = validateCartItems(cartItems);
+        if (cartValidationResult.isError()) {
+            return Result.error(cartValidationResult.getMessage(), cartValidationResult.getErrorCode());
+        }
+        
         Address shippingAddress = resolveShippingAddress(request, user);
         Address billingAddress = resolveBillingAddress(request, user);
 
-        validateAddresses(user, shippingAddress, billingAddress);
+        Result<Void> addressValidationResult = validateAddresses(user, shippingAddress, billingAddress);
+        if (addressValidationResult.isError()) {
+            return Result.error(addressValidationResult.getMessage(), addressValidationResult.getErrorCode());
+        }
 
         BigDecimal totalAmount = pricing != null && pricing.getTotal() != null ? pricing.getTotal() : calculateTotalAmount(cartItems);
         BigDecimal subtotal = pricing != null ? pricing.getSubtotalAfterCampaigns() : null;
@@ -70,14 +77,15 @@ public class OrderCreationService {
         Order savedOrder = orderRepository.save(order);
         log.info("Order created with ID: {} and order number: {}", savedOrder.getId(), orderNumber);
 
-        return savedOrder;
+        return Result.success(savedOrder);
     }
 
-        private void validateCartItems(List<Cart> cartItems) {
+        private Result<Void> validateCartItems(List<Cart> cartItems) {
         if (cartItems == null || cartItems.isEmpty()) {
-            throw new BusinessException(OrderErrorCodes.CART_EMPTY);
+            return Result.error(OrderErrorCodes.CART_EMPTY);
         }
         log.debug("Validated {} cart items", cartItems.size());
+        return Result.success();
     }
 
         private Address resolveShippingAddress(CheckoutRequest request, User user) {
@@ -90,16 +98,17 @@ public class OrderCreationService {
             : null;
     }
 
-        private void validateAddresses(User user, Address shippingAddress, Address billingAddress) {
-        if (!shippingAddress.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
+        private Result<Void> validateAddresses(User user, Address shippingAddress, Address billingAddress) {
+        if (shippingAddress == null || !shippingAddress.getUser().getId().equals(user.getId())) {
+            return Result.error(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
         }
         
         if (billingAddress != null && !billingAddress.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
+            return Result.error(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
         }
         
         log.debug("Validated addresses for user: {}", user.getEmail());
+        return Result.success();
     }
 
         private BigDecimal calculateTotalAmount(List<Cart> cartItems) {

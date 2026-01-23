@@ -41,47 +41,71 @@ public class UserController {
 
 
     @PostMapping("/verification/send")
-    public ResponseEntity<Void> sendVerificationCode(Authentication authentication) {
+    public ResponseEntity<?> sendVerificationCode(Authentication authentication) {
         log.info("Sending verification code for user: {}", authentication.getName());
-        verificationService.sendAccountVerificationCode(authentication);
+        var result = verificationService.sendAccountVerificationCode(authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok().build();
     }
 
 
     @PostMapping("/verification/verify")
-    public ResponseEntity<Void> verifyUser(
+    public ResponseEntity<?> verifyUser(
             @Valid @RequestBody VerificationRequest request,
             Authentication authentication) {
         log.info("Verifying user account for: {}", authentication.getName());
-        verificationService.verifyUser(request, authentication);
-        return ResponseEntity.ok().build();
+        try {
+            var result = verificationService.verifyUser(request, authentication);
+            if (result.isError()) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                        .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            }
+            return ResponseEntity.ok().build();
+        } catch (com.serhat.secondhand.core.exception.VerificationLockedException e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.LOCKED)
+                    .body(java.util.Map.of("error", "ACCOUNT_BLOCKED", "message", e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        UserDto response = userService.getById(id);
-        return ResponseEntity.ok(response);
-
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        var result = userService.getById(id);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
 
     @PutMapping("/email")
-    public ResponseEntity<String> updateEmail(
+    public ResponseEntity<?> updateEmail(
             @Valid @RequestBody UpdateEmailRequest request,
             Authentication authentication) {
         log.info("Updating email for user: {}", authentication.getName());
-        String response = userService.updateEmail(request, authentication);
-        return ResponseEntity.ok(response);
+        var result = userService.updateEmail(request, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
 
     @PutMapping("/phone")
-    public ResponseEntity<String> updatePhone(
+    public ResponseEntity<?> updatePhone(
             @Valid @RequestBody UpdatePhoneRequest request,
             Authentication authentication) {
         log.info("Updating phone for user: {}", authentication.getName());
-        String response = userService.updatePhone(request, authentication);
-        return ResponseEntity.ok(response);
+        var result = userService.updatePhone(request, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/search")

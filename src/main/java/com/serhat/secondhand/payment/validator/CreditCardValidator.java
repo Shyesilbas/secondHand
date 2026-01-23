@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.validator;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
@@ -18,29 +18,31 @@ public class CreditCardValidator {
 
     private final CreditCardRepository creditCardRepository;
 
-    public void validateForCreate(User user, CreditCardRequest request) {
+    public Result<Void> validateForCreate(User user, CreditCardRequest request) {
         if (creditCardRepository.existsByCardHolder(user)) {
-            throw new BusinessException(PaymentErrorCodes.CREDIT_CARD_EXISTS);
+            return Result.error(PaymentErrorCodes.CREDIT_CARD_EXISTS);
         }
-        validateCreditLimit(request.limit());
+        return validateCreditLimit(request.limit());
     }
 
-    public void validateCreditLimit(BigDecimal limit) {
+    public Result<Void> validateCreditLimit(BigDecimal limit) {
         if (limit == null || limit.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_CREDIT_LIMIT);
+            return Result.error(PaymentErrorCodes.INVALID_CREDIT_LIMIT);
         }
+        return Result.success();
     }
 
 
-    public void validateSufficientCredit(CreditCard creditCard, BigDecimal amount) {
+    public Result<Void> validateSufficientCredit(CreditCard creditCard, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_AMOUNT);
+            return Result.error(PaymentErrorCodes.INVALID_AMOUNT);
         }
 
         BigDecimal availableCredit = creditCard.getLimit().subtract(creditCard.getAmount());
         if (availableCredit.compareTo(amount) < 0) {
-            throw new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS);
+            return Result.error(PaymentErrorCodes.INSUFFICIENT_FUNDS);
         }
+        return Result.success();
     }
 
 

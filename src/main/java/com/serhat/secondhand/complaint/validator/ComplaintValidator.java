@@ -3,7 +3,7 @@ package com.serhat.secondhand.complaint.validator;
 import com.serhat.secondhand.complaint.ComplaintRepository;
 import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.complaint.util.ComplaintErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,23 +14,25 @@ public class ComplaintValidator {
 
     private final ComplaintRepository complaintRepository;
 
-    public void validateRequest(ComplaintRequest request) {
+    public Result<Void> validateRequest(ComplaintRequest request) {
         if (request.complainerId() == null) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINER_ID_NULL);
+            return Result.error(ComplaintErrorCodes.COMPLAINER_ID_NULL);
         }
         if (request.complainedUserId() == null) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINED_USER_ID_NULL);
+            return Result.error(ComplaintErrorCodes.COMPLAINED_USER_ID_NULL);
         }
+        return Result.success();
     }
 
-    public void validateComplaint(User complainer, User complainedUser) {
+    public Result<Void> validateComplaint(User complainer, User complainedUser) {
         if (complainer.getId().equals(complainedUser.getId())) {
-            throw new BusinessException(ComplaintErrorCodes.CANNOT_COMPLAIN_ABOUT_SELF);
+            return Result.error(ComplaintErrorCodes.CANNOT_COMPLAIN_ABOUT_SELF);
         }
 
         if (complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser)) {
-            throw new BusinessException(ComplaintErrorCodes.COMPLAINT_ALREADY_EXISTS);
+            return Result.error(ComplaintErrorCodes.COMPLAINT_ALREADY_EXISTS);
         }
+        return Result.success();
     }
 }
 

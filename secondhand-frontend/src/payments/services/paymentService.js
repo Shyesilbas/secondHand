@@ -6,13 +6,13 @@ export const paymentService = {
 
     createPayment: async (paymentData) => {
         const paymentRequestData = createPaymentRequest(paymentData);
-        const response = await post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData);
-        return response.data;
+        // request.js already handles Result pattern, returns data directly on success
+        return await post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData);
     },
 
     createListingFeePayment: async (paymentData) => {
-        const response = await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, paymentData);
-        return response.data;
+        // request.js already handles Result pattern, returns data directly on success
+        return await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, paymentData);
     },
 
     getMyPayments: async (page = 0, size = 5, filters = {}) => {

@@ -3,7 +3,7 @@ package com.serhat.secondhand.user.application;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.util.AddressErrorCodes;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.AddressRepository;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
@@ -27,24 +27,30 @@ public class AddressService {
                 .toList();
     }
 
-    public AddressDto addAddress(User user, AddressDto addressDto) {
+    public Result<AddressDto> addAddress(User user, AddressDto addressDto) {
         if (addressRepository.countByUser(user) >= 3) {
-            throw new BusinessException(AddressErrorCodes.MAX_ADDRESSES_EXCEEDED);
+            return Result.error(AddressErrorCodes.MAX_ADDRESSES_EXCEEDED);
         }
         Address address = addressMapper.toEntity(addressDto);
         address.setUser(user);
         if (address.isMainAddress()) {
             selectAsMainAddress(user, address);
         }
-        return addressMapper.toDto(addressRepository.save(address));
+        return Result.success(addressMapper.toDto(addressRepository.save(address)));
     }
 
-    public AddressDto updateAddress(Long addressId, AddressDto updatedAddressDto, User user) {
+    public Result<AddressDto> updateAddress(Long addressId, AddressDto updatedAddressDto, User user) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new BusinessException(AddressErrorCodes.ADDRESS_NOT_FOUND));
-        if (!address.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+                .orElse(null);
+        
+        if (address == null) {
+            return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
         }
+        
+        if (!address.getUser().getId().equals(user.getId())) {
+            return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+        }
+        
         address.setAddressLine(updatedAddressDto.getAddressLine());
         address.setCity(updatedAddressDto.getCity());
         address.setState(updatedAddressDto.getState());
@@ -54,16 +60,23 @@ public class AddressService {
         if (updatedAddressDto.isMainAddress()) {
             selectAsMainAddress(user, address);
         }
-        return addressMapper.toDto(addressRepository.save(address));
+        return Result.success(addressMapper.toDto(addressRepository.save(address)));
     }
 
-    public void deleteAddress(Long addressId, User user) {
+    public Result<Void> deleteAddress(Long addressId, User user) {
         Address address = addressRepository.findById(addressId)
-                .orElseThrow(() -> new BusinessException(AddressErrorCodes.ADDRESS_NOT_FOUND));
-        if (!address.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+                .orElse(null);
+        
+        if (address == null) {
+            return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
         }
+        
+        if (!address.getUser().getId().equals(user.getId())) {
+            return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+        }
+        
         addressRepository.delete(address);
+        return Result.success();
     }
 
     @Transactional
@@ -82,6 +95,6 @@ public class AddressService {
 
     public Address getAddressById(@NotNull(message = "Shipping address ID is required") Long shippingAddressId) {
         return addressRepository.findById(shippingAddressId)
-                .orElseThrow(() -> new BusinessException(AddressErrorCodes.SHIPPING_ADDRESS_NOT_FOUND));
+                .orElse(null);
     }
 }

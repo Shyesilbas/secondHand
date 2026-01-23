@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.service;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -16,7 +17,7 @@ public class CheckoutService {
 
     private final CheckoutOrchestrator checkoutOrchestrator;
 
-    public OrderDto checkout(User user, CheckoutRequest request) {
+    public Result<OrderDto> checkout(User user, CheckoutRequest request) {
         log.info("Processing checkout for user: {}", user.getEmail());
         return checkoutOrchestrator.executeCheckout(user, request);
     }

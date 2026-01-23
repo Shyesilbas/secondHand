@@ -13,6 +13,8 @@ import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.
 import {useEnums} from '../../hooks/useEnums.js';
 import {usePendingCompletionOrders} from '../../../order/hooks/usePendingCompletionOrders.js';
 import {useCart} from '../../../cart/hooks/useCart.js';
+import {useQuery} from '@tanstack/react-query';
+import {emailService} from '../../../emails/services/emailService.js';
 import {
     Bell,
     ChevronDown,
@@ -53,7 +55,17 @@ const Header = () => {
     const listingsMenuRef = useRef(null);
 
     const { totalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
-    const [unreadEmailCount, setUnreadEmailCount] = useState(0);
+    
+    const { data: unreadEmailCount = 0 } = useQuery({
+        queryKey: ['emails', 'unread-count', user?.id],
+        queryFn: () => emailService.getUnreadCount(),
+        enabled: !!isAuthenticated && !!user?.id,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchInterval: false,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true,
+    });
     const { countsByCategory } = useListingStatistics();
     const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
     const { hasPendingOrders } = usePendingCompletionOrders({ enabled: isAuthenticated });

@@ -3,7 +3,7 @@ package com.serhat.secondhand.payment.service;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.listing.application.ListingService;
@@ -97,7 +97,11 @@ public class PaymentVerificationService {
         Offer acceptedOffer = null;
         List<Cart> effectiveCartItems = cartItems;
         if (req != null && req.getOfferId() != null) {
-            acceptedOffer = offerService.getAcceptedOfferForCheckout(user, req.getOfferId());
+            Result<Offer> offerResult = offerService.getAcceptedOfferForCheckout(user, req.getOfferId());
+            if (offerResult.isError()) {
+                throw new RuntimeException(offerResult.getMessage());
+            }
+            acceptedOffer = offerResult.getData();
             effectiveCartItems = new ArrayList<>();
             for (Cart ci : cartItems) {
                 if (ci.getListing() != null && acceptedOffer.getListing() != null && acceptedOffer.getListing().getId() != null
@@ -156,20 +160,21 @@ public class PaymentVerificationService {
         }
     }
 
-    public void validateOrGenerateVerification(User user, String code) {
+    public Result<Void> validateOrGenerateVerification(User user, String code) {
         if (code == null || code.isBlank()) {
             String generatedCode = verificationService.generateCode();
             verificationService.generateVerification(user, generatedCode, CodeType.PAYMENT_VERIFICATION);
             paymentNotificationService.sendPaymentVerificationNotification(user, generatedCode, "Payment verification code generated.");
             log.info("Payment verification code generated for user {}: {}", user.getEmail(), generatedCode);
-            throw new BusinessException(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
+            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
         }
         boolean valid = verificationService.validateVerificationCode(user, code, CodeType.PAYMENT_VERIFICATION);
         if (!valid) {
-            throw new BusinessException(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
+            return Result.error(PaymentErrorCodes.INVALID_VERIFICATION_CODE);
         }
 
         log.info("Verification code validated successfully for user: {}", user.getEmail());
+        return Result.success();
     }
 
     private BigDecimal calculateTotalListingFee() {

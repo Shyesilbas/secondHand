@@ -65,7 +65,7 @@ public class OrderNotificationService {
                         "orderId", orderDto.getId().toString(),
                         "orderNumber", orderDto.getOrderNumber()
                 ));
-                notificationService.createAndSend(NotificationRequest.builder()
+                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(customer.getId())
                         .type(NotificationType.ORDER_CREATED)
                         .title("Siparişiniz Oluşturuldu")
@@ -73,6 +73,9 @@ public class OrderNotificationService {
                         .actionUrl("/orders/" + orderDto.getId())
                         .metadata(metadata)
                         .build());
+                if (notificationResult.isError()) {
+                    log.error("Failed to create notification: {}", notificationResult.getMessage());
+                }
             } catch (JsonProcessingException e) {
                 log.error("Failed to create in-app notification for order created", e);
             }
@@ -105,7 +108,13 @@ public class OrderNotificationService {
 
     private void sendSellerNotification(Long sellerId, OrderDto orderDto, List<OrderItemDto> sellerItems) {
         try {
-            User seller = userService.findById(sellerId);
+            var sellerResult = userService.findById(sellerId);
+            if (sellerResult.isError() || sellerResult.getData() == null) {
+                log.warn("Seller not found for ID: {}", sellerId);
+                return;
+            }
+            
+            User seller = sellerResult.getData();
             String subject = emailConfig.getSaleNotificationSubject();
             String content = buildSaleNotificationContent(seller, orderDto, sellerItems);
 
@@ -123,7 +132,7 @@ public class OrderNotificationService {
                         "listingId", sellerItems.isEmpty() || sellerItems.get(0).getListing() == null ? "" :
                                 sellerItems.get(0).getListing().getId().toString()
                 ));
-                notificationService.createAndSend(NotificationRequest.builder()
+                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(sellerId)
                         .type(NotificationType.ORDER_RECEIVED)
                         .title("Yeni Sipariş Aldınız")
@@ -132,6 +141,9 @@ public class OrderNotificationService {
                         .actionUrl("/orders/seller/" + orderDto.getId())
                         .metadata(metadata)
                         .build());
+                if (notificationResult.isError()) {
+                    log.error("Failed to create notification: {}", notificationResult.getMessage());
+                }
             } catch (JsonProcessingException e) {
                 log.error("Failed to create in-app notification for seller order received", e);
             }
@@ -154,7 +166,7 @@ public class OrderNotificationService {
                         "orderId", order.getId().toString(),
                         "orderNumber", order.getOrderNumber()
                 ));
-                notificationService.createAndSend(NotificationRequest.builder()
+                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                         .userId(user.getId())
                         .type(NotificationType.ORDER_CANCELLED)
                         .title("Sipariş İptal Edildi")
@@ -162,6 +174,9 @@ public class OrderNotificationService {
                         .actionUrl("/orders/" + order.getId())
                         .metadata(metadata)
                         .build());
+                if (notificationResult.isError()) {
+                    log.error("Failed to create notification: {}", notificationResult.getMessage());
+                }
             } catch (JsonProcessingException e) {
                 log.error("Failed to create in-app notification for order cancelled", e);
             }

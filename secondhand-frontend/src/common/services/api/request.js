@@ -10,9 +10,60 @@ export const request = async (method, url, data, config = {}) => {
   try {
     const response = await apiClient({ method, url, data, ...config });
     console.log(`API Response: ${method.toUpperCase()} ${url}`, response.data);
-    return response.data;
+    
+    // Handle Result pattern from backend
+    const responseData = response.data;
+    
+    // Check if response follows Result pattern (has 'error' field for errors, or 'data' field for success)
+    if (responseData && typeof responseData === 'object') {
+      // If it's an error response (has 'error' field)
+      if ('error' in responseData && responseData.error) {
+        const error = new Error(responseData.message || 'An error occurred');
+        error.response = {
+          ...response,
+          data: {
+            message: responseData.message || 'An error occurred',
+            error: responseData.error,
+            errorCode: responseData.error
+          },
+          status: response.status || 400
+        };
+        throw error;
+      }
+      
+      // If it's a success response with Result pattern (has 'data' field)
+      if ('data' in responseData && responseData.data !== undefined) {
+        return responseData.data;
+      }
+      
+      // If it's a success response without Result pattern (direct data)
+      // This handles endpoints that haven't been migrated yet
+      return responseData;
+    }
+    
+    return responseData;
   } catch (error) {
     console.error(`API Error: ${method.toUpperCase()} ${url}`, error);
+    
+    // If error already has response data with Result pattern, preserve it
+    if (error.response && error.response.data && error.response.data.error) {
+      // Already formatted, just throw
+      throw error;
+    }
+    
+    // If it's a 400 error with Result pattern in response body
+    if (error.response && error.response.status === 400 && error.response.data) {
+      const errorData = error.response.data;
+      if (errorData.error || errorData.errorCode) {
+        // Format as Result pattern error
+        error.response.data = {
+          message: errorData.message || 'An error occurred',
+          error: errorData.error || errorData.errorCode,
+          errorCode: errorData.error || errorData.errorCode
+        };
+      }
+    }
+    
     throw error;
   }
 };

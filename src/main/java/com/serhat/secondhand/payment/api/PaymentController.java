@@ -1,5 +1,6 @@
 package com.serhat.secondhand.payment.api;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
@@ -34,14 +35,18 @@ public class PaymentController {
     private final PaymentVerificationService paymentVerificationService;
 
     @PostMapping("/pay")
-    public ResponseEntity<PaymentDto> createPayment(
+    public ResponseEntity<?> createPayment(
             @RequestBody PaymentRequest paymentRequest,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             Authentication authentication) {
         log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
         PaymentRequest requestWithKey = mergeIdempotencyKey(paymentRequest, idempotencyKey);
-        PaymentDto paymentDto = paymentProcessor.process(requestWithKey, authentication);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
+        Result<PaymentDto> result = paymentProcessor.process(requestWithKey, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
     }
     
     private PaymentRequest mergeIdempotencyKey(PaymentRequest paymentRequest, String idempotencyKey) {
@@ -81,14 +86,18 @@ public class PaymentController {
 
 
     @PostMapping("/listings/pay-fee")
-    public ResponseEntity<PaymentDto> payListingCreationFee(
+    public ResponseEntity<?> payListingCreationFee(
             @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             Authentication authentication) {
         log.info("Processing listing fee payment for listing {} by user {}", listingFeePaymentRequest.listingId(), authentication.getName());
         ListingFeePaymentRequest requestWithKey = mergeIdempotencyKeyForListingFee(listingFeePaymentRequest, idempotencyKey);
-        PaymentDto paymentDto = listingFeeService.payListingCreationFee(requestWithKey, authentication);
-        return ResponseEntity.status(HttpStatus.CREATED).body(paymentDto);
+        Result<PaymentDto> result = listingFeeService.payListingCreationFee(requestWithKey, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
     }
     
     private ListingFeePaymentRequest mergeIdempotencyKeyForListingFee(ListingFeePaymentRequest request, String idempotencyKey) {

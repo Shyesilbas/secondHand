@@ -4,6 +4,7 @@ import com.serhat.secondhand.cart.dto.AddToCartRequest;
 import com.serhat.secondhand.cart.dto.CartDto;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
 import com.serhat.secondhand.cart.service.CartService;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +37,14 @@ public class CartController {
         @ApiResponse(responseCode = "200", description = "Cart items retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<List<CartDto>> getCartItems(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> getCartItems(@AuthenticationPrincipal User currentUser) {
         log.info("API request to get cart items for user: {}", currentUser.getEmail());
-        List<CartDto> cartItems = cartService.getCartItems(currentUser);
-        return ResponseEntity.ok(cartItems);
+        Result<List<CartDto>> result = cartService.getCartItems(currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PostMapping("/add")
@@ -49,13 +55,17 @@ public class CartController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Listing not found")
     })
-    public ResponseEntity<CartDto> addToCart(
+    public ResponseEntity<?> addToCart(
             @Valid @RequestBody AddToCartRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to add item to cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), request.getListingId());
-        CartDto cartItem = cartService.addToCart(currentUser, request);
-        return ResponseEntity.ok(cartItem);
+        Result<CartDto> result = cartService.addToCart(currentUser, request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/items/{listingId}")
@@ -66,14 +76,18 @@ public class CartController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Item not found in cart")
     })
-    public ResponseEntity<CartDto> updateCartItem(
+    public ResponseEntity<?> updateCartItem(
             @PathVariable UUID listingId,
             @Valid @RequestBody UpdateCartItemRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update cart item for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        CartDto updatedCartItem = cartService.updateCartItem(currentUser, listingId, request);
-        return ResponseEntity.ok(updatedCartItem);
+        Result<CartDto> result = cartService.updateCartItem(currentUser, listingId, request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @DeleteMapping("/items/{listingId}")
@@ -83,12 +97,16 @@ public class CartController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Item not found in cart")
     })
-    public ResponseEntity<Map<String, String>> removeFromCart(
+    public ResponseEntity<?> removeFromCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to remove item from cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        cartService.removeFromCart(currentUser, listingId);
+        Result<Void> result = cartService.removeFromCart(currentUser, listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
     }
 
@@ -98,9 +116,13 @@ public class CartController {
         @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Map<String, String>> clearCart(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
         log.info("API request to clear cart for user: {}", currentUser.getEmail());
-        cartService.clearCart(currentUser);
+        Result<Void> result = cartService.clearCart(currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.ok(Map.of("message", "Cart cleared successfully"));
     }
 
@@ -110,10 +132,14 @@ public class CartController {
         @ApiResponse(responseCode = "200", description = "Cart count retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Map<String, Long>> getCartItemCount(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
         log.info("API request to get cart item count for user: {}", currentUser.getEmail());
-        long count = cartService.getCartItemCount(currentUser);
-        return ResponseEntity.ok(Map.of("count", count));
+        Result<Long> result = cartService.getCartItemCount(currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(Map.of("count", result.getData()));
     }
 
     @GetMapping("/check/{listingId}")
@@ -122,12 +148,16 @@ public class CartController {
         @ApiResponse(responseCode = "200", description = "Check completed successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Map<String, Boolean>> isInCart(
+    public ResponseEntity<?> isInCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to check if item is in cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        boolean inCart = cartService.isInCart(currentUser, listingId);
-        return ResponseEntity.ok(Map.of("inCart", inCart));
+        Result<Boolean> result = cartService.isInCart(currentUser, listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(Map.of("inCart", result.getData()));
     }
 }

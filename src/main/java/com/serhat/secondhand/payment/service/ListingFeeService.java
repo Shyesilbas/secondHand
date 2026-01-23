@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.config.ListingConfig;
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
@@ -31,12 +31,19 @@ public class ListingFeeService {
     private final PaymentRequestMapper paymentRequestMapper;
 
     @Transactional
-    public PaymentDto payListingCreationFee(ListingFeePaymentRequest request, Authentication authentication) {
+    public Result<PaymentDto> payListingCreationFee(ListingFeePaymentRequest request, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         Listing listing = listingService.findById(request.listingId())
-                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.LISTING_NOT_FOUND));
+                .orElse(null);
 
-        listingService.validateOwnership(request.listingId(), user);
+        if (listing == null) {
+            return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND);
+        }
+
+        Result<Void> ownershipResult = listingService.validateOwnership(request.listingId(), user);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
 
         BigDecimal totalFee = calculateTotalListingFee();
         PaymentRequest paymentRequest = paymentRequestMapper.buildListingFeePaymentRequest(user, listing, request, totalFee);

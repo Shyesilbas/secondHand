@@ -1,6 +1,6 @@
 package com.serhat.secondhand.review.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +38,19 @@ public class ReviewService {
     private final ListingRepository listingRepository;
     private final ReviewValidator reviewValidator;
 
-    public ReviewDto createReview(User reviewer, CreateReviewRequest request) {
+    public Result<ReviewDto> createReview(User reviewer, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewer.getId());
 
         OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId())
-                .orElseThrow(() -> new BusinessException(ReviewErrorCodes.ORDER_ITEM_NOT_FOUND));
+                .orElse(null);
+        if (orderItem == null) {
+            return Result.error(ReviewErrorCodes.ORDER_ITEM_NOT_FOUND);
+        }
 
-        reviewValidator.validateForCreate(reviewer, orderItem);
+        Result<Void> validationResult = reviewValidator.validateForCreate(reviewer, orderItem);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         User reviewedUser = orderItem.getListing().getSeller();
         Review review = reviewMapper.fromCreateRequest(request, reviewer, reviewedUser, orderItem);
@@ -53,45 +58,60 @@ public class ReviewService {
         Review savedReview = reviewRepository.save(review);
         log.info("Review created with ID: {}", savedReview.getId());
 
-        return reviewMapper.toDto(savedReview);
+        return Result.success(reviewMapper.toDto(savedReview));
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewDto> getReviewsForUser(Long userId, Pageable pageable) {
+    public Result<Page<ReviewDto>> getReviewsForUser(Long userId, Pageable pageable) {
         log.info("Getting reviews for user: {}", userId);
         
-        User user = userService.findById(userId);
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        
+        User user = userResult.getData();
         Page<Review> reviews = reviewRepository.findByReviewedUserOrderByCreatedAtDesc(user, pageable);
-        return reviews.map(reviewMapper::toDto);
+        return Result.success(reviews.map(reviewMapper::toDto));
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewDto> getReviewsByUser(Long userId, Pageable pageable) {
+    public Result<Page<ReviewDto>> getReviewsByUser(Long userId, Pageable pageable) {
         log.info("Getting reviews written by user: {}", userId);
         
-        User user = userService.findById(userId);
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        
+        User user = userResult.getData();
         Page<Review> reviews = reviewRepository.findByReviewerOrderByCreatedAtDesc(user, pageable);
-        return reviews.map(reviewMapper::toDto);
+        return Result.success(reviews.map(reviewMapper::toDto));
     }
 
 
     @Transactional(readOnly = true)
-    public UserReviewStatsDto getUserReviewStats(Long userId) {
+    public Result<UserReviewStatsDto> getUserReviewStats(Long userId) {
         log.info("Getting review statistics for user: {}", userId);
         
-        User user = userService.findById(userId);
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        
+        User user = userResult.getData();
         List<Object[]> statsList = reviewRepository.getUserReviewStats(userId);
         
         ReviewStatsDto stats = (statsList == null || statsList.isEmpty()) 
             ? ReviewStatsDto.empty() 
             : reviewMapper.mapToReviewStatsDto(statsList.get(0), 0);
 
-        return reviewMapper.mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats);
+        return Result.success(reviewMapper.mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats));
     }
 
 
     @Transactional(readOnly = true)
-    public List<ReviewDto> getReviewsForOrderItems(List<Long> orderItemIds) {
+    public Result<List<ReviewDto>> getReviewsForOrderItems(List<Long> orderItemIds) {
         log.info("Getting reviews for order items: {}", orderItemIds);
         
         List<OrderItem> orderItems = orderItemIds.stream()
@@ -101,52 +121,66 @@ public class ReviewService {
                 .toList();
         
         List<Review> reviews = reviewRepository.findByOrderItemIn(orderItems);
-        return reviews.stream()
+        return Result.success(reviews.stream()
                 .map(reviewMapper::toDto)
-                .toList();
+                .toList());
     }
 
     @Transactional(readOnly = true)
-    public Optional<ReviewDto> getReviewByOrderItem(Long orderItemId, Long reviewerId) {
+    public Result<ReviewDto> getReviewByOrderItem(Long orderItemId, Long reviewerId) {
         log.info("Getting review for order item {} by reviewer {}", orderItemId, reviewerId);
         
         Optional<OrderItem> orderItemOpt = orderItemRepository.findById(orderItemId);
         if (orderItemOpt.isEmpty()) {
-            return Optional.empty();
+            return Result.error(ReviewErrorCodes.ORDER_ITEM_NOT_FOUND);
         }
         
-        User reviewer = userService.findById(reviewerId);
+        Result<User> reviewerResult = userService.findById(reviewerId);
+        if (reviewerResult.isError()) {
+            return Result.error(reviewerResult.getMessage(), reviewerResult.getErrorCode());
+        }
+        
+        User reviewer = reviewerResult.getData();
         Optional<Review> review = reviewRepository.findByReviewerAndOrderItem(reviewer, orderItemOpt.get());
-        return review.map(reviewMapper::toDto);
+        if (review.isEmpty()) {
+            return Result.error("Review not found", "REVIEW_NOT_FOUND");
+        }
+        return Result.success(reviewMapper.toDto(review.get()));
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewDto> getReviewsForListing(String listingId, Pageable pageable) {
+    public Result<Page<ReviewDto>> getReviewsForListing(String listingId, Pageable pageable) {
         log.info("Getting reviews for listing: {}", listingId);
         
-        UUID uuid = UUID.fromString(listingId);
-        
-                Page<Review> reviews = reviewRepository.findByOrderItemListingIdOrderByCreatedAtDesc(uuid, pageable);
-        
-        return reviews.map(reviewMapper::toDto);
+        try {
+            UUID uuid = UUID.fromString(listingId);
+            Page<Review> reviews = reviewRepository.findByOrderItemListingIdOrderByCreatedAtDesc(uuid, pageable);
+            return Result.success(reviews.map(reviewMapper::toDto));
+        } catch (IllegalArgumentException e) {
+            return Result.error("Invalid listing ID format", "INVALID_LISTING_ID");
+        }
     }
 
     @Transactional(readOnly = true)
-    public UserReviewStatsDto getListingReviewStats(String listingId) {
+    public Result<UserReviewStatsDto> getListingReviewStats(String listingId) {
         log.info("Getting review stats for listing: {}", listingId);
         
-        UUID uuid = UUID.fromString(listingId);
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(listingId);
+        } catch (IllegalArgumentException e) {
+            return Result.error("Invalid listing ID format", "INVALID_LISTING_ID");
+        }
         
         Optional<Listing> listing = listingRepository.findById(uuid);
         if (listing.isEmpty()) {
-            throw new BusinessException("Listing not found", HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND");
+            return Result.error("Listing not found", "LISTING_NOT_FOUND");
         }
         
-        // Use batch method for single item to reuse logic and query
         Map<UUID, ReviewStatsDto> statsMap = getListingReviewStatsDto(List.of(uuid));
         ReviewStatsDto stats = statsMap.getOrDefault(uuid, ReviewStatsDto.empty());
 
-        return reviewMapper.mapToUserReviewStatsDto(listing.get().getSeller().getId(), listing.get().getTitle(), "", stats);
+        return Result.success(reviewMapper.mapToUserReviewStatsDto(listing.get().getSeller().getId(), listing.get().getTitle(), "", stats));
     }
 
     @Transactional(readOnly = true)

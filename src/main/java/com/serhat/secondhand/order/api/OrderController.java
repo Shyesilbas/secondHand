@@ -1,30 +1,31 @@
 package com.serhat.secondhand.order.api;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
+import com.serhat.secondhand.order.service.*;
 import com.serhat.secondhand.payment.service.CheckoutService;
-import com.serhat.secondhand.order.service.OrderCancellationService;
-import com.serhat.secondhand.order.service.OrderCompletionService;
-import com.serhat.secondhand.order.service.OrderEscrowService;
-import com.serhat.secondhand.order.service.OrderNameService;
-import com.serhat.secondhand.order.service.OrderQueryService;
-import com.serhat.secondhand.order.service.OrderRefundService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -49,12 +50,16 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Address not found")
     })
-    public ResponseEntity<OrderDto> checkout(
+    public ResponseEntity<?> checkout(
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to checkout for user: {}", currentUser.getEmail());
-        OrderDto order = checkoutService.checkout(currentUser, request);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = checkoutService.checkout(currentUser, request);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping
@@ -118,12 +123,16 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> getOrderById(
+    public ResponseEntity<?> getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by ID: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderQueryService.getOrderById(orderId, currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderQueryService.getOrderById(orderId, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/order-number/{orderNumber}")
@@ -133,12 +142,16 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> getOrderByOrderNumber(
+    public ResponseEntity<?> getOrderByOrderNumber(
             @PathVariable String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by order number: {} for user: {}", orderNumber, currentUser.getEmail());
-        OrderDto order = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/{orderId}/cancel")
@@ -149,13 +162,17 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> cancelOrder(
+    public ResponseEntity<?> cancelOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to cancel order: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderCancellationService.cancelOrder(orderId, request, currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderCancellationService.cancelOrder(orderId, request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PostMapping("/{orderId}/refund")
@@ -166,13 +183,17 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> refundOrder(
+    public ResponseEntity<?> refundOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderRefundRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to refund order: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderRefundService.refundOrder(orderId, request, currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderRefundService.refundOrder(orderId, request, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/{orderId}/complete")
@@ -183,12 +204,16 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> completeOrder(
+    public ResponseEntity<?> completeOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to complete order: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderCompletionService.completeOrder(orderId, currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderCompletionService.completeOrder(orderId, currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PutMapping("/{orderId}/name")
@@ -199,24 +224,23 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
-    public ResponseEntity<OrderDto> updateOrderName(
+    public ResponseEntity<?> updateOrderName(
             @PathVariable Long orderId,
             @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
-        OrderDto order = orderNameService.updateOrderName(orderId, request.getName(), currentUser);
-        return ResponseEntity.ok(order);
+        Result<OrderDto> result = orderNameService.updateOrderName(orderId, request.getName(), currentUser);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
+    @Setter
+    @Getter
     public static class UpdateOrderNameRequest {
         private String name;
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 }

@@ -20,27 +20,39 @@ public class SellerFollowController {
     private final SellerFollowService sellerFollowService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<SellerFollowDto> follow(
+    public ResponseEntity<?> follow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        SellerFollowDto result = sellerFollowService.follow(currentUser, userId);
-        return ResponseEntity.ok(result);
+        var result = sellerFollowService.follow(currentUser, userId);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> unfollow(
+    public ResponseEntity<?> unfollow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        sellerFollowService.unfollow(currentUser, userId);
+        var result = sellerFollowService.unfollow(currentUser, userId);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{userId}/notifications")
-    public ResponseEntity<SellerFollowDto> toggleNotifications(
+    public ResponseEntity<?> toggleNotifications(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        SellerFollowDto result = sellerFollowService.toggleNotifications(currentUser, userId);
-        return ResponseEntity.ok(result);
+        var result = sellerFollowService.toggleNotifications(currentUser, userId);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @GetMapping("/following")

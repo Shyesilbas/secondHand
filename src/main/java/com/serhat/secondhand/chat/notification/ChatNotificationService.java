@@ -7,6 +7,7 @@ import com.serhat.secondhand.notification.dto.NotificationRequest;
 import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,8 +31,9 @@ public class ChatNotificationService {
         try {
             String senderName = "Birisi";
             try {
-                var sender = userService.findById(dto.getSenderId());
-                if (sender != null) {
+                var senderResult = userService.findById(dto.getSenderId());
+                if (senderResult.isSuccess() && senderResult.getData() != null) {
+                    User sender = senderResult.getData();
                     senderName = sender.getName() + " " + sender.getSurname();
                 }
             } catch (Exception e) {
@@ -48,7 +50,7 @@ public class ChatNotificationService {
                     "messageId", dto.getId() != null ? dto.getId().toString() : ""
             ));
             
-            notificationService.createAndSend(NotificationRequest.builder()
+            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
                     .userId(dto.getRecipientId())
                     .type(NotificationType.CHAT_MESSAGE_RECEIVED)
                     .title("Yeni Mesaj")
@@ -56,6 +58,9 @@ public class ChatNotificationService {
                     .actionUrl("/chat/" + dto.getChatRoomId())
                     .metadata(metadata)
                     .build());
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
+            }
         } catch (JsonProcessingException e) {
             log.error("Failed to create in-app notification for chat message", e);
         }

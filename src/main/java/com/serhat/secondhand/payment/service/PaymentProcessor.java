@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
@@ -38,7 +38,7 @@ public class PaymentProcessor {
     private final PaymentValidator paymentValidator;
 
 
-    public PaymentDto process(PaymentRequest paymentRequest, Authentication authentication) {
+    public Result<PaymentDto> process(PaymentRequest paymentRequest, Authentication authentication) {
         String idempotencyKey = paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank()
                 ? paymentRequest.idempotencyKey()
                 : generateIdempotencyKey(paymentRequest, authentication);
@@ -58,23 +58,23 @@ public class PaymentProcessor {
                 
                 if (attempt >= maxRetries) {
                     log.error("Payment processing failed after {} retries due to concurrent updates", maxRetries);
-                    throw new BusinessException(PaymentErrorCodes.CONCURRENT_UPDATE);
+                    return Result.error(PaymentErrorCodes.CONCURRENT_UPDATE);
                 }
                 
                 try {
                     Thread.sleep(50 * attempt);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
+                    return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
                 }
             }
         }
         
-        throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
+        return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
     }
     
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected PaymentDto executePaymentWithTransaction(PaymentRequest paymentRequest, Authentication authentication) {
+    protected Result<PaymentDto> executePaymentWithTransaction(PaymentRequest paymentRequest, Authentication authentication) {
         User fromUser = userService.getAuthenticatedUser(authentication);
         String idempotencyKey = paymentRequest.idempotencyKey();
         
@@ -82,20 +82,34 @@ public class PaymentProcessor {
                 .orElse(null);
         
         if (existingPayment != null) {
-            validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
-            return paymentMapper.toDto(existingPayment);
+            Result<Void> validationResult = validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
+            if (validationResult.isError()) {
+                return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+            }
+            return Result.success(paymentMapper.toDto(existingPayment));
         }
         
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
-        paymentValidator.validatePaymentAgreements(paymentRequest);
-        paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
-        paymentValidator.validatePaymentRequest(paymentRequest, fromUser);
+        Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
+        if (agreementsResult.isError()) {
+            return Result.error(agreementsResult.getMessage(), agreementsResult.getErrorCode());
+        }
+
+        Result<Void> verificationResult = paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
+        if (verificationResult.isError()) {
+            return Result.error(verificationResult.getMessage(), verificationResult.getErrorCode());
+        }
+
+        Result<Void> requestValidationResult = paymentValidator.validatePaymentRequest(paymentRequest, fromUser);
+        if (requestValidationResult.isError()) {
+            return Result.error(requestValidationResult.getMessage(), requestValidationResult.getErrorCode());
+        }
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
 
         if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
-            throw new BusinessException(PaymentErrorCodes.PAYMENT_ERROR);
+            return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
         }
 
         PaymentResult result = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
@@ -107,7 +121,7 @@ public class PaymentProcessor {
             eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
         }
 
-        return paymentMapper.toDto(payment);
+        return Result.success(paymentMapper.toDto(payment));
     }
     
     private String generateIdempotencyKey(PaymentRequest paymentRequest, Authentication authentication) {
@@ -137,7 +151,7 @@ public class PaymentProcessor {
                 .build();
     }
     
-    private void validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, User fromUser) {
+    private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, User fromUser) {
         boolean amountMatches = existingPayment.getAmount().compareTo(paymentRequest.amount()) == 0;
         boolean listingMatches = (existingPayment.getListingId() == null && paymentRequest.listingId() == null) ||
                 (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
@@ -145,7 +159,8 @@ public class PaymentProcessor {
         boolean fromUserMatches = existingPayment.getFromUser().getId().equals(fromUser.getId());
         
         if (!amountMatches || !listingMatches || !paymentTypeMatches || !fromUserMatches) {
-            throw new BusinessException(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT);
+            return Result.error(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT);
         }
+        return Result.success();
     }
 }

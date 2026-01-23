@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
@@ -17,7 +17,6 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,18 +37,14 @@ public class ElectronicListingService {
 
 
     @Transactional
-    public UUID createElectronicListing(ElectronicCreateRequest request, User seller) {
+    public Result<UUID> createElectronicListing(ElectronicCreateRequest request, User seller) {
         ElectronicListing electronicListing = listingMapper.toElectronicEntity(request);
         if (electronicListing.getQuantity() == null || electronicListing.getQuantity() < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         if (electronicListing.getElectronicType() == ElectronicType.LAPTOP) {
             if (electronicListing.getRam() == null || electronicListing.getStorage() == null) {
-                throw new BusinessException(
-                        "ram and storage are required for LAPTOP",
-                        HttpStatus.BAD_REQUEST,
-                        "LAPTOP_SPECS_REQUIRED"
-                );
+                return Result.error("ram and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
             }
         } else {
             electronicListing.setRam(null);
@@ -65,23 +60,29 @@ public class ElectronicListingService {
         
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
         
-        return saved.getId();
+        return Result.success(saved.getId());
     }
 
     @Transactional
-    public void updateElectronicListings(UUID id, ElectronicUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateElectronicListings(UUID id, ElectronicUpdateRequest request, User currentUser) {
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
 
         ElectronicListing existing = repository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Electronic listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+                .orElse(null);
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (existing == null) {
+            return Result.error("Electronic listing not found", "LISTING_NOT_FOUND");
+        }
 
-                var oldPrice = existing.getPrice();
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return statusResult;
+        }
+
+        var oldPrice = existing.getPrice();
 
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
@@ -89,7 +90,7 @@ public class ElectronicListingService {
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
             if (q < 1) {
-                throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+                return;
             }
             existing.setQuantity(q);
         });
@@ -109,13 +110,13 @@ public class ElectronicListingService {
         request.processor().ifPresent(existing::setProcessor);
         request.screenSize().ifPresent(existing::setScreenSize);
 
+        if (request.quantity().isPresent() && request.quantity().get() < 1) {
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        }
+
         if (existing.getElectronicType() == ElectronicType.LAPTOP) {
             if (existing.getRam() == null || existing.getStorage() == null) {
-                throw new BusinessException(
-                        "ram and storage are required for LAPTOP",
-                        HttpStatus.BAD_REQUEST,
-                        "LAPTOP_SPECS_REQUIRED"
-                );
+                return Result.error("ram and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
             }
         } else {
             existing.setRam(null);
@@ -126,7 +127,7 @@ public class ElectronicListingService {
 
         repository.save(existing);
 
-                if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                 existing, 
                 oldPrice, 
@@ -136,6 +137,7 @@ public class ElectronicListingService {
             );
         }
         log.info("electronic listing updated: {}", id);
+        return Result.success();
     }
 
     public List<ElectronicListingDto> findByElectronicType(ElectronicType electronicType) {

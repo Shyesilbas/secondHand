@@ -1,6 +1,7 @@
 package com.serhat.secondhand.complaint;
 
 import com.serhat.secondhand.complaint.validator.ComplaintValidator;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.user.application.UserService;
@@ -27,15 +28,31 @@ public class ComplaintService {
 
 
     @Transactional
-    public ComplaintDto createComplaint(ComplaintRequest complaintRequest) {
+    public Result<ComplaintDto> createComplaint(ComplaintRequest complaintRequest) {
         log.info("Creating complaint from user {} about user {}", complaintRequest.complainerId(), complaintRequest.complainedUserId());
 
-        complaintValidator.validateRequest(complaintRequest);
+        Result<Void> validationResult = complaintValidator.validateRequest(complaintRequest);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
-        User complainer = userService.findById(complaintRequest.complainerId());
-        User complainedUser = userService.findById(complaintRequest.complainedUserId());
+        Result<User> complainerResult = userService.findById(complaintRequest.complainerId());
+        if (complainerResult.isError()) {
+            return Result.error(complainerResult.getMessage(), complainerResult.getErrorCode());
+        }
+        
+        Result<User> complainedUserResult = userService.findById(complaintRequest.complainedUserId());
+        if (complainedUserResult.isError()) {
+            return Result.error(complainedUserResult.getMessage(), complainedUserResult.getErrorCode());
+        }
 
-        complaintValidator.validateComplaint(complainer, complainedUser);
+        User complainer = complainerResult.getData();
+        User complainedUser = complainedUserResult.getData();
+
+        Result<Void> complaintValidationResult = complaintValidator.validateComplaint(complainer, complainedUser);
+        if (complaintValidationResult.isError()) {
+            return Result.error(complaintValidationResult.getMessage(), complaintValidationResult.getErrorCode());
+        }
 
         Listing listing = null;
         if (complaintRequest.listingId() != null) {
@@ -46,7 +63,7 @@ public class ComplaintService {
         Complaint savedComplaint = complaintRepository.save(complaint);
 
         log.info("Complaint created with ID: {}", savedComplaint.getId());
-        return complaintMapper.mapComplaintToDto(savedComplaint);
+        return Result.success(complaintMapper.mapComplaintToDto(savedComplaint));
     }
 
 

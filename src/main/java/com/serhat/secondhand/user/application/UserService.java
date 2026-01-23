@@ -2,6 +2,7 @@ package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
@@ -39,69 +40,77 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
     }
 
-    public void save(User user) {
-        validateUniqueUser(user.getEmail(), user.getPhoneNumber());
+    public Result<Void> save(User user) {
+        Result<Void> validationResult = validateUniqueUser(user.getEmail(), user.getPhoneNumber());
+        if (validationResult.isError()) {
+            return validationResult;
+        }
         userRepository.save(user);
         log.info("User saved with email: {}", user.getEmail());
+        return Result.success();
     }
 
     public void update(User user) {
         userRepository.save(user);
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
+    public Result<User> findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(Result::success)
+                .orElse(Result.error(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
     }
 
     public Optional<User> findOptionalByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public void validateUniqueUser(String email, String phoneNumber) {
+    public Result<Void> validateUniqueUser(String email, String phoneNumber) {
         if (userRepository.existsByEmail(email) || userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw UserAlreadyExistsException.withCredentials(email,phoneNumber);
+            UserAlreadyExistsException exception = UserAlreadyExistsException.withCredentials(email, phoneNumber);
+            return Result.error(exception.getMessage(), exception.getErrorCode());
         }
+        return Result.success();
     }
 
-    public String updatePhone(UpdatePhoneRequest updatePhoneRequest, Authentication authentication) {
+    public Result<String> updatePhone(UpdatePhoneRequest updatePhoneRequest, Authentication authentication) {
         User user = getAuthenticatedUser(authentication);
 
         String currentPhone = user.getPhoneNumber();
         String requestedPhone = updatePhoneRequest.newPhoneNumber();
 
         if (currentPhone.equals(requestedPhone)) {
-            throw new BusinessException(UserErrorCodes.PHONE_NUMBER_UNCHANGED);
+            return Result.error(UserErrorCodes.PHONE_NUMBER_UNCHANGED);
         }
 
         if (userRepository.existsByPhoneNumber(requestedPhone)) {
-            throw new BusinessException(UserErrorCodes.PHONE_NUMBER_ALREADY_IN_USE);
+            return Result.error(UserErrorCodes.PHONE_NUMBER_ALREADY_IN_USE);
         }
 
         user.setPhoneNumber(requestedPhone);
         update(user);
         log.info("User phone number updated for user: {}, new phone number: {}", user.getEmail(), requestedPhone);
         userNotificationService.sendPhoneNumberUpdatedNotification(user);
-        return "Phone number updated successfully.";
+        return Result.success("Phone number updated successfully.");
     }
 
 
-    public String updateEmail(UpdateEmailRequest updateEmailRequest, Authentication authentication) {
+    public Result<String> updateEmail(UpdateEmailRequest updateEmailRequest, Authentication authentication) {
         User user = getAuthenticatedUser(authentication);
         String currentEmail = user.getEmail();
         String requestedEmail = updateEmailRequest.newEmail();
 
         if (currentEmail.equals(requestedEmail)) {
-            throw new BusinessException(UserErrorCodes.EMAIL_UNCHANGED);
+            return Result.error(UserErrorCodes.EMAIL_UNCHANGED);
         }
 
         if (userRepository.existsByEmail(requestedEmail)) {
-            throw new BusinessException(UserErrorCodes.EMAIL_ALREADY_IN_USE);
+            return Result.error(UserErrorCodes.EMAIL_ALREADY_IN_USE);
         }
 
         user.setEmail(requestedEmail);
         update(user);
         log.info("Email updated successfully from: {}, to: {}, by user: {}", currentEmail, requestedEmail, user.getId());
-        return "Email updated successfully.";
+        return Result.success("Email updated successfully.");
     }
 
     public UserDto getCurrentUserProfile(Authentication authentication) {
@@ -109,13 +118,16 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public User findById(Long id){
-        return userRepository.findById(id).orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_ID));
+    public Result<User> findById(Long id){
+        return userRepository.findById(id)
+                .map(Result::success)
+                .orElse(Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID));
     }
 
-    public UserDto getById(Long id){
-        return userRepository.findById(id).map(userMapper::toDto)
-                .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_ID));
+    public Result<UserDto> getById(Long id){
+        return userRepository.findById(id)
+                .map(user -> Result.success(userMapper.toDto(user)))
+                .orElse(Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID));
     }
 
     public List<User> getAllUsers() {
