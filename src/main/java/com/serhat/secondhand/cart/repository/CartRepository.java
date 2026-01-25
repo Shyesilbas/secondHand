@@ -1,8 +1,6 @@
 package com.serhat.secondhand.cart.repository;
 
 import com.serhat.secondhand.cart.entity.Cart;
-import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,28 +15,26 @@ import java.util.UUID;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-        List<Cart> findByUserOrderByCreatedAtDesc(User user);
+    List<Cart> findByUserIdOrderByCreatedAtDesc(Long userId);
 
-        @Query("SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user = :user ORDER BY c.createdAt DESC")
-    List<Cart> findByUserWithListing(@Param("user") User user);
+    List<Cart> findByUserId(Long userId);
 
-        Optional<Cart> findByUserAndListing(User user, Listing listing);
+    @Query("SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user.id = :userId ORDER BY c.createdAt DESC")
+    List<Cart> findByUserIdWithListing(@Param("userId") Long userId);
 
-        boolean existsByUserAndListing(User user, Listing listing);
+    Optional<Cart> findByUserIdAndListingId(Long userId, UUID listingId);
 
-        long countByUser(User user);
+    boolean existsByUserIdAndListingId(Long userId, UUID listingId);
 
-        @Modifying
-    @Query("DELETE FROM Cart c WHERE c.user = :user")
-    void deleteByUser(@Param("user") User user);
+    long countByUserId(Long userId);
 
-        @Modifying
-    @Query("DELETE FROM Cart c WHERE c.user = :user AND c.listing = :listing")
-    void deleteByUserAndListing(@Param("user") User user, @Param("listing") Listing listing);
+    @Modifying
+    @Query("DELETE FROM Cart c WHERE c.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 
-        @Modifying
-    @Query("UPDATE Cart c SET c.quantity = :quantity WHERE c.user = :user AND c.listing = :listing")
-    void updateQuantityByUserAndListing(@Param("user") User user, @Param("listing") Listing listing, @Param("quantity") Integer quantity);
+    @Modifying
+    @Query("DELETE FROM Cart c WHERE c.user.id = :userId AND c.listing.id = :listingId")
+    void deleteByUserIdAndListingId(@Param("userId") Long userId, @Param("listingId") UUID listingId);
 
     @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.listing.id = :listingId AND c.reservedAt > :expirationTime")
     int countReservedQuantityByListing(@Param("listingId") UUID listingId, @Param("expirationTime") LocalDateTime expirationTime);

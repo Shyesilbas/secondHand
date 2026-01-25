@@ -37,15 +37,13 @@ public class ListingViewController {
             HttpServletRequest httpRequest) {
 
         String sessionId = request != null ? request.getSessionId() : null;
-        String userAgent = request != null ? request.getUserAgent() : null;
-        
-        if (userAgent == null) {
-            userAgent = httpRequest.getHeader("User-Agent");
-        }
-
+        String userAgent = request != null ? request.getUserAgent() : (httpRequest.getHeader("User-Agent"));
         String ipAddress = getClientIpAddress(httpRequest);
 
-        listingViewService.trackView(id, currentUser, sessionId, ipAddress, userAgent);
+        // KRİTİK DÜZELTME: Giriş yapmamış kullanıcılar için currentUser null olabilir.
+        Long userId = (currentUser != null) ? currentUser.getId() : null;
+
+        listingViewService.trackView(id, userId, sessionId, ipAddress, userAgent);
 
         return ResponseEntity.ok().build();
     }
@@ -58,13 +56,8 @@ public class ListingViewController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @AuthenticationPrincipal User currentUser) {
 
-        // Default to last 7 days if not specified
-        if (endDate == null) {
-            endDate = LocalDateTime.now();
-        }
-        if (startDate == null) {
-            startDate = endDate.minusDays(7);
-        }
+        if (endDate == null) endDate = LocalDateTime.now();
+        if (startDate == null) startDate = endDate.minusDays(7);
 
         ListingViewStatsDto stats = listingViewService.getViewStatistics(id, startDate, endDate);
         return ResponseEntity.ok(stats);
@@ -75,12 +68,10 @@ public class ListingViewController {
         if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
             return xForwardedFor.split(",")[0].trim();
         }
-
         String xRealIp = request.getHeader("X-Real-IP");
         if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
             return xRealIp;
         }
-
         return request.getRemoteAddr();
     }
 
@@ -92,4 +83,3 @@ public class ListingViewController {
         private String userAgent;
     }
 }
-

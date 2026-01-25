@@ -9,63 +9,67 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 public class PaymentStatsService {
 
     private final PaymentRepository paymentRepository;
-    private final UserService userService;
     private final PaymentMapper paymentMapper;
     private final ListingService listingService;
 
-    public Map<String, Object> getPaymentStatistics(Authentication authentication, PaymentType filterType) {
-        // Payment stats for specific payment type
-        User user = userService.getAuthenticatedUser(authentication);
-        var payments = paymentRepository.findByFromUserOrToUser(user, user);
+
+    public Map<String, Object> getPaymentStatistics(Long userId) {
+        return getPaymentStatistics(userId, null);
+    }
+
+    public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
+        log.info("Calculating payment statistics for userId: {}", userId);
+
+        List<Payment> payments = paymentRepository.findByFromUserIdOrToUserId(userId, userId);
+
         if (filterType != null) {
-            payments = payments.stream().filter(p -> p.getPaymentType() == filterType).toList();
+            payments = payments.stream()
+                    .filter(p -> p.getPaymentType() == filterType)
+                    .toList();
         }
 
         long total = payments.size();
         long successful = payments.stream().filter(Payment::isSuccess).count();
-        BigDecimal totalAmount = payments.stream().filter(Payment::isSuccess)
+        BigDecimal totalAmount = payments.stream()
+                .filter(Payment::isSuccess)
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return Map.of(
-                "totalPayments", total,
-                "successfulPayments", successful,
-                "failedPayments", total - successful,
-                "successRate", total > 0 ? (double) successful / total * 100 : 0,
-                "totalAmount", totalAmount
-        );
-    }
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalPayments", total);
+        stats.put("successfulPayments", successful);
+        stats.put("failedPayments", total - successful);
+        stats.put("successRate", total > 0 ? (double) successful / total * 100 : 0);
+        stats.put("totalAmount", totalAmount);
 
-    public Map<String, Object> getPaymentStatistics(Authentication authentication) {
-        return getPaymentStatistics(authentication, null);
-    }
-
-    public Page<PaymentDto> getMyPayments(Authentication authentication, int page, int size) {
-        return getMyPayments(authentication, page, size, null, null, null, null, null, null, null, null);
+        return stats;
     }
 
     public Page<PaymentDto> getMyPayments(
-            Authentication authentication,
+            Long userId,
             int page,
             int size,
             PaymentTransactionType transactionType,
@@ -76,13 +80,13 @@ public class PaymentStatsService {
             BigDecimal amountMin,
             BigDecimal amountMax,
             String sellerName) {
-        User user = userService.getAuthenticatedUser(authentication);
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "processedAt"));
-        
+
         Page<Payment> payments;
         if (hasFilters(transactionType, paymentType, paymentDirection, dateFrom, dateTo, amountMin, amountMax, sellerName)) {
             payments = paymentRepository.findByFilters(
-                    user, user,
+                    userId,
                     transactionType,
                     paymentType,
                     paymentDirection,
@@ -94,10 +98,10 @@ public class PaymentStatsService {
                     pageable
             );
         } else {
-            payments = paymentRepository.findByFromUserOrToUser(user, user, pageable);
+            payments = paymentRepository.findByUserId(userId, pageable);
         }
-        
-        return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, user));
+
+        return payments.map(payment -> mapPaymentToDtoWithListingInfo(payment, userId));
     }
 
     private boolean hasFilters(
@@ -110,16 +114,16 @@ public class PaymentStatsService {
             BigDecimal amountMax,
             String sellerName) {
         return transactionType != null ||
-               paymentType != null ||
-               paymentDirection != null ||
-               dateFrom != null ||
-               dateTo != null ||
-               amountMin != null ||
-               amountMax != null ||
-               (sellerName != null && !sellerName.trim().isEmpty());
+                paymentType != null ||
+                paymentDirection != null ||
+                dateFrom != null ||
+                dateTo != null ||
+                amountMin != null ||
+                amountMax != null ||
+                (sellerName != null && !sellerName.trim().isEmpty());
     }
 
-    private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment, User currentUser) {
+    private PaymentDto mapPaymentToDtoWithListingInfo(Payment payment, Long currentUserId) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
         String listingTitle = null;
         String listingNo = null;
@@ -146,7 +150,7 @@ public class PaymentStatsService {
             direction = payment.getPaymentDirection();
             transactionType = payment.getTransactionType();
         } else {
-            if (payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUser.getId())) {
+            if (payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUserId)) {
                 direction = PaymentDirection.OUTGOING;
                 transactionType = PaymentTransactionType.ITEM_PURCHASE;
             } else {
@@ -172,7 +176,4 @@ public class PaymentStatsService {
                 baseDto.isSuccess()
         );
     }
-
-
-
 }

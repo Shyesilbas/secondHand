@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.vehicle;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
@@ -13,11 +13,11 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,38 +28,61 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class VehicleListingService {
-    
+
     private final VehicleListingRepository vehicleRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final VehicleListingFilterService vehicleListingFilterService;
     private final PriceHistoryService priceHistoryService;
-    
+    private final UserService userService;
+
     @Transactional
-    public UUID createVehicleListing(VehicleCreateRequest request, User seller) {
+    public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
+        log.info("Creating vehicle listing for sellerId: {}", sellerId);
+
+        // 1. Resolve User
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User seller = userResult.getData();
+
+        // 2. Map and Save
         VehicleListing vehicle = listingMapper.toVehicleEntity(request);
         vehicle.setSeller(seller);
+        vehicle.setStatus(ListingStatus.ACTIVE);
+        vehicle.setListingFeePaid(true);
+
         VehicleListing saved = vehicleRepository.save(vehicle);
         log.info("Vehicle listing created: {}", saved.getId());
-        return saved.getId();
+
+        return Result.success(saved.getId());
     }
-    
+
     @Transactional
-    public void updateVehicleListing(UUID id, VehicleUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateVehicleListing(UUID id, VehicleUpdateRequest request, Long currentUserId) {
+        log.info("Updating vehicle listing: {} by user: {}", id, currentUserId);
 
-        VehicleListing existing = vehicleRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Vehicle listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+        // 1. Ownership Validation (Using updated Long based method)
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        VehicleListing existing = vehicleRepository.findById(id).orElse(null);
+        if (existing == null) {
+            return Result.error("Vehicle listing not found", "LISTING_NOT_FOUND");
+        }
 
-                var oldPrice = existing.getPrice();
-        var oldCurrency = existing.getCurrency();
+        // 2. Status Validation
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
+        }
 
+        var oldPrice = existing.getPrice();
+
+        // 3. Selective Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -85,18 +108,21 @@ public class VehicleListingService {
 
         vehicleRepository.save(existing);
 
-                if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
+        // 4. Price History Check
+        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
-                existing, 
-                oldPrice, 
-                existing.getPrice(), 
-                existing.getCurrency(), 
-                "Price updated via listing edit"
+                    existing,
+                    oldPrice,
+                    existing.getPrice(),
+                    existing.getCurrency(),
+                    "Price updated via listing edit"
             );
         }
+
         log.info("Vehicle listing updated: {}", id);
+        return Result.success();
     }
-    
+
     public List<VehicleListingDto> findByBrandAndModel(CarBrand brand, String model) {
         List<VehicleListing> vehicles = vehicleRepository.findByBrandAndModel(brand, model);
         return vehicles.stream()
@@ -109,7 +135,6 @@ public class VehicleListingService {
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle listing not found"));
         return listingMapper.toVehicleDto(vehicle);
     }
-
 
     public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
         log.info("Filtering vehicle listings with criteria: {}", filters);

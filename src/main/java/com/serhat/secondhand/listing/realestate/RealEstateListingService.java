@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.realestate;
 
-import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
@@ -12,11 +12,11 @@ import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,35 +32,55 @@ public class RealEstateListingService {
     private final ListingMapper listingMapper;
     private final RealEstateListingFilterService realEstateListingFilterService;
     private final PriceHistoryService priceHistoryService;
+    private final UserService userService;
 
     @Transactional
-    public UUID createRealEstateListing(RealEstateCreateRequest request, User seller) {
+    public Result<UUID> createRealEstateListing(RealEstateCreateRequest request, Long sellerId) {
+        log.info("Creating real estate listing for sellerId: {}", sellerId);
 
+        // 1. Resolve Seller
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User seller = userResult.getData();
+
+        // 2. Map and Save
         RealEstateListing realEstateListing = listingMapper.toRealEstateEntity(request);
         realEstateListing.setSeller(seller);
+        realEstateListing.setStatus(ListingStatus.ACTIVE);
+        realEstateListing.setListingFeePaid(true);
 
-        RealEstateListing saved =  realEstateRepository.save(realEstateListing);
-        log.info("Real estate listing created: {}", realEstateListing.getId());
+        RealEstateListing saved = realEstateRepository.save(realEstateListing);
+        log.info("Real estate listing created: {}", saved.getId());
 
-        return saved.getId();
-
+        return Result.success(saved.getId());
     }
 
     @Transactional
-    public void updateRealEstateListing(UUID id, RealEstateUpdateRequest request, User currentUser) {
-        listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateRealEstateListing(UUID id, RealEstateUpdateRequest request, Long currentUserId) {
+        log.info("Updating real estate listing: {} by user: {}", id, currentUserId);
 
-        RealEstateListing existing = realEstateRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(
-                        "Real Estate listing not found",
-                        HttpStatus.NOT_FOUND,
-                        "LISTING_NOT_FOUND"
-                ));
+        // 1. Ownership Validation (ID Based)
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) {
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+        }
 
-        listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        RealEstateListing existing = realEstateRepository.findById(id).orElse(null);
+        if (existing == null) {
+            return Result.error("Real Estate listing not found", "LISTING_NOT_FOUND");
+        }
+
+        // 2. Status Validation
+        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        if (statusResult.isError()) {
+            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
+        }
+
         var oldPrice = existing.getPrice();
-        var oldCurrency = existing.getCurrency();
 
+        // 3. Mapping Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -82,6 +102,7 @@ public class RealEstateListingService {
 
         realEstateRepository.save(existing);
 
+        // 4. Price History Check
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                     existing,
@@ -93,10 +114,11 @@ public class RealEstateListingService {
         }
 
         log.info("Real estate listing updated: {}", id);
+        return Result.success();
     }
 
     public Page<ListingDto> filterRealEstate(RealEstateFilterDto filters) {
-        log.info("Filtering vehicle listings with criteria: {}", filters);
+        log.info("Filtering real estate listings with criteria: {}", filters);
         return realEstateListingFilterService.filterRealEstates(filters);
     }
 
@@ -105,6 +127,4 @@ public class RealEstateListingService {
                 .orElseThrow(() -> new IllegalArgumentException("Real Estate listing not found"));
         return listingMapper.toRealEstateDto(realEstateListing);
     }
-
-
 }

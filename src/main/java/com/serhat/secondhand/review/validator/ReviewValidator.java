@@ -17,20 +17,24 @@ public class ReviewValidator {
 
     public Result<Void> validateForCreate(User reviewer, OrderItem orderItem) {
         if (!orderItem.getOrder().getUser().getId().equals(reviewer.getId())) {
-            return Result.error(ReviewErrorCodes.ORDER_ITEM_NOT_BELONG_TO_USER);
+            return Result.error("This order item does not belong to the user",
+                    ReviewErrorCodes.ORDER_ITEM_NOT_BELONG_TO_USER.toString());
         }
 
-        ShippingStatus currentStatus = orderItem.getOrder().getShipping() != null 
-                ? orderItem.getOrder().getShipping().getStatus() 
+        ShippingStatus currentStatus = orderItem.getOrder().getShipping() != null
+                ? orderItem.getOrder().getShipping().getStatus()
                 : null;
+
         if (currentStatus == null || currentStatus != ShippingStatus.DELIVERED) {
-            return Result.error(ReviewErrorCodes.ORDER_NOT_DELIVERED);
+            return Result.error("Reviews can only be submitted for delivered orders",
+                    ReviewErrorCodes.ORDER_NOT_DELIVERED.toString());
         }
 
-        if (reviewRepository.existsByReviewerAndOrderItem(reviewer, orderItem)) {
-            return Result.error(ReviewErrorCodes.REVIEW_ALREADY_EXISTS);
+        if (reviewRepository.existsByReviewerIdAndOrderItemId(reviewer.getId(), orderItem.getId())) {
+            return Result.error("You have already reviewed this item",
+                    ReviewErrorCodes.REVIEW_ALREADY_EXISTS.toString());
         }
+
         return Result.success();
     }
 }
-

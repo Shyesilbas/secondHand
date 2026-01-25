@@ -39,7 +39,7 @@ public class CartController {
     })
     public ResponseEntity<?> getCartItems(@AuthenticationPrincipal User currentUser) {
         log.info("API request to get cart items for user: {}", currentUser.getEmail());
-        Result<List<CartDto>> result = cartService.getCartItems(currentUser);
+        Result<List<CartDto>> result = cartService.getCartItems(currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -60,7 +60,7 @@ public class CartController {
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to add item to cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), request.getListingId());
-        Result<CartDto> result = cartService.addToCart(currentUser, request);
+        Result<CartDto> result = cartService.addToCart(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -82,7 +82,7 @@ public class CartController {
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update cart item for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        Result<CartDto> result = cartService.updateCartItem(currentUser, listingId, request);
+        Result<CartDto> result = cartService.updateCartItem(currentUser.getId(), listingId, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -102,7 +102,7 @@ public class CartController {
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to remove item from cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        Result<Void> result = cartService.removeFromCart(currentUser, listingId);
+        Result<Void> result = cartService.removeFromCart(currentUser.getId(), listingId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -118,7 +118,7 @@ public class CartController {
     })
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
         log.info("API request to clear cart for user: {}", currentUser.getEmail());
-        Result<Void> result = cartService.clearCart(currentUser);
+        Result<Void> result = cartService.clearCart(currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -134,7 +134,7 @@ public class CartController {
     })
     public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
         log.info("API request to get cart item count for user: {}", currentUser.getEmail());
-        Result<Long> result = cartService.getCartItemCount(currentUser);
+        Result<Long> result = cartService.getCartItemCount(currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -153,7 +153,7 @@ public class CartController {
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to check if item is in cart for user: {} - listingId: {}", 
                 currentUser.getEmail(), listingId);
-        Result<Boolean> result = cartService.isInCart(currentUser, listingId);
+        Result<Boolean> result = cartService.isInCart(currentUser.getId(), listingId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));

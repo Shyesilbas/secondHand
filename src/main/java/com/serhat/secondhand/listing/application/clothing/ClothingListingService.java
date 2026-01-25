@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,61 +32,72 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class ClothingListingService {
-    
+
     private final ClothingListingRepository clothingRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
-    
+    private final UserService userService;
+
     @Transactional
-    public Result<UUID> createClothingListing(ClothingCreateRequest request, User seller) {
+    public Result<UUID> createClothingListing(ClothingCreateRequest request, Long sellerId) {
+        log.info("Creating clothing listing for sellerId: {}", sellerId);
+
+        // 1. Resolve Seller
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User seller = userResult.getData();
+
+        // 2. Map and Initial Validate
         ClothingListing clothing = listingMapper.toClothingEntity(request);
         if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
-            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error("Invalid quantity for clothing listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
+
         clothing.setSeller(seller);
         clothing.setListingFeePaid(true);
         clothing.setStatus(ListingStatus.ACTIVE);
+
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
-        
+
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
-        
+
         return Result.success(saved.getId());
     }
-    
+
     @Transactional
-    public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, User currentUser) {
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
+        // 1. Ownership Check (ID based)
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
-            return ownershipResult;
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
         }
 
-        ClothingListing existing = clothingRepository.findById(id)
-                .orElse(null);
-
+        ClothingListing existing = clothingRepository.findById(id).orElse(null);
         if (existing == null) {
             return Result.error("Clothing listing not found", "LISTING_NOT_FOUND");
         }
 
+        // 2. Status Validation
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
         if (statusResult.isError()) {
-            return statusResult;
+            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
         }
 
         var oldPrice = existing.getPrice();
 
+        // 3. Mapping Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
-            if (q < 1) {
-                return;
-            }
-            existing.setQuantity(q);
+            if (q >= 1) existing.setQuantity(q);
         });
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
@@ -100,11 +112,12 @@ public class ClothingListingService {
         request.clothingCategory().ifPresent(existing::setClothingCategory);
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
-            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
         clothingRepository.save(existing);
 
+        // 4. Price History Check
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                     existing,
@@ -114,10 +127,11 @@ public class ClothingListingService {
                     "Price updated via listing edit"
             );
         }
+
         log.info("Clothing listing updated: {}", id);
         return Result.success();
     }
-    
+
     public List<ClothingListingDto> findByBrandAndClothingType(ClothingBrand brand, ClothingType clothingType) {
         List<ClothingListing> clothing = clothingRepository.findByBrandAndClothingType(brand, clothingType);
         return clothing.stream()
