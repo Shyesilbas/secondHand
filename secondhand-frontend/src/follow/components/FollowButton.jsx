@@ -88,7 +88,7 @@ const FollowButton = memo(({ userId, size = 'md', showDropdown = true, className
             </button>
 
             {isFollowing && showDropdown && isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-background-primary rounded-lg shadow-lg border border-border-light py-1 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-background-primary rounded-lg shadow-lg border border-border-light py-1 z-[100]">
                     <button
                         onClick={handleToggleNotifications}
                         disabled={isTogglingNotifications}

@@ -1,12 +1,12 @@
 package com.serhat.secondhand.user.application;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import com.serhat.secondhand.user.domain.entity.Address;
-import com.serhat.secondhand.user.util.AddressErrorCodes;
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.repository.AddressRepository;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
+import com.serhat.secondhand.user.domain.repository.AddressRepository;
+import com.serhat.secondhand.user.util.AddressErrorCodes;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,85 +16,83 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AddressService {
+
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
+    private final UserService userService;
 
-    public List<AddressDto> getAddressesByUser(User user) {
-        return addressRepository.findByUser(user)
-                .stream()
-                .map(addressMapper::toDto)
-                .toList();
+    public List<AddressDto> getAddressesByUserId(Long userId) {
+        return addressRepository.findByUserId(userId).stream()
+                .map(addressMapper::toDto).toList();
     }
 
-    public Result<AddressDto> addAddress(User user, AddressDto addressDto) {
-        if (addressRepository.countByUser(user) >= 3) {
+    @Transactional
+    public Result<AddressDto> addAddress(Long userId, AddressDto addressDto) {
+        if (addressRepository.countByUserId(userId) >= 3) {
             return Result.error(AddressErrorCodes.MAX_ADDRESSES_EXCEEDED);
         }
+
+        var userResult = userService.findById(userId);
+
+        if (userResult.isError()) {
+            return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        }
+
+        User user = userResult.getData();
+
         Address address = addressMapper.toEntity(addressDto);
         address.setUser(user);
+
         if (address.isMainAddress()) {
-            selectAsMainAddress(user, address);
+            addressRepository.resetMainAddressByUserId(userId);
+        }
+
+        return Result.success(addressMapper.toDto(addressRepository.save(address)));
+    }
+
+    @Transactional
+    public Result<AddressDto> updateAddress(Long addressId, Long userId, AddressDto dto) {
+        Address address = addressRepository.findById(addressId).orElse(null);
+        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
+        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+
+        addressMapper.updateEntityFromDto(dto, address);
+
+        if (dto.isMainAddress()) {
+            addressRepository.resetMainAddressByUserId(userId);
+            address.setMainAddress(true);
         }
         return Result.success(addressMapper.toDto(addressRepository.save(address)));
     }
 
-    public Result<AddressDto> updateAddress(Long addressId, AddressDto updatedAddressDto, User user) {
-        Address address = addressRepository.findById(addressId)
-                .orElse(null);
-        
-        if (address == null) {
-            return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
-        }
-        
-        if (!address.getUser().getId().equals(user.getId())) {
-            return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
-        }
-        
-        address.setAddressLine(updatedAddressDto.getAddressLine());
-        address.setCity(updatedAddressDto.getCity());
-        address.setState(updatedAddressDto.getState());
-        address.setPostalCode(updatedAddressDto.getPostalCode());
-        address.setCountry(updatedAddressDto.getCountry());
-        address.setAddressType(updatedAddressDto.getAddressType());
-        if (updatedAddressDto.isMainAddress()) {
-            selectAsMainAddress(user, address);
-        }
-        return Result.success(addressMapper.toDto(addressRepository.save(address)));
-    }
+    @Transactional
+    public Result<Void> deleteAddress(Long addressId, Long userId) {
+        Address address = addressRepository.findById(addressId).orElse(null);
 
-    public Result<Void> deleteAddress(Long addressId, User user) {
-        Address address = addressRepository.findById(addressId)
-                .orElse(null);
-        
-        if (address == null) {
-            return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
-        }
-        
-        if (!address.getUser().getId().equals(user.getId())) {
-            return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
-        }
-        
+        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
+        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+
         addressRepository.delete(address);
         return Result.success();
     }
 
     @Transactional
-    public void selectAsMainAddress(User user, Address address) {
-        List<Address> addresses = addressRepository.findByUser(user);
-        for (Address addr : addresses) {
-            if (addr.isMainAddress()) {
-                addr.setMainAddress(false);
-                addressRepository.save(addr);
-            }
-        }
+    public Result<Void> setMainAddress(Long addressId, Long userId) {
+        Address address = addressRepository.findById(addressId).orElse(null);
 
+        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
+        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+
+        addressRepository.resetMainAddressByUserId(userId);
         address.setMainAddress(true);
         addressRepository.save(address);
+
+        return Result.success();
     }
 
-    public Address getAddressById(@NotNull(message = "Shipping address ID is required") Long shippingAddressId) {
-        return addressRepository.findById(shippingAddressId)
-                .orElse(null);
+    public Address getAddressById(@NotNull Long addressId) {
+        return addressRepository.findById(addressId).orElse(null);
     }
 }

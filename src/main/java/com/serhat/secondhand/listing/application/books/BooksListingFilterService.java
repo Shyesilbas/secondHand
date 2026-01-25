@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.books;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;

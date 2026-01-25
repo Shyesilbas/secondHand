@@ -10,11 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -114,7 +110,7 @@ public class ListingCampaignPricingUtil {
         dto.setCampaignName(best.getName());
     }
 
-    private boolean isApplicable(Campaign campaign, UUID listingId, ListingType type) {
+    public boolean isApplicable(Campaign campaign, UUID listingId, ListingType type) {
         if (campaign == null || !campaign.isActive()) {
             return false;
         }

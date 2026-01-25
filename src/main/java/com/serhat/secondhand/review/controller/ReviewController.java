@@ -1,14 +1,11 @@
 package com.serhat.secondhand.review.controller;
 
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
-import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;

@@ -1,10 +1,17 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { SparklesIcon } from '@heroicons/react/24/outline';
+import { getPageName } from '../../utils/getPageName.js';
 
 const AuthLayout = () => {
+    const { pathname } = useLocation();
+    const pageName = getPageName(pathname);
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div
+            className="min-h-screen bg-gray-50"
+            data-page={pageName ?? undefined}
+            data-path={pathname}
+        >
             <div className="flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">

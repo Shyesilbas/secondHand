@@ -1,6 +1,5 @@
 package com.serhat.secondhand.listing.application;
 
-import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.listing.domain.dto.PriceHistoryDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -8,6 +7,7 @@ import com.serhat.secondhand.listing.domain.entity.PriceHistory;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.mapper.PriceHistoryMapper;
 import com.serhat.secondhand.listing.domain.repository.PriceHistoryRepository;
+import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +36,6 @@ public class PriceHistoryService {
                 .toList();
     }
 
-    public List<PriceHistoryDto> getPriceHistoryByListing(Listing listing) {
-        return priceHistoryRepository.findByListingOrderByChangeDateDesc(listing)
-                .stream()
-                .map(priceHistoryMapper::toDto)
-                .toList();
-    }
 
     @Transactional
     public void recordPriceChange(Listing listing, BigDecimal oldPrice, BigDecimal newPrice, 

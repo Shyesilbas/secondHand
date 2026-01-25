@@ -3,7 +3,7 @@ package com.serhat.secondhand.listing.domain.entity;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.util.ListingNoGenerator;
+import com.serhat.secondhand.listing.util.ListingNoGenerator;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.*;

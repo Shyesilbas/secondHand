@@ -1,5 +1,6 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.vehicle;
 
+import com.serhat.secondhand.listing.application.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

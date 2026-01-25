@@ -1,9 +1,12 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.clothing;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.PriceHistoryService;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
@@ -13,17 +16,16 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 
 @Service
 @RequiredArgsConstructor

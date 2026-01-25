@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.listing.application.BooksListingService;
+import com.serhat.secondhand.listing.application.books.BooksListingService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
