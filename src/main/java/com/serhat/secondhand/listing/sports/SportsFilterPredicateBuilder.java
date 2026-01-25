@@ -1,5 +1,6 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.sports;
 
+import com.serhat.secondhand.listing.application.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

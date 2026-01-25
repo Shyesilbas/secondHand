@@ -1,7 +1,8 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.sports;
 
-import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFilterDto;
+import com.serhat.secondhand.listing.application.GenericListingFilterService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

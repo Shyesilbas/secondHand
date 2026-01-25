@@ -1,74 +1,60 @@
 package com.serhat.secondhand.user.api;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.AddressService;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.Address;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
-import com.serhat.secondhand.user.domain.repository.AddressRepository;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
 public class AddressController {
     private final AddressService addressService;
-    private final UserService userService;
-    private final AddressRepository addressRepository;
 
     @GetMapping
-    public ResponseEntity<List<AddressDto>> getAddresses(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        return ResponseEntity.ok(addressService.getAddressesByUser(user));
+    public ResponseEntity<List<AddressDto>> getAddresses(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(addressService.getAddressesByUserId(user.getId()));
     }
 
     @PostMapping
-    public ResponseEntity<?> addAddress(@RequestBody AddressDto addressDto, Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        var result = addressService.addAddress(user, addressDto);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+    public ResponseEntity<?> addAddress(@RequestBody AddressDto addressDto, @AuthenticationPrincipal User user) {
+        var result = addressService.addAddress(user.getId(), addressDto);
+        return handleResult(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody AddressDto addressDto, Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        var result = addressService.updateAddress(id, addressDto, user);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+    public ResponseEntity<?> updateAddress(@PathVariable Long id,
+                                           @RequestBody AddressDto addressDto,
+                                           @AuthenticationPrincipal User user) {
+        var result = addressService.updateAddress(id, user.getId(), addressDto);
+        return handleResult(result);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAddress(@PathVariable Long id, Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        var result = addressService.deleteAddress(id, user);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteAddress(@PathVariable Long id,
+                                           @AuthenticationPrincipal User user) {
+        var result = addressService.deleteAddress(id, user.getId());
+        return result.isError() ? handleResult(result) : ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/main")
-    public ResponseEntity<Void> selectAsMainAddress(@PathVariable Long id, Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        Address address = addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
-        if (!address.getUser().getId().equals(user.getId())) {
-            throw new SecurityException("Unauthorized");
+    public ResponseEntity<?> setMainAddress(@PathVariable Long id,
+                                            @AuthenticationPrincipal User user) {
+        var result = addressService.setMainAddress(id, user.getId());
+        return handleResult(result);
+    }
+
+    private ResponseEntity<?> handleResult(Result<?> result) {
+        if (result.isError()) {
+            return ResponseEntity.badRequest().body(Map.of("error", result.getErrorCode()));
         }
-        addressService.selectAsMainAddress(user, address);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(result.getData());
     }
 }

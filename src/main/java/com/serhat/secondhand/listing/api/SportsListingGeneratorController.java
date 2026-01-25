@@ -1,8 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.listing.application.SportsListingService;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
+import com.serhat.secondhand.listing.sports.SportsListingService;
 import com.serhat.secondhand.listing.util.SportsListingGenerator;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;

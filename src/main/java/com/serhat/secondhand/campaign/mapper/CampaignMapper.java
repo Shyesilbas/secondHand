@@ -4,11 +4,24 @@ import com.serhat.secondhand.campaign.dto.CampaignDto;
 import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.entity.Campaign;
+import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class CampaignMapper {
+
+    public AppliedCampaignDto toAppliedCampaignDto(Campaign campaign, BigDecimal discountAmount) {
+        return new AppliedCampaignDto(
+                campaign.getId(),
+                campaign.getName(),
+                campaign.getDiscountKind(),
+                campaign.getValue(),
+                discountAmount
+        );
+    }
 
     public CampaignDto toDto(Campaign campaign) {
         return CampaignDto.builder()

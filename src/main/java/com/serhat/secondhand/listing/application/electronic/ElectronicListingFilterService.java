@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.electronic;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;

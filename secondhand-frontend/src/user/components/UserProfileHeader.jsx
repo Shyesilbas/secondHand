@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import { FollowButton, FollowStats } from '../../follow/index.js';
+import { formatDate } from '../../common/formatters.js';
 
 const UserProfileHeader = ({ 
   user, 
@@ -13,8 +14,10 @@ const UserProfileHeader = ({
 
   const userInitials = `${user.name?.[0]?.toUpperCase() || ''}${user.surname?.[0]?.toUpperCase() || ''}`;
 
+  const memberSince = formatDate(user?.accountCreationDate);
+
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden mb-8">
+    <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm mb-8">
       <div className="p-8">
         <button
           onClick={() => navigate(-1)}
@@ -62,7 +65,7 @@ const UserProfileHeader = ({
             </div>
             
             <p className="text-sm text-slate-500 tracking-tight">
-              {user.accountCreationDate && `Member since ${new Date(user.accountCreationDate).getFullYear()}`}
+              {memberSince && `Member since ${memberSince}`}
             </p>
           </div>
         </div>
@@ -79,7 +82,7 @@ const UserProfileHeader = ({
                 sellerSurname: user.surname
               }}
               isDirectChat={true}
-              className="px-5 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md tracking-tight"
+              className="px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md tracking-tight"
             />
             <ComplaintButton
               targetUserId={user.id}

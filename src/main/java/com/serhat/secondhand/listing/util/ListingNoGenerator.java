@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.domain.util;
+package com.serhat.secondhand.listing.util;
 
 import java.security.SecureRandom;
 

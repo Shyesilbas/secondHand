@@ -1,6 +1,8 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.realestate;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;

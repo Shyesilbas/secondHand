@@ -1,17 +1,19 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.books;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.PriceHistoryService;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFilterDto;
-import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
-import com.serhat.secondhand.listing.domain.entity.SportsListing;
+import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,26 +27,26 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SportsListingService {
+public class BooksListingService {
 
-    private final SportsListingRepository sportsRepository;
+    private final BooksListingRepository booksRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
-    private final SportsListingFilterService sportsListingFilterService;
+    private final BooksListingFilterService booksListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Result<UUID> createSportsListing(SportsCreateRequest request, User seller) {
-        SportsListing entity = listingMapper.toSportsEntity(request);
-        if (entity.getQuantity() == null || entity.getQuantity() < 1) {
+    public Result<UUID> createBooksListing(BooksCreateRequest request, User seller) {
+        BooksListing books = listingMapper.toBooksEntity(request);
+        if (books.getQuantity() == null || books.getQuantity() < 1) {
             return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
-        entity.setSeller(seller);
-        entity.setListingFeePaid(true);
-        entity.setStatus(ListingStatus.ACTIVE);
-        SportsListing saved = sportsRepository.save(entity);
-        log.info("Sports listing created: {}", saved.getId());
+        books.setSeller(seller);
+        books.setListingFeePaid(true);
+        books.setStatus(ListingStatus.ACTIVE);
+        BooksListing saved = booksRepository.save(books);
+        log.info("Books listing created: {}", saved.getId());
         
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
         
@@ -52,17 +54,17 @@ public class SportsListingService {
     }
 
     @Transactional
-    public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, User currentUser) {
+    public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, User currentUser) {
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
         if (ownershipResult.isError()) {
             return ownershipResult;
         }
 
-        SportsListing existing = sportsRepository.findById(id)
+        BooksListing existing = booksRepository.findById(id)
                 .orElse(null);
 
         if (existing == null) {
-            return Result.error("Sports listing not found", "LISTING_NOT_FOUND");
+            return Result.error("Books listing not found", "LISTING_NOT_FOUND");
         }
 
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
@@ -85,13 +87,21 @@ public class SportsListingService {
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
-        request.discipline().ifPresent(existing::setDiscipline);
-        request.equipmentType().ifPresent(existing::setEquipmentType);
+
+        request.author().ifPresent(existing::setAuthor);
+        request.genre().ifPresent(existing::setGenre);
+        request.language().ifPresent(existing::setLanguage);
+        request.publicationYear().ifPresent(existing::setPublicationYear);
+        request.pageCount().ifPresent(existing::setPageCount);
+        request.format().ifPresent(existing::setFormat);
         request.condition().ifPresent(existing::setCondition);
+        request.isbn().ifPresent(existing::setIsbn);
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
             return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
+
+        booksRepository.save(existing);
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
@@ -102,21 +112,18 @@ public class SportsListingService {
                     "Price updated via listing edit"
             );
         }
-
-        sportsRepository.save(existing);
-
-        log.info("Sports listing updated: {}", id);
+        log.info("Books listing updated: {}", id);
         return Result.success();
     }
 
-    public SportsListingDto getSportsDetails(UUID id) {
-        SportsListing entity = sportsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sports listing not found"));
-        return listingMapper.toSportsDto(entity);
+    public BooksListingDto getBooksDetails(UUID id) {
+        BooksListing books = booksRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Books listing not found"));
+        return listingMapper.toBooksDto(books);
     }
 
-    public Page<ListingDto> filterSports(SportsListingFilterDto filters) {
-        return sportsListingFilterService.filterSports(filters);
+    public Page<ListingDto> filterBooks(BooksListingFilterDto filters) {
+        return booksListingFilterService.filterBooks(filters);
     }
 }
 

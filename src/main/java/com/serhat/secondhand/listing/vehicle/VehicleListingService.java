@@ -1,11 +1,13 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.vehicle;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -14,13 +16,13 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRep
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 
 @Service
 @RequiredArgsConstructor

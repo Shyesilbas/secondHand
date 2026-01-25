@@ -1,11 +1,11 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.listing.application.SportsListingService;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.SportsListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
+import com.serhat.secondhand.listing.sports.SportsListingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

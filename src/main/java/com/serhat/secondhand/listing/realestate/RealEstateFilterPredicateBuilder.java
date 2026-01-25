@@ -1,5 +1,6 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.realestate;
 
+import com.serhat.secondhand.listing.application.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.RealEstateFilterDto;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

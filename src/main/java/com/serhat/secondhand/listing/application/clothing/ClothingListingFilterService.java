@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.clothing;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;

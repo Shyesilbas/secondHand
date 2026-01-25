@@ -2,6 +2,9 @@ package com.serhat.secondhand.listing.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.application.books.BooksListingFilterService;
+import com.serhat.secondhand.listing.application.clothing.ClothingListingFilterService;
+import com.serhat.secondhand.listing.application.electronic.ElectronicListingFilterService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -10,6 +13,9 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
+import com.serhat.secondhand.listing.realestate.RealEstateListingFilterService;
+import com.serhat.secondhand.listing.sports.SportsListingFilterService;
+import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +85,6 @@ public class ListingService {
         ListingDto dto = listingMapper.toDynamicDto(listing);
         dto = enrichmentService.enrich(dto, userEmail);
 
-        // Enrich with view stats if user is the seller
         if (userEmail != null) {
             try {
                 Result<User> userResult = userService.findByEmail(userEmail);
@@ -150,14 +155,6 @@ public class ListingService {
         return new PageImpl<>(enrichmentService.enrich(dtos, userEmail), pageable, results.getTotalElements());
     }
 
-    public List<ListingDto> getMyListings(User user) {
-        return enrichList(
-                listingRepository.findBySellerOrderByCreatedAtDesc(user)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                user.getEmail()
-        );
-    }
-
     public Page<ListingDto> getMyListings(User user, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
@@ -176,19 +173,6 @@ public class ListingService {
         );
     }
 
-    public List<ListingDto> getListingsByUser(Long userId) {
-        Result<User> userResult = userService.findById(userId);
-        if (userResult.isError()) {
-            log.warn("User not found for ID: {}", userId);
-            return List.of();
-        }
-        User user = userResult.getData();
-        return enrichList(
-                listingRepository.findBySeller(user)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                null
-        );
-    }
 
     public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
         Result<User> userResult = userService.findById(userId);

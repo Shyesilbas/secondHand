@@ -1,8 +1,8 @@
-package com.serhat.secondhand.listing.application;
+package com.serhat.secondhand.listing.application.electronic;
 
+import com.serhat.secondhand.listing.application.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
