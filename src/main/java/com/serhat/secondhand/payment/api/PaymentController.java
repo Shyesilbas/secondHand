@@ -10,6 +10,8 @@ import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.payment.service.PaymentStatsService;
 import com.serhat.secondhand.payment.service.PaymentVerificationService;
+import com.serhat.secondhand.user.domain.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -35,23 +37,101 @@ public class PaymentController {
     private final PaymentVerificationService paymentVerificationService;
 
     @PostMapping("/pay")
+    @Operation(summary = "Create a new payment", description = "Processes a general payment request using idempotency for safety.")
     public ResponseEntity<?> createPayment(
             @RequestBody PaymentRequest paymentRequest,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
-            Authentication authentication) {
-        log.info("Creating payment from user {} with request: {}", authentication.getName(), paymentRequest);
+            @AuthenticationPrincipal User currentUser) {
+
+        log.info("Creating payment for user ID {} with request: {}", currentUser.getId(), paymentRequest);
         PaymentRequest requestWithKey = mergeIdempotencyKey(paymentRequest, idempotencyKey);
-        Result<PaymentDto> result = paymentProcessor.process(requestWithKey, authentication);
+
+        Result<PaymentDto> result = paymentProcessor.process(currentUser.getId(), requestWithKey);
+
+        return handleResult(result, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/initiate-verification")
+    @Operation(summary = "Initiate payment verification", description = "Starts the verification process (e.g., OTP) for a payment.")
+    public ResponseEntity<Void> initiatePaymentVerification(
+            @RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request,
+            @AuthenticationPrincipal User currentUser) {
+
+        log.info("Initiating payment verification for user ID: {}", currentUser.getId());
+        paymentVerificationService.initiatePaymentVerification(currentUser.getId(), request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/listings/pay-fee")
+    @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fees.")
+    public ResponseEntity<?> payListingCreationFee(
+            @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @AuthenticationPrincipal User currentUser) {
+
+        log.info("Processing listing fee payment for listing {} by user ID {}",
+                listingFeePaymentRequest.listingId(), currentUser.getId());
+
+        ListingFeePaymentRequest requestWithKey = mergeIdempotencyKeyForListingFee(listingFeePaymentRequest, idempotencyKey);
+        Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), requestWithKey);
+
+        return handleResult(result, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/my-payments")
+    @Operation(summary = "Get user payments", description = "Retrieve paginated and filtered history of payments for the authenticated user.")
+    public ResponseEntity<Page<PaymentDto>> getMyPayments(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentTransactionType transactionType,
+            @RequestParam(required = false) PaymentType paymentType,
+            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentDirection paymentDirection,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateTo,
+            @RequestParam(required = false) java.math.BigDecimal amountMin,
+            @RequestParam(required = false) java.math.BigDecimal amountMax,
+            @RequestParam(required = false) String sellerName) {
+
+        java.time.LocalDateTime dateToEndOfDay = dateTo != null ? dateTo.with(java.time.LocalTime.MAX) : null;
+
+        Page<PaymentDto> payments = paymentStatsService.getMyPayments(
+                currentUser.getId(), page, size,
+                transactionType, paymentType, paymentDirection,
+                dateFrom, dateToEndOfDay, amountMin, amountMax, sellerName);
+
+        return ResponseEntity.ok(payments);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String, Object>> getPaymentStatistics(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(name = "paymentType", required = false) String paymentType) {
+
+        if (paymentType == null || paymentType.isBlank()) {
+            return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId()));
+        }
+
+        return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(
+                currentUser.getId(), PaymentType.valueOf(paymentType)));
+    }
+
+    @GetMapping("/listing-fee-config")
+    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
+        return ResponseEntity.ok(listingFeeService.getListingFeeConfig());
+    }
+
+    private ResponseEntity<?> handleResult(Result<?> result, HttpStatus successStatus) {
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
+        return ResponseEntity.status(successStatus).body(result.getData());
     }
-    
+
     private PaymentRequest mergeIdempotencyKey(PaymentRequest paymentRequest, String idempotencyKey) {
-        if (idempotencyKey != null && !idempotencyKey.isBlank() && 
-            (paymentRequest.idempotencyKey() == null || paymentRequest.idempotencyKey().isBlank())) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank() &&
+                (paymentRequest.idempotencyKey() == null || paymentRequest.idempotencyKey().isBlank())) {
             return PaymentRequest.builder()
                     .fromUserId(paymentRequest.fromUserId())
                     .toUserId(paymentRequest.toUserId())
@@ -71,38 +151,9 @@ public class PaymentController {
         return paymentRequest;
     }
 
-    @PostMapping("/initiate-verification")
-    public ResponseEntity<Void> initiatePaymentVerification(@RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request, Authentication authentication) {
-        log.info("Received initiate payment verification request from user: {}, request: {}", authentication.getName(), request);
-        try {
-            paymentVerificationService.initiatePaymentVerification(authentication, request);
-            log.info("Payment verification initiated successfully for user: {}", authentication.getName());
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Error initiating payment verification for user: {}, error: {}", authentication.getName(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-
-    @PostMapping("/listings/pay-fee")
-    public ResponseEntity<?> payListingCreationFee(
-            @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
-            Authentication authentication) {
-        log.info("Processing listing fee payment for listing {} by user {}", listingFeePaymentRequest.listingId(), authentication.getName());
-        ListingFeePaymentRequest requestWithKey = mergeIdempotencyKeyForListingFee(listingFeePaymentRequest, idempotencyKey);
-        Result<PaymentDto> result = listingFeeService.payListingCreationFee(requestWithKey, authentication);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
-    }
-    
     private ListingFeePaymentRequest mergeIdempotencyKeyForListingFee(ListingFeePaymentRequest request, String idempotencyKey) {
-        if (idempotencyKey != null && !idempotencyKey.isBlank() && 
-            (request.idempotencyKey() == null || request.idempotencyKey().isBlank())) {
+        if (idempotencyKey != null && !idempotencyKey.isBlank() &&
+                (request.idempotencyKey() == null || request.idempotencyKey().isBlank())) {
             return new ListingFeePaymentRequest(
                     request.paymentType(),
                     request.listingId(),
@@ -113,49 +164,5 @@ public class PaymentController {
             );
         }
         return request;
-    }
-
-
-    @GetMapping("/my-payments")
-    public ResponseEntity<Page<PaymentDto>> getMyPayments(
-            Authentication authentication,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentTransactionType transactionType,
-            @RequestParam(required = false) PaymentType paymentType,
-            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentDirection paymentDirection,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateFrom,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateTo,
-            @RequestParam(required = false) java.math.BigDecimal amountMin,
-            @RequestParam(required = false) java.math.BigDecimal amountMax,
-            @RequestParam(required = false) String sellerName) {
-        log.info("Getting paginated payments for user: {} with filters", authentication.getName());
-        
-        java.time.LocalDateTime dateToEndOfDay = dateTo != null ? dateTo.with(java.time.LocalTime.MAX) : null;
-        
-        Page<PaymentDto> payments = paymentStatsService.getMyPayments(
-                authentication, page, size,
-                transactionType, paymentType, paymentDirection,
-                dateFrom, dateToEndOfDay, amountMin, amountMax, sellerName);
-        return ResponseEntity.ok(payments);
-    }
-
-
-    @GetMapping("/statistics")
-    public ResponseEntity<Map<String, Object>> getPaymentStatistics(Authentication authentication,
-                                                                    @RequestParam(name = "paymentType", required = false) String paymentType) {
-        log.info("Getting payment statistics for user: {}", authentication.getName());
-        if (paymentType == null || paymentType.isBlank()) {
-            return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(authentication));
-        }
-        Map<String, Object> statistics = paymentStatsService.getPaymentStatistics(authentication, PaymentType.valueOf(paymentType));
-        return ResponseEntity.ok(statistics);
-    }
-
-    @GetMapping("/listing-fee-config")
-    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
-        log.info("Getting listing fee configuration");
-        ListingFeeConfigDto config = listingFeeService.getListingFeeConfig();
-        return ResponseEntity.ok(config);
     }
 }

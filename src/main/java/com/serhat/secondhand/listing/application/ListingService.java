@@ -17,7 +17,6 @@ import com.serhat.secondhand.listing.realestate.RealEstateListingFilterService;
 import com.serhat.secondhand.listing.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
 import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -33,14 +32,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class ListingService {
 
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
     private final UserService userService;
     private final ListingEnrichmentService enrichmentService;
-    private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
     private final ListingViewService listingViewService;
+    private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
 
     public ListingService(
             ListingRepository listingRepository,
@@ -75,43 +75,21 @@ public class ListingService {
         return listingRepository.findById(id);
     }
 
-    public Optional<ListingDto> findByIdAsDto(UUID id, String userEmail) {
-        Optional<Listing> listingOpt = listingRepository.findById(id);
-        if (listingOpt.isEmpty()) {
-            return Optional.empty();
-        }
+    public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, String userEmail) {
+        return listingRepository.findById(id).map(listing -> {
+            ListingDto dto = listingMapper.toDynamicDto(listing);
+            dto = enrichmentService.enrich(dto, userEmail);
 
-        Listing listing = listingOpt.get();
-        ListingDto dto = listingMapper.toDynamicDto(listing);
-        dto = enrichmentService.enrich(dto, userEmail);
-
-        if (userEmail != null) {
-            try {
-                Result<User> userResult = userService.findByEmail(userEmail);
-                if (userResult.isSuccess() && userResult.getData() != null) {
-                    User user = userResult.getData();
-                    if (listing.getSeller().getId().equals(user.getId())) {
-                        log.debug("Enriching view stats for listing {} for seller {}", id, userEmail);
-                        // Default to last 7 days
-                        LocalDateTime endDate = LocalDateTime.now();
-                        LocalDateTime startDate = endDate.minusDays(7);
-                        ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
-                        dto.setViewStats(viewStats);
-                        log.debug("View stats enriched for listing {}: totalViews={}, uniqueViews={}",
-                                id, viewStats.getTotalViews(), viewStats.getUniqueViews());
-                    } else {
-                        log.debug("User {} is not the seller of listing {}", userEmail, id);
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("Could not enrich view stats for listing {}: {}", id, e.getMessage(), e);
+            // PERFORMANS: Artık DB'ye gitmeden elimizdeki ID'ler ile yetki kontrolü yapıyoruz
+            if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
+                log.debug("Enriching view stats for listing {} for owner", id);
+                LocalDateTime endDate = LocalDateTime.now();
+                LocalDateTime startDate = endDate.minusDays(7);
+                ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
+                dto.setViewStats(viewStats);
             }
-                
-        } else {
-            log.debug("No user email provided, skipping view stats enrichment for listing {}", id);
-        }
-
-        return Optional.of(dto);
+            return dto;
+        });
     }
 
     public Optional<ListingDto> findByListingNo(String listingNo) {
@@ -122,9 +100,7 @@ public class ListingService {
     }
 
     public List<ListingDto> findByIds(List<UUID> ids, String userEmail) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
+        if (ids == null || ids.isEmpty()) return List.of();
         List<Listing> listings = listingRepository.findAllById(ids);
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
@@ -155,45 +131,29 @@ public class ListingService {
         return new PageImpl<>(enrichmentService.enrich(dtos, userEmail), pageable, results.getTotalElements());
     }
 
-    public Page<ListingDto> getMyListings(User user, int page, int size) {
+    public Page<ListingDto> getMyListings(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
-        return enrichPage(
-                listingsPage.map(listingMapper::toDynamicDto),
-                user.getEmail()
-        );
+        Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
     }
 
-    public Page<ListingDto> getMyListings(User user, int page, int size, ListingType listingType) {
+    public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Listing> listingsPage = listingRepository.findBySellerAndListingType(user, listingType, pageable);
-        return enrichPage(
-                listingsPage.map(listingMapper::toDynamicDto),
-                user.getEmail()
-        );
+        Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingType(userId, listingType, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
     }
-
 
     public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
-        Result<User> userResult = userService.findById(userId);
-        if (userResult.isError()) {
-            log.warn("User not found for ID: {}", userId);
-            return Page.empty();
-        }
-        User user = userResult.getData();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Listing> listingsPage = listingRepository.findBySeller(user, pageable);
-        return enrichPage(
-                listingsPage.map(listingMapper::toDynamicDto),
-                user.getEmail()
-        );
+        Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
     }
 
-    public List<ListingDto> getMyListingsByStatus(User user, ListingStatus status) {
+    public List<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status) {
         return enrichList(
-                listingRepository.findBySellerAndStatus(user, status)
+                listingRepository.findBySellerIdAndStatus(userId, status)
                         .stream().map(listingMapper::toDynamicDto).toList(),
-                user.getEmail()
+                getUserEmail(userId)
         );
     }
 
@@ -234,78 +194,55 @@ public class ListingService {
     }
 
     @Transactional
-    public void publish(UUID listingId) {
-        Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+    public void publish(UUID listingId, Long userId) {
+        Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.DRAFT);
         listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
     }
 
     @Transactional
-    public void reactivate(UUID listingId) {
-        Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+    public void reactivate(UUID listingId, Long userId) {
+        Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.INACTIVE);
         listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
     }
 
     @Transactional
-    public void deactivate(UUID listingId) {
-        Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+    public void deactivate(UUID listingId, Long userId) {
+        Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.ACTIVE);
         listing.setStatus(ListingStatus.INACTIVE);
         listingRepository.save(listing);
     }
 
-    public Result<Void> validateOwnership(UUID listingId, User currentUser) {
-        Listing listing = findById(listingId)
-                .orElse(null);
-
-        if (listing == null) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
-        }
-
-        if (!listing.getSeller().getId().equals(currentUser.getId())) {
-            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
-        }
-        return Result.success();
+    public Result<Void> validateOwnership(UUID listingId, Long userId) {
+        return listingRepository.findById(listingId)
+                .map(listing -> listing.getSeller().getId().equals(userId)
+                        ? Result.<Void>success()
+                        : Result.<Void>error(ListingErrorCodes.NOT_LISTING_OWNER))
+                .orElse(Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     public Result<Void> validateStatus(Listing listing, ListingStatus... allowedStatuses) {
         for (ListingStatus allowedStatus : allowedStatuses) {
-            if (listing.getStatus() == allowedStatus) {
-                return Result.success();
-            }
+            if (listing.getStatus() == allowedStatus) return Result.success();
         }
         return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
     }
 
     @Transactional
-    public void markAsSold(UUID listingId) {
-        Listing listing = findById(listingId)
-                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+    public void markAsSold(UUID listingId, Long userId) {
+        Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
-        log.info("markAsSold called for listing {}, but status change is disabled. Keeping status as {}.",
-                listingId, listing.getStatus());
+        log.info("markAsSold logic executed for listing {}", listingId);
     }
 
-
     @Transactional
-    public Result<Void> deleteListing(UUID listingId, User currentUser) {
-        Listing listing = findById(listingId)
-                .orElse(null);
-
-        if (listing == null) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
-        }
-
-        Result<Void> ownershipResult = validateOwnership(listingId, currentUser);
-        if (ownershipResult.isError()) {
-            return ownershipResult;
-        }
+    public Result<Void> deleteListing(UUID listingId, Long userId) {
+        Result<Void> ownershipResult = validateOwnership(listingId, userId);
+        if (ownershipResult.isError()) return ownershipResult;
 
         listingRepository.deleteById(listingId);
         return Result.success();
@@ -365,6 +302,21 @@ public class ListingService {
     }
 
     // ---------- Private helper methods ----------
+
+    private Listing findAndValidateOwner(UUID listingId, Long userId) {
+        Listing listing = listingRepository.findById(listingId)
+                .orElseThrow(() -> new BusinessException(ListingErrorCodes.LISTING_NOT_FOUND));
+        if (!listing.getSeller().getId().equals(userId)) {
+            throw new BusinessException(ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+        return listing;
+    }
+
+    private String getUserEmail(Long userId) {
+        var userResult = userService.findById(userId);
+        return userResult.isSuccess() ? userResult.getData().getEmail() : null;
+    }
+
     private List<ListingDto> enrichList(List<ListingDto> dtos, String userEmail) {
         return enrichmentService.enrich(dtos, userEmail);
     }
@@ -373,4 +325,3 @@ public class ListingService {
         return new PageImpl<>(enrichmentService.enrich(page.getContent(), userEmail), page.getPageable(), page.getTotalElements());
     }
 }
-

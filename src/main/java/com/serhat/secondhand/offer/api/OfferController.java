@@ -41,7 +41,7 @@ public class OfferController {
     public ResponseEntity<?> create(@Valid @RequestBody CreateOfferRequest request,
                                     @AuthenticationPrincipal User currentUser) {
         log.info("API request to create offer by user: {} for listing: {}", currentUser.getEmail(), request.getListingId());
-        var result = offerService.create(currentUser, request);
+        var result = offerService.create(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -52,20 +52,20 @@ public class OfferController {
     @GetMapping("/made")
     @Operation(summary = "List offers I made", description = "List offers created by the authenticated user")
     public ResponseEntity<List<OfferDto>> listMade(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listMade(currentUser));
+        return ResponseEntity.ok(offerService.listMade(currentUser.getId()));
     }
 
     @GetMapping("/received")
     @Operation(summary = "List offers I received", description = "List offers received by the authenticated seller")
     public ResponseEntity<List<OfferDto>> listReceived(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listReceived(currentUser));
+        return ResponseEntity.ok(offerService.listReceived(currentUser.getId()));
     }
 
     @GetMapping("/{offerId}")
     @Operation(summary = "Get offer", description = "Get a single offer by id (buyer or seller only)")
     public ResponseEntity<?> getById(@PathVariable UUID offerId,
                                            @AuthenticationPrincipal User currentUser) {
-        var result = offerService.getByIdForUser(currentUser, offerId);
+        var result = offerService.getByIdForUser(currentUser.getId(), offerId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -77,7 +77,7 @@ public class OfferController {
     @Operation(summary = "Accept offer", description = "Seller accepts an offer")
     public ResponseEntity<?> accept(@PathVariable UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
-        var result = offerService.accept(currentUser, offerId);
+        var result = offerService.accept(currentUser.getId(), offerId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -89,7 +89,7 @@ public class OfferController {
     @Operation(summary = "Reject offer", description = "Seller rejects an offer")
     public ResponseEntity<?> reject(@PathVariable UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
-        var result = offerService.reject(currentUser, offerId);
+        var result = offerService.reject(currentUser.getId(), offerId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -102,7 +102,7 @@ public class OfferController {
     public ResponseEntity<?> counter(@PathVariable UUID offerId,
                                            @Valid @RequestBody CounterOfferRequest request,
                                            @AuthenticationPrincipal User currentUser) {
-        var result = offerService.counter(currentUser, offerId, request);
+        var result = offerService.counter(currentUser.getId(), offerId, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));

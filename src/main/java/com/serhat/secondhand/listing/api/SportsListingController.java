@@ -13,11 +13,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,13 +36,17 @@ public class SportsListingController {
     public ResponseEntity<?> createSportsListing(
             @Valid @RequestBody SportsCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        var result = sportsListingService.createSportsListing(request, currentUser);
+
+        log.info("Request to create sports listing by user: {}", currentUser.getId());
+
+        var result = sportsListingService.createSportsListing(request, currentUser.getId());
+
         if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return buildErrorResponse(result);
         }
+
         URI location = URI.create("/api/v1/sports/" + result.getData());
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(Map.of("id", result.getData()));
     }
 
     @PutMapping("/{id}")
@@ -49,11 +55,15 @@ public class SportsListingController {
             @PathVariable UUID id,
             @Valid @RequestBody SportsUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        var result = sportsListingService.updateSportsListing(id, request, currentUser);
+
+        log.info("Request to update sports listing: {} by user: {}", id, currentUser.getId());
+
+        var result = sportsListingService.updateSportsListing(id, request, currentUser.getId());
+
         if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return buildErrorResponse(result);
         }
+
         return ResponseEntity.ok().build();
     }
 
@@ -70,6 +80,13 @@ public class SportsListingController {
         Page<ListingDto> page = sportsListingService.filterSports(filters);
         return ResponseEntity.ok(page);
     }
+
+
+    private ResponseEntity<?> buildErrorResponse(com.serhat.secondhand.core.result.Result<?> result) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "message", result.getMessage() != null ? result.getMessage() : "Unexpected error",
+                        "error", result.getErrorCode() != null ? result.getErrorCode() : "ERROR"
+                ));
+    }
 }
-
-

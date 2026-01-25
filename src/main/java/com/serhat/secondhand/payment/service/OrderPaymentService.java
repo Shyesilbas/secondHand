@@ -17,8 +17,6 @@ import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +40,7 @@ public class OrderPaymentService {
         log.info("Processing payments for order: {}", order.getOrderNumber());
 
         List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing, order);
-        Result<List<PaymentDto>> batchResult = processBatchPayments(paymentRequests);
+        Result<List<PaymentDto>> batchResult = processBatchPayments(user.getId(), paymentRequests);
         
         if (batchResult.isError()) {
             log.error("Payment failed for order: {} - {}", order.getOrderNumber(), batchResult.getMessage());
@@ -78,9 +76,9 @@ public class OrderPaymentService {
 
 
     @Transactional
-    protected Result<List<PaymentDto>> processBatchPayments(List<PaymentRequest> paymentRequests) {
+    public Result<List<PaymentDto>> processBatchPayments(Long userId, List<PaymentRequest> paymentRequests) {
         if (paymentRequests == null || paymentRequests.isEmpty()) {
-            return Result.error(PaymentErrorCodes.EMPTY_PAYMENT_BATCH);
+            return Result.error("Ödeme listesi boş olamaz.");
         }
 
         for (PaymentRequest request : paymentRequests) {
@@ -90,15 +88,16 @@ public class OrderPaymentService {
             }
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<PaymentDto> results = new ArrayList<>();
         for (PaymentRequest request : paymentRequests) {
-            Result<PaymentDto> result = paymentProcessor.process(request, authentication);
+            Result<PaymentDto> result = paymentProcessor.process(userId, request);
+
             if (result.isError()) {
                 return Result.error(result.getMessage(), result.getErrorCode());
             }
             results.add(result.getData());
         }
+
         return Result.success(results);
     }
 

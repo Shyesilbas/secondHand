@@ -54,7 +54,7 @@ public class OrderController {
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to checkout for user: {}", currentUser.getEmail());
-        Result<OrderDto> result = checkoutService.checkout(currentUser, request);
+        Result<OrderDto> result = checkoutService.checkout(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -72,7 +72,7 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
         log.info("API request to get orders for user: {}", currentUser.getEmail());
-        Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser, pageable);
+        Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -86,7 +86,7 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
         log.info("API request to get seller orders for user: {}", currentUser.getEmail());
-        Page<OrderDto> orders = orderQueryService.getSellerOrders(currentUser, pageable);
+        Page<OrderDto> orders = orderQueryService.getSellerOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -112,7 +112,7 @@ public class OrderController {
     public ResponseEntity<java.util.Map<String, Object>> getPendingCompletionStatus(
             @AuthenticationPrincipal User currentUser) {
         log.debug("API request to check pending completion orders for user: {}", currentUser.getEmail());
-        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser);
+        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
         return ResponseEntity.ok(status);
     }
 
@@ -127,7 +127,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by ID: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderQueryService.getOrderById(orderId, currentUser);
+        Result<OrderDto> result = orderQueryService.getOrderById(orderId, currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -146,7 +146,7 @@ public class OrderController {
             @PathVariable String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by order number: {} for user: {}", orderNumber, currentUser.getEmail());
-        Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser);
+        Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));

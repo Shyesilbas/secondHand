@@ -15,6 +15,7 @@ import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,64 +36,47 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
     private final ListingService listingService;
+    private final UserService userService;
     private final CartValidator cartValidator;
     private final ListingEnrichmentService enrichmentService;
     private final ListingRepository listingRepository;
     private final CartConfig cartConfig;
 
     @Transactional(readOnly = true)
-    public Result<List<CartDto>> getCartItems(User user) {
-        log.info("Getting cart items for user: {}", user.getEmail());
-        List<Cart> cartItems = cartRepository.findByUserWithListing(user);
+    public Result<List<CartDto>> getCartItems(Long userId) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+
+        List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
         List<CartDto> cartDtos = cartMapper.toDtoList(cartItems);
 
         for (CartDto cartDto : cartDtos) {
             if (cartDto.getListing() != null) {
-                cartDto.setListing(enrichmentService.enrich(cartDto.getListing(), user.getEmail()));
+                cartDto.setListing(enrichmentService.enrich(cartDto.getListing(), userResult.getData().getEmail()));
             }
         }
-
         return Result.success(cartDtos);
     }
 
-    public Result<CartDto> addToCart(User user, AddToCartRequest request) {
-        Listing listing = listingService.findById(request.getListingId())
-                .orElse(null);
-        
-        if (listing == null) {
-            return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
-        }
+    public Result<CartDto> addToCart(Long userId, AddToCartRequest request) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        User user = userResult.getData();
 
-        Result<Void> existsResult = cartValidator.validateListingExists(listing);
-        if (existsResult.isError()) {
-            return Result.error(existsResult.getMessage(), existsResult.getErrorCode());
-        }
-        
-        Result<Void> activeResult = cartValidator.validateListingActive(listing);
-        if (activeResult.isError()) {
-            return Result.error(activeResult.getMessage(), activeResult.getErrorCode());
-        }
-        
-        Result<Void> typeResult = cartValidator.validateListingType(listing);
-        if (typeResult.isError()) {
-            return Result.error(typeResult.getMessage(), typeResult.getErrorCode());
-        }
+        Listing listing = listingService.findById(request.getListingId()).orElse(null);
+        if (listing == null) return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
 
-        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
-        Result<Void> quantityResult = cartValidator.validateQuantity(reqQty);
-        if (quantityResult.isError()) {
-            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
-        }
+        if (cartValidator.validateListingActive(listing).isError()) return Result.error(CartErrorCodes.LISTING_NOT_ACTIVE);
 
-        Optional<Cart> existingCartItemOpt = cartRepository.findByUserAndListing(user, listing);
+        Optional<Cart> existingCartItemOpt = cartRepository.findByUserIdAndListingId(userId, listing.getId());
 
         Cart cartItem;
-        int totalQty;
+        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(1);
+
         if (existingCartItemOpt.isPresent()) {
             cartItem = existingCartItemOpt.get();
-            totalQty = (cartItem.getQuantity() != null ? cartItem.getQuantity() : 0) + reqQty;
+            cartItem.setQuantity(cartItem.getQuantity() + reqQty);
         } else {
-            totalQty = reqQty;
             cartItem = Cart.builder()
                     .user(user)
                     .listing(listing)
@@ -102,21 +86,12 @@ public class CartService {
         }
 
         if (cartConfig.getReservation().isEnabled()) {
-            Result<Void> reserveResult = reserveStockForCart(listing, totalQty, existingCartItemOpt.map(Cart::getQuantity).orElse(0));
-            if (reserveResult.isError()) {
-                return Result.error(reserveResult.getMessage(), reserveResult.getErrorCode());
+            if (reserveStockForCart(listing, cartItem.getQuantity(),
+                    existingCartItemOpt.map(Cart::getQuantity).orElse(0)).isError())
+            {
+                return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
             cartItem.setReservedAt(LocalDateTime.now());
-        } else {
-            Result<Void> stockResult = cartValidator.validateStock(totalQty, listing.getQuantity());
-            if (stockResult.isError()) {
-                return Result.error(stockResult.getMessage(), stockResult.getErrorCode());
-            }
-        }
-
-        if (existingCartItemOpt.isPresent()) {
-            cartItem.setQuantity(totalQty);
-            cartItem.setNotes(request.getNotes());
         }
 
         Cart savedCart = cartRepository.save(cartItem);
@@ -125,71 +100,52 @@ public class CartService {
         return Result.success(dto);
     }
 
-    private Result<Void> reserveStockForCart(Listing listing, int requestedQty, int previousQty) {
-        Listing lockedListing = listingRepository.findByIdWithLock(listing.getId())
-                .orElse(null);
-        
-        if (lockedListing == null) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+    @Transactional
+    public Result<Void> removeFromCart(Long userId, UUID listingId) {
+        if (!cartRepository.existsByUserIdAndListingId(userId, listingId)) {
+            return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
         }
-
-        if (lockedListing.getQuantity() == null) {
-            return Result.success();
-        }
-
-        int qtyDifference = requestedQty - previousQty;
-        if (qtyDifference <= 0) {
-            return Result.success();
-        }
-
-        int availableStock = lockedListing.getQuantity() - getReservedQuantityForListing(lockedListing.getId());
-        
-        if (availableStock < qtyDifference) {
-            return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
-        }
-        
+        cartRepository.deleteByUserIdAndListingId(userId, listingId);
         return Result.success();
     }
 
+    @Transactional
+    public Result<Void> clearCart(Long userId) {
+        cartRepository.deleteByUserId(userId);
+        return Result.success();
+    }
+
+    private Result<Void> reserveStockForCart(Listing listing, int requestedQty, int previousQty) {
+        return listingRepository.findByIdWithLock(listing.getId())
+                .map(lockedListing -> {
+                    int availableStock = lockedListing.getQuantity() - getReservedQuantityForListing(lockedListing.getId());
+                    return (availableStock >= (requestedQty - previousQty)) ? Result.<Void>success() : Result.<Void>error(ListingErrorCodes.STOCK_INSUFFICIENT);
+                }).orElse(Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
+    }
+
     private int getReservedQuantityForListing(UUID listingId) {
-        LocalDateTime expirationTime = LocalDateTime.now().minus(cartConfig.getReservation().getTimeoutMinutes());
+        LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(cartConfig.getReservation().getTimeoutMinutes().toMinutes());
         return cartRepository.countReservedQuantityByListing(listingId, expirationTime);
     }
 
-    public Result<CartDto> updateCartItem(User user, UUID listingId, UpdateCartItemRequest request) {
-        Listing listing = listingService.findById(listingId)
-                .orElse(null);
-        
-        if (listing == null) {
-            return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
-        }
+    @Transactional
+    public Result<CartDto> updateCartItem(Long userId, UUID listingId, UpdateCartItemRequest request) {
+        log.info("Updating cart item for user: {} - listingId: {}", userId, listingId);
 
-        Cart cartItem = cartRepository.findByUserAndListing(user, listing)
-                .orElse(null);
-        
-        if (cartItem == null) {
-            return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
-        }
+        Listing listing = listingService.findById(listingId).orElse(null);
+        if (listing == null) return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
 
-        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(0);
-        Result<Void> quantityResult = cartValidator.validateQuantity(reqQty);
-        if (quantityResult.isError()) {
-            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
-        }
+        Cart cartItem = cartRepository.findByUserIdAndListingId(userId, listingId).orElse(null);
+        if (cartItem == null) return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
 
+        int reqQty = Optional.ofNullable(request.getQuantity()).orElse(1);
         int previousQty = cartItem.getQuantity() != null ? cartItem.getQuantity() : 0;
 
         if (cartConfig.getReservation().isEnabled()) {
-            Result<Void> reserveResult = reserveStockForCart(listing, reqQty, previousQty);
-            if (reserveResult.isError()) {
-                return Result.error(reserveResult.getMessage(), reserveResult.getErrorCode());
+            if (reserveStockForCart(listing, reqQty, previousQty).isError()) {
+                return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
             cartItem.setReservedAt(LocalDateTime.now());
-        } else {
-            Result<Void> stockResult = cartValidator.validateStock(reqQty, listing.getQuantity());
-            if (stockResult.isError()) {
-                return Result.error(stockResult.getMessage(), stockResult.getErrorCode());
-            }
         }
 
         cartItem.setQuantity(reqQty);
@@ -197,47 +153,21 @@ public class CartService {
 
         Cart updatedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(updatedCart);
-        dto.setListing(enrichmentService.enrich(dto.getListing(), user.getEmail()));
+
+        String email = userService.findById(userId).getData().getEmail();
+        dto.setListing(enrichmentService.enrich(dto.getListing(), email));
+
         return Result.success(dto);
     }
 
-    public Result<Void> removeFromCart(User user, UUID listingId) {
-        Listing listing = listingService.findById(listingId)
-                .orElse(null);
-        
-        if (listing == null) {
-            return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
-        }
-
-        if (!cartRepository.existsByUserAndListing(user, listing)) {
-            return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
-        }
-
-        cartRepository.deleteByUserAndListing(user, listing);
-        log.info("Removed item from cart for user: {} - listingId: {}", user.getEmail(), listingId);
-        return Result.success();
-    }
-
-    public Result<Void> clearCart(User user) {
-        cartRepository.deleteByUser(user);
-        log.info("Cleared cart for user: {}", user.getEmail());
-        return Result.success();
+    @Transactional(readOnly = true)
+    public Result<Long> getCartItemCount(Long userId) {
+        return Result.success(cartRepository.countByUserId(userId));
     }
 
     @Transactional(readOnly = true)
-    public Result<Long> getCartItemCount(User user) {
-        return Result.success(cartRepository.countByUser(user));
+    public Result<Boolean> isInCart(Long userId, UUID listingId) {
+        return Result.success(cartRepository.existsByUserIdAndListingId(userId, listingId));
     }
 
-    @Transactional(readOnly = true)
-    public Result<Boolean> isInCart(User user, UUID listingId) {
-        Listing listing = listingService.findById(listingId)
-                .orElse(null);
-        
-        if (listing == null) {
-            return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
-        }
-        
-        return Result.success(cartRepository.existsByUserAndListing(user, listing));
-    }
 }

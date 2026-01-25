@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -15,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.serhat.secondhand.core.result.Result;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.UUID;
 @Slf4j
 @Tag(name = "Listing Management", description = "General listing operations")
 public class ListingController {
-    
+
     private final ListingService listingService;
     private final ListingViewService listingViewService;
 
@@ -40,22 +41,22 @@ public class ListingController {
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
 
+        Long userId = currentUser != null ? currentUser.getId() : null;
         String email = currentUser != null ? currentUser.getEmail() : null;
 
-        return listingService.findByIdAsDto(id, email)
+        return listingService.findByIdAsDto(id, userId, email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/bulk")
-    @Operation(summary = "Get listings by IDs", description = "Get multiple listings by their IDs in bulk")
+    @Operation(summary = "Get listings by IDs")
     public ResponseEntity<List<ListingDto>> getListingsByIds(
             @RequestBody List<UUID> ids,
             @AuthenticationPrincipal User currentUser) {
-        
+
         String email = currentUser != null ? currentUser.getEmail() : null;
-        List<ListingDto> listings = listingService.findByIds(ids, email);
-        return ResponseEntity.ok(listings);
+        return ResponseEntity.ok(listingService.findByIds(ids, email));
     }
 
     @PostMapping("/filter")
@@ -64,188 +65,120 @@ public class ListingController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal User currentUser) {
-               filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
-        filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
-        
-        String userEmail = currentUser != null ? currentUser.getEmail() : null;
-        Page<ListingDto> filteredListings = listingService.filterByCategory(filters, userEmail);
-        return ResponseEntity.ok(filteredListings);
-    }
 
-    @GetMapping("/search/listing-no/{listingNo}")
-    @Operation(summary = "Find listing by listing number", description = "Search for a specific listing using its unique listing number")
-    public ResponseEntity<ListingDto> findByListingNo(@PathVariable String listingNo) {
-        log.info("API request to find listing by listingNo: {}", listingNo);
-        
-        return listingService.findByListingNo(listingNo)
-                .map(dto -> {
-                    log.info("Successfully returning listing DTO for listingNo: {}", listingNo);
-                    return ResponseEntity.ok(dto);
-                })
-                .orElseGet(() -> {
-                    log.info("Listing not found for listingNo: {}, returning 404", listingNo);
-                    return ResponseEntity.notFound().build();
-                });
+        filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
+        filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
+
+        String userEmail = currentUser != null ? currentUser.getEmail() : null;
+        return ResponseEntity.ok(listingService.filterByCategory(filters, userEmail));
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Global search for listings", description = "Search listings by title or listing number")
     public ResponseEntity<Page<ListingDto>> globalSearch(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal User currentUser) {
-        
-        log.info("Global search request - query: {}, page: {}, size: {}", query, page, size);
-        
+
         String userEmail = currentUser != null ? currentUser.getEmail() : null;
-        Page<ListingDto> results = listingService.globalSearch(query, page, size, userEmail);
-        
-        return ResponseEntity.ok(results);
-    }
-    
-    @GetMapping("/status/{status}")
-    @Operation(summary = "Get listings by status - Returns appropriate DTOs based on listing types")
-    public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
-        List<ListingDto> dtos = listingService.findByStatusAsDto(status);
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(listingService.globalSearch(query, page, size, userEmail));
     }
 
-   @GetMapping("/allListings")
-   public ResponseEntity<List<ListingDto>> getAllListings() {
-        return ResponseEntity.ok(listingService.getAllListings());
-   }
-
-   @GetMapping("/byUser/{id}")
-   @Operation(summary = "Get listings by user ID with pagination")
-   public ResponseEntity<Page<ListingDto>> getListingsByUser(
-           @PathVariable Long id,
-           @RequestParam(defaultValue = "0") int page,
-           @RequestParam(defaultValue = "10") int size) {
+    @GetMapping("/byUser/{id}")
+    public ResponseEntity<Page<ListingDto>> getListingsByUser(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(listingService.getListingsByUser(id, page, size));
-   }
-   
-   @GetMapping("/type/{listingType}")
-   @Operation(summary = "Get listings by type")
-   public ResponseEntity<List<ListingDto>> getListingsByType(@PathVariable ListingType listingType) {
-        List<ListingDto> listings = listingService.getListingsByType(listingType);
-        return ResponseEntity.ok(listings);
-   }
-   
-   @GetMapping("/type/{listingType}/active")
-   @Operation(summary = "Get active listings by type")
-   public ResponseEntity<List<ListingDto>> getActiveListingsByType(@PathVariable ListingType listingType) {
-        List<ListingDto> listings = listingService.getActiveListingsByType(listingType);
-        return ResponseEntity.ok(listings);
-   }
-   
-   @GetMapping("/type/{listingType}/ordered")
-   @Operation(summary = "Get listings by type ordered by creation date")
-   public ResponseEntity<List<ListingDto>> getListingsByTypeOrderByDate(@PathVariable ListingType listingType) {
-        List<ListingDto> listings = listingService.getListingsByTypeOrderByDate(listingType);
-        return ResponseEntity.ok(listings);
-   }
-
+    }
 
     @GetMapping("/my-listings")
-    @Operation(summary = "Get current user's all listings with pagination")
     public ResponseEntity<Page<ListingDto>> getMyListings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) ListingType listingType,
             @AuthenticationPrincipal User currentUser) {
-        Page<ListingDto> myListings = listingType != null 
-                ? listingService.getMyListings(currentUser, page, size, listingType)
-                : listingService.getMyListings(currentUser, page, size);
+
+        Page<ListingDto> myListings = listingType != null
+                ? listingService.getMyListings(currentUser.getId(), page, size, listingType)
+                : listingService.getMyListings(currentUser.getId(), page, size);
         return ResponseEntity.ok(myListings);
     }
 
     @GetMapping("/my-listings/status/{status}")
-    @Operation(summary = "Get current user's listings by status")
     public ResponseEntity<List<ListingDto>> getMyListingsByStatus(
             @PathVariable ListingStatus status,
             @AuthenticationPrincipal User currentUser) {
-        List<ListingDto> myListings = listingService.getMyListingsByStatus(currentUser, status);
-        return ResponseEntity.ok(myListings);
+        return ResponseEntity.ok(listingService.getMyListingsByStatus(currentUser.getId(), status));
     }
-    
+
     @PutMapping("/{id}/publish")
-    @Operation(summary = "Publish a listing")
     public ResponseEntity<Void> publishListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.validateOwnership(id, currentUser);
-        listingService.publish(id);
+        listingService.publish(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
-    
+
     @PutMapping("/{id}/reactivate")
-    @Operation(summary = "reactivate a listing")
-    public ResponseEntity<Void> closeListing(
+    public ResponseEntity<Void> reactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.validateOwnership(id, currentUser);
-        listingService.reactivate(id);
+        listingService.reactivate(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
-    
-    @PutMapping("/{id}/mark-sold")
-    @Operation(summary = "Mark listing as sold")
-    public ResponseEntity<Void> markListingAsSold(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal User currentUser) {
-        listingService.validateOwnership(id, currentUser);
-        listingService.markAsSold(id);
-        return ResponseEntity.ok().build();
-    }
-    
+
     @PutMapping("/{id}/deactivate")
-    @Operation(summary = "Deactivate a listing")
     public ResponseEntity<Void> deactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.validateOwnership(id, currentUser);
-        listingService.deactivate(id);
+        listingService.deactivate(id, currentUser.getId());
         return ResponseEntity.ok().build();
-    }
-    
-    @GetMapping("/statistics")
-    @Operation(summary = "Get listing statistics", description = "Returns comprehensive statistics about listings")
-    public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        log.info("Getting listing statistics");
-        ListingStatisticsDto statistics = listingService.getListingStatistics();
-        return ResponseEntity.ok(statistics);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a listing")
     public ResponseEntity<?> deleteListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.deleteListing(id, currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", result.getMessage(), "errorCode", result.getErrorCode()));
-        }
-        return ResponseEntity.noContent().build();
+        Result<Void> result = listingService.deleteListing(id, currentUser.getId());
+        return handleResult(result);
     }
 
     @GetMapping("/my-listings/view-stats")
-    @Operation(summary = "Get aggregated view statistics for all seller's listings", description = "Get total view statistics across all listings owned by the current user")
     public ResponseEntity<ListingViewStatsDto> getMyListingsViewStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @AuthenticationPrincipal User currentUser) {
-        
-        // Default to last 7 days if not specified
-        if (endDate == null) {
-            endDate = LocalDateTime.now();
-        }
-        if (startDate == null) {
-            startDate = endDate.minusDays(7);
-        }
 
-        ListingViewStatsDto stats = listingViewService.getAggregatedViewStatisticsForSeller(currentUser, startDate, endDate);
-        return ResponseEntity.ok(stats);
+        if (endDate == null) endDate = LocalDateTime.now();
+        if (startDate == null) startDate = endDate.minusDays(7);
+
+        return ResponseEntity.ok(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate));
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
+        return ResponseEntity.ok(listingService.getListingStatistics());
+    }
+
+    @PutMapping("/{id}/mark-sold")
+    public ResponseEntity<Void> markListingAsSold(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+        listingService.markAsSold(id, currentUser.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
+        return ResponseEntity.ok(listingService.findByStatusAsDto(status));
+    }
+
+    private ResponseEntity<?> handleResult(Result<?> result) {
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", result.getMessage(), "errorCode", result.getErrorCode()));
+        }
+        return ResponseEntity.noContent().build();
     }
 }

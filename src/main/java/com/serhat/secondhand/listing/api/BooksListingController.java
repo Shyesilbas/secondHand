@@ -34,7 +34,7 @@ public class BooksListingController {
     public ResponseEntity<?> createBooksListing(
             @Valid @RequestBody BooksCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        var result = booksListingService.createBooksListing(request, currentUser);
+        var result = booksListingService.createBooksListing(request, currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
                     .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -49,7 +49,7 @@ public class BooksListingController {
             @PathVariable UUID id,
             @Valid @RequestBody BooksUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        var result = booksListingService.updateBooksListing(id, request, currentUser);
+        var result = booksListingService.updateBooksListing(id, request, currentUser.getId());
         if (result.isError()) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
                     .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));

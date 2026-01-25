@@ -1,6 +1,7 @@
 package com.serhat.secondhand.pricing.service;
 
 import com.serhat.secondhand.campaign.service.CampaignService;
+import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.service.CouponService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -14,19 +15,12 @@ import com.serhat.secondhand.pricing.handler.OfferPriceHandler;
 import com.serhat.secondhand.pricing.mapper.PricingMapper;
 import com.serhat.secondhand.pricing.util.PricingUtil;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.cart.entity.Cart;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,14 +38,14 @@ public class PricingService {
     }
 
     public PricingResultDto priceCart(User buyer, List<Cart> cartItems, String couponCode, UUID offerListingId, Integer offerQuantity, BigDecimal offerTotalPrice) {
-        if (offerListingId == null) {
-            return priceCartInternal(buyer, cartItems, couponCode, null);
+        OfferPriceHandler.OfferOverride override = null;
+        if (offerListingId != null) {
+            override = OfferPriceHandler.OfferOverride.builder()
+                    .listingId(offerListingId)
+                    .quantity(offerQuantity)
+                    .totalPrice(offerTotalPrice)
+                    .build();
         }
-        OfferPriceHandler.OfferOverride override = OfferPriceHandler.OfferOverride.builder()
-                .listingId(offerListingId)
-                .quantity(offerQuantity)
-                .totalPrice(offerTotalPrice)
-                .build();
         return priceCartInternal(buyer, cartItems, couponCode, override);
     }
 
@@ -66,7 +60,7 @@ public class PricingService {
                 .toList();
 
         var activeCampaigns = campaignService.loadActiveCampaignsForSellers(sellerIds);
-        Map<Long, List<com.serhat.secondhand.campaign.entity.Campaign>> campaignsBySeller = 
+        Map<Long, List<com.serhat.secondhand.campaign.entity.Campaign>> campaignsBySeller =
                 campaignDiscountCalculator.groupCampaignsBySeller(activeCampaigns);
 
         BigDecimal originalSubtotal = BigDecimal.ZERO;
@@ -79,9 +73,7 @@ public class PricingService {
 
         for (Cart cartItem : cartItems) {
             Listing listing = cartItem.getListing();
-            if (listing == null) {
-                continue;
-            }
+            if (listing == null) continue;
 
             ListingType type = listing.getListingType();
             if (type != null && type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
@@ -92,10 +84,10 @@ public class PricingService {
 
             int defaultQuantity = cartItem.getQuantity() != null ? cartItem.getQuantity() : 1;
             BigDecimal defaultUnitPrice = PricingUtil.scale(listing.getPrice());
-            
+
             OfferPriceHandler.OfferPriceResult offerResult = OfferPriceHandler.applyOfferOverride(
                     offerOverride, defaultQuantity, defaultUnitPrice);
-            
+
             int quantity = offerResult.getQuantity();
             BigDecimal unitPrice = offerResult.getUnitPrice();
             BigDecimal lineOriginal = offerResult.getLineTotal();
@@ -104,15 +96,14 @@ public class PricingService {
             BigDecimal campaignUnitPrice = unitPrice;
 
             if (!isOfferLine && type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
-                List<com.serhat.secondhand.campaign.entity.Campaign> sellerCampaigns = 
+                List<com.serhat.secondhand.campaign.entity.Campaign> sellerCampaigns =
                         campaignsBySeller.getOrDefault(listing.getSeller().getId(), List.of());
+
                 AppliedCampaignDto best = campaignDiscountCalculator.findBestCampaignForListing(sellerCampaigns, listing);
                 if (best != null && best.getDiscountAmount() != null && best.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
                     appliedCampaign = best;
                     campaignUnitPrice = PricingUtil.scale(unitPrice.subtract(best.getDiscountAmount()));
-                    if (campaignUnitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                        campaignUnitPrice = BigDecimal.ZERO;
-                    }
+                    campaignUnitPrice = campaignUnitPrice.max(BigDecimal.ZERO);
                 }
             }
 
@@ -122,14 +113,15 @@ public class PricingService {
             } else {
                 lineAfterCampaign = PricingUtil.scale(campaignUnitPrice.multiply(BigDecimal.valueOf(quantity)));
             }
+
             BigDecimal lineCampaignDiscount = isOfferLine ? BigDecimal.ZERO : PricingUtil.scale(lineOriginal.subtract(lineAfterCampaign));
 
-            originalSubtotal = PricingUtil.scale(originalSubtotal.add(lineOriginal));
-            subtotalAfterCampaigns = PricingUtil.scale(subtotalAfterCampaigns.add(lineAfterCampaign));
-            campaignDiscountTotal = PricingUtil.scale(campaignDiscountTotal.add(lineCampaignDiscount));
+            originalSubtotal = originalSubtotal.add(lineOriginal);
+            subtotalAfterCampaigns = subtotalAfterCampaigns.add(lineAfterCampaign);
+            campaignDiscountTotal = campaignDiscountTotal.add(lineCampaignDiscount);
 
             Long sellerId = listing.getSeller().getId();
-            sellerSubtotalsAfterCampaign.put(sellerId, 
+            sellerSubtotalsAfterCampaign.put(sellerId,
                     PricingUtil.scale(sellerSubtotalsAfterCampaign.getOrDefault(sellerId, BigDecimal.ZERO).add(lineAfterCampaign)));
 
             pricedItems.add(pricingMapper.toPricedCartItemDto(
@@ -139,15 +131,17 @@ public class PricingService {
         BigDecimal couponEligibleSubtotal = subtotalAfterCampaigns;
         Coupon coupon = null;
         String normalizedCouponCode = pricingMapper.normalizeCouponCode(couponCode);
+
         if (normalizedCouponCode != null) {
-            var couponResult = couponService.getValidCoupon(normalizedCouponCode, buyer, cartTypes, couponEligibleSubtotal);
+            var couponResult = couponService.getValidCoupon(normalizedCouponCode, buyer.getId(), cartTypes, couponEligibleSubtotal);
             if (couponResult.isSuccess()) {
                 coupon = couponResult.getData();
             }
         }
 
-        BigDecimal couponDiscount = coupon == null ? BigDecimal.ZERO : 
+        BigDecimal couponDiscount = coupon == null ? BigDecimal.ZERO :
                 couponDiscountCalculator.computeCouponDiscount(coupon, pricedItems);
+
         BigDecimal total = PricingUtil.scale(subtotalAfterCampaigns.subtract(couponDiscount));
         BigDecimal discountTotal = PricingUtil.scale(campaignDiscountTotal.add(couponDiscount));
 
@@ -157,7 +151,4 @@ public class PricingService {
         return pricingMapper.toResult(originalSubtotal, subtotalAfterCampaigns, campaignDiscountTotal,
                 normalizedCouponCode, couponDiscount, discountTotal, total, payableBySeller, pricedItems);
     }
-
 }
-
-

@@ -18,6 +18,7 @@ import com.serhat.secondhand.order.service.OrderEscrowService;
 import com.serhat.secondhand.order.service.OrderNotificationService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,70 +42,78 @@ public class CheckoutOrchestrator {
     private final OfferService offerService;
     private final ListingRepository listingRepository;
     private final OrderEscrowService orderEscrowService;
+    private final UserService userService;
 
     @Transactional
-    public Result<OrderDto> executeCheckout(User user, CheckoutRequest request) {
-        log.info("Executing checkout for user: {}", user.getEmail());
+    public Result<OrderDto> executeCheckout(Long userId, CheckoutRequest request) {
+        log.info("Executing checkout for userId: {}", userId);
 
-        var cartItems = cartRepository.findByUserWithListing(user);
-        Result<Offer> offerResult = resolveAcceptedOffer(user, request);
-        if (offerResult.isError()) {
-            return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getErrorCode(), userResult.getMessage());
         }
-        
+        User user = userResult.getData();
+
+        var cartItems = cartRepository.findByUserIdWithListing(userId);
+        Result<Offer> offerResult = resolveAcceptedOffer(userId, request);
+        if (offerResult.isError()) {
+            return Result.error(offerResult.getErrorCode(), offerResult.getMessage());
+        }
+
         Offer acceptedOffer = offerResult.getData();
         var effectiveCartItems = buildEffectiveCartItems(cartItems, acceptedOffer, user);
 
         PricingResultDto pricing = calculatePricing(user, effectiveCartItems, request, acceptedOffer);
-        
+
         Result<Map<UUID, Integer>> reservedResult = reserveStockOrThrow(effectiveCartItems);
         if (reservedResult.isError()) {
-            return Result.error(reservedResult.getMessage(), reservedResult.getErrorCode());
+            return Result.error(reservedResult.getErrorCode(), reservedResult.getMessage());
         }
-        
+
         Map<UUID, Integer> reserved = reservedResult.getData();
-        
+
         Result<Order> orderResult = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
         if (orderResult.isError()) {
             releaseReservedStock(reserved);
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
         }
-        
+
         Order order = orderResult.getData();
 
         try {
             var paymentResult = orderPaymentService.processOrderPayments(user, effectiveCartItems, request, order, pricing);
             if (paymentResult.isError()) {
                 releaseReservedStock(reserved);
-                return Result.error(paymentResult.getMessage(), paymentResult.getErrorCode());
+                return Result.error(paymentResult.getErrorCode(), paymentResult.getMessage());
             }
-            
+
             var paymentProcessingResult = paymentResult.getData();
-            orderNotificationService.sendOrderNotifications(user, order, paymentProcessingResult.allSuccessful());
 
             if (paymentProcessingResult.allSuccessful()) {
                 orderEscrowService.createEscrowsForOrder(order);
-                handleSuccessfulCheckout(user, order, pricing, acceptedOffer);
-                log.info("Checkout completed successfully for order: {} with {} payments",
-                        order.getOrderNumber(), paymentProcessingResult.paymentResults().size());
+                handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
+                orderNotificationService.sendOrderNotifications(user, order, true);
+                log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
                 releaseReservedStock(reserved);
-                log.warn("Checkout completed with failed payments for order: {}", order.getOrderNumber());
+                log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
+                return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
             }
 
             return Result.success(orderMapper.toDto(order));
+
         } catch (Exception e) {
             releaseReservedStock(reserved);
-            log.error("Exception during checkout for order: {}", order.getOrderNumber(), e);
+            log.error("Critical exception during checkout for order: {}", order.getOrderNumber(), e);
             throw e;
         }
     }
 
-    private Result<Offer> resolveAcceptedOffer(User user, CheckoutRequest request) {
+    private Result<Offer> resolveAcceptedOffer(Long userId, CheckoutRequest request) {
         if (request.getOfferId() == null) {
-            return Result.success((Offer) null);
+            return Result.success(null);
         }
-        return offerService.getAcceptedOfferForCheckout(user, request.getOfferId());
+        return offerService.getAcceptedOfferForCheckout(userId, request.getOfferId());
     }
 
     private List<Cart> buildEffectiveCartItems(List<Cart> cartItems, Offer acceptedOffer, User user) {
@@ -112,20 +121,22 @@ public class CheckoutOrchestrator {
             return cartItems;
         }
 
-        var effectiveCartItems = new ArrayList<Cart>();
-        for (var ci : cartItems) {
-            if (ci.getListing() != null && acceptedOffer.getListing() != null && acceptedOffer.getListing().getId() != null
-                    && acceptedOffer.getListing().getId().equals(ci.getListing().getId())) {
+        List<Cart> effectiveCartItems = new ArrayList<>();
+        UUID offerListingId = acceptedOffer.getListing().getId();
+
+        for (Cart ci : cartItems) {
+            if (ci.getListing() != null && ci.getListing().getId().equals(offerListingId)) {
                 continue;
             }
             effectiveCartItems.add(ci);
         }
+
         effectiveCartItems.add(Cart.builder()
                 .user(user)
                 .listing(acceptedOffer.getListing())
                 .quantity(acceptedOffer.getQuantity())
-                .notes(null)
                 .build());
+
         return effectiveCartItems;
     }
 
@@ -139,75 +150,41 @@ public class CheckoutOrchestrator {
 
     private Result<Map<UUID, Integer>> reserveStockOrThrow(List<Cart> cartItems) {
         Map<UUID, Integer> reserved = new HashMap<>();
-        if (cartItems == null || cartItems.isEmpty()) {
-            return Result.success(reserved);
-        }
-        for (var item : cartItems) {
-            if (item == null || item.getListing() == null || item.getListing().getId() == null) {
-                continue;
-            }
-            
-            int qty = item.getQuantity() != null ? item.getQuantity() : 1;
-            if (qty < 1) {
-                releaseReservedStock(reserved);
-                return Result.error(ListingErrorCodes.INVALID_QUANTITY);
-            }
-            
+        for (Cart item : cartItems) {
             Listing listing = listingRepository.findByIdWithLock(item.getListing().getId())
                     .orElse(null);
-            
+
             if (listing == null) {
                 releaseReservedStock(reserved);
-                return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+                return Result.error(ListingErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
             }
-            
-            if (listing.getQuantity() == null) {
-                continue;
+
+            if (listing.getQuantity() != null) {
+                int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;
+                if (listing.getQuantity() < requestedQty) {
+                    releaseReservedStock(reserved);
+                    return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT.toString(), "Stock Insufficient.");
+                }
+                listing.setQuantity(listing.getQuantity() - requestedQty);
+                listingRepository.save(listing);
+                reserved.put(listing.getId(), requestedQty);
             }
-            
-            if (listing.getQuantity() < qty) {
-                releaseReservedStock(reserved);
-                return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
-            }
-            
-            listing.setQuantity(listing.getQuantity() - qty);
-            listingRepository.save(listing);
-            reserved.put(listing.getId(), qty);
         }
         return Result.success(reserved);
     }
 
     private void releaseReservedStock(Map<UUID, Integer> reserved) {
-        if (reserved == null || reserved.isEmpty()) {
-            return;
-        }
-        for (var entry : reserved.entrySet()) {
-            if (entry.getKey() == null || entry.getValue() == null) {
-                continue;
-            }
-            listingRepository.incrementQuantity(entry.getKey(), entry.getValue());
-        }
+        if (reserved == null) return;
+        reserved.forEach(listingRepository::incrementQuantity);
     }
 
-    private void handleSuccessfulCheckout(User user, Order order, PricingResultDto pricing, Offer acceptedOffer) {
+    private void handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {
         if (pricing.getCouponCode() != null) {
-            couponService.redeem(pricing.getCouponCode(), user, order);
+            couponService.redeem(pricing.getCouponCode(), userId, order);
         }
         if (acceptedOffer != null) {
             offerService.markCompleted(acceptedOffer);
         }
-        clearCartReservations(user);
-        cartRepository.deleteByUser(user);
-    }
-
-    private void clearCartReservations(User user) {
-        var cartItems = cartRepository.findByUserWithListing(user);
-        for (var cartItem : cartItems) {
-            if (cartItem.getReservedAt() != null) {
-                cartItem.setReservedAt(null);
-                cartRepository.save(cartItem);
-            }
-        }
+        cartRepository.deleteByUserId(userId);
     }
 }
-

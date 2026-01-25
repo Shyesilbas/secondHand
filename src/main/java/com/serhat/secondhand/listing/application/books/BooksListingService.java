@@ -14,6 +14,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,54 +36,66 @@ public class BooksListingService {
     private final BooksListingFilterService booksListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserService userService;
 
     @Transactional
-    public Result<UUID> createBooksListing(BooksCreateRequest request, User seller) {
+    public Result<UUID> createBooksListing(BooksCreateRequest request, Long sellerId) {
+        log.info("Creating books listing for sellerId: {}", sellerId);
+
+        // 1. Resolve Seller
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User seller = userResult.getData();
+
+        // 2. Map and Validate
         BooksListing books = listingMapper.toBooksEntity(request);
         if (books.getQuantity() == null || books.getQuantity() < 1) {
-            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+            // Your Result structure: error(message, errorCode)
+            return Result.error("Invalid quantity for books listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
+
         books.setSeller(seller);
         books.setListingFeePaid(true);
         books.setStatus(ListingStatus.ACTIVE);
+
         BooksListing saved = booksRepository.save(books);
         log.info("Books listing created: {}", saved.getId());
-        
+
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
-        
+
         return Result.success(saved.getId());
     }
 
     @Transactional
-    public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, User currentUser) {
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUser);
+    public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, Long currentUserId) {
+        // 1. Ownership Check (Long userId based)
+        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
-            return ownershipResult;
+            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
         }
 
-        BooksListing existing = booksRepository.findById(id)
-                .orElse(null);
-
+        BooksListing existing = booksRepository.findById(id).orElse(null);
         if (existing == null) {
             return Result.error("Books listing not found", "LISTING_NOT_FOUND");
         }
 
+        // 2. Status Validation
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
         if (statusResult.isError()) {
-            return statusResult;
+            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
         }
 
         var oldPrice = existing.getPrice();
 
+        // 3. Optional Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
         request.currency().ifPresent(existing::setCurrency);
         request.quantity().ifPresent(q -> {
-            if (q < 1) {
-                return;
-            }
-            existing.setQuantity(q);
+            if (q >= 1) existing.setQuantity(q);
         });
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
@@ -98,9 +111,10 @@ public class BooksListingService {
         request.isbn().ifPresent(existing::setIsbn);
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
-            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+            return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
+        // 4. Save and Price History Record
         booksRepository.save(existing);
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
@@ -112,6 +126,7 @@ public class BooksListingService {
                     "Price updated via listing edit"
             );
         }
+
         log.info("Books listing updated: {}", id);
         return Result.success();
     }
@@ -126,5 +141,3 @@ public class BooksListingService {
         return booksListingFilterService.filterBooks(filters);
     }
 }
-
-

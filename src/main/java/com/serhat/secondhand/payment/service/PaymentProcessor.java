@@ -18,7 +18,6 @@ import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,79 +36,82 @@ public class PaymentProcessor {
     private final PaymentVerificationService paymentVerificationService;
     private final PaymentValidator paymentValidator;
 
+    public Result<PaymentDto> process(Long userId, PaymentRequest paymentRequest) {
+        log.info("Processing payment request for userId: {}", userId);
 
-    public Result<PaymentDto> process(PaymentRequest paymentRequest, Authentication authentication) {
-        String idempotencyKey = paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank()
+        String idempotencyKey = (paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank())
                 ? paymentRequest.idempotencyKey()
-                : generateIdempotencyKey(paymentRequest, authentication);
-        
+                : generateIdempotencyKey(paymentRequest, userId);
+
         PaymentRequest requestWithIdempotency = createPaymentRequestWithIdempotency(paymentRequest, idempotencyKey);
-        
+
         int maxRetries = 3;
         int attempt = 0;
-        
+
         while (attempt < maxRetries) {
             try {
-                return executePaymentWithTransaction(requestWithIdempotency, authentication);
+                return executePaymentWithTransaction(userId, requestWithIdempotency);
             } catch (OptimisticLockException e) {
                 attempt++;
-                log.warn("Optimistic lock exception during payment processing, attempt {}/{}: {}", 
-                        attempt, maxRetries, e.getMessage());
-                
+                log.warn("Optimistic lock exception during payment, attempt {}/{}", attempt, maxRetries);
+
                 if (attempt >= maxRetries) {
-                    log.error("Payment processing failed after {} retries due to concurrent updates", maxRetries);
-                    return Result.error(PaymentErrorCodes.CONCURRENT_UPDATE);
+                    return Result.error(PaymentErrorCodes.CONCURRENT_UPDATE.toString(), "Concurrent Update");
                 }
-                
+
                 try {
                     Thread.sleep(50 * attempt);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
+                    return Result.error(PaymentErrorCodes.PAYMENT_ERROR.toString(), "Processing payment interrupted.");
                 }
             }
         }
-        
-        return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
+
+        return Result.error(PaymentErrorCodes.PAYMENT_ERROR.toString(), "Unexpected error occurred during payment processing.");
     }
-    
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected Result<PaymentDto> executePaymentWithTransaction(PaymentRequest paymentRequest, Authentication authentication) {
-        User fromUser = userService.getAuthenticatedUser(authentication);
+    public Result<PaymentDto> executePaymentWithTransaction(Long userId, PaymentRequest paymentRequest) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        }
+        User fromUser = userResult.getData();
         String idempotencyKey = paymentRequest.idempotencyKey();
-        
-        Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUser(idempotencyKey, fromUser)
+
+        Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUserId(idempotencyKey, userId)
                 .orElse(null);
-        
+
         if (existingPayment != null) {
-            Result<Void> validationResult = validateIdempotencyKeyMatch(existingPayment, paymentRequest, fromUser);
+            Result<Void> validationResult = validateIdempotencyKeyMatch(existingPayment, paymentRequest, userId);
             if (validationResult.isError()) {
-                return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+                return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
             }
             return Result.success(paymentMapper.toDto(existingPayment));
         }
-        
+
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
         Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
         if (agreementsResult.isError()) {
-            return Result.error(agreementsResult.getMessage(), agreementsResult.getErrorCode());
+            return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
         }
 
         Result<Void> verificationResult = paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
         if (verificationResult.isError()) {
-            return Result.error(verificationResult.getMessage(), verificationResult.getErrorCode());
+            return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
         }
 
         Result<Void> requestValidationResult = paymentValidator.validatePaymentRequest(paymentRequest, fromUser);
         if (requestValidationResult.isError()) {
-            return Result.error(requestValidationResult.getMessage(), requestValidationResult.getErrorCode());
+            return Result.error(requestValidationResult.getErrorCode(), requestValidationResult.getMessage());
         }
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
 
         if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
-            return Result.error(PaymentErrorCodes.PAYMENT_ERROR);
+            return Result.error(PaymentErrorCodes.PAYMENT_ERROR.toString(), "Payment Method is not eligible.");
         }
 
         PaymentResult result = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
@@ -123,16 +125,15 @@ public class PaymentProcessor {
 
         return Result.success(paymentMapper.toDto(payment));
     }
-    
-    private String generateIdempotencyKey(PaymentRequest paymentRequest, Authentication authentication) {
-        User fromUser = userService.getAuthenticatedUser(authentication);
-        return String.format("payment-%s-%s-%s-%s", 
-                fromUser.getId(), 
-                paymentRequest.amount(), 
+
+    private String generateIdempotencyKey(PaymentRequest paymentRequest, Long userId) {
+        return String.format("payment-%s-%s-%s-%s",
+                userId,
+                paymentRequest.amount(),
                 paymentRequest.listingId() != null ? paymentRequest.listingId() : "null",
                 paymentRequest.paymentType());
     }
-    
+
     private PaymentRequest createPaymentRequestWithIdempotency(PaymentRequest original, String idempotencyKey) {
         return PaymentRequest.builder()
                 .fromUserId(original.fromUserId())
@@ -150,16 +151,16 @@ public class PaymentProcessor {
                 .idempotencyKey(idempotencyKey)
                 .build();
     }
-    
-    private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, User fromUser) {
+
+    private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, Long userId) {
         boolean amountMatches = existingPayment.getAmount().compareTo(paymentRequest.amount()) == 0;
         boolean listingMatches = (existingPayment.getListingId() == null && paymentRequest.listingId() == null) ||
                 (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
         boolean paymentTypeMatches = existingPayment.getPaymentType() == paymentRequest.paymentType();
-        boolean fromUserMatches = existingPayment.getFromUser().getId().equals(fromUser.getId());
-        
+        boolean fromUserMatches = existingPayment.getFromUser().getId().equals(userId);
+
         if (!amountMatches || !listingMatches || !paymentTypeMatches || !fromUserMatches) {
-            return Result.error(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT);
+            return Result.error(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString(), "Processed already.");
         }
         return Result.success();
     }

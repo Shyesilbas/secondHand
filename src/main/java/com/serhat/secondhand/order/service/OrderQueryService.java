@@ -7,6 +7,7 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,119 +32,104 @@ public class OrderQueryService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderEscrowService orderEscrowService;
+    private final UserService userService;
 
-    public Page<OrderDto> getUserOrders(User user, Pageable pageable) {
-        log.info("Getting orders for user: {}", user.getEmail());
+    public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
+        log.info("Getting orders for userId: {}", userId);
 
-        // If no sort is specified, default to createdAt DESC
-        Pageable finalPageable = pageable;
-        if (pageable.getSort().isUnsorted()) {
-            finalPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-            );
-        }
+        Pageable finalPageable = ensureSort(pageable);
 
-        Page<Order> orders = orderRepository.findByUser(user, finalPageable);
+        // Repository'de findByUserId metodunu kullanmalısın
+        Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
 
         return orders.map(orderMapper::toDto);
     }
 
-    public Result<OrderDto> getOrderById(Long orderId, User user) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+    public Result<OrderDto> getOrderById(Long orderId, Long userId) {
+        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, userId);
         if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
         }
         return Result.success(orderMapper.toDto(orderResult.getData()));
     }
 
-    public Result<OrderDto> getOrderByOrderNumber(String orderNumber, User user) {
-        Result<Order> orderResult = findOrderByNumberAndValidateOwnership(orderNumber, user);
+    public Result<OrderDto> getOrderByOrderNumber(String orderNumber, Long userId) {
+        Result<Order> orderResult = findOrderByNumberAndValidateOwnership(orderNumber, userId);
         if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
         }
         return Result.success(orderMapper.toDto(orderResult.getData()));
     }
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
+    public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
+        log.info("Getting orders for sellerId: {}", sellerId);
 
-        Result<Void> ownershipResult = validateOwnership(order, user);
-        if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
-        }
-        
-        return Result.success(order);
-    }
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) return Page.empty();
+        User seller = userResult.getData();
 
-    private Result<Order> findOrderByNumberAndValidateOwnership(String orderNumber, User user) {
-        Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
-        Result<Void> ownershipResult = validateOwnership(order, user);
-        if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
-        }
-        
-        return Result.success(order);
-    }
-
-    private Result<Void> validateOwnership(Order order, User user) {
-        if (!order.getUser().getId().equals(user.getId())) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-        }
-        return Result.success();
-    }
-
-    public Page<OrderDto> getSellerOrders(User seller, Pageable pageable) {
-        log.info("Getting orders for seller: {}", seller.getEmail());
-
-        Pageable finalPageable = pageable;
-        if (pageable.getSort().isUnsorted()) {
-            finalPageable = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-            );
-        }
-
-        Page<Order> orders = orderRepository.findOrdersBySeller(seller, finalPageable);
+        Pageable finalPageable = ensureSort(pageable);
+        Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
 
         return orders.map(order -> {
             OrderDto orderDto = orderMapper.toDto(order);
             if (orderDto.getOrderItems() != null) {
                 List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
-                        .filter(item -> item.getListing() != null && 
+                        .filter(item -> item.getListing() != null &&
                                 item.getListing().getSellerId() != null &&
-                                item.getListing().getSellerId().equals(seller.getId()))
+                                item.getListing().getSellerId().equals(sellerId))
                         .collect(Collectors.toList());
                 orderDto.setOrderItems(sellerOrderItems);
             }
-            java.math.BigDecimal escrowAmount = orderEscrowService.getPendingEscrowAmountByOrder(order, seller);
+            BigDecimal escrowAmount = orderEscrowService.getPendingEscrowAmountByOrder(order, seller);
             orderDto.setEscrowAmount(escrowAmount);
             return orderDto;
         });
     }
 
-    public Map<String, Object> getPendingCompletionStatus(User user) {
-        boolean hasPending = orderRepository.existsByUserAndStatus(user, Order.OrderStatus.DELIVERED);
-        long count = hasPending ? orderRepository.countByUserAndStatus(user, Order.OrderStatus.DELIVERED) : 0;
-        
-        log.debug("User {} has {} pending completion orders", user.getEmail(), count);
-        
+    public Map<String, Object> getPendingCompletionStatus(Long userId) {
+        boolean hasPending = orderRepository.existsByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
+        long count = hasPending ? orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED) : 0;
+
         return Map.of(
-            "hasPendingOrders", hasPending,
-            "pendingCount", count
+                "hasPendingOrders", hasPending,
+                "pendingCount", count
         );
+    }
+
+    // --- Private Helper Methods ---
+
+    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Sipariş bulunamadı.");
+        }
+        return validateOwnership(order, userId);
+    }
+
+    private Result<Order> findOrderByNumberAndValidateOwnership(String orderNumber, Long userId) {
+        Order order = orderRepository.findByOrderNumber(orderNumber).orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Sipariş bulunamadı.");
+        }
+        return validateOwnership(order, userId);
+    }
+
+    private Result<Order> validateOwnership(Order order, Long userId) {
+        if (!order.getUser().getId().equals(userId)) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "Bu sipariş size ait değil.");
+        }
+        return Result.success(order);
+    }
+
+    private Pageable ensureSort(Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            return PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt")
+            );
+        }
+        return pageable;
     }
 }

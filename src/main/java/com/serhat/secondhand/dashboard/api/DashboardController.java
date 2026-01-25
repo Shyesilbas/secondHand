@@ -3,17 +3,20 @@ package com.serhat.secondhand.dashboard.api;
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.dashboard.service.DashboardService;
+import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -50,7 +53,7 @@ public class DashboardController {
         }
         
         log.info("API request for seller dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
-        SellerDashboardDto dashboard = dashboardService.getSellerDashboard(currentUser, startDate, endDate);
+        SellerDashboardDto dashboard = dashboardService.getSellerDashboard(currentUser.getId(), startDate, endDate);
         return ResponseEntity.ok(dashboard);
     }
 
@@ -77,7 +80,7 @@ public class DashboardController {
         }
         
         log.info("API request for buyer dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
-        BuyerDashboardDto dashboard = dashboardService.getBuyerDashboard(currentUser, startDate, endDate);
+        BuyerDashboardDto dashboard = dashboardService.getBuyerDashboard(currentUser.getId(), startDate, endDate);
         return ResponseEntity.ok(dashboard);
     }
 }
