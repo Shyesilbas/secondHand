@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +37,6 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
 
     Page<Listing> findBySellerId(Long sellerId, Pageable pageable);
 
-    List<Listing> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
 
     List<Listing> findBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
@@ -67,23 +65,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l.listingType, COUNT(l) FROM Listing l WHERE l.status = :status GROUP BY l.listingType")
     List<Object[]> getActiveCountsByType(ListingStatus status);
 
-
-    @Modifying
-    @Query("update Listing l set l.quantity = l.quantity - :qty where l.id = :id and l.quantity is not null and l.quantity >= :qty")
-    int decrementQuantityIfEnough(@Param("id") UUID id, @Param("qty") int qty);
-
     @Modifying
     @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
     int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
 
-
-    @Query("SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.createdAt BETWEEN :startDate AND :endDate")
-    long countBySellerIdAndCreatedAtBetween(@Param("sellerId") Long sellerId,
-                                            @Param("startDate") LocalDateTime startDate,
-                                            @Param("endDate") LocalDateTime endDate);
-
-    @Query("SELECT l.status, COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.createdAt BETWEEN :startDate AND :endDate GROUP BY l.status")
-    List<Object[]> countBySellerIdAndStatusGrouped(@Param("sellerId") Long sellerId,
-                                                   @Param("startDate") LocalDateTime startDate,
-                                                   @Param("endDate") LocalDateTime endDate);
 }

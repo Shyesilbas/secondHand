@@ -3,16 +3,10 @@ package com.serhat.secondhand.dashboard.service;
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.dashboard.mapper.DashboardMapper;
-import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
-import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.dashboard.service.port.*;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.order.repository.OrderItemRepository;
-import com.serhat.secondhand.order.repository.OrderRepository;
-import com.serhat.secondhand.review.repository.ReviewRepository;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.order.entity.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +16,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,81 +28,152 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class DashboardService {
 
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final ListingRepository listingRepository;
-    private final ReviewRepository reviewRepository;
-    private final FavoriteRepository favoriteRepository;
-    private final UserService userService;
+    private final SalesStatisticsPort salesStatisticsPort;
+    private final ListingStatisticsPort listingStatisticsPort;
+    private final ReviewStatisticsPort reviewStatisticsPort;
+    private final FavoriteStatisticsPort favoriteStatisticsPort;
     private final DashboardMapper dashboardMapper;
-    private final ListingViewService listingViewService;
+    private final ListingViewStatisticsPort listingViewStatisticsPort;
 
     public SellerDashboardDto getSellerDashboard(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Getting seller dashboard for user id: {} from {} to {}", sellerId, startDate, endDate);
 
-        BigDecimal totalRevenue = orderItemRepository.sumRevenueBySellerAndDateRange(sellerId, startDate, endDate);
+        BigDecimal totalRevenue = salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, startDate, endDate);
         totalRevenue = totalRevenue != null ? totalRevenue : BigDecimal.ZERO;
 
         // Growth Calculation
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         LocalDateTime previousStartDate = startDate.minusDays(daysBetween);
-        BigDecimal previousRevenue = orderItemRepository.sumRevenueBySellerAndDateRange(sellerId, previousStartDate, startDate);
+        BigDecimal previousRevenue = salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, previousStartDate, startDate);
         previousRevenue = previousRevenue != null ? previousRevenue : BigDecimal.ZERO;
         BigDecimal revenueGrowth = calculateGrowthPercentage(previousRevenue, totalRevenue);
 
         // Trend
-        List<Object[]> dailyRevenue = orderItemRepository.getDailyRevenueTrend(sellerId, startDate, endDate);
+        List<Object[]> dailyRevenue = salesStatisticsPort.getDailyRevenueTrend(sellerId, startDate, endDate);
         List<SellerDashboardDto.RevenueDataPoint> revenueTrend = dailyRevenue.stream()
                 .map(row -> dashboardMapper.toRevenueDataPoint(((java.sql.Date) row[0]).toLocalDate(), (BigDecimal) row[1]))
                 .collect(Collectors.toList());
 
         // 2. Order statistics
-        long totalOrders = orderItemRepository.countDistinctOrdersBySellerAndDateRange(sellerId, startDate, endDate);
-        List<Object[]> ordersByStatus = orderItemRepository.countDistinctOrdersBySellerAndStatusGrouped(sellerId, startDate, endDate);
+        List<Object[]> ordersByStatus = salesStatisticsPort.countDistinctOrdersBySellerAndStatusGrouped(sellerId, startDate, endDate);
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatus);
 
-        long totalListings = listingRepository.countBySellerIdAndCreatedAtBetween(sellerId, startDate, endDate);
-        List<Object[]> listingsByStatus = listingRepository.countBySellerIdAndStatusGrouped(sellerId, startDate, endDate);
-        Map<String, Long> listingsByStatusMap = new HashMap<>();
-        for (Object[] row : listingsByStatus) {
-            listingsByStatusMap.put(row[0].toString(), ((Number) row[1]).longValue());
+        long totalOrders = ordersByStatusMap.values().stream().mapToLong(Long::longValue).sum();
+        long completedOrders = ordersByStatusMap.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L)
+                + ordersByStatusMap.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
+
+        long totalListings = listingStatisticsPort.findBySellerId(sellerId).size();
+        long activeListings = listingStatisticsPort.findBySellerIdAndStatus(sellerId, ListingStatus.ACTIVE).size();
+        long deactivatedListings = listingStatisticsPort.findBySellerIdAndStatus(sellerId, ListingStatus.INACTIVE).size();
+        long soldListings = salesStatisticsPort.countDistinctListingsSoldBySellerAndDateRange(sellerId, startDate, endDate);
+
+        ListingViewStatsDto viewStats = listingViewStatisticsPort.getAggregatedViewStatisticsForSeller(sellerId, startDate, endDate);
+
+        List<Object[]> categoryRevenueRaw = salesStatisticsPort.sumRevenueBySellerAndCategory(sellerId, startDate, endDate);
+        Map<String, BigDecimal> categoryRevenue = dashboardMapper.mapCategoryRevenue(categoryRevenueRaw);
+
+        long totalFavorites = favoriteStatisticsPort.countByListingSellerId(sellerId);
+
+        List<Object[]> reviewStats = reviewStatisticsPort.getUserReviewStats(sellerId);
+        Long totalReviews = 0L;
+        if (reviewStats != null && !reviewStats.isEmpty()) {
+            Object[] stats = reviewStats.get(0);
+            if (stats[0] != null) {
+                totalReviews = ((Number) stats[0]).longValue();
+            }
         }
 
-        User seller = userService.findById(sellerId).getData();
-        ListingViewStatsDto viewStats = listingViewService.getAggregatedViewStatisticsForSeller(seller.getId(), startDate, endDate);
+        Map<Integer, Long> ratingDistribution = dashboardMapper.mapRatingDistribution(reviewStats);
 
         // Top Listings logic...
-        List<Object[]> topListingsData = orderItemRepository.findTopListingsByRevenue(sellerId, startDate, endDate);
+        List<Object[]> topListingsData = salesStatisticsPort.findTopListingsByRevenue(sellerId, startDate, endDate);
         List<SellerDashboardDto.TopListingDto> topListings = processTopListings(topListingsData);
 
         return SellerDashboardDto.builder()
                 .totalRevenue(totalRevenue)
                 .revenueGrowth(revenueGrowth)
                 .revenueTrend(revenueTrend)
-                .totalOrders(totalOrders)
                 .ordersByStatus(ordersByStatusMap)
+                .totalOrders(totalOrders)
+                .completedOrders(completedOrders)
                 .totalListings(totalListings)
-                .activeListings(listingsByStatusMap.getOrDefault(ListingStatus.ACTIVE.name(), 0L))
-                .soldListings(listingsByStatusMap.getOrDefault(ListingStatus.SOLD.name(), 0L))
+                .activeListings(activeListings)
+                .deactivatedListings(deactivatedListings)
+                .soldListings(soldListings)
+                .topListings(topListings)
                 .totalViews(viewStats.getTotalViews())
-                .averageRating(reviewRepository.getUserAverageRating(sellerId))
+                .uniqueViews(viewStats.getUniqueViews())
+                .totalFavorites(totalFavorites)
+                .averageRating(reviewStatisticsPort.getUserAverageRating(sellerId))
+                .totalReviews(totalReviews)
+                .ratingDistribution(ratingDistribution)
+                .categoryRevenue(categoryRevenue)
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
     }
 
+
     public BuyerDashboardDto getBuyerDashboard(Long buyerId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Getting buyer dashboard for user id: {}", buyerId);
 
-        BigDecimal totalSpending = orderRepository.sumTotalAmountByUserIdAndDateRange(buyerId, startDate, endDate);
+        BigDecimal totalSpending = salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, startDate, endDate);
         totalSpending = totalSpending != null ? totalSpending : BigDecimal.ZERO;
 
-        long totalOrders = orderRepository.countByUserIdAndCreatedAtBetween(buyerId, startDate, endDate);
+        long totalOrders = salesStatisticsPort.countOrdersByUserIdAndCreatedAtBetween(buyerId, startDate, endDate);
 
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        LocalDateTime previousStartDate = startDate.minusDays(daysBetween);
+        BigDecimal previousSpending = salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, previousStartDate, startDate);
+        previousSpending = previousSpending != null ? previousSpending : BigDecimal.ZERO;
+        BigDecimal spendingGrowth = calculateGrowthPercentage(previousSpending, totalSpending);
+
+        List<Object[]> spendingTrendRaw = salesStatisticsPort.getDailySpendingTrend(buyerId, startDate, endDate);
+        List<BuyerDashboardDto.SpendingDataPoint> spendingTrend = spendingTrendRaw.stream()
+                .map(row -> dashboardMapper.toSpendingDataPoint(((java.sql.Date) row[0]).toLocalDate(), (BigDecimal) row[1]))
+                .collect(Collectors.toList());
+
+        List<Object[]> ordersByStatusRaw = salesStatisticsPort.countOrdersByUserIdAndStatusGrouped(buyerId, startDate, endDate);
+        Map<String, Long> ordersByStatus = dashboardMapper.mapStatusCounts(ordersByStatusRaw);
+
+        long completedOrders = ordersByStatus.getOrDefault(Order.OrderStatus.COMPLETED.name(), 0L)
+                + ordersByStatus.getOrDefault(Order.OrderStatus.DELIVERED.name(), 0L);
+        long pendingOrders = ordersByStatus.getOrDefault(Order.OrderStatus.PENDING.name(), 0L)
+                + ordersByStatus.getOrDefault(Order.OrderStatus.CONFIRMED.name(), 0L)
+                + ordersByStatus.getOrDefault(Order.OrderStatus.PROCESSING.name(), 0L)
+                + ordersByStatus.getOrDefault(Order.OrderStatus.SHIPPED.name(), 0L);
+        long cancelledOrders = ordersByStatus.getOrDefault(Order.OrderStatus.CANCELLED.name(), 0L);
+        long refundedOrders = ordersByStatus.getOrDefault(Order.OrderStatus.REFUNDED.name(), 0L);
+
+        BigDecimal averageOrderValue = totalOrders > 0
+                ? totalSpending.divide(BigDecimal.valueOf(totalOrders), 2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+
+        List<Object[]> categorySpendingRaw = salesStatisticsPort.sumSpendingByBuyerAndCategory(buyerId, startDate, endDate);
+        Map<String, BigDecimal> categorySpending = dashboardMapper.mapCategoryRevenue(categorySpendingRaw);
+
+        List<Object[]> categoryOrderCountRaw = salesStatisticsPort.countOrdersByBuyerAndCategory(buyerId, startDate, endDate);
+        Map<String, Long> categoryOrderCount = dashboardMapper.mapCategoryOrderCount(categoryOrderCountRaw);
+
+        Long totalFavorites = 0L;
+
+        long reviewsGiven = reviewStatisticsPort.countByReviewerId(buyerId);
 
         return BuyerDashboardDto.builder()
                 .totalSpending(totalSpending)
+                .spendingGrowth(spendingGrowth)
+                .averageOrderValue(averageOrderValue)
+                .spendingTrend(spendingTrend)
                 .totalOrders(totalOrders)
+                .completedOrders(completedOrders)
+                .pendingOrders(pendingOrders)
+                .cancelledOrders(cancelledOrders)
+                .refundedOrders(refundedOrders)
+                .ordersByStatus(ordersByStatus)
+                .categorySpending(categorySpending)
+                .categoryOrderCount(categoryOrderCount)
+                .totalFavorites(totalFavorites)
+                .reviewsGiven(reviewsGiven)
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
@@ -116,8 +184,8 @@ public class DashboardService {
         for (Object[] row : topListingsData) {
             if (topListings.size() >= 10) break;
             UUID listingId = (UUID) row[0];
-            listingRepository.findById(listingId).ifPresent(listing -> {
-                Long favoriteCount = favoriteRepository.countByListingId(listingId);
+            listingStatisticsPort.findById(listingId).ifPresent(listing -> {
+                Long favoriteCount = favoriteStatisticsPort.countByListingId(listingId);
                 topListings.add(dashboardMapper.toTopListingDto(row, listing, favoriteCount, 0.0));
             });
         }

@@ -50,4 +50,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     @Query("SELECT r FROM Review r WHERE r.orderItem.listing.id = :listingId ORDER BY r.createdAt DESC")
     Page<Review> findReviewsByListingId(@Param("listingId") UUID listingId, Pageable pageable);
+
+    long countByReviewerId(Long reviewerId);
 }
