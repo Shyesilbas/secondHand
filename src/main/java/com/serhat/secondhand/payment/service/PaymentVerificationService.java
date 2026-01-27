@@ -2,7 +2,6 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
-import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
@@ -21,16 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentVerificationService {
+public class PaymentVerificationService implements IPaymentVerificationService{
 
-    private final ListingConfig listingConfig;
+    private final ListingFeeService listingConfig;
     private final IVerificationService verificationService;
     private final UserService userService;
     private final ListingService listingService;
@@ -40,7 +38,6 @@ public class PaymentVerificationService {
     private final OfferService offerService;
 
     public void initiatePaymentVerification(Long userId, InitiateVerificationRequest req) {
-        // 1. Kullanıcıyı ID üzerinden çek
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
             throw new RuntimeException(userResult.getMessage());
@@ -50,11 +47,9 @@ public class PaymentVerificationService {
         log.info("Initiating payment verification for user: {}, transactionType: {}", user.getEmail(),
                 req != null ? req.getTransactionType() : "NULL");
 
-        // 2. Kod üret ve kaydet
         String code = verificationService.generateCode();
         verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
 
-        // 3. Bildirim detaylarını oluştur
         PaymentTransactionType type = (req != null && req.getTransactionType() != null)
                 ? req.getTransactionType() : PaymentTransactionType.ITEM_PURCHASE;
 
@@ -75,7 +70,7 @@ public class PaymentVerificationService {
 
         switch (type) {
             case ITEM_PURCHASE -> appendCartDetails(details, user, req);
-            case LISTING_CREATION -> appendListingDetails(details, req, calculateTotalListingFee());
+            case LISTING_CREATION -> appendListingDetails(details, req, listingConfig.calculateTotalListingFee());
             case SHOWCASE_PAYMENT -> {
                 appendListingDetails(details, req, req != null ? req.getAmount() : null);
                 if (req != null && req.getDays() != null) {
@@ -94,14 +89,12 @@ public class PaymentVerificationService {
     }
 
     private void appendCartDetails(StringBuilder details, User user, InitiateVerificationRequest req) {
-        // Repository ID metodunu kullanıyoruz
         List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
         String couponCode = req != null ? req.getCouponCode() : null;
         Offer acceptedOffer = null;
         List<Cart> effectiveCartItems = cartItems;
 
         if (req != null && req.getOfferId() != null) {
-            // OfferService artik userId alıyor
             Result<Offer> offerResult = offerService.getAcceptedOfferForCheckout(user.getId(), req.getOfferId());
             if (offerResult.isError()) {
                 throw new RuntimeException(offerResult.getMessage());
@@ -151,19 +144,12 @@ public class PaymentVerificationService {
             String generatedCode = verificationService.generateCode();
             verificationService.generateVerification(user, generatedCode, CodeType.PAYMENT_VERIFICATION);
             paymentNotificationService.sendPaymentVerificationNotification(user, generatedCode, "Payment verification code generated.");
-            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Doğrulama kodu gerekli.");
+            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
         }
         boolean valid = verificationService.validateVerificationCode(user, code, CodeType.PAYMENT_VERIFICATION);
         if (!valid) {
-            return Result.error(PaymentErrorCodes.INVALID_VERIFICATION_CODE.toString(), "Geçersiz doğrulama kodu.");
+            return Result.error(PaymentErrorCodes.INVALID_VERIFICATION_CODE.toString(), "Invalid verification code.");
         }
         return Result.success();
-    }
-
-    private BigDecimal calculateTotalListingFee() {
-        BigDecimal fee = listingConfig.getCreation().getFee();
-        BigDecimal tax = listingConfig.getFee().getTax();
-        BigDecimal taxAmount = fee.multiply(tax).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        return fee.add(taxAmount);
     }
 }

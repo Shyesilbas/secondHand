@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class ShowcaseController {
 
-    private final ShowcaseService showcaseService;
+    private final IShowcaseService showcaseService;
     private final ShowcaseMapper showcaseMapper;
 
     @PostMapping

@@ -6,10 +6,10 @@ import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.payment.service.IPaymentVerificationService;
 import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.payment.service.PaymentStatsService;
-import com.serhat.secondhand.payment.service.PaymentVerificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +34,7 @@ public class PaymentController {
     private final PaymentProcessor paymentProcessor;
     private final PaymentStatsService paymentStatsService;
     private final ListingFeeService listingFeeService;
-    private final PaymentVerificationService paymentVerificationService;
+    private final IPaymentVerificationService paymentVerificationService;
 
     @PostMapping("/pay")
     @Operation(summary = "Create a new payment", description = "Processes a general payment request using idempotency for safety.")
@@ -46,7 +46,7 @@ public class PaymentController {
         log.info("Creating payment for user ID {} with request: {}", currentUser.getId(), paymentRequest);
         PaymentRequest requestWithKey = mergeIdempotencyKey(paymentRequest, idempotencyKey);
 
-        Result<PaymentDto> result = paymentProcessor.process(currentUser.getId(), requestWithKey);
+        Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), requestWithKey);
 
         return handleResult(result, HttpStatus.CREATED);
     }

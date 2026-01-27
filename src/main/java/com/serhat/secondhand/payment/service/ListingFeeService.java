@@ -54,7 +54,7 @@ public class ListingFeeService {
         BigDecimal totalFee = calculateTotalListingFee();
         PaymentRequest paymentRequest = paymentRequestMapper.buildListingFeePaymentRequest(user, listing, request, totalFee);
 
-        return paymentProcessor.process(user.getId(), paymentRequest);
+        return paymentProcessor.executeSinglePayment(user.getId(), paymentRequest);
     }
 
     @Transactional(readOnly = true)

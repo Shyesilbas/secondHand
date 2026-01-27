@@ -81,7 +81,7 @@ public class CheckoutOrchestrator {
         Order order = orderResult.getData();
 
         try {
-            var paymentResult = orderPaymentService.processOrderPayments(user, effectiveCartItems, request, order, pricing);
+            var paymentResult = orderPaymentService.processPaymentsForOrder(user, effectiveCartItems, request, order, pricing);
             if (paymentResult.isError()) {
                 releaseReservedStock(reserved);
                 return Result.error(paymentResult.getErrorCode(), paymentResult.getMessage());
@@ -96,6 +96,7 @@ public class CheckoutOrchestrator {
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
                 releaseReservedStock(reserved);
+                orderNotificationService.sendOrderNotifications(user, order, false);
                 log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
                 return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
             }

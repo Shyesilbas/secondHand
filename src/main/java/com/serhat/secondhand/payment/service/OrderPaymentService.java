@@ -35,12 +35,12 @@ public class OrderPaymentService {
     private final PaymentRequestMapper paymentRequestMapper;
     private final OrderPaymentMapper orderPaymentMapper;
 
-    public Result<PaymentProcessingResult> processOrderPayments(User user, List<Cart> cartItems,
+    public Result<PaymentProcessingResult> processPaymentsForOrder(User user, List<Cart> cartItems,
                                                       CheckoutRequest request, Order order, PricingResultDto pricing) {
         log.info("Processing payments for order: {}", order.getOrderNumber());
 
         List<PaymentRequest> paymentRequests = createPaymentRequests(user, cartItems, request, pricing, order);
-        Result<List<PaymentDto>> batchResult = processBatchPayments(user.getId(), paymentRequests);
+        Result<List<PaymentDto>> batchResult = processPaymentBatch(user.getId(), paymentRequests);
         
         if (batchResult.isError()) {
             log.error("Payment failed for order: {} - {}", order.getOrderNumber(), batchResult.getMessage());
@@ -76,9 +76,9 @@ public class OrderPaymentService {
 
 
     @Transactional
-    public Result<List<PaymentDto>> processBatchPayments(Long userId, List<PaymentRequest> paymentRequests) {
+    public Result<List<PaymentDto>> processPaymentBatch(Long userId, List<PaymentRequest> paymentRequests) {
         if (paymentRequests == null || paymentRequests.isEmpty()) {
-            return Result.error("Ödeme listesi boş olamaz.");
+            return Result.error("Payment List cannot be empty.");
         }
 
         for (PaymentRequest request : paymentRequests) {
@@ -90,7 +90,7 @@ public class OrderPaymentService {
 
         List<PaymentDto> results = new ArrayList<>();
         for (PaymentRequest request : paymentRequests) {
-            Result<PaymentDto> result = paymentProcessor.process(userId, request);
+            Result<PaymentDto> result = paymentProcessor.executeSinglePayment(userId, request);
 
             if (result.isError()) {
                 return Result.error(result.getMessage(), result.getErrorCode());
