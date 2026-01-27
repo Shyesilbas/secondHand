@@ -21,19 +21,15 @@ public class SellerDashboardDto {
     private BigDecimal revenueGrowth; // Percentage change from previous period
     private List<RevenueDataPoint> revenueTrend; // Time series data
     
-    // Sales Statistics
+    private Map<String, Long> ordersByStatus; // Status -> Count
     private Long totalOrders;
     private Long completedOrders;
-    private Long pendingOrders;
-    private Long cancelledOrders;
-    private Long refundedOrders;
-    private Map<String, Long> ordersByStatus; // Status -> Count
     
     // Listing Metrics
     private Long totalListings;
     private Long activeListings;
-    private Long soldListings;
     private Long deactivatedListings;
+    private Long soldListings;
     private Long totalViews; // Total views across all listings (from view tracking)
     private Long uniqueViews; // Unique viewers across all listings
     private Long totalFavorites;

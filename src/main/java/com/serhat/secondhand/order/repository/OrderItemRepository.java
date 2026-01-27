@@ -42,6 +42,16 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
                                                  @Param("startDate") LocalDateTime startDate,
                                                  @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT COUNT(DISTINCT oi.listing) FROM OrderItem oi " +
+            "WHERE oi.listing.seller.id = :sellerId " +
+            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.status != 'CANCELLED' " +
+            "AND oi.order.status != 'REFUNDED' " +
+            "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
+    long countDistinctListingsSoldBySellerAndDateRange(@Param("sellerId") Long sellerId,
+                                                       @Param("startDate") LocalDateTime startDate,
+                                                       @Param("endDate") LocalDateTime endDate);
+
     @Query("SELECT oi.order.status, COUNT(DISTINCT oi.order) FROM OrderItem oi " +
             "WHERE oi.listing.seller.id = :sellerId " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +

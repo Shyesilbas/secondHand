@@ -59,4 +59,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<UUID> findListingIdsByUserEmail(@Param("userEmail") String userEmail);
     
         boolean existsByUserEmailAndListingId(String userEmail, UUID listingId);
+
+        @Query("SELECT COUNT(f) FROM Favorite f WHERE f.listing.seller.id = :sellerId")
+        long countByListingSellerId(@Param("sellerId") Long sellerId);
 }
