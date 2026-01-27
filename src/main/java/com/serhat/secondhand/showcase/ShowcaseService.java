@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class ShowcaseService {
+public class ShowcaseService implements IShowcaseService{
 
     private final ShowcaseConfig showcaseConfig;
     private final ShowcaseRepository showcaseRepository;
@@ -39,6 +39,7 @@ public class ShowcaseService {
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestMapper paymentRequestMapper;
 
+    @Override
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
         log.info("Creating showcase for user ID: {} and listing ID: {}", userId, request.listingId());
 
@@ -69,7 +70,7 @@ public class ShowcaseService {
 
         // 4. Payment Processing (Using updated process(userId, request) signature)
         PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
-        var paymentResult = paymentProcessor.process(userId, paymentRequest);
+        var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
         if (paymentResult.isError()) {
             return Result.error("Payment failed for showcase creation", "SHOWCASE_PAYMENT_FAILED");

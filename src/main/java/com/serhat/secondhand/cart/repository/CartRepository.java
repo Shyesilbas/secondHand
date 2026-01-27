@@ -15,7 +15,6 @@ import java.util.UUID;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    List<Cart> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     List<Cart> findByUserId(Long userId);
 

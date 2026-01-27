@@ -10,6 +10,7 @@ import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
+import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -35,7 +36,7 @@ public class OrderNotificationService {
     private final ObjectMapper objectMapper;
 
     @Async("notificationExecutor")
-    public void sendOrderNotifications(User user, com.serhat.secondhand.order.entity.Order order, boolean paymentSuccessful) {
+    public void sendOrderNotifications(User user, Order order, boolean paymentSuccessful) {
         if (!paymentSuccessful) {
             log.info("Skipping notifications for failed order: {}", order.getOrderNumber());
             return;

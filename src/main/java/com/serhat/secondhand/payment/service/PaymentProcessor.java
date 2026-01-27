@@ -10,10 +10,7 @@ import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.payment.util.PaymentValidationHelper;
-import com.serhat.secondhand.payment.validator.PaymentValidator;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,21 +26,19 @@ public class PaymentProcessor {
 
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final PaymentRepository paymentRepository;
-    private final UserService userService;
-    private final PaymentValidationHelper paymentValidationHelper;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
-    private final PaymentVerificationService paymentVerificationService;
-    private final PaymentValidator paymentValidator;
+    private final PaymentIdempotencyHelper paymentIdempotencyHelper;
+    private final PaymentPreCheckService paymentPreCheckService;
 
-    public Result<PaymentDto> process(Long userId, PaymentRequest paymentRequest) {
+    public Result<PaymentDto> executeSinglePayment(Long userId, PaymentRequest paymentRequest) {
         log.info("Processing payment request for userId: {}", userId);
 
         String idempotencyKey = (paymentRequest.idempotencyKey() != null && !paymentRequest.idempotencyKey().isBlank())
                 ? paymentRequest.idempotencyKey()
-                : generateIdempotencyKey(paymentRequest, userId);
+                : paymentIdempotencyHelper.buildIdempotencyKey(paymentRequest, userId);
 
-        PaymentRequest requestWithIdempotency = createPaymentRequestWithIdempotency(paymentRequest, idempotencyKey);
+        PaymentRequest requestWithIdempotency = paymentIdempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
 
         int maxRetries = 3;
         int attempt = 0;
@@ -73,11 +68,6 @@ public class PaymentProcessor {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Result<PaymentDto> executePaymentWithTransaction(Long userId, PaymentRequest paymentRequest) {
-        var userResult = userService.findById(userId);
-        if (userResult.isError()) {
-            return Result.error(userResult.getErrorCode(), userResult.getMessage());
-        }
-        User fromUser = userResult.getData();
         String idempotencyKey = paymentRequest.idempotencyKey();
 
         Payment existingPayment = paymentRepository.findByIdempotencyKeyAndFromUserId(idempotencyKey, userId)
@@ -91,32 +81,21 @@ public class PaymentProcessor {
             return Result.success(paymentMapper.toDto(existingPayment));
         }
 
-        User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
-
-        Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
-        if (agreementsResult.isError()) {
-            return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
+        Result<PaymentPreCheckContext> preCheckResult = paymentPreCheckService.preCheck(userId, paymentRequest);
+        if (preCheckResult.isError()) {
+            return Result.error(preCheckResult.getErrorCode(), preCheckResult.getMessage());
         }
-
-        Result<Void> verificationResult = paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
-        if (verificationResult.isError()) {
-            return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
-        }
-
-        Result<Void> requestValidationResult = paymentValidator.validatePaymentRequest(paymentRequest, fromUser);
-        if (requestValidationResult.isError()) {
-            return Result.error(requestValidationResult.getErrorCode(), requestValidationResult.getMessage());
-        }
+        PaymentPreCheckContext context = preCheckResult.getData();
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
 
-        if (!strategy.canProcess(fromUser, toUser, paymentRequest.amount())) {
+        if (!strategy.canProcess(context.fromUser(), context.toUser(), paymentRequest.amount())) {
             return Result.error(PaymentErrorCodes.PAYMENT_ERROR.toString(), "Payment Method is not eligible.");
         }
 
-        PaymentResult result = strategy.process(fromUser, toUser, paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
+        PaymentResult result = strategy.process(context.fromUser(), context.toUser(), paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
 
-        Payment payment = paymentMapper.fromPaymentRequest(paymentRequest, fromUser, toUser, result);
+        Payment payment = paymentMapper.fromPaymentRequest(paymentRequest, context.fromUser(), context.toUser(), result);
         payment = paymentRepository.save(payment);
 
         if (result.success()) {
@@ -124,32 +103,6 @@ public class PaymentProcessor {
         }
 
         return Result.success(paymentMapper.toDto(payment));
-    }
-
-    private String generateIdempotencyKey(PaymentRequest paymentRequest, Long userId) {
-        return String.format("payment-%s-%s-%s-%s",
-                userId,
-                paymentRequest.amount(),
-                paymentRequest.listingId() != null ? paymentRequest.listingId() : "null",
-                paymentRequest.paymentType());
-    }
-
-    private PaymentRequest createPaymentRequestWithIdempotency(PaymentRequest original, String idempotencyKey) {
-        return PaymentRequest.builder()
-                .fromUserId(original.fromUserId())
-                .toUserId(original.toUserId())
-                .receiverName(original.receiverName())
-                .receiverSurname(original.receiverSurname())
-                .listingId(original.listingId())
-                .amount(original.amount())
-                .paymentType(original.paymentType())
-                .transactionType(original.transactionType())
-                .paymentDirection(original.paymentDirection())
-                .verificationCode(original.verificationCode())
-                .agreementsAccepted(original.agreementsAccepted())
-                .acceptedAgreementIds(original.acceptedAgreementIds())
-                .idempotencyKey(idempotencyKey)
-                .build();
     }
 
     private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, Long userId) {
