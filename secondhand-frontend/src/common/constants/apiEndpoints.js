@@ -35,7 +35,7 @@ export const API_ENDPOINTS = {
         ACTIVATE: (id) => `/v1/listings/${id}/reactivate`,
         DEACTIVATE: (id) => `/v1/listings/${id}/deactivate`,
         STATISTICS: '/v1/listings/statistics',
-        BY_USER: (userId) => `/v1/listings/byUser/${userId}`,
+        BY_USER: (userId) => `/v1/users/${userId}/listings`,
         FILTER: '/v1/listings/filter',
         TRACK_VIEW: (id) => `/v1/listings/${id}/view`,
         VIEW_STATS: (id) => `/v1/listings/${id}/view-stats`,
@@ -55,8 +55,8 @@ export const API_ENDPOINTS = {
         LIST_SELLER_ORDERS: '/v1/orders/seller',
         GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',
         PENDING_COMPLETION: '/v1/orders/pending-completion',
-        GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders/order-number/${orderNumber}`,
-        GET_ORDER_DETAILS: (id) => `/v1/orders/details/${id}`,
+        GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders?orderNumber=${encodeURIComponent(orderNumber)}`,
+        GET_ORDER_DETAILS: (id) => `/v1/orders/${id}`,
         CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,
         REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,
         COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,
@@ -74,9 +74,9 @@ export const API_ENDPOINTS = {
         AVAILABLE_CREDIT: '/v1/credit-card/available-credit',
     },
     COMPLAINTS: {
-        CREATE: '/v1/complaints/create',
-        MY_COMPLAINTS: '/v1/complaints/myComplaints',
-        ABOUT_ME: '/v1/complaints/aboutMe',
+        CREATE: '/v1/complaints',
+        MY_COMPLAINTS: '/v1/users/me/complaints',
+        ABOUT_ME: '/v1/users/me/complaints/received',
     },
     BANK_ACCOUNTS: {
         GET_ALL: '/v1/bank',
@@ -88,8 +88,8 @@ export const API_ENDPOINTS = {
     EMAILS: {
         MY_EMAILS: '/v1/emails/my-emails',
         UNREAD_COUNT: '/v1/emails/unread-count',
-        DELETE: (emailId) => `/v1/emails/delete/${emailId}`,
-        DELETE_ALL:  `/v1/emails/deleteAll`,
+        DELETE: (emailId) => `/v1/emails/${emailId}`,
+        DELETE_ALL: '/v1/emails',
     },
     ENUMS: {
         LISTING_TYPES: '/v1/enums/listing-types',
@@ -241,10 +241,10 @@ export const API_ENDPOINTS = {
     },
     CART: {
         GET_ITEMS: '/v1/cart',
-        ADD_ITEM: '/v1/cart/add',
+        ADD_ITEM: '/v1/cart/items',
         UPDATE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
         REMOVE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
-        CLEAR_CART: '/v1/cart/clear',
+        CLEAR_CART: '/v1/cart/items',
         GET_COUNT: '/v1/cart/count',
         CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
     },
@@ -258,23 +258,23 @@ export const API_ENDPOINTS = {
     },
     OFFERS: {
         CREATE: '/v1/offers',
-        MADE: '/v1/offers/made',
-        RECEIVED: '/v1/offers/received',
+        MADE: '/v1/users/me/offers/made',
+        RECEIVED: '/v1/users/me/offers/received',
         BY_ID: (id) => `/v1/offers/${id}`,
         ACCEPT: (id) => `/v1/offers/${id}/accept`,
         REJECT: (id) => `/v1/offers/${id}/reject`,
         COUNTER: (id) => `/v1/offers/${id}/counter`,
     },
     REVIEWS: {
-        CREATE_REVIEW: '/v1/reviews',                                                        // POST - Create review
-        GET_REVIEWS_RECEIVED: '/v1/reviews/received',                                        // GET - Reviews received by me
-        GET_REVIEWS_RECEIVED_BY: (userId) => `/v1/reviews/received-by/${userId}`,           // GET - Reviews received by user
-        GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/reviews/written-by/${userId}`,            // GET - Reviews written by user
-        GET_USER_REVIEW_STATS: (userId) => `/v1/reviews/user-stats/${userId}`,             // GET - User review stats
-        GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews/by-order-items',                          // GET - Reviews for order items
-        GET_REVIEW_BY_ORDER_ITEM: (orderItemId) => `/v1/reviews/by-order-item/${orderItemId}`, // GET - Review by order item
-        GET_REVIEWS_FOR_LISTING: (listingId) => `/v1/reviews/for-listing/${listingId}`,    // GET - Reviews for listing
-        GET_LISTING_REVIEW_STATS: (listingId) => `/v1/reviews/listing-stats/${listingId}`, // GET - Listing review stats
+        CREATE_REVIEW: '/v1/reviews',
+        GET_REVIEWS_RECEIVED: '/v1/users/me/reviews/received',
+        GET_REVIEWS_RECEIVED_BY: (userId) => `/v1/users/${userId}/reviews/received`,
+        GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/users/${userId}/reviews/written`,
+        GET_USER_REVIEW_STATS: (userId) => `/v1/users/${userId}/review-stats`,
+        GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews',
+        GET_REVIEW_BY_ORDER_ITEM: (orderItemId) => `/v1/orders/items/${orderItemId}/review`,
+        GET_REVIEWS_FOR_LISTING: (listingId) => `/v1/listings/${listingId}/reviews`,
+        GET_LISTING_REVIEW_STATS: (listingId) => `/v1/listings/${listingId}/review-stats`,
     },
     EWALLET: {
         CREATE: '/ewallet',

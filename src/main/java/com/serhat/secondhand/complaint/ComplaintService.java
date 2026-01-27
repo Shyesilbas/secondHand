@@ -8,8 +8,6 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,18 +67,16 @@ public class ComplaintService {
 
 
     @Transactional(readOnly = true)
-    public List<ComplaintDto> getUserComplaints() {
-        log.info("Getting complaints for authenticated user");
-        User user = getAuthenticatedUser();
+    public List<ComplaintDto> getUserComplaints(User user) {
+        log.info("Getting complaints for user: {}", user.getId());
         return complaintRepository.findByComplainer(user).stream()
                 .map(complaintMapper::mapComplaintToDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<ComplaintDto> getComplaintsAboutUser() {
-        log.info("Getting complaints about authenticated user");
-        User user = getAuthenticatedUser();
+    public List<ComplaintDto> getComplaintsAboutUser(User user) {
+        log.info("Getting complaints about user: {}", user.getId());
         return complaintRepository.findByComplainedUser(user).stream()
                 .map(complaintMapper::mapComplaintToDto)
                 .toList();
@@ -116,11 +112,6 @@ public class ComplaintService {
     @Transactional(readOnly = true)
     public boolean hasUserComplainedAbout(User complainer, User complainedUser) {
         return complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser);
-    }
-
-    private User getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userService.getAuthenticatedUser(authentication);
     }
 }
 

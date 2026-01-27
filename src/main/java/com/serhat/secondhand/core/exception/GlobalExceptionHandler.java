@@ -2,6 +2,7 @@ package com.serhat.secondhand.core.exception;
 
 import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
+import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -173,6 +174,22 @@ public class GlobalExceptionHandler {
 
         log.warn("Illegal argument: {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(VerificationLockedException.class)
+    public ResponseEntity<ErrorResponse> handleVerificationLocked(
+            VerificationLockedException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse errorResponse = createErrorResponse(
+                HttpStatus.LOCKED,
+                ex.getErrorCode(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        log.warn("Verification locked: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.LOCKED);
     }
 
     @ExceptionHandler(AsyncRequestNotUsableException.class)
