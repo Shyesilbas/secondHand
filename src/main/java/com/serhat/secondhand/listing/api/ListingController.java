@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
@@ -15,9 +16,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +38,7 @@ public class ListingController {
 
     private final ListingService listingService;
     private final ListingViewService listingViewService;
+    private final ReviewService reviewService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -47,6 +51,28 @@ public class ListingController {
         return listingService.findByIdAsDto(id, userId, email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{listingId}/reviews")
+    public ResponseEntity<?> getReviewsForListing(
+            @PathVariable String listingId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        var result = reviewService.getReviewsForListing(listingId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
+    @GetMapping("/{listingId}/review-stats")
+    public ResponseEntity<?> getListingReviewStats(@PathVariable String listingId) {
+        var result = reviewService.getListingReviewStats(listingId);
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 
     @PostMapping("/bulk")
@@ -82,14 +108,6 @@ public class ListingController {
 
         String userEmail = currentUser != null ? currentUser.getEmail() : null;
         return ResponseEntity.ok(listingService.globalSearch(query, page, size, userEmail));
-    }
-
-    @GetMapping("/byUser/{id}")
-    public ResponseEntity<Page<ListingDto>> getListingsByUser(
-            @PathVariable Long id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(listingService.getListingsByUser(id, page, size));
     }
 
     @GetMapping("/my-listings")

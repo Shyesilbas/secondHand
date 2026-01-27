@@ -47,7 +47,7 @@ public class CartController {
         return ResponseEntity.ok(result.getData());
     }
 
-    @PostMapping("/add")
+    @PostMapping("/items")
     @Operation(summary = "Add item to cart", description = "Add a listing to the user's cart")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Item added to cart successfully"),
@@ -110,7 +110,7 @@ public class CartController {
         return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
     }
 
-    @DeleteMapping("/clear")
+    @DeleteMapping("/items")
     @Operation(summary = "Clear cart", description = "Remove all items from the user's cart")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),

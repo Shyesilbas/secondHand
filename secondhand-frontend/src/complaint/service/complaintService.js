@@ -15,3 +15,9 @@ export const getMyComplaints = async () => {
     if (!Array.isArray(response)) return [];
     return response.map(item => new ComplaintDto(item));
 };
+
+export const getComplaintsAboutMe = async () => {
+    const response = await get(API_ENDPOINTS.COMPLAINTS.ABOUT_ME);
+    if (!Array.isArray(response)) return [];
+    return response.map(item => new ComplaintDto(item));
+};

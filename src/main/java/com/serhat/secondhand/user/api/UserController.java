@@ -3,7 +3,14 @@ package com.serhat.secondhand.user.api;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.verification.VerificationService;
+import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.complaint.ComplaintService;
+import com.serhat.secondhand.complaint.ComplaintDto;
+import com.serhat.secondhand.offer.dto.OfferDto;
+import com.serhat.secondhand.offer.service.OfferService;
+import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
@@ -13,11 +20,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +41,10 @@ public class UserController {
     private final UserService userService;
     private final AuditLogService auditLogService;
     private final VerificationService verificationService;
+    private final ReviewService reviewService;
+    private final ListingService listingService;
+    private final ComplaintService complaintService;
+    private final OfferService offerService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
@@ -57,17 +70,86 @@ public class UserController {
             @Valid @RequestBody VerificationRequest request,
             Authentication authentication) {
         log.info("Verifying user account for: {}", authentication.getName());
-        try {
-            var result = verificationService.verifyUser(request, authentication);
-            if (result.isError()) {
-                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                        .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-            }
-            return ResponseEntity.ok().build();
-        } catch (com.serhat.secondhand.core.exception.VerificationLockedException e) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.LOCKED)
-                    .body(java.util.Map.of("error", "ACCOUNT_BLOCKED", "message", e.getMessage()));
+        var result = verificationService.verifyUser(request, authentication);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
         }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me/reviews/received")
+    public ResponseEntity<?> getMyReceivedReviews(
+            @PageableDefault(size = 10) Pageable pageable,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Getting reviews received by current user: {}", currentUser.getId());
+        var result = reviewService.getReviewsForUser(currentUser.getId(), pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
+    @GetMapping("/me/complaints")
+    public ResponseEntity<java.util.List<ComplaintDto>> getMyComplaints(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(complaintService.getUserComplaints(currentUser));
+    }
+
+    @GetMapping("/me/complaints/received")
+    public ResponseEntity<java.util.List<ComplaintDto>> getComplaintsAboutMe(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(complaintService.getComplaintsAboutUser(currentUser));
+    }
+
+    @GetMapping("/me/offers/made")
+    public ResponseEntity<java.util.List<OfferDto>> getMyOffersMade(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(offerService.listMade(currentUser.getId()));
+    }
+
+    @GetMapping("/me/offers/received")
+    public ResponseEntity<java.util.List<OfferDto>> getMyOffersReceived(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(offerService.listReceived(currentUser.getId()));
+    }
+
+    @GetMapping("/{userId}/reviews/received")
+    public ResponseEntity<?> getReviewsReceivedByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        var result = reviewService.getReviewsForUser(userId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
+    @GetMapping("/{userId}/reviews/written")
+    public ResponseEntity<?> getReviewsWrittenByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        var result = reviewService.getReviewsByUser(userId, pageable);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
+    @GetMapping("/{userId}/review-stats")
+    public ResponseEntity<?> getUserReviewStats(@PathVariable Long userId) {
+        var result = reviewService.getUserReviewStats(userId);
+        if (result.isError()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
+    @GetMapping("/{userId}/listings")
+    public ResponseEntity<Page<ListingDto>> getListingsByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(listingService.getListingsByUser(userId, pageable.getPageNumber(), pageable.getPageSize()));
     }
 
     @GetMapping("/{id}")

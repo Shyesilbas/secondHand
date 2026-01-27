@@ -40,7 +40,7 @@ public class EmailController {
         return ResponseEntity.ok(Map.of("count", emailService.getUnreadCount(user)));
     }
 
-    @DeleteMapping("/delete/{emailId}")
+    @DeleteMapping("/{emailId}")
     public ResponseEntity<?> delete(@PathVariable UUID emailId) {
         var result = emailService.deleteEmail(emailId);
         if (result.isError()) {
@@ -50,8 +50,8 @@ public class EmailController {
         return ResponseEntity.ok(result.getData());
     }
 
-    @DeleteMapping("/deleteAll")
-    public ResponseEntity<String> delete(Authentication authentication) {
+    @DeleteMapping
+    public ResponseEntity<String> deleteAll(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         return ResponseEntity.ok(emailService.deleteAllEmails(user));
     }

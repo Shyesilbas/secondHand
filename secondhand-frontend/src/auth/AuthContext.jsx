@@ -48,26 +48,26 @@ export const AuthProvider = ({ children }) => {
                     setIsAuthenticated(true);
                 }
 
-                                if (isCookieAuth || hasValidTokens()) {
-                    try {
-                        console.debug('Attempting session validation via getCurrentUser...');
-                        const userProfile = await authService.getCurrentUser();
-                        console.debug('Session is valid, user profile fetched');
-                        const newUserData = {
-                            ...UserDTO,
-                            ...userProfile
-                        };
-                        setUser(newUserData);
-                        setUserState(newUserData);
-                        setIsAuthenticated(true);
-                    } catch (error) {
-                        console.debug('Session validation failed:', error.message);
-                        setUserState(null);
-                        setIsAuthenticated(false);
-                        clearTokens();
+                if (isCookieAuth || hasValidTokens()) {
+                    if (!userData) {
+                        try {
+                            const userProfile = await authService.getCurrentUser();
+                            const newUserData = {
+                                ...UserDTO,
+                                ...userProfile
+                            };
+                            setUser(newUserData);
+                            setUserState(newUserData);
+                            setIsAuthenticated(true);
+                        } catch (error) {
+                            console.debug('Session validation failed:', error.message);
+                            setUserState(null);
+                            setIsAuthenticated(false);
+                            clearTokens();
+                        }
                     }
                 } else {
-                                        console.debug('No valid authentication found');
+                    console.debug('No valid authentication found');
                     setUserState(null);
                     setIsAuthenticated(false);
                 }

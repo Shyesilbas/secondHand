@@ -49,18 +49,6 @@ public class OfferController {
         return ResponseEntity.ok(result.getData());
     }
 
-    @GetMapping("/made")
-    @Operation(summary = "List offers I made", description = "List offers created by the authenticated user")
-    public ResponseEntity<List<OfferDto>> listMade(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listMade(currentUser.getId()));
-    }
-
-    @GetMapping("/received")
-    @Operation(summary = "List offers I received", description = "List offers received by the authenticated seller")
-    public ResponseEntity<List<OfferDto>> listReceived(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listReceived(currentUser.getId()));
-    }
-
     @GetMapping("/{offerId}")
     @Operation(summary = "Get offer", description = "Get a single offer by id (buyer or seller only)")
     public ResponseEntity<?> getById(@PathVariable UUID offerId,

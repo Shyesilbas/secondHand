@@ -7,12 +7,14 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.service.*;
 import com.serhat.secondhand.payment.service.CheckoutService;
+import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -41,6 +43,7 @@ public class OrderController {
     private final OrderCompletionService orderCompletionService;
     private final OrderNameService orderNameService;
     private final OrderEscrowService orderEscrowService;
+    private final ReviewService reviewService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -63,14 +66,24 @@ public class OrderController {
     }
 
     @GetMapping
-    @Operation(summary = "Get user orders", description = "Retrieve paginated list of user's orders")
+    @Operation(summary = "Get user orders or order by order number", description = "Retrieve paginated list of user's orders, or a single order when orderNumber is provided")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Orders retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+        @ApiResponse(responseCode = "200", description = "Orders or single order retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found when querying by orderNumber")
     })
-    public ResponseEntity<Page<OrderDto>> getUserOrders(
+    public ResponseEntity<?> getUserOrders(
             @AuthenticationPrincipal User currentUser,
-            @PageableDefault(size = 5) Pageable pageable) {
+            @PageableDefault(size = 5) Pageable pageable,
+            @RequestParam(required = false) String orderNumber) {
+        if (orderNumber != null && !orderNumber.isBlank()) {
+            Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser.getId());
+            if (result.isError()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            }
+            return ResponseEntity.ok(result.getData());
+        }
         log.info("API request to get orders for user: {}", currentUser.getEmail());
         Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
@@ -103,20 +116,7 @@ public class OrderController {
         return ResponseEntity.ok(java.util.Map.of("amount", amount));
     }
 
-    @GetMapping("/pending-completion")
-    @Operation(summary = "Check pending completion orders", description = "Check if user has any orders waiting for completion (DELIVERED status)")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    public ResponseEntity<java.util.Map<String, Object>> getPendingCompletionStatus(
-            @AuthenticationPrincipal User currentUser) {
-        log.debug("API request to check pending completion orders for user: {}", currentUser.getEmail());
-        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
-        return ResponseEntity.ok(status);
-    }
-
-    @GetMapping("/details/{orderId}")
+    @GetMapping("/{orderId}")
     @Operation(summary = "Get order by ID", description = "Retrieve specific order details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order retrieved successfully"),
@@ -135,20 +135,27 @@ public class OrderController {
         return ResponseEntity.ok(result.getData());
     }
 
-    @GetMapping("/order-number/{orderNumber}")
-    @Operation(summary = "Get order by order number", description = "Retrieve specific order by order number")
+    @GetMapping("/pending-completion")
+    @Operation(summary = "Check pending completion orders", description = "Check if user has any orders waiting for completion (DELIVERED status)")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Order retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "404", description = "Order not found")
+        @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<?> getOrderByOrderNumber(
-            @PathVariable String orderNumber,
+    public ResponseEntity<java.util.Map<String, Object>> getPendingCompletionStatus(
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to get order by order number: {} for user: {}", orderNumber, currentUser.getEmail());
-        Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser.getId());
+        log.debug("API request to check pending completion orders for user: {}", currentUser.getEmail());
+        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/items/{orderItemId}/review")
+    public ResponseEntity<?> getReviewByOrderItem(
+            @PathVariable Long orderItemId,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Getting review for order item: {} by user: {}", orderItemId, currentUser.getId());
+        var result = reviewService.getReviewByOrderItem(orderItemId, currentUser.getId());
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
         }
         return ResponseEntity.ok(result.getData());
@@ -226,7 +233,7 @@ public class OrderController {
     })
     public ResponseEntity<?> updateOrderName(
             @PathVariable Long orderId,
-            @RequestBody UpdateOrderNameRequest request,
+            @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
         Result<OrderDto> result = orderNameService.updateOrderName(orderId, request.getName(), currentUser);
@@ -240,7 +247,7 @@ public class OrderController {
     @Setter
     @Getter
     public static class UpdateOrderNameRequest {
+        @NotBlank
         private String name;
-
     }
 }
