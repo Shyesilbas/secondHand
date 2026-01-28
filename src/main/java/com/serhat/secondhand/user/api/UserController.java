@@ -1,28 +1,28 @@
 package com.serhat.secondhand.user.api;
 
+import com.serhat.secondhand.complaint.ComplaintDto;
+import com.serhat.secondhand.complaint.ComplaintService;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.ListingService;
-import com.serhat.secondhand.complaint.ComplaintService;
-import com.serhat.secondhand.complaint.ComplaintDto;
-import com.serhat.secondhand.offer.dto.OfferDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
+import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -102,13 +102,17 @@ public class UserController {
     }
 
     @GetMapping("/me/offers/made")
-    public ResponseEntity<java.util.List<OfferDto>> getMyOffersMade(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listMade(currentUser.getId()));
+    public ResponseEntity<?> getMyOffersMade(
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(offerService.listMade(currentUser.getId(), pageable));
     }
 
     @GetMapping("/me/offers/received")
-    public ResponseEntity<java.util.List<OfferDto>> getMyOffersReceived(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(offerService.listReceived(currentUser.getId()));
+    public ResponseEntity<?> getMyOffersReceived(
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(offerService.listReceived(currentUser.getId(), pageable));
     }
 
     @GetMapping("/{userId}/reviews/received")

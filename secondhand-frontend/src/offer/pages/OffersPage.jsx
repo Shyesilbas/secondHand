@@ -6,6 +6,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
 import {RefreshCw, CheckCircle2, XCircle, Clock, ShoppingCart, Handshake} from 'lucide-react';
+import Pagination from '../../common/components/ui/Pagination.jsx';
 
 const statusBadge = (status) => {
   switch (status) {
@@ -32,18 +33,47 @@ const OffersPage = () => {
   const [error, setError] = useState(null);
   const [made, setMade] = useState([]);
   const [received, setReceived] = useState([]);
+  const [madePage, setMadePage] = useState(0);
+  const [madeTotalPages, setMadeTotalPages] = useState(0);
+  const [madeTotalElements, setMadeTotalElements] = useState(0);
+  const [receivedPage, setReceivedPage] = useState(0);
+  const [receivedTotalPages, setReceivedTotalPages] = useState(0);
+  const [receivedTotalElements, setReceivedTotalElements] = useState(0);
+  const size = 5;
   const [counterTarget, setCounterTarget] = useState(null);
 
-  const refresh = async () => {
+  const refresh = async (opts = {}) => {
     setIsLoading(true);
     setError(null);
     try {
-      const [m, r] = await Promise.all([offerService.listMade(), offerService.listReceived()]);
-      setMade(Array.isArray(m) ? m : []);
-      setReceived(Array.isArray(r) ? r : []);
+      const nextMadePage = Number.isFinite(opts?.madePage) ? opts.madePage : madePage;
+      const nextReceivedPage = Number.isFinite(opts?.receivedPage) ? opts.receivedPage : receivedPage;
+
+      const [mRes, rRes] = await Promise.all([
+        offerService.listMade(nextMadePage, size),
+        offerService.listReceived(nextReceivedPage, size),
+      ]);
+
+      const mItems = Array.isArray(mRes) ? mRes : (Array.isArray(mRes?.content) ? mRes.content : []);
+      const rItems = Array.isArray(rRes) ? rRes : (Array.isArray(rRes?.content) ? rRes.content : []);
+
+      setMade(mItems);
+      setReceived(rItems);
+
+      setMadePage(Number.isFinite(mRes?.number) ? mRes.number : nextMadePage);
+      setMadeTotalPages(Number.isFinite(mRes?.totalPages) ? mRes.totalPages : 0);
+      setMadeTotalElements(Number.isFinite(mRes?.totalElements) ? mRes.totalElements : mItems.length);
+
+      setReceivedPage(Number.isFinite(rRes?.number) ? rRes.number : nextReceivedPage);
+      setReceivedTotalPages(Number.isFinite(rRes?.totalPages) ? rRes.totalPages : 0);
+      setReceivedTotalElements(Number.isFinite(rRes?.totalElements) ? rRes.totalElements : rItems.length);
     } catch (e) {
       setMade([]);
       setReceived([]);
+      setMadeTotalPages(0);
+      setMadeTotalElements(0);
+      setReceivedTotalPages(0);
+      setReceivedTotalElements(0);
       setError(e?.response?.data?.message || 'Failed to load offers');
     } finally {
       setIsLoading(false);
@@ -57,6 +87,10 @@ const OffersPage = () => {
   const items = useMemo(() => {
     return activeTab === 'received' ? received : made;
   }, [activeTab, made, received]);
+
+  const totalPages = activeTab === 'received' ? receivedTotalPages : madeTotalPages;
+  const page = activeTab === 'received' ? receivedPage : madePage;
+  const totalElements = activeTab === 'received' ? receivedTotalElements : madeTotalElements;
 
   const handleAccept = async (offerId) => {
     try {
@@ -90,13 +124,13 @@ const OffersPage = () => {
             <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">Offers</h1>
             {items.length > 0 && (
               <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                {activeTab === 'made' ? 'Offers you made' : 'Offers you received'} • {items.length} total
+                {activeTab === 'made' ? 'Offers you made' : 'Offers you received'} • {totalElements} total
               </p>
             )}
           </div>
           <button
             type="button"
-            onClick={refresh}
+            onClick={() => refresh()}
             disabled={isLoading}
             className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-60"
           >
@@ -119,7 +153,7 @@ const OffersPage = () => {
               >
                 <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
                 Made
-                <span className="ml-1.5 text-[11px] text-slate-400">{made.length}</span>
+                <span className="ml-1.5 text-[11px] text-slate-400">{madeTotalElements}</span>
               </button>
               <button
                 type="button"
@@ -132,7 +166,7 @@ const OffersPage = () => {
               >
                 <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
                 Received
-                <span className="ml-1.5 text-[11px] text-slate-400">{received.length}</span>
+                <span className="ml-1.5 text-[11px] text-slate-400">{receivedTotalElements}</span>
               </button>
             </div>
             <div className="text-[11px] text-slate-500 tracking-tight">
@@ -170,127 +204,146 @@ const OffersPage = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {items.map((o) => {
-                const currency = 'TRY';
-                const isExpired = o.status === 'EXPIRED';
-                const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
-                const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
-                const personName = activeTab === 'made'
-                  ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
-                  : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
+            <>
+              <div className="space-y-3">
+                {items.map((o) => {
+                  const currency = 'TRY';
+                  const isExpired = o.status === 'EXPIRED';
+                  const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
+                  const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
+                  const personName = activeTab === 'made'
+                    ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
+                    : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
 
-                return (
-                  <div
-                    key={o.id}
-                    className={`rounded-3xl border border-slate-200/60 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm transition-all hover:shadow-[0_24px_70px_rgba(15,23,42,0.07)] ${
-                      isExpired ? 'opacity-60 grayscale' : ''
-                    }`}
-                  >
-                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold tracking-tight text-slate-900">
-                              {o.listingTitle || 'Listing'}
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                              {activeTab === 'made' ? 'To' : 'From'} {personName}
-                            </p>
+                  return (
+                    <div
+                      key={o.id}
+                      className={`rounded-3xl border border-slate-200/60 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm transition-all hover:shadow-[0_24px_70px_rgba(15,23,42,0.07)] ${
+                        isExpired ? 'opacity-60 grayscale' : ''
+                      }`}
+                    >
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-semibold tracking-tight text-slate-900">
+                                {o.listingTitle || 'Listing'}
+                              </p>
+                              <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
+                                {activeTab === 'made' ? 'To' : 'From'} {personName}
+                              </p>
+                            </div>
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tracking-tight ${statusBadge(
+                                o.status
+                              )}`}
+                            >
+                              <Clock className="h-3 w-3" />
+                              {o.status}
+                            </span>
                           </div>
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tracking-tight ${statusBadge(
-                              o.status
-                            )}`}
-                          >
-                            <Clock className="h-3 w-3" />
-                            {o.status}
-                          </span>
+
+                          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                                Total offer
+                              </div>
+                              <div className="mt-1 flex items-baseline gap-1.5">
+                                <span className="font-mono text-2xl font-black tracking-tighter text-indigo-600">
+                                  {formatCurrency(o.totalPrice, currency)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                                Quantity and unit
+                              </div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
+                              </div>
+                            </div>
+                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
+                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                                Timeline
+                              </div>
+                              <div className="mt-1 text-xs text-slate-600">
+                                <span>
+                                  {o.createdAt ? formatDateTime(o.createdAt) : '—'}
+                                </span>
+                                <span className="mx-1 text-slate-400">→</span>
+                                <span className={isExpired ? 'text-red-600 font-medium' : ''}>
+                                  {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                              Total offer
-                            </div>
-                            <div className="mt-1 flex items-baseline gap-1.5">
-                              <span className="font-mono text-2xl font-black tracking-tighter text-indigo-600">
-                                {formatCurrency(o.totalPrice, currency)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                              Quantity and unit
-                            </div>
-                            <div className="mt-1 text-xs text-slate-600">
-                              {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
-                            </div>
-                          </div>
-                          <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                            <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                              Timeline
-                            </div>
-                            <div className="mt-1 text-xs text-slate-600">
-                              <span>
-                                {o.createdAt ? formatDateTime(o.createdAt) : '—'}
-                              </span>
-                              <span className="mx-1 text-slate-400">→</span>
-                              <span className={isExpired ? 'text-red-600 font-medium' : ''}>
-                                {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
-                              </span>
-                            </div>
-                          </div>
+                        <div className="flex items-center justify-end gap-1.5 md:flex-col md:items-end md:gap-2">
+                          {isExpired ? (
+                            <span className="text-[11px] font-medium text-slate-500 tracking-tight">
+                              Offer expired
+                            </span>
+                          ) : canCheckout ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCheckout(o.id)}
+                              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold tracking-tight text-white shadow-sm hover:bg-indigo-700"
+                            >
+                              <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
+                              Checkout
+                            </button>
+                          ) : canActAsSeller ? (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleAccept(o.id)}
+                                className="inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold tracking-tight text-emerald-700 hover:bg-emerald-500/15"
+                              >
+                                <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                                Accept
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCounterTarget(o)}
+                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-700 hover:border-slate-300"
+                              >
+                                Counter
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleReject(o.id)}
+                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                              >
+                                <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                                Reject
+                              </button>
+                            </>
+                          ) : null}
                         </div>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-1.5 md:flex-col md:items-end md:gap-2">
-                        {isExpired ? (
-                          <span className="text-[11px] font-medium text-slate-500 tracking-tight">
-                            Offer expired
-                          </span>
-                        ) : canCheckout ? (
-                          <button
-                            type="button"
-                            onClick={() => handleCheckout(o.id)}
-                            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold tracking-tight text-white shadow-sm hover:bg-indigo-700"
-                          >
-                            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
-                            Checkout
-                          </button>
-                        ) : canActAsSeller ? (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleAccept(o.id)}
-                              className="inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold tracking-tight text-emerald-700 hover:bg-emerald-500/15"
-                            >
-                              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-                              Accept
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setCounterTarget(o)}
-                              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-700 hover:border-slate-300"
-                            >
-                              Counter
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleReject(o.id)}
-                              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                            >
-                              <XCircle className="mr-1.5 h-3.5 w-3.5" />
-                              Reject
-                            </button>
-                          </>
-                        ) : null}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 rounded-3xl bg-white border border-slate-100 shadow-sm/50 shadow-[0_22px_60px_rgba(15,23,42,0.04)] overflow-hidden">
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={(p) => {
+                    const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
+                    if (activeTab === 'made') {
+                      setMadePage(next);
+                      refresh({ madePage: next });
+                      return;
+                    }
+                    setReceivedPage(next);
+                    refresh({ receivedPage: next });
+                  }}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>

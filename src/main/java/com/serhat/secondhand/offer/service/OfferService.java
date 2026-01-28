@@ -18,11 +18,12 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,20 +41,16 @@ public class OfferService {
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
-        // 1. User State Check
         var userResult = userService.findById(buyerId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
         User buyer = userResult.getData();
 
-        // 2. Request Validation
         Result<Void> validationResult = offerValidator.validateCreateRequest(request);
         if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
 
-        // 3. Listing Check
         Listing listing = listingService.findById(request.getListingId()).orElse(null);
         if (listing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
 
-        // 4. Business Validation
         Result<Void> listingValidationResult = offerValidator.validateListingForOffer(listing, buyer);
         if (listingValidationResult.isError()) return Result.error(listingValidationResult.getMessage(), listingValidationResult.getErrorCode());
 
@@ -65,21 +62,18 @@ public class OfferService {
     }
 
     @Transactional(readOnly = true)
-    public List<OfferDto> listMade(Long buyerId) {
-        return offerRepository.findByBuyerIdOrderByCreatedAtDesc(buyerId).stream()
-                .peek(o -> expireIfNeeded(o, false))
-                .map(offerMapper::toDto)
-                .toList();
+    public Page<OfferDto> listMade(Long buyerId, Pageable pageable) {
+        return offerRepository.findByBuyerIdWithDetails(buyerId, pageable)
+                .map(offerMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<OfferDto> listReceived(Long sellerId) {
-        return offerRepository.findBySellerIdOrderByCreatedAtDesc(sellerId).stream()
-                .peek(o -> expireIfNeeded(o, false))
-                .map(offerMapper::toDto)
-                .toList();
+    public Page<OfferDto> listReceived(Long sellerId, Pageable pageable) {
+        return offerRepository.findBySellerIdWithDetails(sellerId, pageable)
+                .map(offerMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
     public Result<OfferDto> getByIdForUser(Long userId, UUID offerId) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
@@ -91,7 +85,7 @@ public class OfferService {
         if (!offerValidator.isBuyerOrSeller(userResult.getData(), offer)) {
             return Result.error(OfferErrorCodes.OFFER_NOT_ALLOWED);
         }
-        expireIfNeeded(offer, false);
+
         return Result.success(offerMapper.toDto(offer));
     }
 
@@ -102,7 +96,11 @@ public class OfferService {
 
         Offer offer = offerResult.getData();
 
-        if (expireIfNeeded(offer, true).isError()) return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+        if (isExpired(offer)) {
+            processManualExpiration(offer);
+            return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+        }
+
         if (requirePending(offer).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
         Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
@@ -124,7 +122,12 @@ public class OfferService {
         if (offerResult.isError()) return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
 
         Offer offer = offerResult.getData();
-        if (expireIfNeeded(offer, true).isError()) return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+
+        if (isExpired(offer)) {
+            processManualExpiration(offer);
+            return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+        }
+
         if (requirePending(offer).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
         offer.setStatus(OfferStatus.REJECTED);
@@ -145,7 +148,12 @@ public class OfferService {
         if (previousResult.isError()) return Result.error(previousResult.getMessage(), previousResult.getErrorCode());
 
         Offer previous = previousResult.getData();
-        if (expireIfNeeded(previous, true).isError()) return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+
+        if (isExpired(previous)) {
+            processManualExpiration(previous);
+            return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+        }
+
         if (requirePending(previous).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
         if (offerValidator.validateListingEligibility(previous.getListing()).isError())
@@ -161,6 +169,33 @@ public class OfferService {
         offerEmailNotificationService.notifyCounterReceived(saved);
         return Result.success(offerMapper.toDto(saved));
     }
+
+    @Transactional(readOnly = true)
+    public Result<Offer> getAcceptedOfferForCheckout(Long buyerId, UUID offerId) {
+        Offer offer = offerRepository.findByIdAndBuyerId(offerId, buyerId).orElse(null);
+
+        if (offer == null) return Result.error(OfferErrorCodes.OFFER_NOT_FOUND);
+
+        if (isExpired(offer)) {
+            return Result.error(OfferErrorCodes.OFFER_EXPIRED);
+        }
+
+        if (offer.getStatus() != OfferStatus.ACCEPTED) return Result.error(OfferErrorCodes.OFFER_NOT_ACCEPTED);
+
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
+        if (eligibilityResult.isError()) return Result.error(eligibilityResult.getErrorCode(), eligibilityResult.getMessage());
+
+        return Result.success(offer);
+    }
+
+    @Transactional
+    public void markCompleted(Offer offer) {
+        if (offer == null) return;
+        log.info("Marking offer {} as COMPLETED", offer.getId());
+        offer.setStatus(OfferStatus.COMPLETED);
+        offerRepository.save(offer);
+    }
+
 
     private Result<Offer> getOfferForAction(Long userId, UUID offerId) {
         var userResult = userService.findById(userId);
@@ -184,53 +219,20 @@ public class OfferService {
                 .orElse(Result.error(OfferErrorCodes.OFFER_NOT_FOUND));
     }
 
-    private Result<Void> expireIfNeeded(Offer offer, boolean throwIfExpired) {
-        if (offer == null || offer.getStatus() != OfferStatus.PENDING) return Result.success();
-
-        if (offer.getExpiresAt() != null && LocalDateTime.now().isAfter(offer.getExpiresAt())) {
-            offer.setStatus(OfferStatus.EXPIRED);
-            offerRepository.save(offer);
-            offerEmailNotificationService.notifyExpiredToBoth(offer);
-            return throwIfExpired ? Result.error(OfferErrorCodes.OFFER_EXPIRED) : Result.success();
-        }
-        return Result.success();
+    private boolean isExpired(Offer offer) {
+        return offer != null &&
+                offer.getStatus() == OfferStatus.PENDING &&
+                offer.getExpiresAt() != null &&
+                LocalDateTime.now().isAfter(offer.getExpiresAt());
     }
 
-    @Transactional(readOnly = true)
-    public Result<Offer> getAcceptedOfferForCheckout(Long buyerId, UUID offerId) {
-        Offer offer = offerRepository.findByIdAndBuyerId(offerId, buyerId)
-                .orElse(null);
-
-        if (offer == null) {
-            return Result.error(OfferErrorCodes.OFFER_NOT_FOUND);
-        }
-
-        Result<Void> expireResult = expireIfNeeded(offer, true);
-        if (expireResult.isError()) {
-            return Result.error(expireResult.getErrorCode(), expireResult.getMessage());
-        }
-
-        if (offer.getStatus() != OfferStatus.ACCEPTED) {
-            return Result.error(OfferErrorCodes.OFFER_NOT_ACCEPTED);
-        }
-
-        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
-        if (eligibilityResult.isError()) {
-            return Result.error(eligibilityResult.getErrorCode(), eligibilityResult.getMessage());
-        }
-
-        return Result.success(offer);
+    private void processManualExpiration(Offer offer) {
+        offer.setStatus(OfferStatus.EXPIRED);
+        offerRepository.save(offer);
+        offerEmailNotificationService.notifyExpiredToBoth(offer);
     }
 
     private Result<Void> requirePending(Offer offer) {
         return offer.getStatus() == OfferStatus.PENDING ? Result.success() : Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
-    }
-
-    @Transactional
-    public void markCompleted(Offer offer) {
-        if (offer == null) return;
-        log.info("Marking offer {} as COMPLETED", offer.getId());
-        offer.setStatus(OfferStatus.COMPLETED);
-        offerRepository.save(offer);
     }
 }

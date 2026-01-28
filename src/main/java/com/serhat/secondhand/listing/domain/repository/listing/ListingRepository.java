@@ -25,22 +25,29 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l WHERE l.id = :id")
     Optional<Listing> findByIdWithLock(@Param("id") UUID id);
 
-    List<Listing> findByStatus(ListingStatus status);
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id = :id")
+    Optional<Listing> findByIdWithSeller(@Param("id") UUID id);
 
-    List<Listing> findBySellerId(Long sellerId);
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.status = :status")
+    Page<Listing> findByStatus(@Param("status") ListingStatus status, Pageable pageable);
 
-    Page<Listing> findBySellerId(Long sellerId, Pageable pageable);
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId")
+    Page<Listing> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId AND l.status = :status")
+    List<Listing> findBySellerIdAndStatus(@Param("sellerId") Long sellerId, @Param("status") ListingStatus status);
 
-    List<Listing> findBySellerIdAndStatus(Long sellerId, ListingStatus status);
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId AND l.listingType = :listingType")
+    Page<Listing> findBySellerIdAndListingType(@Param("sellerId") Long sellerId, @Param("listingType") ListingType listingType, Pageable pageable);
 
-    Page<Listing> findBySellerIdAndListingType(Long sellerId, ListingType listingType, Pageable pageable);
-
-
-    Page<Listing> findByTitleContainingIgnoreCaseOrListingNoContainingIgnoreCaseAndStatus(
-            String title, String listingNo, ListingStatus status, Pageable pageable
-    );
-
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller " +
+            "WHERE (LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
+            "OR LOWER(l.listingNo) LIKE LOWER(CONCAT('%', :listingNo, '%'))) " +
+            "AND l.status = :status")
+    Page<Listing> findBySearch(@Param("title") String title,
+                               @Param("listingNo") String listingNo,
+                               @Param("status") ListingStatus status,
+                               Pageable pageable);
 
     @Query("SELECT COUNT(l) FROM Listing l")
     long getTotalListingCount();
@@ -61,9 +68,12 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
     int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
 
-    List<Listing> findAllByIdIn(Collection<UUID> ids);
+    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
+    List<Listing> findAllByIdIn(@Param("ids") Collection<UUID> ids);
 
     long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
     long countBySellerId(Long sellerId);
+
+    List<Listing> findByStatus(ListingStatus status);
 }
