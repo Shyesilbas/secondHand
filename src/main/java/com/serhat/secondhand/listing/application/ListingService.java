@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -82,17 +83,22 @@ public class ListingService {
     }
 
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, String userEmail) {
-        return listingRepository.findById(id).map(listing -> {
+        return listingRepository.findByIdWithSeller(id).map(listing -> {
             ListingDto dto = listingMapper.toDynamicDto(listing);
-            dto = enrichmentService.enrich(dto, userEmail);
+
+            CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
+                    enrichmentService.enrich(dto, userEmail));
 
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
-                log.debug("Enriching view stats for listing {} for owner", id);
-                LocalDateTime endDate = LocalDateTime.now();
-                LocalDateTime startDate = endDate.minusDays(7);
-                ListingViewStatsDto viewStats = listingViewService.getViewStatistics(id, startDate, endDate);
-                dto.setViewStats(viewStats);
+                CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
+                        listingViewService.getViewStatistics(id, LocalDateTime.now().minusDays(7), LocalDateTime.now()));
+
+                CompletableFuture.allOf(enrichTask, statsTask).join();
+                dto.setViewStats(statsTask.join());
+            } else {
+                enrichTask.join();
             }
+
             return dto;
         });
     }
@@ -121,9 +127,10 @@ public class ListingService {
     public Page<ListingDto> globalSearch(String query, int page, int size, String userEmail) {
         if (query == null || query.trim().isEmpty()) return Page.empty();
 
-        String searchTerm = query.trim().toLowerCase();
+        String searchTerm = query.trim();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Listing> results = listingRepository.findByTitleContainingIgnoreCaseOrListingNoContainingIgnoreCaseAndStatus(
+
+        Page<Listing> results = listingRepository.findBySearch(
                 searchTerm, searchTerm, ListingStatus.ACTIVE, pageable
         );
 

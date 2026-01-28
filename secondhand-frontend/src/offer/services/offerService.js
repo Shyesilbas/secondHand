@@ -5,11 +5,11 @@ export const offerService = {
   create: async (payload) => {
     return post(API_ENDPOINTS.OFFERS.CREATE, payload);
   },
-  listMade: async () => {
-    return get(API_ENDPOINTS.OFFERS.MADE);
+  listMade: async (page = 0, size = 5) => {
+    return get(`${API_ENDPOINTS.OFFERS.MADE}?page=${page}&size=${size}`);
   },
-  listReceived: async () => {
-    return get(API_ENDPOINTS.OFFERS.RECEIVED);
+  listReceived: async (page = 0, size = 5) => {
+    return get(`${API_ENDPOINTS.OFFERS.RECEIVED}?page=${page}&size=${size}`);
   },
   getById: async (id) => {
     return get(API_ENDPOINTS.OFFERS.BY_ID(id));
