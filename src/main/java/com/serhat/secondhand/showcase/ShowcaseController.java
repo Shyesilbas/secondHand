@@ -30,7 +30,7 @@ public class ShowcaseController {
             @RequestBody ShowcasePaymentRequest request,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Request to create showcase for user: {} and listing: {}",
+        log.info("Request to create showcase for user: {} and listing {}",
                 currentUser.getId(), request.listingId());
 
         var result = showcaseService.createShowcase(currentUser.getId(), request);

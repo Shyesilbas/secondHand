@@ -235,7 +235,7 @@ public class SecurityConfig {
                 response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+                response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept, Origin, X-Requested-With, Cache-Control, X-File-Name, Idempotency-Key");
 
                 String jsonResponse = String.format(
                         "{\"error\":\"UNAUTHORIZED\",\"message\":\"Token expired or invalid\",\"timestamp\":\"%s\",\"path\":\"%s\"}",
@@ -308,7 +308,8 @@ public class SecurityConfig {
                 "Accept",
                 "Origin",
                 "Cache-Control",
-                "X-File-Name"
+                "X-File-Name",
+                "Idempotency-Key"
         ));
 
         // Allow credentials (important for JWT tokens)
@@ -321,7 +322,8 @@ public class SecurityConfig {
                 "X-RateLimit-Limit",
                 "X-RateLimit-Remaining", 
                 "X-RateLimit-Reset",
-                "Retry-After"
+                "Retry-After",
+                "Idempotency-Key"
         ));
 
         // Max age for preflight requests

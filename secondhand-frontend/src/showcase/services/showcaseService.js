@@ -36,7 +36,8 @@ export const showcaseService = {
       paymentType,
       verificationCode,
       agreementsAccepted,
-      acceptedAgreementIds
+      acceptedAgreementIds,
+      idempotencyKey: `showcase-${listingId}-${days}-${Date.now()}`
     };
     
     return withErrorHandling(

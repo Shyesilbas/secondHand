@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application;
 
+import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.books.BooksListingFilterService;
@@ -22,6 +23,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +42,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final UserService userService;
     private final ListingEnrichmentService enrichmentService;
+    private final ListingConfig listingConfig;
     private final ListingViewService listingViewService;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
 
@@ -53,13 +57,15 @@ public class ListingService {
             SportsListingFilterService sportsListingFilterService,
             UserService userService,
             ListingEnrichmentService enrichmentService,
-            ListingViewService listingViewService
+            ListingViewService listingViewService,
+            ListingConfig listingConfig
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
         this.userService = userService;
         this.enrichmentService = enrichmentService;
         this.listingViewService = listingViewService;
+        this.listingConfig = listingConfig;
 
         this.filterStrategyMap = Map.of(
                 VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f),
@@ -80,7 +86,6 @@ public class ListingService {
             ListingDto dto = listingMapper.toDynamicDto(listing);
             dto = enrichmentService.enrich(dto, userEmail);
 
-            // PERFORMANS: Artık DB'ye gitmeden elimizdeki ID'ler ile yetki kontrolü yapıyoruz
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
                 log.debug("Enriching view stats for listing {} for owner", id);
                 LocalDateTime endDate = LocalDateTime.now();
@@ -165,33 +170,6 @@ public class ListingService {
         );
     }
 
-    public List<ListingDto> getAllListings() {
-        return findByStatusAsDto(ListingStatus.ACTIVE);
-    }
-
-    public List<ListingDto> getListingsByType(ListingType listingType) {
-        return enrichList(
-                listingRepository.findByListingType(listingType)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                null
-        );
-    }
-
-    public List<ListingDto> getActiveListingsByType(ListingType listingType) {
-        return enrichList(
-                listingRepository.findByListingTypeAndStatus(listingType, ListingStatus.ACTIVE)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                null
-        );
-    }
-
-    public List<ListingDto> getListingsByTypeOrderByDate(ListingType listingType) {
-        return enrichList(
-                listingRepository.findByListingTypeOrderByCreatedAtDesc(listingType)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                null
-        );
-    }
 
     @Transactional
     public void publish(UUID listingId, Long userId) {
@@ -323,5 +301,12 @@ public class ListingService {
 
     private Page<ListingDto> enrichPage(Page<ListingDto> page, String userEmail) {
         return new PageImpl<>(enrichmentService.enrich(page.getContent(), userEmail), page.getPageable(), page.getTotalElements());
+    }
+
+    public BigDecimal calculateTotalListingFee() {
+        BigDecimal fee = listingConfig.getCreation().getFee();
+        BigDecimal tax = listingConfig.getFee().getTax();
+        BigDecimal taxAmount = fee.multiply(tax).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return fee.add(taxAmount);
     }
 }

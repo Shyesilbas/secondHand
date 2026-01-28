@@ -3,7 +3,6 @@ package com.serhat.secondhand.payment.mapper;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
-import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -40,9 +39,8 @@ public class PaymentRequestMapper {
         return orderNumber + "-" + sellerId;
     }
 
-    public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems, 
+    public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems,
                                                            BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey) {
-        var seller = sellerItems.get(0).getListing().getSeller();
         PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
 
         return PaymentRequest.builder()
@@ -62,8 +60,8 @@ public class PaymentRequestMapper {
                 .build();
     }
 
-    public PaymentRequest buildListingFeePaymentRequest(User user, Listing listing, 
-                                                       ListingFeePaymentRequest request, BigDecimal totalFee) {
+    public PaymentRequest buildListingFeePaymentRequest(User user, Listing listing,
+                                                       PaymentRequest request, BigDecimal totalFee) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
                 .toUserId(null)

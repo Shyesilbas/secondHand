@@ -1,11 +1,10 @@
-package com.serhat.secondhand.payment.strategy.impl;
+package com.serhat.secondhand.payment.bank;
 
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.CreditCardService;
+import com.serhat.secondhand.payment.service.BankService;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
-import com.serhat.secondhand.payment.validator.CreditCardValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,23 +16,22 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CreditCardPaymentStrategy implements PaymentStrategy {
-    
-    private final CreditCardService creditCardService;
-    private final CreditCardValidator creditCardValidator;
+public class BankPaymentStrategy implements PaymentStrategy {
+    private final BankService bankService;
+    private final BankValidator bankValidator;
 
     @Override
     public PaymentType getPaymentType() {
-        return PaymentType.CREDIT_CARD;
+        return PaymentType.TRANSFER;
     }
 
     @Override
     public boolean canProcess(User fromUser, User toUser, BigDecimal amount) {
-        return creditCardValidator.hasSufficientCredit(fromUser, amount);
+        return bankValidator.hasSufficientBalance(fromUser, amount);
     }
 
     @Override
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
-        return creditCardService.processCreditCardPayment(fromUser, toUser, amount, listingId);
+        return bankService.processBankPayment(fromUser, toUser, amount, listingId);
     }
 }

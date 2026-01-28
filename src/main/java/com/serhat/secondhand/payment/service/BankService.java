@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.payment.bank.BankValidator;
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.PaymentResult;
@@ -8,7 +9,6 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.payment.validator.BankValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;

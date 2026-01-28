@@ -98,8 +98,10 @@ export const createPaymentRequest = (data) => {
 
 export const createListingFeePaymentRequest = (data) => {
   return {
-    paymentType: data.paymentType || '',
     listingId: data.listingId || '',
+    paymentType: data.paymentType || PAYMENT_TYPES.CREDIT_CARD,
+    transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
+    paymentDirection: PAYMENT_DIRECTIONS.OUTGOING,
     verificationCode: data.verificationCode || null,
     agreementsAccepted: data.agreementsAccepted || false,
     acceptedAgreementIds: data.acceptedAgreementIds || []
