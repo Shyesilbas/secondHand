@@ -15,7 +15,6 @@ export const ERROR_SEVERITY = {
     CRITICAL: 'critical'
 };
 
-// Error message mappings using enum-based indexing
 const ERROR_MESSAGES = {
     [ERROR_TYPES.NETWORK]: 'Check your internet connection and try again',
     [ERROR_TYPES.VALIDATION]: {
