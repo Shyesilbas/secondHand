@@ -4,6 +4,7 @@ import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
 import { createListingFeePaymentRequest } from '../payments.js';
 import { usePaymentAgreements } from './usePaymentAgreements.js';
+import { handleError } from '../../common/errorHandler.js';
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess, onVerificationRequired }) => {
     const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
@@ -109,11 +110,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
                 }
             }
         } catch (err) {
-            const message =
-                err?.response?.data?.message ||
-                err?.message ||
-                'An unexpected error occurred.';
-            showError('Error', message);
+            handleError(err, showError);
         } finally {
             setIsProcessingPayment(false);
         }
@@ -141,11 +138,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
                 onVerificationRequired();
             }
         } catch (err) {
-            const message =
-                err?.response?.data?.message ||
-                err?.message ||
-                'An unexpected error occurred.';
-            showError('Error', message);
+            handleError(err, showError);
         } finally {
             setIsResendingCode(false);
         }

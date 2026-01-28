@@ -33,7 +33,32 @@ export const request = async (method, url, data, config = {}) => {
       
       // If it's a success response with Result pattern (has 'data' field)
       if ('data' in responseData && responseData.data !== undefined) {
-        return responseData.data;
+        const resultData = responseData.data;
+        if (responseData.message) {
+          try {
+            Object.defineProperty(resultData, '__message', {
+              value: responseData.message,
+              writable: false,
+              enumerable: false,
+              configurable: true
+            });
+          } catch {
+            resultData.__message = responseData.message;
+          }
+        }
+        if (responseData.errorCode) {
+          try {
+            Object.defineProperty(resultData, '__errorCode', {
+              value: responseData.errorCode,
+              writable: false,
+              enumerable: false,
+              configurable: true
+            });
+          } catch {
+            resultData.__errorCode = responseData.errorCode;
+          }
+        }
+        return resultData;
       }
       
       // If it's a success response without Result pattern (direct data)
