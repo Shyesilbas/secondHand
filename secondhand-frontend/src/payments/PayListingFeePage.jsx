@@ -5,6 +5,7 @@ import { useDraftListings } from './hooks/useDraftListings.js';
 import { useEnums } from '../common/hooks/useEnums.js';
 import { usePaymentMethods } from './hooks/usePaymentMethods.js';
 import { useEmails } from './hooks/useEmails.js';
+import { EMAIL_TYPES } from '../emails/emails.js';
 import BackButton from '../common/components/ui/BackButton.jsx';
 import ErrorMessage from '../common/components/ui/ErrorMessage.jsx';
 import EmptyState from '../common/components/ui/EmptyState.jsx';
@@ -154,9 +155,11 @@ const PayListingFeePage = () => {
                     />
                 )}
 
-                {emails.length > 0 && (
+                {emails.filter(e => e.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION).slice(0, 3).length > 0 && (
                     <EmailDisplayModal
-                        emails={emails}
+                        emails={emails
+                            .filter(e => e.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION)
+                            .slice(0, 3)}
                         onClose={clearEmails}
                     />
                 )}

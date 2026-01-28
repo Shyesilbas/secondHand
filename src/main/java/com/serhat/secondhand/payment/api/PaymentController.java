@@ -1,15 +1,13 @@
 package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
-import com.serhat.secondhand.payment.dto.ListingFeePaymentRequest;
-import com.serhat.secondhand.payment.dto.PaymentDto;
-import com.serhat.secondhand.payment.dto.PaymentRequest;
+import com.serhat.secondhand.payment.dto.*;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.IPaymentVerificationService;
 import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
 import com.serhat.secondhand.payment.service.PaymentStatsService;
+import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,18 +33,19 @@ public class PaymentController {
     private final PaymentStatsService paymentStatsService;
     private final ListingFeeService listingFeeService;
     private final IPaymentVerificationService paymentVerificationService;
+    private final PaymentIdempotencyHelper idempotencyHelper;
 
     @PostMapping("/pay")
     @Operation(summary = "Create a new payment", description = "Processes a general payment request using idempotency for safety.")
     public ResponseEntity<?> createPayment(
             @RequestBody PaymentRequest paymentRequest,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Creating payment for user ID {} with request: {}", currentUser.getId(), paymentRequest);
-        PaymentRequest requestWithKey = mergeIdempotencyKey(paymentRequest, idempotencyKey);
 
-        Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), requestWithKey);
+        PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
+        Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), finalRequest);
 
         return handleResult(result, HttpStatus.CREATED);
     }
@@ -54,7 +53,7 @@ public class PaymentController {
     @PostMapping("/initiate-verification")
     @Operation(summary = "Initiate payment verification", description = "Starts the verification process (e.g., OTP) for a payment.")
     public ResponseEntity<Void> initiatePaymentVerification(
-            @RequestBody(required = false) com.serhat.secondhand.payment.dto.InitiateVerificationRequest request,
+            @RequestBody(required = false) InitiateVerificationRequest request,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Initiating payment verification for user ID: {}", currentUser.getId());
@@ -65,15 +64,15 @@ public class PaymentController {
     @PostMapping("/listings/pay-fee")
     @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fees.")
     public ResponseEntity<?> payListingCreationFee(
-            @RequestBody ListingFeePaymentRequest listingFeePaymentRequest,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @RequestBody PaymentRequest listingFeePaymentRequest,
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Processing listing fee payment for listing {} by user ID {}",
-                listingFeePaymentRequest.listingId(), currentUser.getId());
+        log.info("Processing listing fee payment for listing {} by user ID {} with idempotency key {}",
+                listingFeePaymentRequest.listingId(), currentUser.getId(), idempotencyKey);
 
-        ListingFeePaymentRequest requestWithKey = mergeIdempotencyKeyForListingFee(listingFeePaymentRequest, idempotencyKey);
-        Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), requestWithKey);
+        PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(listingFeePaymentRequest, idempotencyKey);
+        Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), finalRequest);
 
         return handleResult(result, HttpStatus.CREATED);
     }
@@ -127,42 +126,5 @@ public class PaymentController {
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
         }
         return ResponseEntity.status(successStatus).body(result.getData());
-    }
-
-    private PaymentRequest mergeIdempotencyKey(PaymentRequest paymentRequest, String idempotencyKey) {
-        if (idempotencyKey != null && !idempotencyKey.isBlank() &&
-                (paymentRequest.idempotencyKey() == null || paymentRequest.idempotencyKey().isBlank())) {
-            return PaymentRequest.builder()
-                    .fromUserId(paymentRequest.fromUserId())
-                    .toUserId(paymentRequest.toUserId())
-                    .receiverName(paymentRequest.receiverName())
-                    .receiverSurname(paymentRequest.receiverSurname())
-                    .listingId(paymentRequest.listingId())
-                    .amount(paymentRequest.amount())
-                    .paymentType(paymentRequest.paymentType())
-                    .transactionType(paymentRequest.transactionType())
-                    .paymentDirection(paymentRequest.paymentDirection())
-                    .verificationCode(paymentRequest.verificationCode())
-                    .agreementsAccepted(paymentRequest.agreementsAccepted())
-                    .acceptedAgreementIds(paymentRequest.acceptedAgreementIds())
-                    .idempotencyKey(idempotencyKey)
-                    .build();
-        }
-        return paymentRequest;
-    }
-
-    private ListingFeePaymentRequest mergeIdempotencyKeyForListingFee(ListingFeePaymentRequest request, String idempotencyKey) {
-        if (idempotencyKey != null && !idempotencyKey.isBlank() &&
-                (request.idempotencyKey() == null || request.idempotencyKey().isBlank())) {
-            return new ListingFeePaymentRequest(
-                    request.paymentType(),
-                    request.listingId(),
-                    request.verificationCode(),
-                    request.agreementsAccepted(),
-                    request.acceptedAgreementIds(),
-                    idempotencyKey
-            );
-        }
-        return request;
     }
 }

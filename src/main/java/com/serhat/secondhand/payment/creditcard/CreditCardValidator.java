@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.validator;
+package com.serhat.secondhand.payment.creditcard;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;

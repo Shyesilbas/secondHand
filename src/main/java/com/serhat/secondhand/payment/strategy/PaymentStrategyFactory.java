@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.strategy;
 
 import com.serhat.secondhand.payment.entity.PaymentType;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ public class PaymentStrategyFactory {
     private final List<PaymentStrategy> strategies;
     private Map<PaymentType, PaymentStrategy> strategyMap;
 
+    @PostConstruct
     private void ensureMap() {
         if (strategyMap == null) {
             strategyMap = strategies.stream().collect(Collectors.toMap(PaymentStrategy::getPaymentType, Function.identity()));

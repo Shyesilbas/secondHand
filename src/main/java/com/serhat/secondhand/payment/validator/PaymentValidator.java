@@ -7,7 +7,6 @@ import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -40,11 +39,6 @@ public class PaymentValidator {
         }
 
         return Result.success();
-    }
-
-    public Result<Void> validatePaymentRequest(PaymentRequest paymentRequest, User fromUser) {
-        User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
-        return paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
     }
 }
 

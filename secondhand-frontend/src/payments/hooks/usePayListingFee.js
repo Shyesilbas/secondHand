@@ -64,50 +64,56 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     };
 
     const confirmPayment = async () => {
+        if (!selectedListing || !feeConfig) {
+            showError('Error', 'Please select a listing and ensure fee configuration is loaded.');
+            return;
+        }
+
         setIsProcessingPayment(true);
 
         try {
-            const paymentData = createListingFeePaymentRequest({
-                listingId: selectedListing.id,
-                paymentType: paymentType,
-                verificationCode: verificationCode,
-                agreementsAccepted: true,
-                acceptedAgreementIds: getAcceptedAgreementIds()
-            });
-            await paymentService.createListingFeePayment(paymentData);
-
-            showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
-
-            setSelectedListing(null);
-            setVerificationCode('');
-            setCodeExpiryTime(null);
-            setModalStep('REVIEW');
-            setShowConfirmModal(false);
-
-            if (onSuccess) {
-                onSuccess();
-            }
-
-        } catch (err) {
-            if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                try {
-                    await orderService.initiatePaymentVerification({
-                        transactionType: 'LISTING_CREATION',
-                        listingId: selectedListing?.id,
-                        amount: feeConfig?.totalCreationFee
-                    });
-                    showInfo('Verification Required', 'Enter the verification code sent to your email.');
-                    setModalStep('VERIFY');
-                    const expiryTime = new Date();
-                    expiryTime.setMinutes(expiryTime.getMinutes() + 3);
-                    setCodeExpiryTime(expiryTime);
-                    if (onVerificationRequired) onVerificationRequired();
-                } catch (e) {
-                    showError('Error', e?.response?.data?.message || 'Failed to send verification code.');
+            if (modalStep === 'REVIEW') {
+                await orderService.initiatePaymentVerification({
+                    transactionType: 'LISTING_CREATION',
+                    listingId: selectedListing.id,
+                    amount: feeConfig.totalCreationFee
+                });
+                showInfo('Verification Required', 'Enter the verification code sent to your email.');
+                const expiryTime = new Date();
+                expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+                setCodeExpiryTime(expiryTime);
+                setModalStep('VERIFY');
+                if (onVerificationRequired) {
+                    onVerificationRequired();
                 }
-            } else {
-                showError('Error', err.response?.data?.message || 'Listing fee payment failed. Please try again later.');
+            } else if (modalStep === 'VERIFY') {
+                const paymentData = createListingFeePaymentRequest({
+                    listingId: selectedListing.id,
+                    paymentType: paymentType,
+                    verificationCode: verificationCode,
+                    agreementsAccepted: true,
+                    acceptedAgreementIds: getAcceptedAgreementIds()
+                });
+                await paymentService.createListingFeePayment(paymentData);
+
+                showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
+
+                setSelectedListing(null);
+                setVerificationCode('');
+                setCodeExpiryTime(null);
+                setModalStep('REVIEW');
+                setShowConfirmModal(false);
+
+                if (onSuccess) {
+                    onSuccess();
+                }
             }
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                err?.message ||
+                'An unexpected error occurred.';
+            showError('Error', message);
         } finally {
             setIsProcessingPayment(false);
         }
@@ -121,22 +127,25 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
         setIsResendingCode(true);
         try {
-            const paymentData = createListingFeePaymentRequest({
+            await orderService.initiatePaymentVerification({
+                transactionType: 'LISTING_CREATION',
                 listingId: selectedListing.id,
-                paymentType: paymentType,
-                verificationCode: '',
+                amount: feeConfig?.totalCreationFee
             });
-            await paymentService.createListingFeePayment(paymentData);
-        } catch (err) {
-            if (err.response?.data?.error === 'PAYMENT_VERIFICATION_REQUIRED' || err.response?.data?.errorCode === 'PAYMENT_VERIFICATION_REQUIRED') {
-                showSuccess('Success', 'A new verification code has been sent to your email.');
-                setVerificationCode('');
-                const expiryTime = new Date();
-                expiryTime.setMinutes(expiryTime.getMinutes() + 3);
-                setCodeExpiryTime(expiryTime);
-            } else {
-                showError('Error', err.response?.data?.message || 'Failed to resend verification code.');
+            showSuccess('Success', 'A new verification code has been sent to your email.');
+            setVerificationCode('');
+            const expiryTime = new Date();
+            expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+            setCodeExpiryTime(expiryTime);
+            if (onVerificationRequired) {
+                onVerificationRequired();
             }
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                err?.message ||
+                'An unexpected error occurred.';
+            showError('Error', message);
         } finally {
             setIsResendingCode(false);
         }

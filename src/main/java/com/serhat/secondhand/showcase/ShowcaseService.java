@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class ShowcaseService implements IShowcaseService{
+public class ShowcaseService implements IShowcaseService {
 
     private final ShowcaseConfig showcaseConfig;
     private final ShowcaseRepository showcaseRepository;
@@ -68,7 +68,7 @@ public class ShowcaseService implements IShowcaseService{
         BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
 
-        // 4. Payment Processing (Using updated process(userId, request) signature)
+        // 4. Payment Processing
         PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
@@ -84,16 +84,19 @@ public class ShowcaseService implements IShowcaseService{
         return Result.success(showcaseRepository.save(showcase));
     }
 
+    @Override
     public List<ShowcaseDto> getActiveShowcases() {
         List<Showcase> activeShowcases = showcaseRepository.findActiveShowcases(ShowcaseStatus.ACTIVE, LocalDateTime.now());
         return activeShowcases.stream().map(showcaseMapper::toDto).toList();
     }
 
+    @Override
     public List<ShowcaseDto> getUserShowcases(Long userId) {
         List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatus(userId, ShowcaseStatus.ACTIVE);
         return activeShowcases.stream().map(showcaseMapper::toDto).toList();
     }
 
+    @Override
     public Result<Void> extendShowcase(UUID showcaseId, int additionalDays) {
         Showcase showcase = showcaseRepository.findById(showcaseId).orElse(null);
 
@@ -117,6 +120,7 @@ public class ShowcaseService implements IShowcaseService{
         return Result.success();
     }
 
+    @Override
     public Result<Void> cancelShowcase(UUID showcaseId) {
         Showcase showcase = showcaseRepository.findById(showcaseId).orElse(null);
 
@@ -129,6 +133,7 @@ public class ShowcaseService implements IShowcaseService{
         return Result.success();
     }
 
+    @Override
     @Transactional
     public void expireShowcases() {
         List<Showcase> expiredShowcases = showcaseRepository.findByStatusAndEndDateAfter(
@@ -140,6 +145,7 @@ public class ShowcaseService implements IShowcaseService{
         });
     }
 
+    @Override
     public ShowcasePricingDto getShowcasePricingConfig() {
         log.info("Getting showcase pricing configuration");
         return showcaseMapper.toPricingDto(showcaseConfig.getDaily().getCost(), showcaseConfig.getFee().getTax());

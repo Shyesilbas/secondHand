@@ -6,13 +6,25 @@ export const paymentService = {
 
     createPayment: async (paymentData) => {
         const paymentRequestData = createPaymentRequest(paymentData);
-        // request.js already handles Result pattern, returns data directly on success
-        return await post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData);
+        const idempotencyKey =
+            paymentData.idempotencyKey
+            || `payment-${paymentRequestData.listingId || 'general'}-${Date.now()}`;
+        const config = {
+            headers: {
+                'Idempotency-Key': idempotencyKey
+            }
+        };
+        return await post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData, config);
     },
 
     createListingFeePayment: async (paymentData) => {
-        // request.js already handles Result pattern, returns data directly on success
-        return await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, paymentData);
+        const idempotencyKey = `listing-fee-${paymentData.listingId}-${Date.now()}`;
+        const config = {
+            headers: {
+                'Idempotency-Key': idempotencyKey
+            }
+        };
+        return await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, paymentData, config);
     },
 
     getMyPayments: async (page = 0, size = 5, filters = {}) => {

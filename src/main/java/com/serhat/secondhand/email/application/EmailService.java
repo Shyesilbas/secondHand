@@ -3,7 +3,6 @@ package com.serhat.secondhand.email.application;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.Email;
-import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.email.mapper.EmailMapper;
@@ -28,7 +27,7 @@ public class EmailService {
     private final EmailConfig emailConfig;
 
 
-    public EmailDto sendEmail(User user, String subject, String content, EmailType emailType) {
+    public EmailDto sendEmail(User user, String subject, String content, com.serhat.secondhand.email.domain.entity.enums.EmailType emailType) {
         log.info("Sending email to user: {}, emailType: {}", user.getEmail(), emailType);
         LocalDateTime now = LocalDateTime.now();
         Email email = Email.builder()

@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.validator;
+package com.serhat.secondhand.payment.bank;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.entity.Bank;
