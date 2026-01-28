@@ -14,7 +14,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,8 +44,9 @@ public class PaymentController {
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Creating payment for user ID {} with request: {}", currentUser.getId(), paymentRequest);
+        log.info("Creating payment for user ID {} with idempotency key {}", currentUser.getId(), idempotencyKey);
 
+        // Helper kullanarak idempotency key'i DTO'ya taşıyoruz
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
         Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), finalRequest);
 
@@ -68,8 +71,8 @@ public class PaymentController {
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Processing listing fee payment for listing {} by user ID {} with idempotency key {}",
-                listingFeePaymentRequest.listingId(), currentUser.getId(), idempotencyKey);
+        log.info("Processing listing fee payment for user ID {} with idempotency key {}",
+                currentUser.getId(), idempotencyKey);
 
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(listingFeePaymentRequest, idempotencyKey);
         Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), finalRequest);
@@ -78,26 +81,18 @@ public class PaymentController {
     }
 
     @GetMapping("/my-payments")
-    @Operation(summary = "Get user payments", description = "Retrieve paginated and filtered history of payments for the authenticated user.")
+    @Operation(summary = "Get user payments", description = "Retrieve paginated and filtered history of payments.")
     public ResponseEntity<Page<PaymentDto>> getMyPayments(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentTransactionType transactionType,
-            @RequestParam(required = false) PaymentType paymentType,
-            @RequestParam(required = false) com.serhat.secondhand.payment.entity.PaymentDirection paymentDirection,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateFrom,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") java.time.LocalDateTime dateTo,
-            @RequestParam(required = false) java.math.BigDecimal amountMin,
-            @RequestParam(required = false) java.math.BigDecimal amountMax,
-            @RequestParam(required = false) String sellerName) {
+            @PageableDefault(size = 10, sort = "processedAt", direction = Sort.Direction.DESC) Pageable pageable,
+            PaymentFilter filter) {
 
-        java.time.LocalDateTime dateToEndOfDay = dateTo != null ? dateTo.with(java.time.LocalTime.MAX) : null;
+        log.info("Fetching payments for user: {} with filters: {}", currentUser.getEmail(), filter);
 
         Page<PaymentDto> payments = paymentStatsService.getMyPayments(
-                currentUser.getId(), page, size,
-                transactionType, paymentType, paymentDirection,
-                dateFrom, dateToEndOfDay, amountMin, amountMax, sellerName);
+                currentUser.getId(),
+                pageable,
+                filter);
 
         return ResponseEntity.ok(payments);
     }
@@ -105,17 +100,13 @@ public class PaymentController {
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getPaymentStatistics(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(name = "paymentType", required = false) String paymentType) {
+            @RequestParam(name = "paymentType", required = false) PaymentType paymentType) {
 
-        if (paymentType == null || paymentType.isBlank()) {
-            return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId()));
-        }
-
-        return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(
-                currentUser.getId(), PaymentType.valueOf(paymentType)));
+        return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId(), paymentType));
     }
 
     @GetMapping("/listing-fee-config")
+    @Operation(summary = "Get fee configuration", description = "Retrieves the current listing fee settings.")
     public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
         return ResponseEntity.ok(listingFeeService.getListingFeeConfig());
     }

@@ -2,11 +2,11 @@ package com.serhat.secondhand.favorite.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteDto;
-import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.entity.Favorite;
 import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
+import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
@@ -143,50 +143,20 @@ public class FavoriteService {
 
     public Result<Page<FavoriteDto>> getUserFavorites(Long userId, Pageable pageable) {
         var userResult = userService.findById(userId);
-        if (userResult.isError()) {
-            return Result.error(userResult.getMessage(), userResult.getErrorCode());
-        }
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
         User user = userResult.getData();
-        String userEmail = user.getEmail();
-        log.info("Getting favorites for user {} with pagination", userEmail);
 
-        Page<Favorite> favorites = favoriteRepository.findByUserOrderByCreatedAtDesc(user, pageable);
-
+        Page<Favorite> favorites = favoriteRepository.findByUserWithListing(user, pageable);
         Page<FavoriteDto> favoriteDtos = favorites.map(favoriteMapper::toDto);
 
-        List<ListingDto> listings = favoriteDtos.stream()
+        List<ListingDto> listings = favoriteDtos.getContent().stream()
                 .map(FavoriteDto::getListing)
                 .toList();
 
-        enrichWithFavoriteStats(listings, userEmail);
+        listingEnrichmentService.enrich(listings, user.getEmail());
 
         return Result.success(favoriteDtos);
     }
-
-
-    private void enrichWithFavoriteStats(List<ListingDto> dtos, String userEmail) {
-        if (dtos == null || dtos.isEmpty()) {
-            return;
-        }
-
-        List<UUID> listingIds = dtos.stream()
-                .map(ListingDto::getId)
-                .toList();
-
-        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
-
-        for (ListingDto dto : dtos) {
-            dto.setFavoriteStats(statsMap.getOrDefault(dto.getId(),
-                    FavoriteStatsDto.builder()
-                            .listingId(dto.getId())
-                            .favoriteCount(0L)
-                            .isFavorited(false)
-                            .build()
-            ));
-        }
-    }
-
-
 
     public Result<FavoriteStatsDto> getFavoriteStats(UUID listingId, String userEmail) {
         return Result.success(favoriteStatsService.getFavoriteStats(listingId, userEmail));

@@ -12,6 +12,7 @@ import com.serhat.secondhand.cart.validator.CartValidator;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
@@ -19,6 +20,8 @@ import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,18 +46,21 @@ public class CartService {
     private final CartConfig cartConfig;
 
     @Transactional(readOnly = true)
-    public Result<List<CartDto>> getCartItems(Long userId) {
+    public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        User user = userResult.getData();
 
-        List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
-        List<CartDto> cartDtos = cartMapper.toDtoList(cartItems);
+        Page<Cart> cartPage = cartRepository.findByUserIdWithListing(userId, pageable);
 
-        for (CartDto cartDto : cartDtos) {
-            if (cartDto.getListing() != null) {
-                cartDto.setListing(enrichmentService.enrich(cartDto.getListing(), userResult.getData().getEmail()));
-            }
-        }
+        Page<CartDto> cartDtos = cartPage.map(cartMapper::toDto);
+
+        List<ListingDto> listings = cartDtos.getContent().stream()
+                .map(CartDto::getListing)
+                .toList();
+
+        enrichmentService.enrich(listings, user.getEmail());
+
         return Result.success(cartDtos);
     }
 

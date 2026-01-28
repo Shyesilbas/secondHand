@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,13 +26,6 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     Optional<Listing> findByIdWithLock(@Param("id") UUID id);
 
     List<Listing> findByStatus(ListingStatus status);
-
-    List<Listing> findByListingType(ListingType listingType);
-
-    List<Listing> findByListingTypeAndStatus(ListingType listingType, ListingStatus status);
-
-    List<Listing> findByListingTypeOrderByCreatedAtDesc(ListingType listingType);
-
 
     List<Listing> findBySellerId(Long sellerId);
 
@@ -46,8 +40,6 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     Page<Listing> findByTitleContainingIgnoreCaseOrListingNoContainingIgnoreCaseAndStatus(
             String title, String listingNo, ListingStatus status, Pageable pageable
     );
-
-    Optional<Listing> findByListingNo(String listingNo);
 
 
     @Query("SELECT COUNT(l) FROM Listing l")
@@ -69,4 +61,9 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
     int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
 
+    List<Listing> findAllByIdIn(Collection<UUID> ids);
+
+    long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
+
+    long countBySellerId(Long sellerId);
 }

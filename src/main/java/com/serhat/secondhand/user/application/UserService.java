@@ -152,4 +152,7 @@ public class UserService {
         return userRepository.findAllById(ids);
     }
 
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

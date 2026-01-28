@@ -7,9 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,18 +38,18 @@ public class FavoriteStatsService {
                 result -> (UUID) result[0], 
                 result -> (Long) result[1]
             ));
-        
-        List<UUID> userFavoriteIds = userEmail != null ?
-            favoriteRepository.findListingIdsByUserEmail(userEmail) : List.of();
-        
-        return listingIds.stream()
-            .collect(Collectors.toMap(
-                listingId -> listingId,
-                listingId -> FavoriteStatsDto.builder()
-                    .listingId(listingId)
-                    .favoriteCount(favoriteCounts.getOrDefault(listingId, 0L))
-                    .isFavorited(userFavoriteIds.contains(listingId))
-                    .build()
-            ));
+
+            Set<UUID> userFavoriteSet = userEmail != null ?
+                    new HashSet<>(favoriteRepository.findListingIdsByUserEmail(userEmail)) : Set.of();
+
+            return listingIds.stream()
+                    .collect(Collectors.toMap(
+                            listingId -> listingId,
+                            listingId -> FavoriteStatsDto.builder()
+                                    .listingId(listingId)
+                                    .favoriteCount(favoriteCounts.getOrDefault(listingId, 0L))
+                                    .isFavorited(userFavoriteSet.contains(listingId))
+                                    .build()
+                    ));
     }
 }

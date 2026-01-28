@@ -12,11 +12,11 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,8 +30,12 @@ public class CampaignService {
     private final CampaignValidator campaignValidator;
     private final CampaignMapper campaignMapper;
 
-    public Result<CampaignDto> create(CreateCampaignRequest request, Authentication authentication) {
-        User seller = userService.getAuthenticatedUser(authentication);
+    public Result<CampaignDto> create(Long userId, CreateCampaignRequest request) {
+        var sellerResult = userService.findById(userId);
+        if (sellerResult.isError()) {
+            return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());
+        }
+        User seller = sellerResult.getData();
 
         Campaign campaign = campaignMapper.fromCreateRequest(request, seller);
 
@@ -43,8 +47,12 @@ public class CampaignService {
         return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
-    public Result<CampaignDto> update(UUID id, UpdateCampaignRequest request, Authentication authentication) {
-        User seller = userService.getAuthenticatedUser(authentication);
+    public Result<CampaignDto> update(Long userId, UUID id, UpdateCampaignRequest request) {
+        var sellerResult = userService.findById(userId);
+        if (sellerResult.isError()) {
+            return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());
+        }
+        User seller = sellerResult.getData();
 
         Result<Campaign> campaignResult = findCampaignById(id);
         if (campaignResult.isError()) {
@@ -68,8 +76,12 @@ public class CampaignService {
         return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
-    public Result<Void> delete(UUID id, Authentication authentication) {
-        User seller = userService.getAuthenticatedUser(authentication);
+    public Result<Void> delete(Long userId, UUID id) {
+        var sellerResult = userService.findById(userId);
+        if (sellerResult.isError()) {
+            return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());
+        }
+        User seller = sellerResult.getData();
 
         Result<Campaign> campaignResult = findCampaignById(id);
         if (campaignResult.isError()) {
@@ -88,20 +100,20 @@ public class CampaignService {
     }
 
     @Transactional(readOnly = true)
-    public List<CampaignDto> listMyCampaigns(Authentication authentication) {
-        User seller = userService.getAuthenticatedUser(authentication);
-        return campaignRepository.findBySellerOrderByCreatedAtDesc(seller)
-                .stream()
-                .map(campaignMapper::toDto)
-                .toList();
+    public Page<CampaignDto> listMyCampaigns(Long userId, Pageable pageable) {
+        if (!userService.existsById(userId)) {
+            return Page.empty(pageable);
+        }
+
+        return campaignRepository.findBySellerIdOrderByCreatedAtDesc(userId, pageable)
+                .map(campaignMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public List<Campaign> loadActiveCampaignsForSellers(List<Long> sellerIds) {
-        if (sellerIds == null || sellerIds.isEmpty()) {
-            return List.of();
-        }
-        return campaignRepository.findActiveCampaignsForSellers(sellerIds, LocalDateTime.now());
+        if (sellerIds == null || sellerIds.isEmpty()) return List.of();
+
+        return campaignRepository.findAllActiveBySellerIdsWithDetails(sellerIds);
     }
 
     private Result<Void> assertOwnedBySeller(Campaign campaign, User seller) {

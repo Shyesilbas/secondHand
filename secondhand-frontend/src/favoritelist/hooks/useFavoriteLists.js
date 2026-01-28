@@ -1,22 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { favoriteListService } from '../services/favoriteListService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { handleError } from '../../common/errorHandler.js';
+import { extractSuccessMessage } from '../../common/successHandler.js';
 
-export const useMyFavoriteLists = () => {
+export const useMyFavoriteLists = (page = 0, size = 5) => {
     return useQuery({
-        queryKey: ['favoriteLists', 'my'],
-        queryFn: () => favoriteListService.getMyLists(),
+        queryKey: ['favoriteLists', 'my', page, size],
+        queryFn: () => favoriteListService.getMyLists(page, size),
+        select: (res) => {
+            if (Array.isArray(res)) return res;
+            if (Array.isArray(res?.content)) return res.content;
+            return [];
+        },
         staleTime: 30000,
     });
 };
 
-export const useUserFavoriteLists = (userId, isOwnProfile = false, options = {}) => {
+export const useUserFavoriteLists = (userId, isOwnProfile = false, options = {}, page = 0, size = 5) => {
     return useQuery({
-        queryKey: ['favoriteLists', 'user', userId, isOwnProfile],
+        queryKey: ['favoriteLists', 'user', userId, isOwnProfile, page, size],
         queryFn: () => isOwnProfile 
-            ? favoriteListService.getMyLists() 
-            : favoriteListService.getUserLists(userId),
+            ? favoriteListService.getMyLists(page, size) 
+            : favoriteListService.getUserLists(userId, page, size),
         enabled: !!userId && (options.enabled !== false),
+        select: (res) => {
+            if (Array.isArray(res)) return res;
+            if (Array.isArray(res?.content)) return res.content;
+            return [];
+        },
         staleTime: 60000,
     });
 };
@@ -60,12 +72,13 @@ export const useCreateFavoriteList = () => {
 
     return useMutation({
         mutationFn: (data) => favoriteListService.createList(data),
-        onSuccess: () => {
+        onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['favoriteLists', 'my'] });
-            showSuccess('Başarılı', 'Liste oluşturuldu!');
+            const msg = extractSuccessMessage(res);
+            if (msg) showSuccess(null, msg);
         },
         onError: (error) => {
-            showError('Hata', error.response?.data?.message || 'Liste oluşturulamadı');
+            handleError(error, showError);
         },
     });
 };
@@ -76,12 +89,13 @@ export const useUpdateFavoriteList = () => {
 
     return useMutation({
         mutationFn: ({ listId, data }) => favoriteListService.updateList(listId, data),
-        onSuccess: () => {
+        onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['favoriteLists'] });
-            showSuccess('Başarılı', 'Liste güncellendi!');
+            const msg = extractSuccessMessage(res);
+            if (msg) showSuccess(null, msg);
         },
         onError: (error) => {
-            showError('Hata', error.response?.data?.message || 'Liste güncellenemedi');
+            handleError(error, showError);
         },
     });
 };
@@ -92,12 +106,13 @@ export const useDeleteFavoriteList = () => {
 
     return useMutation({
         mutationFn: (listId) => favoriteListService.deleteList(listId),
-        onSuccess: () => {
+        onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['favoriteLists'] });
-            showSuccess('Başarılı', 'Liste silindi!');
+            const msg = extractSuccessMessage(res);
+            if (msg) showSuccess(null, msg);
         },
         onError: (error) => {
-            showError('Hata', error.response?.data?.message || 'Liste silinemedi');
+            handleError(error, showError);
         },
     });
 };
@@ -112,10 +127,10 @@ export const useAddItemToList = () => {
         onSuccess: (_, { listingId }) => {
             queryClient.invalidateQueries({ queryKey: ['favoriteLists'] });
             queryClient.invalidateQueries({ queryKey: ['favoriteLists', 'containing', listingId] });
-            showSuccess('Başarılı', 'Ürün listeye eklendi!');
+            // Success message backend'den Result.message ile gelebilir, burada ekstra mesaj göstermemek de yeterli
         },
         onError: (error) => {
-            showError('Hata', error.response?.data?.message || 'Ürün eklenemedi');
+            handleError(error, showError);
         },
     });
 };
@@ -130,10 +145,10 @@ export const useRemoveItemFromList = () => {
         onSuccess: (_, { listingId }) => {
             queryClient.invalidateQueries({ queryKey: ['favoriteLists'] });
             queryClient.invalidateQueries({ queryKey: ['favoriteLists', 'containing', listingId] });
-            showSuccess('Başarılı', 'Ürün listeden çıkarıldı!');
+            // Success toast backend message'e bırakılabilir veya sessiz geçilebilir
         },
         onError: (error) => {
-            showError('Hata', error.response?.data?.message || 'Ürün çıkarılamadı');
+            handleError(error, showError);
         },
     });
 };

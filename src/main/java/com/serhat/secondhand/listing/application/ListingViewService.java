@@ -76,50 +76,20 @@ public class ListingViewService {
 
     @Transactional(readOnly = true)
     public ListingViewStatsDto getAggregatedViewStatisticsForSeller(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Listing> sellerListings = listingRepository.findBySellerId(sellerId);
+        List<Object[]> stats = listingViewRepository.getAggregatedStats(sellerId, startDate, endDate);
 
-        if (sellerListings.isEmpty()) {
-            return createEmptyStats(startDate, endDate);
-        }
-
-        int periodDays = (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
-
-        long totalViews = sellerListings.stream()
-                .mapToLong(l -> listingViewRepository.countByListingIdAndViewedAtBetween(l.getId(), startDate, endDate))
-                .sum();
-
-        Map<String, Boolean> uniqueViewers = new HashMap<>();
-        for (Listing listing : sellerListings) {
-            listingViewRepository.findByListingIdAndViewedAtBetween(listing.getId(), startDate, endDate)
-                    .forEach(view -> {
-                        String key = view.getUser() != null ? "u:" + view.getUser().getId() : "s:" + view.getSessionId();
-                        uniqueViewers.put(key, true);
-                    });
-        }
-
-        Map<LocalDate, Long> viewsByDate = new HashMap<>();
-        for (Listing listing : sellerListings) {
-            listingViewRepository.countViewsByDate(listing.getId(), startDate, endDate).forEach(row -> {
-                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
-                Long count = ((Number) row[1]).longValue();
-                viewsByDate.merge(date, count, Long::sum);
-            });
-        }
+        Object[] result = stats.get(0);
+        long totalViews = result[0] != null ? (long) result[0] : 0L;
+        long uniqueViews = result[1] != null ? (long) result[1] : 0L;
 
         return ListingViewStatsDto.builder()
                 .totalViews(totalViews)
-                .uniqueViews((long) uniqueViewers.size())
-                .periodDays(periodDays)
-                .viewsByDate(viewsByDate)
+                .uniqueViews(uniqueViews)
+                .periodDays((int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1)
+                .viewsByDate(new HashMap<>())
                 .build();
     }
 
-    private ListingViewStatsDto createEmptyStats(LocalDateTime start, LocalDateTime end) {
-        return ListingViewStatsDto.builder()
-                .totalViews(0L).uniqueViews(0L)
-                .periodDays((int) java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1)
-                .viewsByDate(new HashMap<>()).build();
-    }
 
     private String hashIpAddress(String ipAddress) {
         if (ipAddress == null || ipAddress.isEmpty()) return "";

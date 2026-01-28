@@ -18,13 +18,18 @@ public class ListingStatisticsAdapter implements ListingStatisticsPort {
     private final ListingRepository listingRepository;
 
     @Override
-    public List<Listing> findBySellerId(Long sellerId) {
-        return listingRepository.findBySellerId(sellerId);
+    public long countBySellerId(Long sellerId) {
+        return listingRepository.countBySellerId(sellerId);
     }
 
     @Override
-    public List<Listing> findBySellerIdAndStatus(Long sellerId, ListingStatus status) {
-        return listingRepository.findBySellerIdAndStatus(sellerId, status);
+    public long countBySellerIdAndStatus(Long sellerId, ListingStatus status) {
+        return listingRepository.countBySellerIdAndStatus(sellerId, status);
+    }
+
+    @Override
+    public List<Listing> findAllByIdIn(List<UUID> ids) {
+        return listingRepository.findAllById(ids);
     }
 
     @Override
@@ -32,4 +37,3 @@ public class ListingStatisticsAdapter implements ListingStatisticsPort {
         return listingRepository.findById(id);
     }
 }
-

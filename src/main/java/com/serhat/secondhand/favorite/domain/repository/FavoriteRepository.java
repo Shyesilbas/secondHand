@@ -17,15 +17,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     
         boolean existsByUserAndListingId(User user, UUID listingId);
     
-        @Query("SELECT f.user FROM Favorite f WHERE f.listing.id = :listingId")
-    List<User> findUsersByListingId(@Param("listingId") UUID listingId);
-        @Query("SELECT f FROM Favorite f " +
-           "JOIN FETCH f.listing l " +
-           "JOIN FETCH f.user u " +
-           "WHERE f.user = :user " +
-           "ORDER BY f.createdAt DESC")
-    Page<Favorite> findByUserOrderByCreatedAtDesc(@Param("user") User user, Pageable pageable);
-    
         long countByListingId(UUID listingId);
     
         @Query("SELECT f.listing.id, COUNT(f) FROM Favorite f " +
@@ -34,9 +25,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     List<Object[]> countByListingIds(@Param("listingIds") List<UUID> listingIds);
     
         void deleteByUserAndListingId(User user, UUID listingId);
-    
-        @Query("SELECT f.user.id FROM Favorite f WHERE f.listing.id = :listingId")
-    List<Long> findUserIdsByListingId(@Param("listingId") UUID listingId);
+
     
         @Query("SELECT f.listing.id, COUNT(f) as favoriteCount FROM Favorite f " +
            "JOIN f.listing l " +
@@ -62,4 +51,12 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
         @Query("SELECT COUNT(f) FROM Favorite f WHERE f.listing.seller.id = :sellerId")
         long countByListingSellerId(@Param("sellerId") Long sellerId);
+
+    @Query("SELECT f FROM Favorite f JOIN FETCH f.listing WHERE f.user = :user ORDER BY f.createdAt DESC")
+    Page<Favorite> findByUserWithListing(@Param("user") User user, Pageable pageable);
+
+    @Query("SELECT DISTINCT f.user FROM Favorite f WHERE f.listing.id = :listingId")
+    List<User> findUsersByListingId(@Param("listingId") UUID listingId);
+
+    Long countByUserId(Long buyerId);
 }

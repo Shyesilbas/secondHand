@@ -1,6 +1,5 @@
 package com.serhat.secondhand.listing.domain.repository.listing;
 
-import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.ListingView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,16 +16,21 @@ public interface ListingViewRepository extends JpaRepository<ListingView, UUID> 
 
     long countByListingIdAndViewedAtBetween(UUID listingId, LocalDateTime startDate, LocalDateTime endDate);
 
-    List<ListingView> findByListingIdAndViewedAtBetween(UUID listingId, LocalDateTime startDate, LocalDateTime endDate);
 
     boolean existsByListingIdAndUserIdAndViewedAtAfter(UUID listingId, Long userId, LocalDateTime after);
 
     boolean existsByListingIdAndSessionIdAndViewedAtAfter(UUID listingId, String sessionId, LocalDateTime after);
 
 
-    long countByListingAndViewedAtBetween(Listing listing, LocalDateTime startDate, LocalDateTime endDate);
 
-    List<ListingView> findByListingAndViewedAtBetween(Listing listing, LocalDateTime startDate, LocalDateTime endDate);
+    @Query(value = "SELECT COUNT(v.id), COUNT(DISTINCT COALESCE(v.user_id::text, v.session_id)) " +
+            "FROM listing_views v " +
+            "JOIN listings l ON v.listing_id = l.id " +
+            "WHERE l.seller_id = :sellerId " +
+            "AND v.viewed_at BETWEEN :startDate AND :endDate", nativeQuery = true)
+    List<Object[]> getAggregatedStats(@Param("sellerId") Long sellerId,
+                                      @Param("startDate") LocalDateTime startDate,
+                                      @Param("endDate") LocalDateTime endDate);
 
 
 

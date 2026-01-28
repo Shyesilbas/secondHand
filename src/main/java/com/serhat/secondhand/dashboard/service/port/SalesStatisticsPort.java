@@ -29,5 +29,7 @@ public interface SalesStatisticsPort {
     List<Object[]> countOrdersByBuyerAndCategory(Long buyerId, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Object[]> findTopListingsByRevenue(Long sellerId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Object[]> countOrdersBySellerAndCategory(Long sellerId, LocalDateTime startDate, LocalDateTime endDate);
 }
 

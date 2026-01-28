@@ -5,7 +5,6 @@ import {ROUTES} from '../common/constants/routes.js';
 import {
   AlertTriangle,
   BarChart3,
-  ChevronRight,
   CreditCard,
   HandCoins,
   Heart,
@@ -98,96 +97,91 @@ const DashboardPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16">
-        <div className="pt-12 pb-24">
-          <div className="mb-16 flex items-center justify-between">
-            <p className="text-xl text-gray-600 font-light">
-              Welcome back, <span className="font-medium text-black">{user?.name}</span>
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold text-slate-900 tracking-tight">Dashboard</h1>
+            <p className="text-sm text-slate-600">
+              Welcome back{user?.name ? `, ${user.name}` : ''}.
             </p>
-            <div className="relative w-full max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+          </div>
+
+          <div className="w-full sm:max-w-md">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={handleSearchChange}
-                placeholder="Search dashboard items..."
-                className="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl bg-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                placeholder="Search..."
+                className="block w-full pl-9 pr-24 py-2.5 border border-slate-200 rounded-lg bg-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs font-medium text-slate-500 hover:text-slate-700"
                 >
-                  <span className="text-sm">Clear</span>
+                  Clear
                 </button>
               )}
             </div>
           </div>
+        </div>
 
-          {filteredSections.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">No results found for "{searchQuery}"</p>
-              <p className="text-gray-400 text-sm mt-2">Try a different search term</p>
-            </div>
-          ) : (
-            <div className="space-y-20">
-              {filteredSections.map((section, idx) => (
-              <section key={idx} className="opacity-0 animate-fade-in" style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'forwards' }}>
-                <h2 className="text-xs font-medium text-gray-500 uppercase tracking-[0.3em] mb-8">
-                  {section.title}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredSections.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-xl p-10 text-center">
+            <p className="text-slate-900 font-semibold">No results</p>
+            <p className="text-sm text-slate-600 mt-1">Try a different search term.</p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {filteredSections.map((section, idx) => (
+              <section key={idx}>
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-slate-900">{section.title}</h2>
+                  <span className="text-xs text-slate-500">{section.items.length}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {section.items.map((item, i) => {
                     const Icon = item.icon;
                     return (
                       <Link
                         key={i}
                         to={item.route}
-                        className="group relative block p-8 bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 rounded-3xl border border-gray-200 hover:border-gray-300 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
+                        className="group block rounded-xl border border-slate-200 bg-white p-4 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                       >
-                        <div className="mb-6">
-                          <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-50 group-hover:bg-black transition-all duration-500">
-                            <Icon size={28} className="text-gray-400 group-hover:text-white transition-colors duration-500" />
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-slate-200 transition-colors">
+                            <Icon className="h-4 w-4" />
                           </div>
-                        </div>
-                        <h3 className="text-xl font-semibold text-black mb-2 tracking-tight">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 font-light leading-relaxed">
-                          {item.desc}
-                        </p>
-                        <div className="mt-6 flex items-center text-gray-400 group-hover:text-black transition-colors duration-500">
-                          <span className="text-sm font-medium">Learn more</span>
-                          <ChevronRight size={16} className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-500" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <h3 className="text-sm font-semibold text-slate-900 truncate">
+                                {item.title}
+                              </h3>
+                              <span className="text-xs text-slate-400 group-hover:text-slate-500">
+                                Open
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-600 mt-1 line-clamp-2">
+                              {item.desc}
+                            </p>
+                          </div>
                         </div>
                       </Link>
                     );
                   })}
                 </div>
               </section>
-              ))}
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-      <style>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

@@ -5,13 +5,16 @@ import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.service.CampaignService;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,8 +26,8 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateCampaignRequest request, Authentication authentication) {
-        Result<CampaignDto> result = campaignService.create(request, authentication);
+    public ResponseEntity<?> create(@RequestBody CreateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
+        Result<CampaignDto> result = campaignService.create(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -33,8 +36,8 @@ public class CampaignController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdateCampaignRequest request, Authentication authentication) {
-        Result<CampaignDto> result = campaignService.update(id, request, authentication);
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
+        Result<CampaignDto> result = campaignService.update(currentUser.getId(), id, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -43,8 +46,8 @@ public class CampaignController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable UUID id, Authentication authentication) {
-        Result<Void> result = campaignService.delete(id, authentication);
+    public ResponseEntity<?> delete(@PathVariable UUID id, @AuthenticationPrincipal User currentUser) {
+        Result<Void> result = campaignService.delete(currentUser.getId(), id);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -53,8 +56,10 @@ public class CampaignController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CampaignDto>> list(Authentication authentication) {
-        return ResponseEntity.ok(campaignService.listMyCampaigns(authentication));
+    public ResponseEntity<?> list(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(campaignService.listMyCampaigns(currentUser.getId(), pageable));
     }
 }
 

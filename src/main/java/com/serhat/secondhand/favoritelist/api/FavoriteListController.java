@@ -1,8 +1,10 @@
 package com.serhat.secondhand.favoritelist.api;
 
-import com.serhat.secondhand.favoritelist.dto.*;
+import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
+import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
+import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
+import com.serhat.secondhand.favoritelist.dto.UpdateFavoriteListRequest;
 import com.serhat.secondhand.favoritelist.service.FavoriteListService;
-import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,9 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,15 +32,13 @@ import java.util.UUID;
 public class FavoriteListController {
 
     private final FavoriteListService favoriteListService;
-    private final UserService userService;
 
     @PostMapping
     @Operation(summary = "Create a new favorite list")
     public ResponseEntity<?> createList(
-            Authentication authentication,
+            @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody CreateFavoriteListRequest request) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.createList(currentUser, request);
+        var result = favoriteListService.createList(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -47,16 +48,23 @@ public class FavoriteListController {
 
     @GetMapping("/my")
     @Operation(summary = "Get current user's favorite lists")
-    public ResponseEntity<List<FavoriteListSummaryDto>> getMyLists(Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        List<FavoriteListSummaryDto> lists = favoriteListService.getMyLists(currentUser);
+    public ResponseEntity<Page<FavoriteListSummaryDto>> getMyLists(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @AuthenticationPrincipal User currentUser) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<FavoriteListSummaryDto> lists = favoriteListService.getMyLists(currentUser.getId(), pageable);
         return ResponseEntity.ok(lists);
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get a user's public favorite lists")
-    public ResponseEntity<List<FavoriteListSummaryDto>> getUserPublicLists(@PathVariable Long userId) {
-        List<FavoriteListSummaryDto> lists = favoriteListService.getUserPublicLists(userId);
+    public ResponseEntity<Page<FavoriteListSummaryDto>> getUserPublicLists(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<FavoriteListSummaryDto> lists = favoriteListService.getUserPublicLists(userId, pageable);
         return ResponseEntity.ok(lists);
     }
 
@@ -74,8 +82,7 @@ public class FavoriteListController {
     @Operation(summary = "Get a favorite list by ID")
     public ResponseEntity<?> getListById(
             @PathVariable Long listId,
-            Authentication authentication) {
-        User currentUser = authentication != null ? userService.getAuthenticatedUser(authentication) : null;
+            @AuthenticationPrincipal User currentUser) {
         var result = favoriteListService.getListById(listId, currentUser);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -88,10 +95,9 @@ public class FavoriteListController {
     @Operation(summary = "Update a favorite list")
     public ResponseEntity<?> updateList(
             @PathVariable Long listId,
-            Authentication authentication,
+            @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateFavoriteListRequest request) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.updateList(currentUser, listId, request);
+        var result = favoriteListService.updateList(currentUser.getId(), listId, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -103,9 +109,8 @@ public class FavoriteListController {
     @Operation(summary = "Delete a favorite list")
     public ResponseEntity<?> deleteList(
             @PathVariable Long listId,
-            Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.deleteList(currentUser, listId);
+            @AuthenticationPrincipal User currentUser) {
+        var result = favoriteListService.deleteList(currentUser.getId(), listId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -117,10 +122,9 @@ public class FavoriteListController {
     @Operation(summary = "Add an item to a favorite list")
     public ResponseEntity<?> addItemToList(
             @PathVariable Long listId,
-            Authentication authentication,
+            @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody AddToListRequest request) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.addItemToList(currentUser, listId, request);
+        var result = favoriteListService.addItemToList(currentUser.getId(), listId, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -133,9 +137,8 @@ public class FavoriteListController {
     public ResponseEntity<?> removeItemFromList(
             @PathVariable Long listId,
             @PathVariable UUID listingId,
-            Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.removeItemFromList(currentUser, listId, listingId);
+            @AuthenticationPrincipal User currentUser) {
+        var result = favoriteListService.removeItemFromList(currentUser.getId(), listId, listingId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -147,9 +150,8 @@ public class FavoriteListController {
     @Operation(summary = "Like a favorite list")
     public ResponseEntity<?> likeList(
             @PathVariable Long listId,
-            Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.likeList(currentUser, listId);
+            @AuthenticationPrincipal User currentUser) {
+        var result = favoriteListService.likeList(currentUser.getId(), listId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -161,9 +163,8 @@ public class FavoriteListController {
     @Operation(summary = "Unlike a favorite list")
     public ResponseEntity<?> unlikeList(
             @PathVariable Long listId,
-            Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        var result = favoriteListService.unlikeList(currentUser, listId);
+            @AuthenticationPrincipal User currentUser) {
+        var result = favoriteListService.unlikeList(currentUser.getId(), listId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -175,9 +176,8 @@ public class FavoriteListController {
     @Operation(summary = "Get list IDs containing a specific listing for current user")
     public ResponseEntity<Map<String, List<Long>>> getListsContainingListing(
             @PathVariable UUID listingId,
-            Authentication authentication) {
-        User currentUser = userService.getAuthenticatedUser(authentication);
-        List<Long> listIds = favoriteListService.getListIdsContainingListing(currentUser, listingId);
+            @AuthenticationPrincipal User currentUser) {
+        List<Long> listIds = favoriteListService.getListIdsContainingListing(currentUser.getId(), listingId);
         return ResponseEntity.ok(Map.of("listIds", listIds));
     }
 }

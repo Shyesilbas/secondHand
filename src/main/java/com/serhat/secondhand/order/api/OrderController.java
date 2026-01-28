@@ -21,6 +21,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,16 +75,8 @@ public class OrderController {
     })
     public ResponseEntity<?> getUserOrders(
             @AuthenticationPrincipal User currentUser,
-            @PageableDefault(size = 5) Pageable pageable,
-            @RequestParam(required = false) String orderNumber) {
-        if (orderNumber != null && !orderNumber.isBlank()) {
-            Result<OrderDto> result = orderQueryService.getOrderByOrderNumber(orderNumber, currentUser.getId());
-            if (result.isError()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-            }
-            return ResponseEntity.ok(result.getData());
-        }
+            @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
         log.info("API request to get orders for user: {}", currentUser.getEmail());
         Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
