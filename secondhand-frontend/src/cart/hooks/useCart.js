@@ -18,6 +18,11 @@ export const useCart = (options = {}) => {
     } = useQuery({
         queryKey: ['cartItems', user?.id],
         queryFn: () => cartService.getCartItems(),
+        select: (res) => {
+            if (Array.isArray(res)) return res;
+            if (Array.isArray(res?.content)) return res.content;
+            return [];
+        },
         enabled: !!user && loadCartItems,
         staleTime: 10 * 60 * 1000,
         gcTime: 30 * 60 * 1000,

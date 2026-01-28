@@ -5,6 +5,8 @@ import { ArrowLeftIcon, EnvelopeIcon, MagnifyingGlassIcon } from '@heroicons/rea
 import { MailOpen } from 'lucide-react';
 import { emailService } from './services/emailService.js';
 import { useNotification } from '../notification/NotificationContext.jsx';
+import { parseError, handleError } from '../common/errorHandler.js';
+import { extractSuccessMessage } from '../common/successHandler.js';
 import EmailListItem from '../emails/components/EmailListItem';
 import EmailContent from '../emails/components/EmailContent';
 import EmailFilterTabs from '../emails/components/EmailFilterTabs';
@@ -94,7 +96,7 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
     return null;
 };
 
-const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail, isDeleting }) => (
+const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail, isDeleting, pageInfo, onPageChange }) => (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-0 bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
         {/* Email List */}
         <div className="lg:col-span-2 border-r border-slate-200/60 bg-slate-50/30 flex flex-col h-[calc(100vh-280px)] min-h-[600px]">
@@ -102,7 +104,28 @@ const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</h3>
-                        <p className="text-xs text-slate-500 mt-0.5 tracking-tight">{emails.length} {emails.length === 1 ? 'email' : 'emails'}</p>
+                        <p className="text-xs text-slate-500 mt-0.5 tracking-tight">
+                            {pageInfo.totalElements} {pageInfo.totalElements === 1 ? 'email' : 'emails'} total
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            disabled={pageInfo.page === 0}
+                            onClick={() => onPageChange(pageInfo.page - 1)}
+                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                        >
+                            Prev
+                        </button>
+                        <span className="text-xs text-slate-500">
+                            Page {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
+                        </span>
+                        <button
+                            disabled={pageInfo.page + 1 >= pageInfo.totalPages}
+                            onClick={() => onPageChange(pageInfo.page + 1)}
+                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             </div>
@@ -135,31 +158,45 @@ const EmailsPage = () => {
     const [filterType, setFilterType] = useState('ALL');
     const [isDeleting, setIsDeleting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(0);
+    const pageSize = 20;
 
     const { 
-        data: emails = [], 
+        data: emailPage, 
         isLoading, 
         error 
     } = useQuery({
-        queryKey: ['myEmails'],
+        queryKey: ['myEmails', page],
         queryFn: async () => {
-            const data = await emailService.getMyEmails();
-            return Array.isArray(data) ? data : [];
+            return await emailService.getMyEmails(page, pageSize);
         },
+        keepPreviousData: true,
         staleTime: 0,
         refetchOnMount: 'always',
         refetchOnWindowFocus: true,
     });
+
+    const emails = emailPage?.content ?? [];
+    const pageInfo = {
+        page: emailPage?.number ?? page,
+        size: emailPage?.size ?? pageSize,
+        totalPages: emailPage?.totalPages ?? 0,
+        totalElements: emailPage?.totalElements ?? emails.length
+    };
 
     const handleDelete = async ({ id, title, deleteFunc, onSuccess }) => {
         notification.showConfirmation(`Delete ${title}`, `Are you sure you want to delete "${title}"?`, async () => {
             try {
                 setIsDeleting(true);
                 await deleteFunc();
-                notification.showSuccess('Success', `${title} deleted successfully.`);
+                const res = await deleteFunc();
+                const msg = typeof res === 'string' ? res : extractSuccessMessage(res);
+                if (msg) {
+                    notification.showSuccess(null, msg);
+                }
                 onSuccess?.();
             } catch (err) {
-                notification.showError('Error', err.response?.data?.message || `Failed to delete ${title.toLowerCase()}.`);
+                handleError(err, notification.showError);
             } finally {
                 setIsDeleting(false);
             }
@@ -167,7 +204,10 @@ const EmailsPage = () => {
     };
 
     const handleDeleteEmail = (emailId, emailSubject) => {
-        if (!emailId) return notification.showError('Error', 'Email ID missing.');
+        if (!emailId) {
+            notification.showError('Email ID missing.');
+            return;
+        }
         handleDelete({
             id: emailId,
             title: 'Email',
@@ -257,7 +297,11 @@ const EmailsPage = () => {
                 </div>
 
                 {/* Feedback Section */}
-                <EmailsPageFeedback error={error ? (error.response?.data?.message || 'Error loading emails') : null} emails={filteredEmails} filterType={filterType} />
+                <EmailsPageFeedback 
+                    error={error ? parseError(error).message : null} 
+                    emails={filteredEmails} 
+                    filterType={filterType} 
+                />
 
                 {/* Main Content */}
                 {filteredEmails.length > 0 && (
@@ -267,6 +311,8 @@ const EmailsPage = () => {
                         setSelectedEmail={setSelectedEmail}
                         handleDeleteEmail={handleDeleteEmail}
                         isDeleting={isDeleting}
+                        pageInfo={pageInfo}
+                        onPageChange={setPage}
                     />
                 )}
             </div>

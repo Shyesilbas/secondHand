@@ -13,34 +13,15 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    // Seller Dashboard Metrics
-    @Query("SELECT SUM(oi.totalPrice) FROM OrderItem oi " +
-            "WHERE oi.listing.seller.id = :sellerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
-            "AND oi.order.status != 'CANCELLED' " +
-            "AND oi.order.status != 'REFUNDED' " +
-            "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
-    BigDecimal sumRevenueBySellerAndDateRange(@Param("sellerId") Long sellerId,
-                                              @Param("startDate") LocalDateTime startDate,
-                                              @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT oi.listing.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
+    @Query("SELECT oi.listing.listingType, COUNT(DISTINCT oi.order) FROM OrderItem oi " +
             "WHERE oi.listing.seller.id = :sellerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
-            "AND oi.order.status != 'CANCELLED' " +
-            "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
             "GROUP BY oi.listing.listingType")
-    List<Object[]> sumRevenueBySellerAndCategory(@Param("sellerId") Long sellerId,
-                                                 @Param("startDate") LocalDateTime startDate,
-                                                 @Param("endDate") LocalDateTime endDate);
+    List<Object[]> countOrdersBySellerAndCategory(@Param("sellerId") Long sellerId,
+                                                  @Param("startDate") LocalDateTime startDate,
+                                                  @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT COUNT(DISTINCT oi.order) FROM OrderItem oi " +
-            "WHERE oi.listing.seller.id = :sellerId " +
-            "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
-    long countDistinctOrdersBySellerAndDateRange(@Param("sellerId") Long sellerId,
-                                                 @Param("startDate") LocalDateTime startDate,
-                                                 @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT COUNT(DISTINCT oi.listing) FROM OrderItem oi " +
             "WHERE oi.listing.seller.id = :sellerId " +
@@ -60,18 +41,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
                                                                @Param("startDate") LocalDateTime startDate,
                                                                @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT oi.listing.id, SUM(oi.totalPrice) as revenue, COUNT(DISTINCT oi.order) as orderCount " +
-            "FROM OrderItem oi " +
-            "WHERE oi.listing.seller.id = :sellerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
-            "AND oi.order.status != 'CANCELLED' " +
-            "AND oi.order.status != 'REFUNDED' " +
-            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
-            "GROUP BY oi.listing.id " +
-            "ORDER BY revenue DESC")
-    List<Object[]> findTopListingsByRevenue(@Param("sellerId") Long sellerId,
-                                            @Param("startDate") LocalDateTime startDate,
-                                            @Param("endDate") LocalDateTime endDate);
 
     @Query(value = "SELECT CAST(o.created_at AS DATE), SUM(oi.total_price) " +
             "FROM order_items oi " +
@@ -121,4 +90,40 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<Object[]> countOrdersByBuyerAndCategory(@Param("buyerId") Long buyerId,
                                                  @Param("startDate") LocalDateTime startDate,
                                                  @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT SUM(oi.totalPrice) FROM OrderItem oi " +
+            "WHERE oi.sellerId = :sellerId " + // JOIN KALKTI
+            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.status != 'CANCELLED' " +
+            "AND oi.order.status != 'REFUNDED' " +
+            "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
+    BigDecimal sumRevenueBySellerAndDateRange(@Param("sellerId") Long sellerId,
+                                              @Param("startDate") LocalDateTime startDate,
+                                              @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT oi.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
+            "WHERE oi.sellerId = :sellerId " + // JOIN KALKTI
+            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.status != 'CANCELLED' " +
+            "AND oi.order.status != 'REFUNDED' " +
+            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY oi.listingType")
+    List<Object[]> sumRevenueBySellerAndCategory(@Param("sellerId") Long sellerId,
+                                                 @Param("startDate") LocalDateTime startDate,
+                                                 @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT oi.listing.id, SUM(oi.totalPrice) as revenue, COUNT(DISTINCT oi.order) as orderCount " +
+            "FROM OrderItem oi " +
+            "WHERE oi.sellerId = :sellerId " +
+            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.status != 'CANCELLED' " +
+            "AND oi.order.status != 'REFUNDED' " +
+            "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY oi.listing.id " +
+            "ORDER BY revenue DESC")
+    List<Object[]> findTopListingsByRevenue(@Param("sellerId") Long sellerId,
+                                            @Param("startDate") LocalDateTime startDate,
+                                            @Param("endDate") LocalDateTime endDate);
+
+
 }

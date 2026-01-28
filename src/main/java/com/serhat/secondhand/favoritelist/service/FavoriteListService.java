@@ -11,6 +11,7 @@ import com.serhat.secondhand.favoritelist.repository.FavoriteListLikeRepository;
 import com.serhat.secondhand.favoritelist.repository.FavoriteListRepository;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.hibernate.Hibernate;
-
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +34,18 @@ public class FavoriteListService {
     private final FavoriteListLikeRepository favoriteListLikeRepository;
     private final ListingRepository listingRepository;
     private final FavoriteListMapper favoriteListMapper;
+    private final UserService userService;
 
     private static final int MAX_LISTS_PER_USER = 20;
     private static final int MAX_ITEMS_PER_LIST = 100;
 
-    public Result<FavoriteListDto> createList(User currentUser, CreateFavoriteListRequest request) {
+    public Result<FavoriteListDto> createList(Long userId, CreateFavoriteListRequest request) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User currentUser = userResult.getData();
+
         long userListCount = favoriteListRepository.countByOwner(currentUser);
         if (userListCount >= MAX_LISTS_PER_USER) {
             return Result.error("Maximum list limit reached (" + MAX_LISTS_PER_USER + ")", "FAVORITE_LIST_LIMIT_EXCEEDED");
@@ -64,14 +69,19 @@ public class FavoriteListService {
         return Result.success(favoriteListMapper.toDto(favoriteList, currentUser));
     }
 
-    public Result<FavoriteListDto> updateList(User currentUser, Long listId, UpdateFavoriteListRequest request) {
+    public Result<FavoriteListDto> updateList(Long userId, Long listId, UpdateFavoriteListRequest request) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User currentUser = userResult.getData();
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
-        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser);
+        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser.getId());
         if (ownershipResult.isError()) {
             return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
         }
@@ -101,27 +111,27 @@ public class FavoriteListService {
         return Result.success(favoriteListMapper.toDto(favoriteList, currentUser));
     }
 
-    public Result<Void> deleteList(User currentUser, Long listId) {
+    public Result<Void> deleteList(Long userId, Long listId) {
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
-        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser);
+        Result<Void> ownershipResult = validateOwnership(favoriteList, userId);
         if (ownershipResult.isError()) {
             return ownershipResult;
         }
 
         favoriteListRepository.delete(favoriteList);
-        log.info("User {} deleted favorite list: {}", currentUser.getId(), listId);
+        log.info("User {} deleted favorite list: {}", userId, listId);
         return Result.success();
     }
 
     @Transactional(readOnly = true)
     public Result<FavoriteListDto> getListById(Long listId, User currentUser) {
-        FavoriteList favoriteList = favoriteListRepository.findById(listId)
-            .orElse(null);
+        FavoriteList favoriteList = favoriteListRepository.findByIdWithDetails(listId)
+                .orElse(null);
 
         if (favoriteList == null) {
             return Result.error("List not found", "FAVORITE_LIST_NOT_FOUND");
@@ -131,37 +141,26 @@ public class FavoriteListService {
             return Result.error("This list is private", "FAVORITE_LIST_PRIVATE");
         }
 
-        // Initialize collections before mapping
-        Hibernate.initialize(favoriteList.getItems());
-        Hibernate.initialize(favoriteList.getLikes());
-
         return Result.success(favoriteListMapper.toDto(favoriteList, currentUser));
     }
 
     @Transactional(readOnly = true)
-    public List<FavoriteListSummaryDto> getMyLists(User currentUser) {
-        List<FavoriteList> lists = favoriteListRepository.findByOwnerOrderByCreatedAtDesc(currentUser);
-        // Initialize collections before mapping to avoid lazy loading issues
-        lists.forEach(list -> {
-            Hibernate.initialize(list.getItems());
-            Hibernate.initialize(list.getLikes());
-        });
-        return lists.stream()
-            .map(favoriteListMapper::toSummaryDto)
-            .collect(Collectors.toList());
+    public Page<FavoriteListSummaryDto> getMyLists(Long userId, Pageable pageable) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Page.empty(pageable);
+        }
+        User currentUser = userResult.getData();
+
+        Page<FavoriteList> lists = favoriteListRepository.findByOwnerWithDetails(currentUser, pageable);
+
+        return lists.map(favoriteListMapper::toSummaryDto);
     }
 
     @Transactional(readOnly = true)
-    public List<FavoriteListSummaryDto> getUserPublicLists(Long userId) {
-        List<FavoriteList> lists = favoriteListRepository.findPublicListsByOwnerId(userId);
-        // Initialize collections before mapping to avoid lazy loading issues
-        lists.forEach(list -> {
-            Hibernate.initialize(list.getItems());
-            Hibernate.initialize(list.getLikes());
-        });
-        return lists.stream()
-            .map(favoriteListMapper::toSummaryDto)
-            .collect(Collectors.toList());
+    public Page<FavoriteListSummaryDto> getUserPublicLists(Long userId, Pageable pageable) {
+        Page<FavoriteList> lists = favoriteListRepository.findPublicByOwnerIdWithDetails(userId, pageable);
+        return lists.map(favoriteListMapper::toSummaryDto);
     }
 
     @Transactional(readOnly = true)
@@ -170,14 +169,19 @@ public class FavoriteListService {
             .map(favoriteListMapper::toSummaryDto);
     }
 
-    public Result<FavoriteListItemDto> addItemToList(User currentUser, Long listId, AddToListRequest request) {
+    public Result<FavoriteListItemDto> addItemToList(Long userId, Long listId, AddToListRequest request) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User currentUser = userResult.getData();
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
-        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser);
+        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser.getId());
         if (ownershipResult.isError()) {
             return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
         }
@@ -209,14 +213,14 @@ public class FavoriteListService {
         return Result.success(favoriteListMapper.toItemDto(item));
     }
 
-    public Result<Void> removeItemFromList(User currentUser, Long listId, UUID listingId) {
+    public Result<Void> removeItemFromList(Long userId, Long listId, UUID listingId) {
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
-        Result<Void> ownershipResult = validateOwnership(favoriteList, currentUser);
+        Result<Void> ownershipResult = validateOwnership(favoriteList, userId);
         if (ownershipResult.isError()) {
             return ownershipResult;
         }
@@ -229,17 +233,23 @@ public class FavoriteListService {
         }
 
         favoriteListItemRepository.delete(item);
-        log.info("User {} removed listing {} from list {}", currentUser.getId(), listingId, listId);
+        log.info("User {} removed listing {} from list {}", userId, listingId, listId);
         return Result.success();
     }
 
-    public Result<Void> likeList(User currentUser, Long listId) {
+    public Result<Void> likeList(Long userId, Long listId) {
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
+
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User currentUser = userResult.getData();
 
         if (!favoriteList.isPublic()) {
             return Result.error("Cannot like a private list", "CANNOT_LIKE_PRIVATE_LIST");
@@ -263,13 +273,19 @@ public class FavoriteListService {
         return Result.success();
     }
 
-    public Result<Void> unlikeList(User currentUser, Long listId) {
+    public Result<Void> unlikeList(Long userId, Long listId) {
         Result<FavoriteList> listResult = getListOrThrow(listId);
         if (listResult.isError()) {
             return Result.error(listResult.getMessage(), listResult.getErrorCode());
         }
 
         FavoriteList favoriteList = listResult.getData();
+
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User currentUser = userResult.getData();
 
         FavoriteListLike like = favoriteListLikeRepository.findByFavoriteListAndUser(favoriteList, currentUser)
             .orElse(null);
@@ -284,15 +300,10 @@ public class FavoriteListService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> getListIdsContainingListing(User currentUser, UUID listingId) {
-        return favoriteListItemRepository.findListIdsByListingIdAndOwnerId(listingId, currentUser.getId());
+    public List<Long> getListIdsContainingListing(Long userId, UUID listingId) {
+        return favoriteListItemRepository.findListIdsByListingIdAndOwnerId(listingId, userId);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isListLikedByUser(Long listId, User user) {
-        if (user == null) return false;
-        return favoriteListLikeRepository.isLikedByUser(listId, user.getId());
-    }
 
     private Result<FavoriteList> getListOrThrow(Long listId) {
         FavoriteList favoriteList = favoriteListRepository.findById(listId)
@@ -305,8 +316,8 @@ public class FavoriteListService {
         return Result.success(favoriteList);
     }
 
-    private Result<Void> validateOwnership(FavoriteList favoriteList, User currentUser) {
-        if (!favoriteList.getOwner().getId().equals(currentUser.getId())) {
+    private Result<Void> validateOwnership(FavoriteList favoriteList, Long userId) {
+        if (!favoriteList.getOwner().getId().equals(userId)) {
             return Result.error("You don't have permission to modify this list", "NOT_LIST_OWNER");
         }
         return Result.success();

@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,13 @@ public class OrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
+
+    @Column(name = "seller_id", nullable = false)
+    private Long sellerId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "listing_type")
+    private ListingType listingType;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;

@@ -8,10 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ListingStatisticsPort {
+    long countBySellerId(Long sellerId);
+    long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
-    List<Listing> findBySellerId(Long sellerId);
-
-    List<Listing> findBySellerIdAndStatus(Long sellerId, ListingStatus status);
+    List<Listing> findAllByIdIn(List<UUID> ids);
 
     Optional<Listing> findById(UUID id);
 }

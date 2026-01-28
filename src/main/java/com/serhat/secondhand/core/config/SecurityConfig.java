@@ -87,7 +87,7 @@ public class SecurityConfig {
 
     private static final List<String> SHOWCASE_PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/showcases/active",
-            "api/showcases/pricing-config"
+            "/api/showcases/pricing-config"
     );
 
     private static final List<String> AGREEMENT_PUBLIC_ENDPOINTS = Arrays.asList(

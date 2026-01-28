@@ -23,6 +23,11 @@ public class SalesStatisticsAdapter implements SalesStatisticsPort {
     }
 
     @Override
+    public List<Object[]> countOrdersBySellerAndCategory(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderItemRepository.countOrdersBySellerAndCategory(sellerId, startDate, endDate);
+    }
+
+    @Override
     public List<Object[]> getDailyRevenueTrend(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         return orderItemRepository.getDailyRevenueTrend(sellerId, startDate, endDate);
     }

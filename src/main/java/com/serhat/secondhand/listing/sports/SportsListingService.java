@@ -110,7 +110,8 @@ public class SportsListingService {
         // 4. Price History Recording
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
-                    existing,
+                    existing.getId(),
+                    existing.getTitle(),
                     oldPrice,
                     existing.getPrice(),
                     existing.getCurrency(),

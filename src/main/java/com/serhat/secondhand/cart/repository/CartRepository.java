@@ -1,6 +1,8 @@
 package com.serhat.secondhand.cart.repository;
 
 import com.serhat.secondhand.cart.entity.Cart;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +20,11 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     List<Cart> findByUserId(Long userId);
 
-    @Query("SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user.id = :userId ORDER BY c.createdAt DESC")
+    @Query(value = "SELECT c FROM Cart c JOIN FETCH c.listing l JOIN FETCH l.seller s WHERE c.user.id = :userId",
+            countQuery = "SELECT COUNT(c) FROM Cart c WHERE c.user.id = :userId")
+    Page<Cart> findByUserIdWithListing(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT c FROM Cart c JOIN FETCH c.listing l JOIN FETCH l.seller s WHERE c.user.id = :userId")
     List<Cart> findByUserIdWithListing(@Param("userId") Long userId);
 
     Optional<Cart> findByUserIdAndListingId(Long userId, UUID listingId);

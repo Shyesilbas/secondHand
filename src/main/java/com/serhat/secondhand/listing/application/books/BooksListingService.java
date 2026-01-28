@@ -119,7 +119,8 @@ public class BooksListingService {
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
-                    existing,
+                    existing.getId(),
+                    existing.getTitle(),
                     oldPrice,
                     existing.getPrice(),
                     existing.getCurrency(),

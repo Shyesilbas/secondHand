@@ -9,6 +9,7 @@ import com.serhat.secondhand.listing.domain.mapper.PriceHistoryMapper;
 import com.serhat.secondhand.listing.domain.repository.PriceHistoryRepository;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class PriceHistoryService {
     private final PriceHistoryMapper priceHistoryMapper;
     private final UserNotificationService userNotificationService;
     private final FavoriteRepository favoriteRepository;
+    private final EntityManager entityManager;
 
     public List<PriceHistoryDto> getPriceHistoryByListingId(UUID listingId) {
         return priceHistoryRepository.findByListingIdOrderByChangeDateDesc(listingId)
@@ -38,11 +40,12 @@ public class PriceHistoryService {
 
 
     @Transactional
-    public void recordPriceChange(Listing listing, BigDecimal oldPrice, BigDecimal newPrice, 
-                                 Currency currency, String changeReason) {
+    public void recordPriceChange(UUID listingId, String listingTitle, BigDecimal oldPrice, BigDecimal newPrice,
+                                  Currency currency, String changeReason) {
+        Listing listingRef = entityManager.getReference(Listing.class, listingId);
         if (oldPrice == null) {
             PriceHistory initialPrice = PriceHistory.builder()
-                    .listing(listing)
+                    .listing(listingRef)
                     .oldPrice(null)
                     .newPrice(newPrice)
                     .currency(currency)
@@ -51,13 +54,13 @@ public class PriceHistoryService {
                     .percentageChange(BigDecimal.ZERO)
                     .build();
             priceHistoryRepository.save(initialPrice);
-            log.info("Initial price recorded for listing: {}, price: {}", listing.getId(), newPrice);
+            log.info("Initial price recorded for listing: {}, price: {}", listingId, newPrice);
             return;
         }
 
         if (oldPrice.compareTo(newPrice) != 0) {
             PriceHistory priceHistory = PriceHistory.builder()
-                    .listing(listing)
+                    .listing(listingRef)
                     .oldPrice(oldPrice)
                     .newPrice(newPrice)
                     .currency(currency)
@@ -68,18 +71,18 @@ public class PriceHistoryService {
             priceHistoryRepository.save(priceHistory);
 
             if (newPrice.compareTo(oldPrice) < 0) {
-                List<User> users = favoriteRepository.findUsersByListingId(listing.getId());
+                List<User> users = favoriteRepository.findUsersByListingId(listingId);
 
                 for (User user : users) {
                     userNotificationService.sendPriceChangeNotification(user,
-                            listing.getTitle(),
+                            listingTitle,
                             oldPrice.toPlainString(),
                             newPrice.toPlainString(),
-                            listing.getId());
+                            listingId);
                 }
             }
             log.info("Price change recorded for listing: {}, from: {} to: {}", 
-                    listing.getId(), oldPrice, newPrice);
+                    listingId, oldPrice, newPrice);
         }
     }
 

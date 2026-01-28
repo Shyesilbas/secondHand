@@ -1,17 +1,21 @@
 package com.serhat.secondhand.dashboard.service.adapter;
 
 import com.serhat.secondhand.dashboard.service.port.FavoriteStatisticsPort;
+import com.serhat.secondhand.favorite.application.FavoriteStatsService;
+import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class FavoriteStatisticsAdapter implements FavoriteStatisticsPort {
-
     private final FavoriteRepository favoriteRepository;
+    private final FavoriteStatsService favoriteStatsService;
 
     @Override
     public long countByListingSellerId(Long sellerId) {
@@ -19,8 +23,12 @@ public class FavoriteStatisticsAdapter implements FavoriteStatisticsPort {
     }
 
     @Override
-    public long countByListingId(UUID listingId) {
-        return favoriteRepository.countByListingId(listingId);
+    public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
+        return favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
+    }
+
+    @Override
+    public Long countByUserId(Long buyerId) {
+        return favoriteRepository.countByUserId(buyerId);
     }
 }
-

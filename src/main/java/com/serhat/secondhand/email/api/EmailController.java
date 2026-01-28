@@ -2,17 +2,19 @@ package com.serhat.secondhand.email.api;
 
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.dto.EmailDto;
-import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,21 +25,21 @@ import java.util.UUID;
 public class EmailController {
 
     private final EmailService emailService;
-    private final UserService userService;
 
 
     @GetMapping("/my-emails")
-    public ResponseEntity<List<EmailDto>> getMyEmails(Authentication authentication) {
-        log.info("Getting email history for user: {}", authentication.getName());
-        User user = userService.getAuthenticatedUser(authentication);
-        List<EmailDto> emails = emailService.getUserEmails(user);
+    public ResponseEntity<Page<EmailDto>> getMyEmails(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        log.info("Getting email history for userId: {}", currentUser.getId());
+        Page<EmailDto> emails = emailService.getUserEmails(currentUser.getId(), pageable);
         return ResponseEntity.ok(emails);
     }
 
     @GetMapping("/unread-count")
-    public ResponseEntity<Map<String, Long>> unreadCount(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        return ResponseEntity.ok(Map.of("count", emailService.getUnreadCount(user)));
+    public ResponseEntity<Map<String, Long>> unreadCount(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(Map.of("count", emailService.getUnreadCount(currentUser.getId())));
     }
 
     @DeleteMapping("/{emailId}")
@@ -51,8 +53,7 @@ public class EmailController {
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteAll(Authentication authentication) {
-        User user = userService.getAuthenticatedUser(authentication);
-        return ResponseEntity.ok(emailService.deleteAllEmails(user));
+    public ResponseEntity<String> deleteAll(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(emailService.deleteAllEmails(currentUser.getId()));
     }
 }

@@ -1,7 +1,8 @@
 package com.serhat.secondhand.campaign.repository;
 
 import com.serhat.secondhand.campaign.entity.Campaign;
-import com.serhat.secondhand.user.domain.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,21 +15,20 @@ import java.util.UUID;
 
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
-    List<Campaign> findBySellerOrderByCreatedAtDesc(User seller);
 
-    @Query("""
-        select c from Campaign c
-        where c.active = true
-          and c.seller.id in :sellerIds
-          and (c.startsAt is null or c.startsAt <= :now)
-          and (c.endsAt is null or c.endsAt >= :now)
-        """)
-    List<Campaign> findActiveCampaignsForSellers(@Param("sellerIds") List<Long> sellerIds, @Param("now") LocalDateTime now);
-
-
+    Page<Campaign> findBySellerIdOrderByCreatedAtDesc(Long sellerId, Pageable pageable);
     @Modifying
     @Query("UPDATE Campaign c SET c.active = false WHERE c.active = true AND c.endsAt < :now")
     void deactivateAllExpired(@Param("now") LocalDateTime now);
+
+    @Query("SELECT DISTINCT c FROM Campaign c " +
+            "LEFT JOIN FETCH c.eligibleListingIds " +
+            "LEFT JOIN FETCH c.eligibleTypes " +
+            "WHERE c.seller.id IN :sellerIds " +
+            "AND c.active = true " +
+            "AND (c.startsAt IS NULL OR c.startsAt <= CURRENT_TIMESTAMP) " +
+            "AND (c.endsAt IS NULL OR c.endsAt >= CURRENT_TIMESTAMP)")
+    List<Campaign> findAllActiveBySellerIdsWithDetails(@Param("sellerIds") List<Long> sellerIds);
 
 }
 

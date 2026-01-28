@@ -13,12 +13,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,14 +35,14 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
-    @Operation(summary = "Get cart items", description = "Retrieve all items in the user's cart")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart items retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    public ResponseEntity<?> getCartItems(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> getCartItems(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
         log.info("API request to get cart items for user: {}", currentUser.getEmail());
-        Result<List<CartDto>> result = cartService.getCartItems(currentUser.getId());
+
+        Result<Page<CartDto>> result = cartService.getCartItems(currentUser.getId(), pageable);
+
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));

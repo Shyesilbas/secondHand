@@ -4,9 +4,11 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 export const favoriteListService = {
     createList: (data) => post(API_ENDPOINTS.FAVORITE_LISTS.CREATE, data),
     
-    getMyLists: () => get(API_ENDPOINTS.FAVORITE_LISTS.MY_LISTS),
+    getMyLists: (page = 0, size = 5) => 
+        get(`${API_ENDPOINTS.FAVORITE_LISTS.MY_LISTS}?page=${page}&size=${size}`),
     
-    getUserLists: (userId) => get(API_ENDPOINTS.FAVORITE_LISTS.USER_LISTS(userId)),
+    getUserLists: (userId, page = 0, size = 5) => 
+        get(`${API_ENDPOINTS.FAVORITE_LISTS.USER_LISTS(userId)}?page=${page}&size=${size}`),
     
     getPopularLists: (page = 0, size = 10) => 
         get(`${API_ENDPOINTS.FAVORITE_LISTS.POPULAR}?page=${page}&size=${size}`),

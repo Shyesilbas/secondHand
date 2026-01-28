@@ -120,7 +120,8 @@ public class ClothingListingService {
         // 4. Price History Check
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
-                    existing,
+                    existing.getId(),
+                    existing.getTitle(),
                     oldPrice,
                     existing.getPrice(),
                     existing.getCurrency(),

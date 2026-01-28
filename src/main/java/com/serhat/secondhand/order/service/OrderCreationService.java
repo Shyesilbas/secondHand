@@ -123,18 +123,23 @@ public class OrderCreationService {
                 .collect(Collectors.toList());
     }
 
-        private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
+
+    private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         BigDecimal unitPrice = cart.getListing() != null ? cart.getListing().getPrice() : BigDecimal.ZERO;
         BigDecimal lineSubtotal = unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity()));
+
         if (cart.getListing() != null && unitPriceByListingId != null) {
             unitPrice = unitPriceByListingId.getOrDefault(cart.getListing().getId(), unitPrice);
             if (lineSubtotalByListingId != null) {
                 lineSubtotal = lineSubtotalByListingId.getOrDefault(cart.getListing().getId(), lineSubtotal);
             }
         }
+
         return OrderItem.builder()
                 .order(order)
                 .listing(cart.getListing())
+                .sellerId(cart.getListing().getSeller().getId())
+                .listingType(cart.getListing().getListingType())
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
                 .totalPrice(lineSubtotal)

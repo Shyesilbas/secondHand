@@ -39,7 +39,6 @@ public class OrderQueryService {
 
         Pageable finalPageable = ensureSort(pageable);
 
-        // Repository'de findByUserId metodunu kullanmalısın
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
 
         return orders.map(orderMapper::toDto);
@@ -53,13 +52,6 @@ public class OrderQueryService {
         return Result.success(orderMapper.toDto(orderResult.getData()));
     }
 
-    public Result<OrderDto> getOrderByOrderNumber(String orderNumber, Long userId) {
-        Result<Order> orderResult = findOrderByNumberAndValidateOwnership(orderNumber, userId);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
-        }
-        return Result.success(orderMapper.toDto(orderResult.getData()));
-    }
 
     public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
         log.info("Getting orders for sellerId: {}", sellerId);
@@ -97,27 +89,19 @@ public class OrderQueryService {
         );
     }
 
-    // --- Private Helper Methods ---
 
     private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Sipariş bulunamadı.");
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Order Not Found.");
         }
         return validateOwnership(order, userId);
     }
 
-    private Result<Order> findOrderByNumberAndValidateOwnership(String orderNumber, Long userId) {
-        Order order = orderRepository.findByOrderNumber(orderNumber).orElse(null);
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Sipariş bulunamadı.");
-        }
-        return validateOwnership(order, userId);
-    }
 
     private Result<Order> validateOwnership(Order order, Long userId) {
         if (!order.getUser().getId().equals(userId)) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "Bu sipariş size ait değil.");
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "You dont have any orders with this id.");
         }
         return Result.success(order);
     }

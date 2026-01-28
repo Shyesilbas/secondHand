@@ -7,6 +7,7 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
 import {formatDateTime} from '../../common/formatters.js';
 import {ArrowLeft, CalendarDays, Clock, Edit2, Layers, Plus, RefreshCw, Tag, Target, Trash2} from 'lucide-react';
+import Pagination from '../../common/components/ui/Pagination.jsx';
 
 const MyCouponsPage = () => {
   const { showError, showSuccess } = useNotification();
@@ -15,15 +16,25 @@ const MyCouponsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState(null);
   const [listingTitleById, setListingTitleById] = useState({});
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const size = 5;
 
-  const load = async () => {
+  const load = async (nextPage = page) => {
     setIsLoading(true);
     try {
-      const data = await campaignService.listMine();
-      setCampaigns(Array.isArray(data) ? data : []);
+      const res = await campaignService.listMine(nextPage, size);
+      const items = Array.isArray(res) ? res : (Array.isArray(res?.content) ? res.content : []);
+      setCampaigns(items);
+      setPage(Number.isFinite(res?.number) ? res.number : nextPage);
+      setTotalPages(Number.isFinite(res?.totalPages) ? res.totalPages : 0);
+      setTotalElements(Number.isFinite(res?.totalElements) ? res.totalElements : items.length);
     } catch (e) {
       setCampaigns([]);
       showError('Kuponlarım', e?.response?.data?.message || 'Failed to load campaigns');
+      setTotalPages(0);
+      setTotalElements(0);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +65,7 @@ const MyCouponsPage = () => {
     try {
       await campaignService.remove(id);
       showSuccess('Deleted', 'Campaign deleted.');
-      await load();
+      await load(page);
     } catch (e) {
       showError('Delete failed', e?.response?.data?.message || 'Failed to delete campaign');
     }
@@ -64,11 +75,11 @@ const MyCouponsPage = () => {
     const active = campaigns.filter(c => c.active).length;
     const inactive = campaigns.filter(c => !c.active).length;
     return {
-      total: campaigns.length,
+      total: totalElements,
       active,
       inactive
     };
-  }, [campaigns]);
+  }, [campaigns, totalElements]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -98,7 +109,7 @@ const MyCouponsPage = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={load}
+                onClick={() => load(page)}
                 disabled={isLoading}
                 className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-60"
               >
@@ -209,8 +220,9 @@ const MyCouponsPage = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-4 space-y-3">
-            {campaigns.map((c) => {
+          <div className="mt-4">
+            <div className="space-y-3">
+              {campaigns.map((c) => {
               const hasListings = c.eligibleListingIds && c.eligibleListingIds.length > 0;
               const hasTypes = c.eligibleTypes && c.eligibleTypes.length > 0;
 
@@ -324,7 +336,20 @@ const MyCouponsPage = () => {
                   </div>
                 </div>
               );
-            })}
+              })}
+            </div>
+
+            <div className="mt-4 rounded-3xl bg-white border border-slate-100 shadow-sm/50 shadow-[0_22px_60px_rgba(15,23,42,0.04)] overflow-hidden">
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={(p) => {
+                  const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
+                  setPage(next);
+                  load(next);
+                }}
+              />
+            </div>
           </div>
         )}
       </div>

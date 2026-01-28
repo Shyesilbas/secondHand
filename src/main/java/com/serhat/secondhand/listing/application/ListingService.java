@@ -97,11 +97,9 @@ public class ListingService {
         });
     }
 
-    public Optional<ListingDto> findByListingNo(String listingNo) {
-        if (listingNo == null || listingNo.trim().isEmpty()) return Optional.empty();
-        return listingRepository.findByListingNo(listingNo.trim().toUpperCase())
-                .map(listingMapper::toDynamicDto)
-                .map(dto -> enrichmentService.enrich(dto, null));
+    public List<Listing> findAllByIds(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        return listingRepository.findAllByIdIn(ids);
     }
 
     public List<ListingDto> findByIds(List<UUID> ids, String userEmail) {
