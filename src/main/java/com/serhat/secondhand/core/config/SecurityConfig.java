@@ -98,6 +98,10 @@ public class SecurityConfig {
             "/api/v1/payments/listing-fee-config"
     );
 
+    private static final List<String> AI_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/ai-test/**"
+    );
+
     private static final List<String> ENUM_PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/v1/enums/**"
     );
@@ -151,8 +155,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Authentication & Authorization endpoints
                         .requestMatchers(AUTH_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public listing endpoints
+
+                        .requestMatchers(AI_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+
                         .requestMatchers(LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
                         
                         // Public category-specific listing endpoints
