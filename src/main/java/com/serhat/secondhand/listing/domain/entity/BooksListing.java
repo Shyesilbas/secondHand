@@ -4,10 +4,12 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,20 +28,28 @@ public class BooksListing extends Listing {
 
     private String author;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_type_id")
+    private BookType bookType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_genre_id")
     private BookGenre genre;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_language_id")
     private BookLanguage language;
 
     private Integer publicationYear;
 
     private Integer pageCount;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_format_id")
     private BookFormat format;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_condition_id")
     private BookCondition condition;
 
     @Column(length = 20)

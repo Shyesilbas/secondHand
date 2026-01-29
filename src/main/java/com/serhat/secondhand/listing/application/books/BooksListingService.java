@@ -10,6 +10,11 @@ import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
+import com.serhat.secondhand.listing.domain.repository.books.BookConditionRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookFormatRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
@@ -31,6 +36,11 @@ import java.util.UUID;
 public class BooksListingService {
 
     private final BooksListingRepository booksRepository;
+    private final BookTypeRepository bookTypeRepository;
+    private final BookGenreRepository bookGenreRepository;
+    private final BookLanguageRepository bookLanguageRepository;
+    private final BookFormatRepository bookFormatRepository;
+    private final BookConditionRepository bookConditionRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final BooksListingFilterService booksListingFilterService;
@@ -55,6 +65,37 @@ public class BooksListingService {
             // Your Result structure: error(message, errorCode)
             return Result.error("Invalid quantity for books listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
+
+        var bookType = bookTypeRepository.findById(request.bookTypeId()).orElse(null);
+        if (bookType == null) {
+            return Result.error("Book type not found", "BOOK_TYPE_NOT_FOUND");
+        }
+        var genre = bookGenreRepository.findById(request.genreId()).orElse(null);
+        if (genre == null) {
+            return Result.error("Book genre not found", "BOOK_GENRE_NOT_FOUND");
+        }
+        var language = bookLanguageRepository.findById(request.languageId()).orElse(null);
+        if (language == null) {
+            return Result.error("Book language not found", "BOOK_LANGUAGE_NOT_FOUND");
+        }
+        var format = bookFormatRepository.findById(request.formatId()).orElse(null);
+        if (format == null) {
+            return Result.error("Book format not found", "BOOK_FORMAT_NOT_FOUND");
+        }
+        var condition = bookConditionRepository.findById(request.conditionId()).orElse(null);
+        if (condition == null) {
+            return Result.error("Book condition not found", "BOOK_CONDITION_NOT_FOUND");
+        }
+
+        if (genre.getBookType() != null && genre.getBookType().getId() != null && !genre.getBookType().getId().equals(bookType.getId())) {
+            return Result.error("Book genre does not belong to selected book type", "BOOK_GENRE_TYPE_MISMATCH");
+        }
+
+        books.setBookType(bookType);
+        books.setGenre(genre);
+        books.setLanguage(language);
+        books.setFormat(format);
+        books.setCondition(condition);
 
         books.setSeller(seller);
         books.setListingFeePaid(true);
@@ -102,13 +143,46 @@ public class BooksListingService {
         request.imageUrl().ifPresent(existing::setImageUrl);
 
         request.author().ifPresent(existing::setAuthor);
-        request.genre().ifPresent(existing::setGenre);
-        request.language().ifPresent(existing::setLanguage);
         request.publicationYear().ifPresent(existing::setPublicationYear);
         request.pageCount().ifPresent(existing::setPageCount);
-        request.format().ifPresent(existing::setFormat);
-        request.condition().ifPresent(existing::setCondition);
         request.isbn().ifPresent(existing::setIsbn);
+
+        request.bookTypeId().ifPresent(bookTypeId -> {
+            var bookType = bookTypeRepository.findById(bookTypeId).orElse(null);
+            if (bookType != null) {
+                existing.setBookType(bookType);
+            }
+        });
+        request.genreId().ifPresent(genreId -> {
+            var genre = bookGenreRepository.findById(genreId).orElse(null);
+            if (genre != null) {
+                existing.setGenre(genre);
+            }
+        });
+        request.languageId().ifPresent(languageId -> {
+            var language = bookLanguageRepository.findById(languageId).orElse(null);
+            if (language != null) {
+                existing.setLanguage(language);
+            }
+        });
+        request.formatId().ifPresent(formatId -> {
+            var format = bookFormatRepository.findById(formatId).orElse(null);
+            if (format != null) {
+                existing.setFormat(format);
+            }
+        });
+        request.conditionId().ifPresent(conditionId -> {
+            var condition = bookConditionRepository.findById(conditionId).orElse(null);
+            if (condition != null) {
+                existing.setCondition(condition);
+            }
+        });
+
+        if (existing.getBookType() != null && existing.getGenre() != null && existing.getGenre().getBookType() != null &&
+                existing.getGenre().getBookType().getId() != null && existing.getBookType().getId() != null &&
+                !existing.getGenre().getBookType().getId().equals(existing.getBookType().getId())) {
+            return Result.error("Book genre does not belong to selected book type", "BOOK_GENRE_TYPE_MISMATCH");
+        }
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());

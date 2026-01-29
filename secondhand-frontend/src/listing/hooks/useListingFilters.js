@@ -105,7 +105,14 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
       (filters.genres && filters.genres.length > 0) ||
       (filters.languages && filters.languages.length > 0) ||
       (filters.formats && filters.formats.length > 0) ||
-      (filters.conditions && filters.conditions.length > 0) ||
+      (filters.bookTypeIds && filters.bookTypeIds.length > 0) ||
+      (filters.genreIds && filters.genreIds.length > 0) ||
+      (filters.languageIds && filters.languageIds.length > 0) ||
+      (filters.formatIds && filters.formatIds.length > 0) ||
+      (filters.conditionIds && filters.conditionIds.length > 0) ||
+      (filters.disciplineIds && filters.disciplineIds.length > 0) ||
+      (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) ||
+      (filters.conditionIds && filters.conditionIds.length > 0) ||
       filters.minPageCount || filters.maxPageCount;
   }, [filters]);
 
@@ -139,6 +146,14 @@ export const useListingFilters = (initialFilters = {}, listingType = null) => {
     if (filters.genres && filters.genres.length > 0) count++;
     if (filters.languages && filters.languages.length > 0) count++;
     if (filters.formats && filters.formats.length > 0) count++;
+    if (filters.bookTypeIds && filters.bookTypeIds.length > 0) count++;
+    if (filters.genreIds && filters.genreIds.length > 0) count++;
+    if (filters.languageIds && filters.languageIds.length > 0) count++;
+    if (filters.formatIds && filters.formatIds.length > 0) count++;
+    if (filters.conditionIds && filters.conditionIds.length > 0) count++;
+    if (filters.disciplineIds && filters.disciplineIds.length > 0) count++;
+    if (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) count++;
+    if (filters.conditionIds && filters.conditionIds.length > 0) count++;
     if (filters.minPageCount || filters.maxPageCount) count++;
     return count;
   }, [filters]);

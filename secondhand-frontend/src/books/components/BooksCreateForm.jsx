@@ -15,8 +15,17 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
   const { enums } = useEnums();
   const formConfig = createFormConfig('books');
 
+  const normalizedInitialData = {
+    ...(initialData || {}),
+    bookTypeId: initialData?.bookTypeId || initialData?.bookType?.id || '',
+    genreId: initialData?.genreId || initialData?.genre?.id || '',
+    languageId: initialData?.languageId || initialData?.language?.id || '',
+    formatId: initialData?.formatId || initialData?.format?.id || '',
+    conditionId: initialData?.conditionId || initialData?.condition?.id || '',
+  };
+
   const formState = useFormState({
-    initialData: { ...formConfig.initialData, ...(initialData || {}) },
+    initialData: { ...formConfig.initialData, ...normalizedInitialData },
     totalSteps: formConfig.totalSteps,
     validateStep: booksValidator.validateStep,
     validateAll: booksValidator.validateAll,
@@ -49,6 +58,7 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
 
     if (stepId === 2) {
       const fields = formConfig.fieldGroups.step2;
+      const genreOptions = (enums?.bookGenres || []).filter((g) => !formData.bookTypeId || g.bookTypeId === formData.bookTypeId);
       return (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
             <div className="pb-4 border-b border-slate-100 mb-6">
@@ -57,14 +67,44 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {fields.map((field) => {
-                if (['genre', 'language', 'format', 'condition'].includes(field)) {
+                if (['bookTypeId', 'genreId', 'languageId', 'formatId', 'conditionId'].includes(field)) {
+                  const isGenre = field === 'genreId';
+                  const enumKey = field === 'bookTypeId'
+                    ? 'bookTypes'
+                    : field === 'genreId'
+                      ? 'bookGenres'
+                      : field === 'languageId'
+                        ? 'bookLanguages'
+                        : field === 'formatId'
+                          ? 'bookFormats'
+                          : 'bookConditions';
+
+                  const label = field === 'bookTypeId'
+                    ? 'Book Type *'
+                    : field === 'genreId'
+                      ? 'Genre *'
+                      : field === 'languageId'
+                        ? 'Language *'
+                        : field === 'formatId'
+                          ? 'Format *'
+                          : 'Condition *';
+
                   return (
                       <div key={field}>
                         <EnumDropdown
-                            label={field.charAt(0).toUpperCase() + field.slice(1) + ' *'}
-                            enumKey={`book${field.charAt(0).toUpperCase() + field.slice(1)}s`}
+                            label={label}
+                            enumKey={enumKey}
                             value={formData[field]}
-                            onChange={(v) => handleDropdownChange(field, v)}
+                            disabled={field === 'genreId' && !formData.bookTypeId}
+                            onChange={(v) => {
+                              if (field === 'bookTypeId') {
+                                handleDropdownChange('bookTypeId', v);
+                                handleDropdownChange('genreId', '');
+                                return;
+                              }
+                              handleDropdownChange(field, v);
+                            }}
+                            options={isGenre ? genreOptions : null}
                         />
                         {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
                       </div>

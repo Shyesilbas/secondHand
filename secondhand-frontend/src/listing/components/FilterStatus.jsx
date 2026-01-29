@@ -37,8 +37,14 @@ const FilterStatus = ({
             (filters.genres && filters.genres.length > 0) ||
             (filters.languages && filters.languages.length > 0) ||
             (filters.formats && filters.formats.length > 0) ||
-            (filters.disciplines && filters.disciplines.length > 0) ||
-            (filters.equipmentTypes && filters.equipmentTypes.length > 0) ||
+            (filters.bookTypeIds && filters.bookTypeIds.length > 0) ||
+            (filters.genreIds && filters.genreIds.length > 0) ||
+            (filters.languageIds && filters.languageIds.length > 0) ||
+            (filters.formatIds && filters.formatIds.length > 0) ||
+            (filters.conditionIds && filters.conditionIds.length > 0) ||
+            (filters.disciplineIds && filters.disciplineIds.length > 0) ||
+            (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) ||
+            (filters.conditionIds && filters.conditionIds.length > 0) ||
             (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) ||
             (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) ||
             filters.adTypeId || filters.ownerTypeId ||
@@ -70,8 +76,14 @@ const FilterStatus = ({
         if (filters.genres && filters.genres.length > 0) count++;
         if (filters.languages && filters.languages.length > 0) count++;
         if (filters.formats && filters.formats.length > 0) count++;
-        if (filters.disciplines && filters.disciplines.length > 0) count++;
-        if (filters.equipmentTypes && filters.equipmentTypes.length > 0) count++;
+        if (filters.bookTypeIds && filters.bookTypeIds.length > 0) count++;
+        if (filters.genreIds && filters.genreIds.length > 0) count++;
+        if (filters.languageIds && filters.languageIds.length > 0) count++;
+        if (filters.formatIds && filters.formatIds.length > 0) count++;
+        if (filters.conditionIds && filters.conditionIds.length > 0) count++;
+        if (filters.disciplineIds && filters.disciplineIds.length > 0) count++;
+        if (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) count++;
+        if (filters.conditionIds && filters.conditionIds.length > 0) count++;
         if (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) count++;
         if (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) count++;
         if (filters.adTypeId) count++;

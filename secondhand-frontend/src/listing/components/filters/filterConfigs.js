@@ -40,19 +40,20 @@ export const createClothingFilterConfig = () => {
 
 export const createBooksFilterConfig = () => {
   return new FilterConfig()
-    .addEnumField('genres', 'Genre', 'bookGenres')
-    .addEnumField('languages', 'Language', 'bookLanguages')
-    .addEnumField('formats', 'Format', 'bookFormats')
-    .addEnumField('conditions', 'Condition', 'bookConditions')
+    .addEnumField('bookTypeIds', 'Book Type', 'bookTypes')
+    .addEnumField('genreIds', 'Genre', 'bookGenres')
+    .addEnumField('languageIds', 'Language', 'bookLanguages')
+    .addEnumField('formatIds', 'Format', 'bookFormats')
+    .addEnumField('conditionIds', 'Condition', 'bookConditions')
     .addNumericRangeField('year', 'Year', { min: 1450, max: new Date().getFullYear(), placeholder: '2000' })
     .addNumericRangeField('pageCount', 'Page Count', { min: 0, placeholder: '200' });
 };
 
 export const createSportsFilterConfig = () => {
   return new FilterConfig()
-    .addEnumField('disciplines', 'Discipline', 'sportDisciplines')
-    .addEnumField('equipmentTypes', 'Equipment Type', 'sportEquipmentTypes')
-    .addEnumField('conditions', 'Condition', 'sportConditions');
+    .addEnumField('disciplineIds', 'Discipline', 'sportDisciplines')
+    .addEnumField('equipmentTypeIds', 'Equipment Type', 'sportEquipmentTypes')
+    .addEnumField('conditionIds', 'Condition', 'sportConditions');
 };
 
 

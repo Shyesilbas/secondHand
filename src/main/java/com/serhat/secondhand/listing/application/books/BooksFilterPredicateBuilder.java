@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
@@ -21,27 +22,28 @@ public class BooksFilterPredicateBuilder implements FilterPredicateBuilder<Books
     public List<Predicate> buildSpecificPredicates(CriteriaBuilder cb, Root<BooksListing> root, BooksListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
         
-        // Listing type constraint
         predicates.add(cb.equal(root.get("listingType"), ListingType.BOOKS));
         
-        // Books-specific filters
-        if (filters.getGenres() != null && !filters.getGenres().isEmpty()) {
-            predicates.add(root.get("genre").in(filters.getGenres()));
+        if (filters.getBookTypeIds() != null && !filters.getBookTypeIds().isEmpty()) {
+            predicates.add(root.join("bookType", JoinType.LEFT).get("id").in(filters.getBookTypeIds()));
         }
         
-        if (filters.getLanguages() != null && !filters.getLanguages().isEmpty()) {
-            predicates.add(root.get("language").in(filters.getLanguages()));
+        if (filters.getGenreIds() != null && !filters.getGenreIds().isEmpty()) {
+            predicates.add(root.join("genre", JoinType.LEFT).get("id").in(filters.getGenreIds()));
         }
         
-        if (filters.getFormats() != null && !filters.getFormats().isEmpty()) {
-            predicates.add(root.get("format").in(filters.getFormats()));
+        if (filters.getLanguageIds() != null && !filters.getLanguageIds().isEmpty()) {
+            predicates.add(root.join("language", JoinType.LEFT).get("id").in(filters.getLanguageIds()));
         }
         
-        if (filters.getConditions() != null && !filters.getConditions().isEmpty()) {
-            predicates.add(root.get("condition").in(filters.getConditions()));
+        if (filters.getFormatIds() != null && !filters.getFormatIds().isEmpty()) {
+            predicates.add(root.join("format", JoinType.LEFT).get("id").in(filters.getFormatIds()));
+        }
+
+        if (filters.getConditionIds() != null && !filters.getConditionIds().isEmpty()) {
+            predicates.add(root.join("condition", JoinType.LEFT).get("id").in(filters.getConditionIds()));
         }
         
-        // Range filters
         if (filters.getMinYear() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("publicationYear"), filters.getMinYear()));
         }
@@ -69,6 +71,10 @@ public class BooksFilterPredicateBuilder implements FilterPredicateBuilder<Books
             case "year", "publicationyear", "publication_year" -> Optional.of(root.get("publicationYear"));
             case "pagecount", "page_count" -> Optional.of(root.get("pageCount"));
             case "author" -> Optional.of(root.get("author"));
+            case "genre" -> Optional.of(root.join("genre", JoinType.LEFT).get("label"));
+            case "language" -> Optional.of(root.join("language", JoinType.LEFT).get("label"));
+            case "format" -> Optional.of(root.join("format", JoinType.LEFT).get("label"));
+            case "condition" -> Optional.of(root.join("condition", JoinType.LEFT).get("label"));
             default -> Optional.empty();
         };
     }

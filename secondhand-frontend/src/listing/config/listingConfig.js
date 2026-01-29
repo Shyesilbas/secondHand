@@ -193,7 +193,8 @@ export const listingTypeConfig = {
     
     compactBadges: (listing) => [
       { label: listing.author, icon: '✍️', show: !!listing.author },
-      { label: listing.genre, icon: '🏷️', show: !!listing.genre },
+      { label: listing.bookType?.label || listing.bookType?.name || listing.bookType, icon: '📚', show: !!listing.bookType },
+      { label: listing.genre?.label || listing.genre?.name || listing.genre, icon: '🏷️', show: !!listing.genre },
       { label: listing.publicationYear, icon: '📅', show: !!listing.publicationYear },
       { 
         label: listing.pageCount ? `${listing.pageCount} pages` : null, 
@@ -227,9 +228,9 @@ export const listingTypeConfig = {
     ],
     
     compactBadges: (listing) => [
-      { label: listing.discipline, icon: '🏅', show: !!listing.discipline },
-      { label: listing.equipmentType, icon: '🎽', show: !!listing.equipmentType },
-      { label: listing.condition, icon: '⭐', show: !!listing.condition },
+      { label: listing.discipline?.label || listing.discipline?.name || listing.discipline, icon: '🏅', show: !!listing.discipline },
+      { label: listing.equipmentType?.label || listing.equipmentType?.name || listing.equipmentType, icon: '🎽', show: !!listing.equipmentType },
+      { label: listing.condition?.label || listing.condition?.name || listing.condition, icon: '⭐', show: !!listing.condition },
     ].filter(badge => badge.show),
     
     defaultFilters: {}

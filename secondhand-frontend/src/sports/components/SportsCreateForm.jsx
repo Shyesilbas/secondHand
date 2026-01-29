@@ -64,28 +64,28 @@ const SportsCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate
                   <EnumDropdown
                       label="Spor Tipi *"
                       enumKey="sportDisciplines"
-                      value={formData.sportType}
-                      onChange={(v) => handleDropdownChange('sportType', v)}
+                      value={formData.disciplineId}
+                      onChange={(v) => handleDropdownChange('disciplineId', v)}
                   />
-                  {errors.sportType && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.sportType}</p>}
+                  {errors.disciplineId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.disciplineId}</p>}
                 </div>
                 <div>
                   <EnumDropdown
                       label="Ekipman Tipi *"
                       enumKey="sportEquipmentTypes"
-                      value={formData.equipmentType}
-                      onChange={(v) => handleDropdownChange('equipmentType', v)}
+                      value={formData.equipmentTypeId}
+                      onChange={(v) => handleDropdownChange('equipmentTypeId', v)}
                   />
-                  {errors.equipmentType && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.equipmentType}</p>}
+                  {errors.equipmentTypeId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.equipmentTypeId}</p>}
                 </div>
                 <div>
                   <EnumDropdown
                       label="Durum *"
                       enumKey="sportConditions"
-                      value={formData.condition}
-                      onChange={(v) => handleDropdownChange('condition', v)}
+                      value={formData.conditionId}
+                      onChange={(v) => handleDropdownChange('conditionId', v)}
                   />
-                  {errors.condition && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.condition}</p>}
+                  {errors.conditionId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.conditionId}</p>}
                 </div>
               </div>
             </div>

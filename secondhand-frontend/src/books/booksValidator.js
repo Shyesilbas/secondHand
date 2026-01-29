@@ -3,12 +3,13 @@ import { validateBasicListingStep1, validateBasicListingStep3 } from "../listing
 const validateBooksStep2 = (formData) => {
     const errors = {};
     if (!formData.author?.trim()) errors.author = 'Author is required';
-    if (!formData.genre) errors.genre = 'Genre is required';
-    if (!formData.language) errors.language = 'Language is required';
+    if (!formData.bookTypeId) errors.bookTypeId = 'Book type is required';
+    if (!formData.genreId) errors.genreId = 'Genre is required';
+    if (!formData.languageId) errors.languageId = 'Language is required';
     if (!formData.publicationYear) errors.publicationYear = 'Publication year is required';
     if (!formData.pageCount) errors.pageCount = 'Page count is required';
-    if (!formData.format) errors.format = 'Format is required';
-    if (!formData.condition) errors.condition = 'Condition is required';
+    if (!formData.formatId) errors.formatId = 'Format is required';
+    if (!formData.conditionId) errors.conditionId = 'Condition is required';
     return errors;
 };
 

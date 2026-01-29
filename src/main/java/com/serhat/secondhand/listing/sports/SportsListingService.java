@@ -13,6 +13,9 @@ import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepository;
+import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
+import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -31,6 +34,9 @@ import java.util.UUID;
 public class SportsListingService {
 
     private final SportsListingRepository sportsRepository;
+    private final SportDisciplineRepository sportDisciplineRepository;
+    private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
+    private final SportConditionRepository sportConditionRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final SportsListingFilterService sportsListingFilterService;
@@ -54,6 +60,23 @@ public class SportsListingService {
         if (entity.getQuantity() == null || entity.getQuantity() < 1) {
             return Result.error("Invalid quantity for sports listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
+
+        var discipline = sportDisciplineRepository.findById(request.disciplineId()).orElse(null);
+        if (discipline == null) {
+            return Result.error("Sport discipline not found", "SPORT_DISCIPLINE_NOT_FOUND");
+        }
+        var equipmentType = sportEquipmentTypeRepository.findById(request.equipmentTypeId()).orElse(null);
+        if (equipmentType == null) {
+            return Result.error("Sport equipment type not found", "SPORT_EQUIPMENT_TYPE_NOT_FOUND");
+        }
+        var condition = sportConditionRepository.findById(request.conditionId()).orElse(null);
+        if (condition == null) {
+            return Result.error("Sport condition not found", "SPORT_CONDITION_NOT_FOUND");
+        }
+
+        entity.setDiscipline(discipline);
+        entity.setEquipmentType(equipmentType);
+        entity.setCondition(condition);
 
         entity.setSeller(seller);
         entity.setListingFeePaid(true);
@@ -99,9 +122,25 @@ public class SportsListingService {
         request.city().ifPresent(existing::setCity);
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
-        request.discipline().ifPresent(existing::setDiscipline);
-        request.equipmentType().ifPresent(existing::setEquipmentType);
-        request.condition().ifPresent(existing::setCondition);
+
+        request.disciplineId().ifPresent(disciplineId -> {
+            var discipline = sportDisciplineRepository.findById(disciplineId).orElse(null);
+            if (discipline != null) {
+                existing.setDiscipline(discipline);
+            }
+        });
+        request.equipmentTypeId().ifPresent(equipmentTypeId -> {
+            var equipmentType = sportEquipmentTypeRepository.findById(equipmentTypeId).orElse(null);
+            if (equipmentType != null) {
+                existing.setEquipmentType(equipmentType);
+            }
+        });
+        request.conditionId().ifPresent(conditionId -> {
+            var condition = sportConditionRepository.findById(conditionId).orElse(null);
+            if (condition != null) {
+                existing.setCondition(condition);
+            }
+        });
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());

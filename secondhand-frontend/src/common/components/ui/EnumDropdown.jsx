@@ -2,9 +2,9 @@ import React from 'react';
 import { useEnums } from '../../hooks/useEnums.js';
 import SearchableDropdown from './SearchableDropdown.jsx';
 
-const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searchPlaceholder = '', multiple = false, className = '' }) => {
+const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searchPlaceholder = '', multiple = false, className = '', options = null, disabled = false }) => {
   const { enums } = useEnums();
-  const options = enums?.[enumKey] || [];
+  const enumOptions = options ?? (enums?.[enumKey] || []);
   const selectedValues = value ? (multiple ? value : [value]) : [];
 
   const handleChange = (values) => {
@@ -14,13 +14,14 @@ const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searc
   return (
     <SearchableDropdown
       label={label}
-      options={options}
+      options={enumOptions}
       selectedValues={selectedValues}
       onSelectionChange={handleChange}
       placeholder={placeholder || `${label} seçin...`}
       searchPlaceholder={searchPlaceholder || `${label} ara...`}
       multiple={multiple}
       className={className}
+      disabled={disabled}
     />
   );
 };

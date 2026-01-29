@@ -25,12 +25,20 @@ import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookConditionRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookFormatRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
+import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepository;
+import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
+import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +62,11 @@ public class EnumController {
     private final ElectronicTypeRepository electronicTypeRepository;
     private final ElectronicBrandRepository electronicBrandRepository;
     private final ElectronicModelRepository electronicModelRepository;
+    private final BookTypeRepository bookTypeRepository;
+    private final BookGenreRepository bookGenreRepository;
+    private final BookLanguageRepository bookLanguageRepository;
+    private final BookFormatRepository bookFormatRepository;
+    private final BookConditionRepository bookConditionRepository;
     private final ClothingBrandRepository clothingBrandRepository;
     private final ClothingTypeRepository clothingTypeRepository;
     private final RealEstateTypeRepository realEstateTypeRepository;
@@ -62,6 +75,9 @@ public class EnumController {
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
     private final CarBrandRepository carBrandRepository;
     private final VehicleModelRepository vehicleModelRepository;
+    private final SportDisciplineRepository sportDisciplineRepository;
+    private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
+    private final SportConditionRepository sportConditionRepository;
 
     private ResponseEntity<List<Map<String, Object>>> getListingTypes() {
         List<Map<String, Object>> listingTypes = Arrays.stream(ListingType.values())
@@ -414,12 +430,31 @@ public class EnumController {
         return ResponseEntity.ok(categories);
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getBookGenres() {
-        List<Map<String, Object>> genres = Arrays.stream(BookGenre.values())
-                .map(genre -> {
+    private ResponseEntity<List<Map<String, Object>>> getBookTypes() {
+        List<Map<String, Object>> types = bookTypeRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(com.serhat.secondhand.listing.domain.entity.enums.books.BookType::getLabel, String.CASE_INSENSITIVE_ORDER))
+                .map(t -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", genre.name());
-                    map.put("label", getBookGenreLabel(genre));
+                    map.put("id", t.getId());
+                    map.put("name", t.getName());
+                    map.put("label", t.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getBookGenres() {
+        List<Map<String, Object>> genres = bookGenreRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(BookGenre::getLabel, String.CASE_INSENSITIVE_ORDER))
+                .map(g -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", g.getId());
+                    map.put("name", g.getName());
+                    map.put("label", g.getLabel());
+                    map.put("bookTypeId", g.getBookType() != null ? g.getBookType().getId() : null);
                     return map;
                 })
                 .toList();
@@ -427,11 +462,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookLanguages() {
-        List<Map<String, Object>> langs = Arrays.stream(BookLanguage.values())
+        List<Map<String, Object>> langs = bookLanguageRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(BookLanguage::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(lang -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", lang.name());
-                    map.put("label", getBookLanguageLabel(lang));
+                    map.put("id", lang.getId());
+                    map.put("name", lang.getName());
+                    map.put("label", lang.getLabel());
                     return map;
                 })
                 .toList();
@@ -439,11 +477,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookFormats() {
-        List<Map<String, Object>> formats = Arrays.stream(BookFormat.values())
+        List<Map<String, Object>> formats = bookFormatRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(BookFormat::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(fmt -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", fmt.name());
-                    map.put("label", getBookFormatLabel(fmt));
+                    map.put("id", fmt.getId());
+                    map.put("name", fmt.getName());
+                    map.put("label", fmt.getLabel());
                     return map;
                 })
                 .toList();
@@ -451,11 +492,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookConditions() {
-        List<Map<String, Object>> conditions = Arrays.stream(BookCondition.values())
+        List<Map<String, Object>> conditions = bookConditionRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(BookCondition::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(cond -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", cond.name());
-                    map.put("label", getBookConditionLabel(cond));
+                    map.put("id", cond.getId());
+                    map.put("name", cond.getName());
+                    map.put("label", cond.getLabel());
                     return map;
                 })
                 .toList();
@@ -463,11 +507,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportDisciplines() {
-        List<Map<String, Object>> list = Arrays.stream(SportDiscipline.values())
+        List<Map<String, Object>> list = sportDisciplineRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(SportDiscipline::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", v.name());
-                    map.put("label", getSportDisciplineLabel(v));
+                    map.put("id", v.getId());
+                    map.put("name", v.getName());
+                    map.put("label", v.getLabel());
                     return map;
                 })
                 .toList();
@@ -475,11 +522,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportEquipmentTypes() {
-        List<Map<String, Object>> list = Arrays.stream(SportEquipmentType.values())
+        List<Map<String, Object>> list = sportEquipmentTypeRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(SportEquipmentType::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", v.name());
-                    map.put("label", getSportEquipmentTypeLabel(v));
+                    map.put("id", v.getId());
+                    map.put("name", v.getName());
+                    map.put("label", v.getLabel());
                     return map;
                 })
                 .toList();
@@ -487,11 +537,14 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportConditions() {
-        List<Map<String, Object>> list = Arrays.stream(SportCondition.values())
+        List<Map<String, Object>> list = sportConditionRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(SportCondition::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", v.name());
-                    map.put("label", getSportConditionLabel(v));
+                    map.put("id", v.getId());
+                    map.put("name", v.getName());
+                    map.put("label", v.getLabel());
                     return map;
                 })
                 .toList();
@@ -540,22 +593,6 @@ public class EnumController {
         return toTitleCase(type.name());
     }
 
-    private String getBookGenreLabel(BookGenre genre) {
-        return toTitleCase(genre.name());
-    }
-
-    private String getBookLanguageLabel(BookLanguage language) {
-        return toTitleCase(language.name());
-    }
-
-    private String getBookFormatLabel(BookFormat format) {
-        return toTitleCase(format.name());
-    }
-
-    private String getBookConditionLabel(BookCondition condition) {
-        return toTitleCase(condition.name());
-    }
-
         private String toTitleCase(String enumName) {
         String lower = enumName.replace('_', ' ').toLowerCase(Locale.ROOT);
         String[] parts = lower.split(" ");
@@ -568,12 +605,6 @@ public class EnumController {
         }
         return sb.toString();
     }
-
-    private String getSportDisciplineLabel(SportDiscipline discipline) { return discipline.getLabel(); }
-
-    private String getSportEquipmentTypeLabel(SportEquipmentType equipmentType) { return equipmentType.getLabel(); }
-
-    private String getSportConditionLabel(SportCondition condition) { return condition.getLabel(); }
 
     private String getGenderLabel(Gender gender) { return gender.getLabel(); }
 
@@ -691,6 +722,7 @@ public class EnumController {
         allEnums.put("clothingConditions", getClothingConditions().getBody());
         allEnums.put("clothingGenders", getClothingGenders().getBody());
         allEnums.put("clothingCategories", getClothingCategories().getBody());
+        allEnums.put("bookTypes", getBookTypes().getBody());
         allEnums.put("bookGenres", getBookGenres().getBody());
         allEnums.put("bookLanguages", getBookLanguages().getBody());
         allEnums.put("bookFormats", getBookFormats().getBody());
