@@ -1,20 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.books;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum BookCondition {
-    NEW("New"),
-    LIKE_NEW("Like New"),
-    GOOD("Good"),
-    FAIR("Fair"),
-    POOR("Poor");
+import java.util.UUID;
 
-    private final String label;
+@Entity
+@Table(name = "book_conditions")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookCondition {
 
-    BookCondition(String label) {
-        this.label = label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(nullable = false, length = 160)
+    private String label;
 }
-
-

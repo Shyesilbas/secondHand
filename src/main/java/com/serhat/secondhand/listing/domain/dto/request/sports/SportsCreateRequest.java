@@ -1,11 +1,9 @@
 package com.serhat.secondhand.listing.domain.dto.request.sports;
 
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record SportsCreateRequest(
         @NotBlank String title,
@@ -15,9 +13,9 @@ public record SportsCreateRequest(
         @NotNull @Min(1) Integer quantity,
         @NotBlank String city,
         @NotBlank String district,
-        @NotNull SportDiscipline discipline,
-        @NotNull SportEquipmentType equipmentType,
-        @NotNull SportCondition condition,
+        @NotNull UUID disciplineId,
+        @NotNull UUID equipmentTypeId,
+        @NotNull UUID conditionId,
         String imageUrl
 ) {}
 

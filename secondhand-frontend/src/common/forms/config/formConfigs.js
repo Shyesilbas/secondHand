@@ -115,13 +115,13 @@ export const sportsFormConfig = {
   entityName: 'Sports',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', currency: 'TRY', quantity: 1, sportType: '', equipmentType: '', condition: '',
+    title: '', description: '', price: '', currency: 'TRY', quantity: 1, disciplineId: '', equipmentTypeId: '', conditionId: '',
     city: '', district: '', address: '', latitude: '', longitude: ''
   },
   steps: [basicInfoStep, sportsDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price', 'currency'],
-    step2: ['sportType', 'equipmentType', 'condition'],
+    step2: ['disciplineId', 'equipmentTypeId', 'conditionId'],
     step3: ['city', 'district', 'address', 'latitude', 'longitude']
   }
 };
@@ -130,13 +130,27 @@ export const booksFormConfig = {
   entityName: 'Books',
   totalSteps: 3,
   initialData: {
-    title: '', description: '', price: '', currency: 'TRY', quantity: 1, author: '', genre: '', language: '',
-    publicationYear: '', pageCount: '', format: '', condition: '', isbn: '', city: '', district: ''
+    title: '',
+    description: '',
+    price: '',
+    currency: 'TRY',
+    quantity: 1,
+    author: '',
+    bookTypeId: '',
+    genreId: '',
+    languageId: '',
+    publicationYear: '',
+    pageCount: '',
+    formatId: '',
+    conditionId: '',
+    isbn: '',
+    city: '',
+    district: ''
   },
   steps: [basicInfoStep, bookDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
-    step2: ['author', 'genre', 'language', 'publicationYear', 'pageCount', 'format', 'condition', 'isbn'],
+    step2: ['author', 'bookTypeId', 'genreId', 'languageId', 'publicationYear', 'pageCount', 'formatId', 'conditionId', 'isbn'],
     step3: ['city', 'district']
   }
 };

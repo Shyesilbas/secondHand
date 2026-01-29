@@ -11,6 +11,7 @@ const SearchableDropdown = ({
   searchPlaceholder = 'Type to search...',
   className = '',
   maxDisplayItems = 3,
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +25,10 @@ const SearchableDropdown = ({
     getOptionLabel(o).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleDropdown = () => setIsOpen(prev => !prev);
+  const toggleDropdown = () => {
+    if (disabled) return;
+    setIsOpen(prev => !prev);
+  };
 
   const handleClickOutside = useCallback((e) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -39,7 +43,7 @@ const SearchableDropdown = ({
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (isOpen) searchInputRef.current?.focus();
+    if (isOpen && !disabled) searchInputRef.current?.focus();
   }, [isOpen]);
 
   const handleOptionClick = (value) => {
@@ -75,8 +79,12 @@ const SearchableDropdown = ({
       <button
         type="button"
         onClick={toggleDropdown}
+        disabled={disabled}
+        aria-disabled={disabled}
         className={`w-full px-4 py-3 border rounded-xl text-left flex items-center justify-between transition-all duration-200 tracking-tight ${
-          isOpen 
+          disabled
+            ? 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'
+            : isOpen 
             ? 'border-indigo-500 ring-4 ring-indigo-500/10' 
             : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
         }`}
@@ -89,17 +97,18 @@ const SearchableDropdown = ({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleClearAll(); }}
+              disabled={disabled}
               className="text-slate-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-full"
               title="Clear all"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-indigo-500' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-indigo-500' : ''}`} />
         </div>
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-200/60 z-50 max-h-80 overflow-hidden animation-fade-in">
           <div className="p-3 border-b border-slate-200/60 relative bg-slate-50/50">
             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />

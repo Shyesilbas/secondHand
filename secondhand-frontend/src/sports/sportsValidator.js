@@ -2,9 +2,9 @@ import { validateBasicListingStep1, validateBasicListingStep3 } from "../listing
 
 const validateSportsStep2 = (formData) => {
     const errors = {};
-    if (!formData.sportType) errors.sportType = 'Sport type is required';
-    if (!formData.equipmentType) errors.equipmentType = 'Equipment type is required';
-    if (!formData.condition) errors.condition = 'Condition is required';
+    if (!formData.disciplineId) errors.disciplineId = 'Sport discipline is required';
+    if (!formData.equipmentTypeId) errors.equipmentTypeId = 'Sport equipment type is required';
+    if (!formData.conditionId) errors.conditionId = 'Sport condition is required';
     return errors;
 };
 

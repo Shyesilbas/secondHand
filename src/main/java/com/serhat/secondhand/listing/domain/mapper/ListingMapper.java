@@ -133,6 +133,11 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "BOOKS")
+    @Mapping(target = "bookType", ignore = true)
+    @Mapping(target = "genre", ignore = true)
+    @Mapping(target = "language", ignore = true)
+    @Mapping(target = "format", ignore = true)
+    @Mapping(target = "condition", ignore = true)
     public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -142,6 +147,9 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "SPORTS")
+    @Mapping(target = "discipline", ignore = true)
+    @Mapping(target = "equipmentType", ignore = true)
+    @Mapping(target = "condition", ignore = true)
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
     public ListingDto toDynamicDto(Listing listing) {

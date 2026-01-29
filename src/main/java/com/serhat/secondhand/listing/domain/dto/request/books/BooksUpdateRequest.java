@@ -1,13 +1,10 @@
 package com.serhat.secondhand.listing.domain.dto.request.books;
 
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 
 import java.util.Optional;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record BooksUpdateRequest(
         Optional<String> title,
@@ -18,12 +15,13 @@ public record BooksUpdateRequest(
         Optional<String> city,
         Optional<String> district,
         Optional<String> author,
-        Optional<BookGenre> genre,
-        Optional<BookLanguage> language,
+        Optional<UUID> bookTypeId,
+        Optional<UUID> genreId,
+        Optional<UUID> languageId,
         Optional<Integer> publicationYear,
         Optional<Integer> pageCount,
-        Optional<BookFormat> format,
-        Optional<BookCondition> condition,
+        Optional<UUID> formatId,
+        Optional<UUID> conditionId,
         Optional<String> isbn,
         Optional<String> imageUrl
 ) {}

@@ -1,24 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.sports;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum SportEquipmentType {
-    CLEATS("Cleats"),
-    JERSEY("Jersey"),
-    SHORTS("Shorts"),
-    SLEEVE("Sleeve"),
-    BALL("Ball"),
-    WRISTBAND("Wristband"),
-    TREADMILL("Treadmill"),
-    EXERCISE_BIKE("Exercise Bike"),
-    OTHER("Other");
+import java.util.UUID;
 
-    private final String label;
+@Entity
+@Table(name = "sport_equipment_types")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SportEquipmentType {
 
-    SportEquipmentType(String label) {
-        this.label = label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(nullable = false, length = 120)
+    private String label;
 }
-
-

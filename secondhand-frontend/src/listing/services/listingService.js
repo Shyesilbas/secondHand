@@ -90,16 +90,21 @@ const createFilterPayload = (filters, listingType) => {
       break;
 
     case LISTING_TYPES.BOOKS:
-      payload.genres = Array.isArray(filters.genres) ? filters.genres : [];
-      payload.languages = Array.isArray(filters.languages) ? filters.languages : [];
-      payload.formats = Array.isArray(filters.formats) ? filters.formats : [];
-      payload.conditions = Array.isArray(filters.conditions) ? filters.conditions : [];
+      payload.bookTypeIds = Array.isArray(filters.bookTypeIds) ? filters.bookTypeIds : [];
+      payload.genreIds = Array.isArray(filters.genreIds) ? filters.genreIds : [];
+      payload.languageIds = Array.isArray(filters.languageIds) ? filters.languageIds : [];
+      payload.formatIds = Array.isArray(filters.formatIds) ? filters.formatIds : [];
+      payload.conditionIds = Array.isArray(filters.conditionIds) ? filters.conditionIds : [];
+      payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
+      payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
+      payload.minPageCount = filters.minPageCount ? parseInt(filters.minPageCount) : null;
+      payload.maxPageCount = filters.maxPageCount ? parseInt(filters.maxPageCount) : null;
       break;
 
     case LISTING_TYPES.SPORTS:
-      payload.disciplines = Array.isArray(filters.disciplines) ? filters.disciplines : [];
-      payload.equipmentTypes = Array.isArray(filters.equipmentTypes) ? filters.equipmentTypes : [];
-      payload.conditions = Array.isArray(filters.conditions) ? filters.conditions : [];
+      payload.disciplineIds = Array.isArray(filters.disciplineIds) ? filters.disciplineIds : [];
+      payload.equipmentTypeIds = Array.isArray(filters.equipmentTypeIds) ? filters.equipmentTypeIds : [];
+      payload.conditionIds = Array.isArray(filters.conditionIds) ? filters.conditionIds : [];
       break;
 
     default:

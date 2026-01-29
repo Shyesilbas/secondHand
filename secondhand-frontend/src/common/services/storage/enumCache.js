@@ -1,6 +1,6 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '3.6';
+const ENUM_CACHE_VERSION = '3.9';
 const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
@@ -28,6 +28,7 @@ const REQUIRED_ENUM_KEYS = [
   'clothingConditions',
   'clothingGenders',
   'clothingCategories',
+  'bookTypes',
   'bookGenres',
   'bookLanguages',
   'bookFormats',

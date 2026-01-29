@@ -15,9 +15,9 @@ export const SportsListingDTO = {
     sellerSurname: '',
     sellerId: 0,
     type: '',
-    discipline: '',
-    equipmentType: '',
-    condition: ''
+    discipline: null,
+    equipmentType: null,
+    condition: null
 };
 
 export const createSportsCreateRequest = (data) => ({
@@ -29,8 +29,9 @@ export const createSportsCreateRequest = (data) => ({
   city: data.city,
   district: data.district,
   imageUrl: data.imageUrl || undefined,
-  discipline: data.sportType,   equipmentType: data.equipmentType,
-  condition: data.condition,
+  disciplineId: data.disciplineId,
+  equipmentTypeId: data.equipmentTypeId,
+  conditionId: data.conditionId,
 });
 
 export const createSportsUpdateRequest = (data) => ({
@@ -42,8 +43,9 @@ export const createSportsUpdateRequest = (data) => ({
   city: data.city ?? undefined,
   district: data.district ?? undefined,
   imageUrl: data.imageUrl ?? undefined,
-  discipline: data.sportType ?? undefined,   equipmentType: data.equipmentType ?? undefined,
-  condition: data.condition ?? undefined,
+  disciplineId: data.disciplineId ?? undefined,
+  equipmentTypeId: data.equipmentTypeId ?? undefined,
+  conditionId: data.conditionId ?? undefined,
 });
 
 
@@ -56,9 +58,9 @@ export const createSportsFilterRequest = (data) => ({
   minPrice: parseFloat(data.minPrice) || null,
   maxPrice: parseFloat(data.maxPrice) || null,
   currency: data.currency || 'TRY',
-  disciplines: Array.isArray(data.disciplines) ? data.disciplines : [],
-  equipmentTypes: Array.isArray(data.equipmentTypes) ? data.equipmentTypes : [],
-  conditions: Array.isArray(data.conditions) ? data.conditions : [],
+  disciplineIds: Array.isArray(data.disciplineIds) ? data.disciplineIds : [],
+  equipmentTypeIds: Array.isArray(data.equipmentTypeIds) ? data.equipmentTypeIds : [],
+  conditionIds: Array.isArray(data.conditionIds) ? data.conditionIds : [],
   sortBy: data.sortBy || 'createdAt',
   sortDirection: data.sortDirection || 'DESC',
   page: parseInt(data.page) || 0,

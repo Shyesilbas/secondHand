@@ -2,12 +2,9 @@ package com.serhat.secondhand.listing.domain.entity.enums.books;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,23 +13,20 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "book_genres")
+@Table(name = "book_types")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookGenre {
+public class BookType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 160)
+    @Column(nullable = false, unique = true, length = 120)
     private String name;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 160)
     private String label;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_type_id")
-    private BookType bookType;
 }
+
