@@ -23,6 +23,9 @@ public class GeminiClient {
     @Value("${gemini.api.base-url}")
     private String baseUrl;
 
+    @Value("${gemini.api.fallback-memory-model:gemini-2.0-flash-lite}")
+    private String fallbackMemoryModel;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String model() {
@@ -30,8 +33,25 @@ public class GeminiClient {
     }
 
     public String generateText(String message) {
-        String url = baseUrl + "/" + model + ":generateContent?key=" + apiKey;
-        log.debug("Request to model: {} at URL: {}", model, baseUrl + "/" + model);
+        return generateTextWithModel(model, message, false);
+    }
+
+    public String generateTextForMemory(String message) {
+        try {
+            return generateTextWithModel(model, message, true);
+        } catch (RuntimeException e) {
+            try {
+                return generateTextWithModel(fallbackMemoryModel, message, true);
+            } catch (RuntimeException ignored) {
+                log.warn("Memory analysis skipped due to rate limiting");
+                return "Cevap hazır";
+            }
+        }
+    }
+
+    private String generateTextWithModel(String modelName, String message, boolean swallowRateLimit) {
+        String url = baseUrl + "/" + modelName + ":generateContent?key=" + apiKey;
+        log.debug("Request to model: {} at URL: {}", modelName, baseUrl + "/" + modelName);
 
         var request = new GeminiRequest(List.of(
                 new GeminiRequest.Content(List.of(
@@ -39,10 +59,11 @@ public class GeminiClient {
                 ))
         ));
 
-        int maxRetries = 3;
-        int retryCount = 0;
+        long[] backoffMillis = {3000L, 3000L};
+        int maxAttempts = backoffMillis.length + 1;
+        int attempt = 0;
 
-        while (retryCount < maxRetries) {
+        while (attempt < maxAttempts) {
             try {
                 GeminiResponse response = restTemplate.postForObject(url, request, GeminiResponse.class);
 
@@ -56,21 +77,22 @@ public class GeminiClient {
                 return "Empty response from AI.";
 
             } catch (HttpClientErrorException.TooManyRequests e) {
-                retryCount++;
-                log.warn("Rate limit exceeded. Retry {}/{}", retryCount, maxRetries);
-
-                if (retryCount < maxRetries) {
-                    try {
-                        long waitTime = (long) Math.pow(2, retryCount) * 1000;
-                        log.info("Waiting {}ms before retry...", waitTime);
-                        Thread.sleep(waitTime);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        throw new RuntimeException("Process interrupted", ie);
+                if (attempt >= maxAttempts - 1) {
+                    if (swallowRateLimit) {
+                        log.warn("Rate limit exceeded for model: {}", modelName);
+                        return "Cevap hazır";
                     }
-                } else {
                     throw new RuntimeException("Rate limit exceeded. Please try again in a few minutes.");
                 }
+                long waitTime = backoffMillis[attempt];
+                log.warn("Rate limit exceeded. Attempt {}/{}. Waiting {}ms", attempt + 1, maxAttempts, waitTime);
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Process interrupted", ie);
+                }
+                attempt++;
 
             } catch (HttpClientErrorException e) {
                 log.error("HTTP Error: Status={}, Body={}", e.getStatusCode(), e.getResponseBodyAsString());

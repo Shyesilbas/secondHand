@@ -53,7 +53,9 @@ public class GeminiAiService {
 
             memoryService.storeMessage(userId, ChatRole.USER, request.question());
             memoryService.storeMessage(userId, ChatRole.ASSISTANT, answer);
-            memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
+            if (memoryService.shouldUpdateMemory(userId, request.question())) {
+                memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
+            }
 
             return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {

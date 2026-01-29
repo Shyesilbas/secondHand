@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
 import {ROUTES} from '../../constants/routes.js';
-import {DropdownDivider, DropdownMenu} from '../ui/DropdownMenu.jsx';
 import {useNotification} from '../../../notification/NotificationContext.jsx';
 import {useInAppNotificationsContext} from '../../../notification/InAppNotificationContext.jsx';
 import NotificationBadge from '../../../notification/components/NotificationBadge.jsx';
@@ -50,10 +49,12 @@ const Header = () => {
     const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
     const [inAppNotificationCenterOpen, setInAppNotificationCenterOpen] = useState(false);
     const [listingsMenuOpen, setListingsMenuOpen] = useState(false);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
     const categoriesMenuRef = useRef(null);
     const notificationMenuRef = useRef(null);
     const listingsMenuRef = useRef(null);
+    const profileMenuRef = useRef(null);
 
     const { totalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
     
@@ -83,6 +84,7 @@ const Header = () => {
             if (categoriesMenuRef.current && !categoriesMenuRef.current.contains(event.target)) setCategoriesMenuOpen(false);
             if (notificationMenuRef.current && !notificationMenuRef.current.contains(event.target)) setNotificationMenuOpen(false);
             if (listingsMenuRef.current && !listingsMenuRef.current.contains(event.target)) setListingsMenuOpen(false);
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) setProfileMenuOpen(false);
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -279,42 +281,69 @@ const Header = () => {
 
                                 <div className="h-8 w-[1px] bg-gray-300 mx-2 hidden sm:block" />
 
-                                {/* Profile Menu */}
-                                <DropdownMenu
-                                    align="right"
-                                    showChevron={false}
-                                    trigger={
-                                        <button className="flex items-center gap-2.5 pl-2 group">
-                                            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200/60 flex items-center justify-center overflow-hidden group-hover:border-slate-300/60 transition-all duration-300 ease-in-out">
-                                                {user?.avatar ? <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" /> : <User className="w-5 h-5 text-slate-600" />}
-                                            </div>
-                                            <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-all duration-300 ease-in-out" />
-                                        </button>
-                                    }
-                                >
-                                    <div className="px-4 py-3 border-b border-slate-200/60">
-                                        <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">Account</p>
-                                        <Link to={ROUTES.PROFILE} className="text-sm font-semibold text-slate-900 truncate tracking-tight block hover:text-slate-600 transition-colors">
-                                            {user?.name || 'User'}
-                                        </Link>
-                                    </div>
-                                    <Link to={ROUTES.DASHBOARD} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
-                                        <Settings className="w-4 h-4 mr-3" /> Dashboard
-                                    </Link>
-                                    <Link to={ROUTES.AURA_CHAT} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
-                                        <Sparkles className="w-4 h-4 mr-3" /> Aura Assistant
-                                    </Link>
-                                    <Link to={ROUTES.MY_LISTINGS} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
-                                        <Package className="w-4 h-4 mr-3" /> Inventory
-                                    </Link>
-                                    <Link to={user?.id ? ROUTES.USER_PROFILE(user.id) : ROUTES.DASHBOARD} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
-                                        <User className="w-4 h-4 mr-3" /> Profile Page
-                                    </Link>
-                                    <DropdownDivider />
-                                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
-                                        <LogOut className="w-4 h-4" /> Sign Out
+                                <div className="relative" ref={profileMenuRef}>
+                                    <button
+                                        onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                                        className="flex items-center gap-2.5 pl-2 group cursor-pointer"
+                                        type="button"
+                                    >
+                                        <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200/60 flex items-center justify-center overflow-hidden group-hover:border-slate-300/60 transition-all duration-300 ease-in-out">
+                                            {user?.avatar ? <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" /> : <User className="w-5 h-5 text-slate-600" />}
+                                        </div>
+                                        <ChevronDown className={`w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-all duration-300 ease-in-out ${profileMenuOpen ? 'rotate-180' : ''}`} />
                                     </button>
-                                </DropdownMenu>
+
+                                    {profileMenuOpen && (
+                                        <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-[9999]">
+                                            <div className="px-4 py-3 border-b border-slate-200/60">
+                                                <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">Account</p>
+                                                <Link
+                                                    to={ROUTES.PROFILE}
+                                                    onClick={() => setProfileMenuOpen(false)}
+                                                    className="text-sm font-semibold text-slate-900 truncate tracking-tight block hover:text-slate-600 transition-colors cursor-pointer"
+                                                >
+                                                    {user?.name || 'User'}
+                                                </Link>
+                                            </div>
+                                            <Link
+                                                to={ROUTES.DASHBOARD}
+                                                onClick={() => setProfileMenuOpen(false)}
+                                                className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
+                                            >
+                                                <Settings className="w-4 h-4 mr-3" /> Dashboard
+                                            </Link>
+                                            <Link
+                                                to={ROUTES.AURA_CHAT}
+                                                onClick={() => setProfileMenuOpen(false)}
+                                                className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
+                                            >
+                                                <Sparkles className="w-4 h-4 mr-3" /> Aura Assistant
+                                            </Link>
+                                            <Link
+                                                to={ROUTES.MY_LISTINGS}
+                                                onClick={() => setProfileMenuOpen(false)}
+                                                className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
+                                            >
+                                                <Package className="w-4 h-4 mr-3" /> Inventory
+                                            </Link>
+                                            <Link
+                                                to={user?.id ? ROUTES.USER_PROFILE(user.id) : ROUTES.DASHBOARD}
+                                                onClick={() => setProfileMenuOpen(false)}
+                                                className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
+                                            >
+                                                <User className="w-4 h-4 mr-3" /> Profile Page
+                                            </Link>
+                                            <div className="border-t border-slate-200/60 my-1" />
+                                            <button
+                                                onClick={handleLogout}
+                                                type="button"
+                                                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
+                                            >
+                                                <LogOut className="w-4 h-4" /> Sign Out
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Mobile Menu Toggle */}
                                 <button className="lg:hidden p-2.5 ml-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out rounded-xl" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
