@@ -99,7 +99,8 @@ public class SecurityConfig {
     );
 
     private static final List<String> AI_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/ai-test/**"
+            "/api/ai-test/**",
+            "/api/ai/**"
     );
 
     private static final List<String> ENUM_PUBLIC_ENDPOINTS = Arrays.asList(

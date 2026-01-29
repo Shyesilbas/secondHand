@@ -44,6 +44,7 @@ import OffersPage from '../../offer/pages/OffersPage.jsx';
 import SellerDashboardPage from '../../dashboard/pages/SellerDashboardPage.jsx';
 import BuyerDashboardPage from '../../dashboard/pages/BuyerDashboardPage.jsx';
 import FavoriteListDetailPage from '../../favoritelist/pages/FavoriteListDetailPage.jsx';
+import AuraChatPage from '../../ai/pages/AuraChatPage.jsx';
 
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
@@ -158,6 +159,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         <Route path={ROUTES.EMAILS} element={<EmailsPage />} />
         <Route path={ROUTES.CHAT} element={<ChatPage />} />
+        <Route path={ROUTES.AURA_CHAT} element={<AuraChatPage />} />
                         <Route path={ROUTES.USER_PROFILE(':userId')} element={<UserProfilePage />} />
                         <Route path={ROUTES.USER_REVIEWS(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.REVIEWS_RECEIVED(':userId')} element={<UserReviewsPage />} />

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../auth/AuthContext.jsx';
 import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
@@ -14,7 +14,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {trackView} from '../services/viewTrackingService.js';
 import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
-import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldCheck, ShoppingBag} from 'lucide-react';
+import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldCheck, ShoppingBag, Sparkles} from 'lucide-react';
 import {useCart} from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
@@ -22,6 +22,7 @@ import {FollowButton} from '../../follow/index.js';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
   const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
@@ -98,6 +99,13 @@ const ListingDetailPage = () => {
           </nav>
 
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
+              className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
+              title="Ask Aura"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
             {canAddToCart && (
               <button
                 onClick={() => addToCart(listing.id)}

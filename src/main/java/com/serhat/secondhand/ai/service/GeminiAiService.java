@@ -1,35 +1,28 @@
 package com.serhat.secondhand.ai.service;
 
 import com.serhat.secondhand.ai.dto.AiResponse;
-import com.serhat.secondhand.ai.dto.GeminiRequest;
-import com.serhat.secondhand.ai.dto.GeminiResponse;
+import com.serhat.secondhand.ai.dto.UserMemory;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
+import com.serhat.secondhand.ai.memory.ChatRole;
+import com.serhat.secondhand.ai.memory.service.MemoryService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @Service
 @Slf4j
 public class GeminiAiService {
 
-    @Value("${gemini.api.key}")
-    private String apiKey;
+    private final MemoryService memoryService;
+    private final GeminiClient geminiClient;
 
-    @Value("${gemini.api.model:gemini-2.5-flash}")
-    private String model;
-
-    @Value("${gemini.api.base-url}")
-    private String baseUrl;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    public GeminiAiService(MemoryService memoryService, GeminiClient geminiClient) {
+        this.memoryService = memoryService;
+        this.geminiClient = geminiClient;
+    }
 
     public String testConnection(String message) {
         log.info("Test connection with message: {}", message.substring(0, Math.min(50, message.length())));
-        return callGeminiApi(message);
+        return geminiClient.generateText(message);
     }
 
     public AiResponse askQuestion(UserQuestionRequest request) {
@@ -37,10 +30,34 @@ public class GeminiAiService {
 
         try {
             String prompt = buildPrompt(request);
-            String answer = callGeminiApi(prompt);
-            return AiResponse.success(answer, model);
+            String answer = geminiClient.generateText(prompt);
+            return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {
             log.error("Error while processing question: ", e);
+            return AiResponse.error("Failed to get response: " + e.getMessage());
+        }
+    }
+
+    public AiResponse askQuestion(Long userId, UserQuestionRequest request) {
+        if (userId == null) {
+            return AiResponse.error("userId is required");
+        }
+        if (request == null || request.question() == null || request.question().isBlank()) {
+            return AiResponse.error("Question cannot be empty");
+        }
+
+        try {
+            UserMemory memory = memoryService.getOrCreate(userId);
+            String prompt = buildMemoryAwarePrompt(memory, request);
+            String answer = geminiClient.generateText(prompt);
+
+            memoryService.storeMessage(userId, ChatRole.USER, request.question());
+            memoryService.storeMessage(userId, ChatRole.ASSISTANT, answer);
+            memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
+
+            return AiResponse.success(answer, geminiClient.model());
+        } catch (Exception e) {
+            log.error("Error while processing memory-aware question: ", e);
             return AiResponse.error("Failed to get response: " + e.getMessage());
         }
     }
@@ -58,62 +75,41 @@ public class GeminiAiService {
         return request.question();
     }
 
-    private String callGeminiApi(String message) {
-        String url = baseUrl + "/" + model + ":generateContent?key=" + apiKey;
-        log.debug("Request to model: {} at URL: {}", model, baseUrl + "/" + model);
+    private String buildMemoryAwarePrompt(UserMemory memory, UserQuestionRequest request) {
+        String memoryData = memoryService.buildMemoryData(memory);
+        boolean introductionMode = memoryService.isIntroductionMode(memory);
 
-        var request = new GeminiRequest(List.of(
-                new GeminiRequest.Content(List.of(
-                        new GeminiRequest.Part(message)
-                ))
-        ));
+        String contextBlock = """
+                CONTEXT:
+                %s
+                """.formatted(memoryData);
 
-        int maxRetries = 3;
-        int retryCount = 0;
+        String systemInstruction = """
+                SYSTEM:
+                Sen Aura'sın, SecondHand çok kategorili ikinci el platformunun merkezi zekasısın.
+                Uzmanlık alanların: Elektronik (Telefon, PC), Kitap, Giyim, Gayrimenkul (Emlak), Spor Ekipmanları ve Otomobil.
+                Rolün: Kullanıcının bu kategorilerde ürün alırken veya satarken en doğru kararı vermesini sağlamak; riskleri azaltmak; doğru soruları sormak; doğrulama adımlarını ve güvenli ticaret önerilerini vermek.
 
-        while (retryCount < maxRetries) {
-            try {
-                GeminiResponse response = restTemplate.postForObject(url, request, GeminiResponse.class);
+                Kategori bazlı jargon:
+                - Elektronik: pil sağlığı, garanti durumu, ekran/kasa çizik-darbe analizi, parça değişimi, IMEI/seri no doğrulama.
+                - Gayrimenkul: tapu durumu, cephe, ısınma tipi, aidat, deprem riski, lokasyon ve ulaşım analizi.
+                - Giyim: kumaş kalitesi, beden uyumu, dikiş/etiket, orijinallik kontrolü, leke/yıpranma.
+                - Kitap: basım yılı, baskı/edisyon, kondisyon, sayfa/kapak durumu, nadir eser kontrolü.
 
-                if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                    String responseText = response.candidates().get(0).content().parts().get(0).text();
-                    log.info("Response received successfully: {} characters", responseText.length());
-                    return responseText;
-                }
+                Kesin sınırlar:
+                - Platform dışı her şeyi reddet. Yemek tarifi, yazılım soruları, okul ödevleri gibi isteklerde şu metinle yanıt ver:
+                  "Ben Aura, senin SecondHand asistanınım. Enerjimi senin için doğru ürünü bulmaya veya güvenli ticaret yapmana harcamalıyım. Bu konuda yardımcı olamam ama platformdaki kategorilerimizle ilgili sorun varsa cevaplayabilirim."
 
-                log.warn("Empty response received for message: {}", message);
-                return "Empty response from AI.";
+                Bu bağlamı dikkate al: CONTEXT içindeki secondHandProfileJson alanında kullanıcının ilgilendiği kategoriler, bütçe ve marka tercihleri olabilir. Cevabını buna göre kişiselleştir ve eksikse netleştirici sorular sor.
+                """;
 
-            } catch (HttpClientErrorException.TooManyRequests e) {
-                retryCount++;
-                log.warn("Rate limit exceeded. Retry {}/{}", retryCount, maxRetries);
+        String introInstruction = introductionMode ? """
+                Kullanıcıyla ilk kez karşılaşıyorsun. Kendini tanıt, onun kim olduğunu ve neye ihtiyacı olduğunu öğrenmek için samimi bir sohbet başlat.
+                """ : "";
 
-                if (retryCount < maxRetries) {
-                    try {
-                        long waitTime = (long) Math.pow(2, retryCount) * 1000;
-                        log.info("Waiting {}ms before retry...", waitTime);
-                        Thread.sleep(waitTime);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        log.error("Sleep interrupted", ie);
-                        throw new RuntimeException("Process interrupted", ie);
-                    }
-                } else {
-                    log.error("Max retry limit reached: {}", e.getMessage());
-                    throw new RuntimeException("Rate limit exceeded. Please try again in a few minutes.");
-                }
+        String questionBlock = buildPrompt(request);
 
-            } catch (HttpClientErrorException e) {
-                log.error("HTTP Error: Status={}, Body={}", e.getStatusCode(), e.getResponseBodyAsString());
-                throw new RuntimeException("API Error: " + e.getStatusCode() + " - " + e.getMessage());
-
-            } catch (Exception e) {
-                log.error("Unexpected Gemini API Error: ", e);
-                throw new RuntimeException("Unexpected error occurred: " + e.getMessage());
-            }
-        }
-
-        throw new RuntimeException("Request failed after maximum retries.");
+        return contextBlock + "\n" + systemInstruction + "\n" + introInstruction + "\nUSER:\n" + questionBlock;
     }
 
 }
