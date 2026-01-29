@@ -27,6 +27,7 @@ import {
     Receipt,
     Settings,
     ShoppingBag,
+    Sparkles,
     TrendingUp,
     User,
     X
@@ -299,6 +300,9 @@ const Header = () => {
                                     </div>
                                     <Link to={ROUTES.DASHBOARD} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
                                         <Settings className="w-4 h-4 mr-3" /> Dashboard
+                                    </Link>
+                                    <Link to={ROUTES.AURA_CHAT} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
+                                        <Sparkles className="w-4 h-4 mr-3" /> Aura Assistant
                                     </Link>
                                     <Link to={ROUTES.MY_LISTINGS} className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1">
                                         <Package className="w-4 h-4 mr-3" /> Inventory

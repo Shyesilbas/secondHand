@@ -31,6 +31,7 @@ export const ROUTES = {
     EWALLET: '/ewallet',
     EMAILS: '/emails',
     CHAT: '/chat',
+    AURA_CHAT: '/aura',
     AGREEMENTS: '/agreements',
     AGREEMENTS_ALL: '/agreements/all',
     SECURITY: '/security',

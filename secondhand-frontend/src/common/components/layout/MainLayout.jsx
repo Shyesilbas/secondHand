@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
 import { getPageName } from '../../utils/getPageName.js';
+import AuraChatWidget from '../../../ai/components/AuraChatWidget.jsx';
 
 const MainLayout = () => {
     const { pathname } = useLocation();
@@ -18,6 +19,7 @@ const MainLayout = () => {
                 <Outlet />
             </main>
             <Footer />
+            <AuraChatWidget />
         </div>
     );
 };
