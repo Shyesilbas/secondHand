@@ -12,6 +12,7 @@ import com.serhat.secondhand.ai.memory.repository.ChatMessageRepository;
 import com.serhat.secondhand.ai.memory.repository.UserMemoryRepository;
 import com.serhat.secondhand.ai.service.GeminiClient;
 import jakarta.transaction.Transactional;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,6 +29,9 @@ public class MemoryService {
 
     private static final String DEFAULT_TONE = "Friendly";
     private static final int SUMMARY_MAX_CHARS = 8000;
+    private static final int MEMORY_UPDATE_EVERY_N_USER_MESSAGES = 3;
+    private static final int MIN_MESSAGE_LENGTH_FOR_MEMORY_UPDATE = 10;
+    private static final Pattern MEMORY_TRIGGER_KEYWORDS = Pattern.compile("\\b(adım|bütçem|arıyorum|satıyorum|konumum|telefonum)\\b", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern NAME_TR_PATTERN = Pattern.compile("\\b(?:adım|benim adım)\\s+([\\p{L}][\\p{L} '-]{1,60})\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern NAME_EN_PATTERN = Pattern.compile("\\b(?:my name is|i am|i'm)\\s+([\\p{L}][\\p{L} '-]{1,60})\\b", Pattern.CASE_INSENSITIVE);
@@ -65,14 +69,28 @@ public class MemoryService {
         chatMessageRepository.save(new ChatMessage(userId, role, normalize(message), Instant.now()));
     }
 
-    @Transactional
+    @Async("taskExecutor")
     public void updateMemoryFromInteraction(Long userId, String userMessage, String assistantAnswer) {
-        UserMemory memory = getOrCreate(userId);
-        MemoryExtraction extraction = extractMemoryWithAi(memory, userMessage, assistantAnswer);
-        applyAiExtraction(memory, extraction);
-        applyFallbackHeuristics(memory, extraction, userMessage);
-        userMemoryRepository.save(memory);
-        refreshSummary(userId);
+        try {
+            updateMemoryFromInteractionInternal(userId, userMessage, assistantAnswer);
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    public boolean shouldUpdateMemory(Long userId, String userMessage) {
+        if (userId == null) {
+            return false;
+        }
+        long userMessageCount = chatMessageRepository.countByUserIdAndRole(userId, ChatRole.USER);
+        if (userMessageCount > 0 && userMessageCount % MEMORY_UPDATE_EVERY_N_USER_MESSAGES == 0) {
+            return true;
+        }
+        String normalized = normalize(userMessage);
+        if (normalized == null || normalized.length() < MIN_MESSAGE_LENGTH_FOR_MEMORY_UPDATE) {
+            return false;
+        }
+        return MEMORY_TRIGGER_KEYWORDS.matcher(normalized).find();
     }
 
     @Transactional
@@ -87,6 +105,21 @@ public class MemoryService {
         String summary = trimToMax(sb.toString().trim(), SUMMARY_MAX_CHARS);
         memory.setSummaryOfPastConversations(summary);
         userMemoryRepository.save(memory);
+    }
+
+    @Transactional
+    public void clearConversationHistory(Long userId) {
+        chatMessageRepository.deleteByUserId(userId);
+        userMemoryRepository.findById(userId).ifPresent(memory -> {
+            memory.setSummaryOfPastConversations(null);
+            userMemoryRepository.save(memory);
+        });
+    }
+
+    @Transactional
+    public void deleteMemory(Long userId) {
+        chatMessageRepository.deleteByUserId(userId);
+        userMemoryRepository.deleteById(userId);
     }
 
     public String buildMemoryData(UserMemory memory) {
@@ -144,11 +177,21 @@ public class MemoryService {
         );
 
         try {
-            String raw = geminiClient.generateText(prompt);
+            String raw = geminiClient.generateTextForMemory(prompt);
             return parseExtraction(raw);
         } catch (Exception e) {
             return new MemoryExtraction(null, null, List.of(), null, null);
         }
+    }
+
+    @Transactional
+    void updateMemoryFromInteractionInternal(Long userId, String userMessage, String assistantAnswer) {
+        UserMemory memory = getOrCreate(userId);
+        MemoryExtraction extraction = extractMemoryWithAi(memory, userMessage, assistantAnswer);
+        applyAiExtraction(memory, extraction);
+        applyFallbackHeuristics(memory, extraction, userMessage);
+        userMemoryRepository.save(memory);
+        refreshSummary(userId);
     }
 
     private MemoryExtraction parseExtraction(String raw) {

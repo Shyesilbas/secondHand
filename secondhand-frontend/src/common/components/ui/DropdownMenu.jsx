@@ -21,7 +21,7 @@ const DropdownMenu = ({
         };
 
         if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('click', handleClickOutside);
             if (menuRef.current && align === 'right') {
                 const rect = menuRef.current.getBoundingClientRect();
                 const viewportWidth = window.innerWidth;
@@ -33,12 +33,12 @@ const DropdownMenu = ({
         }
         
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('click', handleClickOutside);
         };
     }, [isOpen, align]);
 
     return (
-        <div className={`relative ${className}`} ref={dropdownRef}>
+        <div className={`relative ${isOpen ? 'z-[9999]' : ''} ${className}`} ref={dropdownRef}>
             <div
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-1 text-text-secondary hover:text-btn-primary transition-colors cursor-pointer"
@@ -59,7 +59,7 @@ const DropdownMenu = ({
             {isOpen && (
                 <div
                     ref={menuRef}
-                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-background-primary rounded-lg shadow-lg border border-sidebar-border py-2 z-50 ${menuClassName || ''}`}
+                    className={`absolute top-full ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-56 bg-background-primary rounded-lg shadow-lg border border-sidebar-border py-2 z-[9999] pointer-events-auto ${menuClassName || ''}`}
                     style={{
                         maxWidth: 'min(100vw - 2rem, 14rem)'
                     }}

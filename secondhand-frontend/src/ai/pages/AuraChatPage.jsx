@@ -2,12 +2,13 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { aiChatService } from '../services/aiChatService.js';
-import { Send, Sparkles } from 'lucide-react';
+import { RotateCcw, Send, Sparkles, Trash2 } from 'lucide-react';
 
 const AuraChatPage = () => {
   const { user } = useAuth();
   const location = useLocation();
   const listing = location?.state?.listing || null;
+  const storageKey = useMemo(() => (user?.id != null ? `aura.chat.started.${user.id}` : 'aura.chat.started.anonymous'), [user?.id]);
 
   const [messages, setMessages] = useState(() => [
     {
@@ -115,6 +116,119 @@ const AuraChatPage = () => {
     }
   };
 
+  const handleNewChat = async () => {
+    if (userId == null) {
+      setMessages([
+        {
+          id: `aura-error-${Date.now()}`,
+          role: 'assistant',
+          content: 'Oturum bilgisi bulunamadı. Lütfen giriş yapıp tekrar dene.',
+          createdAt: Date.now(),
+        },
+      ]);
+      return;
+    }
+    setIsSending(true);
+    try {
+      await aiChatService.newChat({ userId });
+      localStorage.removeItem(storageKey);
+      setMessages([
+        {
+          id: `aura-${Date.now()}`,
+          role: 'assistant',
+          content: 'Yeni sohbet başlatıldı. Ne arıyorsun, hangi kategoride?',
+          createdAt: Date.now(),
+        },
+      ]);
+      queueMicrotask(scrollToBottom);
+    } catch (e) {
+      const errorMessage = e?.response?.data?.message || e?.message || 'Yeni sohbet başlatılamadı.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `aura-error-${Date.now()}`,
+          role: 'assistant',
+          content: errorMessage,
+          createdAt: Date.now(),
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleDeleteHistory = async () => {
+    if (userId == null) {
+      return;
+    }
+    if (!window.confirm('Geçmiş konuşmalar silinsin mi?')) {
+      return;
+    }
+    setIsSending(true);
+    try {
+      await aiChatService.deleteHistory({ userId });
+      localStorage.removeItem(storageKey);
+      setMessages([
+        {
+          id: `aura-${Date.now()}`,
+          role: 'assistant',
+          content: 'Geçmiş konuşmalar silindi. Yeni bir sohbet başlatabiliriz.',
+          createdAt: Date.now(),
+        },
+      ]);
+      queueMicrotask(scrollToBottom);
+    } catch (e) {
+      const errorMessage = e?.response?.data?.message || e?.message || 'Silme işlemi başarısız.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `aura-error-${Date.now()}`,
+          role: 'assistant',
+          content: errorMessage,
+          createdAt: Date.now(),
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleDeleteMemory = async () => {
+    if (userId == null) {
+      return;
+    }
+    if (!window.confirm('Hafızan (memory) ve sohbet geçmişin tamamen silinsin mi?')) {
+      return;
+    }
+    setIsSending(true);
+    try {
+      await aiChatService.deleteMemory({ userId });
+      localStorage.removeItem(storageKey);
+      setMessages([
+        {
+          id: `aura-${Date.now()}`,
+          role: 'assistant',
+          content: 'Hafızan silindi. Yeni bir sohbet başlatabilirsin.',
+          createdAt: Date.now(),
+        },
+      ]);
+      queueMicrotask(scrollToBottom);
+    } catch (e) {
+      const errorMessage = e?.response?.data?.message || e?.message || 'Silme işlemi başarısız.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `aura-error-${Date.now()}`,
+          role: 'assistant',
+          content: errorMessage,
+          createdAt: Date.now(),
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const onKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -145,6 +259,41 @@ const AuraChatPage = () => {
             <div className="text-sm font-semibold text-slate-900 tracking-tight">
               {userId ?? '—'}
             </div>
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleNewChat}
+              disabled={isSending}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              New chat
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteHistory}
+              disabled={isSending}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-100 text-slate-900 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Geçmiş konuşmaları sil
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteMemory}
+              disabled={isSending}
+              className="inline-flex items-center gap-2 rounded-xl bg-red-50 text-red-700 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Memory’mi sil
+            </button>
+          </div>
+          <div className="mt-2 text-xs text-slate-500 tracking-tight">
+            New chat: geçmişi temizler, hafızanı korur. Memory’mi sil: hafıza + geçmişi tamamen siler.
           </div>
         </div>
 
@@ -185,7 +334,7 @@ const AuraChatPage = () => {
               <button
                 onClick={handleSend}
                 disabled={isSending || !input.trim()}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 text-sm font-semibold tracking-tight cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
               >
                 <Send className="w-4 h-4" />
                 Send
