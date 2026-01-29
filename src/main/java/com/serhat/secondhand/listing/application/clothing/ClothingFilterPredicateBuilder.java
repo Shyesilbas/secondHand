@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,13 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
         
         // Clothing-specific filters
         if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
-            predicates.add(root.get("brand").in(filters.getBrands()));
+            Join<Object, Object> brandJoin = root.join("brand");
+            predicates.add(brandJoin.get("id").in(filters.getBrands()));
         }
         
         if (filters.getTypes() != null && !filters.getTypes().isEmpty()) {
-            predicates.add(root.get("clothingType").in(filters.getTypes()));
+            Join<Object, Object> typeJoin = root.join("clothingType");
+            predicates.add(typeJoin.get("id").in(filters.getTypes()));
         }
         
         if (filters.getColors() != null && !filters.getColors().isEmpty()) {
@@ -66,8 +69,8 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
         return switch (sortBy) {
             case "price" -> Optional.of(root.get("price"));
             case "createdat", "created_at" -> Optional.of(root.get("createdAt"));
-            case "brand" -> Optional.of(root.get("brand"));
-            case "type" -> Optional.of(root.get("clothingType"));
+            case "brand" -> Optional.of(root.join("brand").get("label"));
+            case "type" -> Optional.of(root.join("clothingType").get("label"));
             case "condition" -> Optional.of(root.get("condition"));
             case "clothingGender" -> Optional.of(root.get("clothingGender"));
             case "clothingCategory" -> Optional.of(root.get("clothingCategory"));

@@ -20,19 +20,20 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class RealEstateListing extends Listing {
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "real_estate_type_id", nullable = false)
     private RealEstateType realEstateType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "heating_type", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "heating_type_id", nullable = false)
     private HeatingType heatingType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ad_type", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ad_type_id", nullable = false)
     private RealEstateAdType adType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "owner_type", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_type_id", nullable = false)
     private ListingOwnerType ownerType;
 
     @Column(name = "square_meters", nullable = false)

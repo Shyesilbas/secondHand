@@ -1,14 +1,13 @@
 package com.serhat.secondhand.listing.domain.dto.request.electronics;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record ElectronicCreateRequest (
         String title,
@@ -20,9 +19,9 @@ public record ElectronicCreateRequest (
         Integer quantity,
         String city,
         String district,
-        ElectronicType electronicType,
-        ElectronicBrand electronicBrand,
-        String model,
+        UUID electronicTypeId,
+        UUID electronicBrandId,
+        UUID electronicModelId,
         String origin,
         boolean warrantyProof,
         int year,

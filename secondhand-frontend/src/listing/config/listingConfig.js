@@ -45,7 +45,7 @@ export const listingTypeConfig = {
     ],
     
     compactBadges: (listing) => [
-      { label: listing.brand, icon: '🚗', show: !!listing.brand },
+      { label: listing.brand?.label || listing.brand?.name || listing.brand, icon: '🚗', show: !!listing.brand },
       { label: listing.year, icon: '📅', show: !!listing.year },
       { 
         label: listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : null, 
@@ -80,8 +80,8 @@ export const listingTypeConfig = {
     ],
     
     compactBadges: (listing) => [
-      { label: listing.electronicType, icon: '📱', show: !!listing.electronicType },
-      { label: listing.electronicBrand, icon: '🏷️', show: !!listing.electronicBrand },
+      { label: listing.electronicType?.label || listing.electronicType?.name || listing.electronicType, icon: '📱', show: !!listing.electronicType },
+      { label: listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand, icon: '🏷️', show: !!listing.electronicBrand },
       { label: listing.year, icon: '📅', show: !!listing.year },
       { label: listing.color, icon: '🎨', show: !!listing.color },
     ].filter(badge => badge.show),
@@ -156,14 +156,14 @@ export const listingTypeConfig = {
     ],
     
     compactBadges: (listing) => [
-      { label: listing.brand, icon: '🏷️', show: !!listing.brand },
-      { label: listing.clothingType, icon: '👕', show: !!listing.clothingType },
+      { label: listing.brand?.label || listing.brand?.name || listing.brand, icon: '🏷️', show: !!listing.brand },
+      { label: listing.clothingType?.label || listing.clothingType?.name || listing.clothingType, icon: '👕', show: !!listing.clothingType },
       { label: listing.color, icon: '🎨', show: !!listing.color },
       { label: listing.condition, icon: '⭐', show: !!listing.condition },
       { label: listing.clothingGender, icon: '👤', show: !!listing.clothingGender },
       { label: listing.clothingCategory, icon: '👶', show: !!listing.clothingCategory },
       { 
-        label: listing.purchaseDate ? new Date(listing.purchaseDate).toLocaleDateString() : null, 
+        label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, 
         icon: '📅', 
         show: !!listing.purchaseDate 
       },

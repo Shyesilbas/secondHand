@@ -1,34 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.clothing;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum ClothingBrand {
-    NIKE("Nike"),
-    ADIDAS("Adidas"),
-    PUMA("Puma"),
-    UNDER_ARMOUR("Under Armour"),
-    ZARA("Zara"),
-    H_M("H&M"),
-    UNIQLO("Uniqlo"),
-    GAP("Gap"),
-    TOMMY_HILFIGER("Tommy Hilfiger"),
-    CALVIN_KLEIN("Calvin Klein"),
-    LACOSTE("Lacoste"),
-    RALPH_LAUREN("Ralph Lauren"),
-    LEVI_S("Levi's"),
-    DIESEL("Diesel"),
-    ARMANI("Armani"),
-    GUCCI("Gucci"),
-    PRADA("Prada"),
-    LOUIS_VUITTON("Louis Vuitton"),
-    CHANEL("Chanel"),
-    HERMES("Hermès"),
-    OTHER("Other");
+import java.util.UUID;
 
-    private final String label;
+@Entity
+@Table(name = "clothing_brands")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ClothingBrand {
 
-    ClothingBrand(String label) {
-        this.label = label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(nullable = false, length = 120)
+    private String label;
 }

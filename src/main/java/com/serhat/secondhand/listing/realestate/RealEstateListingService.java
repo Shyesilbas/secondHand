@@ -11,7 +11,11 @@ import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateLi
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
+import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
+import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepository;
+import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,10 @@ public class RealEstateListingService {
     private final RealEstateListingFilterService realEstateListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final UserService userService;
+    private final RealEstateTypeRepository realEstateTypeRepository;
+    private final RealEstateAdTypeRepository realEstateAdTypeRepository;
+    private final HeatingTypeRepository heatingTypeRepository;
+    private final ListingOwnerTypeRepository listingOwnerTypeRepository;
 
     @Transactional
     public Result<UUID> createRealEstateListing(RealEstateCreateRequest request, Long sellerId) {
@@ -50,6 +58,10 @@ public class RealEstateListingService {
         realEstateListing.setSeller(seller);
         realEstateListing.setStatus(ListingStatus.ACTIVE);
         realEstateListing.setListingFeePaid(true);
+        realEstateListing.setAdType(resolveAdType(request.adTypeId()));
+        realEstateListing.setRealEstateType(resolveRealEstateType(request.realEstateTypeId()));
+        realEstateListing.setHeatingType(resolveHeatingType(request.heatingTypeId()));
+        realEstateListing.setOwnerType(resolveOwnerType(request.ownerTypeId()));
 
         RealEstateListing saved = realEstateRepository.save(realEstateListing);
         log.info("Real estate listing created: {}", saved.getId());
@@ -89,10 +101,10 @@ public class RealEstateListingService {
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
 
-        request.adType().ifPresent(existing::setAdType);
-        request.realEstateType().ifPresent(existing::setRealEstateType);
-        request.heatingType().ifPresent(existing::setHeatingType);
-        request.ownerType().ifPresent(existing::setOwnerType);
+        request.adTypeId().ifPresent(idValue -> existing.setAdType(resolveAdType(idValue)));
+        request.realEstateTypeId().ifPresent(idValue -> existing.setRealEstateType(resolveRealEstateType(idValue)));
+        request.heatingTypeId().ifPresent(idValue -> existing.setHeatingType(resolveHeatingType(idValue)));
+        request.ownerTypeId().ifPresent(idValue -> existing.setOwnerType(resolveOwnerType(idValue)));
         request.squareMeters().ifPresent(existing::setSquareMeters);
         request.roomCount().ifPresent(existing::setRoomCount);
         request.bathroomCount().ifPresent(existing::setBathroomCount);
@@ -127,5 +139,33 @@ public class RealEstateListingService {
         RealEstateListing realEstateListing = realEstateRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Real Estate listing not found"));
         return listingMapper.toRealEstateDto(realEstateListing);
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType resolveRealEstateType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return realEstateTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Real estate type not found"));
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType resolveAdType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return realEstateAdTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Real estate ad type not found"));
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType resolveHeatingType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return heatingTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Heating type not found"));
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType resolveOwnerType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return listingOwnerTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Owner type not found"));
     }
 }

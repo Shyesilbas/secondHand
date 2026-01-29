@@ -4,6 +4,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record VehicleCreateRequest(
     String title,
@@ -12,8 +13,8 @@ public record VehicleCreateRequest(
     Currency currency,
     String city,
     String district,
-    CarBrand brand,
-    String model,
+    UUID brandId,
+    UUID vehicleModelId,
     Integer year,
     Integer mileage,
     Integer engineCapacity,

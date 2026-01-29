@@ -7,7 +7,6 @@ import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUp
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,7 +79,7 @@ public class ElectronicListingController {
     @GetMapping("/electronicType/{electronicType}")
     @Operation(summary = "Find electronics by type")
     public ResponseEntity<List<ElectronicListingDto>> findByElectronicType(
-            @PathVariable ElectronicType electronicType) {
+            @PathVariable UUID electronicType) {
         List<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType);
         return ResponseEntity.ok(electronicDto);
     }

@@ -85,6 +85,10 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "REAL_ESTATE")
+    @Mapping(target = "adType", ignore = true)
+    @Mapping(target = "realEstateType", ignore = true)
+    @Mapping(target = "heatingType", ignore = true)
+    @Mapping(target = "ownerType", ignore = true)
     public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -94,6 +98,8 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "VEHICLE")
+    @Mapping(target = "brand", ignore = true)
+    @Mapping(target = "model", ignore = true)
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -103,6 +109,9 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "ELECTRONICS")
+    @Mapping(target = "electronicType", ignore = true)
+    @Mapping(target = "electronicBrand", ignore = true)
+    @Mapping(target = "model", ignore = true)
     public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -112,6 +121,9 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "CLOTHING")
+    @Mapping(target = "brand", ignore = true)
+    @Mapping(target = "clothingType", ignore = true)
+    @Mapping(target = "purchaseDate", ignore = true)
     public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
     @Mapping(target = "id", ignore = true)

@@ -139,7 +139,7 @@ export const API_ENDPOINTS = {
         CREATE: '/v1/vehicles/create-listing',
         BY_ID: (id) => `/v1/vehicles/${id}`,
         UPDATE: (id) => `/v1/vehicles/${id}`,
-        BY_BRAND_MODEL: (brand, model) => `/v1/vehicles/brand/${brand}/model/${model}`,
+        BY_BRAND_MODEL: (brandId, modelId) => `/v1/vehicles/brand/${brandId}/model/${modelId}`,
         BRANDS: '/v1/vehicles/brands',
         FILTER: '/v1/vehicles/filter',
     },

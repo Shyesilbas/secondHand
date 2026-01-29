@@ -10,8 +10,8 @@ export const VehicleCreateRequestDTO = {
   district: '',
   imageUrl: '',
   
-    brand: '',
-  model: '',
+    brandId: '',
+  vehicleModelId: '',
   year: 0,
   mileage: 0,
   engineCapacity: 0,
@@ -38,8 +38,8 @@ export const VehicleCreateRequestDTO = {
 export const VehicleListingDTO = {
   ...ListingDTO,
   imageUrl: '',
-    brand: '',
-  model: '',
+    brand: null,
+  model: null,
   year: 0,
   mileage: 0,
   engineCapacity: 0,
@@ -72,8 +72,8 @@ export const createVehicleCreateRequest = (data) => {
     district: (data.district || '').trim(),
     imageUrl: data.imageUrl || undefined,
     
-        brand: data.brand || '',
-    model: (data.model || '').trim(),
+        brandId: data.brandId || null,
+    vehicleModelId: data.vehicleModelId || null,
     year: parseInt(data.year) || 0,
     mileage: parseInt(data.mileage) || 0,
     engineCapacity: parseInt(data.engineCapacity) || 0,
@@ -105,7 +105,9 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
   if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
-  if (data.model !== undefined && data.model !== '') updateData.model = data.model.trim();
+  if (data.brandId !== undefined && data.brandId !== '') updateData.brandId = data.brandId;
+  if (data.vehicleModelId !== undefined && data.vehicleModelId !== '') updateData.vehicleModelId = data.vehicleModelId;
+  if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
   if (data.mileage !== undefined && data.mileage !== '') updateData.mileage = parseInt(data.mileage);
   if (data.engineCapacity !== undefined && data.engineCapacity !== '') updateData.engineCapacity = parseInt(data.engineCapacity);
   if (data.gearbox !== undefined && data.gearbox !== '') updateData.gearbox = data.gearbox;

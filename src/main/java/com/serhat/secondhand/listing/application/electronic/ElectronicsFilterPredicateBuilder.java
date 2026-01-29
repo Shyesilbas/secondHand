@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,14 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         predicates.add(cb.equal(root.get("listingType"), ListingType.ELECTRONICS));
         
         // Electronics-specific filters
-        if (filters.getElectronicTypes() != null && !filters.getElectronicTypes().isEmpty()) {
-            predicates.add(root.get("electronicType").in(filters.getElectronicTypes()));
+        if (filters.getElectronicTypeIds() != null && !filters.getElectronicTypeIds().isEmpty()) {
+            Join<Object, Object> typeJoin = root.join("electronicType");
+            predicates.add(typeJoin.get("id").in(filters.getElectronicTypeIds()));
         }
         
-        if (filters.getElectronicBrands() != null && !filters.getElectronicBrands().isEmpty()) {
-            predicates.add(root.get("electronicBrand").in(filters.getElectronicBrands()));
+        if (filters.getElectronicBrandIds() != null && !filters.getElectronicBrandIds().isEmpty()) {
+            Join<Object, Object> brandJoin = root.join("electronicBrand");
+            predicates.add(brandJoin.get("id").in(filters.getElectronicBrandIds()));
         }
         
         if (filters.getColors() != null && !filters.getColors().isEmpty()) {
@@ -76,9 +79,9 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         return switch (sortBy) {
             case "price" -> Optional.of(root.get("price"));
             case "year" -> Optional.of(root.get("year"));
-            case "brand" -> Optional.of(root.get("electronicBrand"));
-            case "type" -> Optional.of(root.get("electronicType"));
-            case "model" -> Optional.of(root.get("model"));
+            case "brand" -> Optional.of(root.join("electronicBrand").get("label"));
+            case "type" -> Optional.of(root.join("electronicType").get("label"));
+            case "model" -> Optional.of(root.join("model").get("name"));
             default -> Optional.empty();
         };
     }

@@ -2,11 +2,15 @@ package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,13 +27,17 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class ElectronicListing extends Listing {
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "electronic_type_id")
     private ElectronicType electronicType;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "electronic_brand_id")
     private ElectronicBrand electronicBrand;
 
-    private String model;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "electronic_model_id")
+    private ElectronicModel model;
 
     private String origin;
 

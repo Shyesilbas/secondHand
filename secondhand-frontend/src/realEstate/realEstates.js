@@ -10,10 +10,10 @@ export const RealEstateCreateRequestDTO = {
   district: '',
   imageUrl: '',
   
-    adType: '',
-  realEstateType: '',
-  heatingType: '',
-  ownerType: '',
+    adTypeId: '',
+  realEstateTypeId: '',
+  heatingTypeId: '',
+  ownerTypeId: '',
   squareMeters: 0,
   roomCount: 0,
   bathroomCount: 0,
@@ -25,10 +25,10 @@ export const RealEstateCreateRequestDTO = {
 export const RealEstateListingDTO = {
   ...ListingDTO,
   imageUrl: '',
-    adType: '',
-  realEstateType: '',
-  heatingType: '',
-  ownerType: '',
+    adType: null,
+  realEstateType: null,
+  heatingType: null,
+  ownerType: null,
   squareMeters: 0,
   roomCount: 0,
   bathroomCount: 0,
@@ -46,10 +46,10 @@ export const RealEstateSearchFiltersDTO = {
   maxPrice: 0,
   currency: 'TRY',
   
-    adType: '',
-  realEstateTypes: [],
-  heatingTypes: [],
-  ownerType: '',
+    adTypeId: '',
+  realEstateTypeIds: [],
+  heatingTypeIds: [],
+  ownerTypeId: '',
   minSquareMeters: 0,
   maxSquareMeters: 0,
   minRoomCount: 0,
@@ -78,10 +78,10 @@ export const createRealEstateCreateRequest = (data) => {
     district: (data.district || '').trim(),
     imageUrl: data.imageUrl || undefined,
     
-        adType: data.adType || '',
-    realEstateType: data.realEstateType || '',
-    heatingType: data.heatingType || '',
-    ownerType: data.ownerType || '',
+        adTypeId: data.adTypeId || null,
+    realEstateTypeId: data.realEstateTypeId || null,
+    heatingTypeId: data.heatingTypeId || null,
+    ownerTypeId: data.ownerTypeId || null,
     squareMeters: parseInt(data.squareMeters) || 0,
     roomCount: parseInt(data.roomCount) || 0,
     bathroomCount: parseInt(data.bathroomCount) || 0,
@@ -100,10 +100,10 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
   if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
-  if (data.adType !== undefined && data.adType !== '') updateData.adType = data.adType;
-  if (data.realEstateType !== undefined && data.realEstateType !== '') updateData.realEstateType = data.realEstateType;
-  if (data.heatingType !== undefined && data.heatingType !== '') updateData.heatingType = data.heatingType;
-  if (data.ownerType !== undefined && data.ownerType !== '') updateData.ownerType = data.ownerType;
+  if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
+  if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
+  if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;
+  if (data.ownerTypeId !== undefined && data.ownerTypeId !== '') updateData.ownerTypeId = data.ownerTypeId;
   if (data.squareMeters !== undefined && data.squareMeters !== '') updateData.squareMeters = parseInt(data.squareMeters);
   if (data.roomCount !== undefined && data.roomCount !== '') updateData.roomCount = parseInt(data.roomCount);
   if (data.bathroomCount !== undefined && data.bathroomCount !== '') updateData.bathroomCount = parseInt(data.bathroomCount);

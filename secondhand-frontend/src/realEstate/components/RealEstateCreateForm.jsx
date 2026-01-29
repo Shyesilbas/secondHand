@@ -54,18 +54,21 @@ const RealEstateCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                   <p className="text-xs text-slate-500 mt-1 tracking-tight">İlan tipi, gayrimenkul tipi ve sahiplik durumu</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {['adType', 'realEstateType', 'heatingType', 'ownerType'].map((field) => (
-                      <div key={field}>
-                        <EnumDropdown
-                            label={`${field.replace(/([A-Z])/g, ' $1')} *`}
-                            enumKey={field === 'adType' ? 'realEstateAdTypes' :
-                                field === 'realEstateType' ? 'realEstateTypes' :
-                                    field === 'heatingType' ? 'heatingTypes' : 'ownerTypes'}
-                            value={formData[field]}
-                            onChange={(v) => handleDropdownChange(field, v)}
-                        />
-                        {errors[field] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field]}</p>}
-                      </div>
+                  {[
+                    { key: 'adTypeId', label: 'Ad Type *', enumKey: 'realEstateAdTypes' },
+                    { key: 'realEstateTypeId', label: 'Property Type *', enumKey: 'realEstateTypes' },
+                    { key: 'heatingTypeId', label: 'Heating Type *', enumKey: 'heatingTypes' },
+                    { key: 'ownerTypeId', label: 'Owner Type *', enumKey: 'ownerTypes' },
+                  ].map((field) => (
+                    <div key={field.key}>
+                      <EnumDropdown
+                        label={field.label}
+                        enumKey={field.enumKey}
+                        value={formData[field.key]}
+                        onChange={(v) => handleDropdownChange(field.key, v)}
+                      />
+                      {errors[field.key] && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors[field.key]}</p>}
+                    </div>
                   ))}
                 </div>
               </div>

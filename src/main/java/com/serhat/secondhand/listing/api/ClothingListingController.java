@@ -7,8 +7,6 @@ import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateR
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -80,8 +78,8 @@ public class ClothingListingController {
     @GetMapping("/brand/{brand}/type/{clothingType}")
     @Operation(summary = "Find clothing by brand and type")
     public ResponseEntity<List<ClothingListingDto>> findByBrandAndClothingType(
-            @PathVariable ClothingBrand brand,
-            @PathVariable ClothingType clothingType) {
+            @PathVariable UUID brand,
+            @PathVariable UUID clothingType) {
         List<ClothingListingDto> clothing = clothingListingService.findByBrandAndClothingType(brand, clothingType);
         return ResponseEntity.ok(clothing);
     }

@@ -33,7 +33,7 @@ const createFilterPayload = (filters, listingType) => {
 
   switch (typeUpper) {
     case LISTING_TYPES.VEHICLE:
-      payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
+      payload.brandIds = Array.isArray(filters.brandIds) ? filters.brandIds : [];
       payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
       payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
       payload.maxMileage = filters.maxMileage ? parseInt(filters.maxMileage) : null;
@@ -47,9 +47,8 @@ const createFilterPayload = (filters, listingType) => {
       break;
 
     case LISTING_TYPES.ELECTRONICS:
-      payload.electronicTypes = Array.isArray(filters.electronicTypes) ? filters.electronicTypes : [];
-      payload.electronicBrands = Array.isArray(filters.electronicBrands) ? filters.electronicBrands : [];
-      payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
+      payload.electronicTypeIds = Array.isArray(filters.electronicTypeIds) ? filters.electronicTypeIds : [];
+      payload.electronicBrandIds = Array.isArray(filters.electronicBrandIds) ? filters.electronicBrandIds : [];
       payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
       payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
       payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
@@ -63,14 +62,31 @@ const createFilterPayload = (filters, listingType) => {
       break;
 
     case LISTING_TYPES.REAL_ESTATE:
-      payload.realEstateTypes = Array.isArray(filters.realEstateTypes) ? filters.realEstateTypes : [];
-      payload.adTypes = Array.isArray(filters.adTypes) ? filters.adTypes : [];
+      payload.realEstateTypeIds = Array.isArray(filters.realEstateTypeIds) ? filters.realEstateTypeIds : [];
+      payload.heatingTypeIds = Array.isArray(filters.heatingTypeIds) ? filters.heatingTypeIds : [];
+      payload.adTypeId = filters.adTypeId || null;
+      payload.ownerTypeId = filters.ownerTypeId || null;
+      payload.minSquareMeters = filters.minSquareMeters ? parseInt(filters.minSquareMeters) : null;
+      payload.maxSquareMeters = filters.maxSquareMeters ? parseInt(filters.maxSquareMeters) : null;
+      payload.minRoomCount = filters.minRoomCount ? parseInt(filters.minRoomCount) : null;
+      payload.maxRoomCount = filters.maxRoomCount ? parseInt(filters.maxRoomCount) : null;
+      payload.minBathroomCount = filters.minBathroomCount ? parseInt(filters.minBathroomCount) : null;
+      payload.maxBathroomCount = filters.maxBathroomCount ? parseInt(filters.maxBathroomCount) : null;
+      payload.floor = filters.floor ? parseInt(filters.floor) : null;
+      payload.minBuildingAge = filters.minBuildingAge ? parseInt(filters.minBuildingAge) : null;
+      payload.maxBuildingAge = filters.maxBuildingAge ? parseInt(filters.maxBuildingAge) : null;
+      payload.furnished = Boolean(filters.furnished);
       break;
 
     case LISTING_TYPES.CLOTHING:
       payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
       payload.types = Array.isArray(filters.types) ? filters.types : [];
       payload.conditions = Array.isArray(filters.conditions) ? filters.conditions : [];
+      payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
+      payload.clothingGenders = Array.isArray(filters.clothingGenders) ? filters.clothingGenders : [];
+      payload.clothingCategories = Array.isArray(filters.clothingCategories) ? filters.clothingCategories : [];
+      payload.minPurchaseDate = filters.minPurchaseDate || null;
+      payload.maxPurchaseDate = filters.maxPurchaseDate || null;
       break;
 
     case LISTING_TYPES.BOOKS:

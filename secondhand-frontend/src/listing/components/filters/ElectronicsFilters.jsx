@@ -13,12 +13,12 @@ const ElectronicsFilters = ({ filters, onInputChange, enums }) => {
         <Select
           isMulti
           options={enums[enumKey]?.map((opt) => ({
-            value: opt.value,
+            value: opt.id || opt.value,
             label: opt.label,
           }))}
           value={selectedValues.map((v) => ({
             value: v,
-            label: enums[enumKey]?.find((o) => o.value === v)?.label,
+            label: enums[enumKey]?.find((o) => (o.id || o.value) === v)?.label,
           }))}
           onChange={(selected) => {
             onInputChange(
@@ -136,12 +136,15 @@ const ElectronicsFilters = ({ filters, onInputChange, enums }) => {
     );
   };
 
-  const laptopSelected = Array.isArray(filters.electronicTypes) && filters.electronicTypes.includes('LAPTOP');
+  const laptopSelected = Array.isArray(filters.electronicTypeIds) && (filters.electronicTypeIds || []).some((id) => {
+    const t = (enums.electronicTypes || []).find((x) => (x.id || x.value) === id);
+    return String(t?.name || '').toUpperCase() === 'LAPTOP';
+  });
 
   return (
     <div className="space-y-8">
-      {renderEnumField('electronicTypes', 'Electronic Type', 'electronicTypes')}
-      {renderEnumField('electronicBrands', 'Brand', 'electronicBrands')}
+      {renderEnumField('electronicTypeIds', 'Electronic Type', 'electronicTypes')}
+      {renderEnumField('electronicBrandIds', 'Brand', 'electronicBrands')}
       {renderNumericRangeField('year', 'Year', 1990, new Date().getFullYear())}
       {laptopSelected && renderNumericRangeField('storage', 'Storage (GB)', 1, 10000)}
       {laptopSelected && renderNumericRangeField('ram', 'RAM (GB)', 1, 128)}

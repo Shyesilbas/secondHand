@@ -5,6 +5,7 @@ import { useEnums } from '../../../common/hooks/useEnums.js';
 import { ROUTES } from '../../../common/constants/routes.js';
 import ListingBasics from '../../../common/components/forms/ListingBasics.jsx';
 import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
+import SearchableDropdown from '../../../common/components/ui/SearchableDropdown.jsx';
 import LocationFields from '../../../common/components/forms/LocationFields.jsx';
 import ImageUpload from '../../../common/components/ImageUpload.jsx';
 import { ElectronicCreateRequestDTO } from '../../electronics.js';
@@ -53,8 +54,16 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
     handleInputChange({ target: { name: 'imageUrl', value: '' } });
   };
 
+  const isLaptopSelected = () => {
+    const typeId = formData.electronicTypeId;
+    if (!typeId) return false;
+    const type = (enums.electronicTypes || []).find((t) => (t.id || t.value) === typeId);
+    const name = type?.name;
+    return String(name || '').toUpperCase() === 'LAPTOP';
+  };
+
   const nextStep = () => {
-    if (electronicValidators.validateStep(currentStep, formData, setErrors)) {
+    if (electronicValidators.validateStep(currentStep, formData, setErrors, isLaptopSelected())) {
       setCurrentStep((s) => Math.min(s + 1, steps.length));
     }
   };
@@ -67,7 +76,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
       nextStep();
       return;
     }
-    if (!electronicValidators.validateStep(null, formData, setErrors)) {
+    if (!electronicValidators.validateStep(null, formData, setErrors, isLaptopSelected())) {
       notification.showError('Missing Information', 'Please fill in all required fields.');
       return;
     }
@@ -99,6 +108,19 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
         );
 
       case 2:
+        const brandId = formData.electronicBrandId;
+        const typeId = formData.electronicTypeId;
+        const allModels = enums.electronicModels || [];
+        const brandFiltered = allModels.filter((m) => {
+          const mBrandId = m.brandId || m.brand_id;
+          return !brandId || mBrandId === brandId;
+        });
+        const typeFiltered = brandFiltered.filter((m) => {
+          const mTypeId = m.typeId || m.type_id;
+          return !typeId || mTypeId === typeId;
+        });
+        const availableModels = typeFiltered.map((m) => ({ id: m.id, label: m.name }));
+
         return (
           <div className="space-y-10">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
@@ -107,12 +129,27 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
                 <p className="text-xs text-slate-500 mt-1 tracking-tight">Ürün tipi, marka ve model bilgileri</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <EnumDropdown label="Tip *" enumKey="electronicTypes" value={formData.electronicType} onChange={(v) => handleDropdownChange('electronicType', v)} />
-                <EnumDropdown label="Marka *" enumKey="electronicBrands" value={formData.electronicBrand} onChange={(v) => handleDropdownChange('electronicBrand', v)} />
+                <EnumDropdown label="Tip *" enumKey="electronicTypes" value={formData.electronicTypeId} onChange={(v) => {
+                  setFormData((prev) => ({ ...prev, electronicTypeId: v, electronicModelId: '' }));
+                  if (errors.electronicTypeId) setErrors((prev) => ({ ...prev, electronicTypeId: '' }));
+                  if (errors.electronicModelId) setErrors((prev) => ({ ...prev, electronicModelId: '' }));
+                }} />
+                <EnumDropdown label="Marka *" enumKey="electronicBrands" value={formData.electronicBrandId} onChange={(v) => {
+                  setFormData((prev) => ({ ...prev, electronicBrandId: v, electronicModelId: '' }));
+                  if (errors.electronicBrandId) setErrors((prev) => ({ ...prev, electronicBrandId: '' }));
+                  if (errors.electronicModelId) setErrors((prev) => ({ ...prev, electronicModelId: '' }));
+                }} />
                 <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Model *</label>
-                  <input type="text" name="model" value={formData.model} onChange={handleInputChange} className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${errors.model ? 'border-red-300' : 'border-slate-200'}`} placeholder="e.g. MacBook Pro M1" />
-                  {errors.model && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.model}</p>}
+                  <SearchableDropdown
+                    label="Model *"
+                    options={availableModels}
+                    selectedValues={formData.electronicModelId ? [formData.electronicModelId] : []}
+                    onSelectionChange={(values) => handleDropdownChange('electronicModelId', values[0] || '')}
+                    placeholder="Model seçin..."
+                    searchPlaceholder="Model ara..."
+                    multiple={false}
+                  />
+                  {errors.electronicModelId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.electronicModelId}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Menşei</label>
@@ -127,7 +164,7 @@ const ElectronicCreateForm = ({ onBack, initialData = null, isEdit = false, onUp
               </div>
             </div>
 
-            {formData.electronicType === 'LAPTOP' && (
+            {isLaptopSelected() && (
               <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
                 <div className="pb-4 border-b border-slate-100 mb-6">
                   <h3 className="text-base font-semibold text-slate-900 tracking-tight">Teknik Özellikler</h3>

@@ -3,10 +3,10 @@ import {validateBasicListingStep1,validateBasicListingStep3} from "../listing/co
 export const validateRealEstateStep2 = (formData, { isCreate = false } = {}) => {
   const errors = {};
   if (isCreate) {
-    if (!formData.adType) errors.adType = 'Please select ad type';
-    if (!formData.realEstateType) errors.realEstateType = 'Please select property type';
-    if (!formData.heatingType) errors.heatingType = 'Please select heating type';
-    if (!formData.ownerType) errors.ownerType = 'Please select owner type';
+    if (!formData.adTypeId) errors.adTypeId = 'Please select ad type';
+    if (!formData.realEstateTypeId) errors.realEstateTypeId = 'Please select property type';
+    if (!formData.heatingTypeId) errors.heatingTypeId = 'Please select heating type';
+    if (!formData.ownerTypeId) errors.ownerTypeId = 'Please select owner type';
   }
   if (!formData.squareMeters || parseInt(formData.squareMeters) <= 0) errors.squareMeters = 'Please enter valid square meters';
   if (!formData.roomCount || parseInt(formData.roomCount) <= 0) errors.roomCount = 'Please enter valid room count';

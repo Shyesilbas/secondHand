@@ -14,7 +14,7 @@ const RealEstateDetails = ({ listing }) => {
   const getEnumLabel = (key, value) => {
     if (!value) return value;
     const list = enums?.[key] || [];
-    const found = list.find((o) => o.value === value);
+    const found = list.find((o) => (o.id || o.value) === value);
     return found?.label || value;
   };
 
@@ -22,10 +22,10 @@ const RealEstateDetails = ({ listing }) => {
     <div className="bg-white rounded-lg shadow-sm border p-6">
       <h3 className="text-xl font-semibold text-text-primary mb-4">Real Estate Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <DetailItem label="Ad Type" value={getEnumLabel('realEstateAdTypes', listing.adType)} />
-        <DetailItem label="Property Type" value={getEnumLabel('realEstateTypes', listing.realEstateType)} />
-        <DetailItem label="Heating Type" value={getEnumLabel('heatingTypes', listing.heatingType)} />
-        <DetailItem label="Owner Type" value={getEnumLabel('ownerTypes', listing.ownerType)} />
+        <DetailItem label="Ad Type" value={listing.adType?.label || listing.adType?.name || getEnumLabel('realEstateAdTypes', listing.adType)} />
+        <DetailItem label="Property Type" value={listing.realEstateType?.label || listing.realEstateType?.name || getEnumLabel('realEstateTypes', listing.realEstateType)} />
+        <DetailItem label="Heating Type" value={listing.heatingType?.label || listing.heatingType?.name || getEnumLabel('heatingTypes', listing.heatingType)} />
+        <DetailItem label="Owner Type" value={listing.ownerType?.label || listing.ownerType?.name || getEnumLabel('ownerTypes', listing.ownerType)} />
         <DetailItem label="Square Meters" value={listing.squareMeters ? `${listing.squareMeters} m²` : '-'} />
         <DetailItem label="Room Count" value={listing.roomCount} />
         <DetailItem label="Bathroom Count" value={listing.bathroomCount} />

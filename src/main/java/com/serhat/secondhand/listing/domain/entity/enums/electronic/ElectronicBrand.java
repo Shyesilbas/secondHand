@@ -1,28 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.electronic;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum ElectronicBrand {
-    APPLE("Apple"),
-    SAMSUNG("Samsung"),
-    MICROSOFT("Microsoft"),
-    GOOGLE("Google"),
-    SONY("Sony"),
-    LG("LG"),
-    ASUS("ASUS"),
-    XIAOMI("Xiaomi"),
-    HUAWEI("Huawei"),
-    FUJITSU("Fujitsu"),
-    OKI("OKI"),
-    BENQ("BenQ"),
-    KODAK("Kodak"),
-    NIKON("Nikon"),
-    PHILLIPS("Phillips");
+import java.util.UUID;
 
-    private final String label;
+@Entity
+@Table(name = "electronic_brands")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ElectronicBrand {
 
-    ElectronicBrand(String label) {
-        this.label = label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String name;
+
+    @Column(nullable = false, length = 100)
+    private String label;
 }

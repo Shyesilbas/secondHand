@@ -14,4 +14,6 @@ public interface ElectronicListingRepository extends JpaRepository<ElectronicLis
     List<ElectronicListing> findByElectronicBrand(ElectronicBrand electronicBrand);
     List<ElectronicListing> findByElectronicType(ElectronicType electronicType);
 
+    List<ElectronicListing> findByElectronicType_Id(UUID electronicTypeId);
+
 }

@@ -2,13 +2,13 @@ import { validateBasicListingStep1, validateBasicListingStep3 } from "../listing
 
 const validateClothingStep2 = (formData) => {
     const errors = {};
-    if (!formData.brand) errors.brand = 'Brand is required';
-    if (!formData.clothingType) errors.clothingType = 'Type is required';
+    if (!formData.brandId) errors.brandId = 'Brand is required';
+    if (!formData.clothingTypeId) errors.clothingTypeId = 'Type is required';
     if (!formData.color) errors.color = 'Color is required';
     if (!formData.condition) errors.condition = 'Condition is required';
     if (!formData.clothingGender) errors.clothingGender = 'Clothing gender is required';
     if (!formData.clothingCategory) errors.clothingCategory = 'Clothing category is required';
-    if (!formData.purchaseDate) errors.purchaseDate = 'Purchase date is required';
+    if (!formData.purchaseYear) errors.purchaseYear = 'Purchase year is required';
     return errors;
 };
 

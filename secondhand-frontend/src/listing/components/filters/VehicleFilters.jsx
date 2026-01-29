@@ -13,12 +13,12 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
         <Select
           isMulti
           options={enums[enumKey]?.map((opt) => ({
-            value: opt.value,
-            label: opt.label,
+            value: opt.id || opt.value,
+            label: opt.label || opt.name,
           }))}
           value={selectedValues.map((v) => ({
             value: v,
-            label: enums[enumKey]?.find((o) => o.value === v)?.label,
+            label: (enums[enumKey]?.find((o) => (o.id || o.value) === v)?.label) || (enums[enumKey]?.find((o) => (o.id || o.value) === v)?.name),
           }))}
           onChange={(selected) => {
             const values = selected ? selected.map((s) => s.value) : [];
@@ -137,7 +137,7 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
 
   return (
     <div className="space-y-8">
-      {renderEnumField('brands', 'Car Brand', 'carBrands')}
+      {renderEnumField('brandIds', 'Car Brand', 'carBrands')}
       {renderEnumField('fuelTypes', 'Fuel Type', 'fuelTypes')}
       {renderEnumField('colors', 'Color', 'colors')}
       {renderEnumField('doors', 'Number of Doors', 'doors')}

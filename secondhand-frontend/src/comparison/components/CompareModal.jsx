@@ -16,9 +16,12 @@ const CompareModal = memo(() => {
 
     const getEnumLabel = (enumKey, value) => {
         if (!value) return null;
+        if (typeof value === 'object') {
+            return value.label || value.name || value.value || value.id || null;
+        }
         const list = enums?.[enumKey] || [];
-        const found = list.find((o) => o.value === value);
-        return found?.label || value;
+        const found = list.find((o) => (o.id || o.value) === value);
+        return found?.label || found?.name || value;
     };
 
     const formatValue = (field, item) => {

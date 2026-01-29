@@ -1,7 +1,11 @@
 
 export const getCarBrandLabel = (value, carBrands) => {
-  const brand = carBrands.find(b => b.value === value);
-  return brand?.label || value;
+  if (!value) return value;
+  if (typeof value === 'object') {
+    return value.label || value.name || value.value || value.id || '';
+  }
+  const brand = carBrands.find(b => (b.id || b.value) === value);
+  return brand?.label || brand?.name || value;
 };
 
 export const getFuelTypeLabel = (value, fuelTypes) => {

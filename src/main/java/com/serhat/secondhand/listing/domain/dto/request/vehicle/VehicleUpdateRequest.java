@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 public record VehicleUpdateRequest(
     Optional<String> title,
@@ -13,7 +14,9 @@ public record VehicleUpdateRequest(
     Optional<Currency> currency,
     Optional<String> city,
     Optional<String> district,
-    Optional<String> model,
+    Optional<UUID> brandId,
+    Optional<UUID> vehicleModelId,
+    Optional<Integer> year,
     Optional<Integer> mileage,
     Optional<Integer> engineCapacity,
     Optional<GearType> gearbox,

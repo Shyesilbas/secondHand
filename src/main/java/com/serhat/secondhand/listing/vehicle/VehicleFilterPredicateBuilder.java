@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,8 +24,8 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
         
         predicates.add(cb.equal(root.get("listingType"), ListingType.VEHICLE));
         
-        if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
-            predicates.add(root.get("brand").in(filters.getBrands()));
+        if (filters.getBrandIds() != null && !filters.getBrandIds().isEmpty()) {
+            predicates.add(root.join("brand").get("id").in(filters.getBrandIds()));
         }
         
         if (filters.getFuelTypes() != null && !filters.getFuelTypes().isEmpty()) {
@@ -77,11 +78,11 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
             case "createdat", "created_at" -> Optional.of(root.get("createdAt"));
             case "year" -> Optional.of(root.get("year"));
             case "mileage" -> Optional.of(root.get("mileage"));
-            case "brand" -> Optional.of(root.get("brand"));
+            case "brand" -> Optional.of(root.join("brand", JoinType.LEFT).get("label"));
             case "doors" -> Optional.of(root.get("doors"));
             case "fueltype", "fuel_type" -> Optional.of(root.get("fuelType"));
             case "geartype", "gear_type" -> Optional.of(root.get("gearbox"));
-            case "model" -> Optional.of(root.get("model"));
+            case "model" -> Optional.of(root.join("model", JoinType.LEFT).get("name"));
             default -> Optional.empty();
         };
     }

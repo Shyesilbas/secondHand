@@ -14,7 +14,7 @@ const VehicleDetails = ({ listing }) => {
   const getEnumLabel = (key, value) => {
     if (!value) return value;
     const list = enums?.[key] || [];
-    const found = list.find((o) => o.value === value);
+    const found = list.find((o) => (o.id || o.value) === value);
     return found?.label || value;
   };
 
@@ -53,8 +53,8 @@ const VehicleDetails = ({ listing }) => {
 
       <Section id="basic" title="Basic">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <DetailItem label="Brand" value={getCarBrandLabel(listing.brand)} />
-        <DetailItem label="Model" value={listing.model} />
+        <DetailItem label="Brand" value={listing.brand?.label || listing.brand?.name || getCarBrandLabel(listing.brand)} />
+        <DetailItem label="Model" value={listing.model?.name || listing.model} />
         <DetailItem label="Year" value={listing.year} />
           <DetailItem label="Color" value={getColorLabel(listing.color)} />
         </div>

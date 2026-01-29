@@ -10,11 +10,16 @@ import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicL
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicListingRepository;
+import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
+import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +37,9 @@ import java.util.UUID;
 @Slf4j
 public class ElectronicListingService {
     private final ElectronicListingRepository repository;
+    private final ElectronicBrandRepository brandRepository;
+    private final ElectronicTypeRepository typeRepository;
+    private final ElectronicModelRepository modelRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final ElectronicListingFilterService electronicListingFilterService;
@@ -56,13 +64,36 @@ public class ElectronicListingService {
             return Result.error("Invalid quantity for electronic listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
-        // 3. Category Specific Validation (Laptop)
-        if (electronicListing.getElectronicType() == ElectronicType.LAPTOP) {
+        ElectronicType electronicType = resolveType(request.electronicTypeId());
+        if (electronicType == null) {
+            return Result.error("Electronic type not found", "ELECTRONIC_TYPE_NOT_FOUND");
+        }
+        ElectronicBrand electronicBrand = resolveBrand(request.electronicBrandId());
+        if (electronicBrand == null) {
+            return Result.error("Electronic brand not found", "ELECTRONIC_BRAND_NOT_FOUND");
+        }
+        ElectronicModel electronicModel = resolveModel(request.electronicModelId());
+        if (electronicModel == null) {
+            return Result.error("Electronic model not found", "ELECTRONIC_MODEL_NOT_FOUND");
+        }
+        if (electronicModel.getBrand() != null && electronicModel.getBrand().getId() != null
+                && !electronicModel.getBrand().getId().equals(electronicBrand.getId())) {
+            return Result.error("Electronic model does not match brand", "ELECTRONIC_MODEL_BRAND_MISMATCH");
+        }
+        if (electronicModel.getType() != null && electronicModel.getType().getId() != null
+                && !electronicModel.getType().getId().equals(electronicType.getId())) {
+            return Result.error("Electronic model does not match type", "ELECTRONIC_MODEL_TYPE_MISMATCH");
+        }
+
+        electronicListing.setElectronicType(electronicType);
+        electronicListing.setElectronicBrand(electronicBrand);
+        electronicListing.setModel(electronicModel);
+
+        if (isLaptop(electronicType)) {
             if (electronicListing.getRam() == null || electronicListing.getStorage() == null) {
                 return Result.error("RAM and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
             }
         } else {
-            // Clean up specs for non-laptop types
             electronicListing.setRam(null);
             electronicListing.setStorage(null);
             electronicListing.setProcessor(null);
@@ -114,9 +145,24 @@ public class ElectronicListingService {
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
 
-        request.model().ifPresent(existing::setModel);
-        request.electronicType().ifPresent(existing::setElectronicType);
-        request.electronicBrand().ifPresent(existing::setElectronicBrand);
+        request.electronicTypeId().ifPresent(typeId -> {
+            ElectronicType type = resolveType(typeId);
+            if (type != null) {
+                existing.setElectronicType(type);
+            }
+        });
+        request.electronicBrandId().ifPresent(brandId -> {
+            ElectronicBrand brand = resolveBrand(brandId);
+            if (brand != null) {
+                existing.setElectronicBrand(brand);
+            }
+        });
+        request.electronicModelId().ifPresent(modelId -> {
+            ElectronicModel model = resolveModel(modelId);
+            if (model != null) {
+                existing.setModel(model);
+            }
+        });
         request.origin().ifPresent(existing::setOrigin);
         request.warrantyProof().ifPresent(existing::setWarrantyProof);
         request.color().ifPresent(existing::setColor);
@@ -130,8 +176,22 @@ public class ElectronicListingService {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
-        // 4. Laptop Validation Re-check
-        if (existing.getElectronicType() == ElectronicType.LAPTOP) {
+        if (existing.getElectronicBrand() != null && existing.getModel() != null
+                && existing.getElectronicBrand().getId() != null
+                && existing.getModel().getBrand() != null
+                && existing.getModel().getBrand().getId() != null
+                && !existing.getElectronicBrand().getId().equals(existing.getModel().getBrand().getId())) {
+            return Result.error("Electronic model does not match brand", "ELECTRONIC_MODEL_BRAND_MISMATCH");
+        }
+        if (existing.getElectronicType() != null && existing.getModel() != null
+                && existing.getElectronicType().getId() != null
+                && existing.getModel().getType() != null
+                && existing.getModel().getType().getId() != null
+                && !existing.getElectronicType().getId().equals(existing.getModel().getType().getId())) {
+            return Result.error("Electronic model does not match type", "ELECTRONIC_MODEL_TYPE_MISMATCH");
+        }
+
+        if (isLaptop(existing.getElectronicType())) {
             if (existing.getRam() == null || existing.getStorage() == null) {
                 return Result.error("RAM and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
             }
@@ -160,8 +220,8 @@ public class ElectronicListingService {
         return Result.success();
     }
 
-    public List<ElectronicListingDto> findByElectronicType(ElectronicType electronicType) {
-        List<ElectronicListing> electronicListings = repository.findByElectronicType(electronicType);
+    public List<ElectronicListingDto> findByElectronicType(UUID electronicTypeId) {
+        List<ElectronicListing> electronicListings = repository.findByElectronicType_Id(electronicTypeId);
         return electronicListings.stream()
                 .map(listingMapper::toElectronicDto)
                 .toList();
@@ -176,5 +236,37 @@ public class ElectronicListingService {
     public Page<ListingDto> filterElectronics(ElectronicListingFilterDto filters) {
         log.info("Filtering electronics listings with criteria: {}", filters);
         return electronicListingFilterService.filterElectronics(filters);
+    }
+
+    private ElectronicBrand resolveBrand(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return brandRepository.findById(id).orElse(null);
+    }
+
+    private ElectronicType resolveType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return typeRepository.findById(id).orElse(null);
+    }
+
+    private ElectronicModel resolveModel(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return modelRepository.findById(id).orElse(null);
+    }
+
+    private boolean isLaptop(ElectronicType type) {
+        if (type == null) {
+            return false;
+        }
+        String name = type.getName();
+        if (name == null) {
+            return false;
+        }
+        return "LAPTOP".equalsIgnoreCase(name);
     }
 }
