@@ -453,7 +453,7 @@ export const comparisonFieldsConfig = {
             key: 'ownerType',
             label: 'Owner Type',
             type: 'enum',
-            enumKey: 'listingOwnerTypes',
+            enumKey: 'ownerTypes',
             highlight: HIGHLIGHT_RULES.NONE,
             priority: 10
         },

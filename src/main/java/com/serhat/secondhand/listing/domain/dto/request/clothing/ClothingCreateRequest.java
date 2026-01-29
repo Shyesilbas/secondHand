@@ -1,20 +1,19 @@
 package com.serhat.secondhand.listing.domain.dto.request.clothing;
 
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.UUID;
 
 public record ClothingCreateRequest(
     @NotBlank(message = "Title is required")
@@ -43,16 +42,18 @@ public record ClothingCreateRequest(
     String district,
 
     @NotNull(message = "Brand is required")
-    ClothingBrand brand,
+    UUID brandId,
 
     @NotNull(message = "Clothing type is required")
-    ClothingType clothingType,
+    UUID clothingTypeId,
 
     @NotNull(message = "Color is required")
     Color color,
 
-    @NotNull(message = "Purchase date is required")
-    LocalDate purchaseDate,
+    @NotNull(message = "Purchase year is required")
+    @Min(value = 1900, message = "Purchase year must be valid")
+    @Max(value = 2100, message = "Purchase year must be valid")
+    Integer purchaseYear,
 
     @NotNull(message = "Condition is required")
     ClothingCondition condition,

@@ -1,11 +1,12 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '3.0';
+const ENUM_CACHE_VERSION = '3.6';
 const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',
   'orderStatuses',
   'carBrands',
+  'vehicleModels',
   'fuelTypes',
   'colors',
   'doors',
@@ -14,6 +15,7 @@ const REQUIRED_ENUM_KEYS = [
   'seatCounts',
   'electronicTypes',
   'electronicBrands',
+  'electronicModels',
   'processors',
   'drivetrains',
   'bodyTypes',

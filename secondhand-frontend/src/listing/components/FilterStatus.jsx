@@ -22,13 +22,14 @@ const FilterStatus = ({
 
         const checkActiveFilters = hasActiveFilters || (() => {
         return filters.minPrice || filters.maxPrice || filters.city || filters.district ||
+            (filters.brandIds && filters.brandIds.length > 0) ||
             (filters.brands && filters.brands.length > 0) ||
-            (filters.electronicBrands && filters.electronicBrands.length > 0) ||
+            (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) ||
             (filters.fuelTypes && filters.fuelTypes.length > 0) ||
             (filters.colors && filters.colors.length > 0) ||
             (filters.gearTypes && filters.gearTypes.length > 0) ||
             (filters.seatCounts && filters.seatCounts.length > 0) ||
-            (filters.electronicTypes && filters.electronicTypes.length > 0) ||
+            (filters.electronicTypeIds && filters.electronicTypeIds.length > 0) ||
             (filters.types && filters.types.length > 0) ||
             (filters.conditions && filters.conditions.length > 0) ||
             (filters.clothingGenders && filters.clothingGenders.length > 0) ||
@@ -38,8 +39,9 @@ const FilterStatus = ({
             (filters.formats && filters.formats.length > 0) ||
             (filters.disciplines && filters.disciplines.length > 0) ||
             (filters.equipmentTypes && filters.equipmentTypes.length > 0) ||
-            (filters.realEstateTypes && filters.realEstateTypes.length > 0) ||
-            (filters.adTypes && filters.adTypes.length > 0) ||
+            (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) ||
+            (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) ||
+            filters.adTypeId || filters.ownerTypeId ||
             filters.minYear || filters.maxYear || filters.maxMileage ||
             filters.minSquareMeters || filters.maxSquareMeters ||
             filters.minRoomCount || filters.maxRoomCount ||
@@ -53,13 +55,14 @@ const FilterStatus = ({
         let count = 0;
         if (filters.minPrice || filters.maxPrice) count++;
         if (filters.city || filters.district) count++;
+        if (filters.brandIds && filters.brandIds.length > 0) count++;
         if (filters.brands && filters.brands.length > 0) count++;
-        if (filters.electronicBrands && filters.electronicBrands.length > 0) count++;
+        if (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) count++;
         if (filters.fuelTypes && filters.fuelTypes.length > 0) count++;
         if (filters.colors && filters.colors.length > 0) count++;
         if (filters.gearTypes && filters.gearTypes.length > 0) count++;
         if (filters.seatCounts && filters.seatCounts.length > 0) count++;
-        if (filters.electronicTypes && filters.electronicTypes.length > 0) count++;
+        if (filters.electronicTypeIds && filters.electronicTypeIds.length > 0) count++;
         if (filters.types && filters.types.length > 0) count++;
         if (filters.conditions && filters.conditions.length > 0) count++;
         if (filters.clothingGenders && filters.clothingGenders.length > 0) count++;
@@ -69,8 +72,10 @@ const FilterStatus = ({
         if (filters.formats && filters.formats.length > 0) count++;
         if (filters.disciplines && filters.disciplines.length > 0) count++;
         if (filters.equipmentTypes && filters.equipmentTypes.length > 0) count++;
-        if (filters.realEstateTypes && filters.realEstateTypes.length > 0) count++;
-        if (filters.adTypes && filters.adTypes.length > 0) count++;
+        if (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) count++;
+        if (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) count++;
+        if (filters.adTypeId) count++;
+        if (filters.ownerTypeId) count++;
         if (filters.minYear || filters.maxYear) count++;
         if (filters.maxMileage) count++;
         if (filters.minSquareMeters || filters.maxSquareMeters) count++;

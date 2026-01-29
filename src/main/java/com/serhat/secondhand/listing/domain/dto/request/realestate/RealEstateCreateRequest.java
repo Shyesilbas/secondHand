@@ -1,12 +1,9 @@
 package com.serhat.secondhand.listing.domain.dto.request.realestate;
 
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record RealEstateCreateRequest(
         String title,
@@ -15,10 +12,10 @@ public record RealEstateCreateRequest(
         Currency currency,
         String city,
         String district,
-        RealEstateAdType adType,
-        RealEstateType realEstateType,
-        HeatingType heatingType,
-        ListingOwnerType ownerType,
+        UUID adTypeId,
+        UUID realEstateTypeId,
+        UUID heatingTypeId,
+        UUID ownerTypeId,
         Integer squareMeters,
         Integer roomCount,
         Integer bathroomCount,

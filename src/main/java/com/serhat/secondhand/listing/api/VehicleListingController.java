@@ -6,7 +6,6 @@ import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateReq
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.vehicle.VehicleListingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,12 +76,12 @@ public class VehicleListingController {
         return ResponseEntity.ok(vehicle);
     }
 
-    @GetMapping("/brand/{brand}/model/{model}")
+    @GetMapping("/brand/{brandId}/model/{modelId}")
     @Operation(summary = "Find vehicles by brand and model")
     public ResponseEntity<List<VehicleListingDto>> findByBrandAndModel(
-            @PathVariable CarBrand brand,
-            @PathVariable String model) {
-        List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brand, model);
+            @PathVariable UUID brandId,
+            @PathVariable UUID modelId) {
+        List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brandId, modelId);
         return ResponseEntity.ok(vehicles);
     }
 

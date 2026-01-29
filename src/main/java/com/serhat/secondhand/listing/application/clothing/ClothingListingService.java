@@ -15,7 +15,9 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
+import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +37,8 @@ import java.util.UUID;
 public class ClothingListingService {
 
     private final ClothingListingRepository clothingRepository;
+    private final ClothingBrandRepository clothingBrandRepository;
+    private final ClothingTypeRepository clothingTypeRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
@@ -57,6 +62,19 @@ public class ClothingListingService {
         if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
             return Result.error("Invalid quantity for clothing listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
+
+        ClothingBrand brand = resolveBrand(request.brandId());
+        if (brand == null) {
+            return Result.error("Clothing brand not found", "CLOTHING_BRAND_NOT_FOUND");
+        }
+        ClothingType type = resolveType(request.clothingTypeId());
+        if (type == null) {
+            return Result.error("Clothing type not found", "CLOTHING_TYPE_NOT_FOUND");
+        }
+
+        clothing.setBrand(brand);
+        clothing.setClothingType(type);
+        clothing.setPurchaseDate(toPurchaseDate(request.purchaseYear()));
 
         clothing.setSeller(seller);
         clothing.setListingFeePaid(true);
@@ -103,10 +121,20 @@ public class ClothingListingService {
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
 
-        request.brand().ifPresent(existing::setBrand);
-        request.clothingType().ifPresent(existing::setClothingType);
+        request.brandId().ifPresent(brandId -> {
+            ClothingBrand brand = resolveBrand(brandId);
+            if (brand != null) {
+                existing.setBrand(brand);
+            }
+        });
+        request.clothingTypeId().ifPresent(typeId -> {
+            ClothingType type = resolveType(typeId);
+            if (type != null) {
+                existing.setClothingType(type);
+            }
+        });
         request.color().ifPresent(existing::setColor);
-        request.purchaseDate().ifPresent(existing::setPurchaseDate);
+        request.purchaseYear().ifPresent(y -> existing.setPurchaseDate(toPurchaseDate(y)));
         request.condition().ifPresent(existing::setCondition);
         request.clothingGender().ifPresent(existing::setClothingGender);
         request.clothingCategory().ifPresent(existing::setClothingCategory);
@@ -133,8 +161,8 @@ public class ClothingListingService {
         return Result.success();
     }
 
-    public List<ClothingListingDto> findByBrandAndClothingType(ClothingBrand brand, ClothingType clothingType) {
-        List<ClothingListing> clothing = clothingRepository.findByBrandAndClothingType(brand, clothingType);
+    public List<ClothingListingDto> findByBrandAndClothingType(UUID brandId, UUID clothingTypeId) {
+        List<ClothingListing> clothing = clothingRepository.findByBrand_IdAndClothingType_Id(brandId, clothingTypeId);
         return clothing.stream()
                 .map(listingMapper::toClothingDto)
                 .toList();
@@ -149,5 +177,26 @@ public class ClothingListingService {
     public Page<ListingDto> filterClothing(ClothingListingFilterDto filters) {
         log.info("Filtering clothing listings with criteria: {}", filters);
         return clothingListingFilterService.filterClothing(filters);
+    }
+
+    private ClothingBrand resolveBrand(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return clothingBrandRepository.findById(id).orElse(null);
+    }
+
+    private ClothingType resolveType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return clothingTypeRepository.findById(id).orElse(null);
+    }
+
+    private LocalDate toPurchaseDate(Integer year) {
+        if (year == null) {
+            return null;
+        }
+        return LocalDate.of(year, 1, 1);
     }
 }

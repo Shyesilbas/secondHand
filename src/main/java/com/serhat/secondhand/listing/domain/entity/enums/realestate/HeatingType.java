@@ -1,23 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.realestate;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum HeatingType {
+import java.util.UUID;
 
-    NONE("None"),
-    STOVE("Stove"),
-    NATURAL_GAS("Natural Gas"),
-    CENTRAL_SYSTEM("Central System"),
-    COMBI_BOILER("Combi Boiler"),
-    AIR_CONDITIONER("Air Conditioner"),
-    GEOTHERMAL("Geothermal"),
-    FLOOR_HEATING("Floor Heating"),
-    OTHER("Other");
+@Entity
+@Table(name = "heating_types")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class HeatingType {
 
-    private final String label;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    HeatingType(String label) {
-        this.label = label;
-    }
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(nullable = false, length = 120)
+    private String label;
 }

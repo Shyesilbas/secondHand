@@ -6,6 +6,7 @@ import { VehicleCreateRequestDTO } from '../vehicles.js';
 import ListingWizard from '../../listing/components/ListingWizard.jsx';
 import ListingBasics from '../../common/components/forms/ListingBasics.jsx';
 import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
+import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 import LocationFields from '../../common/components/forms/LocationFields.jsx';
 import ImageUpload from '../../common/components/ImageUpload.jsx';
 import { vehicleFormConfig } from '../../common/forms/config/formConfigs.js';
@@ -66,12 +67,25 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <p className="text-xs text-slate-500 mt-1 tracking-tight">Araç markası, model ve temel özellikler</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <EnumDropdown label="Marka *" enumKey="carBrands" value={formData.brand} onChange={(v) => handleDropdownChange('brand', v)} />
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Model *</label>
-                    <input type="text" name="model" value={formData.model} onChange={handleInputChange} placeholder="Model Adı" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${errors.model ? 'border-red-300' : 'border-slate-200'}`} />
-                    {errors.model && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.model}</p>}
-                  </div>
+                  <EnumDropdown
+                    label="Marka *"
+                    enumKey="carBrands"
+                    value={formData.brandId}
+                    onChange={(v) => {
+                      handleDropdownChange('brandId', v);
+                      handleDropdownChange('vehicleModelId', '');
+                    }}
+                  />
+                  <SearchableDropdown
+                    label="Model *"
+                    options={(enums.vehicleModels || []).filter((m) => (m.brandId || m.brand_id) === formData.brandId)}
+                    selectedValues={formData.vehicleModelId ? [formData.vehicleModelId] : []}
+                    onSelectionChange={(values) => handleDropdownChange('vehicleModelId', values[0] || '')}
+                    placeholder="Model seçin..."
+                    searchPlaceholder="Model ara..."
+                    multiple={false}
+                  />
+                  {errors.vehicleModelId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.vehicleModelId}</p>}
                   <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Yıl *</label>
                     <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1950" max={new Date().getFullYear() + 1} placeholder="YYYY" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${errors.year ? 'border-red-300' : 'border-slate-200'}`} />

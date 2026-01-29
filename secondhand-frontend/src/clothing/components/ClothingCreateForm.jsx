@@ -53,12 +53,12 @@ const ClothingCreateForm = ({ onBack, initialData = null, isEdit = false, onUpda
                 <p className="text-xs text-slate-500 mt-1 tracking-tight">Kıyafet tipi, marka ve diğer özellikler</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {['brand', 'clothingType', 'color', 'condition', 'clothingGender', 'clothingCategory'].map((field) => (
+                {['brandId', 'clothingTypeId', 'color', 'condition', 'clothingGender', 'clothingCategory'].map((field) => (
                     <div key={field}>
                       <EnumDropdown
                           label={field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1') + ' *'}
-                          enumKey={field === 'brand' ? 'clothingBrands' :
-                              field === 'clothingType' ? 'clothingTypes' :
+                          enumKey={field === 'brandId' ? 'clothingBrands' :
+                              field === 'clothingTypeId' ? 'clothingTypes' :
                                   field === 'condition' ? 'clothingConditions' :
                                       field === 'clothingGender' ? 'clothingGenders' :
                                           field === 'clothingCategory' ? 'clothingCategories' : 'colors'}
@@ -71,16 +71,17 @@ const ClothingCreateForm = ({ onBack, initialData = null, isEdit = false, onUpda
                 <div>
                   <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Satın Alma Tarihi *</label>
                   <input
-                      type="date"
-                      name="purchaseDate"
-                      value={formData.purchaseDate}
+                      type="number"
+                      name="purchaseYear"
+                      value={formData.purchaseYear}
                       onChange={handleInputChange}
-                      max={new Date().toISOString().split('T')[0]}
+                      min="1900"
+                      max={new Date().getFullYear()}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${
-                          errors.purchaseDate ? 'border-red-300' : 'border-slate-200'
+                          errors.purchaseYear ? 'border-red-300' : 'border-slate-200'
                       }`}
                   />
-                  {errors.purchaseDate && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.purchaseDate}</p>}
+                  {errors.purchaseYear && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.purchaseYear}</p>}
                 </div>
               </div>
             </div>

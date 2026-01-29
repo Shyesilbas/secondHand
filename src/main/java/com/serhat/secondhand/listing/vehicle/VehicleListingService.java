@@ -9,9 +9,10 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
+import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -35,6 +36,8 @@ public class VehicleListingService {
     private final VehicleListingFilterService vehicleListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final UserService userService;
+    private final CarBrandRepository carBrandRepository;
+    private final VehicleModelRepository vehicleModelRepository;
 
     @Transactional
     public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
@@ -52,6 +55,16 @@ public class VehicleListingService {
         vehicle.setSeller(seller);
         vehicle.setStatus(ListingStatus.ACTIVE);
         vehicle.setListingFeePaid(true);
+        vehicle.setBrand(resolveBrand(request.brandId()));
+        vehicle.setModel(resolveModel(request.vehicleModelId()));
+
+        if (vehicle.getBrand() != null && vehicle.getModel() != null) {
+            var modelBrandId = vehicle.getModel().getBrand() != null ? vehicle.getModel().getBrand().getId() : null;
+            var brandId = vehicle.getBrand().getId();
+            if (modelBrandId == null || !modelBrandId.equals(brandId)) {
+                return Result.error("Vehicle model does not belong to the selected brand", "MODEL_BRAND_MISMATCH");
+            }
+        }
 
         VehicleListing saved = vehicleRepository.save(vehicle);
         log.info("Vehicle listing created: {}", saved.getId());
@@ -91,7 +104,7 @@ public class VehicleListingService {
         request.district().ifPresent(existing::setDistrict);
         request.imageUrl().ifPresent(existing::setImageUrl);
 
-        request.model().ifPresent(existing::setModel);
+        request.year().ifPresent(existing::setYear);
         request.mileage().ifPresent(existing::setMileage);
         request.engineCapacity().ifPresent(existing::setEngineCapacity);
         request.gearbox().ifPresent(existing::setGearbox);
@@ -105,6 +118,16 @@ public class VehicleListingService {
         request.kilometersPerLiter().ifPresent(existing::setKilometersPerLiter);
         request.fuelType().ifPresent(existing::setFuelType);
         request.swap().ifPresent(existing::setSwap);
+        request.brandId().ifPresent(idValue -> existing.setBrand(resolveBrand(idValue)));
+        request.vehicleModelId().ifPresent(idValue -> existing.setModel(resolveModel(idValue)));
+
+        if (existing.getBrand() != null && existing.getModel() != null) {
+            var modelBrandId = existing.getModel().getBrand() != null ? existing.getModel().getBrand().getId() : null;
+            var brandId = existing.getBrand().getId();
+            if (modelBrandId == null || !modelBrandId.equals(brandId)) {
+                return Result.error("Vehicle model does not belong to the selected brand", "MODEL_BRAND_MISMATCH");
+            }
+        }
 
         vehicleRepository.save(existing);
 
@@ -124,8 +147,8 @@ public class VehicleListingService {
         return Result.success();
     }
 
-    public List<VehicleListingDto> findByBrandAndModel(CarBrand brand, String model) {
-        List<VehicleListing> vehicles = vehicleRepository.findByBrandAndModel(brand, model);
+    public List<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId) {
+        List<VehicleListing> vehicles = vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId);
         return vehicles.stream()
                 .map(listingMapper::toVehicleDto)
                 .toList();
@@ -140,5 +163,19 @@ public class VehicleListingService {
     public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
         log.info("Filtering vehicle listings with criteria: {}", filters);
         return vehicleListingFilterService.filterVehicles(filters);
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand resolveBrand(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return carBrandRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Car brand not found"));
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel resolveModel(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return vehicleModelRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle model not found"));
     }
 }

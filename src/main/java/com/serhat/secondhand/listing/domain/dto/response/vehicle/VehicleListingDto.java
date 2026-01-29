@@ -1,14 +1,15 @@
 package com.serhat.secondhand.listing.domain.dto.response.vehicle;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class VehicleListingDto extends ListingDto {
 
     private CarBrand brand;
-    private String model;
+    private VehicleModel model;
     private Integer year;
     private Integer mileage;
     private Integer engineCapacity;

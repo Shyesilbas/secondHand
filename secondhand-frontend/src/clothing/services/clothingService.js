@@ -21,7 +21,7 @@ export const clothingService = {
 
     getClothingDetails: async (id) => get(API_ENDPOINTS.CLOTHING.BY_ID(id)),
 
-    findByBrandAndClothingType: async (brand, clothingType) => get(API_ENDPOINTS.CLOTHING.BY_BRAND_TYPE(brand, clothingType)),
+    findByBrandAndClothingType: async (brandId, clothingTypeId) => get(API_ENDPOINTS.CLOTHING.BY_BRAND_TYPE(brandId, clothingTypeId)),
 
     filterClothing: async (filters) => {
     const filterData = createClothingFilterRequest(filters);

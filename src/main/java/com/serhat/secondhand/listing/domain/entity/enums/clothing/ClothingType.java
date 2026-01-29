@@ -1,44 +1,31 @@
 package com.serhat.secondhand.listing.domain.entity.enums.clothing;
 
-import lombok.Getter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public enum ClothingType {
-    TSHIRT("T-Shirt"),
-    SHIRT("Shirt"),
-    PANTS("Pants"),
-    JEANS("Jeans"),
-    SHORTS("Shorts"),
-    DRESS("Dress"),
-    SKIRT("Skirt"),
-    JACKET("Jacket"),
-    COAT("Coat"),
-    SWEATER("Sweater"),
-    HOODIE("Hoodie"),
-    SWEATSHIRT("Sweatshirt"),
-    SUIT("Suit"),
-    BLAZER("Blazer"),
-    VEST("Vest"),
-    UNDERWEAR("Underwear"),
-    SOCKS("Socks"),
-    HAT("Hat"),
-    CAP("Cap"),
-    SCARF("Scarf"),
-    GLOVES("Gloves"),
-    BELT("Belt"),
-    TIE("Tie"),
-    BAG("Bag"),
-    SHOES("Shoes"),
-    SNEAKERS("Sneakers"),
-    BOOTS("Boots"),
-    SANDALS("Sandals"),
-    HEELS("Heels"),
-    FLATS("Flats"),
-    OTHER("Other");
+import java.util.UUID;
 
-    private final String label;
+@Entity
+@Table(name = "clothing_types")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ClothingType {
 
-    ClothingType(String label) {
-        this.label = label;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true, length = 120)
+    private String name;
+
+    @Column(nullable = false, length = 120)
+    private String label;
 }

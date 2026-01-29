@@ -17,8 +17,11 @@ const SearchableDropdown = ({
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  const filteredOptions = options.filter(o =>
-    o.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const getOptionValue = (o) => o?.id ?? o?.value ?? o?.name;
+  const getOptionLabel = (o) => o?.label ?? o?.name ?? String(getOptionValue(o) ?? '');
+
+  const filteredOptions = options.filter((o) =>
+    getOptionLabel(o).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const toggleDropdown = () => setIsOpen(prev => !prev);
@@ -57,7 +60,10 @@ const SearchableDropdown = ({
   const getDisplayText = () => {
     if (!selectedValues.length) return placeholder;
     if (selectedValues.length <= maxDisplayItems) {
-      return selectedValues.map(v => options.find(o => o.value === v)?.label || v).join(', ');
+      return selectedValues
+        .map((v) => options.find((o) => getOptionValue(o) === v))
+        .map((o, idx) => (o ? getOptionLabel(o) : selectedValues[idx]))
+        .join(', ');
     }
     return `${selectedValues.length} selected`;
   };
@@ -114,20 +120,21 @@ const SearchableDropdown = ({
                 No options found
               </div>
             ) : (
-              filteredOptions.map(o => {
-                const isSelected = selectedValues.includes(o.value);
+              filteredOptions.map((o) => {
+                const optionValue = getOptionValue(o);
+                const isSelected = selectedValues.includes(optionValue);
                 return (
                   <button
-                    key={o.value}
+                    key={optionValue}
                     type="button"
-                    onClick={() => handleOptionClick(o.value)}
+                    onClick={() => handleOptionClick(optionValue)}
                     className={`w-full px-4 py-2.5 text-left text-xs rounded-lg flex items-center justify-between transition-colors mb-0.5 tracking-tight ${
                       isSelected 
                         ? 'bg-indigo-50 text-indigo-700 font-medium' 
                         : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    <span>{o.label}</span>
+                    <span>{getOptionLabel(o)}</span>
                     {isSelected && (
                       <Check className="w-4 h-4 text-indigo-600" />
                     )}

@@ -24,10 +24,12 @@ import java.time.LocalDate;
 @Data
 public class ClothingListing extends Listing {
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clothing_brand_id")
     private ClothingBrand brand;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clothing_type_id")
     private ClothingType clothingType;
 
     @Enumerated(EnumType.STRING)

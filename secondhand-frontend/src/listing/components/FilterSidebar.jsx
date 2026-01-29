@@ -5,6 +5,7 @@ import CategorySelector from "./CategorySelector.jsx";
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import VehicleFilters from "./filters/VehicleFilters.jsx";
 import ElectronicsFilters from "./filters/ElectronicsFilters.jsx";
+import ClothingFilters from "./filters/ClothingFilters.jsx";
 
 const FilterSidebar = ({
     isOpen,
@@ -116,7 +117,14 @@ const FilterSidebar = ({
                                     enums={enums}
                                 />
                             )}
-                            {localCategory !== "VEHICLE" && localCategory !== "ELECTRONICS" && (
+                            {localCategory === "CLOTHING" && (
+                                <ClothingFilters
+                                    filters={localFilters}
+                                    onInputChange={handleInputChange}
+                                    enums={enums}
+                                />
+                            )}
+                            {localCategory !== "VEHICLE" && localCategory !== "ELECTRONICS" && localCategory !== "CLOTHING" && (
                                 <div className="text-center text-gray-500 py-8">
                                     <p>No specific filters available for this category.</p>
                                     <p className="text-sm mt-2">Use price and location filters instead.</p>

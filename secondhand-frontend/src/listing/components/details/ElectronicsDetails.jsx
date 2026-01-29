@@ -14,7 +14,7 @@ const ElectronicsDetails = ({ listing }) => {
   const getEnumLabel = (key, value) => {
     if (!value) return value;
     const list = enums?.[key] || [];
-    const found = list.find((o) => o.value === value);
+    const found = list.find((o) => (o.id || o.value) === value);
     return found?.label || value;
   };
 
@@ -22,9 +22,9 @@ const ElectronicsDetails = ({ listing }) => {
     <div className="bg-white rounded-lg shadow-sm border p-6">
       <h3 className="text-xl font-semibold text-text-primary mb-4">Electronics Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <DetailItem label="Type" value={getEnumLabel('electronicTypes', listing.electronicType)} />
-        <DetailItem label="Brand" value={getEnumLabel('electronicBrands', listing.electronicBrand)} />
-        <DetailItem label="Model" value={listing.model} />
+        <DetailItem label="Type" value={listing.electronicType?.label || listing.electronicType?.name || getEnumLabel('electronicTypes', listing.electronicType)} />
+        <DetailItem label="Brand" value={listing.electronicBrand?.label || listing.electronicBrand?.name || getEnumLabel('electronicBrands', listing.electronicBrand)} />
+        <DetailItem label="Model" value={listing.model?.name || listing.model} />
         <DetailItem label="Origin" value={listing.origin} />
         <DetailItem label="Year" value={listing.year} />
         <DetailItem label="Color" value={getEnumLabel('colors', listing.color)} />
