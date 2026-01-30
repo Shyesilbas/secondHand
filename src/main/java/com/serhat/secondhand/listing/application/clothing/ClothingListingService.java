@@ -106,11 +106,11 @@ public class ClothingListingService {
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
-        clothingMapper.updateEntityFromRequest(existing, request);
         Result<Void> applyResult = clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId());
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        clothingMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators);
         if (validationResult.isError()) {

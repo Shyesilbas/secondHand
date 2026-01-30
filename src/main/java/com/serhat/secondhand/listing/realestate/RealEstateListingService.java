@@ -102,7 +102,6 @@ public class RealEstateListingService {
 
         var oldPrice = existing.getPrice();
 
-        realEstateMapper.updateEntityFromRequest(existing, request);
         Result<Void> applyResult = realEstateListingResolver.apply(
                 existing,
                 request.adTypeId(),
@@ -113,6 +112,7 @@ public class RealEstateListingService {
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        realEstateMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, realEstateSpecValidators);
         if (validationResult.isError()) {
