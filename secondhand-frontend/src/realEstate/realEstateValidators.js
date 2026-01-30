@@ -2,14 +2,17 @@ import {validateBasicListingStep1,validateBasicListingStep3} from "../listing/co
 
 export const validateRealEstateStep2 = (formData, { isCreate = false } = {}) => {
   const errors = {};
+  const typeName = (formData._realEstateTypeName || '').toUpperCase();
+  const isLand = typeName === 'LAND' || typeName === 'FARM';
   if (isCreate) {
     if (!formData.adTypeId) errors.adTypeId = 'Please select ad type';
     if (!formData.realEstateTypeId) errors.realEstateTypeId = 'Please select property type';
-    if (!formData.heatingTypeId) errors.heatingTypeId = 'Please select heating type';
     if (!formData.ownerTypeId) errors.ownerTypeId = 'Please select owner type';
+    if (!isLand && !formData.heatingTypeId) errors.heatingTypeId = 'Please select heating type';
   }
   if (!formData.squareMeters || parseInt(formData.squareMeters) <= 0) errors.squareMeters = 'Please enter valid square meters';
-  if (!formData.roomCount || parseInt(formData.roomCount) <= 0) errors.roomCount = 'Please enter valid room count';
+  if (!isLand && (!formData.roomCount || parseInt(formData.roomCount) <= 0)) errors.roomCount = 'Please enter valid room count';
+  if (isLand && (!formData.zoningStatus || String(formData.zoningStatus).trim().length === 0)) errors.zoningStatus = 'Please enter zoning status';
   if (formData.bathroomCount && parseInt(formData.bathroomCount) < 0) errors.bathroomCount = 'Please enter valid bathroom count';
   if (formData.floor && parseInt(formData.floor) < 0) errors.floor = 'Please enter valid floor number';
   if (formData.buildingAge && parseInt(formData.buildingAge) < 0) errors.buildingAge = 'Please enter valid building age';

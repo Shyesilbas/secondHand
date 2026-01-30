@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale;
 
 @Component
 public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<ClothingListing, ClothingListingFilterDto> {
@@ -21,11 +22,9 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
     @Override
     public List<Predicate> buildSpecificPredicates(CriteriaBuilder cb, Root<ClothingListing> root, ClothingListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
-        
-        // Listing type constraint
+
         predicates.add(cb.equal(root.get("listingType"), ListingType.CLOTHING));
-        
-        // Clothing-specific filters
+
         if (filters.getBrands() != null && !filters.getBrands().isEmpty()) {
             Join<Object, Object> brandJoin = root.join("brand");
             predicates.add(brandJoin.get("id").in(filters.getBrands()));
@@ -51,14 +50,30 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
         if (filters.getClothingCategories() != null && !filters.getClothingCategories().isEmpty()) {
             predicates.add(root.get("clothingCategory").in(filters.getClothingCategories()));
         }
-        
-        // Date range filters
+
         if (filters.getMinPurchaseDate() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("purchaseDate"), filters.getMinPurchaseDate()));
         }
         
         if (filters.getMaxPurchaseDate() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("purchaseDate"), filters.getMaxPurchaseDate()));
+        }
+
+        if (filters.getSizes() != null && !filters.getSizes().isEmpty()) {
+            predicates.add(root.get("size").in(filters.getSizes()));
+        }
+
+        if (filters.getMinShoeSizeEu() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("shoeSizeEu"), filters.getMinShoeSizeEu()));
+        }
+
+        if (filters.getMaxShoeSizeEu() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("shoeSizeEu"), filters.getMaxShoeSizeEu()));
+        }
+
+        if (filters.getMaterial() != null && !filters.getMaterial().isBlank()) {
+            String q = "%" + filters.getMaterial().trim().toLowerCase(Locale.ROOT) + "%";
+            predicates.add(cb.like(cb.lower(root.get("material")), q));
         }
         
         return predicates;

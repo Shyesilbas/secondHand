@@ -1,5 +1,6 @@
 const PATH_MATCHERS = [
     { test: (p) => /^\/listings\/[^/]+\/edit$/.test(p), page: 'EditListingPage' },
+    { test: (p) => /^\/listings\/create\/[^/]+\/subtype$/.test(p), page: 'ListingSubtypeSelectionPage' },
     { test: (p) => p === '/listings/create', page: 'CreateListingPage' },
     { test: (p) => /^\/listings\/[^/]+$/.test(p), page: 'ListingDetailPage' },
     { test: (p) => /^\/lists\/[^/]+$/.test(p), page: 'FavoriteListDetailPage' },

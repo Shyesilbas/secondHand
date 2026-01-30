@@ -143,7 +143,7 @@ const Header = () => {
                     {isAuthenticated && (
                         <nav className="hidden lg:flex items-center gap-1">
                             <NavLink to={ROUTES.LISTINGS}>Marketplace</NavLink>
-                            <NavLink to={ROUTES.CREATE_LISTING}>Sell Item</NavLink>
+                            <NavLink to={ROUTES.CREATE_LISTING}>Sell</NavLink>
                             <div className="h-4 w-[1px] bg-gray-300 mx-2" />
 
                             {/* Categories Dropdown */}

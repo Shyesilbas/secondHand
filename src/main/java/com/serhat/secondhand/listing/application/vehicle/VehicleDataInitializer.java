@@ -1,33 +1,86 @@
 package com.serhat.secondhand.listing.application.vehicle;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class VehicleDataInitializer implements CommandLineRunner {
+public class VehicleDataInitializer implements SeedTask {
 
     private final CarBrandRepository brandRepository;
+    private final VehicleTypeRepository typeRepository;
     private final VehicleModelRepository modelRepository;
+    private final VehicleListingRepository vehicleListingRepository;
 
     @Override
-    public void run(String... args) {
-        if (brandRepository.count() == 0) {
-            seedBrands();
-        }
-        if (modelRepository.count() == 0) {
-            seedModels();
+    public String key() {
+        return "vehicle";
+    }
+
+    @Override
+    @Transactional
+    public Result<Void> run() {
+        dedupeDuplicateModels();
+        seedBrands();
+        seedTypes();
+        seedModels();
+        backfillNullModelTypes();
+        return Result.success();
+    }
+
+    private void dedupeDuplicateModels() {
+        List<Object[]> duplicates = modelRepository.findDuplicateModelKeys();
+        for (Object[] row : duplicates) {
+            if (row == null || row.length < 3) {
+                continue;
+            }
+            UUID brandId = (UUID) row[0];
+            UUID typeId = (UUID) row[1];
+            String nameKey = (String) row[2];
+
+            List<VehicleModel> models = typeId == null
+                    ? modelRepository.findAllByBrand_IdAndTypeIsNullAndNameIgnoreCase(brandId, nameKey)
+                    : modelRepository.findAllByBrand_IdAndType_IdAndNameIgnoreCase(brandId, typeId, nameKey);
+
+            if (models == null || models.size() < 2) {
+                continue;
+            }
+
+            VehicleModel keep = models.stream()
+                    .max(Comparator.<VehicleModel>comparingLong(m -> vehicleListingRepository.countByModel_Id(m.getId()))
+                            .thenComparing(m -> String.valueOf(m.getId())))
+                    .orElse(models.get(0));
+
+            List<UUID> deleteIds = models.stream()
+                    .filter(m -> m.getId() != null && !m.getId().equals(keep.getId()))
+                    .map(VehicleModel::getId)
+                    .toList();
+
+            if (deleteIds.isEmpty()) {
+                continue;
+            }
+
+            vehicleListingRepository.reassignModel(keep, deleteIds);
+            modelRepository.deleteAllById(deleteIds);
         }
     }
 
@@ -36,28 +89,36 @@ public class VehicleDataInitializer implements CommandLineRunner {
                 "Audi", "BMW", "Mercedes-Benz", "Toyota", "Volkswagen", "Hyundai", "Peugeot", "Nissan", "Kia",
                 "Ford", "Suzuki", "TOGG", "Renault", "Škoda", "SEAT", "Cupra", "Honda", "Opel", "Tesla", "Fiat",
                 "Jeep", "Volvo", "Citroën", "Mazda", "Mini", "Porsche", "Alfa Romeo", "Land Rover",
-                "Dacia", "Mitsubishi", "Subaru", "Chevrolet", "Lexus", "Chery", "MG", "BYD", "Jaguar", "Infiniti"
+                "Dacia", "Mitsubishi", "Subaru", "Chevrolet", "Lexus", "Chery", "MG", "BYD", "Jaguar", "Infiniti",
+                "Yamaha", "Kawasaki", "Ducati", "KTM", "Vespa", "Harley-Davidson", "Triumph"
         );
 
         for (String label : brands) {
-            String key = toKey(label);
-            CarBrand existing = brandRepository.findByNameIgnoreCase(key).orElse(null);
-            if (existing != null) {
-                if (existing.getLabel() == null || existing.getLabel().isBlank()) {
-                    existing.setLabel(label);
-                    brandRepository.save(existing);
-                }
-                continue;
-            }
-            CarBrand brand = new CarBrand();
-            brand.setName(key);
-            brand.setLabel(label);
-            brandRepository.save(brand);
+            upsertBrand(label);
+        }
+    }
+
+    private void seedTypes() {
+        List<String> types = List.of(
+                "Car",
+                "Motorcycle",
+                "Scooter",
+                "Bicycle",
+                "Truck",
+                "Van",
+                "Other"
+        );
+        for (String label : types) {
+            upsertType(label);
         }
     }
 
     private void seedModels() {
         Map<String, List<String>> brandModels = new LinkedHashMap<>();
+
+        VehicleType car = getType("CAR");
+        VehicleType motorcycle = getType("MOTORCYCLE");
+        VehicleType scooter = getType("SCOOTER");
 
         brandModels.put("AUDI", List.of("A1", "A3", "A4", "A5", "A6", "A7", "A8", "Q2", "Q3", "Q5", "Q7", "Q8", "TT", "e-tron"));
         brandModels.put("BMW", List.of("1 Series", "2 Series", "3 Series", "4 Series", "5 Series", "7 Series", "8 Series", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "i3", "i4", "iX", "Z4"));
@@ -99,20 +160,107 @@ public class VehicleDataInitializer implements CommandLineRunner {
         brandModels.put("INFINITI", List.of("Q30", "Q50", "Q60", "QX30", "QX50", "QX70"));
 
         for (Map.Entry<String, List<String>> entry : brandModels.entrySet()) {
-            String brandKey = entry.getKey();
-            CarBrand brand = brandRepository.findByNameIgnoreCase(brandKey).orElse(null);
-            if (brand == null) {
+            CarBrand brand = getBrand(entry.getKey());
+            if (brand == null || car == null) {
                 continue;
             }
             for (String modelName : entry.getValue()) {
-                if (modelRepository.findByBrand_IdAndNameIgnoreCase(brand.getId(), modelName).isPresent()) {
-                    continue;
-                }
-                VehicleModel model = new VehicleModel();
-                model.setName(modelName);
-                model.setBrand(brand);
-                modelRepository.save(model);
+                ensureModel(brand, car, modelName);
             }
+        }
+
+        if (motorcycle != null) {
+            CarBrand honda = getBrand("HONDA");
+            CarBrand yamaha = getBrand("YAMAHA");
+            CarBrand kawasaki = getBrand("KAWASAKI");
+            CarBrand bmw = getBrand("BMW");
+            CarBrand ducati = getBrand("DUCATI");
+            CarBrand ktm = getBrand("KTM");
+            CarBrand triumph = getBrand("TRIUMPH");
+            CarBrand harley = getBrand("HARLEY_DAVIDSON");
+
+            if (honda != null) {
+                ensureModel(honda, motorcycle, "CBR 600RR");
+                ensureModel(honda, motorcycle, "CB 650R");
+                ensureModel(honda, motorcycle, "Africa Twin");
+            }
+            if (yamaha != null) {
+                ensureModel(yamaha, motorcycle, "MT-07");
+                ensureModel(yamaha, motorcycle, "R6");
+                ensureModel(yamaha, motorcycle, "Tenere 700");
+            }
+            if (kawasaki != null) {
+                ensureModel(kawasaki, motorcycle, "Ninja 400");
+                ensureModel(kawasaki, motorcycle, "Z900");
+            }
+            if (bmw != null) {
+                ensureModel(bmw, motorcycle, "R 1250 GS");
+                ensureModel(bmw, motorcycle, "S 1000 RR");
+            }
+            if (ducati != null) {
+                ensureModel(ducati, motorcycle, "Monster");
+                ensureModel(ducati, motorcycle, "Panigale V4");
+            }
+            if (ktm != null) {
+                ensureModel(ktm, motorcycle, "390 Duke");
+                ensureModel(ktm, motorcycle, "1290 Super Duke R");
+            }
+            if (triumph != null) {
+                ensureModel(triumph, motorcycle, "Street Triple");
+                ensureModel(triumph, motorcycle, "Tiger 900");
+            }
+            if (harley != null) {
+                ensureModel(harley, motorcycle, "Iron 883");
+                ensureModel(harley, motorcycle, "Street Bob");
+            }
+        }
+
+        if (scooter != null) {
+            CarBrand vespa = getBrand("VESPA");
+            CarBrand yamaha = getBrand("YAMAHA");
+            CarBrand honda = getBrand("HONDA");
+            if (vespa != null) {
+                ensureModel(vespa, scooter, "Primavera 150");
+                ensureModel(vespa, scooter, "GTS 300");
+            }
+            if (yamaha != null) {
+                ensureModel(yamaha, scooter, "NMAX 125");
+            }
+            if (honda != null) {
+                ensureModel(honda, scooter, "PCX 125");
+            }
+        }
+    }
+
+    private void ensureModel(CarBrand brand, VehicleType type, String modelName) {
+        if (brand == null || type == null || modelName == null || modelName.isBlank()) {
+            return;
+        }
+        if (modelRepository.findAllByBrand_IdAndType_IdAndNameIgnoreCase(brand.getId(), type.getId(), modelName).isEmpty()) {
+            VehicleModel created = new VehicleModel();
+            created.setBrand(brand);
+            created.setType(type);
+            created.setName(modelName);
+            modelRepository.save(created);
+        }
+        List<VehicleModel> existingModels = modelRepository.findAllByBrand_IdAndNameIgnoreCase(brand.getId(), modelName);
+        for (VehicleModel m : existingModels) {
+            if (m.getType() == null) {
+                m.setType(type);
+                modelRepository.save(m);
+            }
+        }
+    }
+
+    private void backfillNullModelTypes() {
+        VehicleType car = getType("CAR");
+        if (car == null) {
+            return;
+        }
+        List<VehicleModel> nullTypedModels = modelRepository.findByTypeIsNull();
+        for (VehicleModel m : nullTypedModels) {
+            m.setType(car);
+            modelRepository.save(m);
         }
     }
 
@@ -126,6 +274,54 @@ public class VehicleDataInitializer implements CommandLineRunner {
                 .replace('-', ' ')
                 .replace('.', ' ')
                 .replaceAll("\\s+", "_");
+    }
+
+    private CarBrand upsertBrand(String label) {
+        String key = toKey(label);
+        Optional<CarBrand> existing = brandRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            CarBrand brand = existing.get();
+            if (brand.getLabel() == null || brand.getLabel().isBlank()) {
+                brand.setLabel(label);
+                return brandRepository.save(brand);
+            }
+            return brand;
+        }
+        CarBrand brand = new CarBrand();
+        brand.setName(key);
+        brand.setLabel(label);
+        return brandRepository.save(brand);
+    }
+
+    private VehicleType upsertType(String label) {
+        String key = toKey(label);
+        Optional<VehicleType> existing = typeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            VehicleType type = existing.get();
+            if (type.getLabel() == null || type.getLabel().isBlank()) {
+                type.setLabel(label);
+                return typeRepository.save(type);
+            }
+            return type;
+        }
+        VehicleType type = new VehicleType();
+        type.setName(key);
+        type.setLabel(label);
+        return typeRepository.save(type);
+    }
+
+    private CarBrand getBrand(String name) {
+        if (name == null) {
+            return null;
+        }
+        return brandRepository.findByNameIgnoreCase(name).orElse(null);
+    }
+
+    private VehicleType getType(String name) {
+        if (name == null) {
+            return null;
+        }
+        return typeRepository.findByNameIgnoreCase(name).orElse(null);
     }
 }
 

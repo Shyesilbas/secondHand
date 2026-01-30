@@ -33,6 +33,7 @@ const createFilterPayload = (filters, listingType) => {
 
   switch (typeUpper) {
     case LISTING_TYPES.VEHICLE:
+      payload.vehicleTypeIds = Array.isArray(filters.vehicleTypeIds) ? filters.vehicleTypeIds : [];
       payload.brandIds = Array.isArray(filters.brandIds) ? filters.brandIds : [];
       payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
       payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
@@ -56,9 +57,25 @@ const createFilterPayload = (filters, listingType) => {
       payload.maxRam = filters.maxRam ? parseInt(filters.maxRam) : null;
       payload.minStorage = filters.minStorage ? parseInt(filters.minStorage) : null;
       payload.maxStorage = filters.maxStorage ? parseInt(filters.maxStorage) : null;
+      payload.storageTypes = Array.isArray(filters.storageTypes) ? filters.storageTypes : [];
       payload.processors = Array.isArray(filters.processors) ? filters.processors : [];
       payload.minScreenSize = filters.minScreenSize ? parseInt(filters.minScreenSize) : null;
       payload.maxScreenSize = filters.maxScreenSize ? parseInt(filters.maxScreenSize) : null;
+      payload.minBatteryHealthPercent = filters.minBatteryHealthPercent ? parseInt(filters.minBatteryHealthPercent) : null;
+      payload.maxBatteryHealthPercent = filters.maxBatteryHealthPercent ? parseInt(filters.maxBatteryHealthPercent) : null;
+      payload.minBatteryCapacityMah = filters.minBatteryCapacityMah ? parseInt(filters.minBatteryCapacityMah) : null;
+      payload.maxBatteryCapacityMah = filters.maxBatteryCapacityMah ? parseInt(filters.maxBatteryCapacityMah) : null;
+      payload.minCameraMegapixels = filters.minCameraMegapixels ? parseInt(filters.minCameraMegapixels) : null;
+      payload.maxCameraMegapixels = filters.maxCameraMegapixels ? parseInt(filters.maxCameraMegapixels) : null;
+      payload.supports5g = filters.supports5g === true ? true : (filters.supports5g === false ? false : null);
+      payload.dualSim = filters.dualSim === true ? true : (filters.dualSim === false ? false : null);
+      payload.hasNfc = filters.hasNfc === true ? true : (filters.hasNfc === false ? false : null);
+      payload.connectionTypes = Array.isArray(filters.connectionTypes) ? filters.connectionTypes : [];
+      payload.wireless = filters.wireless === true ? true : (filters.wireless === false ? false : null);
+      payload.noiseCancelling = filters.noiseCancelling === true ? true : (filters.noiseCancelling === false ? false : null);
+      payload.hasMicrophone = filters.hasMicrophone === true ? true : (filters.hasMicrophone === false ? false : null);
+      payload.minBatteryLifeHours = filters.minBatteryLifeHours ? parseInt(filters.minBatteryLifeHours) : null;
+      payload.maxBatteryLifeHours = filters.maxBatteryLifeHours ? parseInt(filters.maxBatteryLifeHours) : null;
       break;
 
     case LISTING_TYPES.REAL_ESTATE:
@@ -76,6 +93,7 @@ const createFilterPayload = (filters, listingType) => {
       payload.minBuildingAge = filters.minBuildingAge ? parseInt(filters.minBuildingAge) : null;
       payload.maxBuildingAge = filters.maxBuildingAge ? parseInt(filters.maxBuildingAge) : null;
       payload.furnished = Boolean(filters.furnished);
+      payload.zoningStatus = (filters.zoningStatus || '').trim() || null;
       break;
 
     case LISTING_TYPES.CLOTHING:
@@ -87,6 +105,10 @@ const createFilterPayload = (filters, listingType) => {
       payload.clothingCategories = Array.isArray(filters.clothingCategories) ? filters.clothingCategories : [];
       payload.minPurchaseDate = filters.minPurchaseDate || null;
       payload.maxPurchaseDate = filters.maxPurchaseDate || null;
+      payload.sizes = Array.isArray(filters.sizes) ? filters.sizes : [];
+      payload.minShoeSizeEu = filters.minShoeSizeEu ? parseInt(filters.minShoeSizeEu) : null;
+      payload.maxShoeSizeEu = filters.maxShoeSizeEu ? parseInt(filters.maxShoeSizeEu) : null;
+      payload.material = (filters.material || '').trim() || null;
       break;
 
     case LISTING_TYPES.BOOKS:

@@ -21,4 +21,5 @@ public class RealEstateListingDto extends ListingDto {
     private Integer floor;
     private Integer buildingAge;
     private boolean furnished;
+    private String zoningStatus;
 }

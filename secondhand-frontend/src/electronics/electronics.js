@@ -19,8 +19,22 @@ export const ElectronicCreateRequestDTO = {
   color: '',
   ram: '',
   storage: '',
+  storageType: '',
   processor: '',
   screenSize: '',
+  gpuModel: '',
+  operatingSystem: '',
+  batteryHealthPercent: '',
+  batteryCapacityMah: '',
+  cameraMegapixels: '',
+  supports5g: false,
+  dualSim: false,
+  hasNfc: false,
+  connectionType: '',
+  wireless: false,
+  noiseCancelling: false,
+  hasMicrophone: false,
+  batteryLifeHours: '',
 };
 
 export const ElectronicListingDTO = {
@@ -35,8 +49,22 @@ export const ElectronicListingDTO = {
   color: '',
   ram: '',
   storage: '',
+  storageType: '',
   processor: '',
   screenSize: '',
+  gpuModel: '',
+  operatingSystem: '',
+  batteryHealthPercent: '',
+  batteryCapacityMah: '',
+  cameraMegapixels: '',
+  supports5g: false,
+  dualSim: false,
+  hasNfc: false,
+  connectionType: '',
+  wireless: false,
+  noiseCancelling: false,
+  hasMicrophone: false,
+  batteryLifeHours: '',
 };
 
 export const ElectronicSearchFiltersDTO = {
@@ -57,9 +85,25 @@ export const ElectronicSearchFiltersDTO = {
   maxRam: 0,
   minStorage: 0,
   maxStorage: 0,
+  storageTypes: [],
   processors: [],
   minScreenSize: 0,
   maxScreenSize: 0,
+  minBatteryHealthPercent: 0,
+  maxBatteryHealthPercent: 0,
+  minBatteryCapacityMah: 0,
+  maxBatteryCapacityMah: 0,
+  minCameraMegapixels: 0,
+  maxCameraMegapixels: 0,
+  supports5g: null,
+  dualSim: null,
+  hasNfc: null,
+  connectionTypes: [],
+  wireless: null,
+  noiseCancelling: null,
+  hasMicrophone: null,
+  minBatteryLifeHours: 0,
+  maxBatteryLifeHours: 0,
 
     sortBy: 'createdAt',
   sortDirection: 'DESC',
@@ -88,8 +132,22 @@ export const createElectronicCreateRequest = (data) => {
     color: data.color || '',
     ram: data.ram ? parseInt(data.ram) : undefined,
     storage: data.storage ? parseInt(data.storage) : undefined,
+    storageType: data.storageType || undefined,
     processor: data.processor || undefined,
     screenSize: data.screenSize ? parseInt(data.screenSize) : undefined,
+    gpuModel: (data.gpuModel || '').trim() || undefined,
+    operatingSystem: (data.operatingSystem || '').trim() || undefined,
+    batteryHealthPercent: data.batteryHealthPercent ? parseInt(data.batteryHealthPercent) : undefined,
+    batteryCapacityMah: data.batteryCapacityMah ? parseInt(data.batteryCapacityMah) : undefined,
+    cameraMegapixels: data.cameraMegapixels ? parseInt(data.cameraMegapixels) : undefined,
+    supports5g: data.supports5g === true ? true : (data.supports5g === false ? false : undefined),
+    dualSim: data.dualSim === true ? true : (data.dualSim === false ? false : undefined),
+    hasNfc: data.hasNfc === true ? true : (data.hasNfc === false ? false : undefined),
+    connectionType: data.connectionType || undefined,
+    wireless: data.wireless === true ? true : (data.wireless === false ? false : undefined),
+    noiseCancelling: data.noiseCancelling === true ? true : (data.noiseCancelling === false ? false : undefined),
+    hasMicrophone: data.hasMicrophone === true ? true : (data.hasMicrophone === false ? false : undefined),
+    batteryLifeHours: data.batteryLifeHours ? parseInt(data.batteryLifeHours) : undefined,
   };
 };
 
@@ -112,8 +170,22 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
   if (data.ram !== undefined && data.ram !== '') updateData.ram = parseInt(data.ram);
   if (data.storage !== undefined && data.storage !== '') updateData.storage = parseInt(data.storage);
+  if (data.storageType !== undefined && data.storageType !== '') updateData.storageType = data.storageType;
   if (data.processor !== undefined && data.processor !== '') updateData.processor = data.processor;
   if (data.screenSize !== undefined && data.screenSize !== '') updateData.screenSize = parseInt(data.screenSize);
+  if (data.gpuModel !== undefined && data.gpuModel !== '') updateData.gpuModel = data.gpuModel.trim();
+  if (data.operatingSystem !== undefined && data.operatingSystem !== '') updateData.operatingSystem = data.operatingSystem.trim();
+  if (data.batteryHealthPercent !== undefined && data.batteryHealthPercent !== '') updateData.batteryHealthPercent = parseInt(data.batteryHealthPercent);
+  if (data.batteryCapacityMah !== undefined && data.batteryCapacityMah !== '') updateData.batteryCapacityMah = parseInt(data.batteryCapacityMah);
+  if (data.cameraMegapixels !== undefined && data.cameraMegapixels !== '') updateData.cameraMegapixels = parseInt(data.cameraMegapixels);
+  if (data.supports5g !== undefined && data.supports5g !== '') updateData.supports5g = Boolean(data.supports5g);
+  if (data.dualSim !== undefined && data.dualSim !== '') updateData.dualSim = Boolean(data.dualSim);
+  if (data.hasNfc !== undefined && data.hasNfc !== '') updateData.hasNfc = Boolean(data.hasNfc);
+  if (data.connectionType !== undefined && data.connectionType !== '') updateData.connectionType = data.connectionType;
+  if (data.wireless !== undefined && data.wireless !== '') updateData.wireless = Boolean(data.wireless);
+  if (data.noiseCancelling !== undefined && data.noiseCancelling !== '') updateData.noiseCancelling = Boolean(data.noiseCancelling);
+  if (data.hasMicrophone !== undefined && data.hasMicrophone !== '') updateData.hasMicrophone = Boolean(data.hasMicrophone);
+  if (data.batteryLifeHours !== undefined && data.batteryLifeHours !== '') updateData.batteryLifeHours = parseInt(data.batteryLifeHours);
   return updateData;
 };
 

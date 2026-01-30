@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,9 @@ public class ClothingListingDto extends ListingDto {
     private Color color;
     private LocalDate purchaseDate;
     private ClothingCondition condition;
+    private ClothingSize size;
+    private Integer shoeSizeEu;
+    private String material;
     private ClothingGender clothingGender;
     private ClothingCategory clothingCategory;
 }

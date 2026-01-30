@@ -9,6 +9,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VehicleListingDto extends ListingDto {
 
+    private VehicleType vehicleType;
     private CarBrand brand;
     private VehicleModel model;
     private Integer year;

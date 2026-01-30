@@ -13,6 +13,7 @@ public record VehicleCreateRequest(
     Currency currency,
     String city,
     String district,
+    UUID vehicleTypeId,
     UUID brandId,
     UUID vehicleModelId,
     Integer year,

@@ -14,6 +14,7 @@ public record VehicleUpdateRequest(
     Optional<Currency> currency,
     Optional<String> city,
     Optional<String> district,
+    Optional<UUID> vehicleTypeId,
     Optional<UUID> brandId,
     Optional<UUID> vehicleModelId,
     Optional<Integer> year,

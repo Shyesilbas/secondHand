@@ -8,7 +8,9 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.*;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
@@ -40,6 +42,7 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -74,6 +77,7 @@ public class EnumController {
     private final HeatingTypeRepository heatingTypeRepository;
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
     private final CarBrandRepository carBrandRepository;
+    private final VehicleTypeRepository vehicleTypeRepository;
     private final VehicleModelRepository vehicleModelRepository;
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
@@ -126,10 +130,25 @@ public class EnumController {
                     modelMap.put("id", model.getId());
                     modelMap.put("name", model.getName());
                     modelMap.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
+                    modelMap.put("typeId", model.getType() != null ? model.getType().getId() : null);
                     return modelMap;
                 })
                 .toList();
         return ResponseEntity.ok(models);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getVehicleTypes() {
+        List<Map<String, Object>> types = vehicleTypeRepository.findAll().stream()
+                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
+                .map(type -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", type.getId());
+                    map.put("name", type.getName());
+                    map.put("label", type.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(types);
     }
 
     private ResponseEntity<List<Map<String, Object>>> getFuelTypes() {
@@ -166,6 +185,30 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(processors);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getStorageTypes() {
+        List<Map<String, Object>> storageTypes = Arrays.stream(StorageType.values())
+                .map(t -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", t.name());
+                    map.put("label", t.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(storageTypes);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getElectronicConnectionTypes() {
+        List<Map<String, Object>> connectionTypes = Arrays.stream(ElectronicConnectionType.values())
+                .map(t -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", t.name());
+                    map.put("label", t.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(connectionTypes);
     }
 
     private ResponseEntity<List<Map<String, Object>>> getGenders() {
@@ -428,6 +471,18 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(categories);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getClothingSizes() {
+        List<Map<String, Object>> sizes = Arrays.stream(ClothingSize.values())
+                .map(size -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", size.name());
+                    map.put("label", size.name());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(sizes);
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookTypes() {
@@ -700,6 +755,7 @@ public class EnumController {
         allEnums.put("listingTypes", getListingTypes().getBody());
         allEnums.put("listingStatuses", getListingStatuses().getBody());
         allEnums.put("carBrands", getCarBrands().getBody());
+        allEnums.put("vehicleTypes", getVehicleTypes().getBody());
         allEnums.put("vehicleModels", getVehicleModels().getBody());
         allEnums.put("fuelTypes", getFuelTypes().getBody());
         allEnums.put("colors", getColors().getBody());
@@ -711,6 +767,8 @@ public class EnumController {
         allEnums.put("electronicBrands", getElectronicBrands().getBody());
         allEnums.put("electronicModels", getElectronicModels().getBody());
         allEnums.put("processors", getProcessors().getBody());
+        allEnums.put("storageTypes", getStorageTypes().getBody());
+        allEnums.put("electronicConnectionTypes", getElectronicConnectionTypes().getBody());
         allEnums.put("drivetrains", getDrivetrains().getBody());
         allEnums.put("bodyTypes", getBodyTypes().getBody());
         allEnums.put("realEstateTypes", getRealEstateTypes().getBody());
@@ -722,6 +780,7 @@ public class EnumController {
         allEnums.put("clothingConditions", getClothingConditions().getBody());
         allEnums.put("clothingGenders", getClothingGenders().getBody());
         allEnums.put("clothingCategories", getClothingCategories().getBody());
+        allEnums.put("clothingSizes", getClothingSizes().getBody());
         allEnums.put("bookTypes", getBookTypes().getBody());
         allEnums.put("bookGenres", getBookGenres().getBody());
         allEnums.put("bookLanguages", getBookLanguages().getBody());

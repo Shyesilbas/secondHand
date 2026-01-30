@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.dto.request.clothing;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import jakarta.validation.constraints.Max;
@@ -57,6 +58,12 @@ public record ClothingCreateRequest(
 
     @NotNull(message = "Condition is required")
     ClothingCondition condition,
+
+    ClothingSize size,
+
+    Integer shoeSizeEu,
+
+    String material,
 
     @NotNull(message = "Clothing gender is required")
     ClothingGender clothingGender,

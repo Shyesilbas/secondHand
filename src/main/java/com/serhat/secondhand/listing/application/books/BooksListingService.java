@@ -19,6 +19,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.books.BooksSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,22 +50,21 @@ public class BooksListingService {
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<BooksSpecValidator> booksSpecValidators;
 
     @Transactional
     public Result<UUID> createBooksListing(BooksCreateRequest request, Long sellerId) {
         log.info("Creating books listing for sellerId: {}", sellerId);
 
-        // 1. Resolve Seller
         var userResult = userService.findById(sellerId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         User seller = userResult.getData();
 
-        // 2. Map and Validate
         BooksListing books = listingMapper.toBooksEntity(request);
         if (books.getQuantity() == null || books.getQuantity() < 1) {
-            // Your Result structure: error(message, errorCode)
             return Result.error("Invalid quantity for books listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
@@ -87,10 +89,6 @@ public class BooksListingService {
             return Result.error("Book condition not found", "BOOK_CONDITION_NOT_FOUND");
         }
 
-        if (genre.getBookType() != null && genre.getBookType().getId() != null && !genre.getBookType().getId().equals(bookType.getId())) {
-            return Result.error("Book genre does not belong to selected book type", "BOOK_GENRE_TYPE_MISMATCH");
-        }
-
         books.setBookType(bookType);
         books.setGenre(genre);
         books.setLanguage(language);
@@ -100,6 +98,11 @@ public class BooksListingService {
         books.setSeller(seller);
         books.setListingFeePaid(true);
         books.setStatus(ListingStatus.ACTIVE);
+
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(books, booksSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         BooksListing saved = booksRepository.save(books);
         log.info("Books listing created: {}", saved.getId());
@@ -111,7 +114,6 @@ public class BooksListingService {
 
     @Transactional
     public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, Long currentUserId) {
-        // 1. Ownership Check (Long userId based)
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
@@ -122,7 +124,6 @@ public class BooksListingService {
             return Result.error("Books listing not found", "LISTING_NOT_FOUND");
         }
 
-        // 2. Status Validation
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
         if (statusResult.isError()) {
             return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
@@ -130,7 +131,6 @@ public class BooksListingService {
 
         var oldPrice = existing.getPrice();
 
-        // 3. Optional Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -178,17 +178,15 @@ public class BooksListingService {
             }
         });
 
-        if (existing.getBookType() != null && existing.getGenre() != null && existing.getGenre().getBookType() != null &&
-                existing.getGenre().getBookType().getId() != null && existing.getBookType().getId() != null &&
-                !existing.getGenre().getBookType().getId().equals(existing.getBookType().getId())) {
-            return Result.error("Book genre does not belong to selected book type", "BOOK_GENRE_TYPE_MISMATCH");
-        }
-
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
-        // 4. Save and Price History Record
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, booksSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
         booksRepository.save(existing);
 
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {

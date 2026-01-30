@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.domain.dto.response.listing;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,4 +24,8 @@ public class ClothingListingFilterDto extends ListingFilterDto {
     private List<ClothingCategory> clothingCategories;
     private LocalDate minPurchaseDate;
     private LocalDate maxPurchaseDate;
+    private List<ClothingSize> sizes;
+    private Integer minShoeSizeEu;
+    private Integer maxShoeSizeEu;
+    private String material;
 }

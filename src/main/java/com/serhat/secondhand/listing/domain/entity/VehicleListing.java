@@ -27,6 +27,10 @@ import java.time.LocalDate;
 public class VehicleListing extends Listing {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_type_id")
+    private VehicleType vehicleType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_brand_id")
     private CarBrand brand;
 

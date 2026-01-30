@@ -6,7 +6,6 @@ import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
@@ -25,15 +24,15 @@ public class SportsFilterPredicateBuilder implements FilterPredicateBuilder<Spor
         predicates.add(cb.equal(root.get("listingType"), ListingType.SPORTS));
         
         if (filters.getDisciplineIds() != null && !filters.getDisciplineIds().isEmpty()) {
-            predicates.add(root.join("discipline", JoinType.LEFT).get("id").in(filters.getDisciplineIds()));
+            predicates.add(root.join("discipline").get("id").in(filters.getDisciplineIds()));
         }
         
         if (filters.getEquipmentTypeIds() != null && !filters.getEquipmentTypeIds().isEmpty()) {
-            predicates.add(root.join("equipmentType", JoinType.LEFT).get("id").in(filters.getEquipmentTypeIds()));
+            predicates.add(root.join("equipmentType").get("id").in(filters.getEquipmentTypeIds()));
         }
         
         if (filters.getConditionIds() != null && !filters.getConditionIds().isEmpty()) {
-            predicates.add(root.join("condition", JoinType.LEFT).get("id").in(filters.getConditionIds()));
+            predicates.add(root.join("condition").get("id").in(filters.getConditionIds()));
         }
         
         return predicates;
@@ -44,9 +43,9 @@ public class SportsFilterPredicateBuilder implements FilterPredicateBuilder<Spor
         return switch (sortBy) {
             case "price" -> Optional.of(root.get("price"));
             case "createdat", "created_at" -> Optional.of(root.get("createdAt"));
-            case "discipline" -> Optional.of(root.join("discipline", JoinType.LEFT).get("label"));
-            case "equipmenttype", "equipment_type" -> Optional.of(root.join("equipmentType", JoinType.LEFT).get("label"));
-            case "condition" -> Optional.of(root.join("condition", JoinType.LEFT).get("label"));
+            case "discipline" -> Optional.of(root.join("discipline").get("label"));
+            case "equipmenttype", "equipment_type" -> Optional.of(root.join("equipmentType").get("label"));
+            case "condition" -> Optional.of(root.join("condition").get("label"));
             default -> Optional.empty();
         };
     }

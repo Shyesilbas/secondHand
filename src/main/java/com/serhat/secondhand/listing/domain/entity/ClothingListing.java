@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,15 @@ public class ClothingListing extends Listing {
 
     @Enumerated(EnumType.STRING)
     private ClothingCondition condition;
+
+    @Enumerated(EnumType.STRING)
+    private ClothingSize size;
+
+    @Column(name = "shoe_size_eu")
+    private Integer shoeSizeEu;
+
+    @Column(name = "material", length = 120)
+    private String material;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "clothing_gender", nullable = false)

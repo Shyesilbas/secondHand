@@ -23,6 +23,10 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
         List<Predicate> predicates = new ArrayList<>();
         
         predicates.add(cb.equal(root.get("listingType"), ListingType.VEHICLE));
+
+        if (filters.getVehicleTypeIds() != null && !filters.getVehicleTypeIds().isEmpty()) {
+            predicates.add(root.join("vehicleType").get("id").in(filters.getVehicleTypeIds()));
+        }
         
         if (filters.getBrandIds() != null && !filters.getBrandIds().isEmpty()) {
             predicates.add(root.join("brand").get("id").in(filters.getBrandIds()));

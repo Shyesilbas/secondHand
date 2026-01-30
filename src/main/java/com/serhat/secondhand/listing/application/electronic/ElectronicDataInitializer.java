@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.electronic;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
@@ -7,7 +9,6 @@ import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBra
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
@@ -17,18 +18,24 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class ElectronicDataInitializer implements CommandLineRunner {
+public class ElectronicDataInitializer implements SeedTask {
 
     private final ElectronicBrandRepository brandRepository;
     private final ElectronicTypeRepository typeRepository;
     private final ElectronicModelRepository modelRepository;
 
     @Override
-    public void run(String... args) {
+    public String key() {
+        return "electronics";
+    }
+
+    @Override
+    public Result<Void> run() {
         seedBrands();
         seedTypes();
         seedModels();
         backfillNullModelTypes();
+        return Result.success();
     }
 
     private void seedBrands() {

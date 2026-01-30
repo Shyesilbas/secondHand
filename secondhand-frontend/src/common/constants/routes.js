@@ -22,6 +22,7 @@ export const ROUTES = {
     EDIT_LISTING: (id) => `/listings/${id}/edit`,
     VEHICLE_DETAIL: '/vehicles/:id',
     CREATE_LISTING: '/listings/create',
+    CREATE_LISTING_SUBTYPE: (listingType) => `/listings/create/${listingType}/subtype`,
     CREATE_REAL_ESTATE: '/real-estates/create',
     CREATE_CLOTHING: '/clothing/create',
     CLOTHING_DETAIL: '/clothing/:id',

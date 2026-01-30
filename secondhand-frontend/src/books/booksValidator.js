@@ -10,6 +10,11 @@ const validateBooksStep2 = (formData) => {
     if (!formData.pageCount) errors.pageCount = 'Page count is required';
     if (!formData.formatId) errors.formatId = 'Format is required';
     if (!formData.conditionId) errors.conditionId = 'Condition is required';
+
+    if (formData.bookTypeId && formData.genreId && formData._genreBookTypeId && String(formData._genreBookTypeId) !== String(formData.bookTypeId)) {
+        errors.genreId = 'Genre does not belong to selected book type';
+    }
+
     return errors;
 };
 

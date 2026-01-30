@@ -6,6 +6,8 @@ import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import VehicleFilters from "./filters/VehicleFilters.jsx";
 import ElectronicsFilters from "./filters/ElectronicsFilters.jsx";
 import ClothingFilters from "./filters/ClothingFilters.jsx";
+import FilterRenderer from "./filters/FilterRenderer.jsx";
+import { getListingConfig } from "../config/listingConfig.js";
 
 const FilterSidebar = ({
     isOpen,
@@ -124,12 +126,25 @@ const FilterSidebar = ({
                                     enums={enums}
                                 />
                             )}
-                            {localCategory !== "VEHICLE" && localCategory !== "ELECTRONICS" && localCategory !== "CLOTHING" && (
-                                <div className="text-center text-gray-500 py-8">
-                                    <p>No specific filters available for this category.</p>
-                                    <p className="text-sm mt-2">Use price and location filters instead.</p>
-                                </div>
-                            )}
+                            {localCategory !== "VEHICLE" && localCategory !== "ELECTRONICS" && localCategory !== "CLOTHING" && (() => {
+                                const config = getListingConfig(localCategory);
+                                if (config?.filterConfig) {
+                                    return (
+                                        <FilterRenderer
+                                            config={config.filterConfig}
+                                            filters={localFilters}
+                                            onChange={handleInputChange}
+                                            title="Specific Filters"
+                                        />
+                                    );
+                                }
+                                return (
+                                    <div className="text-center text-gray-500 py-8">
+                                        <p>No specific filters available for this category.</p>
+                                        <p className="text-sm mt-2">Use price and location filters instead.</p>
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
                 </div>

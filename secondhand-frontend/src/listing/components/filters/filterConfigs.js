@@ -21,6 +21,11 @@ export const createElectronicsFilterConfig = () => {
 
 export const createRealEstateFilterConfig = () => {
   return new FilterConfig()
+    .addEnumField('realEstateTypeIds', 'Property Type', 'realEstateTypes')
+    .addEnumField('heatingTypeIds', 'Heating Type', 'heatingTypes')
+    .addEnumField('adTypeId', 'Ad Type', 'realEstateAdTypes', { multiple: false })
+    .addEnumField('ownerTypeId', 'Owner Type', 'ownerTypes', { multiple: false })
+    .addTextField('zoningStatus', 'Zoning Status', { placeholder: 'e.g. zoned, imarlı' })
     .addNumericRangeField('squareMeters', 'Square Meters', { min: 0, placeholder: '100' })
     .addNumericRangeField('roomCount', 'Room Count', { min: 1, step: 1, placeholder: '3' })
     .addNumericRangeField('buildingAge', 'Building Age', { min: 0, placeholder: '10' })
@@ -31,10 +36,13 @@ export const createClothingFilterConfig = () => {
   return new FilterConfig()
     .addEnumField('brands', 'Brand', 'clothingBrands')
     .addEnumField('types', 'Type', 'clothingTypes')
+    .addEnumField('sizes', 'Size', 'clothingSizes')
     .addEnumField('colors', 'Color', 'colors')
     .addEnumField('conditions', 'Condition', 'clothingConditions')
     .addEnumField('clothingGenders', 'Clothing Gender', 'clothingGenders')
     .addEnumField('clothingCategories', 'Clothing Category', 'clothingCategories')
+    .addNumericRangeField('shoeSizeEu', 'Shoe Size (EU)', { min: 20, max: 55, step: 1, placeholder: '42' })
+    .addTextField('material', 'Material', { placeholder: 'e.g. cotton, leather' })
     .addDateRangeField('purchaseDate', 'Purchase Date');
 };
 

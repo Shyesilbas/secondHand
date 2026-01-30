@@ -1,6 +1,6 @@
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '3.9';
+const ENUM_CACHE_VERSION = '4.2';
 const REQUIRED_ENUM_KEYS = [
   'listingTypes',
   'listingStatuses',

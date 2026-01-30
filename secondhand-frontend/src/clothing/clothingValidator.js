@@ -9,6 +9,23 @@ const validateClothingStep2 = (formData) => {
     if (!formData.clothingGender) errors.clothingGender = 'Clothing gender is required';
     if (!formData.clothingCategory) errors.clothingCategory = 'Clothing category is required';
     if (!formData.purchaseYear) errors.purchaseYear = 'Purchase year is required';
+
+    const typeName = String(formData._clothingTypeName || '').toUpperCase();
+    const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(typeName);
+    const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(typeName);
+    const apparel = Boolean(typeName) && !footwear && !accessory;
+
+    if (footwear) {
+        const shoeSize = parseInt(formData.shoeSizeEu);
+        if (!shoeSize || shoeSize < 20 || shoeSize > 55) errors.shoeSizeEu = 'Shoe size (EU) is required';
+    }
+
+    if (apparel) {
+        if (!formData.size) errors.size = 'Size is required';
+    }
+
+    if (formData.material && String(formData.material).trim().length > 120) errors.material = 'Material is too long';
+
     return errors;
 };
 

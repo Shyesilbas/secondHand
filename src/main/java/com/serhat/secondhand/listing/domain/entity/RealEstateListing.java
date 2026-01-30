@@ -24,8 +24,8 @@ public class RealEstateListing extends Listing {
     @JoinColumn(name = "real_estate_type_id", nullable = false)
     private RealEstateType realEstateType;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "heating_type_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "heating_type_id")
     private HeatingType heatingType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -53,5 +53,8 @@ public class RealEstateListing extends Listing {
 
     @Column(name = "is_furnished", nullable = false)
     private boolean furnished;
+
+    @Column(name = "zoning_status", length = 120)
+    private String zoningStatus;
 
 }
