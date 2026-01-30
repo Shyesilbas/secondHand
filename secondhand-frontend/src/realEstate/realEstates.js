@@ -74,13 +74,15 @@ export const RealEstateSearchFiltersDTO = {
 
 export const createRealEstateCreateRequest = (data) => {
   return {
-        title: (data.title || '').trim(),
-    description: (data.description || '').trim(),
-    price: parseFloat(data.price) || 0,
-    currency: data.currency || 'TRY',
-    city: (data.city || '').trim(),
-    district: (data.district || '').trim(),
-    imageUrl: data.imageUrl || undefined,
+        base: {
+      title: (data.title || '').trim(),
+      description: (data.description || '').trim(),
+      price: parseFloat(data.price) || 0,
+      currency: data.currency || 'TRY',
+      city: (data.city || '').trim(),
+      district: (data.district || '').trim(),
+      imageUrl: data.imageUrl || undefined,
+    },
     
         adTypeId: data.adTypeId || null,
     realEstateTypeId: data.realEstateTypeId || null,
@@ -99,12 +101,13 @@ export const createRealEstateCreateRequest = (data) => {
 export const createRealEstateUpdateRequest = (data) => {
   const updateData = {};
   
-    if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
-  if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
-  if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
-  if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
-  if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
-  if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
+    const base = {};
+  if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
+  if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
+  if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
+  if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
+  if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
+  if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
   if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
   if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
   if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;
@@ -115,8 +118,9 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.floor !== undefined && data.floor !== '') updateData.floor = parseInt(data.floor);
   if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
   if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
   if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
+  if (Object.keys(base).length > 0) updateData.base = base;
   
   return updateData;
 };

@@ -46,7 +46,11 @@ public class LaptopValidator implements ElectronicSpecValidator {
 
     @Override
     public void cleanup(ElectronicListing listing) {
-        if (isLaptop(listing)) {
+        if (!isLaptop(listing)) {
+            return;
+        }
+        
+        {
             listing.setBatteryCapacityMah(null);
             listing.setCameraMegapixels(null);
             listing.setSupports5g(null);
@@ -57,17 +61,7 @@ public class LaptopValidator implements ElectronicSpecValidator {
             listing.setNoiseCancelling(null);
             listing.setHasMicrophone(null);
             listing.setBatteryLifeHours(null);
-            return;
         }
-
-        listing.setRam(null);
-        listing.setStorage(null);
-        listing.setStorageType(null);
-        listing.setProcessor(null);
-        listing.setScreenSize(null);
-        listing.setGpuModel(null);
-        listing.setOperatingSystem(null);
-        listing.setBatteryHealthPercent(null);
     }
 
     private boolean isLaptop(ElectronicListing listing) {

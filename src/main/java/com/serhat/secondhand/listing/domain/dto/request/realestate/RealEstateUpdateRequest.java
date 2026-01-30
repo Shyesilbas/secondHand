@@ -1,18 +1,12 @@
 package com.serhat.secondhand.listing.domain.dto.request.realestate;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 public record RealEstateUpdateRequest(
-        Optional<String> title,
-        Optional<String> description,
-        Optional<BigDecimal> price,
-        Optional<Currency> currency,
-        Optional<String> city,
-        Optional<String> district,
+        BaseListingUpdateRequest base,
         Optional<UUID> adTypeId,
         Optional<UUID> realEstateTypeId,
         Optional<UUID> heatingTypeId,
@@ -23,7 +17,5 @@ public record RealEstateUpdateRequest(
         Optional<Integer>   floor,
         Optional<Integer>   buildingAge,
         Optional<Boolean> furnished,
-        Optional<String> zoningStatus,
-        Optional<String> imageUrl
-) {
-}
+        Optional<String> zoningStatus
+) {}

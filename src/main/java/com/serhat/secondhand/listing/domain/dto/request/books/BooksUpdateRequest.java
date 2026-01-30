@@ -1,19 +1,13 @@
 package com.serhat.secondhand.listing.domain.dto.request.books;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 
 import java.util.Optional;
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public record BooksUpdateRequest(
-        Optional<String> title,
-        Optional<String> description,
-        Optional<BigDecimal> price,
-        Optional<Currency> currency,
+        BaseListingUpdateRequest base,
         Optional<Integer> quantity,
-        Optional<String> city,
-        Optional<String> district,
         Optional<String> author,
         Optional<UUID> bookTypeId,
         Optional<UUID> genreId,
@@ -22,8 +16,7 @@ public record BooksUpdateRequest(
         Optional<Integer> pageCount,
         Optional<UUID> formatId,
         Optional<UUID> conditionId,
-        Optional<String> isbn,
-        Optional<String> imageUrl
+        Optional<String> isbn
 ) {}
 
 

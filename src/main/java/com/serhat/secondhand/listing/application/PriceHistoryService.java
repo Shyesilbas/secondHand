@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -84,6 +85,30 @@ public class PriceHistoryService {
             log.info("Price change recorded for listing: {}, from: {} to: {}", 
                     listingId, oldPrice, newPrice);
         }
+    }
+
+    public void recordPriceChangeIfUpdated(Listing listing, BigDecimal oldPrice, Optional<BigDecimal> requestedPrice, String changeReason) {
+        if (listing == null) {
+            return;
+        }
+        if (requestedPrice == null || requestedPrice.isEmpty()) {
+            return;
+        }
+        BigDecimal newPrice = listing.getPrice();
+        if (newPrice == null) {
+            return;
+        }
+        if (oldPrice != null && oldPrice.compareTo(newPrice) == 0) {
+            return;
+        }
+        recordPriceChange(
+                listing.getId(),
+                listing.getTitle(),
+                oldPrice,
+                newPrice,
+                listing.getCurrency(),
+                changeReason
+        );
     }
 
     public PriceHistoryDto getLatestPriceChange(UUID listingId) {

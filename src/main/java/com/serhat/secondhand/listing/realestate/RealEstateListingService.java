@@ -9,13 +9,8 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.RealEstateFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.listing.validation.ListingValidationEngine;
@@ -40,12 +35,10 @@ public class RealEstateListingService {
     private final RealEstateListingFilterService realEstateListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final UserService userService;
-    private final RealEstateTypeRepository realEstateTypeRepository;
-    private final RealEstateAdTypeRepository realEstateAdTypeRepository;
-    private final HeatingTypeRepository heatingTypeRepository;
-    private final ListingOwnerTypeRepository listingOwnerTypeRepository;
     private final ListingValidationEngine listingValidationEngine;
     private final List<RealEstateSpecValidator> realEstateSpecValidators;
+    private final RealEstateMapper realEstateMapper;
+    private final RealEstateListingResolver realEstateListingResolver;
 
     @Transactional
     public Result<UUID> createRealEstateListing(RealEstateCreateRequest request, Long sellerId) {
@@ -61,12 +54,20 @@ public class RealEstateListingService {
         // 2. Map and Save
         RealEstateListing realEstateListing = listingMapper.toRealEstateEntity(request);
         realEstateListing.setSeller(seller);
-        realEstateListing.setStatus(ListingStatus.ACTIVE);
-        realEstateListing.setListingFeePaid(true);
-        realEstateListing.setAdType(resolveAdType(request.adTypeId()));
-        realEstateListing.setRealEstateType(resolveRealEstateType(request.realEstateTypeId()));
-        realEstateListing.setHeatingType(resolveHeatingType(request.heatingTypeId()));
-        realEstateListing.setOwnerType(resolveOwnerType(request.ownerTypeId()));
+        var resolutionResult = realEstateListingResolver.resolve(
+                request.adTypeId(),
+                request.realEstateTypeId(),
+                request.heatingTypeId(),
+                request.ownerTypeId()
+        );
+        if (resolutionResult.isError()) {
+            return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
+        }
+        RealEstateResolution res = resolutionResult.getData();
+        realEstateListing.setAdType(res.adType());
+        realEstateListing.setRealEstateType(res.realEstateType());
+        realEstateListing.setHeatingType(res.heatingType());
+        realEstateListing.setOwnerType(res.ownerType());
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(realEstateListing, realEstateSpecValidators);
         if (validationResult.isError()) {
@@ -86,7 +87,7 @@ public class RealEstateListingService {
         // 1. Ownership Validation (ID Based)
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+            return ownershipResult;
         }
 
         RealEstateListing existing = realEstateRepository.findById(id).orElse(null);
@@ -94,34 +95,24 @@ public class RealEstateListingService {
             return Result.error("Real Estate listing not found", "LISTING_NOT_FOUND");
         }
 
-        // 2. Status Validation
-        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
-            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
+            return statusResult;
         }
 
         var oldPrice = existing.getPrice();
 
-        // 3. Mapping Updates
-        request.title().ifPresent(existing::setTitle);
-        request.description().ifPresent(existing::setDescription);
-        request.price().ifPresent(existing::setPrice);
-        request.currency().ifPresent(existing::setCurrency);
-        request.city().ifPresent(existing::setCity);
-        request.district().ifPresent(existing::setDistrict);
-        request.imageUrl().ifPresent(existing::setImageUrl);
-
-        request.adTypeId().ifPresent(idValue -> existing.setAdType(resolveAdType(idValue)));
-        request.realEstateTypeId().ifPresent(idValue -> existing.setRealEstateType(resolveRealEstateType(idValue)));
-        request.heatingTypeId().ifPresent(idValue -> existing.setHeatingType(resolveHeatingType(idValue)));
-        request.ownerTypeId().ifPresent(idValue -> existing.setOwnerType(resolveOwnerType(idValue)));
-        request.squareMeters().ifPresent(existing::setSquareMeters);
-        request.roomCount().ifPresent(existing::setRoomCount);
-        request.bathroomCount().ifPresent(existing::setBathroomCount);
-        request.floor().ifPresent(existing::setFloor);
-        request.buildingAge().ifPresent(existing::setBuildingAge);
-        request.furnished().ifPresent(existing::setFurnished);
-        request.zoningStatus().ifPresent(existing::setZoningStatus);
+        realEstateMapper.updateEntityFromRequest(existing, request);
+        Result<Void> applyResult = realEstateListingResolver.apply(
+                existing,
+                request.adTypeId(),
+                request.realEstateTypeId(),
+                request.heatingTypeId(),
+                request.ownerTypeId()
+        );
+        if (applyResult.isError()) {
+            return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
+        }
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, realEstateSpecValidators);
         if (validationResult.isError()) {
@@ -131,16 +122,12 @@ public class RealEstateListingService {
         realEstateRepository.save(existing);
 
         // 4. Price History Check
-        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
-            priceHistoryService.recordPriceChange(
-                    existing.getId(),
-                    existing.getTitle(),
-                    oldPrice,
-                    existing.getPrice(),
-                    existing.getCurrency(),
-                    "Price updated via listing edit"
-            );
-        }
+        priceHistoryService.recordPriceChangeIfUpdated(
+                existing,
+                oldPrice,
+                request.base() != null ? request.base().price() : null,
+                "Price updated via listing edit"
+        );
 
         log.info("Real estate listing updated: {}", id);
         return Result.success();
@@ -157,31 +144,4 @@ public class RealEstateListingService {
         return listingMapper.toRealEstateDto(realEstateListing);
     }
 
-    private com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType resolveRealEstateType(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return realEstateTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Real estate type not found"));
-    }
-
-    private com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType resolveAdType(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return realEstateAdTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Real estate ad type not found"));
-    }
-
-    private com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType resolveHeatingType(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return heatingTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Heating type not found"));
-    }
-
-    private com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType resolveOwnerType(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return listingOwnerTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Owner type not found"));
-    }
 }

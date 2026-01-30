@@ -69,13 +69,15 @@ export const VehicleListingDTO = {
 
 export const createVehicleCreateRequest = (data) => {
   return {
-        title: (data.title || '').trim(),
-    description: (data.description || '').trim(),
-    price: parseFloat(data.price) || 0,
-    currency: data.currency || 'TRY',
-    city: (data.city || '').trim(),
-    district: (data.district || '').trim(),
-    imageUrl: data.imageUrl || undefined,
+        base: {
+      title: (data.title || '').trim(),
+      description: (data.description || '').trim(),
+      price: parseFloat(data.price) || 0,
+      currency: data.currency || 'TRY',
+      city: (data.city || '').trim(),
+      district: (data.district || '').trim(),
+      imageUrl: data.imageUrl || undefined,
+    },
     
         vehicleTypeId: data.vehicleTypeId || null,
         brandId: data.brandId || null,
@@ -105,12 +107,13 @@ export const createVehicleCreateRequest = (data) => {
 export const createVehicleUpdateRequest = (data) => {
   const updateData = {};
   
-    if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
-  if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
-  if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
-  if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
-  if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
-  if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
+    const base = {};
+  if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
+  if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
+  if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
+  if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
+  if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
+  if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
   if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') updateData.vehicleTypeId = data.vehicleTypeId;
   if (data.brandId !== undefined && data.brandId !== '') updateData.brandId = data.brandId;
   if (data.vehicleModelId !== undefined && data.vehicleModelId !== '') updateData.vehicleModelId = data.vehicleModelId;
@@ -128,12 +131,13 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter);
   if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
   if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
   if (data.accidentHistory !== undefined) updateData.accidentHistory = Boolean(data.accidentHistory);
   if (data.accidentDetails !== undefined) updateData.accidentDetails = (data.accidentDetails || '').trim();
   if (data.inspectionValidUntil !== undefined && data.inspectionValidUntil !== '') updateData.inspectionValidUntil = String(data.inspectionValidUntil);
   if (data.drivetrain !== undefined && data.drivetrain !== '') updateData.drivetrain = data.drivetrain;
   if (data.bodyType !== undefined && data.bodyType !== '') updateData.bodyType = data.bodyType;
+  if (Object.keys(base).length > 0) updateData.base = base;
   
   return updateData;
 };

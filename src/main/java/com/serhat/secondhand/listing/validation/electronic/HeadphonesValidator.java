@@ -39,7 +39,11 @@ public class HeadphonesValidator implements ElectronicSpecValidator {
 
     @Override
     public void cleanup(ElectronicListing listing) {
-        if (isHeadphones(listing)) {
+        if (!isHeadphones(listing)) {
+            return;
+        }
+        
+        {
             listing.setRam(null);
             listing.setStorage(null);
             listing.setStorageType(null);
@@ -53,14 +57,7 @@ public class HeadphonesValidator implements ElectronicSpecValidator {
             listing.setSupports5g(null);
             listing.setDualSim(null);
             listing.setHasNfc(null);
-            return;
         }
-
-        listing.setConnectionType(null);
-        listing.setWireless(null);
-        listing.setNoiseCancelling(null);
-        listing.setHasMicrophone(null);
-        listing.setBatteryLifeHours(null);
     }
 
     private boolean isHeadphones(ElectronicListing listing) {

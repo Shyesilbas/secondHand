@@ -11,7 +11,8 @@ public enum ListingErrorCodes implements ErrorCode {
     INVALID_LISTING_STATUS("INVALID_LISTING_STATUS", "Invalid listing status for this operation", HttpStatus.BAD_REQUEST),
     NOT_LISTING_OWNER("NOT_LISTING_OWNER", "User is not the owner of this listing", HttpStatus.FORBIDDEN),
     INVALID_QUANTITY("LISTING_INVALID_QUANTITY", "Quantity must be at least 1", HttpStatus.BAD_REQUEST),
-    STOCK_INSUFFICIENT("LISTING_STOCK_INSUFFICIENT", "Insufficient stock for this listing", HttpStatus.CONFLICT);
+    STOCK_INSUFFICIENT("LISTING_STOCK_INSUFFICIENT", "Insufficient stock for this listing", HttpStatus.CONFLICT),
+    INVALID_LISTING_ID("INVALID_LISTING_ID", "Invalid listing ID" , HttpStatus.BAD_REQUEST ),;
 
     private final String code;
     private final String message;

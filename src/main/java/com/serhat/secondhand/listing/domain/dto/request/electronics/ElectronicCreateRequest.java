@@ -4,23 +4,18 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-public record ElectronicCreateRequest (
-        String title,
-        String description,
-        BigDecimal price,
-        Currency currency,
+public record ElectronicCreateRequest(
+        @NotNull @Valid BaseListingCreateRequest base,
         @NotNull(message = "Quantity is required")
         @Min(value = 1, message = "Quantity must be at least 1")
         Integer quantity,
-        String city,
-        String district,
         UUID electronicTypeId,
         UUID electronicBrandId,
         UUID electronicModelId,
@@ -28,7 +23,6 @@ public record ElectronicCreateRequest (
         boolean warrantyProof,
         int year,
         Color color,
-        String imageUrl,
         Integer ram,
         Integer storage,
         StorageType storageType,
@@ -47,5 +41,4 @@ public record ElectronicCreateRequest (
         Boolean noiseCancelling,
         Boolean hasMicrophone,
         Integer batteryLifeHours
-        ){
-}
+) {}

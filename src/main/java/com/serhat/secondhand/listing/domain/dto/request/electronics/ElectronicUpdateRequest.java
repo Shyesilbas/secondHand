@@ -4,20 +4,14 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 public record ElectronicUpdateRequest(
-        Optional<String> title,
-        Optional<String> description,
-        Optional<BigDecimal> price,
-        Optional<Currency> currency,
+        BaseListingUpdateRequest base,
         Optional<Integer> quantity,
-        Optional<String> city,
-        Optional<String> district,
         Optional<UUID> electronicTypeId,
         Optional<UUID> electronicBrandId,
         Optional<UUID> electronicModelId,
@@ -25,7 +19,6 @@ public record ElectronicUpdateRequest(
         Optional<Boolean> warrantyProof,
         Optional<Integer> year,
         Optional<Color> color,
-        Optional<String> imageUrl,
         Optional<Integer> ram,
         Optional<Integer> storage,
         Optional<StorageType> storageType,
@@ -44,5 +37,4 @@ public record ElectronicUpdateRequest(
         Optional<Boolean> noiseCancelling,
         Optional<Boolean> hasMicrophone,
         Optional<Integer> batteryLifeHours
-) {
-}
+) {}
