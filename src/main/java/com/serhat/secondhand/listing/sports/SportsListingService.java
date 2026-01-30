@@ -101,16 +101,18 @@ public class SportsListingService {
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
-        sportsMapper.updateEntityFromRequest(existing, request);
         Result<Void> applyResult = sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId());
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        sportsMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators);
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
+
+        sportsRepository.save(existing);
 
         priceHistoryService.recordPriceChangeIfUpdated(
                 existing,
@@ -118,8 +120,6 @@ public class SportsListingService {
                 request.base() != null ? request.base().price() : null,
                 "Price updated via listing edit"
         );
-
-        sportsRepository.save(existing);
         log.info("Sports listing updated: {}", id);
         return Result.success();
     }

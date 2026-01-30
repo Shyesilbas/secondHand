@@ -110,7 +110,6 @@ public class BooksListingService {
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
-        booksMapper.updateEntityFromRequest(existing, request);
         Result<Void> applyResult = booksListingResolver.apply(
                 existing,
                 request.bookTypeId(),
@@ -122,6 +121,7 @@ public class BooksListingService {
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        booksMapper.updateEntityFromRequest(existing, request);
 
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, booksSpecValidators);
