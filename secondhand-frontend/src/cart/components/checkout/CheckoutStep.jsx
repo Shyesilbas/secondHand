@@ -39,6 +39,7 @@ const CheckoutStep = ({
     sendVerificationCode,
     acceptedAgreements,
     onAgreementToggle,
+    onRequiredAgreementsChange,
     areAllAgreementsAccepted
 }) => {
     const renderStepContent = () => {
@@ -88,6 +89,7 @@ const CheckoutStep = ({
                         sendVerificationCode={sendVerificationCode}
                         acceptedAgreements={acceptedAgreements}
                         onAgreementToggle={onAgreementToggle}
+                        onRequiredAgreementsChange={onRequiredAgreementsChange}
                         areAllAgreementsAccepted={areAllAgreementsAccepted}
                     />
                 );

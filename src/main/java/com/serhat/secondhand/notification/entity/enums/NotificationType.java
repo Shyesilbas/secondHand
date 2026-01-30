@@ -16,6 +16,7 @@ public enum NotificationType {
     LISTING_SOLD,
     REVIEW_RECEIVED,
     PAYMENT_SUCCESS,
-    PAYMENT_FAILED
+    PAYMENT_FAILED,
+    AGREEMENT_UPDATED
 }
 

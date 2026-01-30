@@ -2,8 +2,8 @@ package com.serhat.secondhand.auth.application;
 
 import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
 import com.serhat.secondhand.agreements.entity.Agreement;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
-import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.service.AgreementRequirementService;
+import com.serhat.secondhand.agreements.service.AgreementUpdateNotificationService;
 import com.serhat.secondhand.agreements.service.UserAgreementService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
@@ -16,7 +16,6 @@ import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
@@ -58,8 +57,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserNotificationService userNotificationService;
     private final UserAgreementService userAgreementService;
+    private final AgreementUpdateNotificationService agreementUpdateNotificationService;
     private final AuditLogService auditLogService;
-    private final AgreementService agreementService;
+    private final AgreementRequirementService agreementRequirementService;
 
     public Result<RegisterResponse> register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
@@ -79,7 +79,7 @@ public class AuthService {
             return Result.error(saveResult.getMessage(), saveResult.getErrorCode());
         }
 
-        var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.REGISTER);
+        var requiredAgreements = agreementRequirementService.getRequiredAgreements("REGISTER");
 
         Set<UUID> requiredIds = requiredAgreements.stream().map(Agreement::getAgreementId).collect(Collectors.toSet());
         Set<UUID> acceptedIds = new HashSet<>(request.getAcceptedAgreementIds());
@@ -88,7 +88,7 @@ public class AuthService {
         }
 
         for (UUID agreementId : acceptedIds) {
-            userAgreementService.acceptAgreement(user,AcceptAgreementRequest.builder()
+            userAgreementService.acceptAgreement(user.getId(),AcceptAgreementRequest.builder()
                 .agreementId(agreementId)
                 .isAcceptedTheLastVersion(true)
                 .build());
@@ -149,6 +149,8 @@ public class AuthService {
                 LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
                 oldRefreshToken
         );
+
+        agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(user.getId());
 
         log.info("User logged in successfully: {}", user.getEmail());
         return new LoginResponse("Login success", user.getId(), user.getEmail(), accessToken, refreshToken);
@@ -271,6 +273,8 @@ public class AuthService {
                     LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
                     oldRefreshToken
             );
+
+            agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(existing.getId());
 
             return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
         }

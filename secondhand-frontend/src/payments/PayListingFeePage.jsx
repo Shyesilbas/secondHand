@@ -44,7 +44,8 @@ const PayListingFeePage = () => {
         // Agreement related
         acceptedAgreements,
         agreementsAccepted,
-        onAgreementToggle
+        onAgreementToggle,
+        onRequiredAgreementsChange
     } = usePayListingFee({
         selectedListing: null,
         feeConfig,
@@ -125,6 +126,7 @@ const PayListingFeePage = () => {
                                 agreementsAccepted={agreementsAccepted}
                                 acceptedAgreementIds={acceptedAgreements}
                                 onAgreementToggle={onAgreementToggle}
+                                onRequiredAgreementsChange={onRequiredAgreementsChange}
                             />
                         </div>
                     </div>

@@ -29,6 +29,9 @@ public class UserAgreement {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Agreement agreement;
 
+    @Column(name = "accepted_version", length = 50)
+    private String acceptedVersion;
+
     private boolean isAcceptedTheLastVersion;
 
     @JsonFormat(pattern = "dd/MM/yyyy")

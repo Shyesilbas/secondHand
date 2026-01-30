@@ -167,6 +167,7 @@ const AppRoutes = () => {
                         <Route path={ROUTES.REVIEWS_RECEIVED(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.REVIEWS_GIVEN(':userId')} element={<UserReviewsPage />} />
                         <Route path={ROUTES.EDIT_LISTING(':id')} element={<EditListingPage />} />
+                        <Route path={ROUTES.AGREEMENTS} element={<AgreementsPage />} />
                         <Route path={ROUTES.AGREEMENTS_ALL} element={<AgreementsPage />} />
                         <Route path={ROUTES.MY_ORDERS} element={<MyOrdersPage />} />
                         <Route path={ROUTES.I_SOLD} element={<ISoldPage />} />

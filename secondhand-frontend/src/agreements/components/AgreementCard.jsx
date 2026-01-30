@@ -38,7 +38,7 @@ const AgreementCard = ({ agreement, status = {}, onAccept, accepting, onRead }) 
         </button>
       </div>
 
-      {status.status === 'pending' && (
+      {(status.status === 'pending' || status.status === 'outdated') && (
         <div className="flex justify-end">
           <button
             disabled={accepting}

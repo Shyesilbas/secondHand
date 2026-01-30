@@ -254,6 +254,7 @@ const CheckoutPage = () => {
                             sendVerificationCode={checkout.sendVerificationCode}
                             acceptedAgreements={checkout.acceptedAgreements}
                             onAgreementToggle={checkout.onAgreementToggle}
+                            onRequiredAgreementsChange={checkout.onRequiredAgreementsChange}
                             areAllAgreementsAccepted={checkout.areAllAgreementsAccepted}
                         />
                     </div>

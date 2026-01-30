@@ -19,6 +19,7 @@ public class UserAgreementDto {
     private UUID agreementId;
     private String agreementType;
     private String agreementVersion;
+    private String acceptedVersion;
     private boolean acceptedTheLastVersion;
     
     @JsonFormat(pattern = "dd/MM/yyyy")

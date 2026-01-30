@@ -1,12 +1,9 @@
 package com.serhat.secondhand.payment.validator;
 
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
-import com.serhat.secondhand.agreements.service.AgreementService;
+import com.serhat.secondhand.agreements.service.AgreementRequirementService;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.payment.util.PaymentValidationHelper;
-import com.serhat.secondhand.user.application.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +11,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentValidator {
 
-    private final AgreementService agreementService;
-    private final PaymentValidationHelper paymentValidationHelper;
-    private final UserService userService;
+    private final AgreementRequirementService agreementRequirementService;
 
     public Result<Void> validatePaymentAgreements(PaymentRequest paymentRequest) {
         if (!paymentRequest.agreementsAccepted()) {
             return Result.error(PaymentErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
-        var requiredAgreements = agreementService.getRequiredAgreements(AgreementGroup.ONLINE_PAYMENT);
+        var requiredAgreements = agreementRequirementService.getRequiredAgreements("ONLINE_PAYMENT");
         var acceptedAgreementIds = paymentRequest.acceptedAgreementIds();
 
         if (acceptedAgreementIds == null || acceptedAgreementIds.size() != requiredAgreements.size()) {

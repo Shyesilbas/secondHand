@@ -1,7 +1,6 @@
 package com.serhat.secondhand.agreements.service;
 
 import com.serhat.secondhand.agreements.entity.Agreement;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.util.AgreementErrorCodes;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,9 +34,7 @@ public class AgreementService {
     }
 
     public Agreement createAgreementIfNotExists(AgreementType agreementType) {
-        Optional<Agreement> existingAgreement = agreementRepository.findAll().stream()
-                .filter(agreement -> agreement.getAgreementType() == agreementType)
-                .findFirst();
+        Optional<Agreement> existingAgreement = agreementRepository.findByAgreementType(agreementType);
 
         if (existingAgreement.isPresent()) {
             log.info("Agreement for type {} already exists, skipping creation", agreementType);
@@ -62,23 +58,17 @@ public class AgreementService {
     }
 
     private String getContentForType(AgreementType agreementType) {
-        if (agreementType instanceof AgreementType) {
-            return switch (agreementType) {
-                case TERMS_OF_SERVICE -> agreementConfig.getTermsOfService().getContent();
-                case PRIVACY_POLICY -> agreementConfig.getPrivacyPolicy().getContent();
-                case KVKK -> agreementConfig.getKvkk().getContent();
-                case DISTANCE_SELLING -> agreementConfig.getDistanceSelling().getContent();
-                case PAYMENT_TERMS -> agreementConfig.getPaymentTerms().getContent();
-                default -> throw new IllegalArgumentException("Unknown agreement type: " + agreementType);
-            };
-        }
-        throw new IllegalArgumentException("Invalid agreement type: " + agreementType);
+        return switch (agreementType) {
+            case TERMS_OF_SERVICE -> agreementConfig.getTermsOfService().getContent();
+            case PRIVACY_POLICY -> agreementConfig.getPrivacyPolicy().getContent();
+            case KVKK -> agreementConfig.getKvkk().getContent();
+            case DISTANCE_SELLING -> agreementConfig.getDistanceSelling().getContent();
+            case PAYMENT_TERMS -> agreementConfig.getPaymentTerms().getContent();
+        };
     }
 
     private String getVersionForType(AgreementType agreementType) {
-        Optional<Agreement> existingAgreement = agreementRepository.findAll().stream()
-                .filter(agreement -> agreement.getAgreementType() == agreementType)
-                .findFirst();
+        Optional<Agreement> existingAgreement = agreementRepository.findByAgreementType(agreementType);
         if (existingAgreement.isPresent()) {
             return agreementVersionHelper.incrementVersion(existingAgreement.get().getVersion());
         }
@@ -86,9 +76,7 @@ public class AgreementService {
     }
 
     public Agreement getAgreementByType(AgreementType agreementType) {
-        return agreementRepository.findAll().stream()
-                .filter(agreement -> agreement.getAgreementType() == agreementType)
-                .findFirst()
+        return agreementRepository.findByAgreementType(agreementType)
                 .orElseThrow(() -> new RuntimeException(AgreementErrorCodes.AGREEMENT_NOT_FOUND.getMessage()));
     }
 
@@ -99,13 +87,6 @@ public class AgreementService {
 
     public List<Agreement> getAllAgreements() {
         return agreementRepository.findAll();
-    }
-
-    public List<Agreement> getRequiredAgreements(AgreementGroup group) {
-        AgreementType[] requiredTypes = group.getRequiredTypes();
-        return agreementRepository.findAll().stream()
-                .filter(agreement -> Arrays.asList(requiredTypes).contains(agreement.getAgreementType()))
-                .toList();
     }
 
     public Agreement updateAgreement(UUID agreementId, String content) {

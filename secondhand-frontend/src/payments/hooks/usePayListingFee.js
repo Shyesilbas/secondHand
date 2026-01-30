@@ -22,6 +22,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     // Payment agreements
     const {
         acceptedAgreements,
+        setRequiredAgreements,
         handleAgreementToggle,
         resetAgreements,
         areAllAgreementsAccepted,
@@ -163,7 +164,8 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         resendVerificationCode,
         // Agreement related
         acceptedAgreements,
-        agreementsAccepted: areAllAgreementsAccepted([]), // Will be updated when we have required agreements
-        onAgreementToggle: handleAgreementToggle
+        agreementsAccepted: areAllAgreementsAccepted(),
+        onAgreementToggle: handleAgreementToggle,
+        onRequiredAgreementsChange: setRequiredAgreements
     };
 };

@@ -1,14 +1,9 @@
 import React from 'react';
-import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
-import { 
-    XMarkIcon, 
-    DocumentTextIcon, 
-    CheckCircleIcon,
-    ClockIcon,
-    ShieldCheckIcon
-} from '@heroicons/react/24/outline';
+import {AGREEMENT_TYPE_LABELS} from '../agreements.js';
+import {formatDate} from '../../common/formatters.js';
+import {CheckCircleIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, XMarkIcon} from '@heroicons/react/24/outline';
 
-const AgreementModal = ({ agreement, open, onClose }) => {
+const AgreementModal = ({ agreement, open, onClose, onAccept, accepting }) => {
   if (!open || !agreement) return null;
   
   return (
@@ -46,11 +41,11 @@ const AgreementModal = ({ agreement, open, onClose }) => {
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
                   <ClockIcon className="w-4 h-4 text-gray-500" />
-                  <span>Last Updated: {new Date(agreement.updatedAt || agreement.createdAt).toLocaleDateString('tr-TR')}</span>
+                  <span>Last Updated: {formatDate(agreement.updatedDate || agreement.createdDate)}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <ShieldCheckIcon className="w-4 h-4 text-green-500" />
-                  <span>Legally Binding Document</span>
+                  <span>Not Legally Binding Document</span>
                 </div>
               </div>
             </div>
@@ -81,10 +76,11 @@ const AgreementModal = ({ agreement, open, onClose }) => {
             </button>
             <button
               type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+              onClick={() => onAccept?.(agreement)}
+              disabled={!!accepting}
+              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              I Understand
+              {accepting ? 'Accepting...' : 'I Understand'}
             </button>
           </div>
         </div>
