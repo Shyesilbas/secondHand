@@ -2,17 +2,14 @@ package com.serhat.secondhand.listing.domain.dto.request.vehicle;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public record VehicleCreateRequest(
-    String title,
-    String description,
-    BigDecimal price,
-    Currency currency,
-    String city,
-    String district,
+    @NotNull @Valid BaseListingCreateRequest base,
     UUID vehicleTypeId,
     UUID brandId,
     UUID vehicleModelId,
@@ -29,7 +26,6 @@ public record VehicleCreateRequest(
     Integer horsePower,
     Integer kilometersPerLiter,
     FuelType fuelType,
-    String imageUrl,
     Boolean accidentHistory,
     String accidentDetails,
     java.time.LocalDate inspectionValidUntil,

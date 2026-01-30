@@ -10,21 +10,14 @@ import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListin
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.listing.validation.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.clothing.ClothingSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,16 +32,15 @@ import java.util.UUID;
 public class ClothingListingService {
 
     private final ClothingListingRepository clothingRepository;
-    private final ClothingBrandRepository clothingBrandRepository;
-    private final ClothingTypeRepository clothingTypeRepository;
     private final ListingService listingService;
     private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
     private final PriceHistoryService priceHistoryService;
-    private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
     private final ListingValidationEngine listingValidationEngine;
     private final List<ClothingSpecValidator> clothingSpecValidators;
+    private final ClothingMapper clothingMapper;
+    private final ClothingListingResolver clothingListingResolver;
 
     @Transactional
     public Result<UUID> createClothingListing(ClothingCreateRequest request, Long sellerId) {
@@ -67,22 +59,16 @@ public class ClothingListingService {
             return Result.error("Invalid quantity for clothing listing", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
-        ClothingBrand brand = resolveBrand(request.brandId());
-        if (brand == null) {
-            return Result.error("Clothing brand not found", "CLOTHING_BRAND_NOT_FOUND");
+        var resolutionResult = clothingListingResolver.resolve(request.brandId(), request.clothingTypeId());
+        if (resolutionResult.isError()) {
+            return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
         }
-        ClothingType type = resolveType(request.clothingTypeId());
-        if (type == null) {
-            return Result.error("Clothing type not found", "CLOTHING_TYPE_NOT_FOUND");
-        }
-
-        clothing.setBrand(brand);
-        clothing.setClothingType(type);
+        ClothingResolution res = resolutionResult.getData();
+        clothing.setBrand(res.brand());
+        clothing.setClothingType(res.type());
         clothing.setPurchaseDate(toPurchaseDate(request.purchaseYear()));
 
         clothing.setSeller(seller);
-        clothing.setListingFeePaid(true);
-        clothing.setStatus(ListingStatus.ACTIVE);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(clothing, clothingSpecValidators);
         if (validationResult.isError()) {
@@ -92,8 +78,6 @@ public class ClothingListingService {
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
 
-        eventPublisher.publishEvent(new NewListingCreatedEvent(this, saved));
-
         return Result.success(saved.getId());
     }
 
@@ -102,7 +86,7 @@ public class ClothingListingService {
         
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
+            return ownershipResult;
         }
 
         ClothingListing existing = clothingRepository.findById(id).orElse(null);
@@ -111,48 +95,21 @@ public class ClothingListingService {
         }
 
         
-        Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+        Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
-            return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
+            return statusResult;
         }
 
         var oldPrice = existing.getPrice();
 
-        
-        request.title().ifPresent(existing::setTitle);
-        request.description().ifPresent(existing::setDescription);
-        request.price().ifPresent(existing::setPrice);
-        request.currency().ifPresent(existing::setCurrency);
-        request.quantity().ifPresent(q -> {
-            if (q >= 1) existing.setQuantity(q);
-        });
-        request.city().ifPresent(existing::setCity);
-        request.district().ifPresent(existing::setDistrict);
-        request.imageUrl().ifPresent(existing::setImageUrl);
-
-        request.brandId().ifPresent(brandId -> {
-            ClothingBrand brand = resolveBrand(brandId);
-            if (brand != null) {
-                existing.setBrand(brand);
-            }
-        });
-        request.clothingTypeId().ifPresent(typeId -> {
-            ClothingType type = resolveType(typeId);
-            if (type != null) {
-                existing.setClothingType(type);
-            }
-        });
-        request.color().ifPresent(existing::setColor);
-        request.purchaseYear().ifPresent(y -> existing.setPurchaseDate(toPurchaseDate(y)));
-        request.condition().ifPresent(existing::setCondition);
-        request.size().ifPresent(existing::setSize);
-        request.shoeSizeEu().ifPresent(existing::setShoeSizeEu);
-        request.material().ifPresent(existing::setMaterial);
-        request.clothingGender().ifPresent(existing::setClothingGender);
-        request.clothingCategory().ifPresent(existing::setClothingCategory);
-
-        if (request.quantity().isPresent() && request.quantity().get() < 1) {
-            return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
+        Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
+        if (quantityResult.isError()) {
+            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+        }
+        clothingMapper.updateEntityFromRequest(existing, request);
+        Result<Void> applyResult = clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId());
+        if (applyResult.isError()) {
+            return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators);
@@ -163,16 +120,12 @@ public class ClothingListingService {
         clothingRepository.save(existing);
 
         
-        if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
-            priceHistoryService.recordPriceChange(
-                    existing.getId(),
-                    existing.getTitle(),
-                    oldPrice,
-                    existing.getPrice(),
-                    existing.getCurrency(),
-                    "Price updated via listing edit"
-            );
-        }
+        priceHistoryService.recordPriceChangeIfUpdated(
+                existing,
+                oldPrice,
+                request.base() != null ? request.base().price() : null,
+                "Price updated via listing edit"
+        );
 
         log.info("Clothing listing updated: {}", id);
         return Result.success();
@@ -194,20 +147,6 @@ public class ClothingListingService {
     public Page<ListingDto> filterClothing(ClothingListingFilterDto filters) {
         log.info("Filtering clothing listings with criteria: {}", filters);
         return clothingListingFilterService.filterClothing(filters);
-    }
-
-    private ClothingBrand resolveBrand(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return clothingBrandRepository.findById(id).orElse(null);
-    }
-
-    private ClothingType resolveType(UUID id) {
-        if (id == null) {
-            return null;
-        }
-        return clothingTypeRepository.findById(id).orElse(null);
     }
 
     private LocalDate toPurchaseDate(Integer year) {

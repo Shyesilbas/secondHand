@@ -1,6 +1,7 @@
 package com.serhat.secondhand.review.service;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -114,7 +115,7 @@ public class ReviewService {
             Page<Review> reviews = reviewRepository.findReviewsByListingId(uuid, pageable);
             return Result.success(reviews.map(reviewMapper::toDto));
         } catch (IllegalArgumentException e) {
-            return Result.error("Invalid listing ID format", "INVALID_LISTING_ID");
+            return Result.error(ListingErrorCodes.INVALID_LISTING_ID);
         }
     }
 
@@ -145,12 +146,12 @@ public class ReviewService {
         try {
             uuid = UUID.fromString(listingId);
         } catch (IllegalArgumentException e) {
-            return Result.error("Invalid listing ID format", "INVALID_LISTING_ID");
+            return Result.error(ListingErrorCodes.INVALID_LISTING_ID);
         }
 
         Optional<Listing> listingOpt = listingRepository.findById(uuid);
         if (listingOpt.isEmpty()) {
-            return Result.error("Listing not found", "LISTING_NOT_FOUND");
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
         }
         Listing listing = listingOpt.get();
 

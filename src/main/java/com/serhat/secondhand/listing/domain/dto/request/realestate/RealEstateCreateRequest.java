@@ -1,17 +1,13 @@
 package com.serhat.secondhand.listing.domain.dto.request.realestate;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public record RealEstateCreateRequest(
-        String title,
-        String description,
-        BigDecimal price,
-        Currency currency,
-        String city,
-        String district,
+        @NotNull @Valid BaseListingCreateRequest base,
         UUID adTypeId,
         UUID realEstateTypeId,
         UUID heatingTypeId,
@@ -22,7 +18,5 @@ public record RealEstateCreateRequest(
         Integer floor,
         Integer buildingAge,
         boolean furnished,
-        String zoningStatus,
-        String imageUrl
-) {
-}
+        String zoningStatus
+) {}

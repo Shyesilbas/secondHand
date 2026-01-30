@@ -1,13 +1,16 @@
 
 
 export const createClothingCreateRequest = (data) => ({
-    title: data.title,
-    description: data.description,
-    price: data.price,
-    currency: data.currency,
+    base: {
+        title: (data.title || '').trim(),
+        description: (data.description || '').trim(),
+        price: data.price,
+        currency: data.currency || 'TRY',
+        city: (data.city || '').trim(),
+        district: (data.district || '').trim(),
+        imageUrl: data.imageUrl || undefined
+    },
     quantity: parseInt(data.quantity) || 1,
-    city: data.city,
-    district: data.district,
     brandId: data.brandId,
     clothingTypeId: data.clothingTypeId,
     color: data.color,
@@ -17,30 +20,34 @@ export const createClothingCreateRequest = (data) => ({
     shoeSizeEu: data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : null,
     material: data.material ? String(data.material).trim() : null,
     clothingGender: data.clothingGender,
-    clothingCategory: data.clothingCategory,
-    imageUrl: data.imageUrl || undefined
+    clothingCategory: data.clothingCategory
 });
 
-export const createClothingUpdateRequest = (data) => ({
-    title: data.title ? data.title : undefined,
-    description: data.description ? data.description : undefined,
-    price: data.price ? data.price : undefined,
-    currency: data.currency ? data.currency : undefined,
-    quantity: data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined,
-    city: data.city ? data.city : undefined,
-    district: data.district ? data.district : undefined,
-    brandId: data.brandId ? data.brandId : undefined,
-    clothingTypeId: data.clothingTypeId ? data.clothingTypeId : undefined,
-    color: data.color ? data.color : undefined,
-    purchaseYear: data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined,
-    condition: data.condition ? data.condition : undefined,
-    size: data.size ? data.size : undefined,
-    shoeSizeEu: data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : undefined,
-    material: data.material ? String(data.material).trim() : undefined,
-    clothingGender: data.clothingGender ? data.clothingGender : undefined,
-    clothingCategory: data.clothingCategory ? data.clothingCategory : undefined,
-    imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined
-});
+export const createClothingUpdateRequest = (data) => {
+    const updateData = {};
+    const base = {};
+    if (data.title !== undefined && data.title !== '') base.title = data.title;
+    if (data.description !== undefined && data.description !== '') base.description = data.description;
+    if (data.price !== undefined && data.price !== '') base.price = data.price;
+    if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
+    if (data.city !== undefined && data.city !== '') base.city = data.city;
+    if (data.district !== undefined && data.district !== '') base.district = data.district;
+    if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
+    if (Object.keys(base).length > 0) updateData.base = base;
+
+    updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;
+    updateData.brandId = data.brandId ? data.brandId : undefined;
+    updateData.clothingTypeId = data.clothingTypeId ? data.clothingTypeId : undefined;
+    updateData.color = data.color ? data.color : undefined;
+    updateData.purchaseYear = data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined;
+    updateData.condition = data.condition ? data.condition : undefined;
+    updateData.size = data.size ? data.size : undefined;
+    updateData.shoeSizeEu = data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : undefined;
+    updateData.material = data.material ? String(data.material).trim() : undefined;
+    updateData.clothingGender = data.clothingGender ? data.clothingGender : undefined;
+    updateData.clothingCategory = data.clothingCategory ? data.clothingCategory : undefined;
+    return updateData;
+};
 
 export const ClothingListingDTO = {
     id: '',

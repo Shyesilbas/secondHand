@@ -114,14 +114,16 @@ export const ElectronicSearchFiltersDTO = {
 
 export const createElectronicCreateRequest = (data) => {
   return {
-    title: (data.title || '').trim(),
-    description: (data.description || '').trim(),
-    price: parseFloat(data.price) || 0,
-    currency: data.currency || 'TRY',
+    base: {
+      title: (data.title || '').trim(),
+      description: (data.description || '').trim(),
+      price: parseFloat(data.price) || 0,
+      currency: data.currency || 'TRY',
+      city: (data.city || '').trim(),
+      district: (data.district || '').trim(),
+      imageUrl: data.imageUrl || undefined,
+    },
     quantity: parseInt(data.quantity) || 1,
-    city: (data.city || '').trim(),
-    district: (data.district || '').trim(),
-    imageUrl: data.imageUrl || undefined,
 
     electronicTypeId: data.electronicTypeId || null,
     electronicBrandId: data.electronicBrandId || null,
@@ -153,13 +155,14 @@ export const createElectronicCreateRequest = (data) => {
 
 export const createElectronicUpdateRequest = (data) => {
   const updateData = {};
-  if (data.title !== undefined && data.title !== '') updateData.title = data.title.trim();
-  if (data.description !== undefined && data.description !== '') updateData.description = data.description.trim();
-  if (data.price !== undefined && data.price !== '') updateData.price = parseFloat(data.price);
-  if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
+  const base = {};
+  if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
+  if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
+  if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
+  if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
   if (data.quantity !== undefined && data.quantity !== '') updateData.quantity = parseInt(data.quantity);
-  if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
-  if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
+  if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
+  if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
   if (data.electronicTypeId !== undefined && data.electronicTypeId !== '') updateData.electronicTypeId = data.electronicTypeId;
   if (data.electronicBrandId !== undefined && data.electronicBrandId !== '') updateData.electronicBrandId = data.electronicBrandId;
   if (data.electronicModelId !== undefined && data.electronicModelId !== '') updateData.electronicModelId = data.electronicModelId;
@@ -167,7 +170,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.warrantyProof !== undefined && data.warrantyProof !== '') updateData.warrantyProof = Boolean(data.warrantyProof);
   if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
   if (data.color !== undefined && data.color !== '') updateData.color = data.color;
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
   if (data.ram !== undefined && data.ram !== '') updateData.ram = parseInt(data.ram);
   if (data.storage !== undefined && data.storage !== '') updateData.storage = parseInt(data.storage);
   if (data.storageType !== undefined && data.storageType !== '') updateData.storageType = data.storageType;
@@ -186,6 +189,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.noiseCancelling !== undefined && data.noiseCancelling !== '') updateData.noiseCancelling = Boolean(data.noiseCancelling);
   if (data.hasMicrophone !== undefined && data.hasMicrophone !== '') updateData.hasMicrophone = Boolean(data.hasMicrophone);
   if (data.batteryLifeHours !== undefined && data.batteryLifeHours !== '') updateData.batteryLifeHours = parseInt(data.batteryLifeHours);
+  if (Object.keys(base).length > 0) updateData.base = base;
   return updateData;
 };
 

@@ -89,6 +89,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "realEstateType", ignore = true)
     @Mapping(target = "heatingType", ignore = true)
     @Mapping(target = "ownerType", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -101,6 +108,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "vehicleType", ignore = true)
     @Mapping(target = "brand", ignore = true)
     @Mapping(target = "model", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -113,6 +127,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "electronicType", ignore = true)
     @Mapping(target = "electronicBrand", ignore = true)
     @Mapping(target = "model", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -125,6 +146,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "brand", ignore = true)
     @Mapping(target = "clothingType", ignore = true)
     @Mapping(target = "purchaseDate", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -139,6 +167,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "language", ignore = true)
     @Mapping(target = "format", ignore = true)
     @Mapping(target = "condition", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -151,6 +186,13 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "discipline", ignore = true)
     @Mapping(target = "equipmentType", ignore = true)
     @Mapping(target = "condition", ignore = true)
+    @Mapping(target = "title", source = "base.title")
+    @Mapping(target = "description", source = "base.description")
+    @Mapping(target = "price", source = "base.price")
+    @Mapping(target = "currency", source = "base.currency")
+    @Mapping(target = "city", source = "base.city")
+    @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
     public ListingDto toDynamicDto(Listing listing) {

@@ -2,18 +2,13 @@ package com.serhat.secondhand.listing.domain.dto.request.vehicle;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 public record VehicleUpdateRequest(
-    Optional<String> title,
-    Optional<String> description,
-    Optional<BigDecimal> price,
-    Optional<Currency> currency,
-    Optional<String> city,
-    Optional<String> district,
+    BaseListingUpdateRequest base,
     Optional<UUID> vehicleTypeId,
     Optional<UUID> brandId,
     Optional<UUID> vehicleModelId,
@@ -31,7 +26,6 @@ public record VehicleUpdateRequest(
     Optional<Integer> kilometersPerLiter,
     Optional<FuelType> fuelType,
     Optional<Boolean> swap,
-    Optional<String> imageUrl,
     Optional<Boolean> accidentHistory,
     Optional<String> accidentDetails,
     Optional<java.time.LocalDate> inspectionValidUntil,

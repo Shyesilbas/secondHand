@@ -11,6 +11,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
@@ -19,6 +20,7 @@ import com.serhat.secondhand.listing.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
 import com.serhat.secondhand.user.application.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +35,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @Transactional(readOnly = true)
@@ -46,6 +47,7 @@ public class ListingService {
     private final ListingConfig listingConfig;
     private final ListingViewService listingViewService;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ListingService(
             ListingRepository listingRepository,
@@ -59,7 +61,8 @@ public class ListingService {
             UserService userService,
             ListingEnrichmentService enrichmentService,
             ListingViewService listingViewService,
-            ListingConfig listingConfig
+            ListingConfig listingConfig,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
@@ -67,6 +70,7 @@ public class ListingService {
         this.enrichmentService = enrichmentService;
         this.listingViewService = listingViewService;
         this.listingConfig = listingConfig;
+        this.eventPublisher = eventPublisher;
 
         this.filterStrategyMap = Map.of(
                 VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f),
@@ -180,8 +184,10 @@ public class ListingService {
     public void publish(UUID listingId, Long userId) {
         Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.DRAFT);
+        listing.setListingFeePaid(true);
         listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
+        eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
     }
 
     @Transactional
@@ -215,11 +221,30 @@ public class ListingService {
         return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
     }
 
+    public Result<Void> validateEditableStatus(Listing listing) {
+        return validateStatus(listing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
+    }
+
+    public Result<Void> applyQuantityUpdate(Listing listing, Optional<Integer> quantity) {
+        if (listing == null) {
+            return Result.error("Listing is required", "LISTING_REQUIRED");
+        }
+        if (quantity == null || quantity.isEmpty()) {
+            return Result.success();
+        }
+        Integer q = quantity.get();
+        if (q == null || q < 1) {
+            return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
+        }
+        listing.setQuantity(q);
+        return Result.success();
+    }
+
     @Transactional
     public void markAsSold(UUID listingId, Long userId) {
         Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
-        log.info("markAsSold logic executed for listing {}", listingId);
+        log.info("Listing with id {} has marked as sold.", listingId);
     }
 
     @Transactional

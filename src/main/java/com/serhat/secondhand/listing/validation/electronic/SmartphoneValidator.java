@@ -38,7 +38,11 @@ public class SmartphoneValidator implements ElectronicSpecValidator {
 
     @Override
     public void cleanup(ElectronicListing listing) {
-        if (isMobilePhone(listing)) {
+        if (!isMobilePhone(listing)) {
+            return;
+        }
+        
+        {
             listing.setStorageType(null);
             listing.setGpuModel(null);
             listing.setOperatingSystem(null);
@@ -48,14 +52,7 @@ public class SmartphoneValidator implements ElectronicSpecValidator {
             listing.setNoiseCancelling(null);
             listing.setHasMicrophone(null);
             listing.setBatteryLifeHours(null);
-            return;
         }
-
-        listing.setBatteryCapacityMah(null);
-        listing.setCameraMegapixels(null);
-        listing.setSupports5g(null);
-        listing.setDualSim(null);
-        listing.setHasNfc(null);
     }
 
     private boolean isMobilePhone(ElectronicListing listing) {

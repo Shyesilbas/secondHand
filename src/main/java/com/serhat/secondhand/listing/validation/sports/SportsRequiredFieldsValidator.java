@@ -5,7 +5,7 @@ import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SportsBaseValidator implements SportsSpecValidator {
+public class SportsRequiredFieldsValidator implements SportsSpecValidator {
 
     @Override
     public Result<Void> validate(SportsListing listing) {

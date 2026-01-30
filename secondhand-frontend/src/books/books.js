@@ -25,14 +25,17 @@ export const BooksListingDTO = {
 };
 
 export const createBooksCreateRequest = (data) => ({
-  title: data.title,
-  description: data.description,
-  price: data.price,
-  currency: data.currency || 'TRY',
+  base: {
+    title: (data.title || '').trim(),
+    description: (data.description || '').trim(),
+    price: data.price,
+    currency: data.currency || 'TRY',
+    city: (data.city || '').trim(),
+    district: (data.district || '').trim(),
+    imageUrl: data.imageUrl || undefined,
+  },
   quantity: parseInt(data.quantity) || 1,
-  city: data.city,
-  district: data.district,
-  author: data.author,
+  author: (data.author || '').trim(),
   bookTypeId: data.bookTypeId,
   genreId: data.genreId,
   languageId: data.languageId,
@@ -41,28 +44,32 @@ export const createBooksCreateRequest = (data) => ({
   formatId: data.formatId,
   conditionId: data.conditionId,
   isbn: data.isbn || undefined,
-  imageUrl: data.imageUrl || undefined,
 });
 
-export const createBooksUpdateRequest = (data) => ({
-  title: data.title ?? undefined,
-  description: data.description ?? undefined,
-  price: data.price ?? undefined,
-  currency: data.currency ?? undefined,
-  quantity: data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined,
-  city: data.city ?? undefined,
-  district: data.district ?? undefined,
-  author: data.author ?? undefined,
-  bookTypeId: data.bookTypeId ?? undefined,
-  genreId: data.genreId ?? undefined,
-  languageId: data.languageId ?? undefined,
-  publicationYear: data.publicationYear ?? undefined,
-  pageCount: data.pageCount ?? undefined,
-  formatId: data.formatId ?? undefined,
-  conditionId: data.conditionId ?? undefined,
-  isbn: data.isbn ?? undefined,
-  imageUrl: data.imageUrl ?? undefined,
-});
+export const createBooksUpdateRequest = (data) => {
+  const updateData = {};
+  const base = {};
+  if (data.title !== undefined) base.title = data.title;
+  if (data.description !== undefined) base.description = data.description;
+  if (data.price !== undefined) base.price = data.price;
+  if (data.currency !== undefined) base.currency = data.currency;
+  if (data.city !== undefined) base.city = data.city;
+  if (data.district !== undefined) base.district = data.district;
+  if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
+  if (Object.keys(base).length > 0) updateData.base = base;
+
+  updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;
+  updateData.author = data.author ?? undefined;
+  updateData.bookTypeId = data.bookTypeId ?? undefined;
+  updateData.genreId = data.genreId ?? undefined;
+  updateData.languageId = data.languageId ?? undefined;
+  updateData.publicationYear = data.publicationYear ?? undefined;
+  updateData.pageCount = data.pageCount ?? undefined;
+  updateData.formatId = data.formatId ?? undefined;
+  updateData.conditionId = data.conditionId ?? undefined;
+  updateData.isbn = data.isbn ?? undefined;
+  return updateData;
+};
 
 export const createBooksListingDto = (data) => ({
   id: data.id,
