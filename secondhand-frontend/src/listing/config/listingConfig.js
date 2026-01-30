@@ -33,6 +33,15 @@ export const listingTypeConfig = {
     
     detailsComponent: VehicleDetails,
     createComponent: VehicleCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'vehicleTypes',
+        queryParamKey: 'vehicleTypeId',
+        initialDataKey: 'vehicleTypeId',
+        title: 'Choose vehicle type',
+        description: 'Select a type to tailor the form fields.'
+      }
+    },
     
     filterConfig: createVehicleFilterConfig(),
     
@@ -68,6 +77,15 @@ export const listingTypeConfig = {
     
     detailsComponent: ElectronicsDetails,
     createComponent: ElectronicCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'electronicTypes',
+        queryParamKey: 'electronicTypeId',
+        initialDataKey: 'electronicTypeId',
+        title: 'Choose electronics type',
+        description: 'Select a type to tailor the form fields.'
+      }
+    },
     
     filterConfig: createElectronicsFilterConfig(),
     
@@ -99,6 +117,15 @@ export const listingTypeConfig = {
     
     detailsComponent: RealEstateDetails,
     createComponent: RealEstateCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'realEstateTypes',
+        queryParamKey: 'realEstateTypeId',
+        initialDataKey: 'realEstateTypeId',
+        title: 'Choose property type',
+        description: 'Select a type to tailor the form fields.'
+      }
+    },
     
     filterConfig: createRealEstateFilterConfig(),
     
@@ -141,6 +168,15 @@ export const listingTypeConfig = {
     
     detailsComponent: ClothingDetails,
     createComponent: ClothingCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'clothingTypes',
+        queryParamKey: 'clothingTypeId',
+        initialDataKey: 'clothingTypeId',
+        title: 'Choose clothing type',
+        description: 'Select a type to tailor the form fields.'
+      }
+    },
     
     filterConfig: createClothingFilterConfig(),
     
@@ -179,6 +215,15 @@ export const listingTypeConfig = {
     
     detailsComponent: BooksDetails,
     createComponent: BooksCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'bookTypes',
+        queryParamKey: 'bookTypeId',
+        initialDataKey: 'bookTypeId',
+        title: 'Choose book type',
+        description: 'Select a type to tailor the form fields.'
+      }
+    },
     
     filterConfig: createBooksFilterConfig(),
     
@@ -216,6 +261,15 @@ export const listingTypeConfig = {
     
     detailsComponent: SportsDetails,
     createComponent: SportsCreateForm,
+    createFlow: {
+      subtypeSelector: {
+        enumKey: 'sportDisciplines',
+        queryParamKey: 'disciplineId',
+        initialDataKey: 'disciplineId',
+        title: 'Choose sport discipline',
+        description: 'Select a discipline to tailor the form fields.'
+      }
+    },
     
     filterConfig: createSportsFilterConfig(),
     

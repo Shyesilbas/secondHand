@@ -20,6 +20,8 @@ import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBra
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicListingRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.electronic.ElectronicSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,8 @@ public class ElectronicListingService {
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<ElectronicSpecValidator> electronicSpecValidators;
 
     @Transactional
     public Result<UUID> createElectronicListing(ElectronicCreateRequest request, Long sellerId) {
@@ -88,16 +92,9 @@ public class ElectronicListingService {
         electronicListing.setElectronicType(electronicType);
         electronicListing.setElectronicBrand(electronicBrand);
         electronicListing.setModel(electronicModel);
-
-        if (isLaptop(electronicType)) {
-            if (electronicListing.getRam() == null || electronicListing.getStorage() == null) {
-                return Result.error("RAM and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
-            }
-        } else {
-            electronicListing.setRam(null);
-            electronicListing.setStorage(null);
-            electronicListing.setProcessor(null);
-            electronicListing.setScreenSize(null);
+        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(electronicListing, electronicSpecValidators);
+        if (specResult.isError()) {
+            return Result.error(specResult.getMessage(), specResult.getErrorCode());
         }
 
         electronicListing.setSeller(seller);
@@ -169,8 +166,22 @@ public class ElectronicListingService {
         request.year().ifPresent(existing::setYear);
         request.ram().ifPresent(existing::setRam);
         request.storage().ifPresent(existing::setStorage);
+        request.storageType().ifPresent(existing::setStorageType);
         request.processor().ifPresent(existing::setProcessor);
         request.screenSize().ifPresent(existing::setScreenSize);
+        request.gpuModel().ifPresent(existing::setGpuModel);
+        request.operatingSystem().ifPresent(existing::setOperatingSystem);
+        request.batteryHealthPercent().ifPresent(existing::setBatteryHealthPercent);
+        request.batteryCapacityMah().ifPresent(existing::setBatteryCapacityMah);
+        request.cameraMegapixels().ifPresent(existing::setCameraMegapixels);
+        request.supports5g().ifPresent(existing::setSupports5g);
+        request.dualSim().ifPresent(existing::setDualSim);
+        request.hasNfc().ifPresent(existing::setHasNfc);
+        request.connectionType().ifPresent(existing::setConnectionType);
+        request.wireless().ifPresent(existing::setWireless);
+        request.noiseCancelling().ifPresent(existing::setNoiseCancelling);
+        request.hasMicrophone().ifPresent(existing::setHasMicrophone);
+        request.batteryLifeHours().ifPresent(existing::setBatteryLifeHours);
 
         if (request.quantity().isPresent() && request.quantity().get() < 1) {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
@@ -191,15 +202,9 @@ public class ElectronicListingService {
             return Result.error("Electronic model does not match type", "ELECTRONIC_MODEL_TYPE_MISMATCH");
         }
 
-        if (isLaptop(existing.getElectronicType())) {
-            if (existing.getRam() == null || existing.getStorage() == null) {
-                return Result.error("RAM and storage are required for LAPTOP", "LAPTOP_SPECS_REQUIRED");
-            }
-        } else {
-            existing.setRam(null);
-            existing.setStorage(null);
-            existing.setProcessor(null);
-            existing.setScreenSize(null);
+        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators);
+        if (specResult.isError()) {
+            return Result.error(specResult.getMessage(), specResult.getErrorCode());
         }
 
         repository.save(existing);
@@ -257,16 +262,5 @@ public class ElectronicListingService {
             return null;
         }
         return modelRepository.findById(id).orElse(null);
-    }
-
-    private boolean isLaptop(ElectronicType type) {
-        if (type == null) {
-            return false;
-        }
-        String name = type.getName();
-        if (name == null) {
-            return false;
-        }
-        return "LAPTOP".equalsIgnoreCase(name);
     }
 }

@@ -23,4 +23,5 @@ public class RealEstateFilterDto extends ListingFilterDto {
     private Integer minBuildingAge;
     private Integer maxBuildingAge;
     private boolean furnished;
+    private String zoningStatus;
 }

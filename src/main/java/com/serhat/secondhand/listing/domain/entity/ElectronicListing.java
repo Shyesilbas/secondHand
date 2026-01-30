@@ -2,9 +2,11 @@ package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -54,8 +56,38 @@ public class ElectronicListing extends Listing {
     private Integer storage;
 
     @Enumerated(EnumType.STRING)
+    private StorageType storageType;
+
+    @Enumerated(EnumType.STRING)
     private Processor processor;
 
     private Integer screenSize;
+
+    private String gpuModel;
+
+    private String operatingSystem;
+
+    private Integer batteryHealthPercent;
+
+    private Integer batteryCapacityMah;
+
+    private Integer cameraMegapixels;
+
+    private Boolean supports5g;
+
+    private Boolean dualSim;
+
+    private Boolean hasNfc;
+
+    @Enumerated(EnumType.STRING)
+    private ElectronicConnectionType connectionType;
+
+    private Boolean wireless;
+
+    private Boolean noiseCancelling;
+
+    private Boolean hasMicrophone;
+
+    private Integer batteryLifeHours;
 
 }

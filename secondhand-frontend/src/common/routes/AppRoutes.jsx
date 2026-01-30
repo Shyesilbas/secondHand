@@ -19,6 +19,7 @@ import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
 
 import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';
 import CreateListingPage from '../../listing/pages/CreateListingPage.jsx';
+import ListingSubtypeSelectionPage from '../../listing/pages/ListingSubtypeSelectionPage.jsx';
 import ComplaintsPage from '../../complaint/pages/ComplaintsPage.jsx';
 import EditListingPage from '../../listing/pages/EditListingPage.jsx';
 import FavoritesPage from '../../favorites/FavoritesPage';
@@ -154,6 +155,7 @@ const AppRoutes = () => {
 
         <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
         <Route path={ROUTES.CREATE_LISTING} element={<CreateListingPage />} />
+        <Route path="/listings/create/:listingType/subtype" element={<ListingSubtypeSelectionPage />} />
         <Route path={ROUTES.PAY_LISTING_FEE} element={<PayListingFeePage />} />
         <Route path={ROUTES.PAYMENT_METHODS} element={<PaymentMethodsPage />} />
         <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />

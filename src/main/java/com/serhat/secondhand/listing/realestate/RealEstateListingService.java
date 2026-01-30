@@ -18,6 +18,8 @@ import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepo
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.realestate.RealEstateSpecValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,8 @@ public class RealEstateListingService {
     private final RealEstateAdTypeRepository realEstateAdTypeRepository;
     private final HeatingTypeRepository heatingTypeRepository;
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<RealEstateSpecValidator> realEstateSpecValidators;
 
     @Transactional
     public Result<UUID> createRealEstateListing(RealEstateCreateRequest request, Long sellerId) {
@@ -62,6 +67,11 @@ public class RealEstateListingService {
         realEstateListing.setRealEstateType(resolveRealEstateType(request.realEstateTypeId()));
         realEstateListing.setHeatingType(resolveHeatingType(request.heatingTypeId()));
         realEstateListing.setOwnerType(resolveOwnerType(request.ownerTypeId()));
+
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(realEstateListing, realEstateSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         RealEstateListing saved = realEstateRepository.save(realEstateListing);
         log.info("Real estate listing created: {}", saved.getId());
@@ -111,6 +121,12 @@ public class RealEstateListingService {
         request.floor().ifPresent(existing::setFloor);
         request.buildingAge().ifPresent(existing::setBuildingAge);
         request.furnished().ifPresent(existing::setFurnished);
+        request.zoningStatus().ifPresent(existing::setZoningStatus);
+
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, realEstateSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
 
         realEstateRepository.save(existing);
 

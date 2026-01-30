@@ -141,6 +141,16 @@ const ElectronicsFilters = ({ filters, onInputChange, enums }) => {
     return String(t?.name || '').toUpperCase() === 'LAPTOP';
   });
 
+  const phoneSelected = Array.isArray(filters.electronicTypeIds) && (filters.electronicTypeIds || []).some((id) => {
+    const t = (enums.electronicTypes || []).find((x) => (x.id || x.value) === id);
+    return String(t?.name || '').toUpperCase() === 'MOBILE_PHONE';
+  });
+
+  const headphonesSelected = Array.isArray(filters.electronicTypeIds) && (filters.electronicTypeIds || []).some((id) => {
+    const t = (enums.electronicTypes || []).find((x) => (x.id || x.value) === id);
+    return String(t?.name || '').toUpperCase() === 'HEADPHONES';
+  });
+
   return (
     <div className="space-y-8">
       {renderEnumField('electronicTypeIds', 'Electronic Type', 'electronicTypes')}
@@ -149,7 +159,13 @@ const ElectronicsFilters = ({ filters, onInputChange, enums }) => {
       {laptopSelected && renderNumericRangeField('storage', 'Storage (GB)', 1, 10000)}
       {laptopSelected && renderNumericRangeField('ram', 'RAM (GB)', 1, 128)}
       {laptopSelected && renderNumericRangeField('screenSize', 'Screen Size (inch)', 1, 50)}
+      {laptopSelected && renderEnumField('storageTypes', 'Storage Type', 'storageTypes')}
       {laptopSelected && renderEnumField('processors', 'Processor', 'processors')}
+      {laptopSelected && renderNumericRangeField('batteryHealthPercent', 'Battery Health (%)', 1, 100)}
+      {phoneSelected && renderNumericRangeField('batteryCapacityMah', 'Battery (mAh)', 500, 20000)}
+      {phoneSelected && renderNumericRangeField('cameraMegapixels', 'Camera (MP)', 1, 300)}
+      {headphonesSelected && renderEnumField('connectionTypes', 'Connection Type', 'electronicConnectionTypes')}
+      {headphonesSelected && renderNumericRangeField('batteryLifeHours', 'Battery Life (h)', 1, 200)}
     </div>
   );
 };

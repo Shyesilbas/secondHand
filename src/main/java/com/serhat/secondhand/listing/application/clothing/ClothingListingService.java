@@ -18,6 +18,8 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.clothing.ClothingSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,8 @@ public class ClothingListingService {
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<ClothingSpecValidator> clothingSpecValidators;
 
     @Transactional
     public Result<UUID> createClothingListing(ClothingCreateRequest request, Long sellerId) {
@@ -57,7 +61,7 @@ public class ClothingListingService {
         }
         User seller = userResult.getData();
 
-        // 2. Map and Initial Validate
+        
         ClothingListing clothing = listingMapper.toClothingEntity(request);
         if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
             return Result.error("Invalid quantity for clothing listing", ListingErrorCodes.INVALID_QUANTITY.toString());
@@ -80,6 +84,11 @@ public class ClothingListingService {
         clothing.setListingFeePaid(true);
         clothing.setStatus(ListingStatus.ACTIVE);
 
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(clothing, clothingSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
         ClothingListing saved = clothingRepository.save(clothing);
         log.info("Clothing listing created: {}", saved.getId());
 
@@ -90,7 +99,7 @@ public class ClothingListingService {
 
     @Transactional
     public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
-        // 1. Ownership Check (ID based)
+        
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
@@ -101,7 +110,7 @@ public class ClothingListingService {
             return Result.error("Clothing listing not found", "LISTING_NOT_FOUND");
         }
 
-        // 2. Status Validation
+        
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
         if (statusResult.isError()) {
             return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
@@ -109,7 +118,7 @@ public class ClothingListingService {
 
         var oldPrice = existing.getPrice();
 
-        // 3. Mapping Updates
+        
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -136,6 +145,9 @@ public class ClothingListingService {
         request.color().ifPresent(existing::setColor);
         request.purchaseYear().ifPresent(y -> existing.setPurchaseDate(toPurchaseDate(y)));
         request.condition().ifPresent(existing::setCondition);
+        request.size().ifPresent(existing::setSize);
+        request.shoeSizeEu().ifPresent(existing::setShoeSizeEu);
+        request.material().ifPresent(existing::setMaterial);
         request.clothingGender().ifPresent(existing::setClothingGender);
         request.clothingCategory().ifPresent(existing::setClothingCategory);
 
@@ -143,9 +155,14 @@ public class ClothingListingService {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
         clothingRepository.save(existing);
 
-        // 4. Price History Check
+        
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                     existing.getId(),

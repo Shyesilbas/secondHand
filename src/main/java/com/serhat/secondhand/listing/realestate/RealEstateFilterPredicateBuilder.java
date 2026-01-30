@@ -6,7 +6,6 @@ import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale;
 
 @Component
 public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<RealEstateListing, RealEstateFilterDto> {
@@ -21,17 +21,15 @@ public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<
     @Override
     public List<Predicate> buildSpecificPredicates(CriteriaBuilder cb, Root<RealEstateListing> root, RealEstateFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
-        
-        // Listing type constraint
+
         predicates.add(cb.equal(root.get("listingType"), ListingType.REAL_ESTATE));
-        
-        // RealEstate-specific filters
+
         if (filters.getHeatingTypeIds() != null && !filters.getHeatingTypeIds().isEmpty()) {
-            predicates.add(root.join("heatingType", JoinType.LEFT).get("id").in(filters.getHeatingTypeIds()));
+            predicates.add(root.join("heatingType").get("id").in(filters.getHeatingTypeIds()));
         }
         
         if (filters.getRealEstateTypeIds() != null && !filters.getRealEstateTypeIds().isEmpty()) {
-            predicates.add(root.join("realEstateType", JoinType.LEFT).get("id").in(filters.getRealEstateTypeIds()));
+            predicates.add(root.join("realEstateType").get("id").in(filters.getRealEstateTypeIds()));
         }
         
         if (filters.getFloor() != null) {
@@ -39,14 +37,13 @@ public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<
         }
         
         if (filters.getAdTypeId() != null) {
-            predicates.add(cb.equal(root.join("adType", JoinType.LEFT).get("id"), filters.getAdTypeId()));
+            predicates.add(cb.equal(root.join("adType").get("id"), filters.getAdTypeId()));
         }
         
         if (filters.getOwnerTypeId() != null) {
-            predicates.add(cb.equal(root.join("ownerType", JoinType.LEFT).get("id"), filters.getOwnerTypeId()));
+            predicates.add(cb.equal(root.join("ownerType").get("id"), filters.getOwnerTypeId()));
         }
-        
-        // Range filters
+
         if (filters.getMinSquareMeters() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("squareMeters"), filters.getMinSquareMeters()));
         }
@@ -74,12 +71,16 @@ public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<
         if (filters.getMaxBuildingAge() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("buildingAge"), filters.getMaxBuildingAge()));
         }
-        
-        // Boolean filters
+
         if (filters.isFurnished()) {
             predicates.add(cb.equal(root.get("furnished"), true));
         }
-        
+
+        if (filters.getZoningStatus() != null && !filters.getZoningStatus().isBlank()) {
+            String q = "%" + filters.getZoningStatus().trim().toLowerCase(Locale.ROOT) + "%";
+            predicates.add(cb.like(cb.lower(root.get("zoningStatus")), q));
+        }
+
         return predicates;
     }
 

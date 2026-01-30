@@ -12,8 +12,11 @@ import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.vehicle.VehicleSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,10 @@ public class VehicleListingService {
     private final PriceHistoryService priceHistoryService;
     private final UserService userService;
     private final CarBrandRepository carBrandRepository;
+    private final VehicleTypeRepository vehicleTypeRepository;
     private final VehicleModelRepository vehicleModelRepository;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<VehicleSpecValidator> vehicleSpecValidators;
 
     @Transactional
     public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
@@ -55,15 +61,18 @@ public class VehicleListingService {
         vehicle.setSeller(seller);
         vehicle.setStatus(ListingStatus.ACTIVE);
         vehicle.setListingFeePaid(true);
+        vehicle.setVehicleType(resolveVehicleType(request.vehicleTypeId()));
         vehicle.setBrand(resolveBrand(request.brandId()));
         vehicle.setModel(resolveModel(request.vehicleModelId()));
 
-        if (vehicle.getBrand() != null && vehicle.getModel() != null) {
-            var modelBrandId = vehicle.getModel().getBrand() != null ? vehicle.getModel().getBrand().getId() : null;
-            var brandId = vehicle.getBrand().getId();
-            if (modelBrandId == null || !modelBrandId.equals(brandId)) {
-                return Result.error("Vehicle model does not belong to the selected brand", "MODEL_BRAND_MISMATCH");
-            }
+        Result<Void> relationResult = validateModelRelations(vehicle);
+        if (relationResult.isError()) {
+            return Result.error(relationResult.getMessage(), relationResult.getErrorCode());
+        }
+
+        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(vehicle, vehicleSpecValidators);
+        if (specResult.isError()) {
+            return Result.error(specResult.getMessage(), specResult.getErrorCode());
         }
 
         VehicleListing saved = vehicleRepository.save(vehicle);
@@ -118,15 +127,18 @@ public class VehicleListingService {
         request.kilometersPerLiter().ifPresent(existing::setKilometersPerLiter);
         request.fuelType().ifPresent(existing::setFuelType);
         request.swap().ifPresent(existing::setSwap);
+        request.vehicleTypeId().ifPresent(idValue -> existing.setVehicleType(resolveVehicleType(idValue)));
         request.brandId().ifPresent(idValue -> existing.setBrand(resolveBrand(idValue)));
         request.vehicleModelId().ifPresent(idValue -> existing.setModel(resolveModel(idValue)));
 
-        if (existing.getBrand() != null && existing.getModel() != null) {
-            var modelBrandId = existing.getModel().getBrand() != null ? existing.getModel().getBrand().getId() : null;
-            var brandId = existing.getBrand().getId();
-            if (modelBrandId == null || !modelBrandId.equals(brandId)) {
-                return Result.error("Vehicle model does not belong to the selected brand", "MODEL_BRAND_MISMATCH");
-            }
+        Result<Void> relationResult = validateModelRelations(existing);
+        if (relationResult.isError()) {
+            return Result.error(relationResult.getMessage(), relationResult.getErrorCode());
+        }
+
+        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, vehicleSpecValidators);
+        if (specResult.isError()) {
+            return Result.error(specResult.getMessage(), specResult.getErrorCode());
         }
 
         vehicleRepository.save(existing);
@@ -177,5 +189,38 @@ public class VehicleListingService {
             return null;
         }
         return vehicleModelRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle model not found"));
+    }
+
+    private com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType resolveVehicleType(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return vehicleTypeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle type not found"));
+    }
+
+    private Result<Void> validateModelRelations(VehicleListing listing) {
+        if (listing.getVehicleType() == null) {
+            return Result.error("Vehicle type is required", "VEHICLE_TYPE_REQUIRED");
+        }
+        if (listing.getBrand() == null) {
+            return Result.error("Vehicle brand is required", "VEHICLE_BRAND_REQUIRED");
+        }
+        if (listing.getModel() == null) {
+            return Result.error("Vehicle model is required", "VEHICLE_MODEL_REQUIRED");
+        }
+
+        var modelBrandId = listing.getModel().getBrand() != null ? listing.getModel().getBrand().getId() : null;
+        var brandId = listing.getBrand().getId();
+        if (modelBrandId == null || !modelBrandId.equals(brandId)) {
+            return Result.error("Vehicle model does not belong to the selected brand", "MODEL_BRAND_MISMATCH");
+        }
+
+        var modelTypeId = listing.getModel().getType() != null ? listing.getModel().getType().getId() : null;
+        var typeId = listing.getVehicleType().getId();
+        if (modelTypeId == null || !modelTypeId.equals(typeId)) {
+            return Result.error("Vehicle model does not belong to the selected type", "MODEL_TYPE_MISMATCH");
+        }
+
+        return Result.success();
     }
 }

@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.books;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
@@ -11,7 +13,6 @@ import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository
 import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class BooksDataInitializer implements CommandLineRunner {
+public class BooksDataInitializer implements SeedTask {
 
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
@@ -31,7 +32,12 @@ public class BooksDataInitializer implements CommandLineRunner {
     private final BookConditionRepository bookConditionRepository;
 
     @Override
-    public void run(String... args) {
+    public String key() {
+        return "books";
+    }
+
+    @Override
+    public Result<Void> run() {
         if (bookTypeRepository.count() == 0) {
             seedBookTypes();
         }
@@ -47,6 +53,7 @@ public class BooksDataInitializer implements CommandLineRunner {
         if (bookConditionRepository.count() == 0) {
             seedBookConditions();
         }
+        return Result.success();
     }
 
     private void seedBookTypes() {

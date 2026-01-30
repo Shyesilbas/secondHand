@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import LocationFields from '../../common/components/forms/LocationFields.jsx';
 import ListingWizard from '../../listing/components/ListingWizard.jsx';
@@ -40,6 +40,24 @@ const BooksCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdate 
   });
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
+
+  const selectedGenreBookTypeId = useMemo(() => {
+    const genres = enums?.bookGenres || [];
+    const found = genres.find((g) => String(g.id) === String(formData.genreId));
+    return found?.bookTypeId || '';
+  }, [enums?.bookGenres, formData.genreId]);
+
+  useEffect(() => {
+    if (String(formData._genreBookTypeId || '') !== String(selectedGenreBookTypeId || '')) {
+      handleInputChange({ target: { name: '_genreBookTypeId', value: selectedGenreBookTypeId || '' } });
+    }
+  }, [formData._genreBookTypeId, selectedGenreBookTypeId, handleInputChange]);
+
+  useEffect(() => {
+    if (formData.bookTypeId && formData.genreId && selectedGenreBookTypeId && String(selectedGenreBookTypeId) !== String(formData.bookTypeId)) {
+      handleDropdownChange('genreId', '');
+    }
+  }, [formData.bookTypeId, formData.genreId, selectedGenreBookTypeId, handleDropdownChange]);
 
   const handleImageUpload = (imageUrl) => {
     handleInputChange({ target: { name: 'imageUrl', value: imageUrl } });

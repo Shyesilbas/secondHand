@@ -46,6 +46,19 @@ export class FilterConfig {
     return this;
   }
 
+  addTextField(key, label, options = {}) {
+    this.fields.push({
+      type: 'text',
+      key,
+      label,
+      placeholder: options.placeholder || '',
+      required: options.required || false,
+      gridSize: options.gridSize || 'md:grid-cols-2',
+      ...options
+    });
+    return this;
+  }
+
   getFields() {
     return this.fields;
   }

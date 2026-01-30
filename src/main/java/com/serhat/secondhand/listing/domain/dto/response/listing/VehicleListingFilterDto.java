@@ -18,6 +18,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
 @EqualsAndHashCode(callSuper = true)
 public class VehicleListingFilterDto extends ListingFilterDto {
     
+    private List<UUID> vehicleTypeIds;
     private List<UUID> brandIds;
     private Integer minYear;
     private Integer maxYear;

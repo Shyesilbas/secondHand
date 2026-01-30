@@ -17,6 +17,8 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
+import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.sports.SportsSpecValidator;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -43,19 +46,19 @@ public class SportsListingService {
     private final PriceHistoryService priceHistoryService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
+    private final ListingValidationEngine listingValidationEngine;
+    private final List<SportsSpecValidator> sportsSpecValidators;
 
     @Transactional
     public Result<UUID> createSportsListing(SportsCreateRequest request, Long sellerId) {
         log.info("Creating sports listing for sellerId: {}", sellerId);
 
-        // 1. Resolve Seller
         var userResult = userService.findById(sellerId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         User seller = userResult.getData();
 
-        // 2. Map and Validate
         SportsListing entity = listingMapper.toSportsEntity(request);
         if (entity.getQuantity() == null || entity.getQuantity() < 1) {
             return Result.error("Invalid quantity for sports listing", ListingErrorCodes.INVALID_QUANTITY.toString());
@@ -82,6 +85,11 @@ public class SportsListingService {
         entity.setListingFeePaid(true);
         entity.setStatus(ListingStatus.ACTIVE);
 
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(entity, sportsSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
         SportsListing saved = sportsRepository.save(entity);
         log.info("Sports listing created: {}", saved.getId());
 
@@ -92,7 +100,6 @@ public class SportsListingService {
 
     @Transactional
     public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, Long currentUserId) {
-        // 1. Ownership Check (Updated to use Long userId)
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return Result.error(ownershipResult.getMessage(), ownershipResult.getErrorCode());
@@ -103,7 +110,6 @@ public class SportsListingService {
             return Result.error("Sports listing not found", "LISTING_NOT_FOUND");
         }
 
-        // 2. Status Validation
         Result<Void> statusResult = listingService.validateStatus(existing, ListingStatus.DRAFT, ListingStatus.ACTIVE, ListingStatus.INACTIVE);
         if (statusResult.isError()) {
             return Result.error(statusResult.getMessage(), statusResult.getErrorCode());
@@ -111,7 +117,6 @@ public class SportsListingService {
 
         var oldPrice = existing.getPrice();
 
-        // 3. Optional Updates
         request.title().ifPresent(existing::setTitle);
         request.description().ifPresent(existing::setDescription);
         request.price().ifPresent(existing::setPrice);
@@ -146,7 +151,11 @@ public class SportsListingService {
             return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
         }
 
-        // 4. Price History Recording
+        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
         if (request.price().isPresent() && (oldPrice == null || !oldPrice.equals(existing.getPrice()))) {
             priceHistoryService.recordPriceChange(
                     existing.getId(),

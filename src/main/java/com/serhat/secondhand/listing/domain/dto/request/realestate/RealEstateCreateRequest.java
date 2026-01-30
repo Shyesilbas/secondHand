@@ -22,6 +22,7 @@ public record RealEstateCreateRequest(
         Integer floor,
         Integer buildingAge,
         boolean furnished,
+        String zoningStatus,
         String imageUrl
 ) {
 }

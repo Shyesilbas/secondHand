@@ -98,6 +98,7 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "listingNo", ignore = true)
     @Mapping(target = "listingType", constant = "VEHICLE")
+    @Mapping(target = "vehicleType", ignore = true)
     @Mapping(target = "brand", ignore = true)
     @Mapping(target = "model", ignore = true)
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);

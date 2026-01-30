@@ -20,6 +20,8 @@ export const RealEstateCreateRequestDTO = {
   floor: 0,
   buildingAge: 0,
   furnished: false,
+  zoningStatus: '',
+  _realEstateTypeName: '',
 };
 
 export const RealEstateListingDTO = {
@@ -35,6 +37,7 @@ export const RealEstateListingDTO = {
   floor: 0,
   buildingAge: 0,
   furnished: false,
+  zoningStatus: '',
 };
 
 export const RealEstateSearchFiltersDTO = {
@@ -60,6 +63,7 @@ export const RealEstateSearchFiltersDTO = {
   minBuildingAge: 0,
   maxBuildingAge: 0,
   furnished: false,
+  zoningStatus: '',
   
     sortBy: 'createdAt',
   sortDirection: 'DESC',
@@ -88,6 +92,7 @@ export const createRealEstateCreateRequest = (data) => {
     floor: parseInt(data.floor) || 0,
     buildingAge: parseInt(data.buildingAge) || 0,
     furnished: Boolean(data.furnished),
+    zoningStatus: (data.zoningStatus || '').trim() || null,
   };
 };
 
@@ -111,6 +116,7 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
   if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
   if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl || undefined;
+  if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
   
   return updateData;
 };

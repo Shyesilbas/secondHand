@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useVehicle } from '../hooks/useVehicle.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
@@ -36,6 +36,112 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
 
   const { formData, errors, currentStep, handleInputChange, handleDropdownChange, nextStep, prevStep } = formState;
 
+  const selectedVehicleTypeName = useMemo(() => {
+    const typeId = formData.vehicleTypeId;
+    if (!typeId) return '';
+    const t = (enums.vehicleTypes || []).find((x) => (x.id || x.value) === typeId);
+    return String(t?.name || '').toUpperCase();
+  }, [enums.vehicleTypes, formData.vehicleTypeId]);
+
+  const isCar = selectedVehicleTypeName === 'CAR';
+  const isMotorcycle = selectedVehicleTypeName === 'MOTORCYCLE';
+  const isScooter = selectedVehicleTypeName === 'SCOOTER';
+  const isBicycle = selectedVehicleTypeName === 'BICYCLE';
+  const isTruck = selectedVehicleTypeName === 'TRUCK';
+  const isVan = selectedVehicleTypeName === 'VAN';
+  const isOther = selectedVehicleTypeName === 'OTHER';
+
+  const showFuelFields = isCar || isMotorcycle || isScooter || isTruck || isVan || isOther;
+  const showDoors = isCar || isTruck || isVan;
+  const showSeatCount = isCar || isTruck || isVan;
+  const showBodyType = isCar;
+  const showDrivetrain = isCar;
+  const showGearbox = isCar;
+
+  const showEngineCapacity = isCar || isMotorcycle || isScooter || isTruck || isVan || isOther;
+  const showMileage = isCar || isMotorcycle || isScooter || isTruck || isVan || isOther;
+  const showPowerAndConsumption = isCar || isTruck || isVan || isOther;
+  const showInspection = isCar || isTruck || isVan || isOther;
+
+  const filteredBrandOptions = useMemo(() => {
+    const allBrands = enums.carBrands || [];
+    const typeId = formData.vehicleTypeId;
+    if (!typeId) {
+      return allBrands;
+    }
+
+    const models = enums.vehicleModels || [];
+    const brandIdsForType = new Set(
+      models
+        .filter((m) => (m.typeId || m.type_id) === typeId)
+        .map((m) => m.brandId || m.brand_id)
+        .filter(Boolean)
+        .map(String)
+    );
+
+    if (brandIdsForType.size === 0) {
+      return allBrands;
+    }
+
+    const filtered = allBrands.filter((b) => brandIdsForType.has(String(b.id || b.value)));
+    return filtered.length > 0 ? filtered : allBrands;
+  }, [enums.carBrands, enums.vehicleModels, formData.vehicleTypeId]);
+
+  const selectedModelInfo = useMemo(() => {
+    if (!formData.vehicleModelId) return null;
+    const m = (enums.vehicleModels || []).find((x) => String(x.id) === String(formData.vehicleModelId));
+    if (!m) return null;
+    return {
+      modelId: String(m.id),
+      brandId: String(m.brandId || m.brand_id || ''),
+      typeId: String(m.typeId || m.type_id || '')
+    };
+  }, [enums.vehicleModels, formData.vehicleModelId]);
+
+  useEffect(() => {
+    if (!selectedModelInfo) return;
+    if (formData._modelBrandId !== selectedModelInfo.brandId) {
+      handleDropdownChange('_modelBrandId', selectedModelInfo.brandId);
+    }
+    if (formData._modelTypeId !== selectedModelInfo.typeId) {
+      handleDropdownChange('_modelTypeId', selectedModelInfo.typeId);
+    }
+  }, [selectedModelInfo, formData._modelBrandId, formData._modelTypeId, handleDropdownChange]);
+
+  useEffect(() => {
+    if (!selectedModelInfo) return;
+    if (selectedModelInfo.brandId && formData.brandId && String(formData.brandId) !== selectedModelInfo.brandId) {
+      handleDropdownChange('vehicleModelId', '');
+      return;
+    }
+    if (selectedModelInfo.typeId && formData.vehicleTypeId && String(formData.vehicleTypeId) !== selectedModelInfo.typeId) {
+      handleDropdownChange('vehicleModelId', '');
+      return;
+    }
+    if (selectedModelInfo.brandId && (!formData.brandId || String(formData.brandId) !== selectedModelInfo.brandId)) {
+      handleDropdownChange('brandId', selectedModelInfo.brandId);
+    }
+    if (selectedModelInfo.typeId && (!formData.vehicleTypeId || String(formData.vehicleTypeId) !== selectedModelInfo.typeId)) {
+      const t = (enums.vehicleTypes || []).find((x) => String(x.id || x.value) === String(selectedModelInfo.typeId));
+      const tn = String(t?.name || '').toUpperCase();
+      handleDropdownChange('vehicleTypeId', selectedModelInfo.typeId);
+      handleDropdownChange('_vehicleTypeName', tn);
+    }
+  }, [
+    selectedModelInfo,
+    formData.brandId,
+    formData.vehicleTypeId,
+    formData.vehicleModelId,
+    enums.vehicleTypes,
+    handleDropdownChange
+  ]);
+
+  useEffect(() => {
+    if (!selectedVehicleTypeName) return;
+    if (formData._vehicleTypeName === selectedVehicleTypeName) return;
+    handleDropdownChange('_vehicleTypeName', selectedVehicleTypeName);
+  }, [selectedVehicleTypeName, formData._vehicleTypeName, handleDropdownChange]);
+
   const handleImageUpload = (imageUrl) => {
     handleInputChange({ target: { name: 'imageUrl', value: imageUrl } });
   };
@@ -68,9 +174,24 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <EnumDropdown
+                    label="Araç Tipi *"
+                    enumKey="vehicleTypes"
+                    value={formData.vehicleTypeId}
+                    onChange={(v) => {
+                      const t = (enums.vehicleTypes || []).find((x) => (x.id || x.value) === v);
+                      const tn = String(t?.name || '').toUpperCase();
+                      handleDropdownChange('vehicleTypeId', v);
+                      handleDropdownChange('_vehicleTypeName', tn);
+                      handleDropdownChange('brandId', '');
+                      handleDropdownChange('vehicleModelId', '');
+                    }}
+                  />
+                  {errors.vehicleTypeId && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.vehicleTypeId}</p>}
+                  <EnumDropdown
                     label="Marka *"
                     enumKey="carBrands"
                     value={formData.brandId}
+                    options={filteredBrandOptions}
                     onChange={(v) => {
                       handleDropdownChange('brandId', v);
                       handleDropdownChange('vehicleModelId', '');
@@ -78,7 +199,13 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   />
                   <SearchableDropdown
                     label="Model *"
-                    options={(enums.vehicleModels || []).filter((m) => (m.brandId || m.brand_id) === formData.brandId)}
+                    options={(enums.vehicleModels || []).filter((m) => {
+                      const b = (m.brandId || m.brand_id);
+                      const t = (m.typeId || m.type_id);
+                      if (formData.vehicleTypeId && t !== formData.vehicleTypeId) return false;
+                      return !formData.brandId || b === formData.brandId;
+                    })}
+                    disabled={!formData.vehicleTypeId || !formData.brandId}
                     selectedValues={formData.vehicleModelId ? [formData.vehicleModelId] : []}
                     onSelectionChange={(values) => handleDropdownChange('vehicleModelId', values[0] || '')}
                     placeholder="Model seçin..."
@@ -91,13 +218,23 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                     <input type="number" name="year" value={formData.year} onChange={handleInputChange} min="1950" max={new Date().getFullYear() + 1} placeholder="YYYY" className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${errors.year ? 'border-red-300' : 'border-slate-200'}`} />
                     {errors.year && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.year}</p>}
                   </div>
-                  <EnumDropdown label="Yakıt Tipi *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => handleDropdownChange('fuelType', v)} />
+                  {showFuelFields && <EnumDropdown label="Yakıt Tipi *" enumKey="fuelTypes" value={formData.fuelType} onChange={(v) => handleDropdownChange('fuelType', v)} />}
                   <EnumDropdown label="Renk" enumKey="colors" value={formData.color} onChange={(v) => handleDropdownChange('color', v)} />
-                  <EnumDropdown label="Kapı Sayısı" enumKey="doors" value={formData.doors} onChange={(v) => handleDropdownChange('doors', v)} />
-                  <EnumDropdown label="Vites" enumKey="gearTypes" value={formData.gearbox} onChange={(v) => handleDropdownChange('gearbox', v)} />
-                  <EnumDropdown label="Koltuk Sayısı" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => handleDropdownChange('seatCount', v)} />
-                  <EnumDropdown label="Çekiş" enumKey="drivetrains" value={formData.drivetrain} onChange={(v) => handleDropdownChange('drivetrain', v)} />
-                  <EnumDropdown label="Kasa Tipi" enumKey="bodyTypes" value={formData.bodyType} onChange={(v) => handleDropdownChange('bodyType', v)} />
+                  {showDoors && <EnumDropdown label="Kapı Sayısı" enumKey="doors" value={formData.doors} onChange={(v) => handleDropdownChange('doors', v)} />}
+                  {showGearbox && (
+                    <div>
+                      <EnumDropdown label="Vites" enumKey="gearTypes" value={formData.gearbox} onChange={(v) => handleDropdownChange('gearbox', v)} />
+                      {errors.gearbox && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.gearbox}</p>}
+                    </div>
+                  )}
+                  {showSeatCount && <EnumDropdown label="Koltuk Sayısı" enumKey="seatCounts" value={formData.seatCount} onChange={(v) => handleDropdownChange('seatCount', v)} />}
+                  {showDrivetrain && <EnumDropdown label="Çekiş" enumKey="drivetrains" value={formData.drivetrain} onChange={(v) => handleDropdownChange('drivetrain', v)} />}
+                  {showBodyType && (
+                    <div>
+                      <EnumDropdown label="Kasa Tipi" enumKey="bodyTypes" value={formData.bodyType} onChange={(v) => handleDropdownChange('bodyType', v)} />
+                      {errors.bodyType && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.bodyType}</p>}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -107,34 +244,35 @@ const VehicleCreateForm = ({ onBack, initialData = null, isEdit = false, onUpdat
                   <p className="text-xs text-slate-500 mt-1 tracking-tight">Motor, performans ve diğer teknik detaylar</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div>
+                  {showMileage && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Kilometre (km)</label>
                     <input type="number" name="mileage" value={formData.mileage} onChange={handleInputChange} placeholder="0" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
-                  <div>
+                  </div>}
+                  {showEngineCapacity && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Motor Hacmi (cc)</label>
                     <input type="number" name="engineCapacity" value={formData.engineCapacity} onChange={handleInputChange} placeholder="e.g. 1600" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
-                  <div>
+                    {errors.engineCapacity && <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.engineCapacity}</p>}
+                  </div>}
+                  {showPowerAndConsumption && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Beygir Gücü</label>
                     <input type="number" name="horsePower" value={formData.horsePower} onChange={handleInputChange} placeholder="e.g. 110" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
+                  </div>}
                   <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Jant Boyutu (inch)</label>
                     <input type="number" name="wheels" value={formData.wheels} onChange={handleInputChange} placeholder="e.g. 17" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
                   </div>
-                  <div>
+                  {showPowerAndConsumption && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Yakıt Kapasitesi (L)</label>
                     <input type="number" name="fuelCapacity" value={formData.fuelCapacity} onChange={handleInputChange} placeholder="e.g. 50" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
-                  <div>
+                  </div>}
+                  {showPowerAndConsumption && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Yakıt Tüketimi (L/100km)</label>
                     <input type="number" name="fuelConsumption" value={formData.fuelConsumption} onChange={handleInputChange} placeholder="e.g. 6.5" className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
-                  <div>
+                  </div>}
+                  {showInspection && <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">Muayene Geçerlilik Tarihi</label>
                     <input type="date" name="inspectionValidUntil" value={formData.inspectionValidUntil} onChange={handleInputChange} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight" />
-                  </div>
+                  </div>}
                 </div>
               </div>
 

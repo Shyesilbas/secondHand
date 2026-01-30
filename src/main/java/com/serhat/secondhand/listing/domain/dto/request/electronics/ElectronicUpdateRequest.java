@@ -1,7 +1,9 @@
 package com.serhat.secondhand.listing.domain.dto.request.electronics;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 
 import java.math.BigDecimal;
@@ -26,7 +28,21 @@ public record ElectronicUpdateRequest(
         Optional<String> imageUrl,
         Optional<Integer> ram,
         Optional<Integer> storage,
+        Optional<StorageType> storageType,
         Optional<Processor> processor,
-        Optional<Integer> screenSize
+        Optional<Integer> screenSize,
+        Optional<String> gpuModel,
+        Optional<String> operatingSystem,
+        Optional<Integer> batteryHealthPercent,
+        Optional<Integer> batteryCapacityMah,
+        Optional<Integer> cameraMegapixels,
+        Optional<Boolean> supports5g,
+        Optional<Boolean> dualSim,
+        Optional<Boolean> hasNfc,
+        Optional<ElectronicConnectionType> connectionType,
+        Optional<Boolean> wireless,
+        Optional<Boolean> noiseCancelling,
+        Optional<Boolean> hasMicrophone,
+        Optional<Integer> batteryLifeHours
 ) {
 }

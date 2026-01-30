@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { getListingConfig, getListingTypeOptions, createFormRegistry } from '../config/listingConfig.js';
+import { ROUTES } from '../../common/constants/routes.js';
 import { 
   Sparkles, 
   ChevronRight, 
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 const CreateListingPage = () => {
+    const navigate = useNavigate();
     const [selectedType, setSelectedType] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const { enums } = useEnums();
@@ -25,7 +27,12 @@ const CreateListingPage = () => {
     }, [searchParams]);
 
     const handleTypeSelect = (type) => {
-        setSelectedType(type);
+        const cfg = getListingConfig(type);
+        const subtype = cfg?.createFlow?.subtypeSelector;
+        if (subtype) {
+            navigate(ROUTES.CREATE_LISTING_SUBTYPE(type));
+            return;
+        }
         const next = new URLSearchParams(searchParams);
         next.set('type', type);
         setSearchParams(next);
@@ -47,6 +54,16 @@ const CreateListingPage = () => {
 
     const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
     const selectedConfig = selectedType ? getListingConfig(selectedType) : null;
+
+    if (SelectedForm && selectedConfig?.createFlow?.subtypeSelector) {
+        const { queryParamKey, initialDataKey } = selectedConfig.createFlow.subtypeSelector;
+        const subtypeValue = searchParams.get(queryParamKey);
+        if (!subtypeValue) {
+            navigate(ROUTES.CREATE_LISTING_SUBTYPE(selectedType), { replace: true });
+            return null;
+        }
+        return <SelectedForm onBack={handleBackToSelection} initialData={{ [initialDataKey]: subtypeValue }} />;
+    }
 
     if (SelectedForm) {
         return <SelectedForm onBack={handleBackToSelection} />;
@@ -77,7 +94,7 @@ const CreateListingPage = () => {
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">What are you listing today?</h2>
                                 <span className="text-xs font-semibold px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200/60 tracking-tight">
-                                    Step 1 of 2
+                                    Step 1 of 3
                                 </span>
                             </div>
 

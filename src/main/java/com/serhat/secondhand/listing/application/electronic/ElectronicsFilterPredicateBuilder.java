@@ -61,6 +61,9 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         if (filters.getMaxStorage() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("storage"), filters.getMaxStorage()));
         }
+        if (filters.getStorageTypes() != null && !filters.getStorageTypes().isEmpty()) {
+            predicates.add(root.get("storageType").in(filters.getStorageTypes()));
+        }
         if (filters.getProcessors() != null && !filters.getProcessors().isEmpty()) {
             predicates.add(root.get("processor").in(filters.getProcessors()));
         }
@@ -69,6 +72,54 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         }
         if (filters.getMaxScreenSize() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("screenSize"), filters.getMaxScreenSize()));
+        }
+
+        if (filters.getMinBatteryHealthPercent() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("batteryHealthPercent"), filters.getMinBatteryHealthPercent()));
+        }
+        if (filters.getMaxBatteryHealthPercent() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("batteryHealthPercent"), filters.getMaxBatteryHealthPercent()));
+        }
+        if (filters.getMinBatteryCapacityMah() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("batteryCapacityMah"), filters.getMinBatteryCapacityMah()));
+        }
+        if (filters.getMaxBatteryCapacityMah() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("batteryCapacityMah"), filters.getMaxBatteryCapacityMah()));
+        }
+        if (filters.getMinCameraMegapixels() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("cameraMegapixels"), filters.getMinCameraMegapixels()));
+        }
+        if (filters.getMaxCameraMegapixels() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("cameraMegapixels"), filters.getMaxCameraMegapixels()));
+        }
+
+        if (filters.getSupports5g() != null) {
+            predicates.add(cb.equal(root.get("supports5g"), filters.getSupports5g()));
+        }
+        if (filters.getDualSim() != null) {
+            predicates.add(cb.equal(root.get("dualSim"), filters.getDualSim()));
+        }
+        if (filters.getHasNfc() != null) {
+            predicates.add(cb.equal(root.get("hasNfc"), filters.getHasNfc()));
+        }
+
+        if (filters.getConnectionTypes() != null && !filters.getConnectionTypes().isEmpty()) {
+            predicates.add(root.get("connectionType").in(filters.getConnectionTypes()));
+        }
+        if (filters.getWireless() != null) {
+            predicates.add(cb.equal(root.get("wireless"), filters.getWireless()));
+        }
+        if (filters.getNoiseCancelling() != null) {
+            predicates.add(cb.equal(root.get("noiseCancelling"), filters.getNoiseCancelling()));
+        }
+        if (filters.getHasMicrophone() != null) {
+            predicates.add(cb.equal(root.get("hasMicrophone"), filters.getHasMicrophone()));
+        }
+        if (filters.getMinBatteryLifeHours() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("batteryLifeHours"), filters.getMinBatteryLifeHours()));
+        }
+        if (filters.getMaxBatteryLifeHours() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("batteryLifeHours"), filters.getMaxBatteryLifeHours()));
         }
         
         return predicates;

@@ -1,11 +1,12 @@
 package com.serhat.secondhand.listing.application.clothing;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
@@ -14,19 +15,25 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-public class ClothingDataInitializer implements CommandLineRunner {
+public class ClothingDataInitializer implements SeedTask {
 
     private final ClothingBrandRepository brandRepository;
     private final ClothingTypeRepository typeRepository;
 
     @Override
-    public void run(String... args) {
+    public String key() {
+        return "clothing";
+    }
+
+    @Override
+    public Result<Void> run() {
         if (brandRepository.count() == 0) {
             seedBrands();
         }
         if (typeRepository.count() == 0) {
             seedTypes();
         }
+        return Result.success();
     }
 
     private void seedBrands() {

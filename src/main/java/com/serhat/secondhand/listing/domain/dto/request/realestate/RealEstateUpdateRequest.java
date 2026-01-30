@@ -23,6 +23,7 @@ public record RealEstateUpdateRequest(
         Optional<Integer>   floor,
         Optional<Integer>   buildingAge,
         Optional<Boolean> furnished,
+        Optional<String> zoningStatus,
         Optional<String> imageUrl
 ) {
 }

@@ -10,6 +10,10 @@ export const VehicleCreateRequestDTO = {
   district: '',
   imageUrl: '',
   
+    vehicleTypeId: '',
+  _vehicleTypeName: '',
+  _modelTypeId: '',
+  _modelBrandId: '',
     brandId: '',
   vehicleModelId: '',
   year: 0,
@@ -38,6 +42,7 @@ export const VehicleCreateRequestDTO = {
 export const VehicleListingDTO = {
   ...ListingDTO,
   imageUrl: '',
+    vehicleType: null,
     brand: null,
   model: null,
   year: 0,
@@ -72,6 +77,7 @@ export const createVehicleCreateRequest = (data) => {
     district: (data.district || '').trim(),
     imageUrl: data.imageUrl || undefined,
     
+        vehicleTypeId: data.vehicleTypeId || null,
         brandId: data.brandId || null,
     vehicleModelId: data.vehicleModelId || null,
     year: parseInt(data.year) || 0,
@@ -105,6 +111,7 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.currency !== undefined && data.currency !== '') updateData.currency = data.currency;
   if (data.city !== undefined && data.city !== '') updateData.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') updateData.district = data.district.trim();
+  if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') updateData.vehicleTypeId = data.vehicleTypeId;
   if (data.brandId !== undefined && data.brandId !== '') updateData.brandId = data.brandId;
   if (data.vehicleModelId !== undefined && data.vehicleModelId !== '') updateData.vehicleModelId = data.vehicleModelId;
   if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);

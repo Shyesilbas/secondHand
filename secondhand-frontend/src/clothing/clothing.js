@@ -13,6 +13,9 @@ export const createClothingCreateRequest = (data) => ({
     color: data.color,
     purchaseYear: data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined,
     condition: data.condition,
+    size: data.size || null,
+    shoeSizeEu: data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : null,
+    material: data.material ? String(data.material).trim() : null,
     clothingGender: data.clothingGender,
     clothingCategory: data.clothingCategory,
     imageUrl: data.imageUrl || undefined
@@ -31,6 +34,9 @@ export const createClothingUpdateRequest = (data) => ({
     color: data.color ? data.color : undefined,
     purchaseYear: data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined,
     condition: data.condition ? data.condition : undefined,
+    size: data.size ? data.size : undefined,
+    shoeSizeEu: data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : undefined,
+    material: data.material ? String(data.material).trim() : undefined,
     clothingGender: data.clothingGender ? data.clothingGender : undefined,
     clothingCategory: data.clothingCategory ? data.clothingCategory : undefined,
     imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined
@@ -57,7 +63,12 @@ export const ClothingListingDTO = {
     clothingType: null,
     color: '',
     purchaseDate: '',
-    condition: ''
+    condition: '',
+    size: '',
+    shoeSizeEu: null,
+    material: '',
+    clothingGender: '',
+    clothingCategory: ''
 };
 
 export const createClothingListingDto = (data) => ({
@@ -82,6 +93,9 @@ export const createClothingListingDto = (data) => ({
     color: data.color,
     purchaseDate: data.purchaseDate,
     condition: data.condition,
+    size: data.size,
+    shoeSizeEu: data.shoeSizeEu,
+    material: data.material,
     imageUrl: data.imageUrl
 });
 

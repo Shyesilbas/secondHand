@@ -137,6 +137,7 @@ const VehicleFilters = ({ filters, onInputChange, enums }) => {
 
   return (
     <div className="space-y-8">
+      {renderEnumField('vehicleTypeIds', 'Vehicle Type', 'vehicleTypes')}
       {renderEnumField('brandIds', 'Car Brand', 'carBrands')}
       {renderEnumField('fuelTypes', 'Fuel Type', 'fuelTypes')}
       {renderEnumField('colors', 'Color', 'colors')}

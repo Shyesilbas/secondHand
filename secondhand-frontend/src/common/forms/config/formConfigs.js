@@ -138,6 +138,7 @@ export const booksFormConfig = {
     author: '',
     bookTypeId: '',
     genreId: '',
+    _genreBookTypeId: '',
     languageId: '',
     publicationYear: '',
     pageCount: '',
@@ -160,12 +161,13 @@ export const clothingFormConfig = {
   totalSteps: 3,
   initialData: {
     title: '', description: '', price: '', currency: 'TRY', quantity: 1, brandId: '', clothingTypeId: '', color: '',
-    condition: '', clothingGender: '', clothingCategory: '', purchaseYear: '', city: '', district: ''
+    condition: '', size: '', shoeSizeEu: '', material: '', clothingGender: '', clothingCategory: '', purchaseYear: '', city: '', district: '',
+    _clothingTypeName: ''
   },
   steps: [basicInfoStep, clothingDetailsStep, locationStep],
   fieldGroups: {
     step1: ['title', 'description', 'price'],
-    step2: ['brandId', 'clothingTypeId', 'color', 'condition', 'clothingGender', 'clothingCategory', 'purchaseYear'],
+    step2: ['brandId', 'clothingTypeId', 'color', 'condition', 'size', 'shoeSizeEu', 'material', 'clothingGender', 'clothingCategory', 'purchaseYear'],
     step3: ['city', 'district']
   }
 };

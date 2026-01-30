@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.sports;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
@@ -7,7 +9,6 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
@@ -16,14 +17,19 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-public class SportsDataInitializer implements CommandLineRunner {
+public class SportsDataInitializer implements SeedTask {
 
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
 
     @Override
-    public void run(String... args) {
+    public String key() {
+        return "sports";
+    }
+
+    @Override
+    public Result<Void> run() {
         if (sportDisciplineRepository.count() == 0) {
             seedDisciplines();
         }
@@ -33,6 +39,7 @@ public class SportsDataInitializer implements CommandLineRunner {
         if (sportConditionRepository.count() == 0) {
             seedConditions();
         }
+        return Result.success();
     }
 
     private void seedDisciplines() {

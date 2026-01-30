@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.realestate;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
@@ -9,7 +11,6 @@ import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTy
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
@@ -18,7 +19,7 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-public class RealEstateDataInitializer implements CommandLineRunner {
+public class RealEstateDataInitializer implements SeedTask {
 
     private final RealEstateTypeRepository realEstateTypeRepository;
     private final RealEstateAdTypeRepository realEstateAdTypeRepository;
@@ -26,7 +27,12 @@ public class RealEstateDataInitializer implements CommandLineRunner {
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
 
     @Override
-    public void run(String... args) {
+    public String key() {
+        return "realestate";
+    }
+
+    @Override
+    public Result<Void> run() {
         if (realEstateTypeRepository.count() == 0) {
             seedRealEstateTypes();
         }
@@ -39,6 +45,7 @@ public class RealEstateDataInitializer implements CommandLineRunner {
         if (listingOwnerTypeRepository.count() == 0) {
             seedOwnerTypes();
         }
+        return Result.success();
     }
 
     private void seedRealEstateTypes() {
