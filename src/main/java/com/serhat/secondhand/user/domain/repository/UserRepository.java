@@ -31,4 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "ORDER BY u.name ASC")
     List<User> searchUsers(@Param("query") String query, Pageable pageable);
 
+    @Query("SELECT u.id FROM User u")
+    List<Long> findAllUserIds();
+
 }

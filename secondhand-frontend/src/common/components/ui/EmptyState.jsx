@@ -19,13 +19,13 @@ const EmptyState = ({
   const iconWrapperClass = 'bg-gradient-to-br from-secondary-50 to-secondary-100 text-text-muted';
   const buttonColor = 'bg-button-primary-bg hover:bg-button-primary-hover active:scale-[0.98] transition-all duration-200';
 
-  const defaultIcon = Icon || MagnifyingGlassIcon;
+  const DefaultIcon = Icon || MagnifyingGlassIcon;
 
   return (
     <div className={`bg-background-primary rounded-xl border border-border-light/60 shadow-sm ${padding} text-center ${className}`}>
-      {(defaultIcon || variant !== 'default') && (
+      {(DefaultIcon || variant !== 'default') && (
         <div className={`${iconSize} mx-auto mb-4 ${iconWrapperClass} rounded-2xl flex items-center justify-center backdrop-blur-sm`}>
-          <defaultIcon className={iconInnerSize} />
+          <DefaultIcon className={iconInnerSize} />
         </div>
       )}
       <h3 className={`${isCompact ? 'text-base' : 'text-lg'} font-semibold text-text-primary mb-2`}>{title}</h3>

@@ -39,7 +39,7 @@ const PaymentAgreementsSection = ({
     };
 
     fetchAgreements();
-  }, []); // Remove onRequiredAgreementsChange from dependencies
+  }, [onRequiredAgreementsChange]);
 
   const handleAgreementToggle = (agreementId) => {
     onToggle(agreementId);

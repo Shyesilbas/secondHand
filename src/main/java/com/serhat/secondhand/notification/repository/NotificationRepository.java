@@ -19,5 +19,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     List<Notification> findByUserIdAndIsReadFalseOrderByCreatedAtDesc(Long userId);
     
     boolean existsByIdAndUserId(UUID id, Long userId);
+
+    boolean existsByUser_IdAndTypeAndMetadataAndIsReadFalse(Long userId, com.serhat.secondhand.notification.entity.enums.NotificationType type, String metadata);
 }
 

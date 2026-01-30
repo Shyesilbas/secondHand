@@ -2,7 +2,6 @@ import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
-import { usePaymentAgreements } from '../hooks/usePaymentAgreements.js';
 
 const PaymentPanel = ({
     selectedListing,
@@ -13,7 +12,8 @@ const PaymentPanel = ({
     onPayment,
     agreementsAccepted,
     acceptedAgreementIds,
-    onAgreementToggle
+    onAgreementToggle,
+    onRequiredAgreementsChange
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const { eWallet, checkBalance } = useEWallet();
@@ -188,6 +188,7 @@ const PaymentPanel = ({
                                 <PaymentAgreementsSection 
                                     acceptedAgreements={acceptedAgreementIds}
                                     onToggle={onAgreementToggle}
+                                    onRequiredAgreementsChange={onRequiredAgreementsChange}
                                     error={!agreementsAccepted ? "Please accept all payment agreements to proceed" : null}
                                 />
                             </div>

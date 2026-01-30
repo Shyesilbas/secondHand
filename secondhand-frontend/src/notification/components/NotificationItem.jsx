@@ -36,6 +36,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
             REVIEW_RECEIVED: Star,
             PAYMENT_SUCCESS: CheckCircle,
             PAYMENT_FAILED: XCircle,
+            AGREEMENT_UPDATED: AlertCircle,
             ACCOUNT_VERIFIED: CheckCircle,
             GENERIC_NOTIFICATION: AlertCircle,
         };
@@ -56,8 +57,19 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
     };
 
     const getNotificationRoute = (notification) => {
-        const { type, metadata } = notification;
-        const metadataObj = metadata || {};
+        const rawType = notification?.type;
+        const type = rawType ? String(rawType).toUpperCase() : '';
+        const rawMetadata = notification?.metadata;
+        let metadataObj = {};
+        if (rawMetadata && typeof rawMetadata === 'string') {
+            try {
+                metadataObj = JSON.parse(rawMetadata);
+            } catch {
+                metadataObj = {};
+            }
+        } else if (rawMetadata && typeof rawMetadata === 'object') {
+            metadataObj = rawMetadata;
+        }
 
         switch (type) {
             case 'OFFER_RECEIVED':
@@ -102,7 +114,13 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
             case 'ACCOUNT_VERIFIED':
                 return ROUTES.DASHBOARD;
 
+            case 'AGREEMENT_UPDATED':
+                return ROUTES.AGREEMENTS_ALL;
+
             default:
+                if (notification?.actionUrl === ROUTES.AGREEMENTS || notification?.actionUrl === '/agreements') {
+                    return ROUTES.AGREEMENTS_ALL;
+                }
                 if (notification.actionUrl) {
                     return notification.actionUrl;
                 }

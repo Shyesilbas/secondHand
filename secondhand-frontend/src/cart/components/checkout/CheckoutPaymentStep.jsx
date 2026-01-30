@@ -20,6 +20,7 @@ const CheckoutPaymentStep = ({
     sendVerificationCode,
     acceptedAgreements,
     onAgreementToggle,
+    onRequiredAgreementsChange,
     areAllAgreementsAccepted
 }) => {
     const canProceed = () => {
@@ -199,6 +200,7 @@ const CheckoutPaymentStep = ({
                     <PaymentAgreementsSection 
                         acceptedAgreements={acceptedAgreements}
                         onToggle={onAgreementToggle}
+                        onRequiredAgreementsChange={onRequiredAgreementsChange}
                     />
                 </div>
             </div>

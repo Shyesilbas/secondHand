@@ -4,7 +4,6 @@ import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.agreements.dto.UserAgreementDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +15,7 @@ public interface UserAgreementMapper {
     @Mapping(target = "agreementId", source = "agreement.agreementId")
     @Mapping(target = "agreementType", source = "agreement.agreementType")
     @Mapping(target = "agreementVersion", source = "agreement.version")
+    @Mapping(target = "acceptedVersion", source = "acceptedVersion")
     @Mapping(target = "acceptedTheLastVersion", source = "acceptedTheLastVersion")
     UserAgreementDto toDto(UserAgreement userAgreement);
     

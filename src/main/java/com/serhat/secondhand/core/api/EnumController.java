@@ -22,8 +22,6 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.ListingFeeService;
 import com.serhat.secondhand.showcase.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
-import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
-import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
@@ -723,29 +721,6 @@ public class EnumController {
         return ResponseEntity.ok(configMap);
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getAgreementGroups() {
-        List<Map<String, Object>> agreementGroups = Arrays.stream(AgreementGroup.values())
-                .map(group -> {
-                    Map<String, Object> groupMap = new LinkedHashMap<>();
-                    groupMap.put("value", group.name());
-                    groupMap.put("label", group.name().replace("_", " "));
-                    return groupMap;
-                })
-                .toList();
-        return ResponseEntity.ok(agreementGroups);
-    }
-
-    private ResponseEntity<List<Map<String, Object>>> getAgreementTypes() {
-        List<Map<String, Object>> agreementTypes = Arrays.stream(AgreementType.values())
-                .map(type -> {
-                    Map<String, Object> typeMap = new LinkedHashMap<>();
-                    typeMap.put("value", type.name());
-                    typeMap.put("label", type.name().replace("_", " "));
-                    return typeMap;
-                })
-                .toList();
-        return ResponseEntity.ok(agreementTypes);
-    }
 
     @GetMapping("/all")
     @Operation(summary = "Get all enums", description = "Returns all enum values in a single response for efficient loading")
@@ -798,8 +773,6 @@ public class EnumController {
         allEnums.put("auditEventStatuses", getAuditEventStatuses().getBody());
         allEnums.put("listingFeeConfig", getListingFeeConfig().getBody());
         allEnums.put("showcasePricingConfig", getShowcasePricingConfig().getBody());
-        allEnums.put("agreementGroups", getAgreementGroups().getBody());
-        allEnums.put("agreementTypes", getAgreementTypes().getBody());
         
         return ResponseEntity.ok(allEnums);
     }

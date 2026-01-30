@@ -38,6 +38,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     // Payment agreements
     const {
         acceptedAgreements,
+        setRequiredAgreements,
         handleAgreementToggle,
         areAllAgreementsAccepted,
         getAcceptedAgreementIds
@@ -278,6 +279,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         
         // Agreement related
         acceptedAgreements,
+        onRequiredAgreementsChange: setRequiredAgreements,
         onAgreementToggle: handleAgreementToggle,
         areAllAgreementsAccepted
     };

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 
 export const usePaymentAgreements = () => {
   const [acceptedAgreements, setAcceptedAgreements] = useState(new Set());
+  const [requiredAgreementIds, setRequiredAgreementIds] = useState(new Set());
 
   const handleAgreementToggle = useCallback((agreementId) => {
     setAcceptedAgreements(prev => {
@@ -15,14 +16,29 @@ export const usePaymentAgreements = () => {
     });
   }, []);
 
-  const resetAgreements = useCallback(() => {
-    setAcceptedAgreements(new Set());
+  const setRequiredAgreements = useCallback((agreements) => {
+    if (!Array.isArray(agreements)) {
+      setRequiredAgreementIds(new Set());
+      return;
+    }
+    const ids = agreements
+      .map((a) => (typeof a === 'string' ? a : a?.agreementId))
+      .filter(Boolean);
+    setRequiredAgreementIds(new Set(ids));
   }, []);
 
-  const areAllAgreementsAccepted = () => {
-    // This will be handled by PaymentAgreementsSection component
-    return acceptedAgreements.size > 0;
-  };
+  const resetAgreements = useCallback(() => {
+    setAcceptedAgreements(new Set());
+    setRequiredAgreementIds(new Set());
+  }, []);
+
+  const areAllAgreementsAccepted = useCallback(() => {
+    if (requiredAgreementIds.size === 0) return true;
+    for (const id of requiredAgreementIds) {
+      if (!acceptedAgreements.has(id)) return false;
+    }
+    return true;
+  }, [acceptedAgreements, requiredAgreementIds]);
 
   const getAcceptedAgreementIds = () => {
     return Array.from(acceptedAgreements);
@@ -30,6 +46,7 @@ export const usePaymentAgreements = () => {
 
   return {
     acceptedAgreements,
+    setRequiredAgreements,
     handleAgreementToggle,
     resetAgreements,
     areAllAgreementsAccepted,
