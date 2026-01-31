@@ -1,6 +1,5 @@
 import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
-import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
 
 const PaymentPanel = ({
@@ -10,13 +9,13 @@ const PaymentPanel = ({
     onPaymentTypeChange,
     isProcessingPayment,
     onPayment,
+    eWallet,
     agreementsAccepted,
     acceptedAgreementIds,
     onAgreementToggle,
     onRequiredAgreementsChange
 }) => {
     const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const { eWallet, checkBalance } = useEWallet();
 
     return (
         <div className="lg:col-span-1">

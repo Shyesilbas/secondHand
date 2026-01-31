@@ -1,5 +1,5 @@
-import { get, post } from '../../common/services/api/request.js';
-import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import {get, post} from '../../common/services/api/request.js';
+import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 
 export const agreementService = {
     getAllAgreements: async () => {
@@ -8,12 +8,6 @@ export const agreementService = {
 
     getAgreementByType: async (agreementType) => {
         return get(API_ENDPOINTS.AGREEMENTS.BY_TYPE(agreementType));
-    },
-
-    getRequiredAgreements: async (agreementGroup) => {
-        return get(API_ENDPOINTS.AGREEMENTS.REQUIRED, { 
-            params: { agreementGroup } 
-        });
     },
 
     getRequiredAgreementsForRegister: async () => {
@@ -35,8 +29,4 @@ export const agreementService = {
             isAcceptedTheLastVersion: ua?.isAcceptedTheLastVersion ?? ua?.acceptedTheLastVersion ?? false,
         })) : [];
     },
-
-    getUserAcceptanceHistory: async (agreementId) => {
-        return get(API_ENDPOINTS.AGREEMENTS.USER_ACCEPTANCE_HISTORY(agreementId));
-    }
 };

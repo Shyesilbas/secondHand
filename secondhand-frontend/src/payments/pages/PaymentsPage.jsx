@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Menu } from 'lucide-react';
-import PaymentReceiptModal from '../common/components/modals/PaymentReceiptModal.jsx';
-import PaymentFilterSidebar from './components/PaymentFilterSidebar.jsx';
-import PaymentList from './components/PaymentList.jsx';
-import PaymentPagination from './components/PaymentPagination.jsx';
-import PaymentInfo from './components/PaymentInfo.jsx';
-import {usePayments} from './hooks/usePayments.js';
+import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
+import PaymentHistory from '../components/PaymentHistory.jsx';
+import PaymentNavigation from '../components/PaymentNavigation.jsx';
+import { PaymentInfo } from '../components/WalletOverview.jsx';
+import { usePayments } from '../hooks/usePayments.js';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();
@@ -87,13 +86,20 @@ const PaymentsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50/50 relative">
-            <PaymentFilterSidebar
-                isOpen={showFilters}
-                onClose={closeFilterSidebar}
+            <PaymentNavigation
+                showFilters={showFilters}
+                onCloseFilters={closeFilterSidebar}
                 filters={filters}
                 onFilterChange={handleFilterChange}
-                onReset={clearFilters}
+                onResetFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
+                shouldShowPagination={shouldShowPagination}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                totalItems={filteredPayments.length}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
             />
 
             <div className={`flex flex-col min-w-0 transition-all duration-300 ${showFilters ? 'lg:ml-80' : ''}`}>
@@ -155,7 +161,7 @@ const PaymentsPage = () => {
                             </button>
                         )}
                     </div>
-                    <PaymentList
+                    <PaymentHistory
                         payments={payments}
                         onShowReceipt={showReceipt}
                         hasActiveFilters={hasActiveFilters}
@@ -163,19 +169,6 @@ const PaymentsPage = () => {
                         isLoading={isLoading}
                     />
                 </div>
-
-                {shouldShowPagination && (
-                    <div className="mt-6">
-                        <PaymentPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            pageSize={pageSize}
-                            totalItems={filteredPayments.length}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={handlePageSizeChange}
-                        />
-                    </div>
-                )}
 
                 <PaymentReceiptModal
                     isOpen={isReceiptModalOpen}
@@ -189,3 +182,4 @@ const PaymentsPage = () => {
 };
 
 export default PaymentsPage;
+

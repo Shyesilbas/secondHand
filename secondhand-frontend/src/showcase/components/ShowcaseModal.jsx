@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
-import {usePaymentAgreements} from '../../payments/hooks/usePaymentAgreements.js';
 import {useListingData} from '../../listing/hooks/useListingData.js';
 import PaymentAgreementsSection from '../../payments/components/PaymentAgreementsSection.jsx';
+import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
 import NotificationModal from '../../notification/NotificationModal.jsx';
 import ShowcasePayment from './ShowcasePayment.jsx';
 import { Zap, ShieldCheck, X } from 'lucide-react';
@@ -15,7 +15,13 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const [requiredAgreements, setRequiredAgreements] = useState([]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const { enums, isLoading: isPricingLoading } = useEnums();
-    const paymentAgreements = usePaymentAgreements();
+    const {
+        acceptedAgreements,
+        onAgreementToggle,
+        onRequiredAgreementsChange,
+        areAllAgreementsAccepted,
+        getAcceptedAgreementIds,
+    } = useAgreementsState();
     const { listing, isLoading: isListingLoading, error: listingError } = useListingData(listingId, isOpen);
     
     const showcasePricing = enums.showcasePricingConfig;
@@ -44,15 +50,9 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     
     const totalCost = useMemo(() => calculateTotal(), [calculateTotal]);
 
-    // Check if all agreements are accepted whenever acceptedAgreements changes
     useEffect(() => {
-        if (requiredAgreements.length > 0) {
-            const allAccepted = requiredAgreements.every(agreement => 
-                paymentAgreements.acceptedAgreements.has(agreement.agreementId)
-            );
-            setAllAgreementsAccepted(allAccepted);
-        }
-    }, [paymentAgreements.acceptedAgreements, requiredAgreements]);
+        setAllAgreementsAccepted(areAllAgreementsAccepted());
+    }, [areAllAgreementsAccepted]);
 
     const handleDaysChange = useCallback((e) => {
         setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)));
@@ -177,10 +177,11 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                     
                     <div className="rounded-3xl border border-slate-200/60 bg-white/50 backdrop-blur-xl p-6">
                         <PaymentAgreementsSection 
-                            acceptedAgreements={paymentAgreements.acceptedAgreements}
-                            onToggle={paymentAgreements.handleAgreementToggle}
+                            acceptedAgreements={acceptedAgreements}
+                            onToggle={onAgreementToggle}
                             onRequiredAgreementsChange={(agreements) => {
                                 setRequiredAgreements(agreements);
+                                onRequiredAgreementsChange(agreements);
                             }}
                         />
                     </div>
@@ -201,12 +202,12 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         onSuccess?.();
                     }}
                     onClose={onClose}
-                    acceptedAgreements={paymentAgreements.acceptedAgreements}
-                    getAcceptedAgreementIds={paymentAgreements.getAcceptedAgreementIds}
+                    acceptedAgreements={acceptedAgreements}
+                    getAcceptedAgreementIds={getAcceptedAgreementIds}
                 />
             );
         }
-    }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, paymentAgreements, handleDaysChange]);
+    }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, getAcceptedAgreementIds, handleDaysChange, onRequiredAgreementsChange]);
 
     if (!isOpen) return null;
     

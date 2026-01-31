@@ -1,131 +1,33 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { paymentService } from '../services/paymentService.js';
-import { orderService } from '../../order/services/orderService.js';
+import { useCallback, useMemo, useEffect, useState } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { PAYMENT_TRANSACTION_TYPES } from '../payments.js';
-
-const PAYMENTS_KEYS = {
-    all: ['payments'],
-    myPayments: () => [...PAYMENTS_KEYS.all, 'my'],
-    withOrders: () => [...PAYMENTS_KEYS.myPayments(), 'withOrders'],
-};
+import { DEFAULT_PAYMENT_FILTERS } from '../paymentSchema.js';
+import { usePaymentsQuery } from './queries.js';
 
 export const usePayments = () => {
     const { user } = useAuth();
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(5);
+    const [filters, setFilters] = useState(DEFAULT_PAYMENT_FILTERS);
+    const [showFilters, setShowFilters] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
-    
-    const [filters, setFilters] = useState({
-        seller: '',
-        transactionType: '',
-        paymentType: '',
-        dateFrom: '',
-        dateTo: '',
-        amountMin: '',
-        amountMax: '',
-        paymentDirection: ''
-    });
-    const [showFilters, setShowFilters] = useState(false);
 
-    const hasActiveFilters = Object.values(filters).some(value => value !== '');
+    const hasActiveFilters = useMemo(
+        () => Object.values(filters).some((value) => value !== ''),
+        [filters]
+    );
 
-    useEffect(() => {
+    const resetPagination = useCallback(() => {
         setCurrentPage(0);
-        setSelectedPayment(null);
-        setIsReceiptModalOpen(false);
-        setFilters({
-            seller: '',
-            transactionType: '',
-            paymentType: '',
-            dateFrom: '',
-            dateTo: '',
-            amountMin: '',
-            amountMax: '',
-            paymentDirection: ''
-        });
-    }, [user?.id]);
-
-    const {
-        data,
-        isLoading,
-        error: queryError,
-        refetch
-    } = useQuery({
-        queryKey: [...PAYMENTS_KEYS.withOrders(), user?.id || 'anonymous', currentPage, pageSize, filters],
-        queryFn: async () => {
-            const [paymentsData, ordersData] = await Promise.all([
-                paymentService.getMyPayments(currentPage, pageSize, filters),
-                orderService.myOrders(0, 5)
-            ]);
-            
-            const payments = paymentsData.content || [];
-            const orders = ordersData.data?.content || ordersData.content || [];
-            
-            const ordersMap = new Map();
-            orders.forEach(order => {
-                if (order.paymentReference) {
-                    ordersMap.set(order.paymentReference, order);
-                }
-            });
-            
-            const enrichedPayments = payments.map(payment => {
-                if (payment.transactionType === PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE && payment.paymentId) {
-                    const order = ordersMap.get(String(payment.paymentId));
-                    if (order && order.orderItems) {
-                        return {
-                            ...payment,
-                            orderItems: order.orderItems.map(item => item.listing?.title).filter(Boolean)
-                        };
-                    }
-                }
-                return payment;
-            });
-            
-            return {
-                payments: enrichedPayments,
-                pagination: {
-                    totalElements: paymentsData.totalElements || 0,
-                    totalPages: paymentsData.totalPages || 0,
-                    number: paymentsData.number || currentPage,
-                    size: paymentsData.size || pageSize
-                }
-            };
-        },
-        enabled: !!user,
-        staleTime: 0,
-        gcTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: 'always',
-    });
-
-    const allPayments = useMemo(() => data?.payments || [], [data]);
-    const error = queryError?.response?.data?.message || queryError?.message || null;
-
-    const filteredPayments = allPayments;
-    const paginatedPayments = allPayments;
-    const totalFilteredPages = data?.pagination?.totalPages || 0;
-    const shouldShowPagination = totalFilteredPages > 1;
+        setPageSize(5);
+    }, []);
 
     const handleFilterChange = useCallback((key, value) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
-        setCurrentPage(0);
+        setFilters((prev) => ({ ...prev, [key]: value }));
     }, []);
 
     const clearFilters = useCallback(() => {
-        setFilters({
-            seller: '',
-            transactionType: '',
-            paymentType: '',
-            dateFrom: '',
-            dateTo: '',
-            amountMin: '',
-            amountMax: '',
-            paymentDirection: ''
-        });
-        setCurrentPage(0);
+        setFilters(DEFAULT_PAYMENT_FILTERS);
     }, []);
 
     const showReceipt = useCallback((payment) => {
@@ -134,6 +36,11 @@ export const usePayments = () => {
     }, []);
 
     const closeReceipt = useCallback(() => {
+        setIsReceiptModalOpen(false);
+        setSelectedPayment(null);
+    }, []);
+
+    const resetReceiptState = useCallback(() => {
         setIsReceiptModalOpen(false);
         setSelectedPayment(null);
     }, []);
@@ -147,9 +54,28 @@ export const usePayments = () => {
         setPageSize(newPageSize);
     }, []);
 
-    const fetchPayments = useCallback(() => {
-        refetch();
-    }, [refetch]);
+    useEffect(() => {
+        resetPagination();
+        resetReceiptState();
+        setFilters(DEFAULT_PAYMENT_FILTERS);
+    }, [user?.id]);
+
+    const { data, isLoading, error: queryError, refetch } = usePaymentsQuery({
+        userId: user?.id,
+        currentPage,
+        pageSize,
+        filters,
+    });
+
+    const allPayments = useMemo(() => data?.payments || [], [data]);
+    const error = queryError?.response?.data?.message || queryError?.message || null;
+
+    const filteredPayments = allPayments;
+    const paginatedPayments = allPayments;
+    const totalFilteredPages = data?.pagination?.totalPages || 0;
+    const shouldShowPagination = totalFilteredPages > 1;
+
+    const fetchPayments = refetch;
 
     return {
         payments: paginatedPayments,
@@ -168,8 +94,14 @@ export const usePayments = () => {
         hasActiveFilters,
         shouldShowPagination,
         fetchPayments,
-        handleFilterChange,
-        clearFilters,
+        handleFilterChange: (key, value) => {
+            handleFilterChange(key, value);
+            setCurrentPage(0);
+        },
+        clearFilters: () => {
+            clearFilters();
+            setCurrentPage(0);
+        },
         showReceipt,
         closeReceipt,
         handlePageChange,
