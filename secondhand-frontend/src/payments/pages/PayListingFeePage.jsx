@@ -1,19 +1,17 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePayListingFee } from './hooks/usePayListingFee.js';
-import { useDraftListings } from './hooks/useDraftListings.js';
-import { useEnums } from '../common/hooks/useEnums.js';
-import { usePaymentMethods } from './hooks/usePaymentMethods.js';
-import { useEmails } from './hooks/useEmails.js';
-import { EMAIL_TYPES } from '../emails/emails.js';
-import BackButton from '../common/components/ui/BackButton.jsx';
-import ErrorMessage from '../common/components/ui/ErrorMessage.jsx';
-import EmptyState from '../common/components/ui/EmptyState.jsx';
-import DraftListingsList from './components/DraftListingsList.jsx';
-import PaymentPanel from './components/PaymentPanel.jsx';
-import ConfirmationModal from './components/ConfirmationModal.jsx';
-import EmailDisplayModal from './components/EmailDisplayModal.jsx';
-import LoadingIndicator from "../common/components/ui/LoadingIndicator.jsx";
+import { useDraftListings, usePayListingFee } from '../hooks/useListingPaymentFlow.js';
+import { useEnums } from '../../common/hooks/useEnums.js';
+import { usePaymentMethods } from '../hooks/useFinancialAccountManager.js';
+import { useEmails } from '../hooks/useEmails.js';
+import BackButton from '../../common/components/ui/BackButton.jsx';
+import ErrorMessage from '../../common/components/ui/ErrorMessage.jsx';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import DraftListingsList from '../components/DraftListingsList.jsx';
+import PaymentPanel from '../components/PaymentPanel.jsx';
+import PaymentVerificationModal from '../components/PaymentVerificationModal.jsx';
+import LoadingIndicator from "../../common/components/ui/LoadingIndicator.jsx";
+import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
@@ -21,27 +19,27 @@ const PayListingFeePage = () => {
     const { draftListings, isLoading: isListingsLoading, error: listingsError, refetch: refetchListings } = useDraftListings();
     const { enums, isLoading: isConfigLoading } = useEnums();
     const { paymentMethods, isLoading: isPaymentMethodsLoading, refetch: refetchPaymentMethods } = usePaymentMethods();
-    
+
     const feeConfig = enums.listingFeeConfig;
     const { emails, isLoading: isEmailsLoading, fetchEmails, clearEmails } = useEmails();
+    const { eWallet } = useEWallet();
     const {
         selectedListing,
         setSelectedListing,
         paymentType,
         setPaymentType,
         isProcessingPayment,
-        modalStep,
         verificationCode,
         setVerificationCode,
         codeExpiryTime,
         countdown,
         isResendingCode,
         handlePayment,
-        confirmPayment,
+        startVerification,
+        verifyAndPay,
         resendVerificationCode,
         showConfirmModal,
         setShowConfirmModal,
-        // Agreement related
         acceptedAgreements,
         agreementsAccepted,
         onAgreementToggle,
@@ -49,8 +47,7 @@ const PayListingFeePage = () => {
     } = usePayListingFee({
         selectedListing: null,
         feeConfig,
-        onSuccess: refetchListings,
-        onVerificationRequired: fetchEmails
+        onSuccess: refetchListings
     });
 
     const isLoading = isListingsLoading || isConfigLoading;
@@ -60,7 +57,7 @@ const PayListingFeePage = () => {
         if (showConfirmModal) {
             refetchPaymentMethods();
         }
-    }, [showConfirmModal]);
+    }, [showConfirmModal, refetchPaymentMethods]);
 
     return (
         <div className="min-h-screen bg-[#F8FAFC]">
@@ -120,9 +117,9 @@ const PayListingFeePage = () => {
                                 onPaymentTypeChange={setPaymentType}
                                 isProcessingPayment={isProcessingPayment}
                                 onPayment={async () => {
-                                    await refetchPaymentMethods();
                                     handlePayment();
                                 }}
+                                eWallet={eWallet}
                                 agreementsAccepted={agreementsAccepted}
                                 acceptedAgreementIds={acceptedAgreements}
                                 onAgreementToggle={onAgreementToggle}
@@ -133,36 +130,32 @@ const PayListingFeePage = () => {
                 ))}
 
                 {showConfirmModal && (
-                    <ConfirmationModal
+                    <PaymentVerificationModal
+                        isOpen={showConfirmModal}
                         selectedListing={selectedListing}
                         feeConfig={feeConfig}
                         paymentType={paymentType}
                         paymentMethods={paymentMethods}
                         isLoadingPaymentMethods={isPaymentMethodsLoading}
-                        onConfirm={confirmPayment}
+                        eWallet={eWallet}
+                        onStartVerification={startVerification}
+                        onVerifyAndPay={verifyAndPay}
                         onCancel={() => setShowConfirmModal(false)}
                         onNavigateToPaymentMethods={(type) => {
                             setShowConfirmModal(false);
                             navigate(`/payments/${type === 'CREDIT_CARD' ? 'credit-cards' : 'bank-accounts'}`);
                         }}
-                        step={modalStep}
                         isProcessing={isProcessingPayment}
                         verificationCode={verificationCode}
                         onChangeVerificationCode={setVerificationCode}
                         codeExpiryTime={codeExpiryTime}
                         countdown={countdown}
-                        onShowEmails={fetchEmails}
                         onResendCode={resendVerificationCode}
                         isResendingCode={isResendingCode}
-                    />
-                )}
-
-                {emails.filter(e => e.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION).slice(0, 3).length > 0 && (
-                    <EmailDisplayModal
-                        emails={emails
-                            .filter(e => e.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION)
-                            .slice(0, 3)}
-                        onClose={clearEmails}
+                        emails={emails}
+                        isEmailsLoading={isEmailsLoading}
+                        onFetchEmails={fetchEmails}
+                        onClearEmails={clearEmails}
                     />
                 )}
             </div>
@@ -171,3 +164,4 @@ const PayListingFeePage = () => {
 };
 
 export default PayListingFeePage;
+

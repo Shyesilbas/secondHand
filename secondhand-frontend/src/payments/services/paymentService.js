@@ -1,6 +1,6 @@
-import { get, post } from '../../common/services/api/request.js';
+import { get, post, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { PaymentDto, ListingFeeConfigDTO, createPaymentRequest } from '../payments.js';
+import { BankDto, PaymentDto, ListingFeeConfigDTO, createPaymentRequest } from '../paymentSchema.js';
 
 export const paymentService = {
 
@@ -48,7 +48,6 @@ export const paymentService = {
 
     getListingFeeConfig: async () => {
         const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
-        console.log('Fee config response:', response);
         return response;
     },
 
@@ -59,6 +58,29 @@ export const paymentService = {
         return get(API_ENDPOINTS.PAYMENTS.STATISTICS);
     },
 
-  
+    getCreditCards: async () => {
+        return get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
+    },
+
+    createCreditCard: async (limit) => {
+        return post(API_ENDPOINTS.CREDIT_CARDS.CREATE, { limit });
+    },
+
+    deleteCreditCard: async () => {
+        return del(API_ENDPOINTS.CREDIT_CARDS.DELETE);
+    },
+
+    createBankAccount: async () => {
+        const data = await post(API_ENDPOINTS.BANK_ACCOUNTS.CREATE);
+        return BankDto(data);
+    },
+
+    getBankAccounts: async () => {
+        const data = await get(API_ENDPOINTS.BANK_ACCOUNTS.GET_ALL);
+        const rawData = Array.isArray(data) ? data : [data].filter(Boolean);
+        return rawData.map(BankDto);
+    },
+
+    deleteBankAccount: async () => del(API_ENDPOINTS.BANK_ACCOUNTS.DELETE),
 
 };

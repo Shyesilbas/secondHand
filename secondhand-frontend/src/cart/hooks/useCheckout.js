@@ -1,13 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { creditCardService } from '../../payments/services/creditCardService.js';
-import { bankService } from '../../payments/services/bankService.js';
 import { orderService } from '../../order/services/orderService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import useAddresses from '../../user/hooks/useAddresses.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
-import { usePaymentAgreements } from '../../payments/hooks/usePaymentAgreements.js';
+import { paymentService } from '../../payments/services/paymentService.js';
+import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
 
 export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, offerId) => {
     const navigate = useNavigate();
@@ -35,19 +34,18 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const [notes, setNotes] = useState('');
     const [orderName, setOrderName] = useState('');
 
-    // Payment agreements
     const {
         acceptedAgreements,
-        setRequiredAgreements,
-        handleAgreementToggle,
+        onAgreementToggle,
+        onRequiredAgreementsChange,
         areAllAgreementsAccepted,
-        getAcceptedAgreementIds
-    } = usePaymentAgreements();
+        getAcceptedAgreementIds,
+    } = useAgreementsState();
 
     useEffect(() => {
         
-        creditCardService
-            .getAll()
+        paymentService
+            .getCreditCards()
             .then((data) => {
                 let normalized = [];
                 if (Array.isArray(data)) {
@@ -64,8 +62,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 setCards([]);
             });
 
-        bankService
-            .getBankAccount()
+        paymentService
+            .getBankAccounts()
             .then((data) => {
                 const normalized = Array.isArray(data)
                     ? data
@@ -279,8 +277,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         
         // Agreement related
         acceptedAgreements,
-        onRequiredAgreementsChange: setRequiredAgreements,
-        onAgreementToggle: handleAgreementToggle,
+        onRequiredAgreementsChange,
+        onAgreementToggle,
         areAllAgreementsAccepted
     };
 };

@@ -23,9 +23,9 @@ import ListingSubtypeSelectionPage from '../../listing/pages/ListingSubtypeSelec
 import ComplaintsPage from '../../complaint/pages/ComplaintsPage.jsx';
 import EditListingPage from '../../listing/pages/EditListingPage.jsx';
 import FavoritesPage from '../../favorites/FavoritesPage';
-import PaymentsPage from '../../payments/PaymentsPage.jsx';
-import PayListingFeePage from '../../payments/PayListingFeePage.jsx';
-import PaymentMethodsPage from '../../payments/PaymentMethodsPage.jsx';
+import PaymentsPage from '../../payments/pages/PaymentsPage.jsx';
+import PayListingFeePage from '../../payments/pages/PayListingFeePage.jsx';
+import PaymentMethodsPage from '../../payments/pages/PaymentMethodsPage.jsx';
 import EmailsPage from '../../emails/EmailsPage';
 
 import OAuthCallbackPage from '../../auth/OAuthCallbackPage.jsx';

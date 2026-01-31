@@ -9,7 +9,7 @@ export * from '../vehicle/vehicles.js';
 
 export * from '../electronics/electronics.js';
 
-export * from '../payments/payments.js';
+export * from '../payments/paymentSchema.js';
 
 export * from '../favorites/favorites.js';
 

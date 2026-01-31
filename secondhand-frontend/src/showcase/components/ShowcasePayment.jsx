@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { usePaymentMethods } from '../../payments/hooks/usePaymentMethods.js';
+import { usePaymentMethods } from '../../payments/hooks/useFinancialAccountManager.js';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
 import { orderService } from '../../order/services/orderService.js';
