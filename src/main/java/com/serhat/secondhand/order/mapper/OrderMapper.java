@@ -34,6 +34,9 @@ public class OrderMapper {
                 .orderNumber(order.getOrderNumber())
                 .name(order.getName())
                 .userId(order.getUser().getId())
+                .buyerName(order.getUser().getName())
+                .buyerSurname(order.getUser().getSurname())
+                .buyerEmail(order.getUser().getEmail())
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
                 .subtotal(order.getSubtotal())
@@ -83,10 +86,19 @@ public class OrderMapper {
         Integer cancelledQuantity = orderItemCancelRepository.sumCancelledQuantityByOrderItem(orderItem);
         Integer refundedQuantity = orderItemRefundRepository.sumRefundedQuantityByOrderItem(orderItem);
 
+        String sellerName = null;
+        String sellerSurname = null;
+        if (orderItem.getListing() != null && orderItem.getListing().getSeller() != null) {
+            sellerName = orderItem.getListing().getSeller().getName();
+            sellerSurname = orderItem.getListing().getSeller().getSurname();
+        }
+
         return OrderItemDto.builder()
                 .id(orderItem.getId())
                 .orderId(orderItem.getOrder().getId())
                 .listing(listingMapper.toDynamicDto(orderItem.getListing()))
+                .sellerName(sellerName)
+                .sellerSurname(sellerSurname)
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())
                 .totalPrice(orderItem.getTotalPrice())

@@ -1,12 +1,18 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { favoriteService } from '../services/favoriteService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 export const useFavorites = (page = 0, size = 20) => {
+  const { user, isAuthenticated } = useAuth();
   const [currentPage, setCurrentPage] = useState(page);
   const notification = useNotification();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [user?.id]);
 
   const {
     data: favoritesData,
@@ -14,8 +20,9 @@ export const useFavorites = (page = 0, size = 20) => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['favorites', currentPage, size],
+    queryKey: ['favorites', user?.id, currentPage, size],
     queryFn: () => favoriteService.getMyFavorites({ page: currentPage, size }),
+    enabled: !!(isAuthenticated && user?.id),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -38,15 +45,13 @@ export const useFavorites = (page = 0, size = 20) => {
   const toggleFavoriteMutation = useMutation({
     mutationFn: (listing) => favoriteService.toggleFavorite(listing.id),
     onSuccess: (response, listing) => {
-      // Refresh favorites list if we are on favorites page
-      queryClient.invalidateQueries(['favorites']);
+      queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
       
       notification.showSuccess(
           'Success',
           response.isFavorited ? 'Added to favorites' : 'Removed from favorites'
       );
       
-      // Return updated stats for UI consistency
       return {
           ...listing.favoriteStats,
           isFavorited: response.isFavorited,

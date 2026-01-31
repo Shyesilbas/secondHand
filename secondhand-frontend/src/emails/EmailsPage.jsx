@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, EnvelopeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -11,6 +11,7 @@ import EmailListItem from '../emails/components/EmailListItem';
 import EmailContent from '../emails/components/EmailContent';
 import EmailFilterTabs from '../emails/components/EmailFilterTabs';
 import EmptyState from '../common/components/ui/EmptyState.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 const EmailsPageLoader = () => (
     <div className="min-h-screen bg-background-secondary">
@@ -154,6 +155,7 @@ const EmailsPage = () => {
     const navigate = useNavigate();
     const notification = useNotification();
     const queryClient = useQueryClient();
+    const { user, isAuthenticated } = useAuth();
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [filterType, setFilterType] = useState('ALL');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -161,15 +163,23 @@ const EmailsPage = () => {
     const [page, setPage] = useState(0);
     const pageSize = 20;
 
+    useEffect(() => {
+        setSelectedEmail(null);
+        setFilterType('ALL');
+        setSearchTerm('');
+        setPage(0);
+    }, [user?.id]);
+
     const { 
         data: emailPage, 
         isLoading, 
         error 
     } = useQuery({
-        queryKey: ['myEmails', page],
+        queryKey: ['myEmails', user?.id, page],
         queryFn: async () => {
             return await emailService.getMyEmails(page, pageSize);
         },
+        enabled: !!(isAuthenticated && user?.id),
         keepPreviousData: true,
         staleTime: 0,
         refetchOnMount: 'always',
@@ -223,7 +233,7 @@ const EmailsPage = () => {
         deleteFunc: () => emailService.deleteAll(),
         onSuccess: () => {
             setSelectedEmail(null);
-            queryClient.invalidateQueries({ queryKey: ['myEmails'] });
+            queryClient.invalidateQueries({ queryKey: ['myEmails', user?.id] });
         }
     });
 

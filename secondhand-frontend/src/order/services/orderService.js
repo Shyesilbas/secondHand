@@ -21,6 +21,9 @@ export const orderService = {
   getById: async (id) => {
     return get(API_ENDPOINTS.ORDERS.GET_ORDER_DETAILS(id));
   },
+  getSellerOrderById: async (id) => {
+    return get(API_ENDPOINTS.ORDERS.GET_SELLER_ORDER_DETAILS(id));
+  },
   cancelOrder: async (id, payload) => {
     return put(API_ENDPOINTS.ORDERS.CANCEL_ORDER(id), payload);
   },

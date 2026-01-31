@@ -22,6 +22,9 @@ public class OrderDto {
     private String orderNumber;
     private String name;
     private Long userId;
+    private String buyerName;
+    private String buyerSurname;
+    private String buyerEmail;
     private Order.OrderStatus status;
     private BigDecimal totalAmount;
     private BigDecimal subtotal;

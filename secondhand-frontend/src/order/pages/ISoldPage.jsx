@@ -43,7 +43,7 @@ const ISoldPage = () => {
   
   const openOrderModal = async (order) => {
     try {
-      const freshOrder = await orderService.getById(order.id);
+      const freshOrder = await orderService.getSellerOrderById(order.id);
       setSelectedOrder(freshOrder);
       setOrderModalOpen(true);
     } catch (error) {

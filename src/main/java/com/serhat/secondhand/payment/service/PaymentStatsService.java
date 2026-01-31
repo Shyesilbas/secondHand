@@ -112,13 +112,32 @@ public class PaymentStatsService {
     }
 
     private InferredPaymentData inferTransactionContext(Payment payment, Long currentUserId) {
+        if (payment.getTransactionType() == PaymentTransactionType.ITEM_SALE || payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
+            boolean isSender = payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUserId);
+            boolean isReceiver = payment.getToUser() != null && payment.getToUser().getId().equals(currentUserId);
+
+            if (isSender && isReceiver) {
+                if (payment.getTransactionType() == PaymentTransactionType.ITEM_SALE) {
+                    return new InferredPaymentData(PaymentDirection.INCOMING, PaymentTransactionType.ITEM_SALE);
+                }
+                return new InferredPaymentData(PaymentDirection.OUTGOING, PaymentTransactionType.ITEM_PURCHASE);
+            }
+
+            return new InferredPaymentData(
+                    isSender ? PaymentDirection.OUTGOING : PaymentDirection.INCOMING,
+                    isSender ? PaymentTransactionType.ITEM_PURCHASE : PaymentTransactionType.ITEM_SALE
+            );
+        }
+
         boolean isSpecialFlow = List.of(
                 PaymentTransactionType.LISTING_CREATION,
                 PaymentTransactionType.SHOWCASE_PAYMENT,
                 PaymentTransactionType.REFUND,
                 PaymentTransactionType.EWALLET_DEPOSIT,
                 PaymentTransactionType.EWALLET_WITHDRAWAL,
-                PaymentTransactionType.EWALLET_PAYMENT_RECEIVED
+                PaymentTransactionType.EWALLET_PAYMENT_RECEIVED,
+                PaymentTransactionType.ITEM_SALE,
+                PaymentTransactionType.ITEM_PURCHASE
         ).contains(payment.getTransactionType());
 
         if (isSpecialFlow) {

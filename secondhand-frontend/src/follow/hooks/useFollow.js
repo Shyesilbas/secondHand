@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { followService } from '../services/followService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -119,7 +119,12 @@ export const useFollow = (userId) => {
 };
 
 export const useFollowingList = (page = 0, size = 20) => {
+    const { user, isAuthenticated } = useAuth();
     const [currentPage, setCurrentPage] = useState(page);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [user?.id]);
 
     const {
         data: followingData,
@@ -127,8 +132,9 @@ export const useFollowingList = (page = 0, size = 20) => {
         error,
         refetch
     } = useQuery({
-        queryKey: ['following', currentPage, size],
+        queryKey: ['following', user?.id, currentPage, size],
         queryFn: () => followService.getFollowing({ page: currentPage, size }),
+        enabled: !!(isAuthenticated && user?.id),
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
     });
@@ -156,7 +162,12 @@ export const useFollowingList = (page = 0, size = 20) => {
 };
 
 export const useFollowersList = (page = 0, size = 20) => {
+    const { user, isAuthenticated } = useAuth();
     const [currentPage, setCurrentPage] = useState(page);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [user?.id]);
 
     const {
         data: followersData,
@@ -164,8 +175,9 @@ export const useFollowersList = (page = 0, size = 20) => {
         error,
         refetch
     } = useQuery({
-        queryKey: ['followers', currentPage, size],
+        queryKey: ['followers', user?.id, currentPage, size],
         queryFn: () => followService.getFollowers({ page: currentPage, size }),
+        enabled: !!(isAuthenticated && user?.id),
         staleTime: 5 * 60 * 1000,
         gcTime: 30 * 60 * 1000,
     });

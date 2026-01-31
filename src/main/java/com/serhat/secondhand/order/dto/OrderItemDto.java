@@ -18,6 +18,8 @@ public class OrderItemDto {
     private Long id;
     private Long orderId;
     private ListingDto listing;
+    private String sellerName;
+    private String sellerSurname;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;

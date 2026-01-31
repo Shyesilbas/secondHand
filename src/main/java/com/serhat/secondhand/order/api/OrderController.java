@@ -96,6 +96,20 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/seller/{orderId}")
+    @Operation(summary = "Get seller order by ID", description = "Retrieve specific order details for seller (only if order contains seller items)")
+    public ResponseEntity<?> getSellerOrderById(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to get seller order by ID: {} for user: {}", orderId, currentUser.getEmail());
+        Result<OrderDto> result = orderQueryService.getSellerOrderById(orderId, currentUser.getId());
+        if (result.isError()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+        }
+        return ResponseEntity.ok(result.getData());
+    }
+
     @GetMapping("/seller/pending-escrow-amount")
     @Operation(summary = "Get pending escrow amount", description = "Get total pending escrow amount for seller")
     @ApiResponses(value = {

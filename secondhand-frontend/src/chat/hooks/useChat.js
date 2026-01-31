@@ -48,9 +48,9 @@ export const useChat = (userId, options = {}) => {
         error: messagesError,
         refetch: refetchMessages
     } = useQuery({
-        queryKey: ['chatMessages', selectedChatRoom?.id],
+        queryKey: ['chatMessages', user?.id, selectedChatRoom?.id],
         queryFn: () => chatService.getChatMessages(selectedChatRoom.id),
-        enabled: !!selectedChatRoom?.id,
+        enabled: !!(user?.id && selectedChatRoom?.id),
         staleTime: 5 * 60 * 1000,
         cacheTime: 15 * 60 * 1000,
         refetchInterval: false,
@@ -67,7 +67,7 @@ export const useChat = (userId, options = {}) => {
                 return [...prev, data];
             });
             // Only update specific queries, don't invalidate everything
-            queryClient.setQueryData(['chatMessages', selectedChatRoom?.id], (oldData) => {
+            queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
                 if (!oldData) return oldData;
                 return {
                     ...oldData,
@@ -94,7 +94,7 @@ export const useChat = (userId, options = {}) => {
         onSuccess: (_, { messageId }) => {
             setMessages(prev => prev.filter(msg => msg.id !== messageId));
             // Only update the specific message cache, don't refetch everything
-            queryClient.setQueryData(['chatMessages', selectedChatRoom?.id], (oldData) => {
+            queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
                 if (!oldData) return oldData;
                 return {
                     ...oldData,

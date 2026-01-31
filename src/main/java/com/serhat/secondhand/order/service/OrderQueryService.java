@@ -52,6 +52,25 @@ public class OrderQueryService {
         return Result.success(orderMapper.toDto(orderResult.getData()));
     }
 
+    public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
+        Order order = orderRepository.findByIdForSeller(orderId, sellerId).orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "You dont have any orders with this id.");
+        }
+
+        OrderDto orderDto = orderMapper.toDto(order);
+        if (orderDto.getOrderItems() != null) {
+            List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
+                    .filter(item -> item.getListing() != null &&
+                            item.getListing().getSellerId() != null &&
+                            item.getListing().getSellerId().equals(sellerId))
+                    .collect(Collectors.toList());
+            orderDto.setOrderItems(sellerOrderItems);
+        }
+        orderDto.setEscrowAmount(null);
+        return Result.success(orderDto);
+    }
+
 
     public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
         log.info("Getting orders for sellerId: {}", sellerId);
