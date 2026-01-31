@@ -1,17 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboardService.js';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 const DASHBOARD_KEYS = {
   all: ['dashboard'],
-  seller: (startDate, endDate) => [...DASHBOARD_KEYS.all, 'seller', startDate, endDate],
-  buyer: (startDate, endDate) => [...DASHBOARD_KEYS.all, 'buyer', startDate, endDate],
+  seller: (userId, startDate, endDate) => [...DASHBOARD_KEYS.all, 'seller', userId, startDate, endDate],
+  buyer: (userId, startDate, endDate) => [...DASHBOARD_KEYS.all, 'buyer', userId, startDate, endDate],
 };
 
 export const useSellerDashboard = (startDate, endDate, options = {}) => {
+  const { user, isAuthenticated } = useAuth();
   return useQuery({
-    queryKey: DASHBOARD_KEYS.seller(startDate, endDate),
+    queryKey: DASHBOARD_KEYS.seller(user?.id, startDate, endDate),
     queryFn: () => dashboardService.getSellerDashboard(startDate, endDate),
-    enabled: options.enabled !== false,
+    enabled: options.enabled !== false && !!(isAuthenticated && user?.id),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -22,10 +24,11 @@ export const useSellerDashboard = (startDate, endDate, options = {}) => {
 };
 
 export const useBuyerDashboard = (startDate, endDate, options = {}) => {
+  const { user, isAuthenticated } = useAuth();
   return useQuery({
-    queryKey: DASHBOARD_KEYS.buyer(startDate, endDate),
+    queryKey: DASHBOARD_KEYS.buyer(user?.id, startDate, endDate),
     queryFn: () => dashboardService.getBuyerDashboard(startDate, endDate),
-    enabled: options.enabled !== false,
+    enabled: options.enabled !== false && !!(isAuthenticated && user?.id),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,

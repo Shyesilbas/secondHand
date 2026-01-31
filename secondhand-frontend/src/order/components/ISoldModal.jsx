@@ -10,9 +10,29 @@ import {
     Home,
     Package,
     Package2,
+    User,
     Truck,
     X
 } from 'lucide-react'
+
+const getLastUpdateInfo = (order) => {
+    const status = order?.status;
+    const shipping = order?.shipping;
+
+    if (status === 'DELIVERED' && shipping?.deliveredAt) {
+        return { status, updatedAt: shipping.deliveredAt };
+    }
+    if (status === 'SHIPPED' && shipping?.inTransitAt) {
+        return { status, updatedAt: shipping.inTransitAt };
+    }
+    if (shipping?.updatedAt) {
+        return { status, updatedAt: shipping.updatedAt };
+    }
+    if (order?.updatedAt) {
+        return { status, updatedAt: order.updatedAt };
+    }
+    return { status, updatedAt: order?.createdAt };
+};
 
 const OrderProgressStepper = ({ currentStatus }) => {
     const steps = [
@@ -74,6 +94,7 @@ const ISoldModal = React.memo(({ isOpen, selectedOrder, onClose, onOpenReceipt }
 
     const sellerOrderItems = selectedOrder.orderItems || [];
     const sellerTotalAmount = sellerOrderItems.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
+    const lastUpdate = getLastUpdateInfo(selectedOrder);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
@@ -106,6 +127,31 @@ const ISoldModal = React.memo(({ isOpen, selectedOrder, onClose, onOpenReceipt }
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
                             <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Tracking Progress</h3>
                             <OrderProgressStepper currentStatus={selectedOrder.status} />
+                            <div className="mt-2 text-xs text-slate-500">
+                                Last update: {resolveEnumLabel(enums, 'orderStatuses', lastUpdate.status) || lastUpdate.status}
+                                {lastUpdate.updatedAt ? ` • ${formatDateTime(lastUpdate.updatedAt)}` : ''}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
+                            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Buyer</h3>
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center flex-shrink-0">
+                                    <User className="w-5 h-5 text-slate-600" />
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="text-sm font-semibold text-slate-900 truncate">
+                                        {(selectedOrder.buyerName || selectedOrder.buyerSurname)
+                                            ? `${selectedOrder.buyerName || ''} ${selectedOrder.buyerSurname || ''}`.trim()
+                                            : `User #${selectedOrder.userId}`}
+                                    </div>
+                                    {selectedOrder.buyerEmail && (
+                                        <div className="text-xs text-slate-500 mt-0.5 truncate">
+                                            {selectedOrder.buyerEmail}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-100 p-6">

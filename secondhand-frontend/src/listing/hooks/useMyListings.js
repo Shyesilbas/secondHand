@@ -1,10 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { listingService } from '../services/listingService';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 export const useMyListings = (statusFilter = null, initialPage = 0, initialSize = 10, listingTypeFilter = null) => {
+    const { user, isAuthenticated } = useAuth();
     const [page, setPage] = useState(initialPage);
     const [size, setSize] = useState(initialSize);
+
+    useEffect(() => {
+        setPage(0);
+    }, [user?.id]);
 
     const { 
         data: paginatedData, 
@@ -12,8 +18,9 @@ export const useMyListings = (statusFilter = null, initialPage = 0, initialSize 
         error, 
         refetch 
     } = useQuery({
-        queryKey: ['myListings', page, size, listingTypeFilter],
+        queryKey: ['myListings', user?.id, page, size, listingTypeFilter],
         queryFn: () => listingService.getMyListings(page, size, listingTypeFilter),
+        enabled: !!(isAuthenticated && user?.id),
         placeholderData: keepPreviousData,
         staleTime: 1000 * 60,
     });

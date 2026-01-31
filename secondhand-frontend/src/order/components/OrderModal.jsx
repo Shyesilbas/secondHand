@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react'
-import {formatCurrency, formatDateTime} from '../../common/formatters.js'
+import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js'
 import {ReviewButton} from '../../reviews/index.js'
-import {getEstimatedDeliveryTime, getStatusColor} from '../utils/orderUtils.js'
+import {getStatusColor} from '../utils/orderUtils.js'
 import {orderService} from '../services/orderService.js'
 import {useNotification} from '../../notification/NotificationContext.jsx'
+import {useEnums} from '../../common/hooks/useEnums.js'
 import {
     AlertCircle,
     Check,
     CheckCircle,
     CheckCircle2,
     Clock,
-    CreditCard,
     FileText,
     Home,
     MapPin,
@@ -26,7 +26,6 @@ import {
 } from 'lucide-react'
 import CancelRefundModal from './CancelRefundModal.jsx'
 
-// --- Alt Bileşen: Geri Sayım (Modern Versiyon) ---
 const DeliveryCountdown = ({ deliveredAt }) => {
     const [timeRemaining, setTimeRemaining] = useState(null)
 
@@ -78,6 +77,25 @@ const DeliveryCountdown = ({ deliveredAt }) => {
         </div>
     )
 }
+
+const getLastUpdateInfo = (order) => {
+    const status = order?.status;
+    const shipping = order?.shipping;
+
+    if (status === 'DELIVERED' && shipping?.deliveredAt) {
+        return { status, updatedAt: shipping.deliveredAt };
+    }
+    if (status === 'SHIPPED' && shipping?.inTransitAt) {
+        return { status, updatedAt: shipping.inTransitAt };
+    }
+    if (shipping?.updatedAt) {
+        return { status, updatedAt: shipping.updatedAt };
+    }
+    if (order?.updatedAt) {
+        return { status, updatedAt: order.updatedAt };
+    }
+    return { status, updatedAt: order?.createdAt };
+};
 
 const OrderProgressStepper = ({ currentStatus }) => {
     const steps = [
@@ -139,6 +157,7 @@ const OrderProgressStepper = ({ currentStatus }) => {
 
 // --- Ana Modal Bileşeni ---
 const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, onOpenReceipt, onReviewSuccess }) => {
+    const { enums } = useEnums();
     const [cancelModalOpen, setCancelModalOpen] = useState(false)
     const [refundModalOpen, setRefundModalOpen] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
@@ -213,6 +232,7 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
     }
 
     if (!isOpen || !selectedOrder) return null
+    const lastUpdate = getLastUpdateInfo(selectedOrder);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-300" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
@@ -295,6 +315,10 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                         <div className="bg-white rounded-lg border border-gray-200/60 p-6 mb-6">
                             <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-5">Tracking Progress</h3>
                             <OrderProgressStepper currentStatus={selectedOrder.status} />
+                            <div className="mt-2 text-xs text-gray-500 font-medium">
+                                Last update: {resolveEnumLabel(enums, 'orderStatuses', lastUpdate.status) || lastUpdate.status}
+                                {lastUpdate.updatedAt ? ` • ${formatDateTime(lastUpdate.updatedAt)}` : ''}
+                            </div>
 
                             {selectedOrder.status === 'DELIVERED' && selectedOrder.shipping?.deliveredAt && (
                                 <DeliveryCountdown deliveredAt={selectedOrder.shipping.deliveredAt} />
@@ -399,6 +423,9 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                                                 <span className="ml-2 text-amber-600">({item.refundedQuantity} refunded)</span>
                                                             )}
                                                         </p>
+                                                        <p className="text-[11px] text-gray-600 mt-1 font-medium">
+                                                            Seller: <span className="font-semibold">{[item.sellerName, item.sellerSurname].filter(Boolean).join(' ') || '—'}</span>
+                                                        </p>
                                                         {item.campaignName && <span className="inline-block mt-1.5 text-[10px] px-2 py-0.5 bg-emerald-50/80 text-emerald-600 font-medium rounded-md border border-emerald-200/60">PROMO: {item.campaignName}</span>}
                                                     </div>
                                                     <div className="text-right flex flex-col justify-between items-end flex-shrink-0">
@@ -493,6 +520,13 @@ const OrderModal = React.memo(({ isOpen, selectedOrder, orderReviews, onClose, o
                                             <span className="text-[11px] font-medium text-slate-400">Total Amount</span>
                                             <span className="text-xl font-semibold font-mono tracking-tight">
                                                 {formatCurrency(selectedOrder.totalAmount, selectedOrder.currency)}
+                                            </span>
+
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <span className="text-[11px] font-medium text-slate-400">Payment Method</span>
+                                            <span className="text-xl font-semibold font-mono tracking-tight">
+                                                {selectedOrder.paymentMethod}
                                             </span>
                                         </div>
                                     </div>

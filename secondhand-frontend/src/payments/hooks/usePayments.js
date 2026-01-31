@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
@@ -32,13 +32,29 @@ export const usePayments = () => {
 
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
+    useEffect(() => {
+        setCurrentPage(0);
+        setSelectedPayment(null);
+        setIsReceiptModalOpen(false);
+        setFilters({
+            seller: '',
+            transactionType: '',
+            paymentType: '',
+            dateFrom: '',
+            dateTo: '',
+            amountMin: '',
+            amountMax: '',
+            paymentDirection: ''
+        });
+    }, [user?.id]);
+
     const {
         data,
         isLoading,
         error: queryError,
         refetch
     } = useQuery({
-        queryKey: [...PAYMENTS_KEYS.withOrders(), currentPage, pageSize, filters],
+        queryKey: [...PAYMENTS_KEYS.withOrders(), user?.id || 'anonymous', currentPage, pageSize, filters],
         queryFn: async () => {
             const [paymentsData, ordersData] = await Promise.all([
                 paymentService.getMyPayments(currentPage, pageSize, filters),
@@ -79,10 +95,10 @@ export const usePayments = () => {
             };
         },
         enabled: !!user,
-        staleTime: 2 * 60 * 1000,
+        staleTime: 0,
         gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false,
-        refetchOnMount: true,
+        refetchOnMount: 'always',
     });
 
     const allPayments = useMemo(() => data?.payments || [], [data]);

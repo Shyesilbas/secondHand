@@ -1,11 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '../services/orderService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 
 const ORDERS_KEYS = {
   all: ['orders'],
-  myOrders: (page, size, sort, direction) => [...ORDERS_KEYS.all, 'my', { page, size, sort, direction }],
+  myOrders: (userId, page, size, sort, direction) => [...ORDERS_KEYS.all, 'my', userId, { page, size, sort, direction }],
 };
 
 export const useOrders = (initialPage = 0, initialSize = 10, sortField = null, sortDirection = 'desc') => {
@@ -18,22 +18,27 @@ export const useOrders = (initialPage = 0, initialSize = 10, sortField = null, s
   const [direction, setDirection] = useState(sortDirection);
   const [searchResult, setSearchResult] = useState(null);
 
+  useEffect(() => {
+    setPage(initialPage);
+    setSearchResult(null);
+  }, [user?.id, initialPage]);
+
   const {
     data,
     isLoading: loading,
     error: queryError,
     refetch
   } = useQuery({
-    queryKey: ORDERS_KEYS.myOrders(page, size, sort, direction),
+    queryKey: ORDERS_KEYS.myOrders(user?.id || 'anonymous', page, size, sort, direction),
     queryFn: async () => {
       // request.js already handles Result pattern, returns data directly on success
       return await orderService.myOrders(page, size, sort, direction);
     },
     enabled: !!user,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: 'always',
   });
 
   const orders = useMemo(() => data?.content || [], [data]);

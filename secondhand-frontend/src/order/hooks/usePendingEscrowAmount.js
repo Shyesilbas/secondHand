@@ -4,7 +4,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 
 const ESCROW_KEYS = {
   all: ['escrow'],
-  pending: () => [...ESCROW_KEYS.all, 'pending'],
+  pending: (userId) => [...ESCROW_KEYS.all, 'pending', userId],
 };
 
 export const usePendingEscrowAmount = (options = {}) => {
@@ -17,7 +17,7 @@ export const usePendingEscrowAmount = (options = {}) => {
     error,
     refetch
   } = useQuery({
-    queryKey: ESCROW_KEYS.pending(),
+    queryKey: ESCROW_KEYS.pending(user?.id),
     queryFn: async () => {
       const response = await orderService.getPendingEscrowAmount();
       return response.amount || 0;

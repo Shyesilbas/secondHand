@@ -53,6 +53,7 @@ export const API_ENDPOINTS = {
         CHECKOUT: '/v1/orders/checkout',
         LIST_MY_ORDERS: '/v1/orders',
         LIST_SELLER_ORDERS: '/v1/orders/seller',
+        GET_SELLER_ORDER_DETAILS: (id) => `/v1/orders/seller/${id}`,
         GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',
         PENDING_COMPLETION: '/v1/orders/pending-completion',
         GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders?orderNumber=${encodeURIComponent(orderNumber)}`,
