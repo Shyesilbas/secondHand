@@ -1,13 +1,10 @@
 package com.serhat.secondhand.order.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
-import com.serhat.secondhand.notification.dto.NotificationRequest;
-import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
@@ -20,7 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +29,7 @@ public class OrderNotificationService {
     private final OrderMapper orderMapper;
     private final UserService userService;
     private final NotificationService notificationService;
-    private final ObjectMapper objectMapper;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Async("notificationExecutor")
     public void sendOrderNotifications(User user, Order order, boolean paymentSuccessful) {
@@ -61,24 +57,11 @@ public class OrderNotificationService {
             emailService.sendEmail(customer, subject, content, EmailType.NOTIFICATION);
             log.info("Order confirmation email sent to customer: {}", customer.getEmail());
             
-            try {
-                String metadata = objectMapper.writeValueAsString(Map.of(
-                        "orderId", orderDto.getId().toString(),
-                        "orderNumber", orderDto.getOrderNumber()
-                ));
-                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
-                        .userId(customer.getId())
-                        .type(NotificationType.ORDER_CREATED)
-                        .title("Siparişiniz Oluşturuldu")
-                        .message("Sipariş #" + orderDto.getOrderNumber() + " başarıyla oluşturuldu")
-                        .actionUrl("/orders/" + orderDto.getId())
-                        .metadata(metadata)
-                        .build());
-                if (notificationResult.isError()) {
-                    log.error("Failed to create notification: {}", notificationResult.getMessage());
-                }
-            } catch (JsonProcessingException e) {
-                log.error("Failed to create in-app notification for order created", e);
+            var notificationResult = notificationService.createAndSend(
+                    notificationTemplateCatalog.orderCreated(customer.getId(), orderDto.getId(), orderDto.getOrderNumber())
+            );
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
             }
         } catch (Exception e) {
             log.warn("Failed to send order confirmation email to customer {}: {}", customer.getEmail(), e.getMessage());
@@ -124,29 +107,14 @@ public class OrderNotificationService {
             log.info("Sale notification sent to seller {} for order {}", 
                     seller.getEmail(), orderDto.getOrderNumber());
             
-            try {
-                String listingTitle = sellerItems.isEmpty() ? "Ürün" : 
-                        (sellerItems.get(0).getListing() != null ? sellerItems.get(0).getListing().getTitle() : "Ürün");
-                String metadata = objectMapper.writeValueAsString(Map.of(
-                        "orderId", orderDto.getId().toString(),
-                        "orderNumber", orderDto.getOrderNumber(),
-                        "listingId", sellerItems.isEmpty() || sellerItems.get(0).getListing() == null ? "" :
-                                sellerItems.get(0).getListing().getId().toString()
-                ));
-                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
-                        .userId(sellerId)
-                        .type(NotificationType.ORDER_RECEIVED)
-                        .title("Yeni Sipariş Aldınız")
-                        .message(String.format("'%s' için yeni sipariş alındı (#%s)",
-                                listingTitle, orderDto.getOrderNumber()))
-                        .actionUrl("/orders/seller/" + orderDto.getId())
-                        .metadata(metadata)
-                        .build());
-                if (notificationResult.isError()) {
-                    log.error("Failed to create notification: {}", notificationResult.getMessage());
-                }
-            } catch (JsonProcessingException e) {
-                log.error("Failed to create in-app notification for seller order received", e);
+            OrderItemDto firstItem = sellerItems.isEmpty() ? null : sellerItems.get(0);
+            String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
+            java.util.UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
+            var notificationResult = notificationService.createAndSend(
+                    notificationTemplateCatalog.orderReceived(sellerId, orderDto.getId(), orderDto.getOrderNumber(), listingId, listingTitle)
+            );
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
             }
         } catch (Exception e) {
             log.warn("Failed to send sale notification to seller {} for order {}: {}", 
@@ -162,24 +130,11 @@ public class OrderNotificationService {
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             log.info("Order cancellation notification sent for order: {}", order.getOrderNumber());
             
-            try {
-                String metadata = objectMapper.writeValueAsString(Map.of(
-                        "orderId", order.getId().toString(),
-                        "orderNumber", order.getOrderNumber()
-                ));
-                var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
-                        .userId(user.getId())
-                        .type(NotificationType.ORDER_CANCELLED)
-                        .title("Sipariş İptal Edildi")
-                        .message("Sipariş #" + order.getOrderNumber() + " iptal edildi")
-                        .actionUrl("/orders/" + order.getId())
-                        .metadata(metadata)
-                        .build());
-                if (notificationResult.isError()) {
-                    log.error("Failed to create notification: {}", notificationResult.getMessage());
-                }
-            } catch (JsonProcessingException e) {
-                log.error("Failed to create in-app notification for order cancelled", e);
+            var notificationResult = notificationService.createAndSend(
+                    notificationTemplateCatalog.orderCancelled(user.getId(), order.getId(), order.getOrderNumber())
+            );
+            if (notificationResult.isError()) {
+                log.error("Failed to create notification: {}", notificationResult.getMessage());
             }
         } catch (Exception e) {
             log.warn("Failed to send cancellation notification for order {}: {}", 
@@ -188,18 +143,6 @@ public class OrderNotificationService {
     }
 
     @Async("notificationExecutor")
-    public void sendOrderStatusUpdateNotification(User user, com.serhat.secondhand.order.entity.Order order) {
-        try {
-            String subject = "SecondHand - Order Status Updated";
-            String content = "Hello " + user.getName() + ",\n\nThe status of your order " + order.getOrderNumber() + " has been updated to: " + order.getStatus();
-            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
-            log.info("Order status update notification sent for order: {}", order.getOrderNumber());
-        } catch (Exception e) {
-            log.warn("Failed to send status update notification for order {}: {}", 
-                    order.getOrderNumber(), e.getMessage());
-        }
-    }
-
     private String buildOrderConfirmationContent(User user, OrderDto order) {
         StringBuilder sb = new StringBuilder();
         sb.append("Hello ").append(user.getName()).append(",\n\n");

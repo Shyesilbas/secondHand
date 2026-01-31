@@ -15,7 +15,6 @@ import {useCart} from '../../../cart/hooks/useCart.js';
 import {useQuery} from '@tanstack/react-query';
 import {emailService} from '../../../emails/services/emailService.js';
 import {
-    Bell,
     ChevronDown,
     Heart,
     LogOut,
@@ -46,13 +45,11 @@ const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
-    const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
     const [inAppNotificationCenterOpen, setInAppNotificationCenterOpen] = useState(false);
     const [listingsMenuOpen, setListingsMenuOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
     const categoriesMenuRef = useRef(null);
-    const notificationMenuRef = useRef(null);
     const listingsMenuRef = useRef(null);
     const profileMenuRef = useRef(null);
 
@@ -82,7 +79,6 @@ const Header = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (categoriesMenuRef.current && !categoriesMenuRef.current.contains(event.target)) setCategoriesMenuOpen(false);
-            if (notificationMenuRef.current && !notificationMenuRef.current.contains(event.target)) setNotificationMenuOpen(false);
             if (listingsMenuRef.current && !listingsMenuRef.current.contains(event.target)) setListingsMenuOpen(false);
             if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) setProfileMenuOpen(false);
         };
@@ -211,38 +207,10 @@ const Header = () => {
                                         />
                                     </div>
 
-                                    <div className="relative" ref={notificationMenuRef}>
-                                        <button
-                                            onClick={() => setNotificationMenuOpen(!notificationMenuOpen)}
-                                            className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
-                                        >
-                                            <Bell className="w-[20px] h-[20px] stroke-[1.5px]" />
-                                            {(totalUnread > 0 || unreadEmailCount > 0) && (
-                                                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 shadow-sm shadow-red-500/50"></span>
-                                                </span>
-                                            )}
-                                        </button>
-
-                                        {notificationMenuOpen && (
-                                            <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50">
-                                                <Link to={ROUTES.EMAILS} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
-                                                    <Mail className="w-4 h-4 text-slate-600" />
-                                                    <span className="text-sm font-medium text-slate-900">Mails</span>
-                                                    {unreadEmailCount > 0 && <span className="ml-auto text-xs font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full shadow-sm shadow-red-500/30">{unreadEmailCount}</span>}
-                                                </Link>
-                                                <Link to={ROUTES.CHAT} onClick={() => setNotificationMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
-                                                    <MessageSquare className="w-4 h-4 text-slate-600" />
-                                                    <span className="text-sm font-medium text-slate-900">Chats</span>
-                                                    {totalUnread > 0 && <span className="ml-auto text-xs font-semibold bg-red-500 text-white px-2.5 py-1 rounded-full shadow-sm shadow-red-500/30">{totalUnread}</span>}
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-
                                     <div className="h-6 w-[1px] bg-gray-300 mx-1" />
 
+                                    <IconButton to={ROUTES.EMAILS} icon={Mail} badge={unreadEmailCount} title="Mails" />
+                                    <IconButton to={ROUTES.CHAT} icon={MessageSquare} badge={totalUnread} title="Chats" />
                                     <IconButton to={ROUTES.FAVORITES} icon={Heart} title="Favorites" />
                                     <IconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />
                                     <IconButton to={ROUTES.PAYMENTS} icon={Receipt} title="Payment History" />

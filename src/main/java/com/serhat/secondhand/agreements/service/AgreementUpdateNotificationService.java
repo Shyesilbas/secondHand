@@ -1,24 +1,18 @@
 package com.serhat.secondhand.agreements.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
-import com.serhat.secondhand.notification.dto.NotificationRequest;
-import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.repository.NotificationRepository;
 import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +24,7 @@ public class AgreementUpdateNotificationService {
     private final UserAgreementRepository userAgreementRepository;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
-    private final ObjectMapper objectMapper;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Transactional
     public void notifyOutdatedRequiredAgreements(Long userId) {
@@ -52,33 +46,16 @@ public class AgreementUpdateNotificationService {
                 continue;
             }
 
-            String agreementName = toTitle(type.name());
-            String versionText = currentVersion == null ? "" : (" (v" + currentVersion + ")");
-            String metadata = null;
-            try {
-                Map<String, String> payload = new LinkedHashMap<>();
-                payload.put("agreementType", type.name());
-                payload.put("version", currentVersion == null ? "" : currentVersion);
-                metadata = objectMapper.writeValueAsString(payload);
-            } catch (JsonProcessingException e) {
-                log.error("Failed to build agreement notification metadata", e);
-                continue;
-            }
+            var request = notificationTemplateCatalog.agreementUpdatedForUser(userId, type.name(), currentVersion);
+            String metadata = request.getMetadata();
 
             boolean alreadyExists = notificationRepository.existsByUser_IdAndTypeAndMetadataAndIsReadFalse(
-                    userId, NotificationType.AGREEMENT_UPDATED, metadata);
+                    userId, request.getType(), metadata);
             if (alreadyExists) {
                 continue;
             }
 
-            notificationService.createAndSend(NotificationRequest.builder()
-                    .userId(userId)
-                    .type(NotificationType.AGREEMENT_UPDATED)
-                    .title("Sözleşme Güncellendi")
-                    .message("\"" + agreementName + "\" sözleşmesi güncellendi" + versionText + ". İncelemek ve onaylamak için tıklayın.")
-                    .actionUrl("/agreements/all")
-                    .metadata(metadata)
-                    .build());
+            notificationService.createAndSend(request);
         }
     }
 
@@ -92,17 +69,5 @@ public class AgreementUpdateNotificationService {
         return !userAgreement.getAcceptedDate().isBefore(userAgreement.getAgreement().getUpdatedDate());
     }
 
-    private String toTitle(String value) {
-        String lower = value.replace('_', ' ').toLowerCase(Locale.ROOT);
-        String[] parts = lower.split(" ");
-        StringBuilder sb = new StringBuilder();
-        for (String p : parts) {
-            if (p.isBlank()) continue;
-            sb.append(Character.toUpperCase(p.charAt(0)));
-            if (p.length() > 1) sb.append(p.substring(1));
-            sb.append(' ');
-        }
-        return sb.toString().trim();
-    }
 }
 

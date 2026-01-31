@@ -6,6 +6,7 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
     const { user } = useAuth();
     const stompClient = useRef(null);
     const subscription = useRef(null);
+    const broadcastSubscription = useRef(null);
     const reconnectTimeoutRef = useRef(null);
 
     const connect = useCallback(() => {
@@ -33,6 +34,15 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
                         console.error('Failed to parse notification message:', error);
                     }
                 });
+
+                broadcastSubscription.current = stompClient.current.subscribe('/topic/notifications', (message) => {
+                    try {
+                        const notification = JSON.parse(message.body);
+                        onNotificationReceived?.(notification);
+                    } catch (error) {
+                        console.error('Failed to parse broadcast notification message:', error);
+                    }
+                });
             },
             (error) => {
                 console.error('WebSocket connection error for notifications:', error);
@@ -52,6 +62,11 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
         if (subscription.current) {
             subscription.current.unsubscribe();
             subscription.current = null;
+        }
+
+        if (broadcastSubscription.current) {
+            broadcastSubscription.current.unsubscribe();
+            broadcastSubscription.current = null;
         }
 
         if (stompClient.current?.connected) {
