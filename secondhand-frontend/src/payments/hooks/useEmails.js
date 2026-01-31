@@ -10,13 +10,11 @@ export const useEmails = () => {
     const fetchEmails = async () => {
         try {
             setIsLoading(true);
-            console.log('Fetching emails...');
             const emailData = await emailService.getMyEmails();
-            console.log('Emails fetched:', emailData);
-            setEmails(emailData);
-            return emailData;
+            const list = Array.isArray(emailData) ? emailData : (emailData?.content ?? []);
+            setEmails(list);
+            return list;
         } catch (err) {
-            console.error('Failed to fetch emails:', err);
             notification.showError('Error', 'Email\'ler yüklenemedi.');
             return [];
         } finally {

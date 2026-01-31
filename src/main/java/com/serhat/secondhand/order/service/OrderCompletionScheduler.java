@@ -1,10 +1,7 @@
 package com.serhat.secondhand.order.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serhat.secondhand.notification.dto.NotificationRequest;
-import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
@@ -19,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +27,7 @@ public class OrderCompletionScheduler {
     private final OrderNotificationService orderNotificationService;
     private final OrderEscrowService orderEscrowService;
     private final NotificationService notificationService;
-    private final ObjectMapper objectMapper;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
     private static final int COMPLETION_HOURS = 48;
@@ -180,42 +176,17 @@ public class OrderCompletionScheduler {
     }
 
     private void sendStatusChangeNotification(Order order, Order.OrderStatus oldStatus, Order.OrderStatus newStatus) {
-        try {
-            String metadata = objectMapper.writeValueAsString(Map.of(
-                    "orderId", order.getId().toString(),
-                    "orderNumber", order.getOrderNumber(),
-                    "oldStatus", oldStatus != null ? oldStatus.name() : "",
-                    "newStatus", newStatus.name()
-            ));
-            
-            var notificationResult = notificationService.createAndSend(NotificationRequest.builder()
-                    .userId(order.getUser().getId())
-                    .type(NotificationType.ORDER_STATUS_CHANGED)
-                    .title("Sipariş Durumu Güncellendi")
-                    .message(String.format("Sipariş #%s durumu '%s' olarak güncellendi",
-                            order.getOrderNumber(), getStatusDisplayName(newStatus)))
-                    .actionUrl("/orders/" + order.getId())
-                    .metadata(metadata)
-                    .build());
-            if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
-            }
-        } catch (JsonProcessingException e) {
-            log.error("Failed to create notification for order status change", e);
+        var request = notificationTemplateCatalog.orderStatusChanged(
+                order.getUser().getId(),
+                order.getId(),
+                order.getOrderNumber(),
+                oldStatus != null ? oldStatus.name() : "",
+                newStatus.name()
+        );
+        var notificationResult = notificationService.createAndSend(request);
+        if (notificationResult.isError()) {
+            log.error("Failed to create notification: {}", notificationResult.getMessage());
         }
-    }
-
-    private String getStatusDisplayName(Order.OrderStatus status) {
-        return switch (status) {
-            case PENDING -> "Beklemede";
-            case CONFIRMED -> "Onaylandı";
-            case PROCESSING -> "İşleniyor";
-            case SHIPPED -> "Kargoya Verildi";
-            case DELIVERED -> "Teslim Edildi";
-            case COMPLETED -> "Tamamlandı";
-            case CANCELLED -> "İptal Edildi";
-            case REFUNDED -> "İade Edildi";
-        };
     }
 
 }

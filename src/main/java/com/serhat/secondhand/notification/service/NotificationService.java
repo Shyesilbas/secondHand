@@ -5,8 +5,14 @@ import com.serhat.secondhand.notification.dto.NotificationDto;
 import com.serhat.secondhand.notification.util.NotificationErrorCodes;
 import com.serhat.secondhand.notification.dto.NotificationRequest;
 import com.serhat.secondhand.notification.entity.Notification;
+import com.serhat.secondhand.notification.entity.NotificationEvent;
+import com.serhat.secondhand.notification.entity.NotificationEventRead;
 import com.serhat.secondhand.notification.mapper.NotificationMapper;
+import com.serhat.secondhand.notification.repository.NotificationEventReadRepository;
+import com.serhat.secondhand.notification.repository.NotificationEventRepository;
+import com.serhat.secondhand.notification.repository.NotificationFeedRepository;
 import com.serhat.secondhand.notification.repository.NotificationRepository;
+import com.serhat.secondhand.notification.repository.projection.NotificationFeedRow;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +32,9 @@ import java.util.UUID;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationFeedRepository notificationFeedRepository;
+    private final NotificationEventRepository notificationEventRepository;
+    private final NotificationEventReadRepository notificationEventReadRepository;
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
     private final NotificationWebSocketService webSocketService;
@@ -59,16 +68,45 @@ public class NotificationService {
         return Result.success(dto);
     }
 
+    public Result<NotificationDto> createBroadcast(NotificationRequest request) {
+        NotificationEvent event = NotificationEvent.builder()
+                .type(request.getType())
+                .title(request.getTitle())
+                .message(request.getMessage())
+                .actionUrl(request.getActionUrl())
+                .metadata(request.getMetadata())
+                .build();
+        NotificationEvent saved = notificationEventRepository.save(event);
+        NotificationDto dto = NotificationDto.builder()
+                .id(saved.getId())
+                .userId(null)
+                .type(saved.getType())
+                .title(saved.getTitle())
+                .message(saved.getMessage())
+                .actionUrl(saved.getActionUrl())
+                .metadata(saved.getMetadata())
+                .isRead(false)
+                .readAt(null)
+                .createdAt(saved.getCreatedAt())
+                .build();
+        webSocketService.sendBroadcast(dto);
+        return Result.success(dto);
+    }
+
     @Transactional(readOnly = true)
     public Page<NotificationDto> getUserNotifications(Long userId, Pageable pageable) {
         log.info("Fetching notifications for user: {}, page: {}, size: {}", userId, pageable.getPageNumber(), pageable.getPageSize());
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(notificationMapper::toDto);
+        Page<NotificationFeedRow> page = notificationFeedRepository.findFeed(userId, pageable);
+        return page.map(this::toDto);
     }
 
     @Transactional(readOnly = true)
     public Long getUnreadCount(Long userId) {
-        return notificationRepository.countByUserIdAndIsReadFalse(userId);
+        long personal = notificationRepository.countByUserIdAndIsReadFalse(userId);
+        long totalEvents = notificationEventRepository.count();
+        long reads = notificationEventReadRepository.countByUserId(userId);
+        long broadcastUnread = Math.max(0, totalEvents - reads);
+        return personal + broadcastUnread;
     }
 
     public Result<Void> markAsRead(UUID notificationId, Long userId) {
@@ -77,21 +115,33 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElse(null);
 
-        if (notification == null) {
+        if (notification != null) {
+            if (!notification.getUser().getId().equals(userId)) {
+                return Result.error(NotificationErrorCodes.NOTIFICATION_NOT_BELONGS_TO_USER);
+            }
+
+            if (!notification.getIsRead()) {
+                notification.setIsRead(true);
+                notification.setReadAt(LocalDateTime.now());
+                notificationRepository.save(notification);
+                log.info("Notification {} marked as read", notificationId);
+            }
+            return Result.success();
+        }
+
+        NotificationEvent event = notificationEventRepository.findById(notificationId).orElse(null);
+        if (event == null) {
             return Result.error(NotificationErrorCodes.NOTIFICATION_NOT_FOUND);
         }
 
-        if (!notification.getUser().getId().equals(userId)) {
-            return Result.error(NotificationErrorCodes.NOTIFICATION_NOT_BELONGS_TO_USER);
+        boolean exists = notificationEventReadRepository.existsByEventIdAndUserId(notificationId, userId);
+        if (!exists) {
+            notificationEventReadRepository.save(NotificationEventRead.builder()
+                    .eventId(notificationId)
+                    .userId(userId)
+                    .readAt(LocalDateTime.now())
+                    .build());
         }
-
-        if (!notification.getIsRead()) {
-            notification.setIsRead(true);
-            notification.setReadAt(LocalDateTime.now());
-            notificationRepository.save(notification);
-            log.info("Notification {} marked as read", notificationId);
-        }
-        
         return Result.success();
     }
 
@@ -110,6 +160,21 @@ public class NotificationService {
 
     public boolean existsByIdAndUserId(UUID notificationId, Long userId) {
         return notificationRepository.existsByIdAndUserId(notificationId, userId);
+    }
+
+    private NotificationDto toDto(NotificationFeedRow row) {
+        return NotificationDto.builder()
+                .id(row.getId())
+                .userId(row.getUserId())
+                .type(row.getType() != null ? com.serhat.secondhand.notification.entity.enums.NotificationType.valueOf(row.getType()) : null)
+                .title(row.getTitle())
+                .message(row.getMessage())
+                .actionUrl(row.getActionUrl())
+                .metadata(row.getMetadata())
+                .isRead(row.getIsRead())
+                .readAt(row.getReadAt())
+                .createdAt(row.getCreatedAt())
+                .build();
     }
 }
 
