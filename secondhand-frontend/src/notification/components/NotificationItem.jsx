@@ -8,6 +8,7 @@ import {
     DollarSign, 
     Package, 
     Star,
+    Heart,
     AlertCircle,
     CheckCircle,
     XCircle,
@@ -33,6 +34,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
             LISTING_PRICE_DROPPED: TrendingDown,
             LISTING_NEW_FROM_FOLLOWED: UserPlus,
             LISTING_SOLD: CheckCircle,
+            LISTING_FAVORITED: Heart,
             REVIEW_RECEIVED: Star,
             PAYMENT_SUCCESS: CheckCircle,
             PAYMENT_FAILED: XCircle,
@@ -82,8 +84,9 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
             case 'ORDER_CREATED':
             case 'ORDER_STATUS_CHANGED':
             case 'ORDER_CANCELLED':
-            case 'ORDER_RECEIVED':
                 return ROUTES.MY_ORDERS;
+            case 'ORDER_RECEIVED':
+                return ROUTES.I_SOLD;
 
             case 'CHAT_MESSAGE_RECEIVED':
                 if (metadataObj.chatRoomId) {
@@ -93,6 +96,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
 
             case 'LISTING_PRICE_DROPPED':
             case 'LISTING_NEW_FROM_FOLLOWED':
+            case 'LISTING_FAVORITED':
                 if (metadataObj.listingId) {
                     return ROUTES.LISTING_DETAIL(metadataObj.listingId);
                 }

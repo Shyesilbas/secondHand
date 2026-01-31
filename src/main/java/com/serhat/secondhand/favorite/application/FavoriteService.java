@@ -12,6 +12,8 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
+import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,8 @@ public class FavoriteService {
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService listingEnrichmentService;
     private final UserService userService;
+    private final NotificationService notificationService;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
     
 
     @Transactional
@@ -83,6 +87,28 @@ public class FavoriteService {
         }
         
         favorite = favoriteRepository.save(favorite);
+
+        try {
+            Long sellerId = listing.getSeller() != null ? listing.getSeller().getId() : null;
+            if (sellerId != null) {
+                String actorName = (user.getName() == null ? "" : user.getName()) + " " + (user.getSurname() == null ? "" : user.getSurname());
+                actorName = actorName.trim();
+                var notificationResult = notificationService.createAndSend(
+                        notificationTemplateCatalog.listingFavorited(
+                                sellerId,
+                                listing.getId(),
+                                listing.getTitle(),
+                                userId,
+                                actorName
+                        )
+                );
+                if (notificationResult.isError()) {
+                    log.error("Failed to create listing favorited notification: {}", notificationResult.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to create in-app notification for listing favorited: {}", e.getMessage());
+        }
         
         log.info("Successfully added listing {} to favorites for user {}", listingId, user.getEmail());
         return Result.success(favoriteMapper.toDto(favorite));
