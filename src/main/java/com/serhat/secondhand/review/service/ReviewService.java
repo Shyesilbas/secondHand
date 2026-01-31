@@ -15,6 +15,8 @@ import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.review.validator.ReviewValidator;
+import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.UserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,8 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final ListingRepository listingRepository;
     private final ReviewValidator reviewValidator;
+    private final NotificationService notificationService;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Transactional
     public Result<ReviewDto> createReview(Long reviewerId, CreateReviewRequest request) {
@@ -57,6 +61,26 @@ public class ReviewService {
         Review review = reviewMapper.fromCreateRequest(request, reviewer, reviewedUser, orderItem);
 
         Review savedReview = reviewRepository.save(review);
+        try {
+            var listing = orderItem.getListing();
+            String listingTitle = listing != null ? listing.getTitle() : null;
+            var notificationResult = notificationService.createAndSend(
+                    notificationTemplateCatalog.reviewReceived(
+                            reviewedUser.getId(),
+                            reviewedUser.getId(),
+                            savedReview.getId(),
+                            savedReview.getRating(),
+                            orderItem.getId(),
+                            listing != null ? listing.getId() : null,
+                            listingTitle
+                    )
+            );
+            if (notificationResult.isError()) {
+                log.error("Failed to create review notification: {}", notificationResult.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Failed to create in-app notification for review received: {}", e.getMessage());
+        }
         return Result.success(reviewMapper.toDto(savedReview));
     }
 

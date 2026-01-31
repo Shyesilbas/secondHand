@@ -22,5 +22,15 @@ public class NotificationWebSocketService {
             log.error("Failed to send notification via WebSocket to user: {}", userId, e);
         }
     }
+
+    public void sendBroadcast(NotificationDto notification) {
+        try {
+            String destination = "/topic/notifications";
+            messagingTemplate.convertAndSend(destination, notification);
+            log.info("Notification broadcast via WebSocket, destination: {}", destination);
+        } catch (Exception e) {
+            log.error("Failed to broadcast notification via WebSocket", e);
+        }
+    }
 }
 
