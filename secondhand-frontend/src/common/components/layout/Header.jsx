@@ -10,7 +10,7 @@ import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {useEnums} from '../../hooks/useEnums.js';
-import {usePendingCompletionOrders} from '../../../order/hooks/usePendingCompletionOrders.js';
+import {usePendingCompletionOrders} from '../../../order/hooks/useOrderFlow.js';
 import {useCart} from '../../../cart/hooks/useCart.js';
 import {useQuery} from '@tanstack/react-query';
 import {emailService} from '../../../emails/services/emailService.js';
