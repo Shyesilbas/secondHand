@@ -12,7 +12,7 @@ import RegisterPage from '../../auth/RegisterPage.jsx';
 import ForgotPasswordPage from '../../auth/ForgotPasswordPage.jsx';
 import ChangePasswordPage from '../../auth/ChangePasswordPage.jsx';
 import AccountVerificationPage from '../../auth/AccountVerificationPage.jsx';
-import DashboardPage from '../../user/DashboardPage.jsx';
+import AccountHubPage from '../../user/AccountHubPage.jsx';
 import ProfilePage from '../../user/ProfilePage.jsx';
 import ListingsPage from '../../listing/pages/ListingsPage.jsx';
 import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
@@ -144,7 +144,7 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             >
-                        <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+                        <Route path={ROUTES.DASHBOARD} element={<AccountHubPage />} />
                         <Route path={ROUTES.SELLER_DASHBOARD} element={<SellerDashboardPage />} />
                         <Route path={ROUTES.BUYER_DASHBOARD} element={<BuyerDashboardPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />

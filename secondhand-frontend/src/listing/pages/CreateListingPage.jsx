@@ -5,105 +5,124 @@ import { getListingConfig, getListingTypeOptions, createFormRegistry } from '../
 import { ROUTES } from '../../common/constants/routes.js';
 import ListingWizard from '../components/ListingWizard.jsx';
 import { ChevronRight } from 'lucide-react';
+import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 
 const CreateListingPage = () => {
     const navigate = useNavigate();
     const [selectedType, setSelectedType] = useState(null);
-    const [selectedSubtypeId, setSelectedSubtypeId] = useState(null);
-    const [selectionStep, setSelectionStep] = useState(0);
+    const [selection, setSelection] = useState({});
+    const [selectionStep, setSelectionStep] = useState(1);
     const { enums } = useEnums();
-
-    const handleTypeSelect = useCallback((type) => {
-        const cfg = getListingConfig(type);
-        const subtype = cfg?.createFlow?.subtypeSelector;
-        setSelectedType(type);
-        setSelectedSubtypeId(null);
-        setSelectionStep(subtype ? 1 : 0);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, []);
-
-    const handleBackToSelection = useCallback(() => {
-        setSelectedType(null);
-        setSelectedSubtypeId(null);
-        setSelectionStep(0);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, []);
 
     const listingTypeOptions = useMemo(() => {
         return getListingTypeOptions();
     }, []);
 
     const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
-    const subtypeConfig = selectedType ? (getListingConfig(selectedType)?.createFlow?.subtypeSelector || null) : null;
+    const flowConfig = selectedType ? (getListingConfig(selectedType)?.createFlow || null) : null;
+    const subtypeConfig = flowConfig?.subtypeSelector || null;
+    const preFormSelectors = Array.isArray(flowConfig?.preFormSelectors) ? flowConfig.preFormSelectors : [];
 
-    const isReadyForForm = Boolean(SelectedForm && (!subtypeConfig || selectedSubtypeId));
-
-    const subtypeOptions = useMemo(() => {
-        if (!subtypeConfig?.enumKey) return [];
-        return enums[subtypeConfig.enumKey] || [];
-    }, [enums, subtypeConfig?.enumKey]);
+    const selectorSteps = useMemo(() => {
+        const list = [];
+        if (subtypeConfig?.enumKey && subtypeConfig?.initialDataKey) {
+            list.push({
+                ...subtypeConfig,
+                kind: 'grid',
+            });
+        }
+        preFormSelectors.forEach((s) => {
+            if (!s?.enumKey || !s?.initialDataKey) return;
+            list.push(s);
+        });
+        return list;
+    }, [preFormSelectors, subtypeConfig]);
 
     const selectionSteps = useMemo(() => {
-        if (!selectedType) {
-            return [
-                { id: 0, title: 'Category', description: 'Choose what you want to list.' }
-            ];
-        }
-        if (subtypeConfig) {
-            return [
-                { id: 0, title: 'Category', description: 'Choose what you want to list.' },
-                { id: 1, title: subtypeConfig.title || 'Subtype', description: subtypeConfig.description || 'Choose a subtype.' }
-            ];
-        }
-        return [
-            { id: 0, title: 'Category', description: 'Choose what you want to list.' }
+        const base = [
+            { id: 1, title: 'Category', description: 'Choose what you want to list.' }
         ];
-    }, [selectedType, subtypeConfig]);
+        const tail = selectorSteps.map((s, idx) => ({
+            id: idx + 2,
+            title: s.title || 'Selection',
+            description: s.description || ''
+        }));
+        return [...base, ...tail];
+    }, [selectorSteps]);
+
+    const handleTypeSelect = useCallback((type) => {
+        setSelectedType(type);
+        setSelection({});
+        const cfg = getListingConfig(type);
+        const selectors = Boolean(cfg?.createFlow?.subtypeSelector || (Array.isArray(cfg?.createFlow?.preFormSelectors) && cfg.createFlow.preFormSelectors.length));
+        setSelectionStep(selectors ? 2 : 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+
+    const handleBackToSelection = useCallback(() => {
+        setSelectedType(null);
+        setSelection({});
+        setSelectionStep(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
 
     const canGoNextSelection = useMemo(() => {
-        if (selectionStep === 0) return Boolean(selectedType);
-        if (selectionStep === 1) return Boolean(selectedSubtypeId);
-        return false;
-    }, [selectedSubtypeId, selectedType, selectionStep]);
+        if (selectionStep === 1) return Boolean(selectedType);
+        const idx = selectionStep - 2;
+        const selector = selectorSteps[idx];
+        if (!selector) return false;
+        return Boolean(selection?.[selector.initialDataKey]);
+    }, [selectedType, selection, selectionStep, selectorSteps]);
 
     const onSelectionBack = useCallback(() => {
         navigate(ROUTES.MY_LISTINGS);
     }, [navigate]);
 
     const onSelectionPrev = useCallback(() => {
-        if (selectionStep <= 0) {
+        if (selectionStep <= 1) {
             handleBackToSelection();
             return;
         }
-        setSelectionStep((s) => Math.max(s - 1, 0));
+        setSelectionStep((s) => Math.max(s - 1, 1));
     }, [handleBackToSelection, selectionStep]);
 
     const onSelectionNext = useCallback(() => {
         if (!selectedType) return;
-
-        if (selectionStep === 0) {
-            if (subtypeConfig) {
-                setSelectionStep(1);
-                return;
-            }
-            return;
+        const maxStep = selectionSteps.length;
+        if (selectionStep < maxStep) {
+            setSelectionStep((s) => Math.min(s + 1, maxStep));
         }
-
-        if (selectionStep === 1) {
-            return;
-        }
-    }, [selectedType, selectionStep, subtypeConfig]);
+    }, [selectedType, selectionStep, selectionSteps.length]);
 
     const onSelectionBackOrPrev = useCallback(() => {
-        if (selectionStep === 0) {
+        if (selectionStep === 1) {
             onSelectionBack();
             return;
         }
         onSelectionPrev();
     }, [onSelectionBack, onSelectionPrev, selectionStep]);
 
+    const setSelectionValue = useCallback((key, value, currentIndex) => {
+        setSelection((prev) => {
+            const next = { ...(prev || {}), [key]: value };
+            for (let i = currentIndex + 1; i < selectorSteps.length; i += 1) {
+                const k = selectorSteps[i]?.initialDataKey;
+                if (k) next[k] = null;
+            }
+            return next;
+        });
+    }, [selectorSteps]);
+
+    const resolveStepOptions = useCallback((selector, selectionState) => {
+        if (!selector) return [];
+        if (typeof selector.getOptions === 'function') {
+            return selector.getOptions({ enums, selection: selectionState || {} }) || [];
+        }
+        return enums?.[selector.enumKey] || [];
+    }, [enums]);
+
     const renderSelectionStep = useCallback((stepId) => {
-        if (stepId === 0) {
+        if (stepId === 1) {
             return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {listingTypeOptions.map((type) => (
@@ -132,18 +151,30 @@ const CreateListingPage = () => {
             );
         }
 
-        if (stepId === 1) {
+        const selectorIndex = stepId - 2;
+        const selector = selectorSteps[selectorIndex];
+        if (!selector) return null;
+
+        const valueKey = selector.initialDataKey;
+        const selectedValue = selection?.[valueKey] ?? null;
+        const dependsOn = Array.isArray(selector.dependsOn) ? selector.dependsOn : [];
+        const isEnabled = dependsOn.every((k) => Boolean(selection?.[k]));
+
+        const optionsRaw = resolveStepOptions(selector, selection);
+
+        if ((selector.kind || 'grid') === 'grid') {
+            const options = optionsRaw || [];
             return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {subtypeOptions.map((opt) => {
+                    {options.map((opt) => {
                         const id = opt.id || opt.value;
                         const label = opt.label || opt.name;
                         return (
                             <button
                                 key={id}
-                                onClick={() => setSelectedSubtypeId(id)}
+                                onClick={() => setSelectionValue(valueKey, id, selectorIndex)}
                                 className={`group relative flex flex-col items-start gap-3 p-6 rounded-3xl bg-white border transition-all duration-300 text-left w-full ${
-                                    String(selectedSubtypeId) === String(id)
+                                    String(selectedValue) === String(id)
                                         ? 'border-indigo-500 shadow-[0_20px_60px_-15px_rgba(99,102,241,0.20)]'
                                         : 'border-slate-200/60 hover:border-indigo-300/60 hover:shadow-[0_20px_60px_-15px_rgba(99,102,241,0.15)]'
                                 }`}
@@ -155,7 +186,7 @@ const CreateListingPage = () => {
                                         </h3>
                                     </div>
                                     <ChevronRight className={`w-5 h-5 text-indigo-500 transition-opacity ${
-                                        String(selectedSubtypeId) === String(id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                        String(selectedValue) === String(id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                                     }`} />
                                 </div>
                             </button>
@@ -165,13 +196,35 @@ const CreateListingPage = () => {
             );
         }
 
-        return null;
-    }, [handleTypeSelect, listingTypeOptions, selectedSubtypeId, subtypeOptions]);
+        const options = optionsRaw || [];
+
+        return (
+            <div className="bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-8">
+                <SearchableDropdown
+                    options={options}
+                    selectedValues={selectedValue ? [selectedValue] : []}
+                    onSelectionChange={(vals) => {
+                        const nextValue = Array.isArray(vals) ? (vals[0] ?? null) : null;
+                        setSelectionValue(valueKey, nextValue, selectorIndex);
+                    }}
+                    label={selector.title || 'Select'}
+                    placeholder={isEnabled ? 'Select...' : 'Complete previous steps first'}
+                    multiple={false}
+                    disabled={!isEnabled}
+                />
+            </div>
+        );
+
+    }, [handleTypeSelect, listingTypeOptions, resolveStepOptions, selection, selectorSteps, setSelectionValue]);
+
+    const isReadyForForm = useMemo(() => {
+        if (!SelectedForm) return false;
+        if (!selectorSteps.length) return true;
+        return selectorSteps.every((s) => Boolean(selection?.[s.initialDataKey]));
+    }, [SelectedForm, selection, selectorSteps]);
 
     if (isReadyForForm && SelectedForm) {
-        const initialDataKey = subtypeConfig?.initialDataKey || null;
-        const initialData = initialDataKey && selectedSubtypeId ? { [initialDataKey]: selectedSubtypeId } : null;
-        return <SelectedForm onBack={handleBackToSelection} initialData={initialData} />;
+        return <SelectedForm onBack={handleBackToSelection} initialData={selection} />;
     }
 
     return (

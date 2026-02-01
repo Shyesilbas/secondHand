@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
 import { useFormSubmission } from '../../common/forms/hooks/useFormSubmission.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import ListingWizard from './ListingWizard.jsx';
 import ListingBasics from '../../common/components/forms/ListingBasics.jsx';
 import LocationFields from '../../common/components/forms/LocationFields.jsx';
@@ -81,10 +82,27 @@ const GenericListingForm = ({
   redirectRoute,
 }) => {
   const navigate = useNavigate();
+  const notification = useNotification();
   const { enums } = useEnums();
 
   const listingConfig = useMemo(() => getListingConfig(listingType), [listingType]);
   const formSchema = listingConfig?.formSchema || null;
+
+  const wizardSteps = useMemo(() => {
+    const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
+    if (!steps.length) return steps;
+    const maxId = Math.max(...steps.map((s) => Number(s?.id ?? 0)));
+    const summaryId = Number.isFinite(maxId) ? maxId + 1 : steps.length + 1;
+    return [
+      ...steps,
+      {
+        id: summaryId,
+        title: 'Summary',
+        description: 'Review your listing before publishing',
+        kind: 'summary',
+      },
+    ];
+  }, [formSchema?.steps]);
 
   const normalizedInitialData = useMemo(() => {
     if (!formSchema) return initialData || null;
@@ -97,7 +115,7 @@ const GenericListingForm = ({
     return { ...base, ...(normalizedInitialData || {}) };
   }, [formSchema?.initialData, normalizedInitialData]);
 
-  const totalSteps = formSchema?.steps?.length || 3;
+  const totalSteps = wizardSteps?.length || 3;
 
   const formState = useFormState({
     initialData: mergedInitialData,
@@ -121,6 +139,7 @@ const GenericListingForm = ({
     handleDropdownChange,
     nextStep,
     prevStep,
+    validateCurrentStep,
   } = formState;
 
   const ctx = useMemo(() => {
@@ -175,7 +194,7 @@ const GenericListingForm = ({
       const options = typeof field.getOptions === 'function' ? field.getOptions(ctx) : null;
       const disabled = typeof field.disabledWhen === 'function' ? field.disabledWhen(ctx) : Boolean(field.disabled);
       return (
-        <div key={field.name}>
+        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
           <EnumDropdown
             label={label}
             enumKey={field.enumKey}
@@ -199,14 +218,14 @@ const GenericListingForm = ({
       const options = typeof field.getOptions === 'function' ? field.getOptions(ctx) : [];
       const disabled = typeof field.disabledWhen === 'function' ? field.disabledWhen(ctx) : Boolean(field.disabled);
       return (
-        <div key={field.name}>
+        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
           <SearchableDropdown
             label={label}
             options={options}
             disabled={disabled}
             selectedValues={value ? [value] : []}
             onSelectionChange={(values) => {
-              const v = values?.[0] || '';
+              const v = values?.[0] ?? '';
               if (typeof field.onChange === 'function') {
                 field.onChange({ value: v, ctx });
               } else {
@@ -224,7 +243,7 @@ const GenericListingForm = ({
 
     if (field.type === 'toggle') {
       return (
-        <div key={field.name}>
+        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
           <ToggleCardField
             name={field.name}
             label={field.label}
@@ -246,7 +265,7 @@ const GenericListingForm = ({
 
     if (field.type === 'textarea') {
       return (
-        <div key={field.name} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
+        <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
           <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{label}</label>
           <textarea
             name={field.name}
@@ -265,7 +284,7 @@ const GenericListingForm = ({
 
     const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
     return (
-      <div key={field.name}>
+      <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
         <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{label}</label>
         <input
           type={inputType}
@@ -318,8 +337,116 @@ const GenericListingForm = ({
     );
   };
 
+  const formatSummaryValue = (field, rawValue) => {
+    if (rawValue === null || rawValue === undefined) return '';
+    if (typeof rawValue === 'boolean') return rawValue ? 'Yes' : 'No';
+    if (Array.isArray(rawValue)) return rawValue.filter(Boolean).join(', ');
+    const value = String(rawValue);
+    if (!value.trim()) return '';
+
+    if (field?.enumKey) {
+      const label = resolveEnumName(enums, field.enumKey, rawValue);
+      return label || value;
+    }
+
+    return value;
+  };
+
+  const renderSummaryStep = () => {
+    const basics = [
+      { label: 'Title', value: String(formData?.title ?? '') },
+      { label: 'Price', value: formData?.price != null && String(formData.price).trim() ? `${formData.price} ${formData?.currency || ''}`.trim() : '' },
+      { label: 'Quantity', value: formData?.quantity != null && String(formData.quantity).trim() ? String(formData.quantity) : '' },
+    ].filter((x) => String(x.value || '').trim());
+
+    const location = [
+      { label: 'City', value: String(formData?.city ?? '') },
+      { label: 'District', value: String(formData?.district ?? '') },
+    ].filter((x) => String(x.value || '').trim());
+
+    const detailFields = [];
+    (formSchema?.steps || []).forEach((step) => {
+      if (step?.kind !== 'details') return;
+      (step?.sections || []).forEach((section) => {
+        const sectionVisible = typeof section.visibleWhen === 'function' ? Boolean(section.visibleWhen(ctx)) : true;
+        if (!sectionVisible) return;
+        (section.fields || []).forEach((field) => {
+          const visible = typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
+          if (!visible) return;
+          const value = formatSummaryValue(field, formData?.[field.name]);
+          if (!value) return;
+          detailFields.push({ label: field.label || field.name, value });
+        });
+      });
+    });
+
+    const typeLabel = listingConfig?.label || listingType;
+
+    return (
+      <div className="space-y-10">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <div className="text-xs font-semibold text-slate-500 tracking-tight">Listing type</div>
+              <div className="mt-1 text-lg font-bold text-slate-900 tracking-tight">{typeLabel}</div>
+              {formData?.description ? (
+                <div className="mt-3 text-sm text-slate-700 tracking-tight whitespace-pre-wrap">
+                  {formData.description}
+                </div>
+              ) : null}
+            </div>
+            {formData?.imageUrl ? (
+              <div className="w-28 h-28 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 shrink-0">
+                <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {basics.length ? (
+          <SectionCard title="Basics">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {basics.map((row) => (
+                <div key={row.label} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        ) : null}
+
+        {location.length ? (
+          <SectionCard title="Location">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {location.map((row) => (
+                <div key={row.label} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        ) : null}
+
+        {detailFields.length ? (
+          <SectionCard title="Details">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {detailFields.map((row) => (
+                <div key={`${row.label}:${row.value}`} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        ) : null}
+      </div>
+    );
+  };
+
   const renderStep = (stepId) => {
-    const step = formSchema?.steps?.find((s) => s.id === stepId) || null;
+    const step = wizardSteps?.find((s) => Number(s.id) === Number(stepId)) || null;
     const kind = step?.kind || (stepId === 1 ? 'basics' : stepId === totalSteps ? 'mediaLocation' : 'details');
 
     if (kind === 'basics') {
@@ -335,7 +462,28 @@ const GenericListingForm = ({
       return renderDetailsStep(step);
     }
 
+    if (kind === 'summary') {
+      return renderSummaryStep();
+    }
+
     return null;
+  };
+
+  const handleNext = () => {
+    const ok = validateCurrentStep();
+    if (ok) {
+      nextStep();
+      return;
+    }
+
+    notification.showError('Missing Information', 'Please check the highlighted fields and try again.');
+    const firstErrorKey = Object.keys(errors || {})[0];
+    if (firstErrorKey) {
+      const el = document.querySelector(`[data-field="${CSS.escape(firstErrorKey)}"]`);
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   };
 
   if (!formSchema) return null;
@@ -344,10 +492,10 @@ const GenericListingForm = ({
     <ListingWizard
       title={typeof formSchema.getTitle === 'function' ? formSchema.getTitle({ isEdit, listingType }) : (isEdit ? 'Edit Listing' : 'Create Listing')}
       subtitle={typeof formSchema.getSubtitle === 'function' ? formSchema.getSubtitle({ isEdit, listingType }) : (isEdit ? 'Update your listing details' : 'Create your listing step by step')}
-      steps={formSchema.steps}
+      steps={wizardSteps}
       currentStep={currentStep}
       onBack={onBack || (() => navigate(-1))}
-      onNext={nextStep}
+      onNext={handleNext}
       onPrev={prevStep}
       onSubmit={handleSubmit}
       isLoading={Boolean(isLoading)}

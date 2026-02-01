@@ -79,11 +79,13 @@ const validateField = (field, ctx) => {
   return null;
 };
 
-const collectStepFields = (step) => {
+const collectStepFields = (step, ctx) => {
   if (!step || step.kind !== 'details') return [];
   const sections = step.sections || [];
   const fields = [];
   sections.forEach((section) => {
+    const sectionVisible = typeof section?.visibleWhen === 'function' ? Boolean(section.visibleWhen(ctx)) : true;
+    if (!sectionVisible) return;
     (section?.fields || []).forEach((f) => fields.push(f));
   });
   return fields;
@@ -144,7 +146,7 @@ export const validationRegistry = {
     }
 
     if (kind === 'details') {
-      const fields = collectStepFields(stepDef);
+      const fields = collectStepFields(stepDef, ctx);
       fields.forEach((field) => {
         const err = validateField(field, ctx);
         if (err) errors[field.name] = err;

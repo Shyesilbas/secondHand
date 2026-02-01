@@ -16,7 +16,7 @@ const PATH_MATCHERS = [
     { test: (p) => p === '/forgot-password', page: 'ForgotPasswordPage' },
     { test: (p) => p === '/', page: 'HomePage' },
     { test: (p) => p === '/listings', page: 'ListingsPage' },
-    { test: (p) => p === '/dashboard', page: 'DashboardPage' },
+    { test: (p) => p === '/dashboard', page: 'AccountHubPage' },
     { test: (p) => p === '/dashboard/seller', page: 'SellerDashboardPage' },
     { test: (p) => p === '/dashboard/buyer', page: 'BuyerDashboardPage' },
     { test: (p) => p === '/profile', page: 'ProfilePage' },

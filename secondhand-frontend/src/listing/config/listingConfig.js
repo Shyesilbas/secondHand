@@ -410,7 +410,35 @@ export const listingTypeConfig = {
         initialDataKey: 'vehicleTypeId',
         title: 'Choose vehicle type',
         description: 'Select a type to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'carBrands',
+          initialDataKey: 'brandId',
+          title: 'Choose brand',
+          description: 'Select a brand to narrow model options.',
+          kind: 'searchable',
+          dependsOn: ['vehicleTypeId'],
+        },
+        {
+          enumKey: 'vehicleModels',
+          initialDataKey: 'vehicleModelId',
+          title: 'Choose model',
+          description: 'Select a model to tailor the form fields.',
+          kind: 'searchable',
+          dependsOn: ['vehicleTypeId', 'brandId'],
+          getOptions: ({ enums, selection }) => {
+            const typeId = selection?.vehicleTypeId;
+            const brandId = selection?.brandId;
+            const models = enums?.vehicleModels || [];
+            return models
+              .filter((m) => (!brandId || String(m?.brandId ?? m?.brand_id ?? '') === String(brandId)))
+              .filter((m) => (!typeId || String(m?.vehicleTypeId ?? m?.typeId ?? m?.vehicle_type_id ?? '') === String(typeId)))
+              .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? '') }))
+              .filter((o) => o.id && o.label);
+          },
+        },
+      ],
     },
     
     filterConfig: filterConfigs.VEHICLE,
@@ -672,7 +700,36 @@ export const listingTypeConfig = {
         initialDataKey: 'electronicTypeId',
         title: 'Choose electronics type',
         description: 'Select a type to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'electronicBrands',
+          initialDataKey: 'electronicBrandId',
+          title: 'Choose brand',
+          description: 'Select a brand to narrow model options.',
+          kind: 'searchable',
+          dependsOn: ['electronicTypeId'],
+        },
+        {
+          enumKey: 'electronicModels',
+          initialDataKey: 'electronicModelId',
+          title: 'Choose model',
+          description: 'Select a model to tailor the form fields.',
+          kind: 'searchable',
+          dependsOn: ['electronicTypeId', 'electronicBrandId'],
+          getOptions: ({ enums, selection }) => {
+            const brandId = selection?.electronicBrandId;
+            const typeId = selection?.electronicTypeId;
+            const allModels = enums?.electronicModels || [];
+            const filtered = allModels
+              .filter((m) => (!brandId || String(m?.brandId ?? m?.brand_id ?? '') === String(brandId)))
+              .filter((m) => (!typeId || String(m?.typeId ?? m?.type_id ?? '') === String(typeId)));
+            return filtered
+              .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? '') }))
+              .filter((o) => o.id && o.label);
+          },
+        },
+      ],
     },
     
     filterConfig: filterConfigs.ELECTRONICS,
@@ -871,7 +928,33 @@ export const listingTypeConfig = {
         initialDataKey: 'realEstateTypeId',
         title: 'Choose property type',
         description: 'Select a type to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'realEstateAdTypes',
+          initialDataKey: 'adTypeId',
+          title: 'Choose ad type',
+          description: 'Select an ad type to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['realEstateTypeId'],
+        },
+        {
+          enumKey: 'heatingTypes',
+          initialDataKey: 'heatingTypeId',
+          title: 'Choose heating type',
+          description: 'Select a heating type to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['realEstateTypeId'],
+        },
+        {
+          enumKey: 'ownerTypes',
+          initialDataKey: 'ownerTypeId',
+          title: 'Choose owner type',
+          description: 'Select an owner type to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['realEstateTypeId'],
+        },
+      ],
     },
     
     filterConfig: filterConfigs.REAL_ESTATE,
@@ -1066,7 +1149,49 @@ export const listingTypeConfig = {
         initialDataKey: 'clothingTypeId',
         title: 'Choose clothing type',
         description: 'Select a type to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'clothingBrands',
+          initialDataKey: 'brandId',
+          title: 'Choose brand',
+          description: 'Select a brand to tailor the form fields.',
+          kind: 'searchable',
+          dependsOn: ['clothingTypeId'],
+        },
+        {
+          enumKey: 'colors',
+          initialDataKey: 'color',
+          title: 'Choose color',
+          description: 'Select a color to tailor the form fields.',
+          kind: 'searchable',
+          dependsOn: ['clothingTypeId'],
+        },
+        {
+          enumKey: 'clothingConditions',
+          initialDataKey: 'condition',
+          title: 'Choose condition',
+          description: 'Select a condition to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['clothingTypeId'],
+        },
+        {
+          enumKey: 'clothingGenders',
+          initialDataKey: 'clothingGender',
+          title: 'Choose clothing gender',
+          description: 'Select a clothing gender to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['clothingTypeId'],
+        },
+        {
+          enumKey: 'clothingCategories',
+          initialDataKey: 'clothingCategory',
+          title: 'Choose clothing category',
+          description: 'Select a clothing category to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['clothingTypeId'],
+        },
+      ],
     },
     
     filterConfig: filterConfigs.CLOTHING,
@@ -1255,7 +1380,49 @@ export const listingTypeConfig = {
         initialDataKey: 'bookTypeId',
         title: 'Choose book type',
         description: 'Select a type to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'bookGenres',
+          initialDataKey: 'genreId',
+          title: 'Choose genre',
+          description: 'Select a genre to tailor the form fields.',
+          kind: 'searchable',
+          dependsOn: ['bookTypeId'],
+          getOptions: ({ enums, selection }) => {
+            const bookTypeId = selection?.bookTypeId;
+            const all = enums?.bookGenres || [];
+            return all
+              .filter((g) => !bookTypeId || String(g?.bookTypeId ?? '') === String(bookTypeId))
+              .map((g) => ({ id: String(g?.id ?? ''), label: String(g?.label ?? g?.name ?? '') }))
+              .filter((o) => o.id && o.label);
+          },
+        },
+        {
+          enumKey: 'bookLanguages',
+          initialDataKey: 'languageId',
+          title: 'Choose language',
+          description: 'Select a language to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['bookTypeId'],
+        },
+        {
+          enumKey: 'bookFormats',
+          initialDataKey: 'formatId',
+          title: 'Choose format',
+          description: 'Select a format to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['bookTypeId'],
+        },
+        {
+          enumKey: 'bookConditions',
+          initialDataKey: 'conditionId',
+          title: 'Choose condition',
+          description: 'Select a condition to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['bookTypeId'],
+        },
+      ],
     },
     
     filterConfig: filterConfigs.BOOKS,
@@ -1372,7 +1539,25 @@ export const listingTypeConfig = {
         initialDataKey: 'disciplineId',
         title: 'Choose sport discipline',
         description: 'Select a discipline to tailor the form fields.'
-      }
+      },
+      preFormSelectors: [
+        {
+          enumKey: 'sportEquipmentTypes',
+          initialDataKey: 'equipmentTypeId',
+          title: 'Choose equipment type',
+          description: 'Select an equipment type to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['disciplineId'],
+        },
+        {
+          enumKey: 'sportConditions',
+          initialDataKey: 'conditionId',
+          title: 'Choose condition',
+          description: 'Select a condition to tailor the form fields.',
+          kind: 'grid',
+          dependsOn: ['disciplineId'],
+        },
+      ],
     },
     
     filterConfig: filterConfigs.SPORTS,
