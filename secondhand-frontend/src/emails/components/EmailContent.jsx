@@ -1,7 +1,7 @@
 import React from 'react';
-import { formatDateTime, replaceEnumCodesInHtml, formatPricesInHtml } from '../../common/formatters.js';
-import { useEnums } from '../../common/hooks/useEnums.js';
-import { EMAIL_TYPES } from '../emails.js';
+import {formatDateTime, formatPricesInHtml, replaceEnumCodesInHtml} from '../../common/formatters.js';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import {EMAIL_TYPES} from '../emails.js';
 
 const EmailContent = ({ email }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
@@ -38,7 +38,6 @@ const EmailContent = ({ email }) => {
 
     return (
         <div className="h-full bg-white flex flex-col">
-            {/* Email Header - Mektup Kağıdı Üst Kısmı */}
             <div className="px-12 pt-12 pb-8 border-b border-slate-200/60">
                 <div className="max-w-3xl">
                     <div className="flex items-start gap-3 mb-6">

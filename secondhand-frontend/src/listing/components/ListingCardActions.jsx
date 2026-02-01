@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
+import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
 import { useListingActions } from '../hooks/useListingActions.js';
 
 const ListingCardActions = ({ listing, onChanged }) => {
   const { user } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { isInShowcase } = useShowcaseQuery();
+  const { isInShowcase } = useShowcaseQueries();
   const dropdownRef = useRef(null);
 
   const isOwner = user?.id === listing?.sellerId;

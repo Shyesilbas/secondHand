@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
-import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
+import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 
 const ShowcaseSection = () => {
@@ -9,7 +9,7 @@ const ShowcaseSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
   
-  const { showcases, loading: showcaseLoading, error: showcaseError, refetch } = useShowcaseQuery({
+  const { showcases, loading: showcaseLoading, error: showcaseError, refetch } = useShowcaseQueries({
     enabled: loadShowcases
   });
 
