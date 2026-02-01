@@ -27,8 +27,8 @@ const buildDefaultsFromFilterConfig = (config) => {
     if (field.type === 'numericRange') {
       const minKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
       const maxKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      defaults[minKey] = 0;
-      defaults[maxKey] = 0;
+      defaults[minKey] = null;
+      defaults[maxKey] = null;
       return;
     }
 
@@ -78,7 +78,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
   const { user, isAuthenticated } = useAuth();
 
   const navState = useMemo(() => window.history.state && window.history.state.usr, []);
-  const initialTypeFromNav = navState?.listingType || null;
+  const initialTypeFromNav = navState?.listingType ? String(navState.listingType).trim().toUpperCase() : null;
 
   const engineModeFromNav = navState?.mode || null;
   const [mode, setMode] = useState(engineModeFromNav || initialMode || 'browse');
@@ -97,7 +97,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
         listingType: initialTypeFromNav || null,
       };
     }
-    const t = initialTypeFromNav || initialListingType || 'VEHICLE';
+    const t = initialTypeFromNav || String(initialListingType || '').trim().toUpperCase() || 'VEHICLE';
     return getDefaultFiltersForType(t, { listingType: t });
   });
 
@@ -124,7 +124,8 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const category = params.get('category');
+    const raw = params.get('category');
+    const category = raw ? String(raw).trim().toUpperCase() : null;
     if (category && category !== selectedCategory) {
       setSelectedCategory(category);
       setFilters((prev) => {
@@ -302,13 +303,14 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
   }, [clearSearch, initialListingType, mode, selectedCategory]);
 
   const onCategoryChange = useCallback((category) => {
-    setSelectedCategory(category);
+    const normalized = category ? String(category).trim().toUpperCase() : null;
+    setSelectedCategory(normalized);
     if (mode === 'mine') {
-      setFilters((prev) => ({ ...prev, listingType: category || null, page: 0 }));
+      setFilters((prev) => ({ ...prev, listingType: normalized || null, page: 0 }));
       clearSearch();
       return;
     }
-    const listingType = category || initialListingType || 'VEHICLE';
+    const listingType = normalized || String(initialListingType || '').trim().toUpperCase() || 'VEHICLE';
     setFilters(getDefaultFiltersForType(listingType, { listingType, type: listingType, page: 0 }));
     clearSearch();
   }, [clearSearch, initialListingType]);

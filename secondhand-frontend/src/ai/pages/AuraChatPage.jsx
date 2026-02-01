@@ -1,26 +1,15 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { aiChatService } from '../services/aiChatService.js';
 import { RotateCcw, Send, Sparkles, Trash2 } from 'lucide-react';
+import { useAuraChat } from '../hooks/useAuraChat.js';
+import { createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 
 const AuraChatPage = () => {
   const { user } = useAuth();
   const location = useLocation();
   const listing = location?.state?.listing || null;
-  const storageKey = useMemo(() => (user?.id != null ? `aura.chat.started.${user.id}` : 'aura.chat.started.anonymous'), [user?.id]);
-
-  const [messages, setMessages] = useState(() => [
-    {
-      id: 'aura-welcome',
-      role: 'assistant',
-      content: 'Merhaba, ben Aura. SecondHand üzerinde doğru ürünü bulmana veya güvenli ticaret yapmana yardımcı olabilirim. Hangi kategoride neye bakıyorsun?',
-      createdAt: Date.now(),
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const listRef = useRef(null);
 
   const userId = user?.id ?? null;
 
@@ -39,119 +28,57 @@ const AuraChatPage = () => {
     return parts.join(' | ');
   }, [listing]);
 
-  const buildOutgoingMessage = (text) => {
-    const trimmed = text.trim();
-    if (!listingContext) return trimmed;
-    return `${trimmed}\n\nListingContext: ${listingContext}`;
-  };
-
-  const scrollToBottom = () => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  };
-
-  const handleSend = async () => {
-    const trimmed = input.trim();
-    if (!trimmed || isSending) return;
-
-    if (userId == null) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Oturum bilgisi bulunamadı. Lütfen giriş yapıp tekrar dene.',
-          createdAt: Date.now(),
-        },
-      ]);
-      setInput('');
-      return;
-    }
-
-    const userMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: trimmed,
-      createdAt: Date.now(),
+  const buildOutgoingMessage = useMemo(() => {
+    return (text) => {
+      const trimmed = text.trim();
+      if (!listingContext) return trimmed;
+      return `${trimmed}\n\nListingContext: ${listingContext}`;
     };
+  }, [listingContext]);
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsSending(true);
-    queueMicrotask(scrollToBottom);
-
-    try {
-      const payload = buildOutgoingMessage(trimmed);
-      const response = await aiChatService.chat({ userId, message: payload });
-      const answer = response?.answer || response?.message || 'Cevap alınamadı.';
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-${Date.now()}`,
-          role: 'assistant',
-          content: answer,
-          createdAt: Date.now(),
-        },
-      ]);
-      queueMicrotask(scrollToBottom);
-    } catch (e) {
-      const errorMessage =
-        e?.response?.data?.message ||
-        e?.message ||
-        'İstek sırasında hata oluştu.';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorMessage,
-          createdAt: Date.now(),
-        },
-      ]);
-      queueMicrotask(scrollToBottom);
-    } finally {
-      setIsSending(false);
-    }
-  };
+  const {
+    storageKey,
+    messages,
+    setMessages,
+    input,
+    setInput,
+    isSending,
+    setIsSending,
+    listRef,
+    sendMessage,
+    onKeyDown,
+    scrollToBottom,
+  } = useAuraChat({
+    userId,
+    isAuthenticated: userId != null,
+    initialMessages: [
+      {
+        id: 'aura-welcome',
+        role: 'assistant',
+        content:
+          "Hi, I'm Aura! I'm here to help you find what you're looking for on SecondHand and keep your trades secure. What are we looking for today?",
+        createdAt: Date.now(),
+      },
+    ],
+    withTyping: true,
+    buildPayload: buildOutgoingMessage,
+    echoUserMessageWhenUnauthed: false,
+  });
 
   const handleNewChat = async () => {
     if (userId == null) {
-      setMessages([
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Oturum bilgisi bulunamadı. Lütfen giriş yapıp tekrar dene.',
-          createdAt: Date.now(),
-        },
-      ]);
+      setMessages([createChatMessage({ role: 'assistant', content: 'Please log in to continue this chat.' })]);
       return;
     }
     setIsSending(true);
     try {
       await aiChatService.newChat({ userId });
       localStorage.removeItem(storageKey);
-      setMessages([
-        {
-          id: `aura-${Date.now()}`,
-          role: 'assistant',
-          content: 'Yeni sohbet başlatıldı. Ne arıyorsun, hangi kategoride?',
-          createdAt: Date.now(),
-        },
-      ]);
+      setMessages([createChatMessage({ role: 'assistant', content: 'New chat created. What are we looking for today?' })]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = e?.response?.data?.message || e?.message || 'Yeni sohbet başlatılamadı.';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorMessage,
-          createdAt: Date.now(),
-        },
-      ]);
+      const errorMessage = getApiErrorMessage(e, 'A new chat could not be created.');
+      setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content: errorMessage })]);
     } finally {
       setIsSending(false);
     }
@@ -161,7 +88,7 @@ const AuraChatPage = () => {
     if (userId == null) {
       return;
     }
-    if (!window.confirm('Geçmiş konuşmalar silinsin mi?')) {
+    if (!window.confirm('Are you sure you want to delete all your chat history?')) {
       return;
     }
     setIsSending(true);
@@ -169,25 +96,12 @@ const AuraChatPage = () => {
       await aiChatService.deleteHistory({ userId });
       localStorage.removeItem(storageKey);
       setMessages([
-        {
-          id: `aura-${Date.now()}`,
-          role: 'assistant',
-          content: 'Geçmiş konuşmalar silindi. Yeni bir sohbet başlatabiliriz.',
-          createdAt: Date.now(),
-        },
+        createChatMessage({ role: 'assistant', content: 'History deleted. You can start a new chat with the button above.' }),
       ]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = e?.response?.data?.message || e?.message || 'Silme işlemi başarısız.';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorMessage,
-          createdAt: Date.now(),
-        },
-      ]);
+      const errorMessage = getApiErrorMessage(e, 'Deleting chat history failed.');
+      setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content: errorMessage })]);
     } finally {
       setIsSending(false);
     }
@@ -197,7 +111,7 @@ const AuraChatPage = () => {
     if (userId == null) {
       return;
     }
-    if (!window.confirm('Hafızan (memory) ve sohbet geçmişin tamamen silinsin mi?')) {
+    if (!window.confirm('Memory and chat history will be deleted. Are you sure you want to continue?')) {
       return;
     }
     setIsSending(true);
@@ -205,34 +119,17 @@ const AuraChatPage = () => {
       await aiChatService.deleteMemory({ userId });
       localStorage.removeItem(storageKey);
       setMessages([
-        {
-          id: `aura-${Date.now()}`,
+        createChatMessage({
           role: 'assistant',
-          content: 'Hafızan silindi. Yeni bir sohbet başlatabilirsin.',
-          createdAt: Date.now(),
-        },
+          content: 'Memory deleted. You can start a new chat with the button above.',
+        }),
       ]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = e?.response?.data?.message || e?.message || 'Silme işlemi başarısız.';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `aura-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorMessage,
-          createdAt: Date.now(),
-        },
-      ]);
+      const errorMessage = getApiErrorMessage(e, 'Deleting memory failed.');
+      setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content: errorMessage })]);
     } finally {
       setIsSending(false);
-    }
-  };
-
-  const onKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
     }
   };
 
@@ -248,14 +145,14 @@ const AuraChatPage = () => {
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Aura Assistant</h1>
                 <p className="text-sm text-slate-500 tracking-tight">
-                  Marketplace odaklı öneriler, güvenlik kontrolleri ve doğru sorular
+                  Marketplace focused AI assistant. <br />
                 </p>
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-xs text-slate-500 tracking-tight">UserId</div>
+            <div className="text-xs text-slate-500 tracking-tight">User Id</div>
             <div className="text-sm font-semibold text-slate-900 tracking-tight">
               {userId ?? '—'}
             </div>
@@ -280,7 +177,7 @@ const AuraChatPage = () => {
               className="inline-flex items-center gap-2 rounded-xl bg-slate-100 text-slate-900 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Geçmiş konuşmaları sil
+              Delete chat history
             </button>
             <button
               type="button"
@@ -289,11 +186,11 @@ const AuraChatPage = () => {
               className="inline-flex items-center gap-2 rounded-xl bg-red-50 text-red-700 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Memory’mi sil
+              Delete memory and chat history
             </button>
           </div>
           <div className="mt-2 text-xs text-slate-500 tracking-tight">
-            New chat: geçmişi temizler, hafızanı korur. Memory’mi sil: hafıza + geçmişi tamamen siler.
+            New chat: clears history,Keeps memory. Delete memory: memory + history will be deleted.
           </div>
         </div>
 
@@ -327,12 +224,12 @@ const AuraChatPage = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Mesajını yaz... (Enter gönderir, Shift+Enter yeni satır)"
+                placeholder="Type your message... (Enter sends, Shift+Enter for a new line)"
                 className="flex-1 resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300"
                 rows={2}
               />
               <button
-                onClick={handleSend}
+                onClick={() => sendMessage()}
                 disabled={isSending || !input.trim()}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 text-sm font-semibold tracking-tight cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
               >

@@ -8,7 +8,7 @@ const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searc
   const selectedValues = value ? (multiple ? value : [value]) : [];
 
   const handleChange = (values) => {
-    onChange(multiple ? values : (values[0] || ''));
+    onChange(multiple ? values : (values?.[0] ?? ''));
   };
 
   return (

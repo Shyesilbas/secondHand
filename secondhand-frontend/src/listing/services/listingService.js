@@ -23,8 +23,8 @@ const serializeFilters = (filters, config, listingType) => {
     size: parseInt(filters.size) || 20,
     sortBy: filters.sortBy || 'createdAt',
     sortDirection: filters.sortDirection || 'DESC',
-    city: filters.city?.trim() || '',
-    district: filters.district?.trim() || '',
+    city: filters.city?.trim() || null,
+    district: filters.district?.trim() || null,
     minPrice: filters.minPrice ? parseFloat(filters.minPrice) : null,
     maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : null,
     currency: filters.currency || null,
@@ -34,6 +34,7 @@ const serializeFilters = (filters, config, listingType) => {
 
   const toInt = (value) => {
     if (value === null || value === undefined || value === '') return null;
+    if (value === 0 || value === '0') return null;
     const n = Number.parseInt(value, 10);
     return Number.isFinite(n) ? n : null;
   };
@@ -51,9 +52,11 @@ const serializeFilters = (filters, config, listingType) => {
     if (field.type === 'enum') {
       if (field.multiple === false) {
         const v = filters[field.key];
-        payload[field.key] = Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+        const value = Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+        payload[field.key] = value === '' ? null : value;
       } else {
-        payload[field.key] = ensureArray(filters[field.key]);
+        const arr = ensureArray(filters[field.key]);
+        payload[field.key] = arr.length ? arr : null;
       }
       return;
     }
@@ -142,9 +145,9 @@ export const listingService = {
   },
 
   filterListings: async (filters) => {
-    const listingType = filters.listingType;
-    if (!listingType || !Object.values(LISTING_TYPES).includes(listingType.toUpperCase())) {
-      console.warn(`Invalid or missing listing type: ${listingType}`);
+    const listingType = String(filters.listingType || filters.type || '').trim().toUpperCase();
+    if (!listingType || !Object.values(LISTING_TYPES).includes(listingType)) {
+      console.warn(`Invalid or missing listing type: ${listingType || '(empty)'}`);
       return {
         content: [],
         totalPages: 0,
@@ -157,9 +160,8 @@ export const listingService = {
       };
     }
 
-    const typeUpper = listingType.toUpperCase();
-    const config = filterConfigs[typeUpper];
-    const payload = serializeFilters(filters, config, typeUpper);
+    const config = filterConfigs[listingType];
+    const payload = serializeFilters({ ...filters, listingType, type: listingType }, config, listingType);
 
     return withErrorHandling(
         () => post(API_ENDPOINTS.LISTINGS.FILTER, payload),
