@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { priceHistoryService } from '../services/priceHistoryService.js';
+import { priceHistoryService } from '../services/listingAddonService.js';
 
 const usePriceHistory = (listingId) => {
   const [priceHistory, setPriceHistory] = useState([]);

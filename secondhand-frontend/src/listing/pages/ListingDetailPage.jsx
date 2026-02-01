@@ -1,24 +1,21 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../auth/AuthContext.jsx';
 import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
-import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
-import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
-import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
-import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
-import ViewStatisticsCard from '../components/ViewStatisticsCard.jsx';
-import {listingTypeRegistry} from '../components/typeRegistry.js';
+import { listingTypeRegistry } from '../config/listingConfig.js';
 import {ROUTES} from '../../common/constants/routes.js';
-import {formatCurrency, formatDateTime} from '../../common/formatters.js';
-import {trackView} from '../services/viewTrackingService.js';
+import {trackView} from '../services/listingAddonService.js';
 import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
-import {AlertTriangle, ArrowLeft, ChevronRight, Flag, HandCoins, Share2, ShieldCheck, ShoppingBag, Sparkles} from 'lucide-react';
+import {AlertTriangle, ArrowLeft, ChevronRight, HandCoins, Share2, ShoppingBag, Sparkles} from 'lucide-react';
 import {useCart} from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
-import {FollowButton} from '../../follow/index.js';
+import ListingHero from '../components/ListingHero.jsx';
+import ListingTrustPanel from '../components/ListingTrustPanel.jsx';
+import ListingAnalyticsPanel from '../components/ListingAnalyticsPanel.jsx';
+import ListingSocialPanel from '../components/ListingSocialPanel.jsx';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -30,10 +27,12 @@ const ListingDetailPage = () => {
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const viewTrackedRef = useRef(false);
 
-  // Calculate isOwner after listing is loaded
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 
-  // Track view when listing is loaded (but not if user is the owner)
+  const handleListingChanged = useCallback(() => {
+    fetchListing?.();
+  }, [fetchListing]);
+
   useEffect(() => {
     if (listing && !viewTrackedRef.current && !isOwner) {
       viewTrackedRef.current = true;
@@ -144,7 +143,10 @@ const ListingDetailPage = () => {
               <Share2 className="w-4 h-4" />
             </button>
             {isOwner && (
-               <ListingCardActions listing={listing} onChanged={fetchListing} />
+               <ListingCardActions
+                 listing={listing}
+                 onChanged={fetchListing}
+               />
             )}
           </div>
         </div>
@@ -160,209 +162,48 @@ const ListingDetailPage = () => {
         <div className="grid lg:grid-cols-12 gap-6">
 
           <div className="lg:col-span-8 space-y-5">
+            <ListingHero
+              listing={listing}
+              variant="main"
+              displayPrice={displayPrice}
+              hasCampaign={hasCampaign}
+              hasStockInfo={hasStockInfo}
+              isLowStock={isLowStock}
+            />
 
-            {isOwner && (
-              <ViewStatisticsCard
-                viewStats={listing.viewStats || { totalViews: 0, uniqueViews: 0, periodDays: 7, viewsByDate: {} }}
-                periodDays={listing.viewStats?.periodDays || 7}
-              />
-            )}
-
-            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/60 shadow-sm relative group min-h-[500px] flex items-center justify-center p-12">
-              {listing.imageUrl ? (
-                <img
-                  src={listing.imageUrl}
-                  alt={listing.title}
-                  className="max-w-full max-h-[600px] w-auto h-auto object-contain transition-transform duration-500 ease-in-out group-hover:scale-[1.01]"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div className={`w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50/30 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
-                  <p className="text-sm font-medium text-slate-400 tracking-tight">No image available</p>
-              </div>
-            </div>
-
-            <div className="lg:hidden bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm">
-               <h1 className="text-2xl font-bold text-slate-900 mb-3 leading-tight tracking-tight">{listing.title}</h1>
-               <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium tracking-tight">
-                 <span>{listing.district}, {listing.city}</span>
-                 <span>•</span>
-                 <span>{formatDateTime(listing.createdAt)}</span>
-               </div>
-               {hasStockInfo && (
-                 <div className="mb-4">
-                   <span className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold border tracking-tight ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-slate-50/80 text-slate-600 border-slate-200/60'}`}>
-                     Stock: {Number(listing.quantity)}
-                   </span>
-                 </div>
-               )}
-               <div className="flex items-baseline gap-4 flex-wrap mb-3">
-                 <p className="text-3xl font-bold text-slate-900 tracking-tighter">{formatCurrency(displayPrice, listing.currency)}</p>
-                 {hasCampaign && (
-                   <p className="text-lg font-medium text-slate-400 line-through tracking-tight">{formatCurrency(listing.price, listing.currency)}</p>
-                 )}
-               </div>
-               {hasCampaign && (
-                 <div className="inline-flex items-center rounded-lg bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60 tracking-tight">
-                   {listing.campaignName || 'Special Offer'}
-                 </div>
-               )}
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-              <div className="flex items-center border-b border-slate-200/60 px-6 bg-slate-50/30">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                      relative py-4 px-5 text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight
-                      ${activeTab === tab.id 
-                        ? 'text-slate-900' 
-                        : 'text-slate-500 hover:text-slate-700'
-                      }
-                    `}
-                  >
-                    {tab.label}
-                    {activeTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900" />
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              <div className="p-8">
-                {activeTab === 'about' && (
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Description</h2>
-                    <div className="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4 prose-headings:font-bold prose-headings:text-slate-900 tracking-tight">
-                      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 tracking-tight">{listing.description}</p>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'details' && DetailsComponent && (
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Specifications</h2>
-                    <DetailsComponent listing={listing} />
-                  </div>
-                )}
-
-                {activeTab === 'reviews' && hasReviews && (
-                  <div>
-                    <ListingReviewsSection listingId={listing.id} listing={listing} />
-                  </div>
-                )}
-              </div>
-            </div>
+            <ListingSocialPanel
+              listing={listing}
+              isOwner={isOwner}
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              DetailsComponent={DetailsComponent}
+              hasReviews={hasReviews}
+            />
           </div>
 
           <div className="lg:col-span-4 space-y-6">
              <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 lg:sticky lg:top-20">
-                <div className="mb-6 hidden lg:block">
-                   <h1 className="text-2xl font-bold text-slate-900 leading-tight mb-4 tracking-tight">{listing.title}</h1>
-                   <div className="flex items-center gap-2 text-xs text-slate-500 mb-4 font-medium tracking-tight">
-                      <span>{listing.district}, {listing.city}</span>
-                      <span>•</span>
-                      <span>{formatDateTime(listing.createdAt)}</span>
-                   </div>
-                   {hasStockInfo && (
-                     <div className="mb-4">
-                       <span className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold border tracking-tight ${isLowStock ? 'bg-amber-50/80 text-amber-700 border-amber-200/60' : 'bg-slate-50/80 text-slate-600 border-slate-200/60'}`}>
-                         Stock: {Number(listing.quantity)}
-                       </span>
-                     </div>
-                   )}
-                   <div className="mb-2">
-                     <p className="text-3xl font-bold text-slate-900 tracking-tighter">
-                        {formatCurrency(displayPrice, listing.currency)}
-                     </p>
-                   </div>
-                   {hasCampaign && (
-                     <div className="mt-3 flex items-center gap-3">
-                       <p className="text-lg font-medium text-slate-400 line-through tracking-tight">{formatCurrency(listing.price, listing.currency)}</p>
-                       <span className="inline-flex items-center rounded-lg bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200/60 tracking-tight">
-                         {listing.campaignName || 'Special Offer'}
-                       </span>
-                     </div>
-                   )}
-                </div>
+                <ListingHero
+                  listing={listing}
+                  variant="sidebar"
+                  displayPrice={displayPrice}
+                  hasCampaign={hasCampaign}
+                  hasStockInfo={hasStockInfo}
+                  isLowStock={isLowStock}
+                />
 
-                <div className="border-t border-b border-slate-200/60 py-6 mb-6">
-                  <div className="mb-6">
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Seller</h3>
-                    <div className="flex items-center justify-between mb-5">
-                       <div className="flex items-center gap-4">
-                         <div className="w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-base font-bold text-white shadow-sm">
-                            {listing.sellerName?.[0]?.toUpperCase() || 'U'}
-                         </div>
-                         <div>
-                            <Link
-                              to={ROUTES.USER_PROFILE(listing.sellerId)}
-                              className="font-bold text-base text-slate-900 hover:text-slate-700 block transition-all duration-300 ease-in-out tracking-tight"
-                            >
-                               {listing.sellerName} {listing.sellerSurname}
-                            </Link>
-                            {listing.sellerAccountCreationDate && (
-                              <div className="text-xs text-slate-500 mt-1 font-medium tracking-tight">
-                                Member since {new Date(listing.sellerAccountCreationDate).getFullYear()}
-                              </div>
-                            )}
-                         </div>
-                       </div>
-                       {!isOwner && (
-                         <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />
-                       )}
-                    </div>
+                <ListingTrustPanel
+                  listing={listing}
+                  isOwner={isOwner}
+                  onShowcaseSuccess={fetchListing}
+                />
 
-                    {!isOwner ? (
-                      <div className="space-y-3">
-                        <ContactSellerButton
-                            listing={listing}
-                            className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all duration-300 ease-in-out shadow-lg hover:shadow-xl tracking-tight"
-                        >
-                            Contact Seller
-                        </ContactSellerButton>
-                        <ComplaintButton
-                            targetUserId={listing.sellerId}
-                            targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
-                            listingId={listing.id}
-                            listingTitle={listing.title}
-                            className="w-full flex items-center justify-center gap-2 py-3 border border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-slate-300/60 rounded-xl text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight"
-                        >
-                            <Flag className="w-4 h-4" />
-                            Report
-                        </ComplaintButton>
-                      </div>
-                    ) : (
-                      <ShowcaseButton listingId={listing.id} onSuccess={fetchListing} />
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-200/40">
-                  <h3 className="text-xs font-bold text-slate-900 mb-3 flex items-center gap-2 uppercase tracking-wider">
-                    <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                    Safety Guidelines
-                  </h3>
-                  <ul className="space-y-2 text-xs text-slate-600 leading-relaxed tracking-tight">
-                    <li className="flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                      <span>Meet in public, well-lit locations</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                      <span>Inspect items thoroughly before purchase</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                      <span>Avoid advance payments or wire transfers</span>
-                    </li>
-                  </ul>
-                </div>
+                <ListingAnalyticsPanel
+                  listing={listing}
+                  isOwner={isOwner}
+                  displayPrice={displayPrice}
+                />
              </div>
           </div>
         </div>

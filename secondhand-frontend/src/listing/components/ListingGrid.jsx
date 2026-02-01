@@ -57,7 +57,11 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
             {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} onDeleted={onDeleted} />
+                <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    onDeleted={onDeleted}
+                />
             ))}
         </div>
     );

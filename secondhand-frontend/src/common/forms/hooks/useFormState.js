@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
+import { validationRegistry } from '../../../listing/validation/ValidationRegistry.js';
 
 export const useFormState = (config) => {
   const { 
     initialData, 
     totalSteps = 3, 
     validateStep, 
-    validateAll 
+    validateAll,
+    listingType,
   } = config;
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -42,20 +44,22 @@ export const useFormState = (config) => {
   }, [errors]);
 
   const validateCurrentStep = useCallback(() => {
-    if (!validateStep) return true;
-    
-    const newErrors = validateStep(currentStep, formData);
+    const validator = validateStep || (listingType ? ((step, data) => validationRegistry.getStepErrors(listingType, step, data)) : null);
+    if (!validator) return true;
+
+    const newErrors = validator(currentStep, formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [currentStep, formData, validateStep]);
+  }, [currentStep, formData, listingType, validateStep]);
 
   const validateAllSteps = useCallback(() => {
-    if (!validateAll) return true;
-    
-    const allErrors = validateAll(formData);
+    const validator = validateAll || (listingType ? ((data) => validationRegistry.getAllErrors(listingType, data)) : null);
+    if (!validator) return true;
+
+    const allErrors = validator(formData);
     setErrors(allErrors);
     return Object.keys(allErrors).length === 0;
-  }, [formData, validateAll]);
+  }, [formData, listingType, validateAll]);
 
   const nextStep = useCallback(() => {
     if (validateCurrentStep()) {

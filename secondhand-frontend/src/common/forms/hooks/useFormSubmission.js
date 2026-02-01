@@ -17,15 +17,33 @@ export const useFormSubmission = (config) => {
 
   const navigate = useNavigate();
   const notification = useNotification();
-  const { formData, errors, goToStep } = formState;
+  const { formData, errors, goToStep, validateAllSteps, setErrors: setFormErrors } = formState;
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
-    if (!validateAll(formData)) {
+    let isValid = true;
+    let newErrors = {};
+
+    if (typeof validateAll === 'function') {
+      const res = validateAll(formData);
+      if (typeof res === 'boolean') {
+        isValid = res;
+        newErrors = errors || {};
+      } else {
+        newErrors = res || {};
+        isValid = Object.keys(newErrors).length === 0;
+      }
+      setFormErrors?.(newErrors);
+    } else {
+      isValid = validateAllSteps?.() ?? true;
+      newErrors = formState?.errors || {};
+    }
+
+    if (!isValid) {
       notification.showError('Missing Information', 'Please fill in all required fields. Location information is especially required!');
 
-            const errorFields = Object.keys(errors);
+            const errorFields = Object.keys(newErrors || {});
       if (errorFields.some(field => ['title', 'description', 'price'].includes(field))) {
         goToStep(1);
       } else if (errorFields.some(field => ['brand', 'model', 'year', 'fuelType', 'adType', 'realEstateType', 'heatingType', 'ownerType', 'squareMeters', 'roomCount'].includes(field))) {
@@ -52,7 +70,7 @@ export const useFormSubmission = (config) => {
         onError(error);
       }
     }
-  }, [submitFunction, validateAll, formData, errors, goToStep, notification, successMessage, errorMessage, redirectRoute, navigate, onSuccess, onError]);
+  }, [submitFunction, validateAll, formData, errors, goToStep, notification, successMessage, errorMessage, redirectRoute, navigate, onSuccess, onError, validateAllSteps, setFormErrors, formState]);
 
   return {
     handleSubmit
