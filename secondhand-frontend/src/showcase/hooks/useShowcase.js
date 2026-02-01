@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { showcaseService } from '../services/showcaseService.js';
-
-const SHOWCASE_KEYS = {
-    all: ['showcases'],
-    active: () => [...SHOWCASE_KEYS.all, 'active'],
-    userShowcases: () => [...SHOWCASE_KEYS.all, 'user']
-};
+import { SHOWCASE_QUERY_KEYS } from './queries.js';
 
 export const useShowcase = () => {
     const [error, setError] = useState(null);
@@ -18,7 +13,7 @@ export const useShowcase = () => {
         error: queryError,
         refetch: fetchShowcases
     } = useQuery({
-        queryKey: SHOWCASE_KEYS.active(),
+        queryKey: SHOWCASE_QUERY_KEYS.active(),
         queryFn: showcaseService.getActiveShowcases,
         staleTime: 5 * 60 * 1000, 
         gcTime: 10 * 60 * 1000, 
@@ -31,8 +26,8 @@ export const useShowcase = () => {
         mutationFn: ({ listingId, days, paymentType }) => 
             showcaseService.createShowcase(listingId, days, paymentType),
         onSuccess: () => {
-                        queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.userShowcases() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
         },
         onError: (err) => setError(err.message)
     });
@@ -41,8 +36,8 @@ export const useShowcase = () => {
         mutationFn: ({ showcaseId, days }) => 
             showcaseService.extendShowcase(showcaseId, days),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.userShowcases() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
         },
         onError: (err) => setError(err.message)
     });
@@ -50,8 +45,8 @@ export const useShowcase = () => {
         const cancelShowcaseMutation = useMutation({
         mutationFn: (showcaseId) => showcaseService.cancelShowcase(showcaseId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_KEYS.userShowcases() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
         },
         onError: (err) => setError(err.message)
     });
