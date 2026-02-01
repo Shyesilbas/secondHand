@@ -90,7 +90,12 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 
                 {/* Action Buttons Overlay (Top Right) */}
                 <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform translate-x-2 group-hover:translate-x-0">
-                    {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
+                    {showActions && (
+                        <ListingCardActions
+                            listing={listing}
+                            onChanged={onDeleted}
+                        />
+                    )}
                     {canMakeOffer && (
                         <button
                             onClick={(e) => {

@@ -1,20 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../common/constants/routes.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useShowcaseQuery } from '../../showcase/hooks/useShowcaseQuery.js';
-import { listingService } from '../services/listingService.js';
-import ShowcaseModal from '../../showcase/components/ShowcaseModal.jsx';
-import CreateCampaignModal from '../../campaign/components/CreateCampaignModal.jsx';
+import { useListingActions } from '../hooks/useListingActions.js';
 
 const ListingCardActions = ({ listing, onChanged }) => {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const notification = useNotification();
-  const [isShowcaseModalOpen, setIsShowcaseModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
   const { isInShowcase } = useShowcaseQuery();
   const dropdownRef = useRef(null);
 
@@ -22,6 +13,12 @@ const ListingCardActions = ({ listing, onChanged }) => {
   if (!isOwner) return null;
 
   const listingInShowcase = isInShowcase(listing.id);
+
+  const actions = useListingActions({
+    listing,
+    onChanged,
+    onCloseMenu: () => setIsDropdownOpen(false),
+  });
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,96 +32,6 @@ const ListingCardActions = ({ listing, onChanged }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  const handleEdit = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    navigate(ROUTES.EDIT_LISTING(listing.id));
-  };
-
-  const handleDeactivate = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    try {
-      await listingService.deactivateListing(listing.id);
-      onChanged && onChanged(listing.id);
-    } catch (err) {
-      console.error('Deactivate failed', err);
-    }
-  };
-
-  const handleReactivate = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    try {
-      await listingService.activateListing(listing.id);
-      onChanged && onChanged(listing.id);
-    } catch (err) {
-            console.error('Reactivate failed', err);
-    }
-  };
-
-  const handleMarkAsSold = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    notification.showConfirmation(
-        'Mark As Sold?',
-        'Are you sure you want to mark this listing as sold? This action cannot be reverted.',
-        async() => {
-          await listingService.markListingSold(listing.id);
-          onChanged && onChanged(listing.id);
-          notification.showSuccess('Successful', 'Listing Mark As Sold');
-        },
-        () => {}
-    );
-  };
-
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    notification.showConfirmation(
-      'Delete Listings',
-      'Are you sure you want to delete this listing? This action cannot be reverted.',
-      async () => {
-        await listingService.deleteListing(listing.id);
-        onChanged && onChanged(listing.id);
-        notification.showSuccess('Successful', 'Listing Deleted');
-      },
-      () => {}
-    );
-  };
-
-  const handleShowcase = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    console.log('Showcase açılıyor, listingId:', listing.id);
-    setIsShowcaseModalOpen(true);
-  };
-
-  const handleCreateCampaign = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    setIsCampaignModalOpen(true);
-  };
-
-  const handleShowcaseSuccess = () => {
-    onChanged && onChanged(listing.id);
-    notification.showSuccess('Successful', 'Listing added to showcase successfully!');
-  };
-
-  const handlePayListingFee = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDropdownOpen(false);
-    navigate(`${ROUTES.PAY_LISTING_FEE}?listingId=${listing.id}`);
-  };
 
   const canEdit = listing.status !== 'SOLD';
 
@@ -149,7 +56,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
           <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
             {canEdit && (
               <button
-                onClick={handleEdit}
+                onClick={actions.handleEdit}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +68,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
             {listing.status === 'DRAFT' && (
               <button
-                onClick={handlePayListingFee}
+                onClick={actions.handlePayListingFee}
                 className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +80,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
             {listing.status === 'ACTIVE' && (
               <button
-                onClick={handleDeactivate}
+                onClick={actions.handleDeactivate}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +92,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
             {listing.status === 'INACTIVE' && (
               <button
-                onClick={handleReactivate}
+                onClick={actions.handleReactivate}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,7 +104,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
             {listing.status !== 'SOLD' && (
               <button
-                onClick={handleMarkAsSold}
+                onClick={actions.handleMarkAsSold}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +116,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
 
             {listing.status === 'ACTIVE' && !listingInShowcase && (
               <button
-                onClick={handleShowcase}
+                onClick={actions.handleOpenShowcase}
                 className="w-full px-4 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +127,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
             )}
 
             <button
-              onClick={handleCreateCampaign}
+              onClick={actions.handleOpenCampaign}
               className="w-full px-4 py-2 text-left text-sm text-indigo-700 hover:bg-indigo-50 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +139,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
             <div className="border-t border-gray-100 my-1"></div>
             
             <button
-              onClick={handleDelete}
+              onClick={actions.handleDelete}
               className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,21 +150,6 @@ const ListingCardActions = ({ listing, onChanged }) => {
           </div>
         )}
       </div>
-      
-      <ShowcaseModal
-        isOpen={isShowcaseModalOpen}
-        onClose={() => setIsShowcaseModalOpen(false)}
-        listingId={listing.id}
-        listingTitle={listing.title}
-        onSuccess={handleShowcaseSuccess}
-      />
-
-      <CreateCampaignModal
-        isOpen={isCampaignModalOpen}
-        onClose={() => setIsCampaignModalOpen(false)}
-        onSuccess={() => onChanged && onChanged(listing.id)}
-        initialListingId={listing.id}
-      />
     </>
   );
 };

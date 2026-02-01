@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
-import { fetchExchangeRate } from '../services/exchangeService.js';
+import { fetchExchangeRate } from '../services/listingAddonService.js';
 import { ArrowRightLeft, RefreshCw, DollarSign, Euro, Globe } from 'lucide-react';
 
 const ExchangeRatesTab = ({ price, currency, listingId }) => {

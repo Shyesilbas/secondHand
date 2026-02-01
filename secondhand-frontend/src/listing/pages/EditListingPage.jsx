@@ -1,58 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
-import { electronicService } from '../../electronics/electronics/services/electronicService.js';
-import { vehicleService } from '../../vehicle/services/vehicleService.js';
-import { realEstateService } from '../../realEstate/services/realEstateService.js';
-import { clothingService } from '../../clothing/services/clothingService.js';
-import { booksService } from '../../books/services/booksService.js';
-import { sportsService } from '../../sports/services/sportsService.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { listingTypeRegistry } from '../components/typeRegistry.js';
+import { listingTypeRegistry } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { LISTING_TYPES } from '../types/index.js';
+import { getListingConfig } from '../config/listingConfig.js';
 import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
-
-// --- Service Configuration Strategy ---
-const SERVICE_STRATEGIES = {
-    [LISTING_TYPES.ELECTRONICS]: {
-        service: electronicService,
-        serviceMethod: 'getElectronicById',
-        updateMethod: 'updateElectronicListing'
-    },
-    [LISTING_TYPES.VEHICLE]: {
-        service: vehicleService,
-        serviceMethod: 'getVehicleById',
-        updateMethod: 'updateVehicleListing'
-    },
-    [LISTING_TYPES.REAL_ESTATE]: {
-        service: realEstateService,
-        serviceMethod: 'getRealEstateById',
-        updateMethod: 'updateRealEstateListing'
-    },
-    [LISTING_TYPES.CLOTHING]: {
-        service: clothingService,
-        serviceMethod: 'getClothingDetails',
-        updateMethod: 'updateClothingListing'
-    },
-    [LISTING_TYPES.BOOKS]: {
-        service: booksService,
-        serviceMethod: 'getBooksDetails',
-        updateMethod: 'updateBooksListing'
-    },
-    [LISTING_TYPES.SPORTS]: {
-        service: sportsService,
-        serviceMethod: 'getSportsDetails',
-        updateMethod: 'updateSportsListing'
-    }
-};
-
-const DEFAULT_SERVICE_STRATEGY = {
-    service: listingService,
-    serviceMethod: 'getListingById',
-    updateMethod: 'updateListing'
-};
 
 // --- Components ---
 
@@ -84,8 +38,6 @@ const PageError = ({ error, onBack }) => (
 
 const EditListingPage = ({
     service = null,
-    serviceMethod = null,
-    updateMethod = null,
     type = null,
     entityName = 'listing',
     entityNameCapitalized = 'Listing'
@@ -102,15 +54,14 @@ const EditListingPage = ({
     const fetchingRef = useRef(false);
 
     const serviceConfig = useMemo(() => {
-        if (service && serviceMethod) {
-            return { service, method: serviceMethod };
+        if (service) {
+            return service;
         }
         if (type) {
-            const strategy = SERVICE_STRATEGIES[type] || DEFAULT_SERVICE_STRATEGY;
-            return { service: strategy.service, method: strategy.serviceMethod };
+            return getListingConfig(type)?.service || null;
         }
         return null;
-    }, [type, service, serviceMethod]);
+    }, [type, service]);
 
     useEffect(() => {
         if (!id || fetchingRef.current) {
@@ -124,20 +75,21 @@ const EditListingPage = ({
             setError(null);
             try {
                 let initialData = null;
-                let activeService, activeMethod;
+                let activeService;
 
                 if (serviceConfig) {
-                    activeService = serviceConfig.service;
-                    activeMethod = serviceConfig.method;
+                    activeService = serviceConfig;
                 } else {
                     initialData = await listingService.getListingById(id);
                     const currentType = initialData?.type;
-                    const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
-                    activeService = strategy.service;
-                    activeMethod = strategy.serviceMethod;
+                    activeService = getListingConfig(currentType)?.service || null;
                 }
 
-                const fullData = await activeService[activeMethod](id);
+                if (!activeService?.getById) {
+                    throw new Error('Editor service not found for this listing type');
+                }
+
+                const fullData = await activeService.getById(id);
                 setData(fullData);
                 
             } catch (err) {
@@ -171,21 +123,20 @@ const EditListingPage = ({
     const handleUpdate = async (updatedFields) => {
         try {
             const currentType = type || data?.type;
-            const strategy = SERVICE_STRATEGIES[currentType] || DEFAULT_SERVICE_STRATEGY;
-            
-            const activeService = service || strategy.service;
-            const activeUpdateMethod = updateMethod || strategy.updateMethod;
+            const activeService = service || getListingConfig(currentType)?.service || null;
 
-            console.log('Updating listing:', { id, method: activeUpdateMethod, fields: updatedFields });
-            
-            await activeService[activeUpdateMethod](id, updatedFields);
+            if (!activeService?.update) {
+                throw new Error('Update service not found for this listing type');
+            }
+
+            await activeService.update(id, updatedFields);
             
             notification.showSuccess('Success', 'Listing updated successfully');
             navigate(ROUTES.MY_LISTINGS);
         } catch (err) {
             console.error('Update failed:', err);
             notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
-            throw err; // Propagate to form for internal error handling if needed
+            throw err;
         }
     };
 

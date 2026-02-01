@@ -16,11 +16,13 @@ const ListingsContent = React.memo(({
     getListingTypeLabel,
     onResetFilters,
     updateFilters,
-    titleSearchTerm
+    searchTerm,
+    searchMode,
+    onListingChanged,
 }) => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
-            {!isLoading && !titleSearchTerm && (
+            {!isLoading && (!searchTerm || searchMode === 'none') && (
                 <div className="mb-8">
                     <FilterStatus
                         totalElements={totalElements}
@@ -35,10 +37,15 @@ const ListingsContent = React.memo(({
             {isLoading ? (
                 <ListingsSkeleton />
             ) : (
-                <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} />
+                <ListingGrid
+                    listings={filteredListings}
+                    isLoading={isLoading}
+                    error={error}
+                    onDeleted={onListingChanged}
+                />
             )}
             
-            {!isLoading && !titleSearchTerm && totalPages > 1 && (
+            {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && (
                 <div className="mt-12 flex justify-center">
                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-2">
                         <Pagination

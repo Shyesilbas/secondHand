@@ -60,7 +60,10 @@ const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListi
                                         </svg>
                                     )}
                                 </div>
-                                <ListingCardActions listing={listing} onChanged={onListingChanged} />
+                                <ListingCardActions
+                                    listing={listing}
+                                    onChanged={onListingChanged}
+                                />
                             </div>
                         </div>
                     </div>

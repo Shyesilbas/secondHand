@@ -1,6 +1,7 @@
 import {get, post, put, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { LISTING_TYPES } from '../types/index.js';
+import { filterConfigs } from '../components/filters/filterConfigs.js';
 
 const withErrorHandling = async (operation, errorMessage) => {
   try {
@@ -11,10 +12,8 @@ const withErrorHandling = async (operation, errorMessage) => {
   }
 };
 
-
-
-const createFilterPayload = (filters, listingType) => {
-  const typeUpper = listingType.toUpperCase();
+const serializeFilters = (filters, config, listingType) => {
+  const typeUpper = String(listingType || '').toUpperCase();
 
   const payload = {
     listingType: typeUpper,
@@ -31,107 +30,66 @@ const createFilterPayload = (filters, listingType) => {
     currency: filters.currency || null,
   };
 
-  switch (typeUpper) {
-    case LISTING_TYPES.VEHICLE:
-      payload.vehicleTypeIds = Array.isArray(filters.vehicleTypeIds) ? filters.vehicleTypeIds : [];
-      payload.brandIds = Array.isArray(filters.brandIds) ? filters.brandIds : [];
-      payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
-      payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
-      payload.maxMileage = filters.maxMileage ? parseInt(filters.maxMileage) : null;
-      payload.fuelTypes = Array.isArray(filters.fuelTypes) ? filters.fuelTypes : [];
-      payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
-      payload.doors = filters.doors || null;
-      payload.gearTypes = Array.isArray(filters.gearTypes) ? filters.gearTypes : [];
-      payload.seatCounts = Array.isArray(filters.seatCounts) ? filters.seatCounts : [];
-      payload.drivetrains = Array.isArray(filters.drivetrains) ? filters.drivetrains : [];
-      payload.bodyTypes = Array.isArray(filters.bodyTypes) ? filters.bodyTypes : [];
-      break;
+  const fields = config?.getFields?.() || [];
 
-    case LISTING_TYPES.ELECTRONICS:
-      payload.electronicTypeIds = Array.isArray(filters.electronicTypeIds) ? filters.electronicTypeIds : [];
-      payload.electronicBrandIds = Array.isArray(filters.electronicBrandIds) ? filters.electronicBrandIds : [];
-      payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
-      payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
-      payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
-      payload.minRam = filters.minRam ? parseInt(filters.minRam) : null;
-      payload.maxRam = filters.maxRam ? parseInt(filters.maxRam) : null;
-      payload.minStorage = filters.minStorage ? parseInt(filters.minStorage) : null;
-      payload.maxStorage = filters.maxStorage ? parseInt(filters.maxStorage) : null;
-      payload.storageTypes = Array.isArray(filters.storageTypes) ? filters.storageTypes : [];
-      payload.processors = Array.isArray(filters.processors) ? filters.processors : [];
-      payload.minScreenSize = filters.minScreenSize ? parseInt(filters.minScreenSize) : null;
-      payload.maxScreenSize = filters.maxScreenSize ? parseInt(filters.maxScreenSize) : null;
-      payload.minBatteryHealthPercent = filters.minBatteryHealthPercent ? parseInt(filters.minBatteryHealthPercent) : null;
-      payload.maxBatteryHealthPercent = filters.maxBatteryHealthPercent ? parseInt(filters.maxBatteryHealthPercent) : null;
-      payload.minBatteryCapacityMah = filters.minBatteryCapacityMah ? parseInt(filters.minBatteryCapacityMah) : null;
-      payload.maxBatteryCapacityMah = filters.maxBatteryCapacityMah ? parseInt(filters.maxBatteryCapacityMah) : null;
-      payload.minCameraMegapixels = filters.minCameraMegapixels ? parseInt(filters.minCameraMegapixels) : null;
-      payload.maxCameraMegapixels = filters.maxCameraMegapixels ? parseInt(filters.maxCameraMegapixels) : null;
-      payload.supports5g = filters.supports5g === true ? true : (filters.supports5g === false ? false : null);
-      payload.dualSim = filters.dualSim === true ? true : (filters.dualSim === false ? false : null);
-      payload.hasNfc = filters.hasNfc === true ? true : (filters.hasNfc === false ? false : null);
-      payload.connectionTypes = Array.isArray(filters.connectionTypes) ? filters.connectionTypes : [];
-      payload.wireless = filters.wireless === true ? true : (filters.wireless === false ? false : null);
-      payload.noiseCancelling = filters.noiseCancelling === true ? true : (filters.noiseCancelling === false ? false : null);
-      payload.hasMicrophone = filters.hasMicrophone === true ? true : (filters.hasMicrophone === false ? false : null);
-      payload.minBatteryLifeHours = filters.minBatteryLifeHours ? parseInt(filters.minBatteryLifeHours) : null;
-      payload.maxBatteryLifeHours = filters.maxBatteryLifeHours ? parseInt(filters.maxBatteryLifeHours) : null;
-      break;
+  const toInt = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number.parseInt(value, 10);
+    return Number.isFinite(n) ? n : null;
+  };
 
-    case LISTING_TYPES.REAL_ESTATE:
-      payload.realEstateTypeIds = Array.isArray(filters.realEstateTypeIds) ? filters.realEstateTypeIds : [];
-      payload.heatingTypeIds = Array.isArray(filters.heatingTypeIds) ? filters.heatingTypeIds : [];
-      payload.adTypeId = filters.adTypeId || null;
-      payload.ownerTypeId = filters.ownerTypeId || null;
-      payload.minSquareMeters = filters.minSquareMeters ? parseInt(filters.minSquareMeters) : null;
-      payload.maxSquareMeters = filters.maxSquareMeters ? parseInt(filters.maxSquareMeters) : null;
-      payload.minRoomCount = filters.minRoomCount ? parseInt(filters.minRoomCount) : null;
-      payload.maxRoomCount = filters.maxRoomCount ? parseInt(filters.maxRoomCount) : null;
-      payload.minBathroomCount = filters.minBathroomCount ? parseInt(filters.minBathroomCount) : null;
-      payload.maxBathroomCount = filters.maxBathroomCount ? parseInt(filters.maxBathroomCount) : null;
-      payload.floor = filters.floor ? parseInt(filters.floor) : null;
-      payload.minBuildingAge = filters.minBuildingAge ? parseInt(filters.minBuildingAge) : null;
-      payload.maxBuildingAge = filters.maxBuildingAge ? parseInt(filters.maxBuildingAge) : null;
-      payload.furnished = Boolean(filters.furnished);
-      payload.zoningStatus = (filters.zoningStatus || '').trim() || null;
-      break;
+  const toText = (value) => {
+    const t = String(value ?? '').trim();
+    return t ? t : null;
+  };
 
-    case LISTING_TYPES.CLOTHING:
-      payload.brands = Array.isArray(filters.brands) ? filters.brands : [];
-      payload.types = Array.isArray(filters.types) ? filters.types : [];
-      payload.conditions = Array.isArray(filters.conditions) ? filters.conditions : [];
-      payload.colors = Array.isArray(filters.colors) ? filters.colors : [];
-      payload.clothingGenders = Array.isArray(filters.clothingGenders) ? filters.clothingGenders : [];
-      payload.clothingCategories = Array.isArray(filters.clothingCategories) ? filters.clothingCategories : [];
-      payload.minPurchaseDate = filters.minPurchaseDate || null;
-      payload.maxPurchaseDate = filters.maxPurchaseDate || null;
-      payload.sizes = Array.isArray(filters.sizes) ? filters.sizes : [];
-      payload.minShoeSizeEu = filters.minShoeSizeEu ? parseInt(filters.minShoeSizeEu) : null;
-      payload.maxShoeSizeEu = filters.maxShoeSizeEu ? parseInt(filters.maxShoeSizeEu) : null;
-      payload.material = (filters.material || '').trim() || null;
-      break;
+  const ensureArray = (value) => (Array.isArray(value) ? value : []);
 
-    case LISTING_TYPES.BOOKS:
-      payload.bookTypeIds = Array.isArray(filters.bookTypeIds) ? filters.bookTypeIds : [];
-      payload.genreIds = Array.isArray(filters.genreIds) ? filters.genreIds : [];
-      payload.languageIds = Array.isArray(filters.languageIds) ? filters.languageIds : [];
-      payload.formatIds = Array.isArray(filters.formatIds) ? filters.formatIds : [];
-      payload.conditionIds = Array.isArray(filters.conditionIds) ? filters.conditionIds : [];
-      payload.minYear = filters.minYear ? parseInt(filters.minYear) : null;
-      payload.maxYear = filters.maxYear ? parseInt(filters.maxYear) : null;
-      payload.minPageCount = filters.minPageCount ? parseInt(filters.minPageCount) : null;
-      payload.maxPageCount = filters.maxPageCount ? parseInt(filters.maxPageCount) : null;
-      break;
+  fields.forEach((field) => {
+    if (!field?.key) return;
 
-    case LISTING_TYPES.SPORTS:
-      payload.disciplineIds = Array.isArray(filters.disciplineIds) ? filters.disciplineIds : [];
-      payload.equipmentTypeIds = Array.isArray(filters.equipmentTypeIds) ? filters.equipmentTypeIds : [];
-      payload.conditionIds = Array.isArray(filters.conditionIds) ? filters.conditionIds : [];
-      break;
+    if (field.type === 'enum') {
+      if (field.multiple === false) {
+        const v = filters[field.key];
+        payload[field.key] = Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
+      } else {
+        payload[field.key] = ensureArray(filters[field.key]);
+      }
+      return;
+    }
 
-    default:
-      console.warn(`Unknown listing type in payload creation: ${typeUpper}`);
-  }
+    if (field.type === 'numericRange') {
+      const minKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+      const maxKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+
+      if (field.key === 'mileage') {
+        payload.maxMileage = toInt(filters[maxKey]);
+        return;
+      }
+
+      if (field.key === 'floor') {
+        payload.floor = toInt(filters[maxKey] ?? filters[minKey]);
+        return;
+      }
+
+      payload[minKey] = toInt(filters[minKey]);
+      payload[maxKey] = toInt(filters[maxKey]);
+      return;
+    }
+
+    if (field.type === 'dateRange') {
+      const minDateKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+      const maxDateKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+      payload[minDateKey] = toText(filters[minDateKey]);
+      payload[maxDateKey] = toText(filters[maxDateKey]);
+      return;
+    }
+
+    if (field.type === 'text') {
+      payload[field.key] = toText(filters[field.key]);
+      return;
+    }
+  });
 
   return payload;
 };
@@ -199,7 +157,9 @@ export const listingService = {
       };
     }
 
-    const payload = createFilterPayload(filters, listingType);
+    const typeUpper = listingType.toUpperCase();
+    const config = filterConfigs[typeUpper];
+    const payload = serializeFilters(filters, config, typeUpper);
 
     return withErrorHandling(
         () => post(API_ENDPOINTS.LISTINGS.FILTER, payload),
