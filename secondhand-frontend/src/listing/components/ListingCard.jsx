@@ -229,6 +229,8 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
                 listingTitle={listing.title}
                 price={displayPrice}
                 currency={listing.currency}
+                isOwner={isOwner}
+                viewStats={listing.viewStats || null}
             />
 
             <MakeOfferModal

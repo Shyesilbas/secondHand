@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useAuth} from '../../../auth/AuthContext.jsx';
 import {ROUTES} from '../../constants/routes.js';
@@ -14,8 +14,8 @@ import {emailService} from '../../../emails/services/emailService.js';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useCart} from '../../../cart/hooks/useCart.js';
 import {usePendingCompletionOrders} from '../../../order/hooks/useOrderFlow.js';
-import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {useEnums} from '../../hooks/useEnums.js';
+import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {
     ChevronDown,
     CreditCard,
@@ -66,8 +66,8 @@ const Header = () => {
 
     const { totalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
     const { hasPendingOrders } = usePendingCompletionOrders({ enabled: isAuthenticated });
-    const { countsByCategory } = useListingStatistics({ enabled: isAuthenticated });
     const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
+    const { countsByCategory } = useListingStatistics({ enabled: isAuthenticated });
 
     const { data: unreadEmailCount = 0 } = useQuery({
         queryKey: ['emails', 'unread-count', user?.id],
@@ -132,7 +132,7 @@ const Header = () => {
                     {/* Desktop Navigation */}
                     {isAuthenticated && (
                         <nav className="hidden lg:flex items-center gap-1">
-                            <NavLink to={ROUTES.LISTINGS}>Marketplace</NavLink>
+                            <NavLink to={ROUTES.FORUM}>Forum</NavLink>
                             <NavLink to={ROUTES.CREATE_LISTING}>Sell</NavLink>
                             <div className="h-4 w-[1px] bg-gray-300 mx-2" />
 
@@ -151,8 +151,8 @@ const Header = () => {
                                 {categoriesMenuOpen && (
                                     <div className="absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50 max-h-[500px] overflow-y-auto">
                                         {enums?.listingTypes?.map((category) => {
-                                            const count = countsByCategory[category.value] ?? 0;
                                             const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
+                                            const count = countsByCategory?.[category.value] ?? 0;
                                             return (
                                                 <Link
                                                     key={category.value}
