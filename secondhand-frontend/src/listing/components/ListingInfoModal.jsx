@@ -4,31 +4,10 @@ import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
 import PriceHistoryTab from './PriceHistoryTab.jsx';
 import ExchangeRatesTab from './ExchangeRatesTab.jsx';
-import { X, TrendingUp, RefreshCw, DollarSign } from 'lucide-react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-} from 'chart.js';
+import ViewStatisticsCard from './ViewStatisticsCard.jsx';
+import { X, TrendingUp, RefreshCw, Eye } from 'lucide-react';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, currency }) => {
+const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, currency, isOwner, viewStats }) => {
   const [activeTab, setActiveTab] = useState('history');
   const { priceHistory, loading: historyLoading, error: historyError, fetchPriceHistory } = usePriceHistory(listingId);
 
@@ -107,6 +86,21 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
                 <RefreshCw className="w-4 h-4" />
                 Currency Converter
               </button>
+              {isOwner && (
+                <button
+                  onClick={() => setActiveTab('views')}
+                  className={`
+                    flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                    ${activeTab === 'views' 
+                      ? 'bg-indigo-600 text-white shadow-md' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }
+                  `}
+                >
+                  <Eye className="w-4 h-4" />
+                  Views
+                </button>
+              )}
             </div>
           </div>
 
@@ -126,6 +120,25 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
                 currency={currency}
                 listingId={listingId}
               />
+            )}
+
+            {activeTab === 'views' && (
+              <div className="animate-fade-in">
+                {viewStats ? (
+                  <ViewStatisticsCard
+                    viewStats={viewStats}
+                    periodDays={viewStats?.periodDays || 7}
+                  />
+                ) : (
+                  <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+                    <div className="mx-auto w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center mb-3">
+                      <Eye className="w-5 h-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-900">No view statistics available</p>
+                    <p className="text-sm text-slate-500 mt-1">We couldn't find view data for this listing.</p>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
