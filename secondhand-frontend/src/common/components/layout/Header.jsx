@@ -13,7 +13,7 @@ import {useQuery} from '@tanstack/react-query';
 import {emailService} from '../../../emails/services/emailService.js';
 import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
 import {useCart} from '../../../cart/hooks/useCart.js';
-import {usePendingCompletionOrders} from '../../../order/hooks/useOrderFlow.js';
+import {usePendingCompletionOrders} from '../../../order/index.js';
 import {useEnums} from '../../hooks/useEnums.js';
 import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
 import {
@@ -308,7 +308,7 @@ const Header = () => {
                                             onClick={dropdowns.closeAll}
                                                 className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50/80 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer"
                                             >
-                                                <Package className="w-4 h-4 mr-3" /> Inventory
+                                                <Package className="w-4 h-4 mr-3" /> My Listings
                                             </Link>
                                             <Link
                                                 to={user?.id ? ROUTES.USER_PROFILE(user.id) : ROUTES.DASHBOARD}

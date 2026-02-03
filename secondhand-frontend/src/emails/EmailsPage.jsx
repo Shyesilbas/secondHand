@@ -1,39 +1,35 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, EnvelopeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { MailOpen } from 'lucide-react';
+import { ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Bell, CreditCard, MailOpen, Megaphone, RefreshCw, Shield, Tag, Trash2 } from 'lucide-react';
 import { emailService } from './services/emailService.js';
 import { useNotification } from '../notification/NotificationContext.jsx';
 import { parseError, handleError } from '../common/errorHandler.js';
 import { extractSuccessMessage } from '../common/successHandler.js';
 import EmailListItem from '../emails/components/EmailListItem';
 import EmailContent from '../emails/components/EmailContent';
-import EmailFilterTabs from '../emails/components/EmailFilterTabs';
-import EmptyState from '../common/components/ui/EmptyState.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { EMAIL_TYPES } from './emails.js';
 
 const EmailsPageLoader = () => (
-    <div className="min-h-screen bg-background-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-slate-50">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-6">
             <div className="animate-pulse space-y-8">
-                {/* Header skeleton */}
                 <div className="space-y-4">
                     <div className="h-8 bg-secondary-200 rounded w-1/4"></div>
                     <div className="h-4 bg-secondary-200 rounded w-1/2"></div>
                 </div>
                 
-                {/* Search and filters skeleton */}
-                <div className="bg-background-primary rounded-lg border border-border-light p-6">
+                <div className="bg-white rounded-xl border border-slate-200 p-6">
                     <div className="flex items-center space-x-4">
                         <div className="h-10 bg-secondary-200 rounded w-1/3"></div>
                         <div className="h-10 bg-secondary-200 rounded w-32"></div>
                     </div>
                 </div>
                 
-                {/* Main content skeleton */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-1 bg-background-primary rounded-lg border border-border-light overflow-hidden">
+                    <div className="lg:col-span-1 bg-white rounded-xl border border-slate-200 overflow-hidden">
                         <div className="p-4 border-b border-border-light">
                             <div className="h-6 bg-secondary-200 rounded w-1/3"></div>
                         </div>
@@ -47,7 +43,7 @@ const EmailsPageLoader = () => (
                             ))}
                         </div>
                     </div>
-                    <div className="lg:col-span-2 bg-background-primary rounded-lg border border-border-light p-6">
+                    <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
                         <div className="space-y-4">
                             <div className="h-6 bg-secondary-200 rounded w-1/2"></div>
                             {[...Array(8)].map((_, i) => (
@@ -97,59 +93,12 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
     return null;
 };
 
-const EmailsGrid = ({ emails, selectedEmail, setSelectedEmail, handleDeleteEmail, isDeleting, pageInfo, onPageChange }) => (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-0 bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-        {/* Email List */}
-        <div className="lg:col-span-2 border-r border-slate-200/60 bg-slate-50/30 flex flex-col h-[calc(100vh-280px)] min-h-[600px]">
-            <div className="px-5 py-4 border-b border-slate-200/60 bg-white/80 backdrop-blur-sm">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</h3>
-                        <p className="text-xs text-slate-500 mt-0.5 tracking-tight">
-                            {pageInfo.totalElements} {pageInfo.totalElements === 1 ? 'email' : 'emails'} total
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            disabled={pageInfo.page === 0}
-                            onClick={() => onPageChange(pageInfo.page - 1)}
-                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
-                        >
-                            Prev
-                        </button>
-                        <span className="text-xs text-slate-500">
-                            Page {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
-                        </span>
-                        <button
-                            disabled={pageInfo.page + 1 >= pageInfo.totalPages}
-                            onClick={() => onPageChange(pageInfo.page + 1)}
-                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                {emails.map((email, i) => (
-                    <EmailListItem
-                        key={i}
-                        email={email}
-                        isSelected={selectedEmail === email}
-                        onSelect={setSelectedEmail}
-                        onDelete={handleDeleteEmail}
-                        isDeleting={isDeleting}
-                    />
-                ))}
-            </div>
-        </div>
-        
-        {/* Email Content */}
-        <div className="lg:col-span-3 bg-white h-[calc(100vh-280px)] min-h-[600px] overflow-y-auto">
-            <EmailContent email={selectedEmail} />
-        </div>
-    </div>
-);
+const getEmailMatchesFilter = (email, filterType) => {
+    if (filterType === 'ALL') return true;
+    if (filterType === 'OFFER') return String(email?.emailType || '').startsWith('OFFER_');
+    if (filterType === 'SECURITY') return [EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.PASSWORD_RESET].includes(email?.emailType);
+    return email?.emailType === filterType;
+};
 
 const EmailsPage = () => {
     const navigate = useNavigate();
@@ -162,6 +111,7 @@ const EmailsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(0);
     const pageSize = 20;
+    const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
 
     useEffect(() => {
         setSelectedEmail(null);
@@ -198,7 +148,6 @@ const EmailsPage = () => {
         notification.showConfirmation(`Delete ${title}`, `Are you sure you want to delete "${title}"?`, async () => {
             try {
                 setIsDeleting(true);
-                await deleteFunc();
                 const res = await deleteFunc();
                 const msg = typeof res === 'string' ? res : extractSuccessMessage(res);
                 if (msg) {
@@ -238,7 +187,7 @@ const EmailsPage = () => {
     });
 
     const filteredEmails = useMemo(() => {
-            const byType = filterType === 'ALL' ? emails : emails.filter(email => email.emailType === filterType);
+            const byType = emails.filter((email) => getEmailMatchesFilter(email, filterType));
             if (!searchTerm || !searchTerm.trim()) return byType;
             const q = searchTerm.toLowerCase().trim();
             return byType.filter(e =>
@@ -250,80 +199,221 @@ const EmailsPage = () => {
         }, [emails, filterType, searchTerm]
     );
 
+    const folderItems = useMemo(() => ([
+        { id: 'ALL', label: 'Inbox', icon: MailOpen },
+        { id: 'OFFER', label: 'Offers', icon: Tag },
+        { id: 'SECURITY', label: 'Security', icon: Shield },
+        { id: EMAIL_TYPES.PAYMENT_VERIFICATION, label: 'Payments', icon: CreditCard },
+        { id: EMAIL_TYPES.NOTIFICATION, label: 'Notifications', icon: Bell },
+        { id: EMAIL_TYPES.PROMOTIONAL, label: 'Promotions', icon: Megaphone },
+    ]), []);
+
+    const counts = useMemo(() => {
+        const base = emails || [];
+        return folderItems.reduce((acc, item) => {
+            acc[item.id] = base.filter((e) => getEmailMatchesFilter(e, item.id)).length;
+            return acc;
+        }, {});
+    }, [emails, folderItems]);
+
+    const onSelectEmail = useCallback((email) => {
+        setSelectedEmail(email);
+        setMobileDetailOpen(true);
+    }, []);
+
     if (isLoading) return <EmailsPageLoader />;
 
     return (
         <div className="min-h-screen bg-slate-50">
-            <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-6">
-                {/* Header Section */}
-                <div className="mb-6">
-                    <div className="flex items-center space-x-4">
+            <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="h-9 px-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-300 inline-flex items-center gap-2"
+                        type="button"
+                    >
+                        <ArrowLeftIcon className="w-5 h-5" />
+                        <span className="text-sm font-medium tracking-tight hidden sm:inline">Back</span>
+                    </button>
+
+                    <div className="flex-1">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search mail"
+                                className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 text-sm"
+                            />
+                            <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
                         <button
-                            onClick={() => navigate(-1)}
-                            className="flex items-center text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out px-3 py-2 rounded-xl hover:bg-slate-100/50"
+                            type="button"
+                            onClick={() => queryClient.invalidateQueries({ queryKey: ['myEmails', user?.id] })}
+                            className="h-9 w-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300"
+                            title="Refresh"
                         >
-                            <ArrowLeftIcon className="w-5 h-5 mr-2" />
-                            <span className="text-sm font-medium tracking-tight">Back</span>
+                            <RefreshCw className="w-4 h-4" />
                         </button>
-                        <div className="h-6 w-px bg-slate-200"></div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-                                Email History
-                            </h1>
-                            <p className="text-sm text-slate-500 mt-1 tracking-tight">
-                                View and manage all emails sent to your account
-                            </p>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={handleDeleteAllEmails}
+                            disabled={isDeleting || filteredEmails.length === 0}
+                            className="h-9 w-9 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                            title="Delete all"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                {/* Search and Filters Section - Sticky */}
-                <div className="sticky top-0 z-40 mb-6 bg-white/80 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-sm">
-                    <div className="p-5">
-                        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                            <div className="flex-1">
-                                <div className="relative group">
-                                    <input
-                                        type="text"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        placeholder="Search emails by subject, sender, recipient, or content"
-                                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 ease-in-out text-sm tracking-tight"
-                                    />
-                                    <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-300 ease-in-out group-focus-within:text-indigo-500" />
-                                </div>
-                            </div>
-                            <div className="flex-none">
-                                <EmailFilterTabs 
-                                    filterType={filterType} 
-                                    onFilterChange={setFilterType} 
-                                    onDeleteAll={handleDeleteAllEmails} 
-                                    hasEmails={filteredEmails.length > 0} 
-                                    isDeleting={isDeleting} 
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Feedback Section */}
-                <EmailsPageFeedback 
-                    error={error ? parseError(error).message : null} 
-                    emails={filteredEmails} 
-                    filterType={filterType} 
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <EmailsPageFeedback
+                    error={error ? parseError(error).message : null}
+                    emails={filteredEmails}
+                    filterType={filterType}
                 />
 
-                {/* Main Content */}
                 {filteredEmails.length > 0 && (
-                    <EmailsGrid
-                        emails={filteredEmails}
-                        selectedEmail={selectedEmail}
-                        setSelectedEmail={setSelectedEmail}
-                        handleDeleteEmail={handleDeleteEmail}
-                        isDeleting={isDeleting}
-                        pageInfo={pageInfo}
-                        onPageChange={setPage}
-                    />
+                    <div className="hidden lg:grid grid-cols-12 gap-4">
+                        <aside className="col-span-2">
+                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                <div className="px-3 py-3 border-b border-slate-100">
+                                    <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Folders</p>
+                                </div>
+                                <div className="p-2">
+                                    {folderItems.map((item) => {
+                                        const Icon = item.icon;
+                                        const active = filterType === item.id;
+                                        return (
+                                            <button
+                                                key={item.id}
+                                                type="button"
+                                                onClick={() => { setFilterType(item.id); setSelectedEmail(null); setMobileDetailOpen(false); }}
+                                                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-300 ${active ? 'bg-indigo-50 text-indigo-900' : 'text-slate-700 hover:bg-slate-50'}`}
+                                            >
+                                                <span className="flex items-center gap-2 min-w-0">
+                                                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-600' : 'text-slate-500'}`} />
+                                                    <span className="truncate">{item.label}</span>
+                                                </span>
+                                                <span className="text-xs text-slate-500 tabular-nums">{counts[item.id] ?? 0}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </aside>
+
+                        <section className="col-span-4">
+                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">{pageInfo.totalElements} total</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            disabled={pageInfo.page === 0}
+                                            onClick={() => setPage(pageInfo.page - 1)}
+                                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                                            type="button"
+                                        >
+                                            Prev
+                                        </button>
+                                        <span className="text-xs text-slate-500 tabular-nums">
+                                            {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
+                                        </span>
+                                        <button
+                                            disabled={pageInfo.page + 1 >= pageInfo.totalPages}
+                                            onClick={() => setPage(pageInfo.page + 1)}
+                                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                                            type="button"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="h-[calc(100vh-190px)] overflow-y-auto">
+                                    {filteredEmails.map((email) => (
+                                        <EmailListItem
+                                            key={email.id}
+                                            email={email}
+                                            isSelected={selectedEmail?.id === email.id}
+                                            onSelect={onSelectEmail}
+                                            onDelete={handleDeleteEmail}
+                                            isDeleting={isDeleting}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="col-span-6">
+                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden h-[calc(100vh-190px)]">
+                                <div className="h-full overflow-y-auto">
+                                    <EmailContent email={selectedEmail} />
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {filteredEmails.length > 0 && (
+                    <div className="lg:hidden">
+                        {!mobileDetailOpen && (
+                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                                    <p className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</p>
+                                    <span className="text-xs text-slate-500 tabular-nums">{filteredEmails.length}</span>
+                                </div>
+                                <div className="max-h-[70vh] overflow-y-auto">
+                                    {filteredEmails.map((email) => (
+                                        <EmailListItem
+                                            key={email.id}
+                                            email={email}
+                                            isSelected={selectedEmail?.id === email.id}
+                                            onSelect={onSelectEmail}
+                                            onDelete={handleDeleteEmail}
+                                            isDeleting={isDeleting}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {mobileDetailOpen && (
+                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileDetailOpen(false)}
+                                        className="text-sm font-medium text-slate-700 hover:text-slate-900"
+                                    >
+                                        Back to list
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id, selectedEmail.subject);
+                                        }}
+                                        disabled={isDeleting || !selectedEmail?.id}
+                                        className="h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <div className="max-h-[70vh] overflow-y-auto">
+                                    <EmailContent email={selectedEmail} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
