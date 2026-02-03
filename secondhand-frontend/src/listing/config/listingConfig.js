@@ -409,7 +409,8 @@ export const listingTypeConfig = {
         queryParamKey: 'vehicleTypeId',
         initialDataKey: 'vehicleTypeId',
         title: 'Choose vehicle type',
-        description: 'Select a type to tailor the form fields.'
+        description: 'Select a type to tailor the form fields.',
+        paramKey: 'vehicleTypeIds',
       },
       preFormSelectors: [
         {
@@ -419,6 +420,22 @@ export const listingTypeConfig = {
           description: 'Select a brand to narrow model options.',
           kind: 'searchable',
           dependsOn: ['vehicleTypeId'],
+          paramKey: 'brandIds',
+          getOptions: ({ enums, selection }) => {
+            const allBrands = enums?.carBrands || [];
+            const typeId = selection?.vehicleTypeId;
+            if (!typeId) return allBrands;
+            const models = enums?.vehicleModels || [];
+            const brandIds = new Set(
+              models
+                .filter((m) => String(m?.typeId ?? m?.type_id ?? '') === String(typeId))
+                .map((m) => m?.brandId ?? m?.brand_id)
+                .filter(Boolean)
+                .map((x) => String(x))
+            );
+            if (brandIds.size === 0) return allBrands;
+            return allBrands.filter((b) => brandIds.has(String(b?.id ?? b?.value ?? '')));
+          },
         },
         {
           enumKey: 'vehicleModels',
@@ -427,6 +444,7 @@ export const listingTypeConfig = {
           description: 'Select a model to tailor the form fields.',
           kind: 'searchable',
           dependsOn: ['vehicleTypeId', 'brandId'],
+          paramKey: 'vehicleModelIds',
           getOptions: ({ enums, selection }) => {
             const typeId = selection?.vehicleTypeId;
             const brandId = selection?.brandId;
@@ -699,7 +717,8 @@ export const listingTypeConfig = {
         queryParamKey: 'electronicTypeId',
         initialDataKey: 'electronicTypeId',
         title: 'Choose electronics type',
-        description: 'Select a type to tailor the form fields.'
+        description: 'Select a type to tailor the form fields.',
+        paramKey: 'electronicTypeIds',
       },
       preFormSelectors: [
         {
@@ -709,6 +728,7 @@ export const listingTypeConfig = {
           description: 'Select a brand to narrow model options.',
           kind: 'searchable',
           dependsOn: ['electronicTypeId'],
+          paramKey: 'electronicBrandIds',
         },
         {
           enumKey: 'electronicModels',
@@ -717,6 +737,7 @@ export const listingTypeConfig = {
           description: 'Select a model to tailor the form fields.',
           kind: 'searchable',
           dependsOn: ['electronicTypeId', 'electronicBrandId'],
+          paramKey: 'electronicModelIds',
           getOptions: ({ enums, selection }) => {
             const brandId = selection?.electronicBrandId;
             const typeId = selection?.electronicTypeId;
@@ -927,7 +948,8 @@ export const listingTypeConfig = {
         queryParamKey: 'realEstateTypeId',
         initialDataKey: 'realEstateTypeId',
         title: 'Choose property type',
-        description: 'Select a type to tailor the form fields.'
+        description: 'Select a type to tailor the form fields.',
+        paramKey: 'realEstateTypeIds',
       },
       preFormSelectors: [
         {
@@ -937,6 +959,7 @@ export const listingTypeConfig = {
           description: 'Select an ad type to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['realEstateTypeId'],
+          paramKey: 'adTypeId',
         },
         {
           enumKey: 'heatingTypes',
@@ -945,6 +968,7 @@ export const listingTypeConfig = {
           description: 'Select a heating type to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['realEstateTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'ownerTypes',
@@ -953,6 +977,7 @@ export const listingTypeConfig = {
           description: 'Select an owner type to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['realEstateTypeId'],
+          paramKey: 'ownerTypeId',
         },
       ],
     },
@@ -1148,7 +1173,8 @@ export const listingTypeConfig = {
         queryParamKey: 'clothingTypeId',
         initialDataKey: 'clothingTypeId',
         title: 'Choose clothing type',
-        description: 'Select a type to tailor the form fields.'
+        description: 'Select a type to tailor the form fields.',
+        paramKey: 'types',
       },
       preFormSelectors: [
         {
@@ -1158,6 +1184,7 @@ export const listingTypeConfig = {
           description: 'Select a brand to tailor the form fields.',
           kind: 'searchable',
           dependsOn: ['clothingTypeId'],
+          paramKey: 'brands',
         },
         {
           enumKey: 'colors',
@@ -1166,6 +1193,7 @@ export const listingTypeConfig = {
           description: 'Select a color to tailor the form fields.',
           kind: 'searchable',
           dependsOn: ['clothingTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'clothingConditions',
@@ -1174,6 +1202,7 @@ export const listingTypeConfig = {
           description: 'Select a condition to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['clothingTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'clothingGenders',
@@ -1182,6 +1211,7 @@ export const listingTypeConfig = {
           description: 'Select a clothing gender to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['clothingTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'clothingCategories',
@@ -1190,6 +1220,7 @@ export const listingTypeConfig = {
           description: 'Select a clothing category to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['clothingTypeId'],
+          prefilter: false,
         },
       ],
     },
@@ -1379,7 +1410,8 @@ export const listingTypeConfig = {
         queryParamKey: 'bookTypeId',
         initialDataKey: 'bookTypeId',
         title: 'Choose book type',
-        description: 'Select a type to tailor the form fields.'
+        description: 'Select a type to tailor the form fields.',
+        paramKey: 'bookTypeIds',
       },
       preFormSelectors: [
         {
@@ -1389,6 +1421,7 @@ export const listingTypeConfig = {
           description: 'Select a genre to tailor the form fields.',
           kind: 'searchable',
           dependsOn: ['bookTypeId'],
+          paramKey: 'genreIds',
           getOptions: ({ enums, selection }) => {
             const bookTypeId = selection?.bookTypeId;
             const all = enums?.bookGenres || [];
@@ -1405,6 +1438,7 @@ export const listingTypeConfig = {
           description: 'Select a language to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['bookTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'bookFormats',
@@ -1413,6 +1447,7 @@ export const listingTypeConfig = {
           description: 'Select a format to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['bookTypeId'],
+          prefilter: false,
         },
         {
           enumKey: 'bookConditions',
@@ -1421,6 +1456,7 @@ export const listingTypeConfig = {
           description: 'Select a condition to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['bookTypeId'],
+          prefilter: false,
         },
       ],
     },
@@ -1538,7 +1574,8 @@ export const listingTypeConfig = {
         queryParamKey: 'disciplineId',
         initialDataKey: 'disciplineId',
         title: 'Choose sport discipline',
-        description: 'Select a discipline to tailor the form fields.'
+        description: 'Select a discipline to tailor the form fields.',
+        paramKey: 'disciplineIds',
       },
       preFormSelectors: [
         {
@@ -1548,6 +1585,7 @@ export const listingTypeConfig = {
           description: 'Select an equipment type to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['disciplineId'],
+          paramKey: 'equipmentTypeIds',
         },
         {
           enumKey: 'sportConditions',
@@ -1556,6 +1594,7 @@ export const listingTypeConfig = {
           description: 'Select a condition to tailor the form fields.',
           kind: 'grid',
           dependsOn: ['disciplineId'],
+          paramKey: 'conditionIds',
         },
       ],
     },
@@ -1583,6 +1622,15 @@ export const listingTypeConfig = {
 
 export const getListingConfig = (listingType) => {
   return listingTypeConfig[listingType] || null;
+};
+
+export const getPrefilterSelectors = (listingType) => {
+  const config = listingTypeConfig[listingType];
+  if (!config?.createFlow) return [];
+  const { subtypeSelector, preFormSelectors = [] } = config.createFlow;
+  const prefilterPreForm = preFormSelectors.filter((s) => s.prefilter !== false);
+  const subtype = subtypeSelector ? [{ ...subtypeSelector, label: subtypeSelector.title }] : [];
+  return [...subtype, ...prefilterPreForm.map((s) => ({ ...s, label: s.title }))];
 };
 
 export const getAllListingTypes = () => {

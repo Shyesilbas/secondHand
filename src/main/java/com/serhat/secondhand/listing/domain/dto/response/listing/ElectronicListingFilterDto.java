@@ -16,6 +16,7 @@ public class ElectronicListingFilterDto extends ListingFilterDto {
     
     private List<UUID> electronicTypeIds;
     private List<UUID> electronicBrandIds;
+    private List<UUID> electronicModelIds;
     private Integer minYear;
     private Integer maxYear;
     private List<Color> colors;

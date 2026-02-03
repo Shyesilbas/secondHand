@@ -20,6 +20,7 @@ public class VehicleListingFilterDto extends ListingFilterDto {
     
     private List<UUID> vehicleTypeIds;
     private List<UUID> brandIds;
+    private List<UUID> vehicleModelIds;
     private Integer minYear;
     private Integer maxYear;
     private Integer maxMileage;

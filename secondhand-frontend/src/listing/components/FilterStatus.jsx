@@ -22,7 +22,9 @@ const FilterStatus = ({
 
         const checkActiveFilters = hasActiveFilters || (() => {
         return filters.minPrice || filters.maxPrice || filters.city || filters.district ||
+            (filters.vehicleTypeIds && filters.vehicleTypeIds.length > 0) ||
             (filters.brandIds && filters.brandIds.length > 0) ||
+            (filters.vehicleModelIds && filters.vehicleModelIds.length > 0) ||
             (filters.brands && filters.brands.length > 0) ||
             (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) ||
             (filters.fuelTypes && filters.fuelTypes.length > 0) ||
@@ -61,7 +63,9 @@ const FilterStatus = ({
         let count = 0;
         if (filters.minPrice || filters.maxPrice) count++;
         if (filters.city || filters.district) count++;
+        if (filters.vehicleTypeIds && filters.vehicleTypeIds.length > 0) count++;
         if (filters.brandIds && filters.brandIds.length > 0) count++;
+        if (filters.vehicleModelIds && filters.vehicleModelIds.length > 0) count++;
         if (filters.brands && filters.brands.length > 0) count++;
         if (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) count++;
         if (filters.fuelTypes && filters.fuelTypes.length > 0) count++;
@@ -99,6 +103,48 @@ const FilterStatus = ({
         
         return count;
     });
+
+    const hasResults = Number(totalElements) > 0;
+
+    if (!hasResults) {
+        return (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <p className="text-slate-600">
+                        <span className="font-medium">No listings found</span>
+                        {filters.listingType && (
+                            <span className="text-slate-500 ml-2">
+                                in {getListingTypeLabel(filters.listingType)} category
+                            </span>
+                        )}
+                    </p>
+                    {(() => {
+                        const activeCount = countActiveFilters();
+                        const hasActive = checkActiveFilters();
+                        if (hasActive && activeCount > 0) {
+                            return (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                        {activeCount} filter{activeCount !== 1 ? 's' : ''} active
+                                    </span>
+                                    <button
+                                        onClick={onResetFilters}
+                                        className="text-xs text-slate-500 hover:text-slate-700 underline transition-colors"
+                                    >
+                                        Clear all
+                                    </button>
+                                </div>
+                            );
+                        }
+                        return null;
+                    })()}
+                </div>
+                <p className="text-xs text-slate-500">
+                    Try changing filters or category to see more listings.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-center justify-between">

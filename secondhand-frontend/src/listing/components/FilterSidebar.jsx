@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useEnums } from "../../common/hooks/useEnums.js";
 import { X } from "lucide-react";
-import CategorySelector from "./CategorySelector.jsx";
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import FilterRenderer from "./filters/FilterRenderer.jsx";
 import { getListingConfig } from "../config/listingConfig.js";
@@ -55,13 +54,11 @@ const FilterSidebar = ({
     const handleReset = useCallback(() => {
         if (mode === 'mine') {
             setLocalFilters({ ...(filters || {}), page: 0, listingType: null });
-            setLocalCategory(null);
             setLocalStatus(null);
             onReset();
             return;
         }
         setLocalFilters({});
-        setLocalCategory("VEHICLE");
         onReset();
     }, [filters, mode, onReset]);
 
@@ -70,7 +67,7 @@ const FilterSidebar = ({
         onFiltersChange(localFilters);
     }, [localFilters, mode, onFiltersChange]);
 
-    const listingConfig = getListingConfig(localCategory);
+    const listingConfig = getListingConfig(selectedCategory);
     const filterConfig = listingConfig?.filterConfig;
     if (enumsLoading) {
         return (
@@ -114,14 +111,6 @@ const FilterSidebar = ({
 
                 <div className="flex-1 overflow-y-auto bg-gray-50 overscroll-contain">
                     <div className="p-4 space-y-4">
-                        <div className="bg-white rounded-lg border border-gray-200 p-4">
-                            <CategorySelector
-                                selectedCategory={localCategory}
-                                onCategoryChange={handleCategoryChange}
-                                compact={true}
-                            />
-                        </div>
-
                         {mode === 'mine' ? (
                             <div className="bg-white rounded-lg border border-gray-200 p-4">
                                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Status</h3>

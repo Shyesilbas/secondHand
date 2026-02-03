@@ -14,6 +14,7 @@ export const ROUTES = {
     BUYER_DASHBOARD: '/dashboard/buyer',
     PROFILE: '/profile',
     LISTINGS: '/listings',
+    LISTINGS_PREFILTER: '/listings/prefilter',
     FORUM: '/forum',
     MY_LISTINGS: '/my-listings',
     COMPLAINTS: '/complaints',

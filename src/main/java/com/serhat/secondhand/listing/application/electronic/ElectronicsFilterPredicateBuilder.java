@@ -35,6 +35,11 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
             Join<Object, Object> brandJoin = root.join("electronicBrand");
             predicates.add(brandJoin.get("id").in(filters.getElectronicBrandIds()));
         }
+
+        if (filters.getElectronicModelIds() != null && !filters.getElectronicModelIds().isEmpty()) {
+            Join<Object, Object> modelJoin = root.join("model");
+            predicates.add(modelJoin.get("id").in(filters.getElectronicModelIds()));
+        }
         
         if (filters.getColors() != null && !filters.getColors().isEmpty()) {
             predicates.add(root.get("color").in(filters.getColors()));

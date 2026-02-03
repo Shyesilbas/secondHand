@@ -3,7 +3,9 @@ import { FilterConfig } from './FilterConfig';
 
 export const createVehicleFilterConfig = () => {
   return new FilterConfig()
-    .addEnumField('brandIds', 'Brands', 'carBrands', { gridSize: 'md:grid-cols-1' })
+    .addEnumField('vehicleTypeIds', 'Vehicle Type', 'vehicleTypes', { gridSize: 'md:grid-cols-1' })
+    .addEnumField('brandIds', 'Brand', 'carBrands', { gridSize: 'md:grid-cols-1' })
+    .addEnumField('vehicleModelIds', 'Model', 'vehicleModels', { gridSize: 'md:grid-cols-1' })
     .addNumericRangeField('year', 'Year', { min: 1980, max: new Date().getFullYear(), placeholder: '2000' })
     .addNumericRangeField('mileage', 'Mileage', { min: 0, placeholder: '200000' })
     .addEnumField('fuelTypes', 'Fuel Type', 'fuelTypes')
@@ -15,8 +17,9 @@ export const createVehicleFilterConfig = () => {
 export const createElectronicsFilterConfig = () => {
   return new FilterConfig()
     .addNumericRangeField('year', 'Year', { min: 2000, max: new Date().getFullYear(), placeholder: '2020' })
+    .addEnumField('electronicTypeIds', 'Type', 'electronicTypes')
     .addEnumField('electronicBrandIds', 'Brand', 'electronicBrands')
-    .addEnumField('electronicTypeIds', 'Type', 'electronicTypes');
+    .addEnumField('electronicModelIds', 'Model', 'electronicModels');
 };
 
 export const createRealEstateFilterConfig = () => {
