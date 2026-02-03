@@ -31,7 +31,11 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
         if (filters.getBrandIds() != null && !filters.getBrandIds().isEmpty()) {
             predicates.add(root.join("brand").get("id").in(filters.getBrandIds()));
         }
-        
+
+        if (filters.getVehicleModelIds() != null && !filters.getVehicleModelIds().isEmpty()) {
+            predicates.add(root.join("model").get("id").in(filters.getVehicleModelIds()));
+        }
+
         if (filters.getFuelTypes() != null && !filters.getFuelTypes().isEmpty()) {
             predicates.add(root.get("fuelType").in(filters.getFuelTypes()));
         }

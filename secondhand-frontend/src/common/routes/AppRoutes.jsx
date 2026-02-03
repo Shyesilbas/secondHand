@@ -15,6 +15,7 @@ import AccountVerificationPage from '../../auth/AccountVerificationPage.jsx';
 import AccountHubPage from '../../user/AccountHubPage.jsx';
 import ProfilePage from '../../user/ProfilePage.jsx';
 import ListingsPage from '../../listing/pages/ListingsPage.jsx';
+import ListingsPrefilterPage from '../../listing/pages/ListingsPrefilterPage.jsx';
 import ForumPage from '../../features/forum/pages/ForumPage.jsx';
 import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
 
@@ -132,6 +133,7 @@ const AppRoutes = () => {
             {/* Public Routes with Main Layout */}
             <Route element={<MainLayout />}>
                 <Route path={ROUTES.HOME} element={<HomePage />} />
+                <Route path={ROUTES.LISTINGS_PREFILTER} element={<ListingsPrefilterPage />} />
                 <Route path={ROUTES.LISTINGS} element={<ListingsPage />} />
                 <Route path={ROUTES.FORUM} element={<ForumPage />} />
                 <Route path={ROUTES.LISTING_DETAIL(':id')} element={<ListingDetailPage />} />

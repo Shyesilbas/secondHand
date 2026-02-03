@@ -44,17 +44,14 @@ const Header = () => {
     const [inAppNotificationCenterOpen, setInAppNotificationCenterOpen] = useState(false);
 
     const dropdowns = useDropdownManager();
-    const categoriesMenuOpen = dropdowns.isOpen('categories');
     const listingsMenuOpen = dropdowns.isOpen('listings');
     const paymentsMenuOpen = dropdowns.isOpen('payments');
     const profileMenuOpen = dropdowns.isOpen('profile');
 
-    const categoriesMenuRef = useRef(null);
     const listingsMenuRef = useRef(null);
     const paymentsMenuRef = useRef(null);
     const profileMenuRef = useRef(null);
 
-    useClickOutside(categoriesMenuRef, dropdowns.closeAll, categoriesMenuOpen);
     useClickOutside(listingsMenuRef, dropdowns.closeAll, listingsMenuOpen);
     useClickOutside(paymentsMenuRef, dropdowns.closeAll, paymentsMenuOpen);
     useClickOutside(profileMenuRef, dropdowns.closeAll, profileMenuOpen);
@@ -134,48 +131,7 @@ const Header = () => {
                         <nav className="hidden lg:flex items-center gap-1">
                             <NavLink to={ROUTES.FORUM}>Forum</NavLink>
                             <NavLink to={ROUTES.CREATE_LISTING}>Sell</NavLink>
-                            <div className="h-4 w-[1px] bg-gray-300 mx-2" />
-
-                            {/* Categories Dropdown */}
-                            <div className="relative" ref={categoriesMenuRef}>
-                                <button
-                                    onClick={() => dropdowns.toggle('categories')}
-                                    className={`text-sm font-medium px-4 py-2.5 flex items-center gap-1.5 transition-all duration-300 ease-in-out rounded-xl ${
-                                        categoriesMenuOpen ? 'text-slate-900 bg-slate-100/50' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/50'
-                                    }`}
-                                >
-                                    Categories
-                                    <ChevronDown className={`w-4 h-4 opacity-60 transition-all duration-300 ease-in-out ${categoriesMenuOpen ? 'rotate-180' : ''}`} />
-                                </button>
-
-                                {categoriesMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 p-2 z-50 max-h-[500px] overflow-y-auto">
-                                        {enums?.listingTypes?.map((category) => {
-                                            const iconText = getListingTypeIcon(category.value, enums?.listingTypes);
-                                            const count = countsByCategory?.[category.value] ?? 0;
-                                            return (
-                                                <Link
-                                                    key={category.value}
-                                                    to={ROUTES.LISTINGS}
-                                                    state={{ listingType: category.value }}
-                                                    onClick={dropdowns.closeAll}
-                                                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl group"
-                                                >
-                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-                                                            <span className="text-base">{iconText}</span>
-                                                        </div>
-                                                        <span className="text-sm font-medium text-slate-900 truncate">
-                                                            {getListingTypeLabel(category.value, enums?.listingTypes) || category.label}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-xs font-medium text-slate-500 ml-3">{count}</span>
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
+                            <NavLink to={ROUTES.LISTINGS_PREFILTER}>Categories</NavLink>
                         </nav>
                     )}
 

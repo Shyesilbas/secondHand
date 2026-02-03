@@ -25,15 +25,15 @@ const Footer = () => {
 
     return (
         <footer className="relative bg-slate-950 text-slate-300 border-t border-white/5">
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-indigo-500/20 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-indigo-500/20 via-transparent to-transparent" />
 
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 mb-6">
+                    <div className="space-y-2">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">
                             About
                         </h3>
-                        <ul className="space-y-3">
+                        <ul className="space-y-1.5">
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">
                                 No membership fees
                             </li>
@@ -49,8 +49,8 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
+                    <div className="space-y-2">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">
                             Pricing
                         </h3>
                         <button
@@ -70,7 +70,7 @@ const Footer = () => {
                             )}
                         </button>
                         {showPricing && (
-                            <div className="mt-4 space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl transition-all duration-300">
+                            <div className="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur-xl transition-all duration-300">
                                 {isLoadingPricing ? (
                                     <div className="space-y-3">
                                         {[...Array(4)].map((_, i) => (
@@ -130,11 +130,11 @@ const Footer = () => {
                         )}
                     </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
+                    <div className="space-y-2">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">
                             Support
                         </h3>
-                        <ul className="space-y-3">
+                        <ul className="space-y-1.5">
                             {['Help Center', 'Contact Us', 'Safety Tips'].map((item, index) => (
                                 <li key={index}>
                                     <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">
@@ -162,7 +162,7 @@ const Footer = () => {
                             </li>
                         </ul>
                         {showReportIssues && (
-                            <div className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/60 p-4 text-sm text-slate-300">
+                            <div className="mt-3 rounded-xl border border-slate-700/80 bg-slate-900/60 p-3 text-sm text-slate-300">
                                 <p className="leading-relaxed tracking-tight">
                                     To report an issue, go to the listing or person's page you want to report, click the Report button, and create your complaint by filling in the necessary information.
                                 </p>
@@ -170,8 +170,8 @@ const Footer = () => {
                         )}
                     </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">
+                    <div className="space-y-2">
+                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">
                             Legal
                         </h3>
                         {isAuthenticated ? (
@@ -251,8 +251,8 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="mt-10 border-t border-white/5 pt-6">
-                    <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
+                <div className="mt-5 border-t border-white/5 pt-4">
+                    <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
                         <p className="text-xs text-slate-500 tracking-tight">
                             &copy; {new Date().getFullYear()} <span className="font-bold tracking-tighter text-white">SecondHand</span>. All rights reserved.
                         </p>

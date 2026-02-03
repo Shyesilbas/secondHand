@@ -126,14 +126,60 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
     const params = new URLSearchParams(location.search);
     const raw = params.get('category');
     const category = raw ? String(raw).trim().toUpperCase() : null;
-    if (category && category !== selectedCategory) {
-      setSelectedCategory(category);
-      setFilters((prev) => {
-        if (mode === 'mine') return { ...prev, listingType: category, page: 0 };
-        return { ...prev, listingType: category, type: category, page: 0 };
-      });
+    if (!category) return;
+
+    setSelectedCategory(category);
+
+    if (mode === 'mine') {
+      setFilters((prev) => ({ ...prev, listingType: category, page: 0 }));
+      return;
     }
-  }, [location.search, mode, selectedCategory]);
+
+    const base = getDefaultFiltersForType(category, { listingType: category, type: category, page: 0 });
+    const next = { ...base };
+
+    if (category === 'VEHICLE') {
+      const vType = params.get('vehicleTypeIds');
+      const brandId = params.get('brandIds');
+      const modelId = params.get('vehicleModelIds');
+      if (vType) next.vehicleTypeIds = [vType];
+      if (brandId) next.brandIds = [brandId];
+      if (modelId) next.vehicleModelIds = [modelId];
+    } else if (category === 'ELECTRONICS') {
+      const typeId = params.get('electronicTypeIds');
+      const brandId = params.get('electronicBrandIds');
+      const modelId = params.get('electronicModelIds');
+      if (typeId) next.electronicTypeIds = [typeId];
+      if (brandId) next.electronicBrandIds = [brandId];
+      if (modelId) next.electronicModelIds = [modelId];
+    } else if (category === 'REAL_ESTATE') {
+      const realEstateTypeId = params.get('realEstateTypeIds');
+      const adTypeId = params.get('adTypeId');
+      const ownerTypeId = params.get('ownerTypeId');
+      if (realEstateTypeId) next.realEstateTypeIds = [realEstateTypeId];
+      if (adTypeId) next.adTypeId = adTypeId;
+      if (ownerTypeId) next.ownerTypeId = ownerTypeId;
+    } else if (category === 'CLOTHING') {
+      const brandId = params.get('brands');
+      const typeId = params.get('types');
+      if (brandId) next.brands = [brandId];
+      if (typeId) next.types = [typeId];
+    } else if (category === 'BOOKS') {
+      const bookTypeId = params.get('bookTypeIds');
+      const genreId = params.get('genreIds');
+      if (bookTypeId) next.bookTypeIds = [bookTypeId];
+      if (genreId) next.genreIds = [genreId];
+    } else if (category === 'SPORTS') {
+      const disciplineId = params.get('disciplineIds');
+      const equipmentTypeId = params.get('equipmentTypeIds');
+      const conditionId = params.get('conditionIds');
+      if (disciplineId) next.disciplineIds = [disciplineId];
+      if (equipmentTypeId) next.equipmentTypeIds = [equipmentTypeId];
+      if (conditionId) next.conditionIds = [conditionId];
+    }
+
+    setFilters(next);
+  }, [location.search, mode]);
 
   const cleanedFilters = useMemo(() => cleanObject(filters), [filters]);
 
@@ -144,6 +190,10 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
     return LISTING_ENGINE_QUERY_KEYS.filtered({ ...cleanedFilters, userId: user?.id || null });
   }, [cleanedFilters, mode, user?.id]);
 
+  const canFetch = mode === 'mine'
+    ? Boolean(isAuthenticated && user?.id)
+    : !!cleanedFilters.listingType;
+
   const { data, isLoading, error: queryError, refetch } = useQuery({
     queryKey,
     queryFn: () => {
@@ -152,7 +202,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
       }
       return listingService.filterListings(cleanedFilters);
     },
-    enabled: mode === 'mine' ? Boolean(isAuthenticated && user?.id) : !!cleanedFilters.listingType,
+    enabled: canFetch,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,

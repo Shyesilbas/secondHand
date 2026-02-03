@@ -31,26 +31,36 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
 
     if (error) {
         return (
-            <EmptyState
-                icon={ExclamationCircleIcon}
-                title="Listings did not load"
-                description={error}
-                primaryAction={{
-                    label: 'Try Again',
-                    onClick: () => window.location.reload()
-                }}
-                variant="error"
-            />
+            <div className="flex items-center justify-center min-h-[320px]">
+                <div className="max-w-md w-full">
+                    <EmptyState
+                        icon={ExclamationCircleIcon}
+                        title="Listings did not load"
+                        description={error}
+                        primaryAction={{
+                            label: 'Try Again',
+                            onClick: () => window.location.reload()
+                        }}
+                        variant="error"
+                        className="w-full"
+                    />
+                </div>
+            </div>
         );
     }
 
     if (!listings || listings.length === 0) {
         return (
-            <EmptyState
-                icon={PhotoIcon}
-                title="No listings found"
-                description="No listings found for the criteria."
-            />
+            <div className="flex items-center justify-center min-h-[320px]">
+                <div className="max-w-md w-full">
+                    <EmptyState
+                        icon={PhotoIcon}
+                        title="No listings found"
+                        description="No listings found for the criteria."
+                        className="w-full"
+                    />
+                </div>
+            </div>
         );
     }
 

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import React, {useMemo, useState} from 'react';
+import {X} from 'lucide-react';
 import {
   getForumVisibilitySettings,
   setForumCommentAuthorVisibility,
@@ -54,6 +54,7 @@ export const ForumVisibilitySettingsModal = ({ isOpen, onClose }) => {
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900 tracking-tight truncate">Forum settings</p>
             <p className="text-xs text-slate-500 mt-0.5 truncate">Choose how your name appears when posting</p>
+            <p className="text-xs text-slate-500 mt-0.5 truncate">! Updates not effects the current threads or comments</p>
           </div>
           <button
             type="button"
