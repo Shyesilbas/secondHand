@@ -15,7 +15,7 @@ import AccountVerificationPage from '../../auth/AccountVerificationPage.jsx';
 import AccountHubPage from '../../user/AccountHubPage.jsx';
 import ProfilePage from '../../user/ProfilePage.jsx';
 import ListingsPage from '../../listing/pages/ListingsPage.jsx';
-import ForumPage from '../../forum/pages/ForumPage.jsx';
+import ForumPage from '../../features/forum/pages/ForumPage.jsx';
 import MyListingsPage from '../../listing/pages/MyListingsPage.jsx';
 
 import ListingDetailPage from '../../listing/pages/ListingDetailPage.jsx';

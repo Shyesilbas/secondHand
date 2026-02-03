@@ -334,4 +334,13 @@ export const API_ENDPOINTS = {
         MARK_AS_READ: (id) => `/v1/notifications/${id}/read`,
         MARK_ALL_AS_READ: '/v1/notifications/read-all',
     },
+    FORUM: {
+        THREADS: '/v1/forum/threads',
+        THREAD_BY_ID: (threadId) => `/v1/forum/threads/${threadId}`,
+        THREAD_STATUS: (threadId) => `/v1/forum/threads/${threadId}/status`,
+        THREAD_REACTION: (threadId) => `/v1/forum/threads/${threadId}/reaction`,
+        THREAD_COMMENTS: (threadId) => `/v1/forum/threads/${threadId}/comments`,
+        COMMENT_BY_ID: (threadId, commentId) => `/v1/forum/threads/${threadId}/comments/${commentId}`,
+        COMMENT_REACTION: (threadId, commentId) => `/v1/forum/threads/${threadId}/comments/${commentId}/reaction`,
+    },
 };
