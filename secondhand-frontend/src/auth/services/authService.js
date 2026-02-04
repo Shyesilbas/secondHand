@@ -8,8 +8,8 @@ import {
 } from '../auth.js';
 
 export const authService = {
-    login: async (email, password) => {
-        const loginData = createLoginRequest({ email, password });
+    login: async (email, password, rememberMe = false) => {
+        const loginData = createLoginRequest({ email, password, rememberMe });
         return post(API_ENDPOINTS.AUTH.LOGIN, loginData);
     },
 

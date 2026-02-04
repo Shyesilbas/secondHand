@@ -29,8 +29,8 @@ const LoginPage = () => {
     const from = location.state?.from?.pathname || ROUTES.HOME;
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
@@ -49,7 +49,7 @@ const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            const response = await authService.login(formData.email, formData.password);
+            const response = await authService.login(formData.email, formData.password, formData.rememberMe);
             await login(response);
 
             notification.showSuccess('Welcome Back!', 'You have successfully logged in.', { autoCloseDelay: 1000 });
@@ -135,8 +135,10 @@ const LoginPage = () => {
                             <div className="flex items-center">
                                 <input
                                     id="remember-me"
-                                    name="remember-me"
+                                    name="rememberMe"
                                     type="checkbox"
+                                    checked={formData.rememberMe}
+                                    onChange={handleChange}
                                     className="h-3.5 w-3.5 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
                                 />
                                 <label htmlFor="remember-me" className="ml-1.5 text-slate-700 tracking-tight">

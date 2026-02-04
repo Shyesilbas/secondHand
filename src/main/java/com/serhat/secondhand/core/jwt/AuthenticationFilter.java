@@ -1,8 +1,10 @@
 package com.serhat.secondhand.core.jwt;
 
-import com.serhat.secondhand.auth.application.UserDetailsServiceImpl;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenStatus;
 import com.serhat.secondhand.core.security.CookieUtils;
+import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +30,6 @@ import java.util.List;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final UserDetailsServiceImpl userDetailsService;
     private final CookieUtils cookieUtils;
 
         private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
@@ -78,19 +81,32 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             }
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                var userDetails = userDetailsService.loadUserByUsername(userEmail);
-                
-                // JWT signature + expiration validation only - NO DB call for access tokens
-                // Access tokens are stateless, only refresh tokens are stored in DB
-                if (!jwtUtils.isTokenValid(jwt, userDetails)) {
+                Long userId = jwtUtils.extractUserId(jwt);
+                if (userId == null) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
                     return;
                 }
-
+                if (!jwtUtils.isTokenValid(jwt)) {
+                    sendTokenError(response, request, TokenStatus.EXPIRED);
+                    return;
+                }
+                List<SimpleGrantedAuthority> authorities = jwtUtils.extractRoles(jwt).stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+                User principal = User.builder()
+                        .id(userId)
+                        .email(userEmail)
+                        .name("")
+                        .surname("")
+                        .phoneNumber("")
+                        .gender(Gender.PREFER_NOT_TO_SAY)
+                        .accountStatus(AccountStatus.ACTIVE)
+                        .accountVerified(true)
+                        .build();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        principal,
                         null,
-                        userDetails.getAuthorities()
+                        authorities
                 );
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

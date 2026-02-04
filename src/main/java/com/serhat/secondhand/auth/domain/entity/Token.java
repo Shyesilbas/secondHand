@@ -48,4 +48,7 @@ public class Token {
 
     @Column(name = "parent_token_id")
     private UUID parentId;
+
+    @Column(name = "remember_me", nullable = false, columnDefinition = "boolean not null default false")
+    private boolean rememberMe;
 }

@@ -23,13 +23,17 @@ public class TokenService {
     private final TokenRepository tokenRepository;
 
     @Transactional
-    public Token saveToken(String tokenValue, TokenType tokenType, User user, LocalDateTime expiresAt, Token oldRefreshToken) {
+    public Token saveToken(String tokenValue, TokenType tokenType, User user, LocalDateTime expiresAt, Token oldRefreshToken, boolean rememberMe) {
+        if (tokenType != TokenType.REFRESH_TOKEN) {
+            rememberMe = false;
+        }
         Token token = new Token();
         token.setToken(tokenValue);
         token.setTokenType(tokenType);
         token.setTokenStatus(TokenStatus.ACTIVE);
         token.setUser(user);
         token.setExpiresAt(expiresAt);
+        token.setRememberMe(rememberMe);
 
         if (tokenType == TokenType.REFRESH_TOKEN) {
             if (oldRefreshToken == null) {
@@ -82,16 +86,6 @@ public class TokenService {
             activeTokens.forEach(token -> token.setTokenStatus(TokenStatus.REVOKED));
             tokenRepository.saveAll(activeTokens);
             log.info("Revoked {} active tokens for user: {}", activeTokens.size(), user.getUsername());
-        }
-    }
-
-    @Transactional
-    public void revokeUserTokensByType(User user, TokenType tokenType) {
-        List<Token> activeTokens = tokenRepository.findByUserAndTokenTypeAndTokenStatus(user, tokenType, TokenStatus.ACTIVE);
-        if (!activeTokens.isEmpty()) {
-            activeTokens.forEach(token -> token.setTokenStatus(TokenStatus.REVOKED));
-            tokenRepository.saveAll(activeTokens);
-            log.info("Revoked {} active {} tokens for user: {}", activeTokens.size(), tokenType, user.getUsername());
         }
     }
 

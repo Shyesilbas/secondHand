@@ -59,16 +59,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 Optional<Token> oldRefreshToken = tokenService.findByUserAndType(user, TokenType.REFRESH_TOKEN);
 
                 String accessToken = jwtUtils.generateAccessToken(user);
-                String refreshToken = jwtUtils.generateRefreshToken(user);
+                String refreshToken = jwtUtils.generateRefreshToken(user, false);
 
                 tokenService.revokeAllUserTokens(user);
 
                 tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user,
-                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000), null);
+                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000), null, false);
 
                 tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
                         LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                        oldRefreshToken.orElse(null));
+                        oldRefreshToken.orElse(null), false);
 
                 handleSuccessResponse(request, response, accessToken, refreshToken);
             } else {

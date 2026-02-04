@@ -2,6 +2,7 @@
 export const LoginRequestDTO = {
   email: '',
   password: '',
+  rememberMe: false,
 };
 
 export const LoginResponseDTO = {
@@ -60,6 +61,7 @@ export const createLoginRequest = (data) => {
   return {
     email: data.email?.trim().toLowerCase() || '',
     password: data.password || '',
+    rememberMe: Boolean(data.rememberMe),
   };
 };
 
