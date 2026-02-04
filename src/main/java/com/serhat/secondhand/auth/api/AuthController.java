@@ -52,9 +52,9 @@ public class AuthController {
             HttpServletResponse httpResponse) {
         log.info("Login request for email: {}", request.email());
         LoginResponse response = authService.login(request);
-        
-                cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
-        cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());
+
+        cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
+        cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken(), request.rememberMe());
         
                 Map<String, Object> responseMap = Map.of(
             "message", response.getMessage(),
@@ -94,14 +94,14 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
         log.info("Token refresh request");
-        
-                String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
+
+        String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found in cookies"));
-        
+
         LoginResponse response = authService.refreshToken(refreshToken);
-        
-                cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
-        cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());
+
+        cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
+        cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken(), response.isRememberMe());
         
                 Map<String, Object> responseMap = Map.of(
             "message", response.getMessage(),

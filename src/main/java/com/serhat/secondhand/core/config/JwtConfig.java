@@ -24,6 +24,7 @@ public class JwtConfig {
     @Setter
     public static class RefreshToken {
         private long expiration;
+        private long rememberMeExpiration;
     }
 }
 

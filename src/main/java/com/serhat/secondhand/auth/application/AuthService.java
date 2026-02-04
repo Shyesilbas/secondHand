@@ -134,26 +134,27 @@ public class AuthService {
         userService.update(user);
 
         Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(user).orElse(null);
-        
-        // Only revoke refresh tokens - access tokens are stateless
+
         tokenService.revokeUserRefreshTokens(user);
 
+        boolean rememberMe = request.rememberMe();
         String accessToken = jwtUtils.generateAccessToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
 
-        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
+        long refreshExpirationMs = rememberMe ? jwtUtils.getRememberMeExpiration() : jwtUtils.getRefreshTokenExpiration();
         tokenService.saveToken(
                 refreshToken,
                 TokenType.REFRESH_TOKEN,
                 user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                oldRefreshToken
+                LocalDateTime.now().plusSeconds(refreshExpirationMs / 1000),
+                oldRefreshToken,
+                rememberMe
         );
 
         agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(user.getId());
 
         log.info("User logged in successfully: {}", user.getEmail());
-        return new LoginResponse("Login success", user.getId(), user.getEmail(), accessToken, refreshToken);
+        return new LoginResponse("Login success", user.getId(), user.getEmail(), accessToken, refreshToken, rememberMe);
     }
 
 
@@ -167,12 +168,10 @@ public class AuthService {
 
         User user = userResult.getData();
 
-        // Only check for active refresh tokens - access tokens are stateless
         if (tokenService.findActiveRefreshTokenByUser(user).isEmpty()) {
             throw UserAlreadyLoggedOutException.defaultMessage();
         }
 
-        // Only revoke refresh tokens - access tokens are not stored in DB
         tokenService.revokeUserRefreshTokens(user);
 
         log.info("User logged out successfully: {}", user.getEmail());
@@ -205,23 +204,24 @@ public class AuthService {
         Token oldRefreshToken = tokenService.findByToken(refreshTokenValue)
                 .orElseThrow(InvalidRefreshTokenException::invalid);
 
+        boolean rememberMe = oldRefreshToken.isRememberMe();
         String newAccessToken = jwtUtils.generateAccessToken(user);
-        String newRefreshToken = jwtUtils.generateRefreshToken(user);
+        String newRefreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
 
-        // Revoke old refresh token
         tokenService.revokeToken(refreshTokenValue);
 
-        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
+        long refreshExpirationMs = rememberMe ? jwtUtils.getRememberMeExpiration() : jwtUtils.getRefreshTokenExpiration();
         tokenService.saveToken(
                 newRefreshToken,
                 TokenType.REFRESH_TOKEN,
                 user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                oldRefreshToken
+                LocalDateTime.now().plusSeconds(refreshExpirationMs / 1000),
+                oldRefreshToken,
+                rememberMe
         );
 
         log.info("Tokens rotated successfully for user: {}", username);
-        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, newRefreshToken);
+        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, newRefreshToken, rememberMe);
     }
 
     public Map<String, String> logout(Authentication authentication, HttpServletRequest request) {
@@ -263,15 +263,15 @@ public class AuthService {
             tokenService.revokeUserRefreshTokens(existing);
 
             String accessToken = jwtUtils.generateAccessToken(existing);
-            String refreshToken = jwtUtils.generateRefreshToken(existing);
+            String refreshToken = jwtUtils.generateRefreshToken(existing, false);
 
-            // Only save REFRESH_TOKEN to DB
             tokenService.saveToken(
                     refreshToken,
                     TokenType.REFRESH_TOKEN,
                     existing,
                     LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                    oldRefreshToken
+                    oldRefreshToken,
+                    false
             );
 
             agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(existing.getId());
@@ -297,15 +297,15 @@ public class AuthService {
         userNotificationService.sendWelcomeNotification(user);
 
         String accessToken = jwtUtils.generateAccessToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user, false);
 
-        // Only save REFRESH_TOKEN to DB - access tokens are stateless (JWT only)
         tokenService.saveToken(
                 refreshToken,
                 TokenType.REFRESH_TOKEN,
                 user,
                 LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                null
+                null,
+                false
         );
 
         return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);

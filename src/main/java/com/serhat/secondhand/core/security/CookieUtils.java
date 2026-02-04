@@ -32,11 +32,16 @@ public class CookieUtils {
     }
 
     public void setRefreshTokenCookie(HttpServletResponse response, String token) {
-        int refreshTokenMaxAge = (int) (jwtConfig.getRefreshToken().getExpiration() / 1000);
+        setRefreshTokenCookie(response, token, false);
+    }
+
+    public void setRefreshTokenCookie(HttpServletResponse response, String token, boolean rememberMe) {
+        long expirationMs = rememberMe ? jwtConfig.getRefreshToken().getRememberMeExpiration() : jwtConfig.getRefreshToken().getExpiration();
+        int refreshTokenMaxAge = (int) (expirationMs / 1000);
         Cookie cookie = createSecureCookie(REFRESH_TOKEN_COOKIE, token, refreshTokenMaxAge, "/");
         response.addCookie(cookie);
         addSameSiteAttribute(response, REFRESH_TOKEN_COOKIE, cookieConfig.getSameSite());
-        log.debug("Refresh token cookie set with SameSite={}, maxAge={}s", cookieConfig.getSameSite(), refreshTokenMaxAge);
+        log.debug("Refresh token cookie set with SameSite={}, maxAge={}s, rememberMe={}", cookieConfig.getSameSite(), refreshTokenMaxAge, rememberMe);
     }
 
     public Optional<String> getAccessTokenFromCookies(HttpServletRequest request) {

@@ -14,7 +14,7 @@ public class CampaignScheduler {
 
     private final CampaignRepository campaignRepository;
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 600000)
     @Transactional
     public void deactivateExpiredCampaigns() {
         LocalDateTime now = LocalDateTime.now();
