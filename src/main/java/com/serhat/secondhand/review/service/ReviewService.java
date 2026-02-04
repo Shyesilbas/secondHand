@@ -146,18 +146,16 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Map<UUID, ReviewStatsDto> getListingReviewStatsDto(List<UUID> listingIds) {
         if (listingIds == null || listingIds.isEmpty()) return new HashMap<>();
-
-        List<Object[]> statsList = reviewRepository.getListingReviewStats(listingIds);
+        List<Object[]> rows = reviewRepository.getListingReviewStats(listingIds);
         Map<UUID, ReviewStatsDto> statsMap = new HashMap<>();
-
         for (UUID id : listingIds) {
             statsMap.put(id, ReviewStatsDto.empty());
         }
-
-        for (Object[] stats : statsList) {
-            UUID listingId = (UUID) stats[0];
-            ReviewStatsDto dto = reviewMapper.mapToReviewStatsDto(stats, 1);
-            statsMap.put(listingId, dto);
+        for (Object[] row : rows) {
+            UUID listingId = (UUID) row[0];
+            Long total = row[1] != null ? (Long) row[1] : 0L;
+            Double avg = row[2] != null ? (Double) row[2] : 0.0;
+            statsMap.put(listingId, new ReviewStatsDto(total, avg, 0L, 0L, 0L, 0L, 0L, 0L));
         }
         return statsMap;
     }

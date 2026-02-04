@@ -3,13 +3,13 @@ package com.serhat.secondhand.listing.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
-import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,10 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,9 +46,8 @@ public class ListingController {
             @AuthenticationPrincipal User currentUser) {
 
         Long userId = currentUser != null ? currentUser.getId() : null;
-        String email = currentUser != null ? currentUser.getEmail() : null;
 
-        return listingService.findByIdAsDto(id, userId, email)
+        return listingService.findByIdAsDto(id, userId, userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -81,8 +80,8 @@ public class ListingController {
             @RequestBody List<UUID> ids,
             @AuthenticationPrincipal User currentUser) {
 
-        String email = currentUser != null ? currentUser.getEmail() : null;
-        return ResponseEntity.ok(listingService.findByIds(ids, email));
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return ResponseEntity.ok(listingService.findByIds(ids, userId));
     }
 
     @PostMapping("/filter")
@@ -95,8 +94,7 @@ public class ListingController {
         filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
         filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
 
-        String userEmail = currentUser != null ? currentUser.getEmail() : null;
-        return ResponseEntity.ok(listingService.filterByCategory(filters, userEmail));
+        return ResponseEntity.ok(listingService.filterByCategory(filters, currentUser.getId()));
     }
 
     @GetMapping("/search")
@@ -106,8 +104,8 @@ public class ListingController {
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal User currentUser) {
 
-        String userEmail = currentUser != null ? currentUser.getEmail() : null;
-        return ResponseEntity.ok(listingService.globalSearch(query, page, size, userEmail));
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return ResponseEntity.ok(listingService.globalSearch(query, page, size, userId));
     }
 
     @GetMapping("/my-listings")

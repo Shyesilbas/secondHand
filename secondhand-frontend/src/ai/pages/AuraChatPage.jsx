@@ -28,11 +28,11 @@ const AuraChatPage = () => {
     return parts.join(' | ');
   }, [listing]);
 
-  const buildOutgoingMessage = useMemo(() => {
+  const buildPayload = useMemo(() => {
     return (text) => {
       const trimmed = text.trim();
       if (!listingContext) return trimmed;
-      return `${trimmed}\n\nListingContext: ${listingContext}`;
+      return { message: trimmed, context: listingContext };
     };
   }, [listingContext]);
 
@@ -61,7 +61,7 @@ const AuraChatPage = () => {
       },
     ],
     withTyping: true,
-    buildPayload: buildOutgoingMessage,
+    buildPayload,
     echoUserMessageWhenUnauthed: false,
   });
 
@@ -195,9 +195,13 @@ const AuraChatPage = () => {
         </div>
 
         {listingContext ? (
-          <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="text-xs font-semibold text-slate-500 tracking-tight mb-2">Selected listing context</div>
+          <div className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span className="text-xs font-semibold text-indigo-700 tracking-tight">Aura sees this listing</span>
+            </div>
             <div className="text-sm text-slate-800 tracking-tight whitespace-pre-wrap">{listingContext}</div>
+            <p className="mt-2 text-xs text-slate-500 tracking-tight">Replies will be tailored to this item.</p>
           </div>
         ) : null}
 

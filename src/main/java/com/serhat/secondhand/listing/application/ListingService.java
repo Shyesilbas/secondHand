@@ -18,7 +18,6 @@ import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
 import com.serhat.secondhand.listing.realestate.RealEstateListingFilterService;
 import com.serhat.secondhand.listing.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
-import com.serhat.secondhand.user.application.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
@@ -42,7 +41,6 @@ public class ListingService {
 
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
-    private final UserService userService;
     private final ListingEnrichmentService enrichmentService;
     private final ListingConfig listingConfig;
     private final ListingViewService listingViewService;
@@ -58,7 +56,6 @@ public class ListingService {
             ClothingListingFilterService clothingListingFilterService,
             RealEstateListingFilterService realEstateListingFilterService,
             SportsListingFilterService sportsListingFilterService,
-            UserService userService,
             ListingEnrichmentService enrichmentService,
             ListingViewService listingViewService,
             ListingConfig listingConfig,
@@ -66,7 +63,6 @@ public class ListingService {
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
-        this.userService = userService;
         this.enrichmentService = enrichmentService;
         this.listingViewService = listingViewService;
         this.listingConfig = listingConfig;
@@ -86,12 +82,12 @@ public class ListingService {
         return listingRepository.findById(id);
     }
 
-    public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, String userEmail) {
+    public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
         return listingRepository.findByIdWithSeller(id).map(listing -> {
             ListingDto dto = listingMapper.toDynamicDto(listing);
 
             CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
-                    enrichmentService.enrich(dto, userEmail));
+                    enrichmentService.enrich(dto, userId));
 
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
                 CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
@@ -112,23 +108,23 @@ public class ListingService {
         return listingRepository.findAllByIdIn(ids);
     }
 
-    public List<ListingDto> findByIds(List<UUID> ids, String userEmail) {
+    public List<ListingDto> findByIds(List<UUID> ids, Long userId) {
         if (ids == null || ids.isEmpty()) return List.of();
         List<Listing> listings = listingRepository.findAllById(ids);
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
-        return enrichList(dtos, userEmail);
+        return enrichList(dtos, userId);
     }
 
-    public Page<ListingDto> filterByCategory(ListingFilterDto filters, String userEmail) {
+    public Page<ListingDto> filterByCategory(ListingFilterDto filters, Long userId) {
         Function<ListingFilterDto, Page<ListingDto>> strategy = filterStrategyMap.get(filters.getClass());
         if (strategy == null) return Page.empty();
         Page<ListingDto> result = strategy.apply(filters);
-        return enrichPage(result, userEmail);
+        return enrichPage(result, userId);
     }
 
-    public Page<ListingDto> globalSearch(String query, int page, int size, String userEmail) {
+    public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
         if (query == null || query.trim().isEmpty()) return Page.empty();
 
         String searchTerm = query.trim();
@@ -142,32 +138,32 @@ public class ListingService {
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(enrichmentService.enrich(dtos, userEmail), pageable, results.getTotalElements());
+        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, results.getTotalElements());
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingType(userId, listingType, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
     public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), getUserEmail(userId));
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
     public List<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status) {
         return enrichList(
                 listingRepository.findBySellerIdAndStatus(userId, status)
                         .stream().map(listingMapper::toDynamicDto).toList(),
-                getUserEmail(userId)
+                userId
         );
     }
 
@@ -320,17 +316,12 @@ public class ListingService {
         return listing;
     }
 
-    private String getUserEmail(Long userId) {
-        var userResult = userService.findById(userId);
-        return userResult.isSuccess() ? userResult.getData().getEmail() : null;
+    private List<ListingDto> enrichList(List<ListingDto> dtos, Long userId) {
+        return enrichmentService.enrich(dtos, userId);
     }
 
-    private List<ListingDto> enrichList(List<ListingDto> dtos, String userEmail) {
-        return enrichmentService.enrich(dtos, userEmail);
-    }
-
-    private Page<ListingDto> enrichPage(Page<ListingDto> page, String userEmail) {
-        return new PageImpl<>(enrichmentService.enrich(page.getContent(), userEmail), page.getPageable(), page.getTotalElements());
+    private Page<ListingDto> enrichPage(Page<ListingDto> page, Long userId) {
+        return new PageImpl<>(enrichmentService.enrich(page.getContent(), userId), page.getPageable(), page.getTotalElements());
     }
 
     public BigDecimal calculateTotalListingFee() {

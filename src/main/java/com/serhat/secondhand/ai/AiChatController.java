@@ -25,7 +25,7 @@ public class AiChatController {
 
     @PostMapping("/chat")
     public ResponseEntity<AiResponse> chat(@RequestParam Long userId, @Valid @RequestBody ChatRequest request) {
-        UserQuestionRequest question = new UserQuestionRequest(request.message(), null);
+        UserQuestionRequest question = new UserQuestionRequest(request.message(), request.context());
         return ResponseEntity.ok(geminiAiService.askQuestion(userId, question));
     }
 

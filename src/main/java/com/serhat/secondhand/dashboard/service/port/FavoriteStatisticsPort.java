@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface FavoriteStatisticsPort {
     long countByListingSellerId(Long sellerId);
-    Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail);
+    Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId);
 
     Long countByUserId(Long buyerId);
 }

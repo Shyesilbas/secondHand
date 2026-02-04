@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.Check;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "electronic_listings")
+@Check(constraints = "connection_type IS NULL OR connection_type IN ('WIRED', 'BLUETOOTH', 'HDMI_USB', 'BOTH')")
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PriceHistoryDto {
     private Long id;
     private UUID listingId;

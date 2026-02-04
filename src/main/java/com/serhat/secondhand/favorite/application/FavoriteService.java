@@ -160,7 +160,7 @@ public class FavoriteService {
             }
         }
         
-        Result<FavoriteStatsDto> statsResult = getFavoriteStats(listingId, user.getEmail());
+        Result<FavoriteStatsDto> statsResult = getFavoriteStats(listingId, user.getId());
         if (statsResult.isError()) {
             return Result.error(statsResult.getMessage(), statsResult.getErrorCode());
         }
@@ -179,18 +179,17 @@ public class FavoriteService {
                 .map(FavoriteDto::getListing)
                 .toList();
 
-        listingEnrichmentService.enrich(listings, user.getEmail());
+        listingEnrichmentService.enrich(listings, userId);
 
         return Result.success(favoriteDtos);
     }
 
-    public Result<FavoriteStatsDto> getFavoriteStats(UUID listingId, String userEmail) {
-        return Result.success(favoriteStatsService.getFavoriteStats(listingId, userEmail));
+    public Result<FavoriteStatsDto> getFavoriteStats(UUID listingId, Long userId) {
+        return Result.success(favoriteStatsService.getFavoriteStats(listingId, userId));
     }
-    
 
-    public Result<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
-        return Result.success(favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail));
+    public Result<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
+        return Result.success(favoriteStatsService.getFavoriteStatsForListings(listingIds, userId));
     }
     
 
@@ -216,19 +215,19 @@ public class FavoriteService {
         return Result.success(favoriteRepository.findTopFavoritedListings(pageable));
     }
 
-    public Result<List<ListingDto>> getTopFavoritedListingsWithDetails(int size, String userEmail) {
+    public Result<List<ListingDto>> getTopFavoritedListingsWithDetails(int size, Long userId) {
         Pageable pageable = PageRequest.of(0, size);
         List<UUID> topIds = favoriteRepository.findTopFavoritedListingIds(pageable);
-        
+
         if (topIds.isEmpty()) {
             return Result.success(List.of());
         }
 
         List<Listing> listings = listingRepository.findAllById(topIds);
-        
+
         Map<UUID, Listing> listingMap = listings.stream()
                 .collect(Collectors.toMap(Listing::getId, l -> l, (a, b) -> a, LinkedHashMap::new));
-        
+
         List<ListingDto> orderedDtos = topIds.stream()
                 .filter(listingMap::containsKey)
                 .map(listingMap::get)
@@ -236,7 +235,7 @@ public class FavoriteService {
                 .filter(dto -> dto != null)
                 .collect(Collectors.toList());
 
-        return Result.success(listingEnrichmentService.enrich(orderedDtos, userEmail));
+        return Result.success(listingEnrichmentService.enrich(orderedDtos, userId));
     }
 
     public Result<List<UUID>> getUserFavoriteIds(Long userId) {

@@ -59,7 +59,7 @@ public class CartService {
                 .map(CartDto::getListing)
                 .toList();
 
-        enrichmentService.enrich(listings, user.getEmail());
+        enrichmentService.enrich(listings, userId);
 
         return Result.success(cartDtos);
     }
@@ -102,7 +102,7 @@ public class CartService {
 
         Cart savedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(savedCart);
-        dto.setListing(enrichmentService.enrich(dto.getListing(), user.getEmail()));
+        dto.setListing(enrichmentService.enrich(dto.getListing(), userId));
         return Result.success(dto);
     }
 
@@ -160,8 +160,7 @@ public class CartService {
         Cart updatedCart = cartRepository.save(cartItem);
         CartDto dto = cartMapper.toDto(updatedCart);
 
-        String email = userService.findById(userId).getData().getEmail();
-        dto.setListing(enrichmentService.enrich(dto.getListing(), email));
+        dto.setListing(enrichmentService.enrich(dto.getListing(), userId));
 
         return Result.success(dto);
     }

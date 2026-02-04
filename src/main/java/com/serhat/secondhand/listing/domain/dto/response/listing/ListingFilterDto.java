@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.domain.dto.response.listing;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -29,6 +31,7 @@ import java.math.BigDecimal;
 public abstract class ListingFilterDto {
     private ListingType listingType;
     private ListingStatus status;
+    private Long sellerId;
     private String city;
     private String district;
 

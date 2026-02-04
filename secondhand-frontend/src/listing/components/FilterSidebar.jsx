@@ -54,6 +54,7 @@ const FilterSidebar = ({
     const handleReset = useCallback(() => {
         if (mode === 'mine') {
             setLocalFilters({ ...(filters || {}), page: 0, listingType: null });
+            setLocalCategory(null);
             setLocalStatus(null);
             onReset();
             return;
@@ -112,23 +113,58 @@ const FilterSidebar = ({
                 <div className="flex-1 overflow-y-auto bg-gray-50 overscroll-contain">
                     <div className="p-4 space-y-4">
                         {mode === 'mine' ? (
-                            <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                <h3 className="text-sm font-semibold text-gray-900 mb-3">Status</h3>
-                                <div className="space-y-2">
-                                    <button
-                                        onClick={() => handleStatusChange(null)}
-                                        className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
-                                            localStatus === null
-                                                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                                        }`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium">All Statuses</span>
-                                            {localStatus === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
-                                        </div>
-                                    </button>
-                                    {LISTING_STATUSES.map((status) => (
+                            <>
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Category</h3>
+                                    <div className="space-y-2">
+                                        <button
+                                            onClick={() => handleCategoryChange(null)}
+                                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                localCategory === null
+                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-medium">All Categories</span>
+                                                {localCategory === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                            </div>
+                                        </button>
+                                        {(enums?.listingTypes || []).map((type) => (
+                                            <button
+                                                key={type.value}
+                                                onClick={() => handleCategoryChange(type.value)}
+                                                className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                    localCategory === type.value
+                                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-medium">{type.label}</span>
+                                                    {localCategory === type.value ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Status</h3>
+                                    <div className="space-y-2">
+                                        <button
+                                            onClick={() => handleStatusChange(null)}
+                                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                localStatus === null
+                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-medium">All Statuses</span>
+                                                {localStatus === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                            </div>
+                                        </button>
+                                        {LISTING_STATUSES.map((status) => (
                                         <button
                                             key={status.value}
                                             onClick={() => handleStatusChange(status.value)}
@@ -146,6 +182,7 @@ const FilterSidebar = ({
                                     ))}
                                 </div>
                             </div>
+                            </>
                         ) : (
                             <div className="bg-white rounded-lg border border-gray-200 p-4">
                                 <PriceLocationFields
