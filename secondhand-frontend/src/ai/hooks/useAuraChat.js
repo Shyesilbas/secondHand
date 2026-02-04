@@ -94,7 +94,9 @@ export const useAuraChat = ({
 
       try {
         const payload = buildPayload(trimmed);
-        const response = await aiChatService.chat({ userId, message: payload });
+        const message = typeof payload === 'object' && payload != null && 'message' in payload ? payload.message : payload;
+        const context = typeof payload === 'object' && payload != null && 'context' in payload ? payload.context : undefined;
+        const response = await aiChatService.chat({ userId, message, context });
         const answer = response?.answer || response?.message || 'No response.';
 
         if (typingId) {

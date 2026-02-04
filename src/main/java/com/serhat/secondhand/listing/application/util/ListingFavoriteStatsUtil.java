@@ -15,21 +15,21 @@ import java.util.UUID;
 public class ListingFavoriteStatsUtil {
     private final FavoriteStatsService favoriteStatsService;
 
-    public void enrichWithFavoriteStats(ListingDto dto, String userEmail) {
+    public void enrichWithFavoriteStats(ListingDto dto,Long userId) {
         if (dto != null && dto.getId() != null) {
-            FavoriteStatsDto stats = favoriteStatsService.getFavoriteStats(dto.getId(), userEmail);
+            FavoriteStatsDto stats = favoriteStatsService.getFavoriteStats(dto.getId(), userId);
             dto.setFavoriteStats(stats);
         }
     }
 
-    public void enrichWithFavoriteStats(List<ListingDto> dtos, String userEmail) {
+    public void enrichWithFavoriteStats(List<ListingDto> dtos, Long userId) {
         if (dtos == null || dtos.isEmpty()) {
             return;
         }
         List<UUID> listingIds = dtos.stream()
                 .map(ListingDto::getId)
                 .toList();
-        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
+        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userId);
         for (ListingDto dto : dtos) {
             dto.setFavoriteStats(statsMap.getOrDefault(dto.getId(),
                     FavoriteStatsDto.builder()

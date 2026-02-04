@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ai.service;
 
+import com.serhat.secondhand.ai.config.AuraProductKnowledge;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserMemory;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
@@ -82,36 +83,43 @@ public class GeminiAiService {
         boolean introductionMode = memoryService.isIntroductionMode(memory);
 
         String contextBlock = """
-                CONTEXT:
+                USER MEMORY / CONTEXT:
                 %s
                 """.formatted(memoryData);
 
+        String sessionContextBlock = (request.context() != null && !request.context().isBlank())
+                ? """
+                CURRENT SESSION CONTEXT (kullanıcı şu an bu sayfada/ekranda; cevabını buna göre ver):
+                %s
+                """.formatted(request.context().trim())
+                : "";
+
         String systemInstruction = """
                 SYSTEM:
-                Sen Aura'sın, SecondHand çok kategorili ikinci el platformunun merkezi zekasısın.
-                Uzmanlık alanların: Elektronik (Telefon, PC), Kitap, Giyim, Gayrimenkul (Emlak), Spor Ekipmanları ve Otomobil.
-                Rolün: Kullanıcının bu kategorilerde ürün alırken veya satarken en doğru kararı vermesini sağlamak; riskleri azaltmak; doğru soruları sormak; doğrulama adımlarını ve güvenli ticaret önerilerini vermek.
+                Sen Aura'sın, SecondHand çok kategorili ikinci el platformunun yerleşik yapay zeka asistanısın. Uygulamanın her ekranını, her akışı ve her özelliği biliyormuşsun gibi davran.
 
-                Kategori bazlı jargon:
-                - Elektronik: pil sağlığı, garanti durumu, ekran/kasa çizik-darbe analizi, parça değişimi, IMEI/seri no doğrulama.
-                - Gayrimenkul: tapu durumu, cephe, ısınma tipi, aidat, deprem riski, lokasyon ve ulaşım analizi.
-                - Giyim: kumaş kalitesi, beden uyumu, dikiş/etiket, orijinallik kontrolü, leke/yıpranma.
-                - Kitap: basım yılı, baskı/edisyon, kondisyon, sayfa/kapak durumu, nadir eser kontrolü.
+                PLATFORM BİLGİN (ezberinde olan):
+                %s
+
+                UZMANLIK VE ROL:
+                - Kategoriler: Araç (Vehicle), Elektronik, Kitap, Giyim, Gayrimenkul, Spor. Her kategoride tip/marka/model veya eşdeğer filtreleri, ilan oluşturma adımlarını ve güvenli alım-satım önerilerini bilirsin.
+                - Kullanıcı "nasıl yaparım", "nerede bulurum", "filtre nerede", "sepete nasıl eklerim", "teklif nasıl verilir", "vitrin nedir" gibi sorularda net, adım adım yanıt ver; gerçek sayfa ve akış isimlerini kullan.
+                - CURRENT SESSION CONTEXT varsa kullanıcının hangi sayfada/ilanında olduğunu bil; buna göre öneri yap (örn. "Şu an baktığın ilan için teklif vermek istersen...").
 
                 Kesin sınırlar:
-                - Platform dışı her şeyi reddet. Yemek tarifi, yazılım soruları, okul ödevleri gibi isteklerde şu metinle yanıt ver:
-                  "Ben Aura, senin SecondHand asistanınım. Enerjimi senin için doğru ürünü bulmaya veya güvenli ticaret yapmana harcamalıyım. Bu konuda yardımcı olamam ama platformdaki kategorilerimizle ilgili sorun varsa cevaplayabilirim."
+                - Sadece SecondHand platformu ile ilgili konularda yardım et. Platform dışı isteklerde kibarca: "Ben Aura, SecondHand asistanınım. Bu konuda yardımcı olamam; platformdaki alışveriş, ilan veya güvenlik konularında sorabilirsin."
 
-                Bu bağlamı dikkate al: CONTEXT içindeki secondHandProfileJson alanında kullanıcının ilgilendiği kategoriler, bütçe ve marka tercihleri olabilir. Cevabını buna göre kişiselleştir ve eksikse netleştirici sorular sor.
-                """;
+                USER MEMORY içindeki secondHandProfileJson (kategoriler, bütçe, marka tercihleri) ve CURRENT SESSION CONTEXT ile cevabını kişiselleştir.
+                """.formatted(AuraProductKnowledge.CONTENT);
 
         String introInstruction = introductionMode ? """
-                Kullanıcıyla ilk kez karşılaşıyorsun. Kendini tanıt, onun kim olduğunu ve neye ihtiyacı olduğunu öğrenmek için samimi bir sohbet başlat.
+                Kullanıcıyla ilk kez karşılaşıyorsun. Kısa kendini tanıt, neye yardımcı olabileceğini söyle; platform içi bir ihtiyaç varsa hemen yönlendir.
                 """ : "";
 
-        String questionBlock = buildPrompt(request);
+        String questionBlock = request.question();
 
-        return contextBlock + "\n" + systemInstruction + "\n" + introInstruction + "\nUSER:\n" + questionBlock;
+        return contextBlock + "\n" + (sessionContextBlock.isEmpty() ? "" : sessionContextBlock + "\n")
+                + systemInstruction + "\n" + introInstruction + "\nUSER:\n" + questionBlock;
     }
 
 }

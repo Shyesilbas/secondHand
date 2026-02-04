@@ -1,11 +1,12 @@
 import { requestWithParams } from '../../common/services/api/request.js';
 
 export const aiChatService = {
-  chat: async ({ userId, message }) => {
+  chat: async ({ userId, message, context }) => {
     if (userId == null) {
       throw new Error('userId is required');
     }
-    return requestWithParams('post', '/ai/chat', { userId }, { message }, { timeout: 10000 });
+    const body = context ? { message, context } : { message };
+    return requestWithParams('post', '/ai/chat', { userId }, body, { timeout: 10000 });
   },
   newChat: async ({ userId }) => {
     if (userId == null) {

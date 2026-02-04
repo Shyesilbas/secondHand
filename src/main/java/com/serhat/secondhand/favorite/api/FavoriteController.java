@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,10 +97,10 @@ public class FavoriteController {
     @ApiResponse(responseCode = "200", description = "Stats retrieved successfully")
     public ResponseEntity<?> getFavoriteStats(
             @PathVariable UUID listingId,
-            Authentication authentication) {
-        
-        String userEmail = authentication != null ? authentication.getName() : null;
-        var result = favoriteService.getFavoriteStats(listingId, userEmail);
+            @AuthenticationPrincipal User currentUser) {
+
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        var result = favoriteService.getFavoriteStats(listingId, userId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -114,10 +113,10 @@ public class FavoriteController {
     @ApiResponse(responseCode = "200", description = "Stats retrieved successfully")
     public ResponseEntity<?> getFavoriteStatsForListings(
             @RequestBody List<UUID> listingIds,
-            Authentication authentication) {
-        
-        String userEmail = authentication != null ? authentication.getName() : null;
-        var result = favoriteService.getFavoriteStatsForListings(listingIds, userEmail);
+            @AuthenticationPrincipal User currentUser) {
+
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        var result = favoriteService.getFavoriteStatsForListings(listingIds, userId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
@@ -183,10 +182,10 @@ public class FavoriteController {
     @ApiResponse(responseCode = "200", description = "Top favorites with details retrieved successfully")
     public ResponseEntity<?> getTopFavoritedListingsWithDetails(
             @RequestParam(defaultValue = "10") int size,
-            Authentication authentication) {
-        
-        String userEmail = authentication != null ? authentication.getName() : null;
-        var result = favoriteService.getTopFavoritedListingsWithDetails(size, userEmail);
+            @AuthenticationPrincipal User currentUser) {
+
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        var result = favoriteService.getTopFavoritedListingsWithDetails(size, userId);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));

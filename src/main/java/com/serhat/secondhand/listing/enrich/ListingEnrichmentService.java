@@ -17,19 +17,22 @@ public class ListingEnrichmentService {
     private final ListingReviewStatsUtil reviewStatsUtil;
     private final ListingCampaignPricingUtil campaignPricingUtil;
 
-    public ListingDto enrich(ListingDto dto, String userEmail) {
+    public ListingDto enrich(ListingDto dto, Long userId) {
         if (dto == null) return null;
-        favoriteStatsUtil.enrichWithFavoriteStats(dto, userEmail);
+        favoriteStatsUtil.enrichWithFavoriteStats(dto, userId);
         reviewStatsUtil.enrichWithReviewStats(dto);
         campaignPricingUtil.enrichWithCampaignPricing(dto);
         return dto;
     }
 
-    public List<ListingDto> enrich(List<ListingDto> dtos, String userEmail) {
+    public List<ListingDto> enrich(List<ListingDto> dtos, Long userId) {
         if (dtos == null || dtos.isEmpty()) return List.of();
-        favoriteStatsUtil.enrichWithFavoriteStats(dtos, userEmail);
-        reviewStatsUtil.enrichWithReviewStats(dtos);
-        campaignPricingUtil.enrichWithCampaignPricing(dtos);
+        List<Runnable> tasks = List.of(
+                () -> favoriteStatsUtil.enrichWithFavoriteStats(dtos, userId),
+                () -> reviewStatsUtil.enrichWithReviewStats(dtos),
+                () -> campaignPricingUtil.enrichWithCampaignPricing(dtos)
+        );
+        tasks.parallelStream().forEach(Runnable::run);
         return dtos;
     }
 

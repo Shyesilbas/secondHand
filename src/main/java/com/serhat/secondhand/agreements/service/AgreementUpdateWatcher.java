@@ -25,7 +25,7 @@ public class AgreementUpdateWatcher {
     private final NotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
-    @Scheduled(fixedDelay = 30_000)
+    @Scheduled(fixedDelay = 30 * 60 * 1000)
     @Transactional
     public void checkAndNotifyAgreementUpdates() {
         List<AgreementType> requiredTypes = agreementRequirementService.getAllRequiredAgreementTypes();

@@ -111,7 +111,7 @@ public class DashboardService {
                 .uniqueViews(viewStatsFuture.join().getUniqueViews())
                 .totalFavorites(totalFavoritesFuture.join())
                 .categoryRevenue(dashboardMapper.mapCategoryRevenue(categoryRevenueFuture.join()))
-                .topListings(processTopListings(topListingsRawFuture.join(), "system@internal.com"))
+                .topListings(processTopListings(topListingsRawFuture.join(), sellerId))
                 .averageRating(avgRatingFuture.join())
                 .totalReviews(totalReviews)
                 .ratingDistribution(dashboardMapper.mapRatingDistribution(reviewStatsRaw))
@@ -192,7 +192,7 @@ public class DashboardService {
                 .build();
     }
 
-    private List<SellerDashboardDto.TopListingDto> processTopListings(List<Object[]> topListingsData, String userEmail) {
+    private List<SellerDashboardDto.TopListingDto> processTopListings(List<Object[]> topListingsData, Long userId) {
         if (topListingsData == null || topListingsData.isEmpty()) return new ArrayList<>();
 
         List<UUID> listingIds = topListingsData.stream()
@@ -203,7 +203,7 @@ public class DashboardService {
         Map<UUID, Listing> listingMap = listingStatisticsPort.findAllByIdIn(listingIds)
                 .stream().collect(Collectors.toMap(Listing::getId, l -> l));
 
-        Map<UUID, FavoriteStatsDto> favoriteStatsMap = favoriteStatisticsPort.getFavoriteStatsForListings(listingIds, userEmail);
+        Map<UUID, FavoriteStatsDto> favoriteStatsMap = favoriteStatisticsPort.getFavoriteStatsForListings(listingIds, userId);
 
         return topListingsData.stream()
                 .limit(10)

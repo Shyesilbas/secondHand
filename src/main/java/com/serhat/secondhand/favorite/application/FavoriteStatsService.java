@@ -18,29 +18,29 @@ public class FavoriteStatsService {
     
     private final FavoriteRepository favoriteRepository;
     
-        public FavoriteStatsDto getFavoriteStats(UUID listingId, String userEmail) {
+    public FavoriteStatsDto getFavoriteStats(UUID listingId, Long userId) {
         long favoriteCount = favoriteRepository.countByListingId(listingId);
-        boolean isFavorited = userEmail != null && favoriteRepository.existsByUserEmailAndListingId(userEmail, listingId);
-        
+        boolean isFavorited = userId != null && favoriteRepository.existsByUserIdAndListingId(userId, listingId);
+
         return FavoriteStatsDto.builder()
             .listingId(listingId)
             .favoriteCount(favoriteCount)
             .isFavorited(isFavorited)
             .build();
     }
-    
-        public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
+
+    public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
         log.info("Getting favorite stats for {} listings", listingIds.size());
-        
+
         List<Object[]> countResults = favoriteRepository.countByListingIds(listingIds);
         Map<UUID, Long> favoriteCounts = countResults.stream()
             .collect(Collectors.toMap(
-                result -> (UUID) result[0], 
+                result -> (UUID) result[0],
                 result -> (Long) result[1]
             ));
 
-            Set<UUID> userFavoriteSet = userEmail != null ?
-                    new HashSet<>(favoriteRepository.findListingIdsByUserEmail(userEmail)) : Set.of();
+        Set<UUID> userFavoriteSet = userId != null ?
+                new HashSet<>(favoriteRepository.findListingIdsByUserId(userId)) : Set.of();
 
             return listingIds.stream()
                     .collect(Collectors.toMap(

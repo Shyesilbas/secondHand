@@ -23,8 +23,8 @@ public class FavoriteStatisticsAdapter implements FavoriteStatisticsPort {
     }
 
     @Override
-    public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, String userEmail) {
-        return favoriteStatsService.getFavoriteStatsForListings(listingIds, userEmail);
+    public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
+        return favoriteStatsService.getFavoriteStatsForListings(listingIds, userId);
     }
 
     @Override
