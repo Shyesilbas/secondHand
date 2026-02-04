@@ -1183,7 +1183,6 @@ export const listingTypeConfig = {
           title: 'Choose brand',
           description: 'Select a brand to tailor the form fields.',
           kind: 'searchable',
-          dependsOn: ['clothingTypeId'],
           paramKey: 'brands',
         },
         {

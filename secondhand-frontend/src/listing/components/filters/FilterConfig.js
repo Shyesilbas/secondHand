@@ -13,6 +13,7 @@ export class FilterConfig {
       multiple: options.multiple !== false,
       required: options.required || false,
       gridSize: options.gridSize || 'md:grid-cols-2',
+      displayAs: options.displayAs || 'dropdown',
       ...options
     });
     return this;

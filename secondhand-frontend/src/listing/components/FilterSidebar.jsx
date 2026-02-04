@@ -1,6 +1,23 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useEnums } from "../../common/hooks/useEnums.js";
-import { X } from "lucide-react";
+import { X, ChevronDown, ChevronRight } from "lucide-react";
+
+const FilterSectionAccordion = ({ title, defaultOpen = false, children }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50/50 hover:bg-slate-50 transition-colors text-left"
+      >
+        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{title}</span>
+        {isOpen ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
+      </button>
+      {isOpen && <div className="p-4 border-t border-slate-100">{children}</div>}
+    </div>
+  );
+};
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import FilterRenderer from "./filters/FilterRenderer.jsx";
 import { getListingConfig } from "../config/listingConfig.js";
@@ -29,6 +46,7 @@ const FilterSidebar = ({
     const [localFilters, setLocalFilters] = useState(filters);
     const [localCategory, setLocalCategory] = useState(selectedCategory);
     const [localStatus, setLocalStatus] = useState(selectedStatus ?? null);
+    const [mineActiveTab, setMineActiveTab] = useState('category');
 
     useEffect(() => {
         setLocalFilters(filters);
@@ -92,143 +110,211 @@ const FilterSidebar = ({
                 />
             )}
             <div className={`
-                fixed left-0 top-0 h-screen w-80 bg-white shadow-xl z-50 border-r border-gray-200 flex flex-col
+                fixed left-0 top-0 h-screen w-80 bg-white shadow-xl z-50 border-r border-slate-200 flex flex-col
                 transform transition-transform duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                <div className="border-b border-gray-200 bg-white px-4 py-3 flex-shrink-0">
+                <div className="border-b border-slate-200 bg-white px-4 py-3.5 flex-shrink-0">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-base font-semibold text-gray-900">Filters</h2>
-                        </div>
+                        <h2 className="text-base font-bold text-slate-900 tracking-tight">Filters</h2>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                            aria-label="Close filters"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto bg-gray-50 overscroll-contain">
-                    <div className="p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto bg-slate-50/80 overscroll-contain">
+                    <div className="p-4 space-y-3">
                         {mode === 'mine' ? (
-                            <>
-                                <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Category</h3>
-                                    <div className="space-y-2">
-                                        <button
-                                            onClick={() => handleCategoryChange(null)}
-                                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
-                                                localCategory === null
-                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-medium">All Categories</span>
-                                                {localCategory === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
-                                            </div>
-                                        </button>
-                                        {(enums?.listingTypes || []).map((type) => (
+                            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <div className="flex border-b border-gray-200">
+                                    <button
+                                        onClick={() => setMineActiveTab('category')}
+                                        className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                                            mineActiveTab === 'category'
+                                                ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-500'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        Category
+                                    </button>
+                                    <button
+                                        onClick={() => setMineActiveTab('status')}
+                                        className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                                            mineActiveTab === 'status'
+                                                ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-500'
+                                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        Status
+                                    </button>
+                                </div>
+                                <div className="p-4">
+                                    {mineActiveTab === 'category' && (
+                                        <div className="space-y-2">
                                             <button
-                                                key={type.value}
-                                                onClick={() => handleCategoryChange(type.value)}
+                                                onClick={() => handleCategoryChange(null)}
                                                 className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
-                                                    localCategory === type.value
+                                                    localCategory === null
                                                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
                                                         : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                                                 }`}
                                             >
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-medium">{type.label}</span>
-                                                    {localCategory === type.value ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                                    <span className="text-sm font-medium">All Categories</span>
+                                                    {localCategory === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
                                                 </div>
                                             </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Status</h3>
-                                    <div className="space-y-2">
-                                        <button
-                                            onClick={() => handleStatusChange(null)}
-                                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
-                                                localStatus === null
-                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-medium">All Statuses</span>
-                                                {localStatus === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
-                                            </div>
-                                        </button>
-                                        {LISTING_STATUSES.map((status) => (
-                                        <button
-                                            key={status.value}
-                                            onClick={() => handleStatusChange(status.value)}
-                                            className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
-                                                localStatus === status.value
-                                                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-medium">{status.label}</span>
-                                                {localStatus === status.value ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
-                                            </div>
-                                        </button>
-                                    ))}
+                                            {(enums?.listingTypes || []).map((type) => (
+                                                <button
+                                                    key={type.value}
+                                                    onClick={() => handleCategoryChange(type.value)}
+                                                    className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                        localCategory === type.value
+                                                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm font-medium">{type.label}</span>
+                                                        {localCategory === type.value ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {mineActiveTab === 'status' && (
+                                        <div className="space-y-2">
+                                            <button
+                                                onClick={() => handleStatusChange(null)}
+                                                className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                    localStatus === null
+                                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-medium">All Statuses</span>
+                                                    {localStatus === null ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                                </div>
+                                            </button>
+                                            {LISTING_STATUSES.map((status) => (
+                                                <button
+                                                    key={status.value}
+                                                    onClick={() => handleStatusChange(status.value)}
+                                                    className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+                                                        localStatus === status.value
+                                                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                                                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm font-medium">{status.label}</span>
+                                                        {localStatus === status.value ? <div className="w-2 h-2 rounded-full bg-indigo-500"></div> : null}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            </>
                         ) : (
-                            <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                <PriceLocationFields
-                                    filters={localFilters}
-                                    onPriceChange={handleInputChange}
-                                    onInputChange={handleInputChange}
-                                    compact={true}
-                                />
-                            </div>
-                        )}
-
-                        {mode === 'mine' ? null : (
-                            <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                {filterConfig ? (
-                                    <FilterRenderer
-                                        config={filterConfig}
-                                        filters={localFilters}
-                                        onChange={handleInputChange}
-                                        title="Specific Filters"
-                                    />
-                                ) : (
-                                    <div className="text-center text-gray-500 py-8">
-                                        <p>No specific filters available for this category.</p>
-                                        <p className="text-sm mt-2">Use price and location filters instead.</p>
+                            <>
+                                <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                                        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Category</h3>
                                     </div>
+                                    <div className="p-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <button
+                                                onClick={() => onCategoryChange(null)}
+                                                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                                    !selectedCategory
+                                                        ? 'bg-slate-900 text-white shadow-sm'
+                                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                }`}
+                                            >
+                                                All
+                                            </button>
+                                            {(enums?.listingTypes || []).map((t) => {
+                                                const typeConfig = getListingConfig(t.value);
+                                                const icon = t.icon ?? typeConfig?.icon ?? '📦';
+                                                return (
+                                                    <button
+                                                        key={t.value}
+                                                        onClick={() => onCategoryChange(t.value)}
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                                            selectedCategory === t.value
+                                                                ? 'bg-slate-900 text-white shadow-sm'
+                                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        }`}
+                                                    >
+                                                        <span>{icon}</span>
+                                                        <span>{t.label}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                                        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Price & Location</h3>
+                                    </div>
+                                    <div className="p-4">
+                                        <PriceLocationFields
+                                            filters={localFilters}
+                                            onPriceChange={handleInputChange}
+                                            onInputChange={handleInputChange}
+                                            compact={true}
+                                        />
+                                    </div>
+                                </div>
+
+                                {selectedCategory && (
+                                    <FilterSectionAccordion
+                                        title={`${listingConfig?.label || selectedCategory} Filters`}
+                                        defaultOpen={true}
+                                    >
+                                        {filterConfig ? (
+                                            <FilterRenderer
+                                                config={filterConfig}
+                                                filters={localFilters}
+                                                onChange={handleInputChange}
+                                                title=""
+                                            />
+                                        ) : (
+                                            <div className="py-6 text-center">
+                                                <p className="text-sm text-slate-500">No additional filters for this category.</p>
+                                            </div>
+                                        )}
+                                    </FilterSectionAccordion>
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 bg-white px-4 py-3 flex-shrink-0">
+                <div className="border-t border-slate-200 bg-white px-4 py-3 flex-shrink-0">
                     <div className="flex flex-col gap-2">
                         {mode === 'mine' ? null : (
                             <button
                                 onClick={handleApplyFilters}
-                                className="w-full px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded hover:bg-gray-800 transition-colors"
+                                className="w-full px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 active:scale-[0.98] transition-all"
                             >
                                 Apply Filters
                             </button>
                         )}
                         <button
                             onClick={handleReset}
-                            className="w-full px-3 py-2 text-gray-600 text-sm font-medium hover:text-gray-900 hover:bg-gray-50 rounded transition-colors"
+                            className="w-full px-4 py-2 text-slate-600 text-sm font-medium hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                         >
-                            Reset All
+                            Reset
                         </button>
                     </div>
                 </div>

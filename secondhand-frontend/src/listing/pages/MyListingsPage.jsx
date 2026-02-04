@@ -1,119 +1,134 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../../common/constants/routes.js';
-import { useEnums } from '../../common/hooks/useEnums.js';
-import { useListingEngine } from '../hooks/useListingEngine.js';
+import React, {useMemo} from 'react';
+import {Link} from 'react-router-dom';
+import {ROUTES} from '../../common/constants/routes.js';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import {useListingEngine} from '../hooks/useListingEngine.js';
 import ListingsModuleLayout from '../components/ListingsModuleLayout.jsx';
-import { Plus, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import {AlertTriangle, ChevronDown, ChevronUp, Plus} from 'lucide-react';
 
 const MyListingsPage = () => {
     const { getListingTypeLabel } = useEnums();
-    const engine = useListingEngine({ initialListingType: null, mode: 'mine' });
+    const engine = useListingEngine({
+        initialListingType: null,
+        mode: 'mine'
+    });
 
     const lowStock = engine.alerts?.lowStock;
 
     const extraActions = (
-      <Link
-        to={ROUTES.CREATE_LISTING}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors text-sm font-semibold"
-      >
-        <Plus className="w-4 h-4" />
-        New Listing
-      </Link>
+        <Link
+            to={ROUTES.LISTINGS.NEW}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg
+                 hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm
+                 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+            <Plus className="w-4 h-4" />
+            New Listing
+        </Link>
     );
 
     const topSlot = useMemo(() => {
-      if (!lowStock || lowStock.count <= 0) return null;
+        if (!lowStock || lowStock.count <= 0) return null;
 
-      if (!lowStock.isOpen) {
-        return (
-          <button
-            type="button"
-            onClick={lowStock.open}
-            className="w-full bg-white rounded-2xl border border-amber-200/60 shadow-sm hover:shadow-md transition-all overflow-hidden"
-          >
-            <div className="px-5 py-4 bg-gradient-to-r from-amber-50/80 to-orange-50/60 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-100/80 flex items-center justify-center">
-                  <AlertTriangle className="w-4 h-4 text-amber-700" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-xs font-semibold text-amber-900 tracking-tight">Low Stock</h3>
-                  <p className="text-[11px] text-amber-800 tracking-tight">
-                    {lowStock.count} listing{lowStock.count === 1 ? '' : 's'} have less than 10 items in stock.
-                  </p>
-                </div>
-              </div>
-              <ChevronDown className="w-4 h-4 text-amber-700" />
-            </div>
-          </button>
-        );
-      }
+        const stockText = `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}`;
 
-      return (
-        <div className="bg-white rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
-          <div className="px-5 py-4 border-b border-amber-200/60 bg-gradient-to-r from-amber-50/80 to-orange-50/60 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-amber-100/80 flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4 text-amber-700" />
-              </div>
-              <div>
-                <h3 className="text-xs font-semibold text-amber-900 tracking-tight">Stock is running low</h3>
-                <p className="text-[11px] text-amber-800 tracking-tight">
-                  {lowStock.count} listing{lowStock.count === 1 ? '' : 's'} have less than 10 items in stock.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={lowStock.close}
-              className="p-1.5 hover:bg-amber-100/60 rounded-lg transition-colors"
-            >
-              <ChevronUp className="w-4 h-4 text-amber-700" />
-            </button>
-          </div>
-          <div className="px-5 py-4">
-            <div className="space-y-2">
-              {lowStock.listings.slice(0, 6).map((listing) => (
-                <Link
-                  key={listing.id}
-                  to={`/listings/${listing.id}`}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-amber-50/50 text-left transition-colors"
+        // Collapsed state
+        if (!lowStock.isOpen) {
+            return (
+                <div
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-4 cursor-pointer
+                     hover:bg-amber-100 transition-colors duration-200 mb-6"
+                    onClick={() => engine.toggleAlert('lowStock')}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600 tracking-tight">
-                      {listing.title?.charAt(0)?.toUpperCase() || 'L'}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                <AlertTriangle className="w-5 h-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-amber-900">Low Stock Alert</h3>
+                                <p className="text-sm text-amber-700">
+                                    {stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.
+                                </p>
+                            </div>
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-900 truncate tracking-tight">{listing.title}</p>
-                      <p className="text-[11px] text-slate-500 truncate tracking-tight">{listing.listingNo}</p>
+                </div>
+            );
+        }
+
+        // Expanded state
+        return (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-5 mb-6">
+                <div
+                    className="flex items-center justify-between cursor-pointer mb-4"
+                    onClick={() => engine.toggleAlert('lowStock')}
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                            <AlertTriangle className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-amber-900">Stock Running Low</h3>
+                            <p className="text-sm text-amber-700">
+                                {stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.
+                            </p>
+                        </div>
                     </div>
-                  </div>
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-100 text-amber-900 border border-amber-200/60 tracking-tight">
-                    In stock: {Number(listing.quantity)}
+                    <ChevronUp className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                </div>
+
+                <div className="space-y-2 mt-3">
+                    {lowStock.listings.slice(0, 6).map((listing) => (
+                        <div
+                            key={listing.id}
+                            className="bg-white border border-amber-100 rounded-lg p-3
+                         hover:border-amber-300 hover:shadow-sm transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600
+                                rounded-lg flex items-center justify-center text-white font-semibold
+                                text-sm shadow-sm">
+                                    {listing.title?.charAt(0)?.toUpperCase() || 'L'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-medium text-gray-900 truncate">
+                                        {listing.title}
+                                    </h4>
+                                    <p className="text-sm text-gray-500">
+                                        {listing.listingNo}
+                                    </p>
+                                </div>
+                                <div className="flex-shrink-0 px-3 py-1 bg-amber-100 rounded-full">
+                  <span className="text-sm font-medium text-amber-800">
+                    Stock: {Number(listing.quantity)}
                   </span>
-                </Link>
-              ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {lowStock.count > 6 && (
+                        <div className="text-center py-2 text-sm text-amber-700 font-medium">
+                            And {lowStock.count - 6} more listing{lowStock.count - 6 === 1 ? '' : 's'} with low stock.
+                        </div>
+                    )}
+                </div>
             </div>
-            {lowStock.count > 6 ? (
-              <p className="mt-3 text-[11px] text-amber-800 tracking-tight">
-                And {lowStock.count - 6} more listing{lowStock.count - 6 === 1 ? '' : 's'} with low stock.
-              </p>
-            ) : null}
-          </div>
-        </div>
-      );
-    }, [lowStock]);
+        );
+    }, [lowStock, engine]);
 
     return (
-      <ListingsModuleLayout
-        mode="mine"
-        engine={engine}
-        getListingTypeLabel={getListingTypeLabel}
-        title="My Listings"
-        extraActions={extraActions}
-        topSlot={topSlot}
-      />
+        <ListingsModuleLayout
+            mode="mine"
+            title="My Listings"
+            getListingTypeLabel={getListingTypeLabel}
+            engine={engine}
+            extraActions={extraActions}
+            topSlot={topSlot}
+            disableSticky={true}
+        />
     );
 };
 
