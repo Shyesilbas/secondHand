@@ -125,7 +125,6 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 couponCode: couponCode?.trim() || null,
                 offerId: offerId || null
             };
-            console.debug('Checkout payload:', payload);
             await orderService.checkout(payload);
             await clearCart();
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');
@@ -213,7 +212,6 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 couponCode: couponCode?.trim() || null,
                 offerId: offerId || null
             };
-            console.debug('Checkout payload (confirm):', payload);
             await orderService.checkout(payload);
             clearCart();
             showSuccess('Order Placed Successfully', 'Your order has been placed and you will receive a confirmation email shortly.');

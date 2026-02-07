@@ -139,7 +139,6 @@ const AccountVerificationPage = () => {
                     </div>
                 ) : (
                     <form className="mt-8 space-y-6" onSubmit={(e) => {
-                        console.log('Form submit triggered'); // Debug log
                         handleVerifyCode(e);
                     }}>
                         <div className="space-y-4">
@@ -166,7 +165,6 @@ const AccountVerificationPage = () => {
                                 type="submit" 
                                 isLoading={isLoading} 
                                 disabled={isLoading || verificationData.code.length !== 6}
-                                onClick={() => console.log('Verify button clicked')}
                             >
                                 Verify Account
                             </VerificationButton>

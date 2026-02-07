@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapPin, Building2, Map } from 'lucide-react';
 
 const LocationFields = ({ formData, errors = {}, onInputChange }) => {

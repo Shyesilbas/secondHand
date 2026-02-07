@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatPhoneNumber } from '../../utils/phoneFormatter.js';
 
 const PhoneUpdateModal = ({ isOpen, formData, handleChange, submit, closeModal, isUpdating }) => {

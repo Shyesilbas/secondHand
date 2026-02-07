@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';

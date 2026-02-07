@@ -6,7 +6,6 @@ export const vehicleService = {
     createVehicleListing: async (vehicleData) => {
     const createData = createVehicleCreateRequest(vehicleData);
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-      console.log('[vehicleService.createVehicleListing] payload', createData);
     }
     return post(API_ENDPOINTS.VEHICLES.CREATE, createData);
   },
@@ -14,7 +13,6 @@ export const vehicleService = {
     updateVehicleListing: async (id, vehicleData) => {
     const updateData = createVehicleUpdateRequest(vehicleData);
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[vehicleService.updateVehicleListing] payload', { id, updateData });
     }
     return put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
   },

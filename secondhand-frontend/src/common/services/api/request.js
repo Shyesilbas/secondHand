@@ -5,11 +5,9 @@ export const request = async (method, url, data, config = {}) => {
   
   // Sanitize data for logging (remove sensitive information)
   const sanitizedData = data ? sanitizeLogData(data) : data;
-  console.log(`API Request: ${method.toUpperCase()} ${url}`, { data: sanitizedData, config });
   
   try {
     const response = await apiClient({ method, url, data, ...config });
-    console.log(`API Response: ${method.toUpperCase()} ${url}`, response.data);
     
     // Handle Result pattern from backend
     const responseData = response.data;

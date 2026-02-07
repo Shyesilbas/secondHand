@@ -56,14 +56,12 @@ export const getCachedEnums = () => {
         const { data, timestamp, version, pricingCacheVersions } = JSON.parse(cached);
         
         if (version !== ENUM_CACHE_VERSION) {
-            console.log('Enum cache version mismatch, clearing cache');
             clearEnumCache();
             return null;
         }
 
         const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
         if (missingKeys.length > 0) {
-            console.log('Enum cache missing keys', missingKeys, '— clearing cache');
             clearEnumCache();
             return null;
         }
@@ -72,7 +70,6 @@ export const getCachedEnums = () => {
         const expiryTime = timestamp + (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
         
         if (now > expiryTime) {
-            console.log('Enum cache expired, clearing cache');
             clearEnumCache();
             return null;
         }
@@ -84,20 +81,17 @@ export const getCachedEnums = () => {
             
             if (currentListingFeeVersion && pricingCacheVersions.listingFeeConfig && 
                 currentListingFeeVersion !== pricingCacheVersions.listingFeeConfig) {
-                console.log('Listing fee config cache version changed, clearing cache');
                 clearEnumCache();
                 return null;
             }
             
             if (currentShowcaseVersion && pricingCacheVersions.showcasePricingConfig && 
                 currentShowcaseVersion !== pricingCacheVersions.showcasePricingConfig) {
-                console.log('Showcase pricing config cache version changed, clearing cache');
                 clearEnumCache();
                 return null;
             }
         }
 
-        console.log('Using cached enums from localStorage');
         return data;
     } catch (error) {
         console.error('Error reading enum cache:', error);
@@ -123,7 +117,6 @@ export const setCachedEnums = (enums) => {
         };
         
         localStorage.setItem(ENUM_CACHE_KEY, JSON.stringify(cacheData));
-        console.log('Enums cached to localStorage');
     } catch (error) {
         console.error('Error caching enums:', error);
     }
@@ -132,7 +125,6 @@ export const setCachedEnums = (enums) => {
 export const clearEnumCache = () => {
     try {
         localStorage.removeItem(ENUM_CACHE_KEY);
-        console.log('Enum cache cleared');
     } catch (error) {
         console.error('Error clearing enum cache:', error);
     }
@@ -141,7 +133,6 @@ export const clearEnumCache = () => {
 export const forceClearEnumCache = () => {
     try {
         localStorage.removeItem(ENUM_CACHE_KEY);
-        console.log('Enum cache force cleared - will refetch all enums including audit enums');
     } catch (error) {
         console.error('Error force clearing enum cache:', error);
     }

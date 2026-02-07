@@ -27,7 +27,6 @@ export const useAgreements = (options = {}) => {
         retry: 1,
         retryDelay: 1000,
         onError: (error) => {
-            console.debug('Agreements fetch failed:', error.message);
         }
     });
 
@@ -54,7 +53,6 @@ export const useAgreementByType = (agreementType) => {
         refetchOnWindowFocus: false,
         retry: 1,
         onError: (error) => {
-            console.debug(`Agreement ${agreementType} fetch failed:`, error.message);
         }
     });
 
@@ -83,7 +81,6 @@ export const useUserAgreements = () => {
         refetchOnMount: false,
         retry: 1,
         onError: (error) => {
-            console.debug('User agreements fetch failed:', error.message);
         }
     });
 

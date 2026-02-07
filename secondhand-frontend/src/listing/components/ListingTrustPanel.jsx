@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';

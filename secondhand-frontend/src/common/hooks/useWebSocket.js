@@ -14,11 +14,9 @@ const useWebSocket = (userId) => {
     const connect = useCallback(() => {
         // Prevent multiple connection attempts
         if (stompClient.current?.connected) {
-            console.log('WebSocket already connected');
             return;
         }
 
-        console.log('Attempting to connect to WebSocket...');
         const socket = new WebSocket('ws://localhost:8080/ws');
         stompClient.current = Stomp.over(socket);
         
@@ -28,7 +26,6 @@ const useWebSocket = (userId) => {
         stompClient.current.connect(
             {},
             (frame) => {
-                console.log('✅ Connected to WebSocket');
                 setIsConnected(true);
                 
                 // Kullanıcıya özel mesajları dinle
@@ -52,7 +49,6 @@ const useWebSocket = (userId) => {
                 try {
                     subscription.unsubscribe();
                 } catch (e) {
-                    console.warn('Error unsubscribing:', e);
                 }
             });
             subscriptions.current.clear();
@@ -83,16 +79,13 @@ const useWebSocket = (userId) => {
 
     const subscribeToChatRoom = useCallback((chatRoomId) => {
         if (!stompClient.current || !isConnected) {
-            console.log('Cannot subscribe to chat room - stompClient or connection not ready');
             return;
         }
 
-        console.log('Subscribing to chat room topic:', `/topic/chat/${chatRoomId}`);
         const subscription = stompClient.current.subscribe(
             `/topic/chat/${chatRoomId}`,
             (message) => {
                 const messageData = JSON.parse(message.body);
-                console.log('WebSocket message received for room:', chatRoomId, messageData);
                 setMessages(prev => [...prev, messageData]);
                 
                 // Tüm callback'leri çağır
@@ -103,7 +96,6 @@ const useWebSocket = (userId) => {
         );
         
         subscriptions.current.set(`room-${chatRoomId}`, subscription);
-        console.log('Successfully subscribed to chat room:', chatRoomId);
     }, [isConnected]);
 
     const unsubscribeFromChatRoom = useCallback((chatRoomId) => {
@@ -111,7 +103,6 @@ const useWebSocket = (userId) => {
         if (subscription) {
             subscription.unsubscribe();
             subscriptions.current.delete(`room-${chatRoomId}`);
-            console.log('Unsubscribed from chat room:', chatRoomId);
         }
     }, []);
 
@@ -129,7 +120,6 @@ const useWebSocket = (userId) => {
     
     const sendMessage = useCallback((message) => {
         if (stompClient.current && isConnected) {
-            console.log('WebSocket sendMessage called with:', message);
             stompClient.current.send('/app/chat.sendMessage', {}, JSON.stringify(message));
         }
     }, [isConnected]);

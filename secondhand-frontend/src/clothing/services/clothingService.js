@@ -6,7 +6,6 @@ export const clothingService = {
     createClothingListing: async (clothingData) => {
     const createData = createClothingCreateRequest(clothingData);
         if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[clothingService.createClothingListing] payload', createData);
     }
     return post(API_ENDPOINTS.CLOTHING.CREATE, createData);
   },
@@ -14,7 +13,6 @@ export const clothingService = {
     updateClothingListing: async (id, clothingData) => {
     const updateData = createClothingUpdateRequest(clothingData);
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[clothingService.updateClothingListing] payload', { id, updateData });
     }
     return put(API_ENDPOINTS.CLOTHING.UPDATE(id), updateData);
   },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, Lightbulb, ThumbsDown, ThumbsUp } from 'lucide-react';
 
 const categoryMeta = {

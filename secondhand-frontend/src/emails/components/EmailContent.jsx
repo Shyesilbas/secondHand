@@ -1,4 +1,3 @@
-import React from 'react';
 import {formatDateTime, formatPricesInHtml, replaceEnumCodesInHtml} from '../../common/formatters.js';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import {EMAIL_TYPES} from '../emails.js';

@@ -1,4 +1,3 @@
-import React from 'react';
 import {AGREEMENT_TYPE_LABELS} from '../agreements.js';
 import {formatDate} from '../../common/formatters.js';
 import {CheckCircleIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, XMarkIcon} from '@heroicons/react/24/outline';

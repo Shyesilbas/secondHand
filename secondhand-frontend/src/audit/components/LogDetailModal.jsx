@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatDateTime } from '../../common/formatters.js';
 import { X, Clock, MapPin, Monitor, AlertCircle, Shield, CheckCircle, XCircle } from 'lucide-react';
 

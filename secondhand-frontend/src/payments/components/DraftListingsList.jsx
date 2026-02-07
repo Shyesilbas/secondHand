@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import ListingCardActions from '../../listing/components/ListingCardActions.jsx';
 

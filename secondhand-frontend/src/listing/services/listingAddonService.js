@@ -38,7 +38,6 @@ export const trackView = async (listingId, sessionId = null, userAgent = null) =
     if (userAgent) payload.userAgent = userAgent;
     await post(API_ENDPOINTS.LISTINGS.TRACK_VIEW(listingId), payload);
   } catch (error) {
-    console.debug('Failed to track view:', error);
   }
 };
 

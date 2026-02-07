@@ -1,4 +1,3 @@
-import React from 'react';
 import {Loader2, Menu, Search, ShoppingBag} from 'lucide-react';
 
 const ListingsNavigation = ({

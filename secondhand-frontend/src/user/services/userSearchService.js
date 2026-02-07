@@ -8,8 +8,6 @@ export const searchUsers = async (query, limit = 10) => {
     }
 
     try {
-        console.log('🔍 Searching users with query:', query);
-        console.log('🔗 API endpoint:', API_ENDPOINTS.USER.SEARCH);
         
                 const response = await get(API_ENDPOINTS.USER.SEARCH, {
             params: {
@@ -18,7 +16,6 @@ export const searchUsers = async (query, limit = 10) => {
             }
         });
 
-        console.log('✅ User search results:', response);
         return response || [];
 
     } catch (error) {

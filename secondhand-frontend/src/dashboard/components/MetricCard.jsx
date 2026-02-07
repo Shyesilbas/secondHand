@@ -1,4 +1,3 @@
-import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue' }) => {

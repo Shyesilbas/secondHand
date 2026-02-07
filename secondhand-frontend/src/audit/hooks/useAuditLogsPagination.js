@@ -32,9 +32,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
             setIsLoading(true);
             setError(null);
             
-            console.log('API CALL:', { userEmail, page, size });
             const data = await auditLogService.getUserAuditLogsByEmail(userEmail, page, size);
-            console.log('API RESPONSE:', data);
             
             setAuditLogs(data.content || []);
             setTotalElements(data.totalElements || 0);
@@ -53,7 +51,6 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
 
     // Fetch data when dependencies change
     useEffect(() => {
-        console.log('EFFECT TRIGGERED:', { userEmail, currentPage, pageSize });
         if (userEmail) {
             fetchAuditLogs(currentPage, pageSize);
         }
@@ -87,28 +84,24 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
 
     // Pagination controls
     const goToPage = (page) => {
-        console.log('GO TO PAGE:', page);
         if (page >= 0 && page < totalPages) {
             setCurrentPage(page);
         }
     };
 
     const goToNextPage = () => {
-        console.log('NEXT PAGE:', currentPage + 1);
         if (currentPage < totalPages - 1) {
             setCurrentPage(currentPage + 1);
         }
     };
 
     const goToPreviousPage = () => {
-        console.log('PREV PAGE:', currentPage - 1);
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
         }
     };
 
     const changePageSize = (newSize) => {
-        console.log('CHANGE PAGE SIZE:', newSize);
         setPageSize(newSize);
         setCurrentPage(0);
     };

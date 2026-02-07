@@ -15,7 +15,6 @@ export const useListingReviews = (listingId, options = {}) => {
   } = useQuery({
     queryKey: REVIEW_KEYS.listing(listingId),
     queryFn: () => {
-      console.log('📝 useListingReviews: Fetching reviews for listing', listingId);
       return reviewService.getReviewsForListing(listingId);
     },
     enabled: !!listingId && (options.enabled !== undefined ? options.enabled : true),

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
 import { formatDate } from '../../common/formatters.js';

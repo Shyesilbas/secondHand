@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlusIcon, MinusIcon, XMarkIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Star } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';

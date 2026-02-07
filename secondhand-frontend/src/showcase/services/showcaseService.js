@@ -6,7 +6,6 @@ const withErrorHandling = async (operation, errorMessage) => {
     return await operation();
   } catch (error) {
     if (error.response?.status === 401) {
-      console.debug('Showcase API requires authentication - this is expected for unauthenticated users');
     } else {
       console.error(errorMessage, error);
     }

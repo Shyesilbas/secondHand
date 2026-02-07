@@ -1,4 +1,3 @@
-import React from 'react';
 import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
 import FilterChipGroup from './FilterChipGroup.jsx';
 import { Calendar, Hash, Type } from 'lucide-react';

@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const SuccessIcon = () => (
     <svg className="h-6 w-6 text-btn-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">

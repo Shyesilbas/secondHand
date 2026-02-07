@@ -1,4 +1,3 @@
-import React from 'react';
 import EnumDropdown from '../../../../common/components/ui/EnumDropdown.jsx';
 import { MapPin, DollarSign, Building2, Map } from 'lucide-react';
 

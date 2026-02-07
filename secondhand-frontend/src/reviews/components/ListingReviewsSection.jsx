@@ -1,4 +1,3 @@
-import React from 'react';
 import { useListingReviews } from '../hooks/useListingReviews.js';
 import ReviewCard from './ReviewCard.jsx';
 import { StarIcon } from '@heroicons/react/24/solid';
