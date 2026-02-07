@@ -1,4 +1,3 @@
-import React from 'react';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
 

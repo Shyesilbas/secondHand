@@ -1,4 +1,3 @@
-import React from 'react';
 
 const ReviewStats = ({ stats, loading }) => {
     const renderStars = (rating) => {

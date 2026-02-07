@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 
 const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, hasStockInfo, isLowStock }) => {

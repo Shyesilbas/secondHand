@@ -1,4 +1,3 @@
-import React from 'react';
 
 const LoadingIndicator = ({ size = 'h-6 w-6', className = '' }) => {
   return (

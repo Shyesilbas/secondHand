@@ -1,4 +1,3 @@
-import React from 'react';
 
 const InfoField = ({ label, value, isVerified }) => (
   <div className="space-y-1">

@@ -2,7 +2,6 @@ export const formatCurrency = (value, currency = 'TRY', options = {}) => {
   const numValue = typeof value === 'string' ? parseFloat(value) : value;
 
   if (numValue === null || numValue === undefined || isNaN(numValue)) {
-    console.warn('Invalid value for currency formatting:', value);
     return '₺0,00';
   }
 

@@ -5,10 +5,8 @@ const getCookie = (name) => {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
         const cookieValue = parts.pop().split(';').shift();
-        console.debug(`🍪 Cookie ${name}:`, cookieValue ? 'exists' : 'not found');
         return cookieValue;
     }
-    console.debug(`🍪 Cookie ${name}: not found`);
     return null;
 };
 
@@ -17,7 +15,6 @@ const deleteCookie = (name, path = '/') => {
 };
 
 export const setTokens = (accessToken, refreshToken) => {
-                console.debug('Tokens are now managed via secure HttpOnly cookies');
 };
 
 export const getToken = () => {
@@ -106,7 +103,6 @@ export const hasValidTokens = () => {
 export const isCookieBasedAuth = () => {
     const accessToken = getToken();
     const refreshToken = getRefreshToken();
-    console.debug('🍪 Cookie check - sh_at:', !!accessToken, 'sh_rt:', !!refreshToken);
     
     // Cookie-based auth if both cookies exist
     return !!(accessToken && refreshToken);

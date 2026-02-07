@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
 

@@ -147,7 +147,6 @@ export const listingService = {
   filterListings: async (filters) => {
     const listingType = String(filters.listingType || filters.type || '').trim().toUpperCase();
     if (!listingType || !Object.values(LISTING_TYPES).includes(listingType)) {
-      console.warn(`Invalid or missing listing type: ${listingType || '(empty)'}`);
       return {
         content: [],
         totalPages: 0,

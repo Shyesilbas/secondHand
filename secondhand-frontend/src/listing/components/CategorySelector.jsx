@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEnums } from '../../common/hooks/useEnums';
 
 const CategorySelector = ({ selectedCategory, onCategoryChange, compact = false }) => {

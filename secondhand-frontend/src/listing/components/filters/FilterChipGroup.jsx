@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { X } from 'lucide-react';
 

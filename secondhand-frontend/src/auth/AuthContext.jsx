@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
                 const userData = getUser();
                 const isCookieAuth = isCookieBasedAuth();
 
-                console.debug('Auth initialization - isCookieAuth:', isCookieAuth, 'hasUserData:', !!userData);
 
                 if (userData) {
                     setAuthState({ user: userData, isAuthenticated: true, isLoading: true });
@@ -60,7 +59,6 @@ export const AuthProvider = ({ children }) => {
                             setUser(newUserData);
                             setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
                         } catch (error) {
-                            console.debug('Session validation failed:', error.message);
                             clearTokens();
                             setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                         }
@@ -68,7 +66,6 @@ export const AuthProvider = ({ children }) => {
                         setAuthState(prev => ({ ...prev, isLoading: false }));
                     }
                 } else {
-                    console.debug('No valid authentication found');
                     setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                 }
             } catch (error) {
@@ -131,7 +128,6 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.logout();
         } catch (error) {
-            console.debug('Server logout failed, continuing with local logout');
         } finally {
             clearTokens();
             setAuthState({ user: null, isAuthenticated: false, isLoading: false });
@@ -151,7 +147,6 @@ export const AuthProvider = ({ children }) => {
 
     const handleTokenRefresh = useCallback((newAccessToken, newRefreshToken) => {
         setTokens(newAccessToken, newRefreshToken);
-        console.debug('Token refresh handled via server cookies');
     }, []);
 
     const handleTokenRefreshFailure = useCallback(() => {

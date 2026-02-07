@@ -18,7 +18,6 @@ export const useListingData = (listingId, autoFetch = true) => {
   } = useQuery({
     queryKey: LISTING_KEYS.detail(listingId),
     queryFn: () => {
-      console.log('🔍 useListingData: Fetching listing', listingId);
       return listingService.getListingById(listingId);
     },
     enabled: Boolean(autoFetch && listingId),

@@ -1,4 +1,3 @@
-import React from 'react';
 import {Calendar, Eye, Users} from 'lucide-react';
 
 const ViewStatisticsCard = ({ viewStats, periodDays }) => {

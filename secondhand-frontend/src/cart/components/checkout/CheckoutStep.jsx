@@ -1,4 +1,3 @@
-import React from 'react';
 import CheckoutReviewStep from './CheckoutReviewStep.jsx';
 import CheckoutAddressStep from './CheckoutAddressStep.jsx';
 import CheckoutPaymentStep from './CheckoutPaymentStep.jsx';

@@ -6,7 +6,6 @@ export const realEstateService = {
     createRealEstateListing: async (realEstateData) => {
     const createData = createRealEstateCreateRequest(realEstateData);
         if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[realEstateService.createRealEstateListing] payload', createData);
     }
     return post(API_ENDPOINTS.REAL_ESTATES.CREATE, createData);
   },
@@ -14,7 +13,6 @@ export const realEstateService = {
     updateRealEstateListing: async (id, realEstateData) => {
     const updateData = createRealEstateUpdateRequest(realEstateData);
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[realEstateService.updateRealEstateListing] payload', { id, updateData });
     }
     return put(API_ENDPOINTS.REAL_ESTATES.UPDATE(id), updateData);
   },
@@ -23,7 +21,6 @@ export const realEstateService = {
 
     filterRealEstates: async (filters) => {
     if (import.meta && import.meta.env && import.meta.env.DEV) {
-            console.log('[realEstateService.filterRealEstates] filters', filters);
     }
     return post(API_ENDPOINTS.REAL_ESTATES.FILTER, filters);
   },

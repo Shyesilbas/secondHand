@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEnums } from '../../hooks/useEnums.js';
 import SearchableDropdown from './SearchableDropdown.jsx';
 

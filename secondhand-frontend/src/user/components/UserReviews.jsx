@@ -1,4 +1,3 @@
-import React from 'react';
 import { ReviewsList } from '../../reviews/index.js';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 

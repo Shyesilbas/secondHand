@@ -22,7 +22,6 @@ export const getOrCreateSessionId = () => {
     return sessionId;
   } catch (error) {
     // If localStorage is not available, generate a temporary session ID
-    console.warn('localStorage not available, using temporary session ID');
     return generateUUID();
   }
 };
@@ -46,7 +45,6 @@ export const clearSessionId = () => {
   try {
     localStorage.removeItem(SESSION_ID_KEY);
   } catch (error) {
-    console.warn('Could not clear session ID:', error);
   }
 };
 

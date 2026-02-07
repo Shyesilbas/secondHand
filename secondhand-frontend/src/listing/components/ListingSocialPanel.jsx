@@ -1,4 +1,3 @@
-import React from 'react';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
 import { Flag } from 'lucide-react';

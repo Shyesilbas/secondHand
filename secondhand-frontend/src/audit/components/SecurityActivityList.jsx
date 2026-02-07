@@ -1,4 +1,3 @@
-import React from 'react';
 import { ClockIcon, MapPinIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
 import { formatDateTime } from '../../common/formatters.js';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../formatters.js';
 import { Type, Tag, AlignLeft } from 'lucide-react';
 

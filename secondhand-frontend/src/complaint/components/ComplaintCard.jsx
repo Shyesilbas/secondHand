@@ -1,4 +1,3 @@
-import React from 'react';
 import { ComplaintReason } from '../types/complaintTypes.js';
 import { formatDate as formatDateCommon } from '../../common/formatters.js';
 

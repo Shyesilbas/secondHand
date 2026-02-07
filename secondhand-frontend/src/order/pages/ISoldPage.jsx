@@ -1,4 +1,3 @@
-import React from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import { OrdersListLayout } from '../components/shared';

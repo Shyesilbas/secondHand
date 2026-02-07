@@ -1,4 +1,3 @@
-import React from 'react';
 
 const ListingReviewStats = ({ listing, listingId, size = 'sm', showIcon = true, showText = true }) => {
   // Use listing.reviewStats if available, otherwise fallback to null

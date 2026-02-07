@@ -10,13 +10,9 @@ export const verificationService = {
     },
 
     verify: async (verificationData) => {
-        console.log('verificationService.verify called with:', verificationData);
         const requestPayload = { code: verificationData.code };
-        console.log('Request payload:', requestPayload);
-        console.log('API endpoint:', API_ENDPOINTS.USER.VERIFY);
         try {
             const result = await post(API_ENDPOINTS.USER.VERIFY, requestPayload);
-            console.log('Verification service response:', result);
             return result;
         } catch (error) {
             console.error('Verification service error:', error);

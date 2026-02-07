@@ -1,4 +1,3 @@
-import React from 'react';
 import { Package, Star, ShoppingBag, Heart } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 

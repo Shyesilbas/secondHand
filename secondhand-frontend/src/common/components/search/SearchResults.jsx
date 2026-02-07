@@ -1,4 +1,3 @@
-import React from 'react';
 import EmptyState from '../ui/EmptyState.jsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 

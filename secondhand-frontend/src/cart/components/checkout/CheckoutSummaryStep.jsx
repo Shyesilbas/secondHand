@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 
 const CheckoutSummaryStep = ({ cartItems, calculateTotal }) => {

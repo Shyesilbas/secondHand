@@ -1,4 +1,3 @@
-import React from 'react';
 
 const ErrorMessage = ({ message, className = '' }) => {
     if (!message) return null;

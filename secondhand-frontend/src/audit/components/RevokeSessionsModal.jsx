@@ -1,4 +1,3 @@
-import React from 'react';
 import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 const RevokeSessionsModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
