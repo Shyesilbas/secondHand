@@ -68,9 +68,6 @@ public class DashboardService {
         CompletableFuture<List<Object[]>> reviewStatsFuture = CompletableFuture.supplyAsync(() ->
                 reviewStatisticsPort.getUserReviewStats(sellerId));
 
-        CompletableFuture<Double> avgRatingFuture = CompletableFuture.supplyAsync(() ->
-                Optional.ofNullable(reviewStatisticsPort.getUserAverageRating(sellerId)).orElse(0.0));
-
         CompletableFuture<List<Object[]>> topListingsRawFuture = CompletableFuture.supplyAsync(() ->
                 salesStatisticsPort.findTopListingsByRevenue(sellerId, startDate, endDate));
 
@@ -85,7 +82,7 @@ public class DashboardService {
         CompletableFuture.allOf(revenueFuture, revenueTrendRawFuture, ordersByStatusFuture,
                 totalListingsFuture, activeListingsFuture, inactiveListingsFuture,
                 viewStatsFuture, totalFavoritesFuture, categoryRevenueFuture,
-                reviewStatsFuture, avgRatingFuture, topListingsRawFuture, prevRevFuture, categoryOrderCountRawFuture).join();
+                reviewStatsFuture, topListingsRawFuture, prevRevFuture, categoryOrderCountRawFuture).join();
 
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatusFuture.join());
         long totalOrders = ordersByStatusMap.values().stream().mapToLong(Long::longValue).sum();
@@ -94,6 +91,8 @@ public class DashboardService {
         List<Object[]> reviewStatsRaw = reviewStatsFuture.join();
         long totalReviews = (reviewStatsRaw != null && !reviewStatsRaw.isEmpty())
                 ? ((Number) reviewStatsRaw.get(0)[0]).longValue() : 0L;
+        double averageRating = (reviewStatsRaw != null && !reviewStatsRaw.isEmpty() && reviewStatsRaw.get(0).length >= 2 && reviewStatsRaw.get(0)[1] != null)
+                ? ((Number) reviewStatsRaw.get(0)[1]).doubleValue() : 0.0;
 
         return SellerDashboardDto.builder()
                 .totalRevenue(revenueFuture.join())
@@ -112,7 +111,7 @@ public class DashboardService {
                 .totalFavorites(totalFavoritesFuture.join())
                 .categoryRevenue(dashboardMapper.mapCategoryRevenue(categoryRevenueFuture.join()))
                 .topListings(processTopListings(topListingsRawFuture.join(), sellerId))
-                .averageRating(avgRatingFuture.join())
+                .averageRating(averageRating)
                 .totalReviews(totalReviews)
                 .ratingDistribution(dashboardMapper.mapRatingDistribution(reviewStatsRaw))
                 .soldListings(salesStatisticsPort.countDistinctListingsSoldBySellerAndDateRange(sellerId, startDate, endDate))

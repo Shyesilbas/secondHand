@@ -1,5 +1,5 @@
 import { get, post } from '../../common/services/api/request.js';
-import { API_BASE_URL, API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { cacheService } from '../../common/services/cacheService.js';
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -14,10 +14,7 @@ export const fetchExchangeRate = async (from, to, listingId) => {
   const cached = cacheService.get(cacheKey, { ttlMs: CACHE_TTL_MS });
   if (cached) return cached;
 
-  const url = `${API_BASE_URL}${API_ENDPOINTS.EXCHANGE.RATE(from, to)}`;
-  const res = await fetch(url, { credentials: 'include' });
-  if (!res.ok) throw new Error('Failed to fetch exchange rate');
-  const data = await res.json();
+  const data = await get(API_ENDPOINTS.EXCHANGE.RATE(from, to));
   cacheService.set(cacheKey, data);
   return data;
 };
@@ -39,32 +36,26 @@ export const trackView = async (listingId, sessionId = null, userAgent = null) =
     const payload = {};
     if (sessionId) payload.sessionId = sessionId;
     if (userAgent) payload.userAgent = userAgent;
-    await post(`${API_BASE_URL}${API_ENDPOINTS.LISTINGS.TRACK_VIEW(listingId)}`, payload);
+    await post(API_ENDPOINTS.LISTINGS.TRACK_VIEW(listingId), payload);
   } catch (error) {
     console.debug('Failed to track view:', error);
   }
 };
 
 export const getViewStats = async (listingId, startDate = null, endDate = null) => {
-  let url = `${API_BASE_URL}${API_ENDPOINTS.LISTINGS.VIEW_STATS(listingId)}`;
-  const params = new URLSearchParams();
+  const params = {};
+  if (startDate) params.startDate = startDate.toISOString();
+  if (endDate) params.endDate = endDate.toISOString();
 
-  if (startDate) params.append('startDate', startDate.toISOString());
-  if (endDate) params.append('endDate', endDate.toISOString());
-
-  if (params.toString()) url += `?${params.toString()}`;
-  return get(url);
+  return get(API_ENDPOINTS.LISTINGS.VIEW_STATS(listingId), { params });
 };
 
 export const getMyListingsViewStats = async (startDate = null, endDate = null) => {
-  let url = `${API_BASE_URL}${API_ENDPOINTS.LISTINGS.MY_LISTINGS_VIEW_STATS}`;
-  const params = new URLSearchParams();
+  const params = {};
+  if (startDate) params.startDate = startDate.toISOString();
+  if (endDate) params.endDate = endDate.toISOString();
 
-  if (startDate) params.append('startDate', startDate.toISOString());
-  if (endDate) params.append('endDate', endDate.toISOString());
-
-  if (params.toString()) url += `?${params.toString()}`;
-  return get(url);
+  return get(API_ENDPOINTS.LISTINGS.MY_LISTINGS_VIEW_STATS, { params });
 };
 
 export const listingAddonService = {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
     getUser,
@@ -28,9 +28,11 @@ let isAuthInitializing = false;
 let isAuthInitialized = false;
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUserState] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [authState, setAuthState] = useState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: true
+    });
 
     useEffect(() => {
         if (isAuthInitialized || isAuthInitializing) return;
@@ -43,9 +45,8 @@ export const AuthProvider = ({ children }) => {
 
                 console.debug('Auth initialization - isCookieAuth:', isCookieAuth, 'hasUserData:', !!userData);
 
-                                if (userData) {
-                    setUserState(userData);
-                    setIsAuthenticated(true);
+                if (userData) {
+                    setAuthState({ user: userData, isAuthenticated: true, isLoading: true });
                 }
 
                 if (isCookieAuth || hasValidTokens()) {
@@ -57,26 +58,23 @@ export const AuthProvider = ({ children }) => {
                                 ...userProfile
                             };
                             setUser(newUserData);
-                            setUserState(newUserData);
-                            setIsAuthenticated(true);
+                            setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
                         } catch (error) {
                             console.debug('Session validation failed:', error.message);
-                            setUserState(null);
-                            setIsAuthenticated(false);
                             clearTokens();
+                            setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                         }
+                    } else {
+                        setAuthState(prev => ({ ...prev, isLoading: false }));
                     }
                 } else {
                     console.debug('No valid authentication found');
-                    setUserState(null);
-                    setIsAuthenticated(false);
+                    setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                 }
             } catch (error) {
                 console.error('Auth initialization error:', error);
-                setUserState(null);
-                setIsAuthenticated(false);
+                setAuthState({ user: null, isAuthenticated: false, isLoading: false });
             } finally {
-                setIsLoading(false);
                 isAuthInitialized = true;
                 isAuthInitializing = false;
             }
@@ -85,13 +83,13 @@ export const AuthProvider = ({ children }) => {
         initializeAuth();
     }, []);
 
-    const login = async (loginResponse) => {
-                        const { userId, email } = loginResponse;
+    const login = useCallback(async (loginResponse) => {
+        const { userId, email } = loginResponse;
 
-                setTokens(null, null);
+        setTokens(null, null);
 
         try {
-                        const userProfile = await authService.getCurrentUser();
+            const userProfile = await authService.getCurrentUser();
 
             const userData = {
                 ...UserDTO,
@@ -101,21 +99,19 @@ export const AuthProvider = ({ children }) => {
             };
 
             setUser(userData);
-            setUserState(userData);
-            setIsAuthenticated(true);
+            setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
         } catch (error) {
-                        const userData = {
+            const userData = {
                 ...UserDTO,
                 id: userId,
                 email
             };
             setUser(userData);
-            setUserState(userData);
-            setIsAuthenticated(true);
+            setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
         }
-    };
+    }, []);
 
-    const loginWithTokens = async (accessToken, refreshToken) => {
+    const loginWithTokens = useCallback(async (accessToken, refreshToken) => {
         setTokens(accessToken, refreshToken);
 
         try {
@@ -125,54 +121,54 @@ export const AuthProvider = ({ children }) => {
                 ...userProfile
             };
             setUser(userData);
-            setUserState(userData);
-            setIsAuthenticated(true);
+            setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
         } catch (error) {
-            setIsAuthenticated(true);
+            setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
         }
-    };
+    }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         try {
-                        await authService.logout();
+            await authService.logout();
         } catch (error) {
-                        console.debug('Server logout failed, continuing with local logout');
+            console.debug('Server logout failed, continuing with local logout');
         } finally {
             clearTokens();
-            setUserState(null);
-            setIsAuthenticated(false);
+            setAuthState({ user: null, isAuthenticated: false, isLoading: false });
             // Reset global flags so auth can be re-initialized if needed
             isAuthInitialized = false;
             isAuthInitializing = false;
         }
-    };
+    }, []);
 
-    const updateUser = (updatedUserData) => {
-        const newUserData = { ...user, ...updatedUserData };
-        setUser(newUserData);
-        setUserState(newUserData);
-    };
+    const updateUser = useCallback((updatedUserData) => {
+        setAuthState(prev => {
+            const newUserData = { ...prev.user, ...updatedUserData };
+            setUser(newUserData);
+            return { ...prev, user: newUserData };
+        });
+    }, []);
 
-    const handleTokenRefresh = (newAccessToken, newRefreshToken) => {
-                        setTokens(newAccessToken, newRefreshToken);
+    const handleTokenRefresh = useCallback((newAccessToken, newRefreshToken) => {
+        setTokens(newAccessToken, newRefreshToken);
         console.debug('Token refresh handled via server cookies');
-    };
+    }, []);
 
-    const handleTokenRefreshFailure = () => {
+    const handleTokenRefreshFailure = useCallback(() => {
         logout();
-    };
+    }, [logout]);
 
-    const value = {
-        user,
-        isAuthenticated,
-        isLoading,
+    const value = useMemo(() => ({
+        user: authState.user,
+        isAuthenticated: authState.isAuthenticated,
+        isLoading: authState.isLoading,
         login,
         loginWithTokens,
         logout,
         updateUser,
         handleTokenRefresh,
         handleTokenRefreshFailure,
-    };
+    }), [authState, login, loginWithTokens, logout, updateUser, handleTokenRefresh, handleTokenRefreshFailure]);
 
     return (
         <AuthContext.Provider value={value}>

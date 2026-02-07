@@ -727,7 +727,6 @@ export const listingTypeConfig = {
           title: 'Choose brand',
           description: 'Select a brand to narrow model options.',
           kind: 'searchable',
-          dependsOn: ['electronicTypeId'],
           paramKey: 'electronicBrandIds',
         },
         {
