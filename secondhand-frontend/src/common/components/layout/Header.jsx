@@ -9,13 +9,7 @@ import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import {useHeaderScroll} from '../../hooks/useHeaderScroll.js';
 import {useDropdownManager} from '../../hooks/useDropdownManager.js';
 import {useClickOutside} from '../../hooks/useClickOutside.js';
-import {useQuery} from '@tanstack/react-query';
-import {emailService} from '../../../emails/services/emailService.js';
-import {useTotalUnreadCount} from '../../../chat/hooks/useUnreadCount.js';
-import {useCart} from '../../../cart/hooks/useCart.js';
-import {usePendingCompletionOrders} from '../../../order/index.js';
-import {useEnums} from '../../hooks/useEnums.js';
-import {useListingStatistics} from '../../../listing/hooks/useListingStatistics.js';
+import {useBadgeCounts} from '../../hooks/useBadgeCounts.js';
 import {
     ChevronDown,
     CreditCard,
@@ -56,25 +50,9 @@ const Header = () => {
     useClickOutside(paymentsMenuRef, dropdowns.closeAll, paymentsMenuOpen);
     useClickOutside(profileMenuRef, dropdowns.closeAll, profileMenuOpen);
 
-    const { cartCount } = useCart({
-        loadCartItems: true,
-        enabled: isAuthenticated
-    });
-
-    const { totalUnread } = useTotalUnreadCount({ enabled: isAuthenticated });
-    const { hasPendingOrders } = usePendingCompletionOrders({ enabled: isAuthenticated });
-    const { enums, getListingTypeLabel, getListingTypeIcon } = useEnums();
-    const { countsByCategory } = useListingStatistics({ enabled: isAuthenticated });
-
-    const { data: unreadEmailCount = 0 } = useQuery({
-        queryKey: ['emails', 'unread-count', user?.id],
-        queryFn: () => emailService.getUnreadCount(),
-        enabled: !!isAuthenticated && !!user?.id,
-        staleTime: 5 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchInterval: false,
-        refetchOnWindowFocus: false,
-        refetchOnMount: true,
+    const { emailCount, chatCount, cartCount, orderCount } = useBadgeCounts({
+        enabled: isAuthenticated,
+        userId: user?.id
     });
 
     const handleLogout = async () => {
@@ -159,8 +137,8 @@ const Header = () => {
 
                                     <div className="h-6 w-[1px] bg-gray-300 mx-1" />
 
-                                    <IconButton to={ROUTES.EMAILS} icon={Mail} badge={unreadEmailCount} title="Mails" />
-                                    <IconButton to={ROUTES.CHAT} icon={MessageSquare} badge={totalUnread} title="Chats" />
+                                    <IconButton to={ROUTES.EMAILS} icon={Mail} badge={emailCount} title="Mails" />
+                                    <IconButton to={ROUTES.CHAT} icon={MessageSquare} badge={chatCount} title="Chats" />
                                     <IconButton to={ROUTES.FAVORITES} icon={Heart} title="Favorites" />
                                     <IconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />
                                     <div className="relative" ref={paymentsMenuRef}>
@@ -194,7 +172,7 @@ const Header = () => {
                                             className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
                                         >
                                             <Package className="w-[20px] h-[20px] stroke-[1.5px]" />
-                                            {hasPendingOrders && (
+                                            {orderCount > 0 && (
                                                 <span className="absolute top-1 right-1 flex h-2.5 w-2.5 bg-red-500 rounded-full border border-white shadow-sm shadow-red-500/30"></span>
                                             )}
                                         </button>
@@ -204,7 +182,7 @@ const Header = () => {
                                                 <Link to={ROUTES.MY_ORDERS} onClick={dropdowns.closeAll} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
                                                     <Receipt className="w-4 h-4 text-slate-600" />
                                                     <span className="text-sm font-medium text-slate-900">My Orders</span>
-                                                    {hasPendingOrders && <span className="ml-auto text-[10px] font-semibold bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>}
+                                                    {orderCount > 0 && <span className="ml-auto text-[10px] font-semibold bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>}
                                                 </Link>
                                                 <Link to={ROUTES.I_SOLD} onClick={dropdowns.closeAll} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-all duration-300 ease-in-out rounded-xl">
                                                     <TrendingUp className="w-4 h-4 text-slate-600" />

@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { API_BASE_URL, API_ENDPOINTS } from '../constants/apiEndpoints.js';
-import { getToken, isCookieBasedAuth } from '../services/storage/tokenStorage.js';
+import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import apiClient from '../services/api/config.js';
 
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -30,55 +30,33 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
       return;
     }
 
-    const token = getToken();
-    const isCookieAuth = isCookieBasedAuth();
-
     setIsUploading(true);
     
     try {
       const formData = new FormData();
       formData.append('image', file);
 
-      const requestOptions = {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      };
-
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
-      requestOptions.signal = controller.signal;
 
-      if (!isCookieAuth && token) {
-        requestOptions.headers = {
-          'Authorization': `Bearer ${token}`
-        };
-      }
-
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.IMAGES.UPLOAD}`, requestOptions);
+      const response = await apiClient.post(API_ENDPOINTS.IMAGES.UPLOAD, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        signal: controller.signal,
+        timeout: 30000,
+      });
       
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const responseText = await response.text();
-        let errorMessage = 'Failed to upload image.';
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // ignore
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      onImageUpload(data.imageUrl);
+      onImageUpload(response.data.imageUrl);
     } catch (error) {
       console.error('Image upload error:', error);
-      if (error.name === 'AbortError') {
+      if (error.name === 'AbortError' || error.code === 'ECONNABORTED') {
         setError('Upload timed out. Please try again.');
       } else {
-        setError(error.message || 'Failed to upload image.');
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to upload image.';
+        setError(errorMessage);
       }
     } finally {
       setIsUploading(false);

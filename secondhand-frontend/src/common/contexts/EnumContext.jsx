@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getCachedEnums, setCachedEnums, clearEnumCache } from '../services/storage/enumCache.js';
-import { enumService } from '../services/enumService.js';
-import { getCarBrandLabel, getFuelTypeLabel, getColorLabel } from '../enums/vehicleEnums.js';
-import { getListingTypeLabel, getListingTypeIcon, getCurrencyLabel, getCurrencySymbol } from '../enums/listingEnums.js';
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {clearEnumCache, getCachedEnums, setCachedEnums} from '../services/storage/enumCache.js';
+import {enumService} from '../services/enumService.js';
+import {getCarBrandLabel, getColorLabel, getFuelTypeLabel} from '../enums/vehicleEnums.js';
+import {getCurrencyLabel, getCurrencySymbol, getListingTypeIcon, getListingTypeLabel} from '../enums/listingEnums.js';
 
 const EnumContext = createContext();
 
@@ -14,55 +14,70 @@ export const useEnumContext = () => {
     return context;
 };
 
+// Split enum state into logical domain sub-objects
 const initialEnumState = {
-    listingTypes: [],
-    listingStatuses: [],
-    orderStatuses: [],
-    carBrands: [],
-    vehicleTypes: [],
-    vehicleModels: [],
-    fuelTypes: [],
-    colors: [],
-    doors: [],
-    currencies: [],
-    gearTypes: [],
-    seatCounts: [],
-    electronicTypes: [],
-    electronicBrands: [],
-    electronicModels: [],
-    storageTypes: [],
-    electronicConnectionTypes: [],
-    realEstateTypes: [],
-    realEstateAdTypes: [],
-    heatingTypes: [],
-    ownerTypes: [],
-    clothingBrands: [],
-    clothingTypes: [],
-    clothingConditions: [],
-    clothingGenders: [],
-    clothingCategories: [],
-    clothingSizes: [],
-    bookTypes: [],
-    bookGenres: [],
-    bookLanguages: [],
-    bookFormats: [],
-    bookConditions: [],
-    sportDisciplines: [],
-    sportEquipmentTypes: [],
-    sportConditions: [],
-    processors: [],
-    paymentTypes: [],
-    shippingStatuses: [],
-    emailTypes: [],
-    genders: [],
-    auditEventTypes: [],
-    auditEventStatuses: [],
-    listingFeeConfig: null,
-    showcasePricingConfig: null,
-    agreementGroups: [],
-    agreementTypes: [],
-    drivetrains: [],
-    bodyTypes: [],
+    general: {
+        listingTypes: [],
+        listingStatuses: [],
+        orderStatuses: [],
+        currencies: [],
+        paymentTypes: [],
+        shippingStatuses: [],
+        emailTypes: [],
+        genders: [],
+        auditEventTypes: [],
+        auditEventStatuses: [],
+        listingFeeConfig: null,
+        showcasePricingConfig: null,
+        agreementGroups: [],
+        agreementTypes: [],
+    },
+    vehicle: {
+        carBrands: [],
+        vehicleTypes: [],
+        vehicleModels: [],
+        fuelTypes: [],
+        colors: [],
+        doors: [],
+        gearTypes: [],
+        seatCounts: [],
+        drivetrains: [],
+        bodyTypes: [],
+    },
+    electronics: {
+        electronicTypes: [],
+        electronicBrands: [],
+        electronicModels: [],
+        storageTypes: [],
+        electronicConnectionTypes: [],
+        processors: [],
+    },
+    realEstate: {
+        realEstateTypes: [],
+        realEstateAdTypes: [],
+        heatingTypes: [],
+        ownerTypes: [],
+    },
+    clothing: {
+        clothingBrands: [],
+        clothingTypes: [],
+        clothingConditions: [],
+        clothingGenders: [],
+        clothingCategories: [],
+        clothingSizes: [],
+    },
+    book: {
+        bookTypes: [],
+        bookGenres: [],
+        bookLanguages: [],
+        bookFormats: [],
+        bookConditions: [],
+    },
+    sport: {
+        sportDisciplines: [],
+        sportEquipmentTypes: [],
+        sportConditions: [],
+    },
 };
 
 export const EnumProvider = ({ children }) => {
@@ -75,66 +90,87 @@ export const EnumProvider = ({ children }) => {
         try {
             setIsLoading(true);
             setError(null);
-            
+
             const cachedEnums = getCachedEnums();
-            if (cachedEnums) {
+
+            // Validate cache structure - ensure it's the new nested structure
+            if (cachedEnums && cachedEnums.general && cachedEnums.vehicle) {
                 setEnums(cachedEnums);
                 setIsLoading(false);
                 setIsInitialized(true);
                 return;
             }
-            
+
+            // If cache is invalid or old flat structure, clear it and fetch fresh
+            if (cachedEnums) {
+                clearEnumCache();
+            }
+
             const allEnumsData = await enumService.getAllEnums();
-            
+
             const fetchedEnums = {
-                listingTypes: allEnumsData.listingTypes || [],
-                listingStatuses: allEnumsData.listingStatuses || [],
-                orderStatuses: allEnumsData.orderStatuses || [],
-                carBrands: allEnumsData.carBrands || [],
-                vehicleTypes: allEnumsData.vehicleTypes || [],
-                vehicleModels: allEnumsData.vehicleModels || [],
-                fuelTypes: allEnumsData.fuelTypes || [],
-                colors: allEnumsData.colors || [],
-                doors: allEnumsData.doors || [],
-                currencies: allEnumsData.currencies || [],
-                gearTypes: allEnumsData.gearTypes || [],
-                seatCounts: allEnumsData.seatCounts || [],
-                electronicTypes: allEnumsData.electronicTypes || [],
-                electronicBrands: allEnumsData.electronicBrands || [],
-                electronicModels: allEnumsData.electronicModels || [],
-                storageTypes: allEnumsData.storageTypes || [],
-                electronicConnectionTypes: allEnumsData.electronicConnectionTypes || [],
-                realEstateTypes: allEnumsData.realEstateTypes || [],
-                realEstateAdTypes: allEnumsData.realEstateAdTypes || [],
-                heatingTypes: allEnumsData.heatingTypes || [],
-                ownerTypes: allEnumsData.ownerTypes || [],
-                clothingBrands: allEnumsData.clothingBrands || [],
-                clothingTypes: allEnumsData.clothingTypes || [],
-                clothingConditions: allEnumsData.clothingConditions || [],
-                clothingGenders: allEnumsData.clothingGenders || [],
-                clothingCategories: allEnumsData.clothingCategories || [],
-                clothingSizes: allEnumsData.clothingSizes || [],
-                bookTypes: allEnumsData.bookTypes || [],
-                bookGenres: allEnumsData.bookGenres || [],
-                bookLanguages: allEnumsData.bookLanguages || [],
-                bookFormats: allEnumsData.bookFormats || [],
-                bookConditions: allEnumsData.bookConditions || [],
-                sportDisciplines: allEnumsData.sportDisciplines || [],
-                sportEquipmentTypes: allEnumsData.sportEquipmentTypes || [],
-                sportConditions: allEnumsData.sportConditions || [],
-                processors: allEnumsData.processors || [],
-                paymentTypes: allEnumsData.paymentTypes || [],
-                shippingStatuses: allEnumsData.shippingStatuses || [],
-                emailTypes: allEnumsData.emailTypes || [],
-                genders: allEnumsData.genders || [],
-                auditEventTypes: allEnumsData.auditEventTypes || [],
-                auditEventStatuses: allEnumsData.auditEventStatuses || [],
-                listingFeeConfig: allEnumsData.listingFeeConfig || null,
-                showcasePricingConfig: allEnumsData.showcasePricingConfig || null,
-                agreementGroups: allEnumsData.agreementGroups || [],
-                agreementTypes: allEnumsData.agreementTypes || [],
-                drivetrains: allEnumsData.drivetrains || [],
-                bodyTypes: allEnumsData.bodyTypes || [],
+                general: {
+                    listingTypes: allEnumsData.listingTypes || [],
+                    listingStatuses: allEnumsData.listingStatuses || [],
+                    orderStatuses: allEnumsData.orderStatuses || [],
+                    currencies: allEnumsData.currencies || [],
+                    paymentTypes: allEnumsData.paymentTypes || [],
+                    shippingStatuses: allEnumsData.shippingStatuses || [],
+                    emailTypes: allEnumsData.emailTypes || [],
+                    genders: allEnumsData.genders || [],
+                    auditEventTypes: allEnumsData.auditEventTypes || [],
+                    auditEventStatuses: allEnumsData.auditEventStatuses || [],
+                    listingFeeConfig: allEnumsData.listingFeeConfig || null,
+                    showcasePricingConfig: allEnumsData.showcasePricingConfig || null,
+                    agreementGroups: allEnumsData.agreementGroups || [],
+                    agreementTypes: allEnumsData.agreementTypes || [],
+                },
+                vehicle: {
+                    carBrands: allEnumsData.carBrands || [],
+                    vehicleTypes: allEnumsData.vehicleTypes || [],
+                    vehicleModels: allEnumsData.vehicleModels || [],
+                    fuelTypes: allEnumsData.fuelTypes || [],
+                    colors: allEnumsData.colors || [],
+                    doors: allEnumsData.doors || [],
+                    gearTypes: allEnumsData.gearTypes || [],
+                    seatCounts: allEnumsData.seatCounts || [],
+                    drivetrains: allEnumsData.drivetrains || [],
+                    bodyTypes: allEnumsData.bodyTypes || [],
+                },
+                electronics: {
+                    electronicTypes: allEnumsData.electronicTypes || [],
+                    electronicBrands: allEnumsData.electronicBrands || [],
+                    electronicModels: allEnumsData.electronicModels || [],
+                    storageTypes: allEnumsData.storageTypes || [],
+                    electronicConnectionTypes: allEnumsData.electronicConnectionTypes || [],
+                    processors: allEnumsData.processors || [],
+                },
+                realEstate: {
+                    realEstateTypes: allEnumsData.realEstateTypes || [],
+                    realEstateAdTypes: allEnumsData.realEstateAdTypes || [],
+                    heatingTypes: allEnumsData.heatingTypes || [],
+                    ownerTypes: allEnumsData.ownerTypes || [],
+                },
+                clothing: {
+                    clothingBrands: allEnumsData.clothingBrands || [],
+                    clothingTypes: allEnumsData.clothingTypes || [],
+                    clothingConditions: allEnumsData.clothingConditions || [],
+                    clothingGenders: allEnumsData.clothingGenders || [],
+                    clothingCategories: allEnumsData.clothingCategories || [],
+                    clothingSizes: allEnumsData.clothingSizes || [],
+                },
+                book: {
+                    bookTypes: allEnumsData.bookTypes || [],
+                    bookGenres: allEnumsData.bookGenres || [],
+                    bookLanguages: allEnumsData.bookLanguages || [],
+                    bookFormats: allEnumsData.bookFormats || [],
+                    bookConditions: allEnumsData.bookConditions || [],
+                },
+                sport: {
+                    sportDisciplines: allEnumsData.sportDisciplines || [],
+                    sportEquipmentTypes: allEnumsData.sportEquipmentTypes || [],
+                    sportConditions: allEnumsData.sportConditions || [],
+                },
             };
 
             setEnums(fetchedEnums);
@@ -159,19 +195,81 @@ export const EnumProvider = ({ children }) => {
         }
     }, [isInitialized, fetchAllEnums]);
 
-    const value = {
-        enums,
-        isLoading,
-        error,
-        refreshEnums,
-        getListingTypeLabel: (value) => getListingTypeLabel(value, enums.listingTypes),
-        getListingTypeIcon: (value) => getListingTypeIcon(value, enums.listingTypes),
-        getCarBrandLabel: (value) => getCarBrandLabel(value, enums.carBrands),
-        getFuelTypeLabel: (value) => getFuelTypeLabel(value, enums.fuelTypes),
-        getColorLabel: (value) => getColorLabel(value, enums.colors),
-        getCurrencyLabel: (value) => getCurrencyLabel(value, enums.currencies),
-        getCurrencySymbol: (value) => getCurrencySymbol(value, enums.currencies),
-    };
+    // Label lookup memoizations
+    const getListingTypeLabelMemo = useCallback(
+        (value) => getListingTypeLabel(value, enums.general.listingTypes),
+        [enums.general.listingTypes]
+    );
+
+    const getListingTypeIconMemo = useCallback(
+        (value) => getListingTypeIcon(value, enums.general.listingTypes),
+        [enums.general.listingTypes]
+    );
+
+    const getCarBrandLabelMemo = useCallback(
+        (value) => getCarBrandLabel(value, enums.vehicle.carBrands),
+        [enums.vehicle.carBrands]
+    );
+
+    const getFuelTypeLabelMemo = useCallback(
+        (value) => getFuelTypeLabel(value, enums.vehicle.fuelTypes),
+        [enums.vehicle.fuelTypes]
+    );
+
+    const getColorLabelMemo = useCallback(
+        (value) => getColorLabel(value, enums.vehicle.colors),
+        [enums.vehicle.colors]
+    );
+
+    const getCurrencyLabelMemo = useCallback(
+        (value) => getCurrencyLabel(value, enums.general.currencies),
+        [enums.general.currencies]
+    );
+
+    const getCurrencySymbolMemo = useCallback(
+        (value) => getCurrencySymbol(value, enums.general.currencies),
+        [enums.general.currencies]
+    );
+
+    // Context Value Optimization with Backward Compatibility
+    const value = useMemo(
+        () => ({
+            // Flattened enums for backward compatibility + original structured enums
+            enums: {
+                ...enums, // enums.general, enums.vehicle vb. erişim için
+                ...enums.general,
+                ...enums.vehicle,
+                ...enums.electronics,
+                ...enums.realEstate,
+                ...enums.clothing,
+                ...enums.book,
+                ...enums.sport
+            },
+            isLoading,
+            error,
+            refreshEnums,
+            getListingTypeLabel: getListingTypeLabelMemo,
+            getListingTypeIcon: getListingTypeIconMemo,
+            getCarBrandLabel: getCarBrandLabelMemo,
+            getFuelTypeLabel: getFuelTypeLabelMemo,
+            getColorLabel: getColorLabelMemo,
+            getCurrencyLabel: getCurrencyLabelMemo,
+            getCurrencySymbol: getCurrencySymbolMemo,
+        }),
+        [
+            enums,
+            isLoading,
+            error,
+            refreshEnums,
+            getListingTypeLabelMemo,
+            getListingTypeIconMemo,
+            getCarBrandLabelMemo,
+            getFuelTypeLabelMemo,
+            getColorLabelMemo,
+            getCurrencyLabelMemo,
+            getCurrencySymbolMemo,
+        ]
+    );
 
     return (
         <EnumContext.Provider value={value}>
@@ -179,4 +277,3 @@ export const EnumProvider = ({ children }) => {
         </EnumContext.Provider>
     );
 };
-
