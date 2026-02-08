@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useEffect, useState } from 'react';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { DEFAULT_PAYMENT_FILTERS } from '../paymentSchema.js';
 import { usePaymentsQuery } from './queries.js';
 
 export const usePayments = () => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(5);
     const [filters, setFilters] = useState(DEFAULT_PAYMENT_FILTERS);

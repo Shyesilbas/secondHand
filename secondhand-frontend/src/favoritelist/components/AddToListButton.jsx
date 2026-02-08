@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { List } from 'lucide-react';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import AddToListModal from './AddToListModal.jsx';
 
 const AddToListButton = ({ listingId, listingTitle, size = 'sm', className = '' }) => {
     const [showModal, setShowModal] = useState(false);
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     if (!user) return null;
 

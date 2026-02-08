@@ -2,8 +2,10 @@ import React, { memo } from 'react';
 import ListingCard from './ListingCard.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import { PhotoIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
+    const { user } = useAuthState();
     if (isLoading) {
         return (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
@@ -71,6 +73,8 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
                     key={listing.id}
                     listing={listing}
                     onDeleted={onDeleted}
+                    isOwner={user?.id === listing.sellerId}
+                    currentUserId={user?.id}
                 />
             ))}
         </div>

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 
@@ -30,7 +30,7 @@ export const usePaymentsQuery = ({ userId, currentPage, pageSize, filters }) => 
 
 export const useBankAccountsQuery = (options = {}) => {
   const { enabled = true } = options;
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
 
   return useQuery({
     queryKey: [...PAYMENT_QUERY_KEYS.bankAccounts, user?.id],
@@ -49,7 +49,7 @@ export const useBankAccountsQuery = (options = {}) => {
 
 export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
   const { enabled = true } = options;
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
 
   return useQuery({
     queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, paymentType],

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboardService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const DASHBOARD_KEYS = {
   all: ['dashboard'],
@@ -9,7 +9,7 @@ const DASHBOARD_KEYS = {
 };
 
 export const useSellerDashboard = (startDate, endDate, options = {}) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   return useQuery({
     queryKey: DASHBOARD_KEYS.seller(user?.id, startDate, endDate),
     queryFn: () => dashboardService.getSellerDashboard(startDate, endDate),
@@ -24,7 +24,7 @@ export const useSellerDashboard = (startDate, endDate, options = {}) => {
 };
 
 export const useBuyerDashboard = (startDate, endDate, options = {}) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   return useQuery({
     queryKey: DASHBOARD_KEYS.buyer(user?.id, startDate, endDate),
     queryFn: () => dashboardService.getBuyerDashboard(startDate, endDate),

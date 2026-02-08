@@ -39,7 +39,7 @@ const StatusAlert = ({ title, children, icon, colorClass = 'yellow' }) => (
 
 const AccountVerificationPage = () => {
     const navigate = useNavigate();
-    const { user, updateUser } = useAuth();
+    const { authState: { user }, updateUser } = useAuth();
     const notification = useNotification();
 
     const [verificationData, setVerificationData] = useState({ code: '' });

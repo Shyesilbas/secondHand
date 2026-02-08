@@ -6,7 +6,7 @@ import { orderService } from '../../order/services/orderService.js';
 import { createListingFeePaymentRequest } from '../paymentSchema.js';
 import { handleError } from '../../common/errorHandler.js';
 import { listingService } from '../../listing/services/listingService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 
 export const useAgreementsState = () => {
@@ -58,7 +58,7 @@ export const useAgreementsState = () => {
 };
 
 export const useDraftListings = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
 
   const queryFn = useCallback(async () => {
     const data = await listingService.getMyListingsByStatus('DRAFT');

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useListingFilters } from './useListingFilters.js';
 import { useListingPagination } from './useListingPagination.js';
 import { useListingSearch } from './useListingSearch.js';
@@ -18,7 +18,7 @@ const LISTING_ENGINE_QUERY_KEYS = {
  */
 export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initialMode = 'browse' } = {}) => {
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
 
   const navState = useMemo(() => window.history.state && window.history.state.usr, []);
   const engineModeFromNav = navState?.mode || null;

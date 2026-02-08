@@ -9,7 +9,7 @@ import { parseError, handleError } from '../common/errorHandler.js';
 import { extractSuccessMessage } from '../common/successHandler.js';
 import EmailListItem from '../emails/components/EmailListItem';
 import EmailContent from '../emails/components/EmailContent';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuthState } from '../auth/AuthContext.jsx';
 import { EMAIL_TYPES } from './emails.js';
 
 const EmailsPageLoader = () => (
@@ -104,7 +104,7 @@ const EmailsPage = () => {
     const navigate = useNavigate();
     const notification = useNotification();
     const queryClient = useQueryClient();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [filterType, setFilterType] = useState('ALL');
     const [isDeleting, setIsDeleting] = useState(false);

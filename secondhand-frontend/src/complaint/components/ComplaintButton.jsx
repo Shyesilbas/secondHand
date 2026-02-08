@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, listingTitle, className = "" }) => {
     const [showModal, setShowModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { user: currentUser, isAuthenticated } = useAuth();
+    const { authState: { user: currentUser, isAuthenticated } } = useAuth();
     const { createComplaint } = useComplaints();
     const notification = useNotification();
     const location = useLocation();

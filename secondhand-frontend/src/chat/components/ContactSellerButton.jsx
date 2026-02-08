@@ -8,7 +8,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { authState: { user, isAuthenticated } } = useAuth();
     const [isChatOpen, setIsChatOpen] = useState(false);
     const notification = useNotification();
     const location = useLocation();

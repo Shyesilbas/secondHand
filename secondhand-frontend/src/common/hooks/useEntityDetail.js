@@ -3,7 +3,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 
 export const useEntityDetail = (config) => {
   const { entityId, service, entityName = 'Entity', ownerField = 'sellerId' } = config;
-  const { user, isAuthenticated } = useAuth();
+  const { authState: { user, isAuthenticated } } = useAuth();
   
   const [entity, setEntity] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

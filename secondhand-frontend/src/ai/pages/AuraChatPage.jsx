@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { aiChatService } from '../services/aiChatService.js';
 import { RotateCcw, Send, Sparkles, Trash2 } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 
 const AuraChatPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const location = useLocation();
   const listing = location?.state?.listing || null;
 

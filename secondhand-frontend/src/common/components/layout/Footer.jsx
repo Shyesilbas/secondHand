@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAuth} from '../../../auth/AuthContext.jsx';
+import {useAuthState} from '../../../auth/AuthContext.jsx';
 import {useEnums} from '../../hooks/useEnums.js';
 import {useAgreements} from '../../../agreements/hooks/useAgreements.js';
 import {formatCurrency} from '../../formatters.js';
@@ -9,7 +9,7 @@ import {ChevronDown, ChevronUp} from 'lucide-react';
 
 const Footer = () => {
     const { enums, isLoading } = useEnums();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuthState();
     const navigate = useNavigate();
     const [showPricing, setShowPricing] = useState(false);
     const [showReportIssues, setShowReportIssues] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuthState } from '../auth/AuthContext.jsx';
 import { usePhoneUpdate } from './hooks/usePhoneUpdate.js';
 import { UserIcon, ShieldCheckIcon, MapPinIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import ProfileHeader from './components/ProfileHeader.jsx';
@@ -37,7 +37,7 @@ const TABS = [
 ];
 
 const ProfilePage = () => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const { updatePhone } = usePhoneUpdate();
     const [activeTab, setActiveTab] = useState('personal');
     const queryClient = useQueryClient();

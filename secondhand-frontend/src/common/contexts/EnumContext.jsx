@@ -1,8 +1,13 @@
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {clearEnumCache, getCachedEnums, setCachedEnums} from '../services/storage/enumCache.js';
 import {enumService} from '../services/enumService.js';
-import {getCarBrandLabel, getColorLabel, getFuelTypeLabel} from '../enums/vehicleEnums.js';
-import {getCurrencyLabel, getCurrencySymbol, getListingTypeIcon, getListingTypeLabel} from '../enums/listingEnums.js';
+import {GeneralEnumProvider} from './GeneralEnumContext.jsx';
+import {VehicleEnumProvider} from './VehicleEnumContext.jsx';
+import {ElectronicsEnumProvider} from './ElectronicsEnumContext.jsx';
+import {RealEstateEnumProvider} from './RealEstateEnumContext.jsx';
+import {ClothingEnumProvider} from './ClothingEnumContext.jsx';
+import {BookEnumProvider} from './BookEnumContext.jsx';
+import {SportEnumProvider} from './SportEnumContext.jsx';
 
 const EnumContext = createContext();
 
@@ -195,85 +200,33 @@ export const EnumProvider = ({ children }) => {
         }
     }, [isInitialized, fetchAllEnums]);
 
-    // Label lookup memoizations
-    const getListingTypeLabelMemo = useCallback(
-        (value) => getListingTypeLabel(value, enums.general.listingTypes),
-        [enums.general.listingTypes]
-    );
-
-    const getListingTypeIconMemo = useCallback(
-        (value) => getListingTypeIcon(value, enums.general.listingTypes),
-        [enums.general.listingTypes]
-    );
-
-    const getCarBrandLabelMemo = useCallback(
-        (value) => getCarBrandLabel(value, enums.vehicle.carBrands),
-        [enums.vehicle.carBrands]
-    );
-
-    const getFuelTypeLabelMemo = useCallback(
-        (value) => getFuelTypeLabel(value, enums.vehicle.fuelTypes),
-        [enums.vehicle.fuelTypes]
-    );
-
-    const getColorLabelMemo = useCallback(
-        (value) => getColorLabel(value, enums.vehicle.colors),
-        [enums.vehicle.colors]
-    );
-
-    const getCurrencyLabelMemo = useCallback(
-        (value) => getCurrencyLabel(value, enums.general.currencies),
-        [enums.general.currencies]
-    );
-
-    const getCurrencySymbolMemo = useCallback(
-        (value) => getCurrencySymbol(value, enums.general.currencies),
-        [enums.general.currencies]
-    );
-
-    // Context Value Optimization with Backward Compatibility
     const value = useMemo(
         () => ({
-            // Flattened enums for backward compatibility + original structured enums
-            enums: {
-                ...enums, // enums.general, enums.vehicle vb. erişim için
-                ...enums.general,
-                ...enums.vehicle,
-                ...enums.electronics,
-                ...enums.realEstate,
-                ...enums.clothing,
-                ...enums.book,
-                ...enums.sport
-            },
-            isLoading,
-            error,
-            refreshEnums,
-            getListingTypeLabel: getListingTypeLabelMemo,
-            getListingTypeIcon: getListingTypeIconMemo,
-            getCarBrandLabel: getCarBrandLabelMemo,
-            getFuelTypeLabel: getFuelTypeLabelMemo,
-            getColorLabel: getColorLabelMemo,
-            getCurrencyLabel: getCurrencyLabelMemo,
-            getCurrencySymbol: getCurrencySymbolMemo,
-        }),
-        [
             enums,
             isLoading,
             error,
             refreshEnums,
-            getListingTypeLabelMemo,
-            getListingTypeIconMemo,
-            getCarBrandLabelMemo,
-            getFuelTypeLabelMemo,
-            getColorLabelMemo,
-            getCurrencyLabelMemo,
-            getCurrencySymbolMemo,
-        ]
+        }),
+        [enums, isLoading, error, refreshEnums]
     );
 
     return (
         <EnumContext.Provider value={value}>
-            {children}
+            <GeneralEnumProvider enums={enums.general} isLoading={isLoading} error={error}>
+                <VehicleEnumProvider enums={enums.vehicle} isLoading={isLoading} error={error}>
+                    <ElectronicsEnumProvider enums={enums.electronics} isLoading={isLoading} error={error}>
+                        <RealEstateEnumProvider enums={enums.realEstate} isLoading={isLoading} error={error}>
+                            <ClothingEnumProvider enums={enums.clothing} isLoading={isLoading} error={error}>
+                                <BookEnumProvider enums={enums.book} isLoading={isLoading} error={error}>
+                                    <SportEnumProvider enums={enums.sport} isLoading={isLoading} error={error}>
+                                        {children}
+                                    </SportEnumProvider>
+                                </BookEnumProvider>
+                            </ClothingEnumProvider>
+                        </RealEstateEnumProvider>
+                    </ElectronicsEnumProvider>
+                </VehicleEnumProvider>
+            </GeneralEnumProvider>
         </EnumContext.Provider>
     );
 };

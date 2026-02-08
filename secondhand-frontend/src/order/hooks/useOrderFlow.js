@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
 
 const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const queryClient = useQueryClient();
 
   const queryKey = useMemo(() => {
@@ -50,7 +50,7 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
 };
 
 export const usePendingCompletionOrders = (options = {}) => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const location = useLocation();
   const enabled = options.enabled !== false && !!user?.id;
 
@@ -81,7 +81,7 @@ export const usePendingCompletionOrders = (options = {}) => {
 };
 
 export const usePendingEscrowAmount = (options = {}) => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const enabled = options.enabled !== false && !!user?.id;
 
   const { data, isLoading, error, refetch } = useQuery({

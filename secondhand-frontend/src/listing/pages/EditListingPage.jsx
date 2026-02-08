@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingTypeRegistry } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -44,7 +44,7 @@ const EditListingPage = ({
 }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const notification = useNotification();
 
     // 1. Fetch Logic

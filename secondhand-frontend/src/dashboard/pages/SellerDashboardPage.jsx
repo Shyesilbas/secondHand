@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
 import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
 import MetricCard from '../components/MetricCard.jsx';
-import RevenueChart from '../components/RevenueChart.jsx';
-import CategoryDistributionChart from '../components/CategoryDistributionChart.jsx';
-import OrderStatusChart from '../components/OrderStatusChart.jsx';
 import TopListingsTable from '../components/TopListingsTable.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+
+const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
+const CategoryDistributionChart = lazy(() => import('../components/CategoryDistributionChart.jsx'));
+const OrderStatusChart = lazy(() => import('../components/OrderStatusChart.jsx'));
 import { 
   DollarSign, 
   ShoppingBag, 
@@ -137,22 +138,28 @@ const SellerDashboardPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <RevenueChart
-            data={dashboard.revenueTrend || []}
-            title="Revenue Trend"
-            label="Revenue"
-          />
-          <CategoryDistributionChart
-            data={dashboard.categoryRevenue || {}}
-            title="Revenue by Category"
-          />
+          <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded-lg" />}>
+            <RevenueChart
+              data={dashboard.revenueTrend || []}
+              title="Revenue Trend"
+              label="Revenue"
+            />
+          </Suspense>
+          <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded-lg" />}>
+            <CategoryDistributionChart
+              data={dashboard.categoryRevenue || {}}
+              title="Revenue by Category"
+            />
+          </Suspense>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <OrderStatusChart
-            data={dashboard.ordersByStatus || {}}
-            title="Orders by Status"
-          />
+          <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded-lg" />}>
+            <OrderStatusChart
+              data={dashboard.ordersByStatus || {}}
+              title="Orders by Status"
+            />
+          </Suspense>
           <TopListingsTable
             listings={dashboard.topListings || []}
             title="Top 10 Listings by Revenue"

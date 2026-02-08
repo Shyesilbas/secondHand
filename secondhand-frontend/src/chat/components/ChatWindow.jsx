@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useAuth} from '../../auth/AuthContext.jsx';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useChatWindow} from '../hooks/useChatWindow.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import ChatHeader from './ChatHeader.jsx';
@@ -19,7 +19,7 @@ const ChatWindow = ({
                         onConversationDeleted,
                         isEmbedded = false
                     }) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const notification = useNotification();
     const {
         messageText,

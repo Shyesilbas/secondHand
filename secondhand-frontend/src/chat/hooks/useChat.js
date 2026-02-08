@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chatService.js';
 import useWebSocket from '../../common/hooks/useWebSocket.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { UNREAD_COUNT_KEYS } from './useUnreadCount.js';
 
 export const useChat = (userId, options = {}) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const queryClient = useQueryClient();
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
     const [messages, setMessages] = useState([]);

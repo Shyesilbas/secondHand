@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { favoriteService } from '../services/favoriteService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../favorites.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -18,7 +18,7 @@ const FavoriteButton = ({
                           className = ''
                         }) => {
 
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useAuthState();
   const { showSuccess, showError, showWarning, addNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();

@@ -5,7 +5,7 @@ import { ThreadCard, ThreadCardSkeleton } from '../components/ThreadCard.jsx';
 import { ThreadDetail, ThreadDetailSkeleton } from '../components/ThreadDetail.jsx';
 import { ThreadComposerModal } from '../components/ThreadComposerModal.jsx';
 import { ForumVisibilitySettingsModal } from '../components/ForumVisibilitySettingsModal.jsx';
-import { useAuth } from '../../../auth/AuthContext.jsx';
+import { useAuthState } from '../../../auth/AuthContext.jsx';
 
 const categories = [
   { id: 'SUGGESTIONS', label: 'Öneriler' },
@@ -19,7 +19,7 @@ const sorts = [
 
 const ForumPage = () => {
   const forum = useForum();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user } = useAuthState();
   const [composerOpen, setComposerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [listTab, setListTab] = useState('ALL');

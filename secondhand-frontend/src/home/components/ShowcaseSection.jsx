@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 
 const ShowcaseSection = () => {
+  const { user } = useAuthState();
   const [loadShowcases, setLoadShowcases] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -124,6 +126,8 @@ const ShowcaseSection = () => {
                   key={showcase.id}
                   listing={listing}
                   showActions={false}
+                  isOwner={user?.id === listing.sellerId}
+                  currentUserId={user?.id}
                 />
               );
             })}

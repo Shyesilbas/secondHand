@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { COMPLAINT_REASONS } from '../types/complaintTypes.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AlertCircle, ShieldCheck, Loader2, X } from 'lucide-react';
 
 const ComplaintModal = ({
@@ -41,7 +41,7 @@ const ComplaintModal = ({
         return Object.keys(newErrors).length === 0;
     };
 
-    const { user: currentUser } = useAuth();
+    const { user: currentUser } = useAuthState();
 
     const handleSubmit = async (e) => {
         e.preventDefault();

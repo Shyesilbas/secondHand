@@ -154,9 +154,7 @@ export const AuthProvider = ({ children }) => {
     }, [logout]);
 
     const value = useMemo(() => ({
-        user: authState.user,
-        isAuthenticated: authState.isAuthenticated,
-        isLoading: authState.isLoading,
+        authState,
         login,
         loginWithTokens,
         logout,
@@ -170,4 +168,10 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
+};
+
+// Convenience hook for components that only need auth state (user, isAuthenticated, isLoading)
+export const useAuthState = () => {
+    const { authState } = useAuth();
+    return authState;
 };

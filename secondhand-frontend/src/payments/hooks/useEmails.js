@@ -2,11 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { emailService } from '../../emails/services/emailService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 
 export const useEmails = () => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const queryClient = useQueryClient();
     const notification = useNotification();
 

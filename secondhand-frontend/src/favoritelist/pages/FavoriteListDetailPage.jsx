@@ -5,14 +5,14 @@ import {
     Share2, Package, X, ExternalLink
 } from 'lucide-react';
 import { useFavoriteListById, useLikeFavoriteList, useUnlikeFavoriteList, useDeleteFavoriteList, useRemoveItemFromList } from '../hooks/useFavoriteLists.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteListModal from '../components/FavoriteListModal.jsx';
 
 const FavoriteListDetailPage = () => {
     const { listId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user } = useAuthState();
     
     const [showMenu, setShowMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);

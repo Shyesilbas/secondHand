@@ -1,10 +1,10 @@
 import {useEffect} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {cartService} from '../services/cartService.js';
-import {useAuth} from '../../auth/AuthContext.jsx';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 
 export const useCart = (options = {}) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const queryClient = useQueryClient();
 
     const isEnabled = options.enabled ?? true;

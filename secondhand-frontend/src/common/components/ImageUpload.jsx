@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import apiClient from '../services/api/config.js';
 
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
@@ -9,7 +9,7 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthState();
 
   const handleFileSelect = async (file) => {
     setError(null);

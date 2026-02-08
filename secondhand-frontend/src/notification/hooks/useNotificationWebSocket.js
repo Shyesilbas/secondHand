@@ -1,9 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Stomp } from '@stomp/stompjs';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const useNotificationWebSocket = (onNotificationReceived) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const stompClient = useRef(null);
     const subscription = useRef(null);
     const broadcastSubscription = useRef(null);

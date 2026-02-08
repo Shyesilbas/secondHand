@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { favoriteService } from '../services/favoriteService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const useFavorites = (page = 0, size = 20) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   const [currentPage, setCurrentPage] = useState(page);
   const notification = useNotification();
   const queryClient = useQueryClient();

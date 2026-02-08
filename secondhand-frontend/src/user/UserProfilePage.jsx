@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, List } from 'lucide-react';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuthState } from '../auth/AuthContext.jsx';
 import { userService } from './services/userService.js';
 import { useUserListings } from './hooks/useUserListings.js';
 import { useReviews, useUserReviewStats } from '../reviews/index.js';
@@ -46,7 +46,7 @@ const useUserProfile = (userId) => {
 const UserProfilePage = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
-    const { user: currentUser } = useAuth();
+    const { user: currentUser } = useAuthState();
     const [activeTab, setActiveTab] = useState('listings');
     const [showCreateListModal, setShowCreateListModal] = useState(false);
 
@@ -208,6 +208,8 @@ const UserProfilePage = () => {
                                                         key={listing.id}
                                                         listing={listing}
                                                         showActions={false}
+                                                        isOwner={currentUser?.id === listing.sellerId}
+                                                        currentUserId={currentUser?.id}
                                                     />
                                                 ))}
                                             </div>
