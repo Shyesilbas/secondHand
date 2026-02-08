@@ -76,7 +76,6 @@ public class PasswordService {
                     
                     
                     log.info("Password reset verification code generated and email sent for user: {}", request.getEmail());
-                    log.info("Password reset verification code generated: {}", verificationCode);
                 });
 
         return Result.success("Check your email account for password reset verification code.");
@@ -93,7 +92,7 @@ public class PasswordService {
                     String verificationCode = verificationService.generateCode();
                     verificationService.generateVerification(user, verificationCode, CodeType.PASSWORD_RESET);
                     codeHolder[0] = verificationCode;
-                    log.info("Password reset code: {}", verificationCode);
+                    log.info("Password reset code generated for user: {}", request.getEmail());
                 });
 
         return Result.success(codeHolder[0]);

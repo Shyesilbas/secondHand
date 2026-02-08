@@ -5,6 +5,7 @@ import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class ShowcaseController {
 
     @PostMapping
     public ResponseEntity<?> createShowcase(
-            @RequestBody ShowcasePaymentRequest request,
+            @Valid @RequestBody ShowcasePaymentRequest request,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Request to create showcase for user: {} and listing {}",
