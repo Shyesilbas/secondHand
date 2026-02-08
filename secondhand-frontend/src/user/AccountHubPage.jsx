@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Search } from 'lucide-react';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuthState } from '../auth/AuthContext.jsx';
 import { getAccountHubSections } from './accountHubSections.js';
 import { filterAccountHubSections } from './accountHubFilter.js';
 
@@ -15,7 +15,7 @@ const getInitials = (name) => {
 };
 
 const AccountHubPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const [searchQuery, setSearchQuery] = useState('');
 
   const allSections = useMemo(() => getAccountHubSections({ userId: user?.id }), [user?.id]);

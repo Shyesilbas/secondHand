@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationService } from '../services/notificationService.js';
 import { useNotificationWebSocket } from './useNotificationWebSocket.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const useInAppNotifications = (onNewNotification) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const queryClient = useQueryClient();
     const [unreadCount, setUnreadCount] = useState(0);
 

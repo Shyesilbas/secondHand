@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { normalizeArrayResponse, PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 import { paymentService } from '../services/paymentService.js';
 
 export const useCreditCard = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   const queryClient = useQueryClient();
   const notification = useNotification();
 
@@ -78,7 +78,7 @@ export const useCreditCard = () => {
 
 export const useBankAccountMutations = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user } = useAuthState();
 
   const createMutation = useMutation({
     mutationFn: () => paymentService.createBankAccount(),
@@ -105,7 +105,7 @@ export const useBankAccountMutations = () => {
 };
 
 export const usePaymentMethods = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
 
   const queryFn = useCallback(async () => {
     const [cardsData, banksData] = await Promise.all([

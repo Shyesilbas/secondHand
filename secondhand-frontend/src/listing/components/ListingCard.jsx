@@ -6,7 +6,6 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { LISTING_STATUS } from '../types/index.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
@@ -15,10 +14,9 @@ import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 
-const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
+const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, currentUserId }) => {
     const [showInfo, setShowInfo] = useState(false);
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
-    const { user } = useAuth();
     const { showcases } = useShowcase();
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
     const { isInComparison } = useComparison();
@@ -26,11 +24,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
     if (!listing) return null;
 
     const isInCompare = isInComparison(listing.id);
-
-    const isOwner = user?.id === listing.sellerId;
     const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
-    const canAddToCart = user && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
-    const canMakeOffer = user && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+    const canAddToCart = currentUserId && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
+    const canMakeOffer = currentUserId && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -244,4 +240,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true }) => {
 
 ListingCard.displayName = 'ListingCard';
 
-export default ListingCard;
+export default memo(ListingCard, (prevProps, nextProps) => 
+    prevProps.listing.id === nextProps.listing.id &&
+    prevProps.isOwner === nextProps.isOwner &&
+    prevProps.currentUserId === nextProps.currentUserId &&
+    prevProps.showActions === nextProps.showActions
+);

@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
 import { useListingActions } from '../hooks/useListingActions.js';
 
 const ListingCardActions = ({ listing, onChanged }) => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isInShowcase } = useShowcaseQueries();
   const dropdownRef = useRef(null);

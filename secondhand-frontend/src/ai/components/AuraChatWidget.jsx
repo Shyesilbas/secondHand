@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { aiChatService } from '../services/aiChatService.js';
 import { MessageCircle, Send, Sparkles, X } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -8,7 +8,7 @@ import { useAuraChat } from '../hooks/useAuraChat.js';
 import { createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 
 const AuraChatWidget = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   const navigate = useNavigate();
   const userId = user?.id ?? null;
 

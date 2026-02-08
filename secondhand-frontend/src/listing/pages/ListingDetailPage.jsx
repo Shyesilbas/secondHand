@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import {useAuth} from '../../auth/AuthContext.jsx';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
@@ -20,7 +20,7 @@ import ListingSocialPanel from '../components/ListingSocialPanel.jsx';
 const ListingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthState();
   const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
   const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
   const [activeTab, setActiveTab] = useState('about');

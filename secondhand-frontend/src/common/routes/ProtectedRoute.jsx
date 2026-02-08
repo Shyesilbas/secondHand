@@ -5,7 +5,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../constants/routes.js';
 
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { authState: { isAuthenticated, isLoading } } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const notification = useNotification();

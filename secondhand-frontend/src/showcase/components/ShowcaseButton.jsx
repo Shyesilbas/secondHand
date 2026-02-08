@@ -3,7 +3,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import ShowcaseModal from './ShowcaseModal.jsx';
 
 const ShowcaseButton = ({ listingId, onSuccess }) => {
-    const { isAuthenticated } = useAuth();
+    const { authState: { isAuthenticated } } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     if (!isAuthenticated) {

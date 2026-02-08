@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { agreementService } from '../services/agreementService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const AGREEMENT_KEYS = {
     all: ['agreements'],
@@ -65,7 +65,7 @@ export const useAgreementByType = (agreementType) => {
 };
 
 export const useUserAgreements = () => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const {
         data: userAgreements = [],
         isLoading,

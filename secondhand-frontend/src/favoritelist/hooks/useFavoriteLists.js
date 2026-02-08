@@ -3,10 +3,10 @@ import { favoriteListService } from '../services/favoriteListService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { handleError } from '../../common/errorHandler.js';
 import { extractSuccessMessage } from '../../common/successHandler.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const useMyFavoriteLists = (page = 0, size = 5) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     return useQuery({
         queryKey: ['favoriteLists', 'my', user?.id, page, size],
         queryFn: () => favoriteListService.getMyLists(page, size),
@@ -72,7 +72,7 @@ export const useListsContainingListing = (listingId) => {
 export const useCreateFavoriteList = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useNotification();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     return useMutation({
         mutationFn: (data) => favoriteListService.createList(data),
@@ -90,7 +90,7 @@ export const useCreateFavoriteList = () => {
 export const useUpdateFavoriteList = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useNotification();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     return useMutation({
         mutationFn: ({ listId, data }) => favoriteListService.updateList(listId, data),
@@ -110,7 +110,7 @@ export const useUpdateFavoriteList = () => {
 export const useDeleteFavoriteList = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useNotification();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     return useMutation({
         mutationFn: (listId) => favoriteListService.deleteList(listId),
@@ -130,7 +130,7 @@ export const useDeleteFavoriteList = () => {
 export const useAddItemToList = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useNotification();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     return useMutation({
         mutationFn: ({ listId, listingId, note }) => 
@@ -150,7 +150,7 @@ export const useAddItemToList = () => {
 export const useRemoveItemFromList = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useNotification();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     return useMutation({
         mutationFn: ({ listId, listingId }) => 

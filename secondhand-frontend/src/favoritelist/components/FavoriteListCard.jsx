@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Globe, Lock, MoreVertical, Pencil, Trash2, Package } from 'lucide-react';
 import { useLikeFavoriteList, useUnlikeFavoriteList, useDeleteFavoriteList } from '../hooks/useFavoriteLists.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteListModal from './FavoriteListModal.jsx';
 
 const FavoriteListCard = ({ list, showOwner = false }) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const [showMenu, setShowMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 

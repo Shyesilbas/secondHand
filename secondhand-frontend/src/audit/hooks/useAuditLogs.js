@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { auditLogService } from '../services/auditLogService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useEnums } from '../../common/hooks/useEnums.js';
 
 export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const { enums, isLoading: isLoadingEnums } = useEnums();
     const [allAuditLogs, setAllAuditLogs] = useState([]);
     const [filteredLogs, setFilteredLogs] = useState([]);

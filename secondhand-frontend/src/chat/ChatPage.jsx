@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../auth/AuthContext.jsx';
+import { useAuthState } from '../auth/AuthContext.jsx';
 import { useChat } from './hooks/useChat.js';
 import ChatWindow from './components/ChatWindow.jsx';
 import ChatList from './components/ChatList.jsx';
@@ -9,7 +9,7 @@ import { MessageCircle } from 'lucide-react';
 import { useNotification } from '../notification/NotificationContext.jsx';
 
 const ChatPage = () => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const navigate = useNavigate();
   const notification = useNotification();
   const [isChatOpen, setIsChatOpen] = useState(false);

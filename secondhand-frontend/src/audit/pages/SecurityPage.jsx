@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAuditLogsPagination} from '../hooks/useAuditLogsPagination.js';
-import {useAuth} from '../../auth/AuthContext.jsx';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 import {authService} from '../../auth/services/authService.js';
 import {ArrowLeft, LogOut, Settings2, ShieldAlert, ShieldCheck} from 'lucide-react';
 
@@ -13,7 +13,7 @@ import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
 
 const SecurityPage = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user } = useAuthState();
 
     const [selectedLog, setSelectedLog] = useState(null);
     const [showFilters, setShowFilters] = useState(false);

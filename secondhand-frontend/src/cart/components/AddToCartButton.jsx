@@ -1,6 +1,6 @@
 import { ShoppingCartIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useCart } from '../hooks/useCart.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const AddToCartButton = ({
                              listing,
@@ -8,7 +8,7 @@ const AddToCartButton = ({
                              showText = false,
                              className = ''
                          }) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const { addToCart, isAddingToCart, cartItems } = useCart({ loadCartItems: true });
     
     // Check if item is in cart from cartItems array (no API call needed!)

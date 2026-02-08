@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import { useAuth } from '../../../auth/AuthContext.jsx';
+import { useAuthState } from '../../../auth/AuthContext.jsx';
 import { getForumVisibilitySettings } from '../utils/forumVisibilitySettings.js';
 
 const categoryLabel = {
@@ -9,7 +9,7 @@ const categoryLabel = {
 };
 
 export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => {
-  const { user } = useAuth();
+  const { user } = useAuthState();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);

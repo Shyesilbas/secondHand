@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { followService } from '../services/followService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const useFollowStats = (userId) => {
     const normalizedUserId = userId ? String(userId) : null;
@@ -30,7 +30,7 @@ export const useFollowStats = (userId) => {
 };
 
 export const useFollow = (userId) => {
-    const { user } = useAuth();
+    const { user } = useAuthState();
     const notification = useNotification();
     const queryClient = useQueryClient();
     const normalizedUserId = userId ? String(userId) : null;
@@ -119,7 +119,7 @@ export const useFollow = (userId) => {
 };
 
 export const useFollowingList = (page = 0, size = 20) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const [currentPage, setCurrentPage] = useState(page);
 
     useEffect(() => {
@@ -162,7 +162,7 @@ export const useFollowingList = (page = 0, size = 20) => {
 };
 
 export const useFollowersList = (page = 0, size = 20) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const [currentPage, setCurrentPage] = useState(page);
 
     useEffect(() => {

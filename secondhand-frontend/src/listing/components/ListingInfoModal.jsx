@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import usePriceHistory from '../hooks/usePriceHistory.js';
 import { formatCurrency } from '../../common/formatters.js';
-import PriceHistoryTab from './PriceHistoryTab.jsx';
 import ExchangeRatesTab from './ExchangeRatesTab.jsx';
 import ViewStatisticsCard from './ViewStatisticsCard.jsx';
 import { X, TrendingUp, RefreshCw, Eye } from 'lucide-react';
+
+const PriceHistoryTab = lazy(() => import('./PriceHistoryTab.jsx'));
 
 const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, currency, isOwner, viewStats }) => {
   const [activeTab, setActiveTab] = useState('history');
@@ -106,12 +107,14 @@ const ListingInfoModal = ({ isOpen, onClose, listingId, listingTitle, price, cur
 
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 min-h-[400px]">
             {activeTab === 'history' && (
-              <PriceHistoryTab
-                priceHistory={priceHistory}
-                loading={historyLoading}
-                error={historyError}
-                currency={currency}
-              />
+              <Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded-lg" />}>
+                <PriceHistoryTab
+                  priceHistory={priceHistory}
+                  loading={historyLoading}
+                  error={historyError}
+                  currency={currency}
+                />
+              </Suspense>
             )}
 
             {activeTab === 'exchange' && (

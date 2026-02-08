@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chatService.js';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const UNREAD_COUNT_KEYS = {
     all: ['unreadCount'],
@@ -9,7 +9,7 @@ export const UNREAD_COUNT_KEYS = {
 };
 
 export const useTotalUnreadCount = (options = {}) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useAuthState();
     const queryClient = useQueryClient();
 
     const {

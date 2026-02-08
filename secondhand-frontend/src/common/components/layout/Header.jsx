@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 const Header = () => {
-    const { isAuthenticated, user, logout } = useAuth();
+    const { authState: { isAuthenticated, user }, logout } = useAuth();
     const navigate = useNavigate();
     const notification = useNotification();
     const scrolled = useHeaderScroll();
