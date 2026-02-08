@@ -4,6 +4,7 @@ import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
 import com.serhat.secondhand.chat.service.ChatService;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -56,9 +57,9 @@ public class ChatRestController {
 
 
     @PostMapping("/messages")
-    public ResponseEntity<ChatMessageDto> sendMessage(@RequestBody ChatMessageDto messageDto) {
-        log.info("Sending message - sender: {}, room: {}, content: {}", 
-                messageDto.getSenderId(), messageDto.getChatRoomId(), messageDto.getContent());
+    public ResponseEntity<ChatMessageDto> sendMessage(@Valid @RequestBody ChatMessageDto messageDto) {
+        log.info("Sending message - sender: {}, room: {}", 
+                messageDto.getSenderId(), messageDto.getChatRoomId());
         ChatMessageDto sentMessage = chatService.sendMessage(messageDto);
         return ResponseEntity.ok(sentMessage);
     }

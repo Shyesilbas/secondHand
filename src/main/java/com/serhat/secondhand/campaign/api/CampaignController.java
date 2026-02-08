@@ -6,6 +6,7 @@ import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.service.CampaignService;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +27,7 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> create(@Valid @RequestBody CreateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
         Result<CampaignDto> result = campaignService.create(currentUser.getId(), request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -36,7 +37,7 @@ public class CampaignController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody UpdateCampaignRequest request, @AuthenticationPrincipal User currentUser) {
         Result<CampaignDto> result = campaignService.update(currentUser.getId(), id, request);
         if (result.isError()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -13,6 +13,7 @@ import com.serhat.secondhand.review.service.ReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -77,7 +78,7 @@ public class ListingController {
     @PostMapping("/bulk")
     @Operation(summary = "Get listings by IDs")
     public ResponseEntity<List<ListingDto>> getListingsByIds(
-            @RequestBody List<UUID> ids,
+            @Valid @RequestBody List<UUID> ids,
             @AuthenticationPrincipal User currentUser) {
 
         Long userId = currentUser != null ? currentUser.getId() : null;
@@ -86,7 +87,7 @@ public class ListingController {
 
     @PostMapping("/filter")
     public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
-            @RequestBody ListingFilterDto filters,
+            @Valid @RequestBody ListingFilterDto filters,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal User currentUser) {

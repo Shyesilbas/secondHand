@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -157,6 +158,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         var result = userService.getById(id);
         if (result.isError()) {
@@ -205,6 +207,7 @@ public class UserController {
 
     @GetMapping("/audit-logs")
     @Operation(summary = "Get user audit logs", description = "Retrieve paginated audit logs for the authenticated user")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<AuditLog>> getMyAuditLogs(
             Authentication authentication,
             @PageableDefault(page = 0, size = 10) Pageable pageable) {

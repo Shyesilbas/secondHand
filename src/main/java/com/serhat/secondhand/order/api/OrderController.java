@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -130,6 +131,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {

@@ -11,6 +11,7 @@ import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,11 +41,11 @@ public class PaymentController {
     @PostMapping("/pay")
     @Operation(summary = "Create a new payment", description = "Processes a general payment request using idempotency for safety.")
     public ResponseEntity<?> createPayment(
-            @RequestBody PaymentRequest paymentRequest,
+            @Valid @RequestBody PaymentRequest paymentRequest,
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Creating payment for user ID {} with idempotency key {}", currentUser.getId(), idempotencyKey);
+        log.info("Creating payment for user ID {}", currentUser.getId());
 
         // Helper kullanarak idempotency key'i DTO'ya taşıyoruz
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
@@ -56,7 +57,7 @@ public class PaymentController {
     @PostMapping("/initiate-verification")
     @Operation(summary = "Initiate payment verification", description = "Starts the verification process (e.g., OTP) for a payment.")
     public ResponseEntity<Void> initiatePaymentVerification(
-            @RequestBody(required = false) InitiateVerificationRequest request,
+            @Valid @RequestBody(required = false) InitiateVerificationRequest request,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Initiating payment verification for user ID: {}", currentUser.getId());
@@ -67,12 +68,11 @@ public class PaymentController {
     @PostMapping("/listings/pay-fee")
     @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fees.")
     public ResponseEntity<?> payListingCreationFee(
-            @RequestBody PaymentRequest listingFeePaymentRequest,
+            @Valid @RequestBody PaymentRequest listingFeePaymentRequest,
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @AuthenticationPrincipal User currentUser) {
 
-        log.info("Processing listing fee payment for user ID {} with idempotency key {}",
-                currentUser.getId(), idempotencyKey);
+        log.info("Processing listing fee payment for user ID {}", currentUser.getId());
 
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(listingFeePaymentRequest, idempotencyKey);
         Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), finalRequest);
