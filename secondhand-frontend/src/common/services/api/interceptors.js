@@ -35,6 +35,19 @@ apiClient.interceptors.request.use(
             }
         }
                 config.withCredentials = true;
+
+        // Manually add CSRF token from cookie if not already present
+        if (!config.headers['X-XSRF-TOKEN']) {
+            const csrfToken = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1];
+            
+            if (csrfToken) {
+                config.headers['X-XSRF-TOKEN'] = csrfToken;
+            }
+        }
+
         return config;
     },
     (error) => Promise.reject(error)
@@ -53,7 +66,8 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-                if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+                // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
+        if (error.response?.status === 401 && !originalRequest._retry) {
             
             if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
                 return Promise.reject(error);

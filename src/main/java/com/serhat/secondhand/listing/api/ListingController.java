@@ -123,10 +123,13 @@ public class ListingController {
     }
 
     @GetMapping("/my-listings/status/{status}")
-    public ResponseEntity<List<ListingDto>> getMyListingsByStatus(
+    public ResponseEntity<Page<ListingDto>> getMyListingsByStatus(
             @PathVariable ListingStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(listingService.getMyListingsByStatus(currentUser.getId(), status));
+        Page<ListingDto> result = listingService.getMyListingsByStatus(currentUser.getId(), status, page, size);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}/publish")

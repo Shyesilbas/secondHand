@@ -19,7 +19,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "orders")
+@Table(name = "orders", indexes = {
+    @Index(name = "idx_order_user", columnList = "user_id"),
+    @Index(name = "idx_order_status", columnList = "status"),
+    @Index(name = "idx_order_payment_status", columnList = "payment_status"),
+    @Index(name = "idx_order_created", columnList = "created_at"),
+    @Index(name = "idx_order_number", columnList = "order_number")
+})
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
 

@@ -5,26 +5,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.serhat.secondhand.ai.dto.UserMemory;
-import com.serhat.secondhand.ai.memory.dto.MemoryExtraction;
 import com.serhat.secondhand.ai.memory.ChatMessage;
 import com.serhat.secondhand.ai.memory.ChatRole;
+import com.serhat.secondhand.ai.memory.dto.MemoryExtraction;
 import com.serhat.secondhand.ai.memory.repository.ChatMessageRepository;
 import com.serhat.secondhand.ai.memory.repository.UserMemoryRepository;
 import com.serhat.secondhand.ai.service.GeminiClient;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class MemoryService {
 
     private static final String DEFAULT_TONE = "Friendly";
@@ -74,6 +72,7 @@ public class MemoryService {
         try {
             updateMemoryFromInteractionInternal(userId, userMessage, assistantAnswer);
         } catch (Exception e) {
+            log.error("Failed to update memory for user {}: {}", userId, e.getMessage(), e);
             return;
         }
     }
@@ -180,6 +179,7 @@ public class MemoryService {
             String raw = geminiClient.generateTextForMemory(prompt);
             return parseExtraction(raw);
         } catch (Exception e) {
+            log.error("Failed to extract memory with AI for user {}: {}", memory.getUserId(), e.getMessage(), e);
             return new MemoryExtraction(null, null, List.of(), null, null);
         }
     }
@@ -208,9 +208,11 @@ public class MemoryService {
             String secondHandProfileJson = readSecondHandProfileJson(node.get("secondHandProfile"));
             return new MemoryExtraction(name, tone, interests, notes, secondHandProfileJson);
         } catch (Exception e) {
+            log.warn("Failed to parse memory extraction JSON, attempting fallback: {}", e.getMessage());
             try {
                 return objectMapper.readValue(json, MemoryExtraction.class);
-            } catch (Exception ignored) {
+            } catch (Exception fallbackException) {
+                log.error("Failed to parse memory extraction with fallback: {}", fallbackException.getMessage(), fallbackException);
                 return new MemoryExtraction(null, null, List.of(), null, null);
             }
         }
@@ -366,6 +368,7 @@ public class MemoryService {
         try {
             return objectMapper.writeValueAsString(base);
         } catch (Exception e) {
+            log.error("Failed to serialize merged profile JSON: {}", e.getMessage(), e);
             return base.toString();
         }
     }
@@ -389,7 +392,8 @@ public class MemoryService {
                     }
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Failed to sync interests from profile JSON: {}", e.getMessage());
         }
     }
 

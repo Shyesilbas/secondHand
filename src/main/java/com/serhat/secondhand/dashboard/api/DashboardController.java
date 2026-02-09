@@ -3,6 +3,7 @@ package com.serhat.secondhand.dashboard.api;
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.dashboard.service.DashboardService;
+import com.serhat.secondhand.dashboard.util.DateRangeHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/v1/dashboard")
@@ -29,6 +29,7 @@ import java.time.LocalTime;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final DateRangeHelper dateRangeHelper;
 
     @GetMapping("/seller")
     @Operation(summary = "Get seller dashboard", description = "Retrieve analytics dashboard for seller")
@@ -41,16 +42,8 @@ public class DashboardController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         
-        if (endDate == null) {
-            endDate = LocalDateTime.now();
-        } else {
-            endDate = endDate.toLocalDate().atTime(23, 59, 59, 999999999);
-        }
-        if (startDate == null) {
-            startDate = endDate.toLocalDate().minusDays(30).atStartOfDay();
-        } else {
-            startDate = startDate.toLocalDate().atStartOfDay();
-        }
+        endDate = dateRangeHelper.normalizeEndDate(endDate);
+        startDate = dateRangeHelper.normalizeStartDate(startDate, endDate);
         
         log.info("API request for seller dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
         SellerDashboardDto dashboard = dashboardService.getSellerDashboard(currentUser.getId(), startDate, endDate);
@@ -68,16 +61,8 @@ public class DashboardController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
         
-        if (endDate == null) {
-            endDate = LocalDateTime.now();
-        } else {
-            endDate = endDate.toLocalDate().atTime(LocalTime.MAX);
-        }
-        if (startDate == null) {
-            startDate = endDate.toLocalDate().minusDays(30).atStartOfDay();
-        } else {
-            startDate = startDate.toLocalDate().atStartOfDay();
-        }
+        endDate = dateRangeHelper.normalizeEndDate(endDate);
+        startDate = dateRangeHelper.normalizeStartDate(startDate, endDate);
         
         log.info("API request for buyer dashboard from {} to {} for user: {}", startDate, endDate, currentUser.getEmail());
         BuyerDashboardDto dashboard = dashboardService.getBuyerDashboard(currentUser.getId(), startDate, endDate);

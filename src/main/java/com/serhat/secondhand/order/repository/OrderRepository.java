@@ -16,7 +16,12 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Page<Order> findByUserId(Long userId, Pageable pageable);
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "LEFT JOIN FETCH o.orderItems oi " +
+           "LEFT JOIN FETCH oi.listing l " +
+           "LEFT JOIN FETCH l.seller " +
+           "WHERE o.user.id = :userId")
+    Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId ORDER BY o.createdAt DESC")
     List<Order> findByUserIdWithOrderItems(@Param("userId") Long userId);
@@ -50,7 +55,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.user.id = :userId AND o.createdAt BETWEEN :startDate AND :endDate AND o.paymentStatus = 'PAID' AND o.status != 'CANCELLED' AND o.status != 'REFUNDED'")
     BigDecimal sumTotalAmountByUserIdAndDateRange(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT DISTINCT o FROM Order o JOIN o.orderItems oi WHERE oi.listing.seller.id = :sellerId ORDER BY o.createdAt DESC")
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN FETCH o.orderItems oi " +
+           "JOIN FETCH oi.listing l " +
+           "JOIN FETCH l.seller " +
+           "WHERE l.seller.id = :sellerId " +
+           "ORDER BY o.createdAt DESC")
     Page<Order> findOrdersBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
     boolean existsByUserIdAndStatus(Long userId, Order.OrderStatus status);

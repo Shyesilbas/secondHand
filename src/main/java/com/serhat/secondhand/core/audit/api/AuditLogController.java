@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.audit.api;
 
+import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,42 +29,42 @@ public class AuditLogController {
 
     @GetMapping("/user/{userEmail}")
     @Operation(summary = "Get audit logs by user email", description = "Retrieve paginated audit logs for a specific user")
-    public ResponseEntity<Page<AuditLog>> getAuditLogsByUserEmail(
+    public ResponseEntity<Page<AuditLogDto>> getAuditLogsByUserEmail(
             @PathVariable String userEmail,
             @PageableDefault(size = 10) Pageable pageable) {
         log.info("Fetching audit logs for user: {} with pagination", userEmail);
-        Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userEmail, pageable);
+        Page<AuditLogDto> auditLogs = auditLogService.getUserAuditLogs(userEmail, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
     @GetMapping("/user/id/{userId}")
     @Operation(summary = "Get audit logs by user ID", description = "Retrieve paginated audit logs for a specific user ID")
-    public ResponseEntity<Page<AuditLog>> getAuditLogsByUserId(
+    public ResponseEntity<Page<AuditLogDto>> getAuditLogsByUserId(
             @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("Fetching audit logs for user ID: {} with pagination", userId);
-        Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(userId, pageable);
+        Page<AuditLogDto> auditLogs = auditLogService.getUserAuditLogs(userId, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
     @GetMapping("/event-type/{eventType}")
     @Operation(summary = "Get audit logs by event type", description = "Retrieve audit logs filtered by event type")
-    public ResponseEntity<Page<AuditLog>> getAuditLogsByEventType(
+    public ResponseEntity<Page<AuditLogDto>> getAuditLogsByEventType(
             @PathVariable AuditLog.AuditEventType eventType,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("Fetching audit logs for event type: {}", eventType);
-        Page<AuditLog> auditLogs = auditLogService.getAuditLogsByEventType(eventType, pageable);
+        Page<AuditLogDto> auditLogs = auditLogService.getAuditLogsByEventType(eventType, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
     @GetMapping("/date-range")
     @Operation(summary = "Get audit logs by date range", description = "Retrieve audit logs within a specific date range")
-    public ResponseEntity<Page<AuditLog>> getAuditLogsByDateRange(
+    public ResponseEntity<Page<AuditLogDto>> getAuditLogsByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("Fetching audit logs from {} to {}", startDate, endDate);
-        Page<AuditLog> auditLogs = auditLogService.getAuditLogsByDateRange(startDate, endDate, pageable);
+        Page<AuditLogDto> auditLogs = auditLogService.getAuditLogsByDateRange(startDate, endDate, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 

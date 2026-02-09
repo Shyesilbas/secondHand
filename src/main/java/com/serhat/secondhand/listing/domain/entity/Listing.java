@@ -17,7 +17,13 @@ import java.util.UUID;
 @NoArgsConstructor @AllArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "listings")
+@Table(name = "listings", indexes = {
+    @Index(name = "idx_listing_seller", columnList = "seller_id"),
+    @Index(name = "idx_listing_status", columnList = "status"),
+    @Index(name = "idx_listing_type", columnList = "listing_type"),
+    @Index(name = "idx_listing_location", columnList = "city, district"),
+    @Index(name = "idx_listing_created", columnList = "createdAt")
+})
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Listing {
 

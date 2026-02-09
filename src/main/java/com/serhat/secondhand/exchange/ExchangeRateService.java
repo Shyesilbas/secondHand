@@ -19,6 +19,8 @@ public class ExchangeRateService {
     private static final String API_URL = "https://v6.exchangerate-api.com/v6/{apiKey}/pair/{base}/{target}";
 
     public ExchangeRateDto getRate(String from, String to) {
+        validateCurrencies(from, to);
+        
         String url = API_URL
                 .replace("{apiKey}", exchangeConfig.getKey())
                 .replace("{base}", from)
@@ -51,5 +53,17 @@ public class ExchangeRateService {
             log.error("Unexpected error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred while fetching exchange rate.", e);
         }
+    }
+
+    private void validateCurrencies(String from, String to) {
+        if (!isSupported(from) || !isSupported(to)) {
+            throw new IllegalArgumentException("Only USD, EUR and TRY currencies are supported.");
+        }
+    }
+
+    private boolean isSupported(String currency) {
+        return "USD".equalsIgnoreCase(currency)
+                || "EUR".equalsIgnoreCase(currency)
+                || "TRY".equalsIgnoreCase(currency);
     }
 }

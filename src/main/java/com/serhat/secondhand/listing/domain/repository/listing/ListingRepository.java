@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,13 +32,21 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.status = :status")
     Page<Listing> findByStatus(@Param("status") ListingStatus status, Pageable pageable);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId")
+    @EntityGraph(attributePaths = {"seller"})
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId")
     Page<Listing> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId AND l.status = :status")
-    List<Listing> findBySellerIdAndStatus(@Param("sellerId") Long sellerId, @Param("status") ListingStatus status);
+    @EntityGraph(attributePaths = {"seller"})
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.status = :status",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.status = :status")
+    Page<Listing> findBySellerIdAndStatus(@Param("sellerId") Long sellerId,
+                                          @Param("status") ListingStatus status,
+                                          Pageable pageable);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.seller.id = :sellerId AND l.listingType = :listingType")
+    @EntityGraph(attributePaths = {"seller"})
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType")
     Page<Listing> findBySellerIdAndListingType(@Param("sellerId") Long sellerId, @Param("listingType") ListingType listingType, Pageable pageable);
 
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller " +

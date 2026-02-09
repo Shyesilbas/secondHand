@@ -130,7 +130,11 @@ export const useListingFilters = ({
   }, [filters, mineStatus, mode]);
 
   const updateFilters = useCallback((newFilters) => {
-    setFilters((prev) => ({ ...prev, ...newFilters, page: 0 }));
+    setFilters((prev) => ({
+      ...prev,
+      ...newFilters,
+      ...(Object.prototype.hasOwnProperty.call(newFilters ?? {}, 'page') ? {} : { page: 0 }),
+    }));
   }, []);
 
   const resetFilters = useCallback(() => {

@@ -17,19 +17,6 @@ public class ExchangeRateController {
             @PathVariable String from,
             @PathVariable String to
     ) {
-        validateCurrencies(from, to);
         return exchangeRateService.getRate(from, to);
-    }
-
-    private void validateCurrencies(String from, String to) {
-        if (!isSupported(from) || !isSupported(to)) {
-            throw new IllegalArgumentException("Only USD, EUR and TRY currencies are supported.");
-        }
-    }
-
-    private boolean isSupported(String currency) {
-        return "USD".equalsIgnoreCase(currency)
-                || "EUR".equalsIgnoreCase(currency)
-                || "TRY".equalsIgnoreCase(currency);
     }
 }

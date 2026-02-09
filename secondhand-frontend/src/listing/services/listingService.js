@@ -106,8 +106,9 @@ export const listingService = {
     }
     return get(url);
   },
-  getMyListingsByStatus: async (status) => {
-    return get(`${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}`);
+  getMyListingsByStatus: async (status, page = 0, size = 20) => {
+    const url = `${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}?page=${page}&size=${size}`;
+    return get(url);
   },
   
   globalSearch: async (query, page = 0, size = 8) => {

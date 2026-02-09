@@ -56,13 +56,13 @@ public class Campaign {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal value;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "campaign_eligible_types", joinColumns = @JoinColumn(name = "campaign_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "listing_type")
     private Set<ListingType> eligibleTypes;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "campaign_eligible_listings", joinColumns = @JoinColumn(name = "campaign_id"))
     @Column(name = "listing_id")
     private Set<UUID> eligibleListingIds;

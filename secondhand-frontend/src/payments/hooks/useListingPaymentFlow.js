@@ -61,7 +61,15 @@ export const useDraftListings = () => {
   const { user, isAuthenticated } = useAuthState();
 
   const queryFn = useCallback(async () => {
-    const data = await listingService.getMyListingsByStatus('DRAFT');
+    // İlk sayfadan (page=0) makul bir limit ile taslak ilanları çek
+    const data = await listingService.getMyListingsByStatus('DRAFT', 0, 50);
+
+    // Backend artık Page döndürüyor; content dizisini kullan
+    if (data && Array.isArray(data.content)) {
+      return data.content;
+    }
+
+    // Eski/non-paginated response için geri dönüş uyumluluğu
     return Array.isArray(data) ? data : [];
   }, []);
 
