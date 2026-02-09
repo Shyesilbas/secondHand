@@ -1,6 +1,7 @@
 package com.serhat.secondhand.email.api;
 
 import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +35,16 @@ public class EmailController {
 
         log.info("Getting email history for userId: {}", currentUser.getId());
         Page<EmailDto> emails = emailService.getUserEmails(currentUser.getId(), pageable);
+        return ResponseEntity.ok(emails);
+    }
+
+    @GetMapping("/my-emails/{emailType}")
+    public ResponseEntity<Page<EmailDto>> getMyEmailsByType(
+            @PathVariable EmailType emailType,
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable)
+    {
+        Page<EmailDto> emails = emailService.getEmailsByType(currentUser.getId(), pageable,emailType);
         return ResponseEntity.ok(emails);
     }
 

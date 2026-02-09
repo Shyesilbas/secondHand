@@ -1,6 +1,7 @@
 package com.serhat.secondhand.email.domain.repository;
 
 import com.serhat.secondhand.email.domain.entity.Email;
+import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,6 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
     @Query("delete from Email e where e.user.id = :userId")
     void deleteAllByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND e.emailType = :emailType ORDER BY e.createdAt DESC")
+    Page<Email> findByUserIdAndEmailType(Long userId, Pageable pageable, EmailType emailType);
 }
