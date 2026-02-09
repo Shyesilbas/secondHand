@@ -60,6 +60,13 @@ public class EmailService {
         return emailsPage.map(emailMapper::toDto);
     }
 
+    public Page<EmailDto> getEmailsByType(Long userId,Pageable pageable, EmailType emailType) {
+        log.info("Fetching emails by type {} for userId: {}", emailType, userId);
+
+        Page<Email> emailsPage = emailRepository.findByUserIdAndEmailType(userId, pageable, emailType);
+        return emailsPage.map(emailMapper::toDto);
+    }
+
     @Transactional(readOnly = true)
     public long getUnreadCount(Long userId) {
         return emailRepository.countByUserIdAndReadAtIsNull(userId);
