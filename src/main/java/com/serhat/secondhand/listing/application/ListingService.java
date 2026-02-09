@@ -78,10 +78,12 @@ public class ListingService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
         return listingRepository.findByIdWithSeller(id).map(listing -> {
             ListingDto dto = listingMapper.toDynamicDto(listing);
@@ -103,11 +105,13 @@ public class ListingService {
         });
     }
 
+    @Transactional(readOnly = true)
     public List<Listing> findAllByIds(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) return List.of();
         return listingRepository.findAllByIdIn(ids);
     }
 
+    @Transactional(readOnly = true)
     public List<ListingDto> findByIds(List<UUID> ids, Long userId) {
         if (ids == null || ids.isEmpty()) return List.of();
         List<Listing> listings = listingRepository.findAllById(ids);
@@ -159,12 +163,10 @@ public class ListingService {
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
-    public List<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status) {
-        return enrichList(
-                listingRepository.findBySellerIdAndStatus(userId, status)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                userId
-        );
+    public Page<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Listing> listingsPage = listingRepository.findBySellerIdAndStatus(userId, status, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
     public List<ListingDto> findByStatusAsDto(ListingStatus status) {

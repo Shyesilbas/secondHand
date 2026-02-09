@@ -1,6 +1,7 @@
 package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
+import com.serhat.secondhand.core.security.CsrfCookieFilter;
 import com.serhat.secondhand.core.security.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -147,8 +149,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
-        
+        requestHandler.setCsrfRequestAttributeName(null);
+
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -160,7 +162,16 @@ public class SecurityConfig {
                                 "/api/auth/refresh",
                                 "/api/auth/oauth2/**",
                                 "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                "/api/v1/listings/filter",
+                                "/api/v1/listings/bulk",
+                                "/api/v1/books/filter",
+                                "/api/v1/realEstates/filter",
+                                "/api/v1/vehicles/filter",
+                                "/api/v1/clothing/filter",
+                                "/api/v1/electronics/filter",
+                                "/api/v1/sports/filter",
+                                "/api/v1/listings/{id}/view"
                         )
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -231,7 +242,8 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(rateLimitingFilter, SecurityContextHolderFilter.class)
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
     }
@@ -329,7 +341,8 @@ public class SecurityConfig {
                 "Origin",
                 "Cache-Control",
                 "X-File-Name",
-                "Idempotency-Key"
+                "Idempotency-Key",
+                "X-XSRF-TOKEN"
         ));
 
         // Allow credentials (important for JWT tokens)

@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class ForumService {
     private final PlatformTransactionManager transactionManager;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public Page<ForumThreadDto> listThreads(ForumCategory category,
                                             ForumThreadStatus status,
                                             String q,
@@ -56,6 +58,7 @@ public class ForumService {
         return threadRepository.search(category, status, normalizeQuery(q), pageable).map(threadMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
     public Result<ForumThreadDto> getThread(Long threadId) {
         if (threadId == null) return Result.error(ForumErrorCodes.INVALID_REQUEST);
         return threadRepository.findById(threadId)

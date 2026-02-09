@@ -7,7 +7,10 @@ const apiClient = axios.create({
         'Content-Type': 'application/json',
     },
     timeout: 10000,
-    withCredentials: true, });
+    withCredentials: true,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN'
+});
 
 export default apiClient;
 export { API_BASE_URL };

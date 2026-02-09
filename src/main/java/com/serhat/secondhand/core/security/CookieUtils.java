@@ -124,13 +124,21 @@ public class CookieUtils {
         java.util.Collection<String> cookieHeaders = response.getHeaders("Set-Cookie");
         
         if (cookieHeaders != null && !cookieHeaders.isEmpty()) {
-            response.setHeader("Set-Cookie", null);
+            // Collect all existing Set-Cookie headers
+            java.util.List<String> updatedHeaders = new java.util.ArrayList<>();
             
             for (String cookieHeader : cookieHeaders) {
+                // Only modify the target cookie, leave others untouched (including XSRF-TOKEN)
                 if (cookieHeader.contains(cookieName + "=") && !cookieHeader.contains("SameSite=")) {
                     cookieHeader = cookieHeader + "; SameSite=" + sameSite;
                 }
-                response.addHeader("Set-Cookie", cookieHeader);
+                updatedHeaders.add(cookieHeader);
+            }
+            
+            // Clear and re-add all headers
+            response.setHeader("Set-Cookie", null);
+            for (String header : updatedHeaders) {
+                response.addHeader("Set-Cookie", header);
             }
         }
     }

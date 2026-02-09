@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
+import com.serhat.secondhand.order.dto.UpdateOrderNameRequest;
 import com.serhat.secondhand.order.service.*;
 import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.review.service.ReviewService;
@@ -14,10 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -251,12 +249,5 @@ public class OrderController {
                     .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
         }
         return ResponseEntity.ok(result.getData());
-    }
-
-    @Setter
-    @Getter
-    public static class UpdateOrderNameRequest {
-        @NotBlank
-        private String name;
     }
 }

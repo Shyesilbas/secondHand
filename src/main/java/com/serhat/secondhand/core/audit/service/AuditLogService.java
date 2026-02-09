@@ -1,6 +1,8 @@
 package com.serhat.secondhand.core.audit.service;
 
+import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
+import com.serhat.secondhand.core.audit.mapper.AuditLogMapper;
 import com.serhat.secondhand.core.audit.repository.AuditLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
+    private final AuditLogMapper auditLogMapper;
 
     @Async("taskExecutor")
     @Transactional
@@ -111,19 +114,27 @@ public class AuditLogService {
         return auditLogRepository.countFailedAttemptsByIpAndTypeSince(ipAddress, AuditLog.AuditEventType.LOGIN_FAILURE, since);
     }
 
-    public Page<AuditLog> getUserAuditLogs(String userEmail, Pageable pageable) {
-        return auditLogRepository.findByUserEmailOrderByCreatedAtDesc(userEmail, pageable);
+    @Transactional(readOnly = true)
+    public Page<AuditLogDto> getUserAuditLogs(String userEmail, Pageable pageable) {
+        return auditLogRepository.findByUserEmailOrderByCreatedAtDesc(userEmail, pageable)
+                .map(auditLogMapper::toDto);
     }
 
-    public Page<AuditLog> getUserAuditLogs(Long userId, Pageable pageable) {
-        return auditLogRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+    @Transactional(readOnly = true)
+    public Page<AuditLogDto> getUserAuditLogs(Long userId, Pageable pageable) {
+        return auditLogRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
+                .map(auditLogMapper::toDto);
     }
 
-    public Page<AuditLog> getAuditLogsByEventType(AuditLog.AuditEventType eventType, Pageable pageable) {
-        return auditLogRepository.findByEventTypeOrderByCreatedAtDesc(eventType, pageable);
+    @Transactional(readOnly = true)
+    public Page<AuditLogDto> getAuditLogsByEventType(AuditLog.AuditEventType eventType, Pageable pageable) {
+        return auditLogRepository.findByEventTypeOrderByCreatedAtDesc(eventType, pageable)
+                .map(auditLogMapper::toDto);
     }
 
-    public Page<AuditLog> getAuditLogsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return auditLogRepository.findByDateRange(startDate, endDate, pageable);
+    @Transactional(readOnly = true)
+    public Page<AuditLogDto> getAuditLogsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return auditLogRepository.findByDateRange(startDate, endDate, pageable)
+                .map(auditLogMapper::toDto);
     }
 }

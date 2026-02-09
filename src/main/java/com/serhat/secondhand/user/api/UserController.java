@@ -2,7 +2,7 @@ package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.complaint.ComplaintDto;
 import com.serhat.secondhand.complaint.ComplaintService;
-import com.serhat.secondhand.core.audit.entity.AuditLog;
+import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.ListingService;
@@ -208,11 +208,11 @@ public class UserController {
     @GetMapping("/audit-logs")
     @Operation(summary = "Get user audit logs", description = "Retrieve paginated audit logs for the authenticated user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<AuditLog>> getMyAuditLogs(
+    public ResponseEntity<Page<AuditLogDto>> getMyAuditLogs(
             Authentication authentication,
             @PageableDefault(page = 0, size = 10) Pageable pageable) {
         log.info("Getting audit logs for user: {} with page: {}, size: {}", authentication.getName(), pageable.getPageNumber(), pageable.getPageSize());
-        Page<AuditLog> auditLogs = auditLogService.getUserAuditLogs(authentication.getName(), pageable);
+        Page<AuditLogDto> auditLogs = auditLogService.getUserAuditLogs(authentication.getName(), pageable);
         return ResponseEntity.ok(auditLogs);
     }
 }

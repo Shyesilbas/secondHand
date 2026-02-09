@@ -57,7 +57,7 @@ public class Coupon {
     @Column(precision = 19, scale = 2)
     private BigDecimal maxDiscount;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "coupon_eligible_types", joinColumns = @JoinColumn(name = "coupon_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "listing_type", nullable = false)

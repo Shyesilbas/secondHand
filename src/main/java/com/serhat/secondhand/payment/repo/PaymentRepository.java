@@ -20,7 +20,10 @@ import java.util.UUID;
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
 
-    @Query("SELECT p FROM Payment p WHERE p.fromUser.id = :userId OR p.toUser.id = :userId")
+    @Query("SELECT p FROM Payment p " +
+           "LEFT JOIN FETCH p.fromUser " +
+           "LEFT JOIN FETCH p.toUser " +
+           "WHERE p.fromUser.id = :userId OR p.toUser.id = :userId")
     Page<Payment> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 
