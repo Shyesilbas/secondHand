@@ -393,7 +393,7 @@ public class MemoryService {
                 }
             }
         } catch (Exception e) {
-            log.warn("Failed to sync interests from profile JSON: {}", e.getMessage());
+            log.error("Failed to sync interests from profile JSON for user {}: {}", memory.getUserId(), e.getMessage(), e);
         }
     }
 
@@ -407,7 +407,8 @@ public class MemoryService {
             if (node != null && node.isObject()) {
                 return (ObjectNode) node;
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.error("Failed to parse JSON object, returning empty object: {}", e.getMessage(), e);
         }
         return objectMapper.createObjectNode();
     }

@@ -291,7 +291,9 @@ public class ListingService {
                     case "SPORTS" -> sportsCount = count;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.error("Failed to retrieve listing counts by type: {}", e.getMessage(), e);
+        }
 
         return ListingStatisticsDto.builder()
                 .totalListings(totalListings)

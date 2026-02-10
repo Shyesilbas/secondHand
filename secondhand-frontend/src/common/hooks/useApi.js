@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { handleError } from '../errorHandler.js';
+import { parseError } from '../errorHandler.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const useApi = (defaultData = null) => {
@@ -16,13 +16,24 @@ const useApi = (defaultData = null) => {
       setData(result);
       return result;
     } catch (err) {
-      setError(err);
-      handleError(err, notification.showError);
-      throw err; 
+      const parsedError = parseError(err);
+      setError(parsedError);
+      
+      // Backend'den gelen user-friendly mesajı göster
+      notification.showError(
+        'Error',
+        parsedError.message,
+        {
+          errorCode: parsedError.errorCode,
+          validationErrors: parsedError.validationErrors
+        }
+      );
+      
+      throw parsedError; // Parsed error'u fırlat
     } finally {
       setIsLoading(false);
     }
-  }, [notification.showError]);
+  }, [notification]);
 
   const reset = useCallback(() => {
     setData(defaultData);

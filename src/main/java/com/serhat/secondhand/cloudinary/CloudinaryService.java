@@ -42,18 +42,19 @@ public class CloudinaryService {
                     "crop", "limit"
             );
 
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
             String imageUrl = (String) uploadResult.get("secure_url");
             
             log.info("Image uploaded successfully to Cloudinary: {}", imageUrl);
             return imageUrl;
 
         } catch (IOException e) {
-            log.error("Error uploading image to Cloudinary: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload image: " + e.getMessage(), e);
+            log.error("IO error uploading image to Cloudinary: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to upload image. Please check your file and try again.", e);
         } catch (Exception e) {
-            log.error("Unexpected error during image upload: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload image: " + e.getMessage(), e);
+            log.error("Unexpected error during image upload to Cloudinary: {}", e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred while uploading the image. Please try again later.", e);
         }
     }
 
@@ -65,7 +66,9 @@ public class CloudinaryService {
                 log.info("Image deleted successfully from Cloudinary: {}", publicId);
             }
         } catch (IOException e) {
-            log.error("Error deleting image from Cloudinary", e);
+            log.error("IO error deleting image from Cloudinary for URL {}: {}", imageUrl, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error deleting image from Cloudinary for URL {}: {}", imageUrl, e.getMessage(), e);
         }
     }
 

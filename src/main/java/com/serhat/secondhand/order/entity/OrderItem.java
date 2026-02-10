@@ -18,7 +18,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_items", indexes = {
+        @Index(name = "idx_order_item_order", columnList = "order_id"),
+        @Index(name = "idx_order_item_listing", columnList = "listing_id"),
+        @Index(name = "idx_order_item_seller", columnList = "seller_id")
+})
 @EntityListeners(AuditingEntityListener.class)
 public class OrderItem {
 

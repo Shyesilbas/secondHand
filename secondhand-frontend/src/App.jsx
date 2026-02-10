@@ -5,6 +5,7 @@ import { NotificationProvider } from './notification/NotificationContext.jsx';
 import { InAppNotificationProvider } from './notification/InAppNotificationContext.jsx';
 import { EnumProvider } from './common/contexts/EnumContext.jsx';
 import { ComparisonProvider, CompareFloatingBar, CompareModal } from './comparison/index.js';
+import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
 import './common/services/api/interceptors';
 
@@ -22,25 +23,27 @@ const queryClient = new QueryClient({
 
 function App() {
     return (
-        <QueryClientProvider client={queryClient}>
-            <Router>
-                <AuthProvider>
-                    <EnumProvider>
-                        <NotificationProvider>
-                            <InAppNotificationProvider>
-                                <ComparisonProvider>
-                                    <div className="App">
-                                        <AppRoutes />
-                                        <CompareFloatingBar />
-                                        <CompareModal />
-                                    </div>
-                                </ComparisonProvider>
-                            </InAppNotificationProvider>
-                        </NotificationProvider>
-                    </EnumProvider>
-                </AuthProvider>
-            </Router>
-        </QueryClientProvider>
+        <ErrorBoundary>
+            <QueryClientProvider client={queryClient}>
+                <Router>
+                    <AuthProvider>
+                        <EnumProvider>
+                            <NotificationProvider>
+                                <InAppNotificationProvider>
+                                    <ComparisonProvider>
+                                        <div className="App">
+                                            <AppRoutes />
+                                            <CompareFloatingBar />
+                                            <CompareModal />
+                                        </div>
+                                    </ComparisonProvider>
+                                </InAppNotificationProvider>
+                            </NotificationProvider>
+                        </EnumProvider>
+                    </AuthProvider>
+                </Router>
+            </QueryClientProvider>
+        </ErrorBoundary>
     );
 }
 

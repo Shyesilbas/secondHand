@@ -101,7 +101,7 @@ public class ChatService {
     public ChatRoomDto createOrGetDirectChat(Long user1, Long user2) {
         Result<Void> validationResult = chatAuthorizationService.validateUsersExist(user1, user2);
         if (validationResult.isError()) {
-            throw new RuntimeException(validationResult.getMessage());
+            throw new IllegalArgumentException("Unable to create chat. Please ensure both users exist.");
         }
 
         return chatRoomRepository
@@ -149,7 +149,7 @@ public class ChatService {
 
         Result<Void> contentResult = chatAuthorizationService.validateMessageContent(dto.getContent());
         if (contentResult.isError()) {
-            throw new RuntimeException(contentResult.getMessage());
+            throw new IllegalArgumentException("Message content is invalid. Please check your message and try again.");
         }
 
         Result<ChatRoom> roomResult = chatAuthorizationService.authorizeRoomAccess(
@@ -157,7 +157,7 @@ public class ChatService {
                         dto.getSenderId()
                 );
         if (roomResult.isError()) {
-            throw new RuntimeException(roomResult.getMessage());
+            throw new SecurityException("You do not have permission to send messages in this chat room.");
         }
 
         ChatRoom room = roomResult.getData();
@@ -168,17 +168,17 @@ public class ChatService {
                 dto.getRecipientId()
         );
         if (participantsResult.isError()) {
-            throw new RuntimeException(participantsResult.getMessage());
+            throw new SecurityException("Invalid message participants. Please check the recipient.");
         }
 
         Result<User> senderResult = userService.findById(dto.getSenderId());
         if (senderResult.isError()) {
-            throw new RuntimeException(senderResult.getMessage());
+            throw new IllegalArgumentException("Sender not found. Please try again.");
         }
         
         Result<User> recipientResult = userService.findById(dto.getRecipientId());
         if (recipientResult.isError()) {
-            throw new RuntimeException(recipientResult.getMessage());
+            throw new IllegalArgumentException("Recipient not found. Please check the user.");
         }
 
         User sender = senderResult.getData();
@@ -200,7 +200,7 @@ public class ChatService {
     public void deleteMessage(Long messageId, Long userId) {
         Result<Message> msgResult = chatAuthorizationService.validateMessageOwner(messageId, userId);
         if (msgResult.isError()) {
-            throw new RuntimeException(msgResult.getMessage());
+            throw new SecurityException("You do not have permission to delete this message.");
         }
 
         Message msg = msgResult.getData();
@@ -212,7 +212,7 @@ public class ChatService {
     public void markMessagesAsRead(Long chatRoomId, Long userId) {
         Result<Void> validationResult = chatAuthorizationService.validateRoomParticipant(chatRoomId, userId);
         if (validationResult.isError()) {
-            throw new RuntimeException(validationResult.getMessage());
+            throw new SecurityException("You do not have permission to access this chat room.");
         }
         messageRepository.markMessagesAsRead(chatRoomId, userId);
     }
@@ -221,7 +221,7 @@ public class ChatService {
     public Page<ChatMessageDto> getChatMessages(Long roomId, Long userId, Pageable pageable) {
         Result<Void> validationResult = chatAuthorizationService.validateRoomParticipant(roomId, userId);
         if (validationResult.isError()) {
-            throw new RuntimeException(validationResult.getMessage());
+            throw new SecurityException("You do not have permission to view messages in this chat room.");
         }
         return messageRepository
                 .findByChatRoomIdOrderByCreatedAtAsc(roomId, pageable)
@@ -251,7 +251,7 @@ public class ChatService {
     public void deleteConversation(Long chatRoomId, Long userId) {
         Result<ChatRoom> roomResult = chatAuthorizationService.authorizeRoomAccess(chatRoomId, userId);
         if (roomResult.isError()) {
-            throw new RuntimeException(roomResult.getMessage());
+            throw new SecurityException("You do not have permission to delete this conversation.");
         }
 
         ChatRoom room = roomResult.getData();

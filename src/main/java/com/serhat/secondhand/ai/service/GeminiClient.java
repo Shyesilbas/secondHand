@@ -40,10 +40,11 @@ public class GeminiClient {
         try {
             return generateTextWithModel(model, message, true);
         } catch (RuntimeException e) {
+            log.warn("Primary model failed for memory extraction: {}", e.getMessage());
             try {
                 return generateTextWithModel(fallbackMemoryModel, message, true);
-            } catch (RuntimeException ignored) {
-                log.warn("Memory analysis skipped due to rate limiting");
+            } catch (RuntimeException fallbackException) {
+                log.error("Fallback model also failed for memory extraction: {}", fallbackException.getMessage(), fallbackException);
                 return "Cevap hazır";
             }
         }
@@ -79,28 +80,32 @@ public class GeminiClient {
             } catch (HttpClientErrorException.TooManyRequests e) {
                 if (attempt >= maxAttempts - 1) {
                     if (swallowRateLimit) {
-                        log.warn("Rate limit exceeded for model: {}", modelName);
+                        log.warn("Rate limit exceeded for model {}: {}", modelName, e.getMessage());
                         return "Cevap hazır";
                     }
-                    throw new RuntimeException("Rate limit exceeded. Please try again in a few minutes.");
+                    log.error("Rate limit exceeded for model {} after {} attempts: {}", modelName, maxAttempts, e.getMessage(), e);
+                    throw new RuntimeException("The AI service is temporarily unavailable. Please try again in a few minutes.");
                 }
                 long waitTime = backoffMillis[attempt];
-                log.warn("Rate limit exceeded. Attempt {}/{}. Waiting {}ms", attempt + 1, maxAttempts, waitTime);
+                log.warn("Rate limit exceeded for model {}. Attempt {}/{}. Waiting {}ms. Error: {}", 
+                        modelName, attempt + 1, maxAttempts, waitTime, e.getMessage());
                 try {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException("Process interrupted", ie);
+                    log.error("Thread interrupted while waiting for retry: {}", ie.getMessage(), ie);
+                    throw new RuntimeException("The request was interrupted. Please try again.", ie);
                 }
                 attempt++;
 
             } catch (HttpClientErrorException e) {
-                log.error("HTTP Error: Status={}, Body={}", e.getStatusCode(), e.getResponseBodyAsString());
-                throw new RuntimeException("API Error: " + e.getStatusCode() + " - " + e.getMessage());
+                log.error("HTTP Error calling Gemini API: Status={}, Body={}, Message={}", 
+                        e.getStatusCode(), e.getResponseBodyAsString(), e.getMessage(), e);
+                throw new RuntimeException("The AI service encountered an error. Please try again later.");
 
             } catch (Exception e) {
-                log.error("Unexpected Gemini API Error: ", e);
-                throw new RuntimeException("Unexpected error occurred: " + e.getMessage());
+                log.error("Unexpected error calling Gemini API with model {}: {}", modelName, e.getMessage(), e);
+                throw new RuntimeException("An unexpected error occurred. Please try again later.");
             }
         }
 
