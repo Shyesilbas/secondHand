@@ -57,17 +57,46 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const status = error.response?.status;
+        const errorData = error.response?.data;
 
-                const AUTH = API_ENDPOINTS.AUTH;
+        // Hata objesini zenginleştir - Backend'den gelen mesajları extract et
+        if (errorData) {
+            error.userMessage = errorData.message || 'An error occurred';
+            error.errorCode = errorData.errorCode || errorData.code;
+            error.validationErrors = errorData.validationErrors;
+            error.errorDetails = {
+                status: status,
+                statusText: error.response?.statusText,
+                timestamp: errorData.timestamp,
+                path: errorData.path
+            };
+        } else if (!error.response) {
+            // Network error
+            error.userMessage = 'Network error. Please check your connection';
+            error.errorCode = 'NETWORK_ERROR';
+        }
+
+        const AUTH = API_ENDPOINTS.AUTH;
         const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
             .some(path => originalRequest.url?.includes(path));
 
         if (isAuthEndpoint) {
+            // Auth endpoint'lerinde backend mesajını koru
             return Promise.reject(error);
         }
 
-                // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // 403: Permission/CSRF hatası - özel handling
+        if (status === 403) {
+            if (errorData?.message?.toLowerCase().includes('csrf')) {
+                error.userMessage = 'Security token expired. Please refresh the page.';
+                error.errorCode = 'CSRF_ERROR';
+            }
+            return Promise.reject(error);
+        }
+
+        // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
+        if (status === 401 && !originalRequest._retry) {
             
             if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
                 return Promise.reject(error);

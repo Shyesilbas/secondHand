@@ -5,6 +5,10 @@ import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -113,8 +117,20 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        } catch (ExpiredJwtException e) {
+            log.debug("JWT token expired for request to {}: {}", request.getRequestURI(), e.getMessage());
+            SecurityContextHolder.clearContext();
+        } catch (MalformedJwtException e) {
+            log.warn("Malformed JWT token for request to {}: {}", request.getRequestURI(), e.getMessage());
+            SecurityContextHolder.clearContext();
+        } catch (SignatureException e) {
+            log.warn("Invalid JWT signature for request to {}: {}", request.getRequestURI(), e.getMessage());
+            SecurityContextHolder.clearContext();
+        } catch (JwtException e) {
+            log.error("JWT processing error for request to {}: {}", request.getRequestURI(), e.getMessage(), e);
+            SecurityContextHolder.clearContext();
         } catch (Exception e) {
-            log.error("Authentication error: ", e);
+            log.error("Unexpected authentication error for request to {}: {}", request.getRequestURI(), e.getMessage(), e);
             SecurityContextHolder.clearContext();
         }
 

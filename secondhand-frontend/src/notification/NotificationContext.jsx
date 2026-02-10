@@ -42,7 +42,29 @@ export const NotificationProvider = ({ children }) => {
     }, [addNotification]);
 
     const showError = useCallback((title, message, options = {}) => {
-        return addNotification({ type: 'error', title: title || 'Error', message, autoClose: false, ...options });
+        const { errorCode, validationErrors, details, ...restOptions } = options;
+        
+        // Validation errors varsa mesaja ekle
+        let fullMessage = message;
+        if (validationErrors && Object.keys(validationErrors).length > 0) {
+            const validationText = Object.entries(validationErrors)
+                .map(([field, msg]) => `• ${field}: ${msg}`)
+                .join('\n');
+            fullMessage = `${message}\n\n${validationText}`;
+        }
+        
+        // Error code varsa title'a ekle
+        const fullTitle = errorCode ? `${title} (${errorCode})` : title;
+        
+        return addNotification({ 
+            type: 'error', 
+            title: fullTitle || 'Error', 
+            message: fullMessage, 
+            autoClose: false,
+            showDetails: !!details,
+            errorDetails: details,
+            ...restOptions 
+        });
     }, [addNotification]);
 
     const showWarning = useCallback((title, message, options = {}) => {
@@ -92,6 +114,23 @@ export const NotificationProvider = ({ children }) => {
     }, [addNotification, removeNotification]);
 
 
+    const showDetailedError = useCallback((parsedError, options = {}) => {
+        return showError(
+            options.customTitle || 'Error',
+            parsedError.message,
+            {
+                errorCode: parsedError.errorCode,
+                validationErrors: parsedError.validationErrors,
+                details: options.showDetails ? {
+                    status: parsedError.statusCode,
+                    timestamp: parsedError.timestamp,
+                    path: parsedError.path
+                } : null,
+                ...options
+            }
+        );
+    }, [showError]);
+
     const value = {
         notifications,
         addNotification,
@@ -102,7 +141,8 @@ export const NotificationProvider = ({ children }) => {
         showWarning,
         showInfo,
         showNotification,
-        showConfirmation
+        showConfirmation,
+        showDetailedError
     };
 
     return (

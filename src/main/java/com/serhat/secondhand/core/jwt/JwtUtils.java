@@ -3,10 +3,15 @@ package com.serhat.secondhand.core.jwt;
 import com.serhat.secondhand.core.config.JwtConfig;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -20,6 +25,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtUtils {
@@ -112,7 +118,17 @@ public class JwtUtils {
     public boolean isTokenValid(String token) {
         try {
             return !isTokenExpired(token);
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            log.debug("JWT token is expired: {}", e.getMessage());
+            return false;
+        } catch (MalformedJwtException e) {
+            log.warn("Malformed JWT token: {}", e.getMessage());
+            return false;
+        } catch (SignatureException e) {
+            log.warn("Invalid JWT signature: {}", e.getMessage());
+            return false;
+        } catch (JwtException e) {
+            log.error("JWT validation error: {}", e.getMessage(), e);
             return false;
         }
     }

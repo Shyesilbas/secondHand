@@ -1,9 +1,5 @@
 package com.serhat.secondhand.core.exception;
 
-import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
-import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
-import com.serhat.secondhand.core.exception.VerificationLockedException;
-import com.serhat.secondhand.user.domain.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -80,22 +76,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(AccountNotActiveException.class)
-    public ResponseEntity<ErrorResponse> handleAccountNotActive(
-            AccountNotActiveException ex,
-            HttpServletRequest request) {
-
-        ErrorResponse errorResponse = createErrorResponse(
-                HttpStatus.FORBIDDEN,
-                "Account Not Active",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        log.warn("Account not active: {} - Status: {}", ex.getMessage(), ex.getAccountStatus());
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(
             AccessDeniedException ex,
@@ -128,69 +108,40 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(
-            UserAlreadyExistsException ex,
-            HttpServletRequest request) {
-
-        ErrorResponse errorResponse = createErrorResponse(
-                HttpStatus.CONFLICT,
-                "User Exists",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        log.warn("User already exists: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(
-            InvalidRefreshTokenException ex,
-            HttpServletRequest request) {
-
-        ErrorResponse errorResponse = createErrorResponse(
-                HttpStatus.UNAUTHORIZED,
-                "Invalid Token",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        log.warn("Invalid refresh token: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
+        String sanitizedMessage = sanitizeMessage(ex.getMessage());
+        
         ErrorResponse errorResponse = createErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "Bad Request",
-                ex.getMessage(),
+                sanitizedMessage,
                 request.getRequestURI()
         );
 
-        log.warn("Illegal argument: {}", ex.getMessage());
+        log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(VerificationLockedException.class)
-    public ResponseEntity<ErrorResponse> handleVerificationLocked(
-            VerificationLockedException ex,
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorResponse> handleSecurityException(
+            SecurityException ex,
             HttpServletRequest request) {
 
         ErrorResponse errorResponse = createErrorResponse(
-                HttpStatus.LOCKED,
-                ex.getErrorCode(),
+                HttpStatus.FORBIDDEN,
+                "Forbidden",
                 ex.getMessage(),
                 request.getRequestURI()
         );
 
-        log.warn("Verification locked: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.LOCKED);
+        log.warn("Security exception: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
+
 
     @ExceptionHandler(AsyncRequestNotUsableException.class)
     public void handleAsyncRequestNotUsable(AsyncRequestNotUsableException ex) {
@@ -226,5 +177,31 @@ public class GlobalExceptionHandler {
                 .path(path)
                 .validationErrors(validationErrors)
                 .build();
+    }
+
+    private String sanitizeMessage(String message) {
+        if (message == null || message.isBlank()) {
+            return "Invalid request";
+        }
+        
+        // Sistem detaylarını sızdırabilecek bilgileri temizle
+        String sanitized = message;
+        
+        // SQL, stack trace veya class path bilgisi içeriyorsa generic mesaj dön
+        if (message.contains("java.") || 
+            message.contains("org.") || 
+            message.contains("com.serhat") ||
+            message.contains("SQLException") ||
+            message.contains("at ") ||
+            message.contains("Caused by")) {
+            return "Invalid request. Please check your input.";
+        }
+        
+        // Çok uzun mesajları kısalt
+        if (sanitized.length() > 200) {
+            sanitized = sanitized.substring(0, 200) + "...";
+        }
+        
+        return sanitized;
     }
 }

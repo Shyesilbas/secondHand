@@ -74,7 +74,8 @@ export const parseError = (error) => {
         originalMessage: '',
         statusCode: null,
         timestamp: new Date().toISOString(),
-        details: null
+        details: null,
+        validationErrors: null
     };
 
     if (!error) return defaultError;
@@ -93,13 +94,22 @@ export const parseError = (error) => {
     const statusCode = response?.status;
     const errorData = response?.data;
 
-    // Handle Result pattern errors (backend now returns { error, message } for business errors)
-    let errorMessage = errorData?.message || error.message;
-    let errorCode = errorData?.error || errorData?.errorCode;
+    // Backend'den gelen mesajı öncelikle kullan (GlobalExceptionHandler formatı)
+    let errorMessage = errorData?.message || error.userMessage || error.message;
+    let errorCode = errorData?.errorCode || errorData?.code; // 'error' alanı generic (Bad Request), 'errorCode' spesifik
     
-    // If it's a Result pattern error, use the message directly
-    if (errorData && (errorData.error || errorData.errorCode)) {
-        errorMessage = errorData.message || errorMessage;
+    // Validation errors varsa detaylandır
+    let validationDetails = null;
+    if (errorData?.validationErrors) {
+        validationDetails = errorData.validationErrors;
+        // Validation mesajlarını birleştir
+        const validationMessages = Object.entries(validationDetails)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(', ');
+        // Eğer ana mesaj yoksa validation mesajlarını kullan
+        if (!errorMessage || errorMessage === 'Validation Failed') {
+            errorMessage = validationMessages;
+        }
     }
 
     let parsedError = {
@@ -107,7 +117,10 @@ export const parseError = (error) => {
         statusCode,
         originalMessage: errorMessage,
         errorCode: errorCode,
-        details: errorData
+        details: errorData,
+        validationErrors: validationDetails,
+        timestamp: errorData?.timestamp || new Date().toISOString(),
+        path: errorData?.path
     };
 
     // Determine error type and message using enum-based lookup
@@ -130,14 +143,16 @@ export const parseError = (error) => {
         message = ERROR_MESSAGES[ERROR_TYPES.SERVER][statusCode] || ERROR_MESSAGES[ERROR_TYPES.SERVER][500];
     }
 
-    // Use Result pattern message if available
-    const finalMessage = errorMessage || message || errorData?.message || 'Unexpected error occurred. Please try again later';
+    // Backend mesajını ÖNCE kontrol et (sanitize edilmiş user-friendly mesaj)
+    const backendMessage = errorData?.message;
+    const finalMessage = backendMessage || errorMessage || message || 'Unexpected error occurred. Please try again later';
     
     return {
         ...parsedError,
         type: errorType,
         message: finalMessage,
-        errorCode: errorCode
+        errorCode: errorCode,
+        validationErrors: validationDetails
     };
 };
 

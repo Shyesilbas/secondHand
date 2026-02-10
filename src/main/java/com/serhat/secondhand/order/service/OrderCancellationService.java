@@ -1,5 +1,6 @@
 package com.serhat.secondhand.order.service;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
@@ -17,6 +18,7 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,13 +129,22 @@ public class OrderCancellationService {
                 try {
                     eWalletService.debitFromUser(seller, sellerAmount, sellerListingId, PaymentTransactionType.REFUND);
                     log.info("Debited {} from seller's eWallet: {} for order: {}", sellerAmount, seller.getEmail(), order.getOrderNumber());
-                } catch (Exception e) {
-                    log.error("Failed to debit from seller's eWallet: {} order: {} - {}", seller.getEmail(), order.getOrderNumber(), e.getMessage(), e);
+                } catch (BusinessException e) {
+                    log.error("Failed to debit from seller's eWallet: {} order: {} - Error: {} [{}]", 
+                            seller.getEmail(), order.getOrderNumber(), e.getMessage(), e.getErrorCode(), e);
+                } catch (DataAccessException e) {
+                    log.error("Database error while debiting from seller's eWallet: {} order: {} - {}", 
+                            seller.getEmail(), order.getOrderNumber(), e.getMessage(), e);
                 }
             }
-        } catch (Exception e) {
-            log.error("Failed to refund to eWallet for user: {} order: {} - {}", user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-            return Result.error("Failed to process refund: " + e.getMessage(), "REFUND_FAILED");
+        } catch (BusinessException e) {
+            log.error("Business error during refund to eWallet for user: {} order: {} - Error: {} [{}]", 
+                    user.getEmail(), order.getOrderNumber(), e.getMessage(), e.getErrorCode(), e);
+            return Result.error("Failed to process refund. Please contact support.", "REFUND_FAILED");
+        } catch (DataAccessException e) {
+            log.error("Database error during refund to eWallet for user: {} order: {} - {}", 
+                    user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
+            return Result.error("Failed to process refund due to a system error. Please try again later.", "REFUND_FAILED");
         }
 
         order = orderRepository.findByIdWithOrderItems(order.getId())

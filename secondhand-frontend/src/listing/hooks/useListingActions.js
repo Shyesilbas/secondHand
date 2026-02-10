@@ -4,6 +4,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { listingService } from '../services/listingService.js';
 import { useListingActionContext } from '../context/ListingActionContext.jsx';
+import { parseError } from '../../common/errorHandler.js';
 
 export const useListingActions = ({
   listing,
@@ -25,9 +26,18 @@ export const useListingActions = ({
     onChanged?.(listingId);
   }, [listingId, onChanged]);
 
-  const handleError = useCallback((title, err, fallbackMessage) => {
-    const msg = err?.response?.data?.message || err?.message || fallbackMessage || 'Operation failed';
-    notification.showError(title, msg);
+  const handleApiError = useCallback((title, err) => {
+    const parsedError = parseError(err);
+    
+    notification.showError(
+      title,
+      parsedError.message, // Backend'den gelen user-friendly message
+      {
+        errorCode: parsedError.errorCode,
+        validationErrors: parsedError.validationErrors,
+        autoClose: false
+      }
+    );
   }, [notification]);
 
   const wrap = useCallback(
@@ -67,10 +77,10 @@ export const useListingActions = ({
           notification.showSuccess('Successful', 'Listing deactivated');
           fireChanged();
         } catch (err) {
-          handleError('Deactivate', err, 'Failed to deactivate listing');
+          handleApiError('Deactivate Failed', err);
         }
       }),
-    [fireChanged, handleError, listingId, notification, wrap]
+    [fireChanged, handleApiError, listingId, notification, wrap]
   );
 
   const handleReactivate = useMemo(
@@ -82,10 +92,10 @@ export const useListingActions = ({
           notification.showSuccess('Successful', 'Listing reactivated');
           fireChanged();
         } catch (err) {
-          handleError('Reactivate', err, 'Failed to reactivate listing');
+          handleApiError('Reactivate Failed', err);
         }
       }),
-    [fireChanged, handleError, listingId, notification, wrap]
+    [fireChanged, handleApiError, listingId, notification, wrap]
   );
 
   const handleMarkAsSold = useMemo(
@@ -101,13 +111,13 @@ export const useListingActions = ({
               notification.showSuccess('Successful', 'Listing marked as sold');
               fireChanged();
             } catch (err) {
-              handleError('Mark As Sold', err, 'Failed to mark listing as sold');
+              handleApiError('Mark As Sold Failed', err);
             }
           },
           () => {}
         );
       }),
-    [fireChanged, handleError, listingId, notification, wrap]
+    [fireChanged, handleApiError, listingId, notification, wrap]
   );
 
   const handleDelete = useMemo(
@@ -123,13 +133,13 @@ export const useListingActions = ({
               notification.showSuccess('Successful', 'Listing deleted');
               fireChanged();
             } catch (err) {
-              handleError('Delete', err, 'Failed to delete listing');
+              handleApiError('Delete Failed', err);
             }
           },
           () => {}
         );
       }),
-    [fireChanged, handleError, listingId, notification, wrap]
+    [fireChanged, handleApiError, listingId, notification, wrap]
   );
 
   const handleOpenShowcase = useMemo(
