@@ -4,6 +4,7 @@ import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.ListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.validation.ListingFeePaymentValidation;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 public class ListingFeeService {
 
     private final ListingConfig listingConfig;
+    private final ListingFeePaymentValidation listingFeePaymentValidation;
     private final UserService userService;
     private final ListingService listingService;
     private final PaymentProcessor paymentProcessor;
@@ -39,14 +41,14 @@ public class ListingFeeService {
         }
         User user = userResult.getData();
 
+        Result<Void> validationResult = listingFeePaymentValidation.validate(request, userId);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
+        }
+
         Listing listing = listingService.findById(request.listingId()).orElse(null);
         if (listing == null) {
             return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
-        }
-
-        Result<Void> ownershipResult = listingService.validateOwnership(request.listingId(), userId);
-        if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getErrorCode(), ownershipResult.getMessage());
         }
 
         BigDecimal totalFee = listingService.calculateTotalListingFee();

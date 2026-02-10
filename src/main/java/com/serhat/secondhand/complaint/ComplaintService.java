@@ -26,25 +26,20 @@ public class ComplaintService {
 
 
     @Transactional
-    public Result<ComplaintDto> createComplaint(ComplaintRequest complaintRequest) {
-        log.info("Creating complaint from user {} about user {}", complaintRequest.complainerId(), complaintRequest.complainedUserId());
+    public Result<ComplaintDto> createComplaint(Long userId,ComplaintRequest complaintRequest) {
+        log.info("Creating complaint from user {} about user {}", userId, complaintRequest.complainedUserId());
 
-        Result<Void> validationResult = complaintValidator.validateRequest(complaintRequest);
+        Result<Void> validationResult = complaintValidator.validateRequest(userId,complaintRequest);
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
-        Result<User> complainerResult = userService.findById(complaintRequest.complainerId());
-        if (complainerResult.isError()) {
-            return Result.error(complainerResult.getMessage(), complainerResult.getErrorCode());
-        }
-        
         Result<User> complainedUserResult = userService.findById(complaintRequest.complainedUserId());
         if (complainedUserResult.isError()) {
             return Result.error(complainedUserResult.getMessage(), complainedUserResult.getErrorCode());
         }
 
-        User complainer = complainerResult.getData();
+        User complainer = userService.findById(userId).getData();
         User complainedUser = complainedUserResult.getData();
 
         Result<Void> complaintValidationResult = complaintValidator.validateComplaint(complainer, complainedUser);
@@ -82,36 +77,5 @@ public class ComplaintService {
                 .toList();
     }
 
-
-    @Transactional(readOnly = true)
-    public List<ComplaintDto> getPendingComplaints() {
-        log.info("Getting pending complaints");
-        return complaintRepository.findPendingComplaints().stream()
-                .map(complaintMapper::mapComplaintToDto)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ComplaintDto> getComplaintsByStatus(ComplaintStatus status) {
-        log.info("Getting complaints by status: {}", status);
-        return complaintRepository.findByStatus(status).stream()
-                .map(complaintMapper::mapComplaintToDto)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Long getUserComplaintCount(User user) {
-        return complaintRepository.countComplaintsByComplainer(user.getId());
-    }
-
-    @Transactional(readOnly = true)
-    public Long getComplaintsAboutUserCount(User user) {
-        return complaintRepository.countComplaintsByComplainedUser(user.getId());
-    }
-
-    @Transactional(readOnly = true)
-    public boolean hasUserComplainedAbout(User complainer, User complainedUser) {
-        return complaintRepository.existsByComplainerAndComplainedUser(complainer, complainedUser);
-    }
 }
 

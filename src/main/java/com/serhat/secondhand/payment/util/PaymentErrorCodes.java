@@ -36,6 +36,7 @@ public enum PaymentErrorCodes implements ErrorCode {
     INVALID_AGREEMENT_COUNT("INVALID_AGREEMENT_COUNT", "All required agreements must be accepted", HttpStatus.BAD_REQUEST),
     REQUIRED_AGREEMENTS_NOT_ACCEPTED("REQUIRED_AGREEMENTS_NOT_ACCEPTED", "Required payment agreements are not accepted", HttpStatus.BAD_REQUEST),
     PAYMENT_ERROR("PAYMENT_ERROR","There is a problem with your payment method." , HttpStatus.BAD_REQUEST ),
+    LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS("LISTING_FEE_PAYMENT_NOT_ALLOWED", "Listing fee payment is not allowed for this listing status", HttpStatus.BAD_REQUEST),
     IDEMPOTENCY_KEY_CONFLICT("IDEMPOTENCY_KEY_CONFLICT", "Idempotency key conflict: same key used with different payment parameters", HttpStatus.CONFLICT),
     CONCURRENT_UPDATE("CONCURRENT_UPDATE", "Payment processing failed due to concurrent update. Please try again", HttpStatus.CONFLICT);
 

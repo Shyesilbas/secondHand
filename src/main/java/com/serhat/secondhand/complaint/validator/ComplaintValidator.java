@@ -14,8 +14,8 @@ public class ComplaintValidator {
 
     private final ComplaintRepository complaintRepository;
 
-    public Result<Void> validateRequest(ComplaintRequest request) {
-        if (request.complainerId() == null) {
+    public Result<Void> validateRequest(Long userId,ComplaintRequest request) {
+        if (userId == null) {
             return Result.error(ComplaintErrorCodes.COMPLAINER_ID_NULL);
         }
         if (request.complainedUserId() == null) {
