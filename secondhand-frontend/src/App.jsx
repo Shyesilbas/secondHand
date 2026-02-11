@@ -1,13 +1,12 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './auth/AuthContext.jsx';
-import { NotificationProvider } from './notification/NotificationContext.jsx';
-import { InAppNotificationProvider } from './notification/InAppNotificationContext.jsx';
-import { EnumProvider } from './common/contexts/EnumContext.jsx';
-import { ComparisonProvider, CompareFloatingBar, CompareModal } from './comparison/index.js';
+import {BrowserRouter as Router} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {AuthProvider} from './auth/AuthContext.jsx';
+import {NotificationProvider} from './notification/NotificationContext.jsx';
+import {InAppNotificationProvider} from './notification/InAppNotificationContext.jsx';
+import {EnumProvider} from './common/contexts/index.js';
+import {CompareFloatingBar, CompareModal, ComparisonProvider} from './comparison/index.js';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
-import './common/services/api/interceptors';
 
 const queryClient = new QueryClient({
     defaultOptions: {
