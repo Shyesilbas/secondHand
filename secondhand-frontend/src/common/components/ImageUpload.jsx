@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
-import apiClient from '../services/api/config.js';
+import apiClient from '../services/api/interceptors.js';
 
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
   const [isUploading, setIsUploading] = useState(false);

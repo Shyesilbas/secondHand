@@ -1,4 +1,4 @@
-import apiClient from './config.js';
+import apiClient from './interceptors.js';
 
 export const request = async (method, url, data, config = {}) => {
   const start = performance.now();
