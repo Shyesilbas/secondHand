@@ -4,6 +4,7 @@ import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,13 @@ public class FavoriteStatsService {
             .build();
     }
 
+    @Cacheable(
+            value = "favoriteStatsBatch",
+            key = "T(java.util.Objects).hash(#listingIds) + '_' + #userId",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
-        log.info("Getting favorite stats for {} listings", listingIds.size());
+        log.info("FavoriteStatsService#getFavoriteStatsForListings CACHE MISS for {} listings, userId={}", listingIds.size(), userId);
 
         List<Object[]> countResults = favoriteRepository.countByListingIds(listingIds);
         Map<UUID, Long> favoriteCounts = countResults.stream()

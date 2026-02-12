@@ -1,6 +1,9 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
@@ -33,6 +36,7 @@ public class OrderCancellationService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderItemCancelRepository orderItemCancelRepository;
+    private final ListingRepository listingRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
@@ -98,6 +102,7 @@ public class OrderCancellationService {
         }
 
         orderItemCancelRepository.saveAll(cancelRecords);
+        restoreListingStock(cancelRecords);
         orderRepository.flush();
 
         List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToCancel = itemsToCancel.stream()
@@ -196,6 +201,40 @@ public class OrderCancellationService {
             }
         }
         return true;
+    }
+
+    /**
+     * Restore listing stock for cancelled items (except VEHICLE and REAL_ESTATE listings).
+     * We only touch listings that actually track quantity (non-null quantity field).
+     */
+    private void restoreListingStock(List<OrderItemCancel> cancelRecords) {
+        if (cancelRecords == null || cancelRecords.isEmpty()) {
+            return;
+        }
+        for (OrderItemCancel cancelRecord : cancelRecords) {
+            OrderItem item = cancelRecord.getOrderItem();
+            if (item == null) continue;
+
+            Listing listing = item.getListing();
+            if (listing == null) continue;
+
+            ListingType type = item.getListingType();
+            if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) {
+                // Quantity is not meaningful for these types
+                continue;
+            }
+
+            if (listing.getQuantity() == null) {
+                continue;
+            }
+
+            int delta = cancelRecord.getCancelledQuantity();
+            if (delta <= 0) {
+                continue;
+            }
+
+            listingRepository.incrementQuantity(listing.getId(), delta);
+        }
     }
 
 }

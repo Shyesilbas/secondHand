@@ -18,6 +18,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +51,7 @@ public class FavoriteService {
     
 
     @Transactional
+    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
     public Result<FavoriteDto> addToFavorites(Long userId, UUID listingId) {
         log.info("Adding listing {} to favorites for userId {}", listingId, userId);
 
@@ -116,6 +118,7 @@ public class FavoriteService {
     
 
     @Transactional
+    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
     public Result<Void> removeFromFavorites(Long userId, UUID listingId) {
         log.info("Removing listing {} from favorites for userId {}", listingId, userId);
 
@@ -137,6 +140,7 @@ public class FavoriteService {
     
 
     @Transactional
+    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
     public Result<FavoriteStatsDto> toggleFavorite(Long userId, UUID listingId) {
         log.info("Toggling favorite status for listing {} and userId {}", listingId, userId);
 
