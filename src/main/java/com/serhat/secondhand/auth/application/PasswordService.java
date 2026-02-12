@@ -7,7 +7,7 @@ import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.util.UserErrorCodes;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class PasswordService {
 
-    private final UserService userService;
+    private final IUserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;

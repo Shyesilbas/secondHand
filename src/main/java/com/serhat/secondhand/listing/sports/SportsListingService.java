@@ -1,9 +1,10 @@
 package com.serhat.secondhand.listing.sports;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.AbstractListingService;
+import com.serhat.secondhand.listing.aspect.TrackPriceChange;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.PriceHistoryService;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -14,9 +15,7 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepository;
 import com.serhat.secondhand.listing.validation.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.sports.SportsSpecValidator;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
-import lombok.RequiredArgsConstructor;
+import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -26,59 +25,84 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class SportsListingService {
+public class SportsListingService extends AbstractListingService<SportsListing, SportsCreateRequest> {
 
     private final SportsListingRepository sportsRepository;
-    private final ListingService listingService;
-    private final ListingMapper listingMapper;
     private final SportsListingFilterService sportsListingFilterService;
     private final PriceHistoryService priceHistoryService;
-    private final UserService userService;
-    private final ListingValidationEngine listingValidationEngine;
     private final List<SportsSpecValidator> sportsSpecValidators;
     private final SportsMapper sportsMapper;
     private final SportsListingResolver sportsListingResolver;
+    
+    public SportsListingService(
+            SportsListingRepository sportsRepository,
+            IListingService listingService,
+            ListingMapper listingMapper,
+            SportsListingFilterService sportsListingFilterService,
+            PriceHistoryService priceHistoryService,
+            IUserService userService,
+            ListingValidationEngine listingValidationEngine,
+            List<SportsSpecValidator> sportsSpecValidators,
+            SportsMapper sportsMapper,
+            SportsListingResolver sportsListingResolver) {
+        super(userService, listingService, listingMapper, listingValidationEngine);
+        this.sportsRepository = sportsRepository;
+        this.sportsListingFilterService = sportsListingFilterService;
+        this.priceHistoryService = priceHistoryService;
+        this.sportsSpecValidators = sportsSpecValidators;
+        this.sportsMapper = sportsMapper;
+        this.sportsListingResolver = sportsListingResolver;
+    }
 
-    @Transactional
     public Result<UUID> createSportsListing(SportsCreateRequest request, Long sellerId) {
-        log.info("Creating sports listing for sellerId: {}", sellerId);
-
-        var userResult = userService.findById(sellerId);
-        if (userResult.isError()) {
-            return Result.error(userResult.getMessage(), userResult.getErrorCode());
-        }
-        User seller = userResult.getData();
-
-        SportsListing entity = listingMapper.toSportsEntity(request);
-        if (entity.getQuantity() == null || entity.getQuantity() < 1) {
-            return Result.error("Invalid quantity for sports listing", ListingErrorCodes.INVALID_QUANTITY.toString());
-        }
-
-        var resolutionResult = sportsListingResolver.resolve(request.disciplineId(), request.equipmentTypeId(), request.conditionId());
-        if (resolutionResult.isError()) {
-            return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
-        }
-        SportsResolution res = resolutionResult.getData();
+        return createListing(request, sellerId);
+    }
+    
+    @Override
+    protected String getListingType() {
+        return "Sports";
+    }
+    
+    @Override
+    protected SportsListing mapRequestToEntity(SportsCreateRequest request) {
+        return listingMapper.toSportsEntity(request);
+    }
+    
+    @Override
+    protected boolean requiresQuantityValidation() {
+        return true;
+    }
+    
+    @Override
+    protected Result<SportsResolution> resolveEntities(SportsCreateRequest request) {
+        return sportsListingResolver.resolve(
+                request.disciplineId(),
+                request.equipmentTypeId(),
+                request.conditionId()
+        );
+    }
+    
+    @Override
+    protected void applyResolution(SportsListing entity, Object resolution) {
+        SportsResolution res = (SportsResolution) resolution;
         entity.setDiscipline(res.discipline());
         entity.setEquipmentType(res.equipmentType());
         entity.setCondition(res.condition());
-
-        entity.setSeller(seller);
-
-        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(entity, sportsSpecValidators);
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
-
-        SportsListing saved = sportsRepository.save(entity);
-        log.info("Sports listing created: {}", saved.getId());
-
-        return Result.success(saved.getId());
+    }
+    
+    @Override
+    protected Result<Void> validate(SportsListing entity) {
+        return listingValidationEngine.cleanupAndValidate(entity, sportsSpecValidators);
+    }
+    
+    @Override
+    protected SportsListing save(SportsListing entity) {
+        return sportsRepository.save(entity);
     }
 
     @Transactional
+    @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, Long currentUserId) {
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
@@ -94,8 +118,6 @@ public class SportsListingService {
         if (statusResult.isError()) {
             return statusResult;
         }
-
-        var oldPrice = existing.getPrice();
 
         Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
         if (quantityResult.isError()) {
@@ -114,12 +136,6 @@ public class SportsListingService {
 
         sportsRepository.save(existing);
 
-        priceHistoryService.recordPriceChangeIfUpdated(
-                existing,
-                oldPrice,
-                request.base() != null ? request.base().price() : null,
-                "Price updated via listing edit"
-        );
         log.info("Sports listing updated: {}", id);
         return Result.success();
     }

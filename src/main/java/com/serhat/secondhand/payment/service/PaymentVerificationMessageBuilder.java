@@ -4,7 +4,7 @@ import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
@@ -24,7 +24,7 @@ import java.util.List;
 public class PaymentVerificationMessageBuilder {
 
     private final ListingConfig listingConfig;
-    private final ListingService listingService;
+    private final IListingService listingService;
     private final CartRepository cartRepository;
     private final PricingService pricingService;
     private final OfferService offerService;

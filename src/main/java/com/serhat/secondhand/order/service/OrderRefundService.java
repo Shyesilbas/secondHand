@@ -1,9 +1,7 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -26,9 +24,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,12 +38,13 @@ public class OrderRefundService {
     private final OrderItemRefundRepository orderItemRefundRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
-    private final EWalletService eWalletService;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
+    private final IOrderValidationService orderValidationService;
+    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
         if (orderResult.isError()) {
             return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
@@ -112,44 +109,23 @@ public class OrderRefundService {
         orderItemRefundRepository.saveAll(refundRecords);
         orderRepository.flush();
 
-        refundEscrowsForItems(itemsToRefund, user, order);
+        List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToRefund = itemsToRefund.stream()
+                .map(item -> orderEscrowService.findEscrowByOrderItem(item))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-        try {
-            BigDecimal nonEscrowRefundAmount = totalRefundAmount.subtract(escrowRefundAmount);
-            if (nonEscrowRefundAmount.compareTo(BigDecimal.ZERO) > 0) {
-                UUID firstListingId = itemsToRefund.isEmpty() ? null : itemsToRefund.get(0).getListing().getId();
-                eWalletService.creditToUser(user, nonEscrowRefundAmount, firstListingId, PaymentTransactionType.REFUND);
-                log.info("Refunded {} to eWallet for user: {} for order: {} (non-escrow amount)", nonEscrowRefundAmount, user.getEmail(), order.getOrderNumber());
-            } else {
-                log.info("All refund amount handled via escrow refund for user: {} for order: {}", user.getEmail(), order.getOrderNumber());
-            }
-
-            Map<com.serhat.secondhand.user.domain.entity.User, BigDecimal> sellerRefunds = itemsToRefund.stream()
-                    .collect(Collectors.groupingBy(
-                            item -> item.getListing().getSeller(),
-                            Collectors.reducing(BigDecimal.ZERO, OrderItem::getTotalPrice, BigDecimal::add)
-                    ));
-
-            for (Map.Entry<com.serhat.secondhand.user.domain.entity.User, BigDecimal> entry : sellerRefunds.entrySet()) {
-                com.serhat.secondhand.user.domain.entity.User seller = entry.getKey();
-                BigDecimal sellerAmount = entry.getValue();
-                UUID sellerListingId = itemsToRefund.stream()
-                        .filter(item -> item.getListing().getSeller().getId().equals(seller.getId()))
-                        .findFirst()
-                        .map(item -> item.getListing().getId())
-                        .orElse(null);
-
-                try {
-                    eWalletService.debitFromUser(seller, sellerAmount, sellerListingId, PaymentTransactionType.REFUND);
-                    log.info("Debited {} from seller's eWallet: {} for order: {}", sellerAmount, seller.getEmail(), order.getOrderNumber());
-                } catch (Exception e) {
-                    log.error("Failed to debit from seller's eWallet: {} order: {} - {}", seller.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to refund to eWallet for user: {} order: {} - {}", user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-            return Result.error("Failed to process refund: " + e.getMessage(), "REFUND_FAILED");
+        Result<Void> orchestratorResult = paymentOrchestrator.refundFromSellersAndEscrows(
+                escrowsToRefund, user, itemsToRefund);
+        
+        if (orchestratorResult.isError()) {
+            log.error("Failed to process refund via orchestrator for order: {} - {}", 
+                    order.getOrderNumber(), orchestratorResult.getMessage());
+            return Result.error("Failed to process refund: " + orchestratorResult.getMessage(), "REFUND_FAILED");
         }
+
+        log.info("Successfully refunded {} to buyer {} for order {}", 
+                totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
         order = orderRepository.findByIdWithOrderItems(order.getId())
                 .orElse(null);
@@ -185,20 +161,6 @@ public class OrderRefundService {
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
-        if (!order.getUser().getId().equals(user.getId())) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-        }
-
-        return Result.success(order);
-    }
 
     private Result<Void> validateOrderCanBeRefunded(Order order) {
         if (order.getStatus() != Order.OrderStatus.DELIVERED) {
@@ -264,29 +226,4 @@ public class OrderRefundService {
         return true;
     }
 
-    private void refundEscrowsForItems(List<OrderItem> itemsToRefund, User buyer, Order order) {
-        for (OrderItem item : itemsToRefund) {
-            orderEscrowService.findEscrowByOrderItem(item).ifPresent(escrow -> {
-                try {
-                    if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
-                        UUID listingId = item.getListing().getId();
-                        eWalletService.debitFromUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.REFUND);
-                        log.info("Debited {} from seller's eWallet: {} for refunded order item {}", 
-                                escrow.getAmount(), escrow.getSeller().getEmail(), item.getId());
-                    }
-                    Result<Void> refundResult = orderEscrowService.refundEscrowToBuyer(escrow, buyer);
-                    if (refundResult.isError()) {
-                        log.error("Failed to refund escrow {} for order item {}: {}", 
-                                escrow.getId(), item.getId(), refundResult.getMessage());
-                    } else {
-                        log.info("Refunded escrow {} for order item {} in order {}", 
-                                escrow.getId(), item.getId(), order.getOrderNumber());
-                    }
-                } catch (Exception e) {
-                    log.error("Failed to refund escrow {} for order item {}: {}", 
-                            escrow.getId(), item.getId(), e.getMessage());
-                }
-            });
-        }
-    }
 }

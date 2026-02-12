@@ -11,7 +11,7 @@ import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.mapper.CreditCardMapper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ import java.util.UUID;
 public class CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final CreditCardMapper creditCardMapper;
     private final CreditCardValidator creditCardValidator;
 

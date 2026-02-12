@@ -1,9 +1,9 @@
 package com.serhat.secondhand.listing.application.clothing;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
-import com.serhat.secondhand.listing.application.PriceHistoryService;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.application.AbstractListingService;
+import com.serhat.secondhand.listing.application.IListingService;
+import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
@@ -14,9 +14,7 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
 import com.serhat.secondhand.listing.validation.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.clothing.ClothingSpecValidator;
-import com.serhat.secondhand.user.application.UserService;
-import com.serhat.secondhand.user.domain.entity.User;
-import lombok.RequiredArgsConstructor;
+import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -27,61 +25,82 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class ClothingListingService {
+public class ClothingListingService extends AbstractListingService<ClothingListing, ClothingCreateRequest> {
 
     private final ClothingListingRepository clothingRepository;
-    private final ListingService listingService;
-    private final ListingMapper listingMapper;
     private final ClothingListingFilterService clothingListingFilterService;
-    private final PriceHistoryService priceHistoryService;
-    private final UserService userService;
-    private final ListingValidationEngine listingValidationEngine;
     private final List<ClothingSpecValidator> clothingSpecValidators;
     private final ClothingMapper clothingMapper;
     private final ClothingListingResolver clothingListingResolver;
+    
+    public ClothingListingService(
+            ClothingListingRepository clothingRepository,
+            IListingService listingService,
+            ListingMapper listingMapper,
+            ClothingListingFilterService clothingListingFilterService,
+            IUserService userService,
+            ListingValidationEngine listingValidationEngine,
+            List<ClothingSpecValidator> clothingSpecValidators,
+            ClothingMapper clothingMapper,
+            ClothingListingResolver clothingListingResolver) {
+        super(userService, listingService, listingMapper, listingValidationEngine);
+        this.clothingRepository = clothingRepository;
+        this.clothingListingFilterService = clothingListingFilterService;
+        this.clothingSpecValidators = clothingSpecValidators;
+        this.clothingMapper = clothingMapper;
+        this.clothingListingResolver = clothingListingResolver;
+    }
 
-    @Transactional
     public Result<UUID> createClothingListing(ClothingCreateRequest request, Long sellerId) {
-        log.info("Creating clothing listing for sellerId: {}", sellerId);
-
-        // 1. Resolve Seller
-        var userResult = userService.findById(sellerId);
-        if (userResult.isError()) {
-            return Result.error(userResult.getMessage(), userResult.getErrorCode());
-        }
-        User seller = userResult.getData();
-
-        
-        ClothingListing clothing = listingMapper.toClothingEntity(request);
-        if (clothing.getQuantity() == null || clothing.getQuantity() < 1) {
-            return Result.error("Invalid quantity for clothing listing", ListingErrorCodes.INVALID_QUANTITY.toString());
-        }
-
-        var resolutionResult = clothingListingResolver.resolve(request.brandId(), request.clothingTypeId());
-        if (resolutionResult.isError()) {
-            return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
-        }
-        ClothingResolution res = resolutionResult.getData();
-        clothing.setBrand(res.brand());
-        clothing.setClothingType(res.type());
-        clothing.setPurchaseDate(toPurchaseDate(request.purchaseYear()));
-
-        clothing.setSeller(seller);
-
-        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(clothing, clothingSpecValidators);
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
-
-        ClothingListing saved = clothingRepository.save(clothing);
-        log.info("Clothing listing created: {}", saved.getId());
-
-        return Result.success(saved.getId());
+        return createListing(request, sellerId);
+    }
+    
+    @Override
+    protected String getListingType() {
+        return "Clothing";
+    }
+    
+    @Override
+    protected ClothingListing mapRequestToEntity(ClothingCreateRequest request) {
+        return listingMapper.toClothingEntity(request);
+    }
+    
+    @Override
+    protected boolean requiresQuantityValidation() {
+        return true;
+    }
+    
+    @Override
+    protected Result<ClothingResolution> resolveEntities(ClothingCreateRequest request) {
+        return clothingListingResolver.resolve(request.brandId(), request.clothingTypeId());
+    }
+    
+    @Override
+    protected void applyResolution(ClothingListing entity, Object resolution) {
+        ClothingResolution res = (ClothingResolution) resolution;
+        entity.setBrand(res.brand());
+        entity.setClothingType(res.type());
+    }
+    
+    @Override
+    protected Result<Void> preProcess(ClothingListing entity, ClothingCreateRequest request) {
+        entity.setPurchaseDate(toPurchaseDate(request.purchaseYear()));
+        return Result.success();
+    }
+    
+    @Override
+    protected Result<Void> validate(ClothingListing entity) {
+        return listingValidationEngine.cleanupAndValidate(entity, clothingSpecValidators);
+    }
+    
+    @Override
+    protected ClothingListing save(ClothingListing entity) {
+        return clothingRepository.save(entity);
     }
 
     @Transactional
+    @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
         
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
@@ -94,13 +113,10 @@ public class ClothingListingService {
             return Result.error("Clothing listing not found", "LISTING_NOT_FOUND");
         }
 
-        
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
         }
-
-        var oldPrice = existing.getPrice();
 
         Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
         if (quantityResult.isError()) {
@@ -118,14 +134,6 @@ public class ClothingListingService {
         }
 
         clothingRepository.save(existing);
-
-        
-        priceHistoryService.recordPriceChangeIfUpdated(
-                existing,
-                oldPrice,
-                request.base() != null ? request.base().price() : null,
-                "Price updated via listing edit"
-        );
 
         log.info("Clothing listing updated: {}", id);
         return Result.success();

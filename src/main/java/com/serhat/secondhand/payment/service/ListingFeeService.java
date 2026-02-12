@@ -2,7 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.validation.ListingFeePaymentValidation;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
@@ -10,7 +10,7 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class ListingFeeService {
 
     private final ListingConfig listingConfig;
     private final ListingFeePaymentValidation listingFeePaymentValidation;
-    private final UserService userService;
-    private final ListingService listingService;
+    private final IUserService userService;
+    private final IListingService listingService;
     private final PaymentProcessor paymentProcessor;
     private final PaymentRequestMapper paymentRequestMapper;
 

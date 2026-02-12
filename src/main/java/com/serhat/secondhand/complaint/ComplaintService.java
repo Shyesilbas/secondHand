@@ -2,9 +2,9 @@ package com.serhat.secondhand.complaint;
 
 import com.serhat.secondhand.complaint.validator.ComplaintValidator;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +20,8 @@ public class ComplaintService {
 
     private final ComplaintRepository complaintRepository;
     private final ComplaintMapper complaintMapper;
-    private final UserService userService;
-    private final ListingService listingService;
+    private final IUserService userService;
+    private final IListingService listingService;
     private final ComplaintValidator complaintValidator;
 
 

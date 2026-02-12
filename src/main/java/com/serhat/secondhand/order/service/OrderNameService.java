@@ -20,9 +20,10 @@ public class OrderNameService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final IOrderValidationService orderValidationService;
 
     public Result<OrderDto> updateOrderName(Long orderId, String name, User user) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
         if (orderResult.isError()) {
             return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
@@ -40,19 +41,5 @@ public class OrderNameService {
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
-        if (!order.getUser().getId().equals(user.getId())) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-        }
-
-        return Result.success(order);
-    }
 }
 

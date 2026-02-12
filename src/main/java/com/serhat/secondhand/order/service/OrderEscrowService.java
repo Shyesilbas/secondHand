@@ -1,14 +1,12 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.repository.OrderItemEscrowRepository;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +19,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Pure escrow state management service.
+ * No wallet operations - those are handled by PaymentOrchestrator.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,7 +30,6 @@ import java.util.stream.Collectors;
 public class OrderEscrowService {
 
     private final OrderItemEscrowRepository orderItemEscrowRepository;
-    private final EWalletService eWalletService;
     private final NotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
@@ -51,6 +52,10 @@ public class OrderEscrowService {
         return Result.success(saved);
     }
 
+    /**
+     * Marks escrow as released (COMPLETED status).
+     * Note: Actual wallet credit is done by PaymentOrchestrator.
+     */
     public Result<Void> releaseEscrowToSeller(OrderItemEscrow escrow) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
             log.warn("Escrow {} already released", escrow.getId());
@@ -60,37 +65,35 @@ public class OrderEscrowService {
             return Result.error("Escrow is not in PENDING status", "ESCROW_INVALID_STATUS");
         }
 
-        try {
-            UUID listingId = escrow.getOrderItem().getListing().getId();
-            eWalletService.creditToUser(escrow.getSeller(), escrow.getAmount(), listingId, PaymentTransactionType.ITEM_SALE);
+        escrow.setStatus(OrderItemEscrow.EscrowStatus.COMPLETED);
+        orderItemEscrowRepository.save(escrow);
         
-            escrow.setStatus(OrderItemEscrow.EscrowStatus.COMPLETED);
-            orderItemEscrowRepository.save(escrow);
-            
-            log.info("Released escrow {} amount {} to seller {}", 
-                    escrow.getId(), escrow.getAmount(), escrow.getSeller().getEmail());
-            
-            String listingTitle = escrow.getOrderItem().getListing() != null ? escrow.getOrderItem().getListing().getTitle() : null;
-            Result<?> notificationResult = notificationService.createAndSend(
-                    notificationTemplateCatalog.listingSold(
-                            escrow.getSeller().getId(),
-                            listingId,
-                            escrow.getOrder().getId(),
-                            escrow.getOrder().getOrderNumber(),
-                            listingTitle
-                    )
-            );
-            if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
-            }
-            return Result.success();
-        } catch (Exception e) {
-            log.error("Failed to release escrow {} to seller {}: {}", 
-                    escrow.getId(), escrow.getSeller().getEmail(), e.getMessage());
-            return Result.error("Failed to release escrow: " + e.getMessage(), "ESCROW_RELEASE_FAILED");
+        log.info("Marked escrow {} as released (amount: {}, seller: {})", 
+                escrow.getId(), escrow.getAmount(), escrow.getSeller().getEmail());
+        
+        UUID listingId = escrow.getOrderItem().getListing() != null ? escrow.getOrderItem().getListing().getId() : null;
+        String listingTitle = escrow.getOrderItem().getListing() != null ? escrow.getOrderItem().getListing().getTitle() : null;
+        
+        Result<?> notificationResult = notificationService.createAndSend(
+                notificationTemplateCatalog.listingSold(
+                        escrow.getSeller().getId(),
+                        listingId,
+                        escrow.getOrder().getId(),
+                        escrow.getOrder().getOrderNumber(),
+                        listingTitle
+                )
+        );
+        if (notificationResult.isError()) {
+            log.error("Failed to create notification: {}", notificationResult.getMessage());
         }
+        
+        return Result.success();
     }
 
+    /**
+     * Marks escrow as refunded.
+     * Note: Actual wallet operations are done by PaymentOrchestrator.
+     */
     public Result<Void> refundEscrowToBuyer(OrderItemEscrow escrow, User buyer) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.REFUNDED) {
             log.warn("Escrow {} already refunded", escrow.getId());
@@ -100,23 +103,19 @@ public class OrderEscrowService {
             return Result.error("Cannot refund a cancelled escrow", "ESCROW_CANNOT_REFUND_CANCELLED");
         }
 
-        try {
-            UUID listingId = escrow.getOrderItem().getListing().getId();
-            eWalletService.creditToUser(buyer, escrow.getAmount(), listingId, PaymentTransactionType.REFUND);
-            
-            escrow.setStatus(OrderItemEscrow.EscrowStatus.REFUNDED);
-            orderItemEscrowRepository.save(escrow);
-            
-            log.info("Refunded escrow {} amount {} to buyer {}", 
-                    escrow.getId(), escrow.getAmount(), buyer.getEmail());
-            return Result.success();
-        } catch (Exception e) {
-            log.error("Failed to refund escrow {} to buyer {}: {}", 
-                    escrow.getId(), buyer.getEmail(), e.getMessage());
-            return Result.error("Failed to refund escrow: " + e.getMessage(), "ESCROW_REFUND_FAILED");
-        }
+        escrow.setStatus(OrderItemEscrow.EscrowStatus.REFUNDED);
+        orderItemEscrowRepository.save(escrow);
+        
+        log.info("Marked escrow {} as refunded (amount: {}, buyer: {})", 
+                escrow.getId(), escrow.getAmount(), buyer.getEmail());
+        
+        return Result.success();
     }
 
+    /**
+     * Marks escrow as cancelled.
+     * Note: Actual wallet refund is done by PaymentOrchestrator.
+     */
     public Result<Void> cancelEscrow(OrderItemEscrow escrow, User buyer) {
         if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.CANCELLED) {
             log.warn("Escrow {} already cancelled", escrow.getId());
@@ -129,20 +128,13 @@ public class OrderEscrowService {
             return Result.error("Cannot cancel a refunded escrow", "ESCROW_CANNOT_CANCEL_REFUNDED");
         }
 
-        try {
-            UUID listingId = escrow.getOrderItem().getListing().getId();
-            eWalletService.creditToUser(buyer, escrow.getAmount(), listingId, PaymentTransactionType.REFUND);
-            
-            escrow.setStatus(OrderItemEscrow.EscrowStatus.CANCELLED);
-            orderItemEscrowRepository.save(escrow);
-            
-            log.info("Cancelled escrow {} amount {} refunded to buyer {}", 
-                    escrow.getId(), escrow.getAmount(), buyer.getEmail());
-            return Result.success();
-        } catch (Exception e) {
-            log.error("Failed to cancel escrow {}: {}", escrow.getId(), e.getMessage());
-            return Result.error("Failed to cancel escrow: " + e.getMessage(), "ESCROW_CANCEL_FAILED");
-        }
+        escrow.setStatus(OrderItemEscrow.EscrowStatus.CANCELLED);
+        orderItemEscrowRepository.save(escrow);
+        
+        log.info("Marked escrow {} as cancelled (amount: {}, buyer: {})", 
+                escrow.getId(), escrow.getAmount(), buyer.getEmail());
+        
+        return Result.success();
     }
 
     public List<OrderItemEscrow> findPendingEscrowsByOrder(Order order) {
@@ -157,7 +149,13 @@ public class OrderEscrowService {
         return orderItemEscrowRepository.findByOrderItem(orderItem);
     }
 
+    /**
+     * Deprecated: Use PaymentOrchestrator.createEscrowsForOrder() instead.
+     * This method is kept for backward compatibility but delegates to PaymentOrchestrator.
+     */
+    @Deprecated
     public void createEscrowsForOrder(Order order) {
+        log.warn("OrderEscrowService.createEscrowsForOrder() is deprecated. Use PaymentOrchestrator instead.");
         if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
             log.warn("Order {} has no order items, skipping escrow creation", order.getOrderNumber());
             return;
@@ -196,14 +194,19 @@ public class OrderEscrowService {
         log.info("Created escrows for order {} with {} order items", order.getOrderNumber(), order.getOrderItems().size());
     }
 
+    /**
+     * Deprecated: Use PaymentOrchestrator.releaseEscrowsToSellers() instead.
+     */
+    @Deprecated
     public void releaseEscrowsForOrder(Order order) {
+        log.warn("OrderEscrowService.releaseEscrowsForOrder() is deprecated. Use PaymentOrchestrator instead.");
         List<OrderItemEscrow> pendingEscrows = findPendingEscrowsByOrder(order);
         
         for (OrderItemEscrow escrow : pendingEscrows) {
             try {
                 releaseEscrowToSeller(escrow);
-                log.info("Released escrow {} for order item {} to seller {}", 
-                        escrow.getId(), escrow.getOrderItem().getId(), escrow.getSeller().getEmail());
+                log.info("Marked escrow {} as released for order item {}", 
+                        escrow.getId(), escrow.getOrderItem().getId());
             } catch (Exception e) {
                 log.error("Failed to release escrow {} for order {}: {}", 
                         escrow.getId(), order.getOrderNumber(), e.getMessage());
@@ -211,7 +214,7 @@ public class OrderEscrowService {
         }
         
         if (!pendingEscrows.isEmpty()) {
-            log.info("Released {} escrow(s) for order {}", pendingEscrows.size(), order.getOrderNumber());
+            log.info("Marked {} escrow(s) as released for order {}", pendingEscrows.size(), order.getOrderNumber());
         }
     }
 

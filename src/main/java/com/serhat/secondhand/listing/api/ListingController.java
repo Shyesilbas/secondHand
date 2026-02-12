@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
@@ -37,9 +37,10 @@ import java.util.UUID;
 @Tag(name = "Listing Management", description = "General listing operations")
 public class ListingController {
 
-    private final ListingService listingService;
+    private final IListingService listingService;
     private final ListingViewService listingViewService;
     private final ReviewService reviewService;
+    private final com.serhat.secondhand.dashboard.service.DashboardService dashboardService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -178,7 +179,7 @@ public class ListingController {
 
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        return ResponseEntity.ok(listingService.getListingStatistics());
+        return ResponseEntity.ok(dashboardService.getGlobalListingStatistics());
     }
 
     @PutMapping("/{id}/mark-sold")

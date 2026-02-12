@@ -12,7 +12,7 @@ import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.service.BankService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class EWalletService {
     private final PaymentRepository paymentRepository;
     private final EWalletMapper eWalletMapper;
     private final EWalletValidator eWalletValidator;
-    private final UserService userService;
+    private final IUserService userService;
 
     @Transactional
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {

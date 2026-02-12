@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @Transactional(readOnly = true)
-public class ListingService {
+public class ListingService implements IListingService {
 
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
@@ -252,61 +252,6 @@ public class ListingService {
 
         listingRepository.deleteById(listingId);
         return Result.success();
-    }
-
-    public long getTotalListingCount() {
-        return listingRepository.getTotalListingCount();
-    }
-
-    public long getActiveSellerCount() {
-        return listingRepository.getActiveSellerCount(ListingStatus.ACTIVE);
-    }
-
-    public long getActiveCityCount() {
-        return listingRepository.getActiveCityCount(ListingStatus.ACTIVE);
-    }
-
-    public long getTotalActiveListingCount() {
-        return listingRepository.getListingCountByStatus(ListingStatus.ACTIVE);
-    }
-
-    public ListingStatisticsDto getListingStatistics() {
-        long totalListings = getTotalListingCount();
-        long activeListings = getTotalActiveListingCount();
-        long activeSellerCount = getActiveSellerCount();
-        long activeCityCount = getActiveCityCount();
-
-        long vehicleCount = 0, electronicsCount = 0, realEstateCount = 0, clothingCount = 0, booksCount = 0, sportsCount = 0;
-        try {
-            var rows = listingRepository.getActiveCountsByType(ListingStatus.ACTIVE);
-            for (Object[] row : rows) {
-                String key = row[0].toString();
-                long count = ((Number) row[1]).longValue();
-                switch (key) {
-                    case "VEHICLE" -> vehicleCount = count;
-                    case "ELECTRONICS" -> electronicsCount = count;
-                    case "REAL_ESTATE" -> realEstateCount = count;
-                    case "CLOTHING" -> clothingCount = count;
-                    case "BOOKS" -> booksCount = count;
-                    case "SPORTS" -> sportsCount = count;
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to retrieve listing counts by type: {}", e.getMessage(), e);
-        }
-
-        return ListingStatisticsDto.builder()
-                .totalListings(totalListings)
-                .activeListings(activeListings)
-                .activeSellerCount(activeSellerCount)
-                .activeCityCount(activeCityCount)
-                .vehicleCount(vehicleCount)
-                .electronicsCount(electronicsCount)
-                .realEstateCount(realEstateCount)
-                .clothingCount(clothingCount)
-                .booksCount(booksCount)
-                .sportsCount(sportsCount)
-                .build();
     }
 
     // ---------- Private helper methods ----------

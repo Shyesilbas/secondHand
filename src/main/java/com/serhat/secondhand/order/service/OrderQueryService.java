@@ -7,7 +7,7 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,8 @@ public class OrderQueryService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderEscrowService orderEscrowService;
-    private final UserService userService;
+    private final IUserService userService;
+    private final IOrderValidationService orderValidationService;
 
     public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
         log.info("Getting orders for userId: {}", userId);
@@ -45,7 +46,7 @@ public class OrderQueryService {
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, userId);
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, userId);
         if (orderResult.isError()) {
             return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
         }
@@ -109,21 +110,6 @@ public class OrderQueryService {
     }
 
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, Long userId) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND.toString(), "Order Not Found.");
-        }
-        return validateOwnership(order, userId);
-    }
-
-
-    private Result<Order> validateOwnership(Order order, Long userId) {
-        if (!order.getUser().getId().equals(userId)) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "You dont have any orders with this id.");
-        }
-        return Result.success(order);
-    }
 
     private Pageable ensureSort(Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {

@@ -10,9 +10,16 @@ import java.util.UUID;
 public interface ListingStatisticsPort {
     long countBySellerId(Long sellerId);
     long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
-
+    
     List<Listing> findAllByIdIn(List<UUID> ids);
-
+    
     Optional<Listing> findById(UUID id);
+    
+    // Global statistics
+    long getTotalListingCount();
+    long getListingCountByStatus(ListingStatus status);
+    long getActiveSellerCount(ListingStatus status);
+    long getActiveCityCount(ListingStatus status);
+    List<Object[]> getActiveCountsByType(ListingStatus status);
 }
 

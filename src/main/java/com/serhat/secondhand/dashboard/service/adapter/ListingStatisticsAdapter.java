@@ -36,4 +36,29 @@ public class ListingStatisticsAdapter implements ListingStatisticsPort {
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
     }
+
+    @Override
+    public long getTotalListingCount() {
+        return listingRepository.getTotalListingCount();
+    }
+
+    @Override
+    public long getListingCountByStatus(ListingStatus status) {
+        return listingRepository.getListingCountByStatus(status);
+    }
+
+    @Override
+    public long getActiveSellerCount(ListingStatus status) {
+        return listingRepository.getActiveSellerCount(status);
+    }
+
+    @Override
+    public long getActiveCityCount(ListingStatus status) {
+        return listingRepository.getActiveCityCount(status);
+    }
+
+    @Override
+    public List<Object[]> getActiveCountsByType(ListingStatus status) {
+        return listingRepository.getActiveCountsByType(status);
+    }
 }

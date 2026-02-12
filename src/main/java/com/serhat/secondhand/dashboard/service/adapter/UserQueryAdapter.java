@@ -2,7 +2,7 @@ package com.serhat.secondhand.dashboard.service.adapter;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.dashboard.service.port.UserQueryPort;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserQueryAdapter implements UserQueryPort {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     @Override
     public User findById(Long id) {

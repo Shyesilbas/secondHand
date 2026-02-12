@@ -6,7 +6,7 @@ import com.serhat.secondhand.chat.repository.ChatRoomRepository;
 import com.serhat.secondhand.chat.repository.MessageRepository;
 import com.serhat.secondhand.chat.util.ChatErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class ChatAuthorizationService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
-    private final UserService userService;
+    private final IUserService userService;
 
     public Result<Void> validateUsersExist(Long... userIds) {
         for (Long id : userIds) {

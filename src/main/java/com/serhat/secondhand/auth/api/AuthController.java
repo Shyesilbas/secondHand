@@ -1,6 +1,6 @@
 package com.serhat.secondhand.auth.api;
 
-import com.serhat.secondhand.auth.application.AuthService;
+import com.serhat.secondhand.auth.application.IAuthService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
@@ -32,7 +32,7 @@ import java.net.URI;
 @Tag(name = "Authentication", description = "User authentication and authorization operations")
 public class AuthController {
 
-    private final AuthService authService;
+    private final IAuthService authService;
     private final CookieUtils cookieUtils;
 
     @PostMapping("/register")

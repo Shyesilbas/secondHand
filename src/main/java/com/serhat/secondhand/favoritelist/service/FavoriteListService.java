@@ -11,7 +11,7 @@ import com.serhat.secondhand.favoritelist.repository.FavoriteListLikeRepository;
 import com.serhat.secondhand.favoritelist.repository.FavoriteListRepository;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class FavoriteListService {
     private final FavoriteListLikeRepository favoriteListLikeRepository;
     private final ListingRepository listingRepository;
     private final FavoriteListMapper favoriteListMapper;
-    private final UserService userService;
+    private final IUserService userService;
 
     private static final int MAX_LISTS_PER_USER = 20;
     private static final int MAX_ITEMS_PER_LIST = 100;
