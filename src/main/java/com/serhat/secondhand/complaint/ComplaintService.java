@@ -64,7 +64,7 @@ public class ComplaintService {
     @Transactional(readOnly = true)
     public List<ComplaintDto> getUserComplaints(User user) {
         log.info("Getting complaints for user: {}", user.getId());
-        return complaintRepository.findByComplainer(user).stream()
+        return complaintRepository.findByComplainerWithDetails(user).stream()
                 .map(complaintMapper::mapComplaintToDto)
                 .toList();
     }
@@ -72,7 +72,7 @@ public class ComplaintService {
     @Transactional(readOnly = true)
     public List<ComplaintDto> getComplaintsAboutUser(User user) {
         log.info("Getting complaints about user: {}", user.getId());
-        return complaintRepository.findByComplainedUser(user).stream()
+        return complaintRepository.findByComplainedUserWithDetails(user).stream()
                 .map(complaintMapper::mapComplaintToDto)
                 .toList();
     }

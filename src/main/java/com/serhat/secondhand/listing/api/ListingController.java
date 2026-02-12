@@ -96,7 +96,8 @@ public class ListingController {
         filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
         filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
 
-        return ResponseEntity.ok(listingService.filterByCategory(filters, currentUser.getId()));
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return ResponseEntity.ok(listingService.filterByCategory(filters, userId));
     }
 
     @GetMapping("/search")

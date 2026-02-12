@@ -14,7 +14,19 @@ public interface ComplaintRepository extends JpaRepository<Complaint, String> {
 
     List<Complaint> findByComplainer(User complainer);
 
+    @Query("SELECT c FROM Complaint c " +
+           "JOIN FETCH c.complainer " +
+           "JOIN FETCH c.complainedUser " +
+           "WHERE c.complainer = :user")
+    List<Complaint> findByComplainerWithDetails(@Param("user") User user);
+
     List<Complaint> findByComplainedUser(User complainedUser);
+
+    @Query("SELECT c FROM Complaint c " +
+           "JOIN FETCH c.complainer " +
+           "JOIN FETCH c.complainedUser " +
+           "WHERE c.complainedUser = :user")
+    List<Complaint> findByComplainedUserWithDetails(@Param("user") User user);
 
 
     List<Complaint> findByStatus(ComplaintStatus status);
