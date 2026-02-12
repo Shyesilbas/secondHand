@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
         BY_ID: (id) => `/v1/users/${id}`,
         SEARCH: '/v1/users/search',
         AUDIT_LOGS: '/v1/users/audit-logs',
+        BADGES: '/v1/user/badges', // Aggregated endpoint for badge counts
     },
     LISTINGS: {
         ALL: '/v1/listings/allListings',
