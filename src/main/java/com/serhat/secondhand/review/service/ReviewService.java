@@ -21,6 +21,8 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class ReviewService implements IReviewService {
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Transactional
+    @CacheEvict(value = "reviewStatsBatch", allEntries = true)
     public Result<ReviewDto> createReview(Long reviewerId, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewerId);
 
@@ -144,8 +147,14 @@ public class ReviewService implements IReviewService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "reviewStatsBatch",
+            key = "T(java.util.Objects).hash(#listingIds)",
+            unless = "#result == null || #result.isEmpty()"
+    )
     public Map<UUID, ReviewStatsDto> getListingReviewStatsDto(List<UUID> listingIds) {
         if (listingIds == null || listingIds.isEmpty()) return new HashMap<>();
+        log.info("ReviewService#getListingReviewStatsDto CACHE MISS for {} listings", listingIds.size());
         List<Object[]> rows = reviewRepository.getListingReviewStats(listingIds);
         Map<UUID, ReviewStatsDto> statsMap = new HashMap<>();
         for (UUID id : listingIds) {

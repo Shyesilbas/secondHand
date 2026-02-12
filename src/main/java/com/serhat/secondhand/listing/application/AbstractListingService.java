@@ -32,7 +32,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     }
 
     @Transactional
-    public final Result<UUID> createListing(C request, Long sellerId) {
+    public Result<UUID> createListing(C request, Long sellerId) {
         log.info("Creating {} listing for sellerId: {}", getListingType(), sellerId);
         
         // Step 1: Resolve seller

@@ -1,6 +1,9 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
@@ -42,6 +45,7 @@ public class OrderRefundService {
     private final OrderEscrowService orderEscrowService;
     private final IOrderValidationService orderValidationService;
     private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
+    private final ListingRepository listingRepository;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -107,6 +111,7 @@ public class OrderRefundService {
         }
 
         orderItemRefundRepository.saveAll(refundRecords);
+        restoreListingStock(refundRecords);
         orderRepository.flush();
 
         List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToRefund = itemsToRefund.stream()
@@ -224,6 +229,40 @@ public class OrderRefundService {
             }
         }
         return true;
+    }
+
+    /**
+     * Restore listing stock for refunded items (except VEHICLE and REAL_ESTATE listings).
+     * For simplicity we assume refunded items are physically returned to inventory.
+     */
+    private void restoreListingStock(List<OrderItemRefund> refundRecords) {
+        if (refundRecords == null || refundRecords.isEmpty()) {
+            return;
+        }
+        for (OrderItemRefund refundRecord : refundRecords) {
+            OrderItem item = refundRecord.getOrderItem();
+            if (item == null) continue;
+
+            Listing listing = item.getListing();
+            if (listing == null) continue;
+
+            ListingType type = item.getListingType();
+            if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) {
+                // Quantity is not meaningful for these listing types
+                continue;
+            }
+
+            if (listing.getQuantity() == null) {
+                continue;
+            }
+
+            int delta = refundRecord.getRefundedQuantity();
+            if (delta <= 0) {
+                continue;
+            }
+
+            listingRepository.incrementQuantity(listing.getId(), delta);
+        }
     }
 
 }
