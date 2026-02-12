@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Pure escrow state management service.
@@ -218,27 +217,19 @@ public class OrderEscrowService {
         }
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal getPendingEscrowAmount(User seller) {
-        List<OrderItemEscrow> pendingEscrows = orderItemEscrowRepository.findBySeller(seller).stream()
+        return orderItemEscrowRepository.findBySellerWithDetails(seller).stream()
                 .filter(escrow -> escrow.getStatus() == OrderItemEscrow.EscrowStatus.PENDING)
-                .collect(Collectors.toList());
-        
-        return pendingEscrows.stream()
                 .map(OrderItemEscrow::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    @Transactional(readOnly = true)
     public BigDecimal getPendingEscrowAmountByOrder(Order order, User seller) {
-        List<OrderItemEscrow> allEscrows = orderItemEscrowRepository.findByOrder(order);
-        List<OrderItemEscrow> pendingEscrows = allEscrows.stream()
+        return orderItemEscrowRepository.findByOrderWithDetails(order).stream()
                 .filter(escrow -> escrow.getStatus() == OrderItemEscrow.EscrowStatus.PENDING)
-                .filter(escrow -> {
-                    User escrowSeller = escrow.getSeller();
-                    return escrowSeller != null && escrowSeller.getId().equals(seller.getId());
-                })
-                .collect(Collectors.toList());
-        
-        return pendingEscrows.stream()
+                .filter(escrow -> escrow.getSeller().getId().equals(seller.getId()))
                 .map(OrderItemEscrow::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

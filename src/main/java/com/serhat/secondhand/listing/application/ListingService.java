@@ -114,7 +114,7 @@ public class ListingService implements IListingService {
     @Transactional(readOnly = true)
     public List<ListingDto> findByIds(List<UUID> ids, Long userId) {
         if (ids == null || ids.isEmpty()) return List.of();
-        List<Listing> listings = listingRepository.findAllById(ids);
+        List<Listing> listings = listingRepository.findByIdsWithSeller(ids);
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());

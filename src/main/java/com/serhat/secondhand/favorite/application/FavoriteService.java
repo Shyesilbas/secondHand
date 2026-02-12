@@ -215,6 +215,7 @@ public class FavoriteService {
         return Result.success(favoriteRepository.findTopFavoritedListings(pageable));
     }
 
+    @Transactional(readOnly = true)
     public Result<List<ListingDto>> getTopFavoritedListingsWithDetails(int size, Long userId) {
         Pageable pageable = PageRequest.of(0, size);
         List<UUID> topIds = favoriteRepository.findTopFavoritedListingIds(pageable);
@@ -223,7 +224,7 @@ public class FavoriteService {
             return Result.success(List.of());
         }
 
-        List<Listing> listings = listingRepository.findAllById(topIds);
+        List<Listing> listings = listingRepository.findByIdsWithSeller(topIds);
 
         Map<UUID, Listing> listingMap = listings.stream()
                 .collect(Collectors.toMap(Listing::getId, l -> l, (a, b) -> a, LinkedHashMap::new));
