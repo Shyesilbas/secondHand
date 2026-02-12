@@ -21,7 +21,7 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
-    private final UserService userService;
+    private final IUserService userService;
 
     public List<AddressDto> getAddressesByUserId(Long userId) {
         return addressRepository.findByUserId(userId).stream()

@@ -5,6 +5,7 @@ import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.dashboard.mapper.DashboardMapper;
 import com.serhat.secondhand.dashboard.service.port.*;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -217,6 +218,45 @@ public class DashboardService {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    public ListingStatisticsDto getGlobalListingStatistics() {
+        long totalListings = listingStatisticsPort.getTotalListingCount();
+        long activeListings = listingStatisticsPort.getListingCountByStatus(ListingStatus.ACTIVE);
+        long activeSellerCount = listingStatisticsPort.getActiveSellerCount(ListingStatus.ACTIVE);
+        long activeCityCount = listingStatisticsPort.getActiveCityCount(ListingStatus.ACTIVE);
+
+        long vehicleCount = 0, electronicsCount = 0, realEstateCount = 0, clothingCount = 0, booksCount = 0, sportsCount = 0;
+        try {
+            var rows = listingStatisticsPort.getActiveCountsByType(ListingStatus.ACTIVE);
+            for (Object[] row : rows) {
+                String key = row[0].toString();
+                long count = ((Number) row[1]).longValue();
+                switch (key) {
+                    case "VEHICLE" -> vehicleCount = count;
+                    case "ELECTRONICS" -> electronicsCount = count;
+                    case "REAL_ESTATE" -> realEstateCount = count;
+                    case "CLOTHING" -> clothingCount = count;
+                    case "BOOKS" -> booksCount = count;
+                    case "SPORTS" -> sportsCount = count;
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to retrieve listing counts by type: {}", e.getMessage(), e);
+        }
+
+        return ListingStatisticsDto.builder()
+                .totalListings(totalListings)
+                .activeListings(activeListings)
+                .activeSellerCount(activeSellerCount)
+                .activeCityCount(activeCityCount)
+                .vehicleCount(vehicleCount)
+                .electronicsCount(electronicsCount)
+                .realEstateCount(realEstateCount)
+                .clothingCount(clothingCount)
+                .booksCount(booksCount)
+                .sportsCount(sportsCount)
+                .build();
     }
 
     private BigDecimal calculateGrowthPercentage(BigDecimal previous, BigDecimal current) {

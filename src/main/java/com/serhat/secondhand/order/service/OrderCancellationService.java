@@ -1,10 +1,7 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.ewallet.service.EWalletService;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -18,15 +15,13 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,12 +35,13 @@ public class OrderCancellationService {
     private final OrderItemCancelRepository orderItemCancelRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
-    private final EWalletService eWalletService;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
+    private final IOrderValidationService orderValidationService;
+    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
         if (orderResult.isError()) {
             return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
@@ -104,48 +100,21 @@ public class OrderCancellationService {
         orderItemCancelRepository.saveAll(cancelRecords);
         orderRepository.flush();
 
-        cancelEscrowsForItems(itemsToCancel, user, order);
+        List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToCancel = itemsToCancel.stream()
+                .map(item -> orderEscrowService.findEscrowByOrderItem(item))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-        try {
-            UUID firstListingId = itemsToCancel.isEmpty() ? null : itemsToCancel.get(0).getListing().getId();
-            eWalletService.creditToUser(user, totalRefundAmount, firstListingId, PaymentTransactionType.REFUND);
-            log.info("Refunded {} to eWallet for user: {} for order: {}", totalRefundAmount, user.getEmail(), order.getOrderNumber());
-
-            Map<com.serhat.secondhand.user.domain.entity.User, BigDecimal> sellerRefunds = itemsToCancel.stream()
-                    .collect(Collectors.groupingBy(
-                            item -> item.getListing().getSeller(),
-                            Collectors.reducing(BigDecimal.ZERO, OrderItem::getTotalPrice, BigDecimal::add)
-                    ));
-
-            for (Map.Entry<com.serhat.secondhand.user.domain.entity.User, BigDecimal> entry : sellerRefunds.entrySet()) {
-                com.serhat.secondhand.user.domain.entity.User seller = entry.getKey();
-                BigDecimal sellerAmount = entry.getValue();
-                UUID sellerListingId = itemsToCancel.stream()
-                        .filter(item -> item.getListing().getSeller().getId().equals(seller.getId()))
-                        .findFirst()
-                        .map(item -> item.getListing().getId())
-                        .orElse(null);
-
-                try {
-                    eWalletService.debitFromUser(seller, sellerAmount, sellerListingId, PaymentTransactionType.REFUND);
-                    log.info("Debited {} from seller's eWallet: {} for order: {}", sellerAmount, seller.getEmail(), order.getOrderNumber());
-                } catch (BusinessException e) {
-                    log.error("Failed to debit from seller's eWallet: {} order: {} - Error: {} [{}]", 
-                            seller.getEmail(), order.getOrderNumber(), e.getMessage(), e.getErrorCode(), e);
-                } catch (DataAccessException e) {
-                    log.error("Database error while debiting from seller's eWallet: {} order: {} - {}", 
-                            seller.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-                }
-            }
-        } catch (BusinessException e) {
-            log.error("Business error during refund to eWallet for user: {} order: {} - Error: {} [{}]", 
-                    user.getEmail(), order.getOrderNumber(), e.getMessage(), e.getErrorCode(), e);
+        Result<Void> orchestratorResult = paymentOrchestrator.cancelEscrowsAndRefundBuyer(escrowsToCancel, user);
+        if (orchestratorResult.isError()) {
+            log.error("Failed to cancel escrows and refund buyer for order: {} - {}", 
+                    order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error("Failed to process refund. Please contact support.", "REFUND_FAILED");
-        } catch (DataAccessException e) {
-            log.error("Database error during refund to eWallet for user: {} order: {} - {}", 
-                    user.getEmail(), order.getOrderNumber(), e.getMessage(), e);
-            return Result.error("Failed to process refund due to a system error. Please try again later.", "REFUND_FAILED");
         }
+
+        log.info("Successfully cancelled escrows and refunded {} to buyer {} for order {}", 
+                totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
         order = orderRepository.findByIdWithOrderItems(order.getId())
                 .orElse(null);
@@ -181,20 +150,6 @@ public class OrderCancellationService {
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
-        if (!order.getUser().getId().equals(user.getId())) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-        }
-
-        return Result.success(order);
-    }
 
     private Result<Void> validateOrderCanBeCancelled(Order order) {
         if (order.getStatus() != Order.OrderStatus.CONFIRMED) {
@@ -248,18 +203,4 @@ public class OrderCancellationService {
         return true;
     }
 
-    private void cancelEscrowsForItems(List<OrderItem> itemsToCancel, User buyer, Order order) {
-        for (OrderItem item : itemsToCancel) {
-            orderEscrowService.findEscrowByOrderItem(item).ifPresent(escrow -> {
-                Result<Void> cancelResult = orderEscrowService.cancelEscrow(escrow, buyer);
-                if (cancelResult.isError()) {
-                    log.error("Failed to cancel escrow {} for order item {}: {}", 
-                            escrow.getId(), item.getId(), cancelResult.getMessage());
-                } else {
-                    log.info("Cancelled escrow {} for order item {} in order {}", 
-                            escrow.getId(), item.getId(), order.getOrderNumber());
-                }
-            });
-        }
-    }
 }

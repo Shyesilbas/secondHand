@@ -25,7 +25,7 @@ public class ListingEventListener {
     private final ListingRepository listingRepository;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
-    private final ListingService listingService;
+    private final IListingService listingService;
 
     @EventListener
     @Transactional

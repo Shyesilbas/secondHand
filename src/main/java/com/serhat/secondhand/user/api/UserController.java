@@ -5,11 +5,11 @@ import com.serhat.secondhand.complaint.ComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.verification.VerificationService;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.review.service.ReviewService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
@@ -39,11 +39,11 @@ import java.util.List;
 @Tag(name = "User Management", description = "User profile and verification operations")
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
     private final AuditLogService auditLogService;
     private final VerificationService verificationService;
     private final ReviewService reviewService;
-    private final ListingService listingService;
+    private final IListingService listingService;
     private final ComplaintService complaintService;
     private final OfferService offerService;
 

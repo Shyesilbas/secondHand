@@ -207,7 +207,7 @@ public class SecurityConfig {
                         // Image endpoints
                         .requestMatchers(IMAGE_ENDPOINTS.toArray(new String[0])).authenticated()
                         
-                        // WebSocket endpoints
+                        // WebSocket endpoints (HTTP handshake public, message-level auth in WebSocketSecurityConfig)
                         .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()
                         .requestMatchers("/api/v1/listings/clothing/generator/**").permitAll()
                         .requestMatchers("/api/v1/listings/electronics/generator/**").permitAll()

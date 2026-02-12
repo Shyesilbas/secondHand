@@ -1,7 +1,9 @@
 package com.serhat.secondhand.listing.application.electronic;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.AbstractListingService;
+import com.serhat.secondhand.listing.aspect.TrackPriceChange;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
@@ -13,8 +15,7 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicListingRepository;
 import com.serhat.secondhand.listing.validation.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.electronic.ElectronicSpecValidator;
-import com.serhat.secondhand.user.application.UserService;
-import lombok.RequiredArgsConstructor;
+import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -24,55 +25,79 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class ElectronicListingService {
+public class ElectronicListingService extends AbstractListingService<ElectronicListing, ElectronicCreateRequest> {
     private final ElectronicListingRepository repository;
-    private final ListingService listingService;
-    private final ListingMapper listingMapper;
     private final ElectronicListingFilterService electronicListingFilterService;
     private final PriceHistoryService priceHistoryService;
-    
-    private final UserService userService;
-    private final ListingValidationEngine listingValidationEngine;
     private final List<ElectronicSpecValidator> electronicSpecValidators;
     private final ElectronicMapper electronicMapper;
     private final ElectronicListingResolver electronicListingResolver;
+    
+    public ElectronicListingService(
+            ElectronicListingRepository repository,
+            IListingService listingService,
+            ListingMapper listingMapper,
+            ElectronicListingFilterService electronicListingFilterService,
+            PriceHistoryService priceHistoryService,
+            IUserService userService,
+            ListingValidationEngine listingValidationEngine,
+            List<ElectronicSpecValidator> electronicSpecValidators,
+            ElectronicMapper electronicMapper,
+            ElectronicListingResolver electronicListingResolver) {
+        super(userService, listingService, listingMapper, listingValidationEngine);
+        this.repository = repository;
+        this.electronicListingFilterService = electronicListingFilterService;
+        this.priceHistoryService = priceHistoryService;
+        this.electronicSpecValidators = electronicSpecValidators;
+        this.electronicMapper = electronicMapper;
+        this.electronicListingResolver = electronicListingResolver;
+    }
 
-    @Transactional
     public Result<UUID> createElectronicListing(ElectronicCreateRequest request, Long sellerId) {
-        log.info("Creating electronic listing for sellerId: {}", sellerId);
-
-        var userResult = userService.findById(sellerId);
-        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
-
-        var resolutionResult = electronicListingResolver.resolve(
+        return createListing(request, sellerId);
+    }
+    
+    @Override
+    protected String getListingType() {
+        return "Electronic";
+    }
+    
+    @Override
+    protected ElectronicListing mapRequestToEntity(ElectronicCreateRequest request) {
+        return listingMapper.toElectronicEntity(request);
+    }
+    
+    @Override
+    protected Result<ElectronicResolution> resolveEntities(ElectronicCreateRequest request) {
+        return electronicListingResolver.resolve(
                 request.electronicTypeId(),
                 request.electronicBrandId(),
                 request.electronicModelId()
         );
-        if (resolutionResult.isError()) return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
-
-        ElectronicListing electronicListing = listingMapper.toElectronicEntity(request);
-        ElectronicResolution res = resolutionResult.getData();
-
-        electronicListing.setElectronicType(res.type());
-        electronicListing.setElectronicBrand(res.brand());
-        electronicListing.setModel(res.model());
-        electronicListing.setSeller(userResult.getData());
-
-        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(electronicListing, electronicSpecValidators);
-        if (specResult.isError()) return Result.error(specResult.getMessage(), specResult.getErrorCode());
-
-        ElectronicListing saved = repository.save(electronicListing);
-        log.info("Electronic listing created: {}", saved.getId());
-
-        return Result.success(saved.getId());
+    }
+    
+    @Override
+    protected void applyResolution(ElectronicListing entity, Object resolution) {
+        ElectronicResolution res = (ElectronicResolution) resolution;
+        entity.setElectronicType(res.type());
+        entity.setElectronicBrand(res.brand());
+        entity.setModel(res.model());
+    }
+    
+    @Override
+    protected Result<Void> validate(ElectronicListing entity) {
+        return listingValidationEngine.cleanupAndValidate(entity, electronicSpecValidators);
+    }
+    
+    @Override
+    protected ElectronicListing save(ElectronicListing entity) {
+        return repository.save(entity);
     }
 
     @Transactional
+    @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateElectronicListings(UUID id, ElectronicUpdateRequest request, Long currentUserId) {
-        // 1. Ownership Check (Updated to Long userId)
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return ownershipResult;
@@ -87,8 +112,6 @@ public class ElectronicListingService {
         if (statusResult.isError()) {
             return statusResult;
         }
-
-        var oldPrice = existing.getPrice();
 
         Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
         if (quantityResult.isError()) {
@@ -113,14 +136,6 @@ public class ElectronicListingService {
         }
 
         repository.save(existing);
-
-        // 5. Price History
-        priceHistoryService.recordPriceChangeIfUpdated(
-                existing,
-                oldPrice,
-                request.base() != null ? request.base().price() : null,
-                "Price updated via listing edit"
-        );
 
         log.info("Electronic listing updated: {}", id);
         return Result.success();

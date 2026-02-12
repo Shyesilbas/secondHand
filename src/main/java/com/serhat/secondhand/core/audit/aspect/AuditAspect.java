@@ -22,7 +22,7 @@ public class AuditAspect {
 
     private final AuditLogService auditLogService;
 
-    @Around("execution(* com.serhat.secondhand.auth.application.AuthService.login(..))")
+    @Around("execution(* com.serhat.secondhand.auth.application.IAuthService.login(..))")
     public Object auditLogin(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         String userEmail = null;
@@ -60,7 +60,7 @@ public class AuditAspect {
         }
     }
 
-    @Around("execution(* com.serhat.secondhand.auth.application.AuthService.logout(..))")
+    @Around("execution(* com.serhat.secondhand.auth.application.IAuthService.logout(..))")
     public Object auditLogout(ProceedingJoinPoint joinPoint) throws Throwable {
         String userEmail = null;
         Long userId = null;

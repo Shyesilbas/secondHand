@@ -1,7 +1,7 @@
 package com.serhat.secondhand.offer.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
@@ -14,7 +14,7 @@ import com.serhat.secondhand.offer.mapper.OfferMapper;
 import com.serhat.secondhand.offer.repository.OfferRepository;
 import com.serhat.secondhand.offer.util.OfferErrorCodes;
 import com.serhat.secondhand.offer.validator.OfferValidator;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +33,8 @@ import java.util.UUID;
 public class OfferService {
 
     private final OfferRepository offerRepository;
-    private final ListingService listingService;
-    private final UserService userService;
+    private final IListingService listingService;
+    private final IUserService userService;
     private final OfferEmailNotificationService offerEmailNotificationService;
     private final OfferValidator offerValidator;
     private final OfferMapper offerMapper;

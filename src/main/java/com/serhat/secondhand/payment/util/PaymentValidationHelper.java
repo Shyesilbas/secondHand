@@ -3,7 +3,7 @@ package com.serhat.secondhand.payment.util;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Component
 public class PaymentValidationHelper {
-    public User resolveToUser(PaymentRequest paymentRequest, UserService userService) {
+    public User resolveToUser(PaymentRequest paymentRequest, IUserService userService) {
         if (paymentRequest.transactionType() == PaymentTransactionType.ITEM_PURCHASE ||
             paymentRequest.transactionType() == PaymentTransactionType.ITEM_SALE) {
             if (paymentRequest.toUserId() == null) {

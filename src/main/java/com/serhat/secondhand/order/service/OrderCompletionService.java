@@ -28,9 +28,11 @@ public class OrderCompletionService {
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
+    private final IOrderValidationService orderValidationService;
+    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
 
     public Result<OrderDto> completeOrder(Long orderId, User user) {
-        Result<Order> orderResult = findOrderByIdAndValidateOwnership(orderId, user);
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
         if (orderResult.isError()) {
             return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
@@ -61,20 +63,6 @@ public class OrderCompletionService {
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
-    private Result<Order> findOrderByIdAndValidateOwnership(Long orderId, User user) {
-        Order order = orderRepository.findById(orderId)
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
-        if (!order.getUser().getId().equals(user.getId())) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-        }
-
-        return Result.success(order);
-    }
 
     private Result<Void> validateOrderCanBeCompleted(Order order) {
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
@@ -89,19 +77,19 @@ public class OrderCompletionService {
     private void releaseEscrowsForOrder(Order order) {
         List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
         
-        for (OrderItemEscrow escrow : pendingEscrows) {
-            Result<Void> releaseResult = orderEscrowService.releaseEscrowToSeller(escrow);
-            if (releaseResult.isError()) {
-                log.error("Failed to release escrow {} for order {}: {}", 
-                        escrow.getId(), order.getOrderNumber(), releaseResult.getMessage());
-            } else {
-                log.info("Released escrow {} for order item {} to seller {}", 
-                        escrow.getId(), escrow.getOrderItem().getId(), escrow.getSeller().getEmail());
-            }
+        if (pendingEscrows.isEmpty()) {
+            log.info("No pending escrows to release for order {}", order.getOrderNumber());
+            return;
         }
+
+        Result<Void> orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
         
-        if (!pendingEscrows.isEmpty()) {
-            log.info("Released {} escrow(s) for order {}", pendingEscrows.size(), order.getOrderNumber());
+        if (orchestratorResult.isError()) {
+            log.error("Failed to release escrows for order {}: {}", 
+                    order.getOrderNumber(), orchestratorResult.getMessage());
+        } else {
+            log.info("Successfully released {} escrow(s) for order {}", 
+                    pendingEscrows.size(), order.getOrderNumber());
         }
     }
 }

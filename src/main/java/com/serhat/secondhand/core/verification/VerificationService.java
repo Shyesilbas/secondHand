@@ -4,7 +4,7 @@ import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
@@ -27,7 +27,7 @@ public class VerificationService implements IVerificationService {
     private final VerificationConfig verificationConfig;
     private final VerificationRepository verificationRepository;
     private final UserNotificationService userNotificationService;
-    private final UserService userService;
+    private final IUserService userService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;

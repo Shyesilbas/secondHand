@@ -17,7 +17,7 @@ import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.review.validator.ReviewValidator;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final OrderItemRepository orderItemRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final ReviewMapper reviewMapper;
     private final ListingRepository listingRepository;
     private final ReviewValidator reviewValidator;

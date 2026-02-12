@@ -2,7 +2,7 @@ package com.serhat.secondhand.showcase;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -12,7 +12,7 @@ import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
 import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseConfig showcaseConfig;
     private final ShowcaseRepository showcaseRepository;
     private final ShowcaseMapper showcaseMapper;
-    private final ListingService listingService;
+    private final IListingService listingService;
     private final PaymentProcessor paymentProcessor;
-    private final UserService userService;
+    private final IUserService userService;
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestMapper paymentRequestMapper;
 

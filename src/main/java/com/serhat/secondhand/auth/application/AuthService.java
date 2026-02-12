@@ -19,7 +19,7 @@ import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.UserNotificationService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
@@ -47,9 +47,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class AuthService {
+public class AuthService implements IAuthService {
 
-    private final UserService userService;
+    private final IUserService userService;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;

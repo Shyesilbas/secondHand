@@ -9,7 +9,7 @@ import com.serhat.secondhand.campaign.repository.CampaignRepository;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.campaign.validator.CampaignValidator;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ import java.util.UUID;
 public class CampaignService {
 
     private final CampaignRepository campaignRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final CampaignValidator campaignValidator;
     private final CampaignMapper campaignMapper;
 

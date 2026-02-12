@@ -17,10 +17,9 @@ import com.serhat.secondhand.offer.service.OfferService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,7 @@ public class CouponService {
     private final CartRepository cartRepository;
     private final OfferService offerService;
     private final PricingService pricingService;
-    private final UserService userService;
+    private final IUserService userService;
 
     public CouponService(
             CouponRepository couponRepository,
@@ -48,8 +47,8 @@ public class CouponService {
             CouponValidator couponValidator,
             CartRepository cartRepository,
             OfferService offerService,
-            @Lazy PricingService pricingService,
-            UserService userService) {
+            PricingService pricingService,
+            IUserService userService) {
         this.couponRepository = couponRepository;
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.couponMapper = couponMapper;

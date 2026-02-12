@@ -9,7 +9,10 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -61,5 +64,40 @@ public class CouponValidator {
             }
         }
         return Result.success();
+    }
+
+    /**
+     * Validates coupon applicability for cart context.
+     * This method is used by PricingService to validate coupons without depending on CouponService.
+     */
+    public Result<Void> validateCouponForCart(Coupon coupon, User buyer, Set<ListingType> cartTypes, BigDecimal eligibleSubtotal) {
+        if (coupon == null) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_FOUND);
+        }
+
+        Result<Void> usableResult = validateUsable(coupon, buyer);
+        if (usableResult.isError()) {
+            return usableResult;
+        }
+
+        Set<ListingType> effectiveEligibleTypes = (coupon.getEligibleTypes() == null || coupon.getEligibleTypes().isEmpty())
+                ? defaultEligibleTypes() : coupon.getEligibleTypes();
+
+        if (cartTypes == null || cartTypes.stream().noneMatch(effectiveEligibleTypes::contains)) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        }
+
+        if (coupon.getMinSubtotal() != null && eligibleSubtotal != null && eligibleSubtotal.compareTo(coupon.getMinSubtotal()) < 0) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        }
+
+        return Result.success();
+    }
+
+    private Set<ListingType> defaultEligibleTypes() {
+        EnumSet<ListingType> all = EnumSet.allOf(ListingType.class);
+        all.remove(ListingType.REAL_ESTATE);
+        all.remove(ListingType.VEHICLE);
+        return all;
     }
 }

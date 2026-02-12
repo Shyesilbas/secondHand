@@ -7,7 +7,7 @@ import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.mapper.UserAgreementMapper;
 import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class UserAgreementService {
     private final AgreementService agreementService;
     private final AgreementRequirementService agreementRequirementService;
     private final UserAgreementMapper userAgreementMapper;
-    private final UserService userService;
+    private final IUserService userService;
 
     public UserAgreementDto acceptAgreement(Long userId, AcceptAgreementRequest request) {
         var userResult = userService.findById(userId);

@@ -14,7 +14,7 @@ import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class FavoriteService {
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService listingEnrichmentService;
-    private final UserService userService;
+    private final IUserService userService;
     private final NotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     

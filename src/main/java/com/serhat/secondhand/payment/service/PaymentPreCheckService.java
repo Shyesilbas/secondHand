@@ -4,7 +4,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import com.serhat.secondhand.payment.validator.PaymentValidator;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PaymentPreCheckService {
 
-    private final UserService userService;
+    private final IUserService userService;
     private final PaymentValidator paymentValidator;
     private final PaymentValidationHelper paymentValidationHelper;
     private final IPaymentVerificationService paymentVerificationService;

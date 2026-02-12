@@ -10,13 +10,13 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.cart.util.CartErrorCodes;
 import com.serhat.secondhand.cart.validator.CartValidator;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +38,8 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
-    private final ListingService listingService;
-    private final UserService userService;
+    private final IListingService listingService;
+    private final IUserService userService;
     private final CartValidator cartValidator;
     private final ListingEnrichmentService enrichmentService;
     private final ListingRepository listingRepository;

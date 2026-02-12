@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.validation;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ListingFeePaymentValidation {
 
-    private final ListingService listingService;
+    private final IListingService listingService;
 
     public Result<Void> validate(PaymentRequest request, Long userId) {
 
@@ -32,7 +32,8 @@ public class ListingFeePaymentValidation {
             return Result.success("Listing fee paid successfully");
         }
         else{
-            return Result.error(PaymentErrorCodes.LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS.toString(), "Listing fee payment is not allowed.");
+            return Result.error(PaymentErrorCodes.LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS.toString(),
+                    "Listing fee payment is not allowed.");
         }
     }
 

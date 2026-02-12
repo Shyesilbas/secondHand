@@ -18,7 +18,7 @@ import com.serhat.secondhand.order.service.OrderEscrowService;
 import com.serhat.secondhand.order.service.OrderNotificationService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.PricingService;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class CheckoutOrchestrator {
     private final OfferService offerService;
     private final ListingRepository listingRepository;
     private final OrderEscrowService orderEscrowService;
-    private final UserService userService;
+    private final IUserService userService;
 
     @Transactional
     public Result<OrderDto> executeCheckout(Long userId, CheckoutRequest request) {

@@ -5,7 +5,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.ListingView;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingViewRepository;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class ListingViewService {
 
     private final ListingViewRepository listingViewRepository;
     private final ListingRepository listingRepository;
-    private final UserService userService;
+    private final IUserService userService;
 
     @Async("viewTrackingExecutor")
     @Transactional

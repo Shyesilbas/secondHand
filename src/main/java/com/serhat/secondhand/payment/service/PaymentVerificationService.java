@@ -6,7 +6,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class PaymentVerificationService implements IPaymentVerificationService{
 
     private final IVerificationService verificationService;
-    private final UserService userService;
+    private final IUserService userService;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentVerificationMessageBuilder paymentVerificationMessageBuilder;
 

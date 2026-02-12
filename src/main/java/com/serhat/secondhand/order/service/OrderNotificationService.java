@@ -9,7 +9,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class OrderNotificationService {
     private final EmailService emailService;
     private final EmailConfig emailConfig;
     private final OrderMapper orderMapper;
-    private final UserService userService;
+    private final IUserService userService;
     private final NotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 

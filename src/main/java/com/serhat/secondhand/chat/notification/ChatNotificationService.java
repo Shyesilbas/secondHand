@@ -3,7 +3,7 @@ package com.serhat.secondhand.chat.notification;
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.notification.service.NotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class ChatNotificationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
-    private final UserService userService;
+    private final IUserService userService;
 
     public void sendMessage(ChatMessageDto dto) {
         messagingTemplate.convertAndSend("/topic/chat/" + dto.getChatRoomId(), dto);

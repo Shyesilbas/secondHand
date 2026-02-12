@@ -9,7 +9,7 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
-import com.serhat.secondhand.user.application.UserService;
+import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class BankService {
 
     private final BankRepository bankRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final BankMapper bankMapper;
     private final BankValidator bankValidator;
 
