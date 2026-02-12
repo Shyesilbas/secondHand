@@ -4,6 +4,7 @@ import { Heart, Globe, Lock, MoreVertical, Pencil, Trash2, Package } from 'lucid
 import { useLikeFavoriteList, useUnlikeFavoriteList, useDeleteFavoriteList } from '../hooks/useFavoriteLists.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
+import { formatCurrency } from '../../common/formatters.js';
 import FavoriteListModal from './FavoriteListModal.jsx';
 
 const FavoriteListCard = ({ list, showOwner = false }) => {
@@ -44,16 +45,6 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
             }
         }
         setShowMenu(false);
-    };
-
-    const formatPrice = (price, currency) => {
-        if (!price) return '₺0';
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: currency || 'TRY',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(price);
     };
 
     return (
@@ -176,7 +167,7 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                                 )}
                             </div>
                             <span className="font-semibold text-gray-900">
-                                {formatPrice(list.totalPrice, list.currency)}
+                                {formatCurrency(list.totalPrice, list.currency)}
                             </span>
                         </div>
 

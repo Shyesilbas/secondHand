@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -76,6 +77,22 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Modifying
     @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
     int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
+
+    @Modifying
+    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id = :id AND l.seller.id = :sellerId AND l.quantity IS NOT NULL")
+    int updateQuantity(@Param("id") UUID id, @Param("qty") int qty, @Param("sellerId") Long sellerId);
+
+    @Modifying
+    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId AND l.quantity IS NOT NULL")
+    int updateQuantityBatch(@Param("ids") List<UUID> ids, @Param("qty") int qty, @Param("sellerId") Long sellerId);
+
+    @Modifying
+    @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id = :id AND l.seller.id = :sellerId")
+    int updatePrice(@Param("id") UUID id, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId);
+
+    @Modifying
+    @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId")
+    int updatePriceBatch(@Param("ids") List<UUID> ids, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId);
 
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
     List<Listing> findAllByIdIn(@Param("ids") Collection<UUID> ids);

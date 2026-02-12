@@ -1,5 +1,5 @@
-import { formatCurrency } from '../../formatters.js';
-import { Type, Tag, AlignLeft } from 'lucide-react';
+import { formatCurrency, parsePrice } from '../../formatters.js';
+import { PriceInput } from '../ui/PriceInput.jsx';
 
 const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = false, showQuantity = true }) => {
   return (
@@ -66,18 +66,14 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
             <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
               Fiyat <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={onInputChange}
-                className={`block w-full px-4 py-3 pr-24 rounded-xl border ${errors.price ? 'border-red-300 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500'} focus:outline-none transition-all tracking-tight`}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
+            <div className="relative flex">
+              <PriceInput
+                value={parsePrice(formData.price) ?? 0}
+                onChange={(n) => onInputChange({ target: { name: 'price', value: n != null ? String(n) : '' } })}
+                placeholder="0,00"
+                className={`flex-1 min-w-0 rounded-l-xl rounded-r-none border-r-0 py-3 ${errors.price ? 'border-red-300 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500'}`}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center">
+              <div className="flex items-center shrink-0">
                 <select
                   name="currency"
                   value={formData.currency}
@@ -92,9 +88,9 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
                 </select>
               </div>
             </div>
-            {formData.price && !isNaN(parseFloat(formData.price)) && (
+            {formData.price && parsePrice(formData.price) != null && (
               <div className="mt-2 text-xs text-slate-600 font-medium tracking-tight">
-                Önizleme: <span className="text-indigo-700 font-mono">{formatCurrency(parseFloat(formData.price), formData.currency)}</span>
+                Önizleme: <span className="text-indigo-700 font-mono">{formatCurrency(parsePrice(formData.price), formData.currency)}</span>
               </div>
             )}
             {errors.price && (

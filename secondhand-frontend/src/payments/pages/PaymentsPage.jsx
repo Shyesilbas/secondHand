@@ -4,7 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Menu } from 'lucide-react';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import PaymentHistory from '../components/PaymentHistory.jsx';
-import PaymentNavigation from '../components/PaymentNavigation.jsx';
+import PaymentNavigation, { PaymentPagination } from '../components/PaymentNavigation.jsx';
 import { PaymentInfo } from '../components/WalletOverview.jsx';
 import { usePayments } from '../hooks/usePayments.js';
 
@@ -19,6 +19,7 @@ const PaymentsPage = () => {
         currentPage,
         pageSize,
         totalPages,
+        totalElements,
         selectedPayment,
         isReceiptModalOpen,
         filters,
@@ -86,20 +87,13 @@ const PaymentsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50/50 relative">
-            <PaymentNavigation
+                <PaymentNavigation
                 showFilters={showFilters}
                 onCloseFilters={closeFilterSidebar}
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onResetFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
-                shouldShowPagination={shouldShowPagination}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                totalItems={filteredPayments.length}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
             />
 
             <div className={`flex flex-col min-w-0 transition-all duration-300 ${showFilters ? 'lg:ml-80' : ''}`}>
@@ -168,6 +162,16 @@ const PaymentsPage = () => {
                         onClearFilters={clearFilters}
                         isLoading={isLoading}
                     />
+                    {shouldShowPagination && (
+                        <PaymentPagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            totalItems={totalElements}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
+                    )}
                 </div>
 
                 <PaymentReceiptModal
