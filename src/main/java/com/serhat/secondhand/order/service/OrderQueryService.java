@@ -11,6 +11,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -102,6 +103,7 @@ public class OrderQueryService {
         });
     }
 
+    @Cacheable(value = "pendingOrders", key = "#userId")
     public Map<String, Object> getPendingCompletionStatus(Long userId) {
         boolean hasPending = orderRepository.existsByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
         long count = hasPending ? orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED) : 0;

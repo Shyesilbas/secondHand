@@ -12,6 +12,7 @@ import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class OrderCompletionService {
     private final IOrderValidationService orderValidationService;
     private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
 
+    @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
         if (orderResult.isError()) {

@@ -1,15 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { emailService } from '../../emails/services/emailService.js';
-import { chatService } from '../../chat/services/chatService.js';
+import { userBadgesService } from '../../user/services/userBadgesService.js';
 import { cartService } from '../../cart/services/cartService.js';
-import { orderService } from '../../order/services/orderService.js';
 
-const normalizeChatCount = (raw) => {
-  if (typeof raw === 'number') return raw;
-  if (typeof raw === 'string' && raw.trim() !== '') return Number(raw) || 0;
-  return raw?.count ?? 0;
-};
-
+// Cart endpoint remains separate as it returns items, not just count
 const normalizeCartItems = (raw) => {
   if (Array.isArray(raw)) return raw;
   if (Array.isArray(raw?.content)) return raw.content;
@@ -26,25 +19,24 @@ export const useBadgeCounts = ({ enabled = true, userId } = {}) => {
     queryKey: ['badgeCounts', userId],
     enabled: !!enabled && !!userId,
     queryFn: async () => {
-      const [emailCountRaw, chatCountRaw, cartItemsRaw, pendingRaw] = await Promise.all([
-        emailService.getUnreadCount(),
-        chatService.getTotalUnreadMessageCount(),
-        cartService.getCartItems(),
-        orderService.getPendingCompletionStatus(),
+      // OPTIMIZATION: Use aggregated endpoint (4 requests → 2 requests)
+      const [badges, cartItemsRaw] = await Promise.all([
+        userBadgesService.getBadges(), // Single endpoint for 3 counts
+        cartService.getCartItems(),     // Separate as it returns items
       ]);
 
-      const emailCount = Number(emailCountRaw) || 0;
-      const chatCount = normalizeChatCount(chatCountRaw);
+      const emailCount = Number(badges.notificationCount) || 0;
+      const chatCount = Number(badges.chatUnreadCount) || 0;
       const cartCount = countCartItems(normalizeCartItems(cartItemsRaw));
-      const orderCount = pendingRaw?.pendingCount ?? 0;
+      const orderCount = Number(badges.pendingOrderCount) || 0;
 
       return { emailCount, chatCount, cartCount, orderCount };
     },
-    staleTime: 60 * 1000,
+    staleTime: 30 * 1000, // Sync with backend cache TTL
     gcTime: 10 * 60 * 1000,
-    refetchInterval: 60 * 1000,
+    refetchInterval: 30 * 1000, // Reduced from 60s, matches cache TTL
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true, // Re-enabled for better UX
     refetchOnMount: true,
     retry: 1,
     retryDelay: 1000,
