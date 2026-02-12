@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class OfferService {
+public class OfferService implements IOfferService {
 
     private final OfferRepository offerRepository;
     private final IListingService listingService;

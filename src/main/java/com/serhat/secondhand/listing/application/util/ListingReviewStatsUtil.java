@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.application.util;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.review.service.ReviewService;
+import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class ListingReviewStatsUtil {
-    private final ReviewService reviewService;
+    private final IReviewService reviewService;
 
     public void enrichWithReviewStats(ListingDto dto) {
         if (dto != null && dto.getId() != null) {

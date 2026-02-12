@@ -27,7 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EWalletService {
+public class EWalletService implements IEWalletService {
 
     private final EWalletRepository eWalletRepository;
     private final BankService bankService;

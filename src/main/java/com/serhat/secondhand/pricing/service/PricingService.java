@@ -1,7 +1,7 @@
 package com.serhat.secondhand.pricing.service;
 
 import com.serhat.secondhand.campaign.entity.Campaign;
-import com.serhat.secondhand.campaign.service.CampaignService;
+import com.serhat.secondhand.campaign.service.ICampaignService;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
@@ -23,9 +23,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PricingService {
+public class PricingService implements IPricingService {
 
-    private final CampaignService campaignService;
+    private final ICampaignService campaignService;
     private final CouponRepository couponRepository;
     private final CouponValidator couponValidator;
     private final PriceCalculationEngine priceCalculationEngine;

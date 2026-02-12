@@ -1,7 +1,7 @@
 package com.serhat.secondhand.notification.api;
 
 import com.serhat.secondhand.notification.dto.NotificationDto;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Tag(name = "Notifications", description = "Notification management operations")
 public class NotificationController {
 
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
 
     @GetMapping
     @Operation(summary = "Get notifications", description = "Get paginated list of notifications for the authenticated user")

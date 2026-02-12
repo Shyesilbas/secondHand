@@ -102,17 +102,17 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
-        
         Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return ownershipResult;
         }
 
-        ClothingListing existing = clothingRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Clothing listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return clothingRepository.findById(id)
+                .map(existing -> performUpdate(existing, request))
+                .orElseGet(() -> Result.error("Clothing listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(ClothingListing existing, ClothingUpdateRequest request) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -122,10 +122,12 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
+        
         Result<Void> applyResult = clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId());
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        
         clothingMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators);
@@ -134,8 +136,7 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
         }
 
         clothingRepository.save(existing);
-
-        log.info("Clothing listing updated: {}", id);
+        log.info("Clothing listing updated: {}", existing.getId());
         return Result.success();
     }
 

@@ -23,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CampaignService {
+public class CampaignService implements ICampaignService {
 
     private final CampaignRepository campaignRepository;
     private final IUserService userService;

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.orchestrator;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.ewallet.service.IEWalletService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class PaymentOrchestrator {
 
-    private final EWalletService eWalletService;
+    private final IEWalletService eWalletService;
     private final OrderItemEscrowRepository orderItemEscrowRepository;
 
     /**

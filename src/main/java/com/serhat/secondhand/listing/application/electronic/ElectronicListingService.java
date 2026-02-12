@@ -103,11 +103,12 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
             return ownershipResult;
         }
 
-        ElectronicListing existing = repository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Electronic listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return repository.findById(id)
+                .map(existing -> performUpdate(existing, request))
+                .orElseGet(() -> Result.error("Electronic listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(ElectronicListing existing, ElectronicUpdateRequest request) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -136,8 +137,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         }
 
         repository.save(existing);
-
-        log.info("Electronic listing updated: {}", id);
+        log.info("Electronic listing updated: {}", existing.getId());
         return Result.success();
     }
 

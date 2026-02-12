@@ -1,7 +1,7 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -29,7 +29,7 @@ import java.util.UUID;
 public class OrderEscrowService {
 
     private final OrderItemEscrowRepository orderItemEscrowRepository;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     public Result<OrderItemEscrow> createEscrowForOrderItem(OrderItem orderItem, User seller, BigDecimal amount) {

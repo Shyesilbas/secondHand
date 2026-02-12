@@ -1,7 +1,7 @@
 package com.serhat.secondhand.ewallet.controller;
 
 import com.serhat.secondhand.ewallet.dto.*;
-import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.ewallet.service.IEWalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Slf4j
 public class EWalletController {
 
-    private final EWalletService eWalletService;
+    private final IEWalletService eWalletService;
 
     @PostMapping
     public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {

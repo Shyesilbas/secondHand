@@ -12,7 +12,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -45,7 +45,7 @@ public class FavoriteService {
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService listingEnrichmentService;
     private final IUserService userService;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     
 
@@ -167,6 +167,7 @@ public class FavoriteService {
         return statsResult;
     }
 
+    @Transactional(readOnly = true)
     public Result<Page<FavoriteDto>> getUserFavorites(Long userId, Pageable pageable) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
@@ -184,15 +185,18 @@ public class FavoriteService {
         return Result.success(favoriteDtos);
     }
 
+    @Transactional(readOnly = true)
     public Result<FavoriteStatsDto> getFavoriteStats(UUID listingId, Long userId) {
         return Result.success(favoriteStatsService.getFavoriteStats(listingId, userId));
     }
 
+    @Transactional(readOnly = true)
     public Result<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
         return Result.success(favoriteStatsService.getFavoriteStatsForListings(listingIds, userId));
     }
     
 
+    @Transactional(readOnly = true)
     public Result<Boolean> isFavorited(Long userId, UUID listingId) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
@@ -203,6 +207,7 @@ public class FavoriteService {
     }
 
 
+    @Transactional(readOnly = true)
     public Result<Long> getFavoriteCount(UUID listingId) {
         return Result.success(favoriteRepository.countByListingId(listingId));
     }
@@ -211,6 +216,7 @@ public class FavoriteService {
 
     
 
+    @Transactional(readOnly = true)
     public Result<Page<Object[]>> getTopFavoritedListings(Pageable pageable) {
         return Result.success(favoriteRepository.findTopFavoritedListings(pageable));
     }
@@ -239,6 +245,7 @@ public class FavoriteService {
         return Result.success(listingEnrichmentService.enrich(orderedDtos, userId));
     }
 
+    @Transactional(readOnly = true)
     public Result<List<UUID>> getUserFavoriteIds(Long userId) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {

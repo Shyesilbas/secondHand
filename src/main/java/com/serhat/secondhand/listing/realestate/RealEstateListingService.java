@@ -108,11 +108,12 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
             return ownershipResult;
         }
 
-        RealEstateListing existing = realEstateRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Real Estate listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return realEstateRepository.findById(id)
+                .map(existing -> performUpdate(existing, request))
+                .orElseGet(() -> Result.error("Real Estate listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(RealEstateListing existing, RealEstateUpdateRequest request) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -128,6 +129,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        
         realEstateMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, realEstateSpecValidators);
@@ -136,8 +138,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         }
 
         realEstateRepository.save(existing);
-
-        log.info("Real estate listing updated: {}", id);
+        log.info("Real estate listing updated: {}", existing.getId());
         return Result.success();
     }
 

@@ -113,11 +113,12 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
             return ownershipResult;
         }
 
-        BooksListing existing = booksRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Books listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return booksRepository.findById(id)
+                .map(existing -> performUpdate(existing, request, currentUserId))
+                .orElseGet(() -> Result.error("Books listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(BooksListing existing, BooksUpdateRequest request, Long currentUserId) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -127,6 +128,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
+        
         Result<Void> applyResult = booksListingResolver.apply(
                 existing,
                 request.bookTypeId(),
@@ -138,6 +140,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        
         booksMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, booksSpecValidators);
@@ -146,8 +149,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         }
 
         booksRepository.save(existing);
-
-        log.info("Books listing updated: {}", id);
+        log.info("Books listing updated: {}", existing.getId());
         return Result.success();
     }
 

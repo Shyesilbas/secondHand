@@ -54,11 +54,14 @@ public class OrderQueryService {
     }
 
     public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
-        Order order = orderRepository.findByIdForSeller(orderId, sellerId).orElse(null);
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), "You dont have any orders with this id.");
-        }
-
+        return orderRepository.findByIdForSeller(orderId, sellerId)
+                .map(order -> buildSellerOrderDto(order, sellerId))
+                .map(Result::success)
+                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), 
+                                             "You dont have any orders with this id."));
+    }
+    
+    private OrderDto buildSellerOrderDto(Order order, Long sellerId) {
         OrderDto orderDto = orderMapper.toDto(order);
         if (orderDto.getOrderItems() != null) {
             List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
@@ -69,7 +72,7 @@ public class OrderQueryService {
             orderDto.setOrderItems(sellerOrderItems);
         }
         orderDto.setEscrowAmount(null);
-        return Result.success(orderDto);
+        return orderDto;
     }
 
 

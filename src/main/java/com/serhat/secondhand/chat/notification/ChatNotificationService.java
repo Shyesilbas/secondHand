@@ -1,7 +1,7 @@
 package com.serhat.secondhand.chat.notification;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class ChatNotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final IUserService userService;
 

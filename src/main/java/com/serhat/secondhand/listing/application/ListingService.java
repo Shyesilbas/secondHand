@@ -121,6 +121,7 @@ public class ListingService implements IListingService {
         return enrichList(dtos, userId);
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> filterByCategory(ListingFilterDto filters, Long userId) {
         Function<ListingFilterDto, Page<ListingDto>> strategy = filterStrategyMap.get(filters.getClass());
         if (strategy == null) return Page.empty();
@@ -128,6 +129,7 @@ public class ListingService implements IListingService {
         return enrichPage(result, userId);
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
         if (query == null || query.trim().isEmpty()) return Page.empty();
 
@@ -145,30 +147,35 @@ public class ListingService implements IListingService {
         return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, results.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> getMyListings(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingType(userId, listingType, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
+    @Transactional(readOnly = true)
     public Page<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndStatus(userId, status, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
+    @Transactional(readOnly = true)
     public List<ListingDto> findByStatusAsDto(ListingStatus status) {
         return enrichList(
                 listingRepository.findByStatus(status)
@@ -204,6 +211,7 @@ public class ListingService implements IListingService {
         listingRepository.save(listing);
     }
 
+    @Transactional(readOnly = true)
     public Result<Void> validateOwnership(UUID listingId, Long userId) {
         return listingRepository.findById(listingId)
                 .map(listing -> listing.getSeller().getId().equals(userId)

@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ComplaintService {
+public class ComplaintService implements IComplaintService {
 
     private final ComplaintRepository complaintRepository;
     private final ComplaintMapper complaintMapper;

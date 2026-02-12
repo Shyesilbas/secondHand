@@ -1,6 +1,6 @@
 package com.serhat.secondhand.order.service;
 
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.Shipping;
@@ -26,7 +26,7 @@ public class OrderCompletionScheduler {
     private final ShippingRepository shippingRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderEscrowService orderEscrowService;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;

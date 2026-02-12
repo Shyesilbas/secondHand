@@ -6,11 +6,11 @@ import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.offer.entity.Offer;
-import com.serhat.secondhand.offer.service.OfferService;
+import com.serhat.secondhand.offer.service.IOfferService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
-import com.serhat.secondhand.pricing.service.PricingService;
+import com.serhat.secondhand.pricing.service.IPricingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,8 +26,8 @@ public class PaymentVerificationMessageBuilder {
     private final ListingConfig listingConfig;
     private final IListingService listingService;
     private final CartRepository cartRepository;
-    private final PricingService pricingService;
-    private final OfferService offerService;
+    private final IPricingService pricingService;
+    private final IOfferService offerService;
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
         StringBuilder details = new StringBuilder("\n\nPayment Details:\n");

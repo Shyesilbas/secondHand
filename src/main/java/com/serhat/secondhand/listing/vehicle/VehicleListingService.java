@@ -106,11 +106,12 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
             return ownershipResult;
         }
 
-        VehicleListing existing = vehicleRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Vehicle listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return vehicleRepository.findById(id)
+                .map(existing -> performUpdate(existing, request))
+                .orElseGet(() -> Result.error("Vehicle listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(VehicleListing existing, VehicleUpdateRequest request) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -120,6 +121,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        
         vehicleMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, vehicleSpecValidators);
@@ -128,8 +130,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         }
 
         vehicleRepository.save(existing);
-
-        log.info("Vehicle listing updated: {}", id);
+        log.info("Vehicle listing updated: {}", existing.getId());
         return Result.success();
     }
 
