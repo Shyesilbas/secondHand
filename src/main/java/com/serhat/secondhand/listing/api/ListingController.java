@@ -3,6 +3,10 @@ package com.serhat.secondhand.listing.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
+import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
+import com.serhat.secondhand.listing.domain.dto.request.UpdatePriceRequest;
+import com.serhat.secondhand.listing.domain.dto.request.UpdateQuantityRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
@@ -189,6 +193,40 @@ public class ListingController {
             @AuthenticationPrincipal User currentUser) {
         listingService.markAsSold(id, currentUser.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/quantity")
+    public ResponseEntity<?> updateQuantity(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateQuantityRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        Result<Void> result = listingService.updateSingleQuantity(id, request.quantity(), currentUser.getId());
+        return handleResult(result);
+    }
+
+    @PutMapping("/{id}/price")
+    public ResponseEntity<?> updatePrice(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdatePriceRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        Result<Void> result = listingService.updateSinglePrice(id, request.price(), currentUser.getId());
+        return handleResult(result);
+    }
+
+    @PutMapping("/quantity/batch")
+    public ResponseEntity<?> updateBatchQuantity(
+            @Valid @RequestBody UpdateBatchQuantityRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        Result<Void> result = listingService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId());
+        return handleResult(result);
+    }
+
+    @PutMapping("/price/batch")
+    public ResponseEntity<?> updateBatchPrice(
+            @Valid @RequestBody UpdateBatchPriceRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        Result<Void> result = listingService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId());
+        return handleResult(result);
     }
 
     @GetMapping("/status/{status}")

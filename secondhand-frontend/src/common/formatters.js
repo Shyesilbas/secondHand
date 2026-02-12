@@ -1,41 +1,28 @@
-export const formatCurrency = (value, currency = 'TRY', options = {}) => {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+/** Parses "35.000,00" or "35000" to number. */
+export const parsePrice = (str) => {
+  if (str == null || str === '') return null;
+  const s = String(str).trim().replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : null;
+};
 
-  if (numValue === null || numValue === undefined || isNaN(numValue)) {
-    return '₺0,00';
-  }
-
-  const currencyConfig = {
-    'TRY': {
-      symbol: '₺',
-      locale: 'tr-TR',
-      position: 'before'
-    },
-    'USD': {
-      symbol: '$',
-      locale: 'en-US',
-      position: 'before'
-    },
-    'EUR': {
-      symbol: '€',
-      locale: 'de-DE',
-      position: 'after'
-    }
-  };
-
-  const config = currencyConfig[currency] || currencyConfig['TRY'];
-  
-  const formatted = numValue.toLocaleString(config.locale, {
-    minimumFractionDigits: options.minimumFractionDigits || 2,
-    maximumFractionDigits: options.maximumFractionDigits || 2,
-    style: 'decimal'
+/** Formats number as 35.000,00 (tr-TR). Use everywhere for price display. */
+export const formatPrice = (value, options = {}) => {
+  const num = typeof value === 'string' ? parsePrice(value) : value;
+  if (num == null || !Number.isFinite(num)) return '';
+  return num.toLocaleString('tr-TR', {
+    minimumFractionDigits: options.decimals ?? 2,
+    maximumFractionDigits: options.decimals ?? 2,
   });
+};
 
-  if (config.position === 'before') {
-    return `${config.symbol}${formatted}`;
-  } else {
-    return `${formatted} ${config.symbol}`;
-  }
+export const formatCurrency = (value, currency = 'TRY', options = {}) => {
+  const numValue = typeof value === 'string' ? parsePrice(value) : value;
+  if (numValue == null || !Number.isFinite(numValue)) return currency === 'TRY' ? '₺0,00' : '0,00';
+  const formatted = formatPrice(numValue, { decimals: options.minimumFractionDigits ?? options.maximumFractionDigits ?? 2 });
+  const symbols = { TRY: '₺', USD: '$', EUR: '€' };
+  const sym = symbols[currency] || symbols.TRY;
+  return `${sym}${formatted}`;
 };
 
 export const formatCurrencyCompact = (value, currency = 'TRY') => {

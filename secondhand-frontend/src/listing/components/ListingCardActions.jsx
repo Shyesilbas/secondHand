@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useListingActions } from '../hooks/useListingActions.js';
+import { ListingQuickEdit } from './ListingQuickEdit.jsx';
 
 const ListingCardActions = ({ listing, onChanged }) => {
   const { user } = useAuthState();
+  const { showSuccess, showError } = useNotification();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isInShowcase } = useShowcaseQueries();
   const dropdownRef = useRef(null);
@@ -53,7 +56,13 @@ const ListingCardActions = ({ listing, onChanged }) => {
         </button>
 
         {isDropdownOpen && (
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+          <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+            {canEdit && (
+              <div className="px-3 py-2 border-b border-gray-100">
+                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Quick Actions</p>
+                <ListingQuickEdit listing={listing} onChanged={onChanged} showSuccess={showSuccess} showError={showError} compact />
+              </div>
+            )}
             {canEdit && (
               <button
                 onClick={actions.handleEdit}

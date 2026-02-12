@@ -1,18 +1,8 @@
 import EmptyState from '../ui/EmptyState.jsx';
+import { formatCurrency } from '../../formatters.js';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-const SearchResults = ({ 
-  results, 
-  activeTab, 
-  selectedIndex, 
-  isLoading, 
-  query,
-  onResultSelect 
-}) => {
-  const formatPrice = (price, currency) => {
-    if (!price) return '';
-    return `${price.toLocaleString('tr-TR')} ${currency || 'TRY'}`;
-  };
+const SearchResults = ({ results, activeTab, selectedIndex, isLoading, query, onResultSelect }) => {
 
   const renderUserResult = (user, index) => (
     <div
@@ -71,7 +61,7 @@ const SearchResults = ({
           </div>
           {listing.price && (
             <div className="text-sm font-semibold text-blue-600 mt-1">
-              {formatPrice(listing.price, listing.currency)}
+              {formatCurrency(listing.price, listing.currency)}
             </div>
           )}
         </div>

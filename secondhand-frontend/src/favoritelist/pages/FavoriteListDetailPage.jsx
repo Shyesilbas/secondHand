@@ -7,6 +7,7 @@ import {
 import { useFavoriteListById, useLikeFavoriteList, useUnlikeFavoriteList, useDeleteFavoriteList, useRemoveItemFromList } from '../hooks/useFavoriteLists.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
+import { formatCurrency } from '../../common/formatters.js';
 import FavoriteListModal from '../components/FavoriteListModal.jsx';
 
 const FavoriteListDetailPage = () => {
@@ -78,16 +79,6 @@ const FavoriteListDetailPage = () => {
             navigator.clipboard.writeText(url);
             alert('Link kopyalandı!');
         }
-    };
-
-    const formatPrice = (price, currency) => {
-        if (!price) return '₺0';
-        return new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: currency || 'TRY',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(price);
     };
 
     if (isLoading) {
@@ -198,7 +189,7 @@ const FavoriteListDetailPage = () => {
                                 <div className="text-right">
                                     <p className="text-sm text-gray-500">Toplam Değer</p>
                                     <p className="text-2xl font-bold text-gray-900">
-                                        {formatPrice(list.totalPrice, list.currency)}
+                                        {formatCurrency(list.totalPrice, list.currency)}
                                     </p>
                                 </div>
 
@@ -312,7 +303,7 @@ const FavoriteListDetailPage = () => {
                                         {item.listingTitle}
                                     </h3>
                                     <p className="font-semibold text-gray-900 mt-1">
-                                        {formatPrice(item.listingPrice, item.listingCurrency)}
+                                        {formatCurrency(item.listingPrice, item.listingCurrency)}
                                     </p>
                                     {item.note && (
                                         <p className="text-xs text-gray-500 mt-1 truncate">

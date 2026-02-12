@@ -262,6 +262,38 @@ public class ListingService implements IListingService {
         return Result.success();
     }
 
+    @Transactional
+    public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
+        if (quantity < 1) return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
+        int updated = listingRepository.updateQuantity(listingId, quantity, userId);
+        return updated > 0 ? Result.success() : Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+    }
+
+    @Transactional
+    public Result<Void> updateBatchQuantity(List<UUID> listingIds, int quantity, Long userId) {
+        if (listingIds == null || listingIds.isEmpty()) return Result.success();
+        if (quantity < 1) return Result.error("Quantity must be at least 1", ListingErrorCodes.INVALID_QUANTITY.toString());
+        listingRepository.updateQuantityBatch(listingIds, quantity, userId);
+        return Result.success();
+    }
+
+    @Transactional
+    public Result<Void> updateSinglePrice(UUID listingId, BigDecimal price, Long userId) {
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0)
+            return Result.error("Price must be non-negative", "INVALID_PRICE");
+        int updated = listingRepository.updatePrice(listingId, price, userId);
+        return updated > 0 ? Result.success() : Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+    }
+
+    @Transactional
+    public Result<Void> updateBatchPrice(List<UUID> listingIds, BigDecimal price, Long userId) {
+        if (listingIds == null || listingIds.isEmpty()) return Result.success();
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0)
+            return Result.error("Price must be non-negative", "INVALID_PRICE");
+        listingRepository.updatePriceBatch(listingIds, price, userId);
+        return Result.success();
+    }
+
     // ---------- Private helper methods ----------
 
     private Listing findAndValidateOwner(UUID listingId, Long userId) {

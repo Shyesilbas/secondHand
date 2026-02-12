@@ -1,7 +1,7 @@
-import {get, post, put, del } from '../../common/services/api/request.js';
-import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { LISTING_TYPES } from '../types/index.js';
-import { filterConfigs } from '../components/filters/filterConfigs.js';
+import {del, get, post, put} from '../../common/services/api/request.js';
+import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
+import {LISTING_TYPES} from '../types/index.js';
+import {filterConfigs} from '../components/filters/filterConfigs.js';
 
 const withErrorHandling = async (operation, errorMessage) => {
   try {
@@ -117,18 +117,14 @@ export const listingService = {
   getListingById: async (id) => {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
   },
-  getListingsByIds: async (ids) => {
-    return post(API_ENDPOINTS.LISTINGS.BULK, ids);
-  },
+
   getListingByUserId: async (userId, page = 0, size = 10) => {
     return get(`${API_ENDPOINTS.LISTINGS.BY_USER(userId)}?page=${page}&size=${size}`);
   },
   getListingByNo: async (no) => {
     return get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(no));
   },
-  getCountsForTypes: async (listingType) => {
-    return get(API_ENDPOINTS.LISTINGS.COUNTS_FOR_TYPES(listingType));
-  },
+
   deactivateListing: async (id) => {
     return put(API_ENDPOINTS.LISTINGS.DEACTIVATE(id));
   },
@@ -138,6 +134,14 @@ export const listingService = {
   markListingSold: async (id) => {
     return put(API_ENDPOINTS.LISTINGS.MARK_SOLD(id));
   },
+  updateQuantity: async (id, quantity) => {
+    return put(API_ENDPOINTS.LISTINGS.UPDATE_QUANTITY(id), { quantity });
+  },
+  updatePrice: async (id, price) => {
+    return put(API_ENDPOINTS.LISTINGS.UPDATE_PRICE(id), { price });
+  },
+  updateBatchQuantity: async (listingIds, quantity) => put(API_ENDPOINTS.LISTINGS.UPDATE_QUANTITY_BATCH, { listingIds, quantity }),
+  updateBatchPrice: async (listingIds, price) => put(API_ENDPOINTS.LISTINGS.UPDATE_PRICE_BATCH, { listingIds, price }),
   deleteListing: async (id) => {
     return del(API_ENDPOINTS.LISTINGS.DELETE(id));
   },

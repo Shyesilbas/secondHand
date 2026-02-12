@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { DEFAULT_PAYMENT_FILTERS } from "../paymentSchema.js";
 
@@ -295,40 +295,17 @@ const PaymentNavigation = ({
     onFilterChange,
     onResetFilters,
     hasActiveFilters,
-    shouldShowPagination,
-    currentPage,
-    totalPages,
-    pageSize,
-    totalItems,
-    onPageChange,
-    onPageSizeChange
-}) => {
-    const paginationTotalItems = useMemo(() => (typeof totalItems === 'number' ? totalItems : 0), [totalItems]);
-
-    return (
-        <>
-            <PaymentFilterSidebar
-                isOpen={showFilters}
-                onClose={onCloseFilters}
-                filters={filters}
-                onFilterChange={onFilterChange}
-                onReset={onResetFilters}
-                hasActiveFilters={hasActiveFilters}
-            />
-
-            {shouldShowPagination ? (
-                <PaymentPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    pageSize={pageSize}
-                    totalItems={paginationTotalItems}
-                    onPageChange={onPageChange}
-                    onPageSizeChange={onPageSizeChange}
-                />
-            ) : null}
-        </>
-    );
-};
+}) => (
+    <PaymentFilterSidebar
+        isOpen={showFilters}
+        onClose={onCloseFilters}
+        filters={filters}
+        onFilterChange={onFilterChange}
+        onReset={onResetFilters}
+        hasActiveFilters={hasActiveFilters}
+    />
+);
 
 export default PaymentNavigation;
+export { PaymentPagination };
 
