@@ -3,7 +3,7 @@ package com.serhat.secondhand.campaign.api;
 import com.serhat.secondhand.campaign.dto.CampaignDto;
 import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
-import com.serhat.secondhand.campaign.service.CampaignService;
+import com.serhat.secondhand.campaign.service.ICampaignService;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CampaignController {
 
-    private final CampaignService campaignService;
+    private final ICampaignService campaignService;
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CreateCampaignRequest request, @AuthenticationPrincipal User currentUser) {

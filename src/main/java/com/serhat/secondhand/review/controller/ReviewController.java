@@ -1,7 +1,7 @@
 package com.serhat.secondhand.review.controller;
 
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
-import com.serhat.secondhand.review.service.ReviewService;
+import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Slf4j
 public class ReviewController {
 
-    private final ReviewService reviewService;
+    private final IReviewService reviewService;
 
     @PostMapping
     public ResponseEntity<?> createReview(

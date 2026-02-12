@@ -3,7 +3,7 @@ package com.serhat.secondhand.order.service;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
@@ -28,7 +28,7 @@ public class OrderNotificationService {
     private final EmailConfig emailConfig;
     private final OrderMapper orderMapper;
     private final IUserService userService;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Async("notificationExecutor")

@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class NotificationService {
+public class NotificationService implements INotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationFeedRepository notificationFeedRepository;

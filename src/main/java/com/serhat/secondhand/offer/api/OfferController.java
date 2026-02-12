@@ -3,7 +3,7 @@ package com.serhat.secondhand.offer.api;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
 import com.serhat.secondhand.offer.dto.OfferDto;
-import com.serhat.secondhand.offer.service.OfferService;
+import com.serhat.secondhand.offer.service.IOfferService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Tag(name = "Offers", description = "Offer management operations")
 public class OfferController {
 
-    private final OfferService offerService;
+    private final IOfferService offerService;
 
     @PostMapping
     @Operation(summary = "Create offer", description = "Create a new offer for a listing")

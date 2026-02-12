@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.ewallet;
 
-import com.serhat.secondhand.ewallet.service.EWalletService;
+import com.serhat.secondhand.ewallet.service.IEWalletService;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class EWalletPaymentStrategy implements PaymentStrategy {
-    private final EWalletService eWalletService;
+    private final IEWalletService eWalletService;
     private final EWalletValidator eWalletValidator;
 
     @Override

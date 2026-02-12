@@ -13,10 +13,10 @@ import com.serhat.secondhand.coupon.util.CouponErrorCodes;
 import com.serhat.secondhand.coupon.validator.CouponValidator;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.offer.entity.Offer;
-import com.serhat.secondhand.offer.service.OfferService;
+import com.serhat.secondhand.offer.service.IOfferService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
-import com.serhat.secondhand.pricing.service.PricingService;
+import com.serhat.secondhand.pricing.service.IPricingService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +36,8 @@ public class CouponService {
     private final CouponMapper couponMapper;
     private final CouponValidator couponValidator;
     private final CartRepository cartRepository;
-    private final OfferService offerService;
-    private final PricingService pricingService;
+    private final IOfferService offerService;
+    private final IPricingService pricingService;
     private final IUserService userService;
 
     public CouponService(
@@ -46,8 +46,8 @@ public class CouponService {
             CouponMapper couponMapper,
             CouponValidator couponValidator,
             CartRepository cartRepository,
-            OfferService offerService,
-            PricingService pricingService,
+            IOfferService offerService,
+            IPricingService pricingService,
             IUserService userService) {
         this.couponRepository = couponRepository;
         this.couponRedemptionRepository = couponRedemptionRepository;
@@ -78,9 +78,12 @@ public class CouponService {
     }
 
     public Result<CouponDto> update(UUID id, UpdateCouponRequest request) {
-        Coupon coupon = couponRepository.findById(id).orElse(null);
-        if (coupon == null) return Result.error(CouponErrorCodes.COUPON_NOT_FOUND);
-
+        return couponRepository.findById(id)
+                .map(coupon -> performUpdate(coupon, request))
+                .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
+    }
+    
+    private Result<CouponDto> performUpdate(Coupon coupon, UpdateCouponRequest request) {
         couponMapper.applyUpdate(coupon, request);
         Result<Set<ListingType>> normalizeResult = normalizeEligibleTypes(coupon.getEligibleTypes());
         if (normalizeResult.isError()) {
@@ -102,17 +105,17 @@ public class CouponService {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
 
-        Coupon coupon = couponRepository.findByCodeIgnoreCase(normalizeCode(code)).orElse(null);
-        if (coupon == null) return Result.error(CouponErrorCodes.COUPON_NOT_FOUND);
-
-        CouponRedemption redemption = CouponRedemption.builder()
-                .coupon(coupon)
-                .user(userResult.getData())
-                .order(order)
-                .build();
-
-        couponRedemptionRepository.save(redemption);
-        return Result.success();
+        return couponRepository.findByCodeIgnoreCase(normalizeCode(code))
+                .map(coupon -> {
+                    CouponRedemption redemption = CouponRedemption.builder()
+                            .coupon(coupon)
+                            .user(userResult.getData())
+                            .order(order)
+                            .build();
+                    couponRedemptionRepository.save(redemption);
+                    return Result.<Void>success();
+                })
+                .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
@@ -183,9 +186,12 @@ public class CouponService {
 
     @Transactional(readOnly = true)
     public Result<Coupon> getValidCoupon(String code, Long userId, Set<ListingType> cartTypes, java.math.BigDecimal eligibleSubtotal) {
-        Coupon coupon = couponRepository.findByCodeIgnoreCase(normalizeCode(code)).orElse(null);
-        if (coupon == null) return Result.error(CouponErrorCodes.COUPON_NOT_FOUND);
-
+        return couponRepository.findByCodeIgnoreCase(normalizeCode(code))
+                .map(coupon -> validateCoupon(coupon, userId, cartTypes, eligibleSubtotal))
+                .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
+    }
+    
+    private Result<Coupon> validateCoupon(Coupon coupon, Long userId, Set<ListingType> cartTypes, java.math.BigDecimal eligibleSubtotal) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
 

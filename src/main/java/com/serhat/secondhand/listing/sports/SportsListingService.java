@@ -109,11 +109,12 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
             return ownershipResult;
         }
 
-        SportsListing existing = sportsRepository.findById(id).orElse(null);
-        if (existing == null) {
-            return Result.error("Sports listing not found", "LISTING_NOT_FOUND");
-        }
-
+        return sportsRepository.findById(id)
+                .map(existing -> performUpdate(existing, request))
+                .orElseGet(() -> Result.error("Sports listing not found", "LISTING_NOT_FOUND"));
+    }
+    
+    private Result<Void> performUpdate(SportsListing existing, SportsUpdateRequest request) {
         Result<Void> statusResult = listingService.validateEditableStatus(existing);
         if (statusResult.isError()) {
             return statusResult;
@@ -123,10 +124,12 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
         if (quantityResult.isError()) {
             return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
         }
+        
         Result<Void> applyResult = sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId());
         if (applyResult.isError()) {
             return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
         }
+        
         sportsMapper.updateEntityFromRequest(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators);
@@ -135,8 +138,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
         }
 
         sportsRepository.save(existing);
-
-        log.info("Sports listing updated: {}", id);
+        log.info("Sports listing updated: {}", existing.getId());
         return Result.success();
     }
 

@@ -4,7 +4,7 @@ import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.AgreementUpdateEvent;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementUpdateEventRepository;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class AgreementUpdateWatcher {
     private final AgreementRequirementService agreementRequirementService;
     private final AgreementService agreementService;
     private final AgreementUpdateEventRepository agreementUpdateEventRepository;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Scheduled(fixedDelay = 30 * 60 * 1000)

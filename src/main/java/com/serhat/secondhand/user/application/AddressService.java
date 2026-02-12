@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +55,15 @@ public class AddressService {
 
     @Transactional
     public Result<AddressDto> updateAddress(Long addressId, Long userId, AddressDto dto) {
-        Address address = addressRepository.findById(addressId).orElse(null);
-        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
-        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+        return addressRepository.findById(addressId)
+                .map(address -> performAddressUpdate(address, userId, dto))
+                .orElseGet(() -> Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND));
+    }
+    
+    private Result<AddressDto> performAddressUpdate(Address address, Long userId, AddressDto dto) {
+        if (!address.getUser().getId().equals(userId)) {
+            return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+        }
 
         addressMapper.updateEntityFromDto(dto, address);
 
@@ -69,30 +76,33 @@ public class AddressService {
 
     @Transactional
     public Result<Void> deleteAddress(Long addressId, Long userId) {
-        Address address = addressRepository.findById(addressId).orElse(null);
-
-        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
-        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
-
-        addressRepository.delete(address);
-        return Result.success();
+        return addressRepository.findById(addressId)
+                .map(address -> {
+                    if (!address.getUser().getId().equals(userId)) {
+                        return Result.<Void>error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+                    }
+                    addressRepository.delete(address);
+                    return Result.<Void>success();
+                })
+                .orElseGet(() -> Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND));
     }
 
     @Transactional
     public Result<Void> setMainAddress(Long addressId, Long userId) {
-        Address address = addressRepository.findById(addressId).orElse(null);
-
-        if (address == null) return Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND);
-        if (!address.getUser().getId().equals(userId)) return Result.error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
-
-        addressRepository.resetMainAddressByUserId(userId);
-        address.setMainAddress(true);
-        addressRepository.save(address);
-
-        return Result.success();
+        return addressRepository.findById(addressId)
+                .map(address -> {
+                    if (!address.getUser().getId().equals(userId)) {
+                        return Result.<Void>error(AddressErrorCodes.UNAUTHORIZED_ADDRESS_ACCESS);
+                    }
+                    addressRepository.resetMainAddressByUserId(userId);
+                    address.setMainAddress(true);
+                    addressRepository.save(address);
+                    return Result.<Void>success();
+                })
+                .orElseGet(() -> Result.error(AddressErrorCodes.ADDRESS_NOT_FOUND));
     }
 
-    public Address getAddressById(@NotNull Long addressId) {
-        return addressRepository.findById(addressId).orElse(null);
+    public Optional<Address> getAddressById(@NotNull Long addressId) {
+        return addressRepository.findById(addressId);
     }
 }

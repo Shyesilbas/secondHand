@@ -56,19 +56,19 @@ public class ShowcaseService implements IShowcaseService {
         }
         User user = userResult.getData();
 
-        Listing listing = listingService.findById(request.listingId()).orElse(null);
-        if (listing == null) {
-            // Result structure fix: error(message, errorCode)
-            return Result.error("Listing not found", ListingErrorCodes.LISTING_NOT_FOUND.toString());
-        }
-
-        // 3. Pricing Calculation
+        return listingService.findById(request.listingId())
+                .map(listing -> createShowcaseInternal(request, user, listing, userId))
+                .orElseGet(() -> Result.error("Listing not found", ListingErrorCodes.LISTING_NOT_FOUND.toString()));
+    }
+    
+    private Result<Showcase> createShowcaseInternal(ShowcasePaymentRequest request, User user, Listing listing, Long userId) {
+        // Pricing Calculation
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
         BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
         BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
 
-        // 4. Payment Processing
+        // Payment Processing
         PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
@@ -76,7 +76,7 @@ public class ShowcaseService implements IShowcaseService {
             return Result.error("Payment failed for showcase creation", "SHOWCASE_PAYMENT_FAILED");
         }
 
-        // 5. Success - Save Showcase
+        // Success - Save Showcase
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
 
@@ -85,12 +85,14 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ShowcaseDto> getActiveShowcases() {
         List<Showcase> activeShowcases = showcaseRepository.findActiveShowcases(ShowcaseStatus.ACTIVE, LocalDateTime.now());
         return activeShowcases.stream().map(showcaseMapper::toDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ShowcaseDto> getUserShowcases(Long userId) {
         List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatus(userId, ShowcaseStatus.ACTIVE);
         return activeShowcases.stream().map(showcaseMapper::toDto).toList();
@@ -98,12 +100,12 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     public Result<Void> extendShowcase(UUID showcaseId, int additionalDays) {
-        Showcase showcase = showcaseRepository.findById(showcaseId).orElse(null);
-
-        if (showcase == null) {
-            return Result.error("Showcase not found", "SHOWCASE_NOT_FOUND");
-        }
-
+        return showcaseRepository.findById(showcaseId)
+                .map(showcase -> performExtension(showcase, additionalDays))
+                .orElseGet(() -> Result.error("Showcase not found", "SHOWCASE_NOT_FOUND"));
+    }
+    
+    private Result<Void> performExtension(Showcase showcase, int additionalDays) {
         Result<Void> validationResult = showcaseValidator.validateIsActive(showcase);
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
@@ -122,15 +124,13 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     public Result<Void> cancelShowcase(UUID showcaseId) {
-        Showcase showcase = showcaseRepository.findById(showcaseId).orElse(null);
-
-        if (showcase == null) {
-            return Result.error("Showcase not found", "SHOWCASE_NOT_FOUND");
-        }
-
-        showcase.setStatus(ShowcaseStatus.CANCELLED);
-        showcaseRepository.save(showcase);
-        return Result.success();
+        return showcaseRepository.findById(showcaseId)
+                .map(showcase -> {
+                    showcase.setStatus(ShowcaseStatus.CANCELLED);
+                    showcaseRepository.save(showcase);
+                    return Result.<Void>success();
+                })
+                .orElseGet(() -> Result.error("Showcase not found", "SHOWCASE_NOT_FOUND"));
     }
 
     @Override

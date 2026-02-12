@@ -8,7 +8,7 @@ import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.dto.UpdateOrderNameRequest;
 import com.serhat.secondhand.order.service.*;
 import com.serhat.secondhand.payment.service.CheckoutService;
-import com.serhat.secondhand.review.service.ReviewService;
+import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +43,7 @@ public class OrderController {
     private final OrderCompletionService orderCompletionService;
     private final OrderNameService orderNameService;
     private final OrderEscrowService orderEscrowService;
-    private final ReviewService reviewService;
+    private final IReviewService reviewService;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class DashboardService {
+public class DashboardService implements IDashboardService {
 
     private final SalesStatisticsPort salesStatisticsPort;
     private final ListingStatisticsPort listingStatisticsPort;

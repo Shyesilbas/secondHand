@@ -116,13 +116,12 @@ public class OrderCancellationService {
         log.info("Successfully cancelled escrows and refunded {} to buyer {} for order {}", 
                 totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
-        order = orderRepository.findByIdWithOrderItems(order.getId())
-                .orElse(null);
-        
-        if (order == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-
+        return orderRepository.findByIdWithOrderItems(order.getId())
+                .map(refreshedOrder -> processCancellationStatus(refreshedOrder, user))
+                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
+    }
+    
+    private Result<OrderDto> processCancellationStatus(Order order, User user) {
         boolean allItemsCancelled = areAllItemsCancelled(order);
         if (allItemsCancelled) {
             order.setStatus(Order.OrderStatus.CANCELLED);
@@ -137,17 +136,13 @@ public class OrderCancellationService {
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
         
-        savedOrder = orderRepository.findByIdWithOrderItems(savedOrder.getId())
-                .orElse(null);
-        
-        if (savedOrder == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-        }
-        
-        orderNotificationService.sendOrderCancellationNotification(user, savedOrder);
-
-        log.info("Order cancelled: {} (partial: {})", order.getOrderNumber(), !allItemsCancelled);
-        return Result.success(orderMapper.toDto(savedOrder));
+        return orderRepository.findByIdWithOrderItems(savedOrder.getId())
+                .map(finalOrder -> {
+                    orderNotificationService.sendOrderCancellationNotification(user, finalOrder);
+                    log.info("Order cancelled: {} (partial: {})", order.getOrderNumber(), !allItemsCancelled);
+                    return Result.success(orderMapper.toDto(finalOrder));
+                })
+                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
     }
 
 

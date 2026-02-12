@@ -2,7 +2,7 @@ package com.serhat.secondhand.listing.application.util;
 
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
-import com.serhat.secondhand.campaign.service.CampaignService;
+import com.serhat.secondhand.campaign.service.ICampaignService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ListingCampaignPricingUtil {
 
-    private final CampaignService campaignService;
+    private final ICampaignService campaignService;
 
     public void enrichWithCampaignPricing(List<ListingDto> dtos) {
         if (dtos == null || dtos.isEmpty()) {

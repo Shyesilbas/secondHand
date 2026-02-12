@@ -89,12 +89,12 @@ public class OrderCreationService {
     }
 
         private Address resolveShippingAddress(CheckoutRequest request, User user) {
-        return addressService.getAddressById(request.getShippingAddressId());
+        return addressService.getAddressById(request.getShippingAddressId()).orElse(null);
     }
 
         private Address resolveBillingAddress(CheckoutRequest request, User user) {
         return request.getBillingAddressId() != null 
-            ? addressService.getAddressById(request.getBillingAddressId())
+            ? addressService.getAddressById(request.getBillingAddressId()).orElse(null)
             : null;
     }
 

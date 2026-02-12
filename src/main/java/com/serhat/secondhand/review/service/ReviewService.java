@@ -15,7 +15,7 @@ import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.review.validator.ReviewValidator;
-import com.serhat.secondhand.notification.service.NotificationService;
+import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -32,7 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class ReviewService {
+public class ReviewService implements IReviewService {
 
     private final ReviewRepository reviewRepository;
     private final OrderItemRepository orderItemRepository;
@@ -40,7 +40,7 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final ListingRepository listingRepository;
     private final ReviewValidator reviewValidator;
-    private final NotificationService notificationService;
+    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Transactional

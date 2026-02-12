@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -130,10 +131,12 @@ public class UserService implements IUserService {
                 .orElse(Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID));
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> searchUsers(String query, int limit) {
         log.info("Searching users with query: {} and limit: {}", query, limit);
         
@@ -148,10 +151,12 @@ public class UserService implements IUserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAllByIds(List<Long> ids) {
         return userRepository.findAllById(ids);
     }
 
+    @Transactional(readOnly = true)
     public boolean existsById(Long userId) {
         return userRepository.existsById(userId);
     }

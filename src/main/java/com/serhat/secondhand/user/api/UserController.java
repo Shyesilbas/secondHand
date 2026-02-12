@@ -1,14 +1,14 @@
 package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.complaint.ComplaintDto;
-import com.serhat.secondhand.complaint.ComplaintService;
+import com.serhat.secondhand.complaint.IComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.offer.service.OfferService;
-import com.serhat.secondhand.review.service.ReviewService;
+import com.serhat.secondhand.offer.service.IOfferService;
+import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
@@ -42,10 +42,10 @@ public class UserController {
     private final IUserService userService;
     private final AuditLogService auditLogService;
     private final VerificationService verificationService;
-    private final ReviewService reviewService;
+    private final IReviewService reviewService;
     private final IListingService listingService;
-    private final ComplaintService complaintService;
-    private final OfferService offerService;
+    private final IComplaintService complaintService;
+    private final IOfferService offerService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
