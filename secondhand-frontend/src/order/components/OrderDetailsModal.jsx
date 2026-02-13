@@ -27,6 +27,25 @@ import {
 } from 'lucide-react';
 import CancelRefundModal from './CancelRefundModal.jsx';
 
+const StatusBadge = ({ label, type = 'rose' }) => {
+  const styles = { rose: 'bg-rose-50/80 border-rose-200/60 text-rose-600', amber: 'bg-amber-50/80 border-amber-200/60 text-amber-600' };
+  return (
+    <span className={`px-2 py-0.5 text-[10px] font-medium rounded-md border ${styles[type]}`}>{label}</span>
+  );
+};
+
+const GlassCard = ({ children, className = '', critical = false }) => (
+  <div
+    className={`rounded-2xl border backdrop-blur-sm transition-all ${
+      critical
+        ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10'
+        : 'bg-white/80 border-slate-200/60 shadow-sm'
+    } ${className}`}
+  >
+    {children}
+  </div>
+);
+
 const DeliveryCountdown = ({ deliveredAt }) => {
   const [timeRemaining, setTimeRemaining] = useState(null);
 
@@ -55,34 +74,31 @@ const DeliveryCountdown = ({ deliveredAt }) => {
 
   if (!timeRemaining) return null;
 
+  const critical = !timeRemaining.expired;
   return (
-    <div
-      className={`mt-5 p-4 rounded-lg border transition-all ${
-        timeRemaining.expired ? 'bg-gray-50/80 border-gray-200/60' : 'bg-indigo-50/80 border-indigo-200/60'
-      }`}
-    >
+    <GlassCard critical={critical} className="mt-5 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className={`p-1.5 rounded-md ${timeRemaining.expired ? 'bg-gray-200' : 'bg-indigo-100'}`}>
-            <Timer className={`w-3.5 h-3.5 ${timeRemaining.expired ? 'text-gray-600' : 'text-indigo-600'}`} />
+          <div className={`p-1.5 rounded-md ${critical ? 'bg-white/10' : 'bg-slate-200'}`}>
+            <Timer className={`w-3.5 h-3.5 ${critical ? 'text-emerald-400' : 'text-slate-600'}`} />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-900">Confirmation Window</p>
-            <p className="text-[11px] text-gray-500 font-medium mt-0.5">
+            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-slate-900'}`}>Confirmation Window</p>
+            <p className={`text-[11px] font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
               {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
             </p>
           </div>
         </div>
-        {!timeRemaining.expired ? (
+        {critical ? (
           <div className="flex gap-1.5 items-baseline">
-            <span className="text-lg font-mono font-semibold text-indigo-600">{String(timeRemaining.h).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-indigo-400 uppercase">h</span>
-            <span className="text-lg font-mono font-semibold text-indigo-600">{String(timeRemaining.m).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-indigo-400 uppercase">m</span>
+            <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.h).padStart(2, '0')}</span>
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">h</span>
+            <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.m).padStart(2, '0')}</span>
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">m</span>
           </div>
         ) : null}
       </div>
-    </div>
+    </GlassCard>
   );
 };
 
@@ -116,14 +132,19 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
 
             return (
               <div key={step.key} className="flex flex-col items-center group">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                    isDone
-                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100'
-                      : 'bg-white border-slate-200 text-slate-400'
-                  } ${isCurrent && !isDone ? 'border-indigo-500 text-indigo-500 ring-4 ring-indigo-50' : ''}`}
-                >
-                  <Icon className="w-5 h-5 stroke-[2.5px]" />
+                <div className="relative">
+                  {isCurrent && (
+                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" aria-hidden />
+                  )}
+                  <div
+                    className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                      isDone
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100'
+                        : 'bg-white/90 backdrop-blur-sm border-slate-200/80 text-slate-400'
+                    } ${isCurrent ? 'ring-4 ring-emerald-500/30 ring-offset-2 ring-offset-white' : ''}`}
+                  >
+                    <Icon className="w-5 h-5 stroke-[2.5px]" />
+                  </div>
                 </div>
                 <span
                   className={`mt-3 text-[11px] font-semibold uppercase tracking-tight ${
@@ -159,12 +180,17 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
           return (
             <React.Fragment key={step.key}>
               <div className="flex flex-col items-center group relative z-10">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
-                    isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'
-                  } ${isCurrent && !isDone ? 'border-indigo-500 text-indigo-500 ring-2 ring-indigo-50' : ''}`}
-                >
-                  <Icon className="w-4 h-4 stroke-[2]" />
+                <div className="relative">
+                  {isCurrent && (
+                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />
+                  )}
+                  <div
+                    className={`relative w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
+                      isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm' : 'bg-white/90 backdrop-blur-sm border-slate-200/80 text-slate-400'
+                    } ${isCurrent ? 'ring-2 ring-emerald-500/30 ring-offset-1' : ''}`}
+                  >
+                    <Icon className="w-4 h-4 stroke-[2]" />
+                  </div>
                 </div>
                 <span
                   className={`mt-2 text-[10px] font-medium uppercase tracking-wide ${
@@ -426,7 +452,7 @@ const OrderDetailsModal = React.memo(
 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             <div className={`${isSellerView ? 'p-8' : 'p-6'}`}>
-              <div className={`${isSellerView ? 'rounded-2xl border border-slate-100 shadow-sm p-6 mb-8' : 'rounded-lg border border-gray-200/60 p-6 mb-6'} bg-white`}>
+              <GlassCard className={`p-6 mb-8`}>
                 <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4' : 'text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-5'}`}>
                   Tracking Progress
                 </h3>
@@ -469,11 +495,11 @@ const OrderDetailsModal = React.memo(
                     ) : null}
                   </div>
                 ) : null}
-              </div>
+              </GlassCard>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-4">
-                  <div className={`${isSellerView ? 'rounded-2xl border border-slate-100 shadow-sm p-6' : 'rounded-lg border border-gray-200/60 p-5'} bg-white`}>
+                  <GlassCard className={`p-6`}>
                     <div className="flex items-center justify-between mb-5">
                       <h3 className={`${isSellerView ? 'text-sm font-semibold text-slate-900 flex items-center gap-2' : 'text-xs font-semibold text-gray-900 flex items-center gap-2'}`}>
                         <Package2 className={`${isSellerView ? 'w-4 h-4 text-indigo-500' : 'w-3.5 h-3.5 text-gray-600'}`} />{' '}
@@ -514,26 +540,10 @@ const OrderDetailsModal = React.memo(
                                 <h4 className={`${isSellerView ? 'text-sm font-semibold text-slate-900' : 'text-xs font-semibold text-gray-900'} line-clamp-1`}>
                                   {item.listing?.title}
                                 </h4>
-                                {isFullyCancelled ? (
-                                  <span className={`px-2 py-0.5 text-[10px] font-medium ${isSellerView ? 'font-semibold bg-rose-50 border-rose-200' : 'bg-rose-50/80 border-rose-200/60'} text-rose-600 rounded-md border`}>
-                                    Cancelled
-                                  </span>
-                                ) : null}
-                                {isFullyRefunded ? (
-                                  <span className={`px-2 py-0.5 text-[10px] font-medium ${isSellerView ? 'font-semibold bg-amber-50 border-amber-200' : 'bg-amber-50/80 border-amber-200/60'} text-amber-600 rounded-md border`}>
-                                    Refunded
-                                  </span>
-                                ) : null}
-                                {isPartiallyCancelled ? (
-                                  <span className={`px-2 py-0.5 text-[10px] font-medium ${isSellerView ? 'font-semibold bg-rose-50 border-rose-200' : 'bg-rose-50/80 border-rose-200/60'} text-rose-600 rounded-md border`}>
-                                    Partially Cancelled
-                                  </span>
-                                ) : null}
-                                {isPartiallyRefunded ? (
-                                  <span className={`px-2 py-0.5 text-[10px] font-medium ${isSellerView ? 'font-semibold bg-amber-50 border-amber-200' : 'bg-amber-50/80 border-amber-200/60'} text-amber-600 rounded-md border`}>
-                                    Partially Refunded
-                                  </span>
-                                ) : null}
+                                {isFullyCancelled ? <StatusBadge label="Cancelled" type="rose" /> : null}
+                                {isFullyRefunded ? <StatusBadge label="Refunded" type="amber" /> : null}
+                                {isPartiallyCancelled ? <StatusBadge label="Partially Cancelled" type="rose" /> : null}
+                                {isPartiallyRefunded ? <StatusBadge label="Partially Refunded" type="amber" /> : null}
                               </div>
                               <p className={`${isSellerView ? 'text-xs text-slate-500 mt-1 font-normal' : 'text-[11px] text-gray-600 mt-1 font-medium'}`}>
                                 Qty: {item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}
@@ -575,36 +585,36 @@ const OrderDetailsModal = React.memo(
                         );
                       })}
                     </div>
-                  </div>
+                  </GlassCard>
 
                   {!isSellerView ? (
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="p-4 bg-gray-50/80 rounded-lg border border-gray-200/60">
-                          <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                        <GlassCard className="p-4">
+                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
                             <MapPin className="w-3 h-3" /> Shipping Address
                           </h4>
-                          <p className="text-xs font-semibold text-gray-900">{selectedOrder.shippingAddress?.addressLine}</p>
-                          <p className="text-[11px] text-gray-500 mt-1 font-medium">
+                          <p className="text-xs font-semibold text-slate-900">{selectedOrder.shippingAddress?.addressLine}</p>
+                          <p className="text-[11px] text-slate-500 mt-1 font-medium">
                             {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}
                           </p>
-                        </div>
-                        <div className="p-4 bg-gray-50/80 rounded-lg border border-gray-200/60">
-                          <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                        </GlassCard>
+                        <GlassCard className="p-4">
+                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
                             <Receipt className="w-3 h-3" /> Billing Details
                           </h4>
-                          <p className="text-xs font-semibold text-gray-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
-                          <p className="text-[11px] text-gray-500 mt-1 font-medium">TR VAT: {selectedOrder.orderNumber}</p>
-                        </div>
+                          <p className="text-xs font-semibold text-slate-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
+                          <p className="text-[11px] text-slate-500 mt-1 font-medium">TR VAT: {selectedOrder.orderNumber}</p>
+                        </GlassCard>
                       </div>
 
                       {selectedOrder.notes ? (
-                        <div className="p-4 bg-gray-50/80 rounded-lg border border-gray-200/60">
-                          <h4 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                        <GlassCard className="p-4">
+                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
                             <FileText className="w-3 h-3" /> Order Notes
                           </h4>
-                          <p className="text-xs text-gray-900 font-medium leading-relaxed whitespace-pre-wrap">{selectedOrder.notes}</p>
-                        </div>
+                          <p className="text-xs text-slate-900 font-medium leading-relaxed whitespace-pre-wrap">{selectedOrder.notes}</p>
+                        </GlassCard>
                       ) : null}
                     </>
                   ) : null}
@@ -612,7 +622,7 @@ const OrderDetailsModal = React.memo(
 
                 <div className="space-y-4">
                   {isSellerView ? (
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                    <GlassCard className="p-6">
                       <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Buyer</h3>
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center flex-shrink-0">
@@ -629,10 +639,10 @@ const OrderDetailsModal = React.memo(
                           ) : null}
                         </div>
                       </div>
-                    </div>
+                    </GlassCard>
                   ) : null}
 
-                  <div className={`${isSellerView ? 'bg-slate-900 rounded-2xl p-6' : 'bg-slate-900 rounded-lg p-5'} text-white`}>
+                  <GlassCard critical className={`${isSellerView ? 'p-6' : 'p-5'}`}>
                     <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-400 uppercase tracking-widest mb-5' : 'text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-5'}`}>
                       Payment Summary
                     </h3>
@@ -718,7 +728,7 @@ const OrderDetailsModal = React.memo(
                         <FileText className="w-3.5 h-3.5" /> View Digital Receipt
                       </button>
                     ) : null}
-                  </div>
+                  </GlassCard>
                 </div>
               </div>
             </div>

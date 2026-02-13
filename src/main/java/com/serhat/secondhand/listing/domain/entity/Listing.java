@@ -65,6 +65,9 @@ public class Listing {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User seller;
 
+    @Version
+    private Long version;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

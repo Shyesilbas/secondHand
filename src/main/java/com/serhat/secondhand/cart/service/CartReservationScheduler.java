@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -20,31 +21,20 @@ public class CartReservationScheduler {
     private final CartRepository cartRepository;
     private final CartConfig cartConfig;
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void cleanupExpiredReservations() {
         if (!cartConfig.getReservation().isEnabled()) {
             return;
         }
 
-        LocalDateTime expirationTime = LocalDateTime.now()
-                .minus(cartConfig.getReservation().getTimeoutMinutes());
+        List<Cart> expired = cartRepository.findExpiredReservations(LocalDateTime.now(ZoneId.of("Europe/Istanbul")));
+        if (expired.isEmpty()) return;
 
-        List<Cart> expiredCarts = cartRepository.findExpiredReservations(expirationTime);
-
-        if (expiredCarts.isEmpty()) {
-            return;
+        log.info("Removing {} expired cart reservations", expired.size());
+        for (Cart cart : expired) {
+            cartRepository.delete(cart);
+            log.debug("Removed expired reservation: cart {} listing {}", cart.getId(), cart.getListing().getId());
         }
-
-        log.info("Cleaning up {} expired cart reservations", expiredCarts.size());
-
-        for (Cart cart : expiredCarts) {
-            cart.setReservedAt(null);
-            cartRepository.save(cart);
-            log.debug("Released reservation for cart item: {} - listing: {}", 
-                    cart.getId(), cart.getListing().getId());
-        }
-
-        log.info("Successfully cleaned up {} expired cart reservations", expiredCarts.size());
     }
 }

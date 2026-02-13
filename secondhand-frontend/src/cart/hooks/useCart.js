@@ -2,10 +2,12 @@ import {useEffect} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {cartService} from '../services/cartService.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 export const useCart = (options = {}) => {
     const { user } = useAuthState();
     const queryClient = useQueryClient();
+    const { showSuccess } = useNotification();
 
     const isEnabled = options.enabled ?? true;
     const loadCartItems = options.loadCartItems ?? isEnabled;
@@ -42,7 +44,11 @@ export const useCart = (options = {}) => {
 
     const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => cartService.addToCart(listingId, quantity, notes),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cartItems'] }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['cartItems'] });
+            queryClient.invalidateQueries({ queryKey: ['badgeCounts'] });
+            showSuccess(null, 'Added to cart successfully.', { toast: true });
+        },
     });
 
     const removeFromCartMutation = useMutation({

@@ -11,7 +11,8 @@ public enum CartErrorCodes implements ErrorCode {
     LISTING_TYPE_NOT_ALLOWED("LISTING_TYPE_NOT_ALLOWED", "This listing type is not allowed to add to cart", HttpStatus.BAD_REQUEST),
     ITEM_NOT_FOUND_IN_CART("ITEM_NOT_FOUND_IN_CART", "Item not found in cart", HttpStatus.NOT_FOUND),
     INVALID_QUANTITY("CART_INVALID_QUANTITY", "Quantity must be at least 1", HttpStatus.BAD_REQUEST),
-    INSUFFICIENT_STOCK("CART_INSUFFICIENT_STOCK", "Insufficient stock for this listing", HttpStatus.CONFLICT);
+    INSUFFICIENT_STOCK("CART_INSUFFICIENT_STOCK", "Insufficient stock for this listing", HttpStatus.CONFLICT),
+    RESERVATION_FAILED("RESERVATION_FAILED", "Reservation could not be completed. Please try again.", HttpStatus.CONFLICT);
 
     private final String code;
     private final String message;

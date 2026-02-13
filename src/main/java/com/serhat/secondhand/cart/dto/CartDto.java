@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,5 +22,7 @@ public class CartDto {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime reservedAt;
+    private Instant reservedAt;
+    private Instant reservationEndTime;
+    private Boolean isReserved;
 }

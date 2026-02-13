@@ -17,7 +17,11 @@ public class CartConfig {
     @Getter
     @Setter
     public static class Reservation {
-        private Duration timeoutMinutes = Duration.ofMinutes(15);
+        private Integer timeoutMinutes = 15;
         private boolean enabled = true;
+
+        public Duration getTimeoutDuration() {
+            return Duration.ofMinutes(timeoutMinutes != null ? timeoutMinutes : 15);
+        }
     }
 }
