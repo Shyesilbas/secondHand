@@ -5,6 +5,7 @@ import {NotificationProvider} from './notification/NotificationContext.jsx';
 import {InAppNotificationProvider} from './notification/InAppNotificationContext.jsx';
 import {EnumProvider} from './common/contexts/index.js';
 import {CompareFloatingBar, CompareModal, ComparisonProvider} from './comparison/index.js';
+import {ReservationModalProvider} from './cart/context/ReservationModalContext.jsx';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
 
@@ -30,11 +31,13 @@ function App() {
                             <NotificationProvider>
                                 <InAppNotificationProvider>
                                     <ComparisonProvider>
+                                        <ReservationModalProvider>
                                         <div className="App">
                                             <AppRoutes />
                                             <CompareFloatingBar />
                                             <CompareModal />
                                         </div>
+                                        </ReservationModalProvider>
                                     </ComparisonProvider>
                                 </InAppNotificationProvider>
                             </NotificationProvider>

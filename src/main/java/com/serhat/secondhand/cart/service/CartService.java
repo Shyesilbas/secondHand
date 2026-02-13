@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,7 +98,7 @@ public class CartService {
             {
                 return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
-            cartItem.setReservedAt(LocalDateTime.now());
+            applyReservationIfLowStock(listing, cartItem);
         }
 
         Cart savedCart = cartRepository.save(cartItem);
@@ -129,9 +130,27 @@ public class CartService {
                 }).orElse(Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
+    private static final ZoneId ZONE = ZoneId.of("Europe/Istanbul");
+
     private int getReservedQuantityForListing(UUID listingId) {
-        LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(cartConfig.getReservation().getTimeoutMinutes().toMinutes());
-        return cartRepository.countReservedQuantityByListing(listingId, expirationTime);
+        LocalDateTime now = LocalDateTime.now(ZONE);
+        LocalDateTime cutoff = now.minusMinutes(cartConfig.getReservation().getTimeoutDuration().toMinutes());
+        return cartRepository.countActiveReservationsByListing(listingId, now, cutoff);
+    }
+
+    /** Reservation only when quantity <= 3 (critical stock). Uses GMT+3. */
+    private void applyReservationIfLowStock(Listing listing, Cart cartItem) {
+        Integer qty = listing.getQuantity();
+        if (qty != null && qty <= 3) {
+            LocalDateTime now = LocalDateTime.now(ZONE);
+            cartItem.setReservedAt(now);
+            cartItem.setReservationEndTime(now.plusMinutes(cartConfig.getReservation().getTimeoutDuration().toMinutes()));
+            cartItem.setIsReserved(true);
+        } else {
+            cartItem.setReservedAt(null);
+            cartItem.setReservationEndTime(null);
+            cartItem.setIsReserved(false);
+        }
     }
 
     @Transactional
@@ -151,7 +170,7 @@ public class CartService {
             if (reserveStockForCart(listing, reqQty, previousQty).isError()) {
                 return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT);
             }
-            cartItem.setReservedAt(LocalDateTime.now());
+            applyReservationIfLowStock(listing, cartItem);
         }
 
         cartItem.setQuantity(reqQty);

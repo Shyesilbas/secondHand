@@ -1,21 +1,36 @@
 import React, {createContext, useCallback, useContext, useState} from 'react';
 import NotificationModal from './NotificationModal.jsx';
+import Toast from './components/Toast.jsx';
 
-const NotificationContext = createContext();
-
-export const useNotification = () => {
-    const context = useContext(NotificationContext);
-    if (!context) {
-        throw new Error('useNotification must be used within a NotificationProvider');
-    }
-    return context;
+const noop = () => {};
+const defaultContext = {
+    addNotification: noop,
+    removeNotification: noop,
+    removeAllNotifications: noop,
+    showSuccess: noop,
+    showError: noop,
+    showWarning: noop,
+    showInfo: noop,
+    showNotification: noop,
+    showConfirmation: noop,
+    showDetailedError: noop,
 };
+
+const NotificationContext = createContext(defaultContext);
+
+export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
+    const [toasts, setToasts] = useState([]);
 
     const addNotification = useCallback((notification) => {
         const id = Math.random().toString(36).substr(2, 9);
+        if (notification.toast) {
+            const toast = { id, ...notification };
+            setToasts(prev => [...prev, toast]);
+            return id;
+        }
         const newNotification = {
             id,
             isOpen: true,
@@ -31,6 +46,7 @@ export const NotificationProvider = ({ children }) => {
 
     const removeNotification = useCallback((id) => {
         setNotifications(prev => prev.filter(notification => notification.id !== id));
+        setToasts(prev => prev.filter(t => t.id !== id));
     }, []);
 
     const removeAllNotifications = useCallback(() => {
@@ -155,6 +171,18 @@ export const NotificationProvider = ({ children }) => {
                     onClose={() => removeNotification(notification.id)}
                 />
             ))}
+            <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2">
+                {toasts.map(toast => (
+                    <Toast
+                        key={toast.id}
+                        title={toast.title}
+                        message={toast.message}
+                        autoClose={toast.autoClose ?? true}
+                        autoCloseDelay={toast.autoCloseDelay ?? 2500}
+                        onClose={() => removeNotification(toast.id)}
+                    />
+                ))}
+            </div>
         </NotificationContext.Provider>
     );
 };

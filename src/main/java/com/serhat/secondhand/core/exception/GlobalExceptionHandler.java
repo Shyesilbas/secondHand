@@ -3,6 +3,8 @@ package com.serhat.secondhand.core.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import com.serhat.secondhand.cart.exception.ReservationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -42,6 +44,34 @@ public class GlobalExceptionHandler {
         );
         log.warn("Validation error: {}", validationErrors);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ReservationException.class)
+    public ResponseEntity<ErrorResponse> handleReservationException(
+            ReservationException ex,
+            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getHttpStatus(),
+                ex.getErrorCode(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        log.warn("Reservation exception: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(
+            ObjectOptimisticLockingFailureException ex,
+            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                HttpStatus.CONFLICT,
+                "CONCURRENT_MODIFICATION",
+                "Ürün şu an başka bir işlem görüyor, lütfen tekrar deneyin",
+                request.getRequestURI()
+        );
+        log.warn("Optimistic lock failure: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

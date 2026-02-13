@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "carts")
+@Table(name = "carts", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "listing_id"}))
 @EntityListeners(AuditingEntityListener.class)
 public class Cart {
 
@@ -52,9 +52,10 @@ public class Cart {
     @Column(name = "reserved_at")
     private LocalDateTime reservedAt;
 
-        @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "listing_id"})
-    })
-    public static class CartTable {
-    }
+    @Column(name = "reservation_end_time")
+    private LocalDateTime reservationEndTime;
+
+    @Column(name = "is_reserved", nullable = false)
+    @Builder.Default
+    private Boolean isReserved = false;
 }

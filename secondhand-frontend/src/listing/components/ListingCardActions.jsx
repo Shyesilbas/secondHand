@@ -11,12 +11,6 @@ const ListingCardActions = ({ listing, onChanged }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isInShowcase } = useShowcaseQueries();
   const dropdownRef = useRef(null);
-
-  const isOwner = user?.id === listing?.sellerId;
-  if (!isOwner) return null;
-
-  const listingInShowcase = isInShowcase(listing.id);
-
   const actions = useListingActions({
     listing,
     onChanged,
@@ -36,6 +30,10 @@ const ListingCardActions = ({ listing, onChanged }) => {
     };
   }, []);
 
+  const isOwner = user?.id === listing?.sellerId;
+  if (!isOwner) return null;
+
+  const listingInShowcase = isInShowcase(listing.id);
   const canEdit = listing.status !== 'SOLD';
 
   return (

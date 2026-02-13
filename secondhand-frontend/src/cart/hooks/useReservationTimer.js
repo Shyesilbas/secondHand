@@ -2,20 +2,21 @@ import { useState, useEffect } from 'react';
 
 const RESERVATION_TIMEOUT_MINUTES = 15;
 
-export const useReservationTimer = (reservedAt) => {
+export const useReservationTimer = (reservedAt, reservationEndTime) => {
     const [timeRemaining, setTimeRemaining] = useState(null);
     const [isExpired, setIsExpired] = useState(false);
 
+    const endTime = reservationEndTime || (reservedAt && new Date(new Date(reservedAt).getTime() + RESERVATION_TIMEOUT_MINUTES * 60 * 1000));
+
     useEffect(() => {
-        if (!reservedAt) {
+        if (!endTime) {
             setTimeRemaining(null);
             setIsExpired(false);
             return;
         }
 
         const calculateTimeRemaining = () => {
-            const reservedTime = new Date(reservedAt);
-            const expirationTime = new Date(reservedTime.getTime() + (RESERVATION_TIMEOUT_MINUTES * 60 * 1000));
+            const expirationTime = new Date(endTime);
             const now = new Date();
             const diff = expirationTime - now;
 
@@ -35,7 +36,7 @@ export const useReservationTimer = (reservedAt) => {
         const interval = setInterval(calculateTimeRemaining, 1000);
 
         return () => clearInterval(interval);
-    }, [reservedAt]);
+    }, [endTime]);
 
-    return { timeRemaining, isExpired, isReserved: !!reservedAt };
+    return { timeRemaining, isExpired, isReserved: !!endTime };
 };

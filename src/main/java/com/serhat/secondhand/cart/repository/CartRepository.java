@@ -41,9 +41,11 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("DELETE FROM Cart c WHERE c.user.id = :userId AND c.listing.id = :listingId")
     void deleteByUserIdAndListingId(@Param("userId") Long userId, @Param("listingId") UUID listingId);
 
-    @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.listing.id = :listingId AND c.reservedAt > :expirationTime")
-    int countReservedQuantityByListing(@Param("listingId") UUID listingId, @Param("expirationTime") LocalDateTime expirationTime);
+    @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.listing.id = :listingId AND (" +
+            "(c.reservationEndTime IS NOT NULL AND c.reservationEndTime > :now) OR " +
+            "(c.reservationEndTime IS NULL AND c.reservedAt IS NOT NULL AND c.reservedAt > :cutoff))")
+    int countActiveReservationsByListing(@Param("listingId") UUID listingId, @Param("now") LocalDateTime now, @Param("cutoff") LocalDateTime cutoff);
 
-    @Query("SELECT c FROM Cart c WHERE c.reservedAt IS NOT NULL AND c.reservedAt < :expirationTime")
-    List<Cart> findExpiredReservations(@Param("expirationTime") LocalDateTime expirationTime);
+    @Query("SELECT c FROM Cart c WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")
+    List<Cart> findExpiredReservations(@Param("now") LocalDateTime now);
 }

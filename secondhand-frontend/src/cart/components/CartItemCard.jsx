@@ -47,7 +47,7 @@ const CartItemCard = ({
     const maxStock = item?.listing?.quantity;
     const isLowStock = maxStock != null && Number.isFinite(Number(maxStock)) && Number(maxStock) > 0 && Number(maxStock) < 10;
     
-    const { timeRemaining, isExpired, isReserved } = useReservationTimer(item.reservedAt);
+    const { timeRemaining, isExpired, isReserved } = useReservationTimer(item.reservedAt, item.reservationEndTime);
     const isReservationExpiring = timeRemaining && timeRemaining.minutes < 3;
 
     return (
