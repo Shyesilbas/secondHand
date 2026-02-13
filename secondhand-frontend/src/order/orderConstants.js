@@ -42,20 +42,7 @@ export const getStatusColor = (status) => {
 
 export const getLastUpdateInfo = (order) => {
   const status = order?.status;
-  const shipping = order?.shipping;
-
-  if (status === 'DELIVERED' && shipping?.deliveredAt) {
-    return { status, updatedAt: shipping.deliveredAt };
-  }
-  if (status === 'SHIPPED' && shipping?.inTransitAt) {
-    return { status, updatedAt: shipping.inTransitAt };
-  }
-  if (shipping?.updatedAt) {
-    return { status, updatedAt: shipping.updatedAt };
-  }
-  if (order?.updatedAt) {
-    return { status, updatedAt: order.updatedAt };
-  }
-  return { status, updatedAt: order?.createdAt };
+  const updatedAt = order?.updatedAt ?? order?.createdAt;
+  return { status, updatedAt };
 };
 
