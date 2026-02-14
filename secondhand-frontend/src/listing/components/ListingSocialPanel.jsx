@@ -57,7 +57,7 @@ const ListingSocialPanel = ({ listing, isOwner, tabs, activeTab, onTabChange, De
 
         {activeTab === 'reviews' && hasReviews && (
           <div>
-            <ListingReviewsSection listingId={listing.id} listing={listing} />
+            <ListingReviewsSection listing={listing} />
           </div>
         )}
       </div>

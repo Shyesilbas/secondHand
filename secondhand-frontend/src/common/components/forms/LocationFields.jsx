@@ -1,9 +1,7 @@
-import { MapPin, Building2, Map } from 'lucide-react';
-
 const LocationFields = ({ formData, errors = {}, onInputChange }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
-      <div className="pb-4 border-b border-slate-100 mb-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <div className="pb-4 border-b-2 border-slate-100 mb-6">
         <h3 className="text-base font-semibold text-slate-900 tracking-tight">Konum Bilgileri</h3>
         <p className="text-xs text-slate-500 mt-1 tracking-tight">Şehir ve ilçe bilgilerini girin</p>
       </div>
@@ -18,7 +16,7 @@ const LocationFields = ({ formData, errors = {}, onInputChange }) => {
             name="city"
             value={formData.city}
             onChange={onInputChange}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.city ? 'border-red-300 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500'} text-slate-900 placeholder-slate-400 focus:outline-none transition-all tracking-tight`}
+            className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.city ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
             placeholder="e.g. İstanbul"
           />
           {errors.city && (
@@ -35,7 +33,7 @@ const LocationFields = ({ formData, errors = {}, onInputChange }) => {
             name="district"
             value={formData.district}
             onChange={onInputChange}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.district ? 'border-red-300 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500'} text-slate-900 placeholder-slate-400 focus:outline-none transition-all tracking-tight`}
+            className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.district ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
             placeholder="e.g. Kadıköy"
           />
           {errors.district && (

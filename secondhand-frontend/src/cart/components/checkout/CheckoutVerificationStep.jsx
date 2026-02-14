@@ -66,7 +66,7 @@ const CheckoutVerificationStep = ({
                                 type="text"
                                 value={paymentVerificationCode[index] || ''}
                                 onChange={(e) => handleCodeChange(index, e.target.value)}
-                                className="w-14 h-14 text-center text-xl font-mono border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 tracking-tight"
+                                className="w-14 h-14 text-center text-xl font-mono border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 tracking-tight"
                                 maxLength="1"
                                 data-index={index}
                             />

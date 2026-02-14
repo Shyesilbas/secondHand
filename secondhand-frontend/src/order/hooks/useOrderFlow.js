@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
@@ -131,14 +131,40 @@ export const useOrderFlow = ({
   const [orderReviews, setOrderReviews] = useState({});
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlQ = searchParams.get('q') || '';
+
+  const [searchTerm, setSearchTerm] = useState(urlQ);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState(null);
   const [isSearchMode, setIsSearchMode] = useState(false);
 
+  useEffect(() => {
+    if (urlQ) setSearchTerm(urlQ);
+  }, []);
+
+  const lastUrlQ = useRef('');
+  useEffect(() => {
+    if (!urlQ) return;
+    if (urlQ === lastUrlQ.current) return;
+    lastUrlQ.current = urlQ;
+    setSearchLoading(true);
+    orderService.getByOrderNumber(urlQ.trim())
+      .then((order) => {
+        if (order) {
+          setSearchOrder(order);
+          setIsSearchMode(true);
+          setSearchTerm('');
+        }
+      })
+      .catch(() => setSearchError('Order not found. Please check the order number.'))
+      .finally(() => setSearchLoading(false));
+  }, [urlQ]);
+
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [editingOrderName, setEditingOrderName] = useState('');
   const [showNameBanner, setShowNameBanner] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('');
 
   const { data, loading, error, refresh } = useOrdersListQuery({
     mode,
@@ -160,7 +186,11 @@ export const useOrderFlow = ({
   }, [initialPage, initialSize, viewMode]);
 
   const ordersRaw = useMemo(() => data?.content || [], [data]);
-  const orders = useMemo(() => (searchResult ? [searchResult] : ordersRaw), [ordersRaw, searchResult]);
+  const ordersUnfiltered = useMemo(() => (searchResult ? [searchResult] : ordersRaw), [ordersRaw, searchResult]);
+  const orders = useMemo(() => {
+    if (!statusFilter) return ordersUnfiltered;
+    return ordersUnfiltered.filter((o) => o.status === statusFilter);
+  }, [ordersUnfiltered, statusFilter]);
 
   const pagination = useMemo(
     () => ({
@@ -198,15 +228,21 @@ export const useOrderFlow = ({
       e.preventDefault();
       if (!searchTerm.trim()) return;
 
+      const term = searchTerm.trim();
       setSearchLoading(true);
       setSearchError(null);
 
       try {
-        const order = await orderService.getByOrderNumber(searchTerm.trim());
+        const order = await orderService.getByOrderNumber(term);
         if (order) {
           setSearchOrder(order);
           setIsSearchMode(true);
           setSearchTerm('');
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('q', term);
+            return next;
+          });
         }
       } catch (err) {
         setSearchError('Order not found. Please check the order number.');
@@ -214,7 +250,7 @@ export const useOrderFlow = ({
         setSearchLoading(false);
       }
     },
-    [searchTerm, setSearchOrder]
+    [searchTerm, setSearchOrder, setSearchParams]
   );
 
   const clearSearch = useCallback(() => {
@@ -222,8 +258,14 @@ export const useOrderFlow = ({
     setSearchError(null);
     setIsSearchMode(false);
     setSearchResult(null);
+    lastUrlQ.current = '';
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('q');
+      return next;
+    });
     refresh();
-  }, [refresh]);
+  }, [refresh, setSearchParams]);
 
   const openReceipt = useCallback(async (paymentReference) => {
     try {
@@ -381,6 +423,8 @@ export const useOrderFlow = ({
       isSearchMode,
       handleSearch,
       clearSearch,
+      statusFilter,
+      setStatusFilter,
     },
     modal: {
       selectedOrder,

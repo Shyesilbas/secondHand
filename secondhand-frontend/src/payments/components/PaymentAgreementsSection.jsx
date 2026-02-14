@@ -80,7 +80,7 @@ const PaymentAgreementsSection = ({
               type="checkbox"
               checked={acceptedAgreements.has(agreement.agreementId)}
               onChange={() => handleAgreementToggle(agreement.agreementId)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
           <div className="min-w-0 flex-1 text-sm">

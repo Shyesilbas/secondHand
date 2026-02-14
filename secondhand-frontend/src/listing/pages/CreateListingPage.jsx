@@ -4,7 +4,7 @@ import { useEnums } from '../../common/hooks/useEnums.js';
 import { getListingConfig, getListingTypeOptions, createFormRegistry } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import ListingWizard from '../components/ListingWizard.jsx';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Check } from 'lucide-react';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 
 const CreateListingPage = () => {
@@ -128,21 +128,22 @@ const CreateListingPage = () => {
                     {listingTypeOptions.map((type) => (
                         <button
                             key={type.value}
+                            type="button"
                             onClick={() => handleTypeSelect(type.value)}
-                            className="group relative flex flex-col items-center gap-5 p-8 rounded-3xl bg-white border border-slate-200/60 hover:border-indigo-300/60 hover:shadow-[0_20px_60px_-15px_rgba(99,102,241,0.15)] transition-all duration-300 text-center w-full"
+                            className="group relative flex flex-col items-center p-6 rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-indigo-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 w-full text-center"
                         >
-                            <div className="w-20 h-20 shrink-0 rounded-3xl bg-gradient-to-br from-slate-50 to-indigo-50/30 group-hover:from-indigo-50 group-hover:to-indigo-100/50 border border-slate-100 group-hover:border-indigo-200/60 flex items-center justify-center text-5xl transition-all duration-300 shadow-sm group-hover:shadow-md">
+                            <div className="w-16 h-16 shrink-0 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center mb-4 transition-all duration-300 text-3xl [&>svg]:w-8 [&>svg]:h-8">
                                 {type.icon}
                             </div>
                             <div className="flex-1 min-w-0 w-full">
-                                <h3 className="text-lg font-bold text-slate-900 group-hover:text-indigo-700 transition-colors tracking-tight mb-2">
+                                <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2">
                                     {type.label}
                                 </h3>
-                                <p className="text-sm text-slate-600 leading-relaxed tracking-tight">
+                                <p className="text-sm text-slate-500 leading-relaxed">
                                     {type.description}
                                 </p>
                             </div>
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
                                 <ChevronRight className="w-5 h-5 text-indigo-500" />
                             </div>
                         </button>
@@ -169,25 +170,27 @@ const CreateListingPage = () => {
                     {options.map((opt) => {
                         const id = opt.id || opt.value;
                         const label = opt.label || opt.name;
+                        const isSelected = String(selectedValue) === String(id);
                         return (
                             <button
                                 key={id}
+                                type="button"
                                 onClick={() => setSelectionValue(valueKey, id, selectorIndex)}
-                                className={`group relative flex flex-col items-start gap-3 p-6 rounded-3xl bg-white border transition-all duration-300 text-left w-full ${
-                                    String(selectedValue) === String(id)
-                                        ? 'border-indigo-500 shadow-[0_20px_60px_-15px_rgba(99,102,241,0.20)]'
-                                        : 'border-slate-200/60 hover:border-indigo-300/60 hover:shadow-[0_20px_60px_-15px_rgba(99,102,241,0.15)]'
+                                className={`relative flex flex-col items-start text-left p-5 rounded-xl transition-all duration-200 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+                                    isSelected
+                                        ? 'ring-2 ring-indigo-600 ring-offset-2 bg-indigo-50/50 border border-indigo-200'
+                                        : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
                                 }`}
                             >
-                                <div className="flex items-start justify-between w-full gap-4">
-                                    <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors tracking-tight">
-                                            {label}
-                                        </h3>
+                                {isSelected && (
+                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
+                                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                                     </div>
-                                    <ChevronRight className={`w-5 h-5 text-indigo-500 transition-opacity ${
-                                        String(selectedValue) === String(id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                                    }`} />
+                                )}
+                                <div className="min-w-0 pr-8">
+                                    <h3 className="font-semibold text-slate-900 tracking-tight">
+                                        {label}
+                                    </h3>
                                 </div>
                             </button>
                         );
@@ -199,7 +202,7 @@ const CreateListingPage = () => {
         const options = optionsRaw || [];
 
         return (
-            <div className="bg-white rounded-3xl border border-slate-200/60 p-6 sm:p-8">
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
                 <SearchableDropdown
                     options={options}
                     selectedValues={selectedValue ? [selectedValue] : []}

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
 
-const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, orderStatus, shippingStatus }) => {
+const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, orderStatus, shippingStatus, reviewsLoading = false, skipIndividualFetch = false }) => {
     const [showModal, setShowModal] = useState(false);
     const [review, setReview] = useState(existingReview);
     const [loading, setLoading] = useState(false);
@@ -11,22 +11,23 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
         setReview(existingReview);
     }, [existingReview]);
 
+    // Parent provides batch reviews via orderReviews - never fetch individually.
     React.useEffect(() => {
-        if (!existingReview && orderItem && orderItem.id) {
-            const checkExistingReview = async () => {
-                try {
-                    const reviewData = await reviewService.getReviewByOrderItem(orderItem.id);
-                    setReview(reviewData);
-                } catch (error) {
-                    if (error?.response?.status !== 404) {
-                        console.error('Error checking review:', error);
-                    }
-                    setReview(null);
+        if (skipIndividualFetch || reviewsLoading || !orderItem?.id) return;
+        if (existingReview !== null && existingReview !== undefined) return; // Parent already provided
+        const checkExistingReview = async () => {
+            try {
+                const reviewData = await reviewService.getReviewByOrderItem(orderItem.id);
+                setReview(reviewData);
+            } catch (error) {
+                if (error?.response?.status !== 404) {
+                    console.error('Error checking review:', error);
                 }
-            };
-            checkExistingReview();
-        }
-    }, [orderItem, existingReview]);
+                setReview(null);
+            }
+        };
+        checkExistingReview();
+    }, [orderItem?.id, existingReview, reviewsLoading, skipIndividualFetch]);
 
     const canReview = orderStatus === 'COMPLETED' || orderStatus === 'DELIVERED' || shippingStatus === 'DELIVERED' || orderItem?.shippingStatus === 'DELIVERED';
 
@@ -78,7 +79,7 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
     return (
         <>
             <button
-                onClick={() => setShowModal(true)}
+                onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
                 disabled={loading}
                 className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >

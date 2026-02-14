@@ -26,7 +26,7 @@ const CheckoutOrderSummary = ({
 
     return (
         <div className="sticky top-8">
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-200/60 overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-100/50">
                     <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Order Summary</h3>
                     <p className="text-sm text-slate-500 mt-1 tracking-tight">{cartCount} items</p>
@@ -79,7 +79,7 @@ const CheckoutOrderSummary = ({
                                         </p>
                                     )}
                                 </div>
-                                <span className="text-sm font-semibold font-mono text-slate-900 tracking-tight">
+                                <span className="text-sm font-semibold tabular-nums text-slate-900 shrink-0">
                                     {formatCurrency(lineTotal, item.listing.currency)}
                                 </span>
                             </div>
@@ -116,7 +116,7 @@ const CheckoutOrderSummary = ({
                                         value={couponInput}
                                         onChange={(e) => setCouponInput(e.target.value)}
                                         placeholder="Enter code"
-                                        className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white tracking-tight"
+                                        className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tracking-tight"
                                     />
                                     <button
                                         type="button"
@@ -144,16 +144,16 @@ const CheckoutOrderSummary = ({
                         </div>
 
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-600 tracking-tight">Subtotal</span>
-                            <span className="font-medium font-mono text-slate-900 tracking-tight">
+                            <span className="text-slate-600">Subtotal</span>
+                            <span className="font-medium tabular-nums text-slate-900">
                                 {formatCurrency(originalSubtotal != null ? originalSubtotal : subtotal, currency)}
                             </span>
                         </div>
 
                         {campaignDiscount > 0 && (
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600 tracking-tight">Campaign discount</span>
-                                <span className="font-semibold font-mono text-emerald-600 tracking-tight">
+                                <span className="text-slate-600">Campaign discount</span>
+                                <span className="font-medium tabular-nums text-emerald-600">
                                     -{formatCurrency(campaignDiscount, currency)}
                                 </span>
                             </div>
@@ -161,29 +161,29 @@ const CheckoutOrderSummary = ({
 
                         {couponDiscount > 0 && (
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-600 tracking-tight">Coupon discount</span>
-                                <span className="font-semibold font-mono text-emerald-600 tracking-tight">
+                                <span className="text-slate-600">Coupon discount</span>
+                                <span className="font-medium tabular-nums text-emerald-600">
                                     -{formatCurrency(couponDiscount, currency)}
                                 </span>
                             </div>
                         )}
                         
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-600 tracking-tight">Shipping</span>
-                            <span className="font-medium text-emerald-600 tracking-tight">Free</span>
+                            <span className="text-slate-600">Shipping</span>
+                            <span className="font-medium text-emerald-600">Free</span>
                         </div>
                         
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-600 tracking-tight">Tax</span>
-                            <span className="font-medium font-mono text-slate-900 tracking-tight">
+                            <span className="text-slate-600">Tax</span>
+                            <span className="font-medium tabular-nums text-slate-900">
                                 {formatCurrency(tax, currency)}
                             </span>
                         </div>
                         
-                        <div className="border-t border-slate-200 pt-4 mt-4">
-                            <div className="flex justify-between">
-                                <span className="text-lg font-bold text-slate-900 tracking-tight">Total</span>
-                                <span className="text-lg font-black font-mono text-slate-900 tracking-tighter">
+                        <div className="border-t-2 border-slate-100 pt-4 mt-4">
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-base font-bold text-slate-900">Total</span>
+                                <span className="text-2xl font-bold tabular-nums text-indigo-900">
                                     {formatCurrency(total, currency)}
                                 </span>
                             </div>

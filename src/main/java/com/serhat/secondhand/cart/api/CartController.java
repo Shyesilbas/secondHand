@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,132 +34,150 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
+    @Operation(summary = "Get cart items", description = "Get all items in the user's cart with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cart items retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     public ResponseEntity<?> getCartItems(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("API request to get cart items for user: {}", currentUser.getEmail());
+        log.debug("Get cart items request - user: {}", currentUser.getEmail());
 
         Result<Page<CartDto>> result = cartService.getCartItems(currentUser.getId(), pageable);
-
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return toResponseEntity(result);
     }
 
     @PostMapping("/items")
     @Operation(summary = "Add item to cart", description = "Add a listing to the user's cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Item added to cart successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "404", description = "Listing not found")
+            @ApiResponse(responseCode = "200", description = "Item added to cart successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Listing not found")
     })
     public ResponseEntity<?> addToCart(
             @Valid @RequestBody AddToCartRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to add item to cart for user: {} - listingId: {}", 
+
+        log.debug("Add to cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), request.getListingId());
+
         Result<CartDto> result = cartService.addToCart(currentUser.getId(), request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return toResponseEntity(result);
     }
 
     @PutMapping("/items/{listingId}")
     @Operation(summary = "Update cart item", description = "Update quantity or notes of a cart item")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart item updated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "404", description = "Item not found in cart")
+            @ApiResponse(responseCode = "200", description = "Cart item updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Item not found in cart")
     })
     public ResponseEntity<?> updateCartItem(
             @PathVariable UUID listingId,
             @Valid @RequestBody UpdateCartItemRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to update cart item for user: {} - listingId: {}", 
+
+        log.debug("Update cart item request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
+
         Result<CartDto> result = cartService.updateCartItem(currentUser.getId(), listingId, request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return toResponseEntity(result);
     }
 
     @DeleteMapping("/items/{listingId}")
     @Operation(summary = "Remove item from cart", description = "Remove a specific item from the user's cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Item removed from cart successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "404", description = "Item not found in cart")
+            @ApiResponse(responseCode = "200", description = "Item removed from cart successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Item not found in cart")
     })
     public ResponseEntity<?> removeFromCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to remove item from cart for user: {} - listingId: {}", 
+
+        log.debug("Remove from cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
+
         Result<Void> result = cartService.removeFromCart(currentUser.getId(), listingId);
+
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return toResponseEntity(result);
         }
+
         return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
     }
 
     @DeleteMapping("/items")
     @Operation(summary = "Clear cart", description = "Remove all items from the user's cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
-        log.info("API request to clear cart for user: {}", currentUser.getEmail());
+
+        log.debug("Clear cart request - user: {}", currentUser.getEmail());
+
         Result<Void> result = cartService.clearCart(currentUser.getId());
+
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return toResponseEntity(result);
         }
+
         return ResponseEntity.ok(Map.of("message", "Cart cleared successfully"));
     }
 
     @GetMapping("/count")
     @Operation(summary = "Get cart item count", description = "Get the total number of items in the user's cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart count retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Cart count retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
-        log.info("API request to get cart item count for user: {}", currentUser.getEmail());
+
+        log.debug("Get cart count request - user: {}", currentUser.getEmail());
+
         Result<Long> result = cartService.getCartItemCount(currentUser.getId());
+
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return toResponseEntity(result);
         }
+
         return ResponseEntity.ok(Map.of("count", result.getData()));
     }
 
     @GetMapping("/check/{listingId}")
     @Operation(summary = "Check if item is in cart", description = "Check if a specific listing is in the user's cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Check completed successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Check completed successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<?> isInCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to check if item is in cart for user: {} - listingId: {}", 
+
+        log.debug("Check in cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
+
         Result<Boolean> result = cartService.isInCart(currentUser.getId(), listingId);
+
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return toResponseEntity(result);
         }
+
         return ResponseEntity.ok(Map.of("inCart", result.getData()));
+    }
+
+    private <T> ResponseEntity<?> toResponseEntity(Result<T> result) {
+        if (result.isError()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", result.getErrorCode() != null ? result.getErrorCode() : "UNKNOWN_ERROR",
+                    "message", result.getMessage() != null ? result.getMessage() : ""
+            ));
+        }
+        return ResponseEntity.ok(result.getData());
     }
 }

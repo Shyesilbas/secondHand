@@ -121,7 +121,7 @@ const SearchableDropdown = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder={searchPlaceholder}
-          className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:ring-4 focus:ring-indigo-500/10 focus:border-slate-500 text-xs focus:outline-none transition-shadow tracking-tight"
+          className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-shadow tracking-tight"
         />
       </div>
 
@@ -181,12 +181,12 @@ const SearchableDropdown = ({
         onClick={toggleDropdown}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`w-full px-4 py-3 border rounded-xl text-left flex items-center justify-between transition-all duration-200 tracking-tight ${
+        className={`w-full px-4 py-3 border rounded-xl text-left flex items-center justify-between transition-all duration-200 tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
           disabled
             ? 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'
             : isOpen 
-            ? 'border-indigo-500 ring-4 ring-indigo-500/10' 
-            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+            ? 'border-indigo-500 ring-2 ring-indigo-500/20' 
+            : 'border-slate-200 hover:border-indigo-300 hover:shadow-sm'
         }`}
       >
         <span className={`truncate text-sm ${selectedValues.length ? 'text-slate-900 font-medium' : 'text-slate-400'}`}>

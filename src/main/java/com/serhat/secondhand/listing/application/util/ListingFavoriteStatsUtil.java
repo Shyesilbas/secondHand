@@ -8,36 +8,56 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class ListingFavoriteStatsUtil {
+
     private final FavoriteStatsService favoriteStatsService;
 
-    public void enrichWithFavoriteStats(ListingDto dto,Long userId) {
+
+    public ListingDto enrichWithFavoriteStats(ListingDto dto, Long userId) {
         if (dto != null && dto.getId() != null) {
             FavoriteStatsDto stats = favoriteStatsService.getFavoriteStats(dto.getId(), userId);
             dto.setFavoriteStats(stats);
         }
+        return dto;
     }
 
-    public void enrichWithFavoriteStats(List<ListingDto> dtos, Long userId) {
+
+    public List<ListingDto> enrichWithFavoriteStats(List<ListingDto> dtos, Long userId) {
         if (dtos == null || dtos.isEmpty()) {
-            return;
+            return dtos;
         }
+
         List<UUID> listingIds = dtos.stream()
                 .map(ListingDto::getId)
+                .filter(Objects::nonNull)
                 .toList();
-        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService.getFavoriteStatsForListings(listingIds, userId);
-        for (ListingDto dto : dtos) {
-            dto.setFavoriteStats(statsMap.getOrDefault(dto.getId(),
-                    FavoriteStatsDto.builder()
-                            .listingId(dto.getId())
-                            .favoriteCount(0L)
-                            .isFavorited(false)
-                            .build()
-            ));
+
+        if (listingIds.isEmpty()) {
+            return dtos;
         }
+
+        Map<UUID, FavoriteStatsDto> statsMap = favoriteStatsService
+                .getFavoriteStatsForListings(listingIds, userId);
+
+        dtos.forEach(dto ->
+                dto.setFavoriteStats(
+                        statsMap.getOrDefault(dto.getId(), createEmptyStats(dto.getId()))
+                )
+        );
+
+        return dtos;
+    }
+
+    private FavoriteStatsDto createEmptyStats(UUID listingId) {
+        return FavoriteStatsDto.builder()
+                .listingId(listingId)
+                .favoriteCount(0L)
+                .isFavorited(false)
+                .build();
     }
 }

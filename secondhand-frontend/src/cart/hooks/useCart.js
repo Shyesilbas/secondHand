@@ -42,29 +42,33 @@ export const useCart = (options = {}) => {
         }
     }, [cartCount, cartItems, isLoadingItems, loadCartItems]);
 
+    const invalidateCartAndBadges = () => {
+        queryClient.invalidateQueries({ queryKey: ['cartItems'] });
+        queryClient.invalidateQueries({ queryKey: ['badgeCounts'] });
+    };
+
     const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => cartService.addToCart(listingId, quantity, notes),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['cartItems'] });
-            queryClient.invalidateQueries({ queryKey: ['badgeCounts'] });
+            invalidateCartAndBadges();
             showSuccess(null, 'Added to cart successfully.', { toast: true });
         },
     });
 
     const removeFromCartMutation = useMutation({
         mutationFn: (listingId) => cartService.removeFromCart(listingId),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cartItems'] }),
+        onSuccess: invalidateCartAndBadges,
     });
 
     const updateCartItemMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => cartService.updateCartItem(listingId, quantity, notes),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cartItems'] }),
+        onSuccess: invalidateCartAndBadges,
     });
 
     const clearCartMutation = useMutation({
         mutationFn: () => cartService.clearCart(),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['cartItems'] });
+            invalidateCartAndBadges();
             localStorage.setItem('cartCount', '0');
         },
     });

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum UserErrorCodes implements ErrorCode {
     USER_NOT_FOUND_BY_EMAIL("USER_NOT_FOUND_BY_EMAIL", "User not found with email", HttpStatus.NOT_FOUND),
+    USER_NOT_FOUND("USER_NOT_FOUND_BY_EMAIL", "User not found", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND_BY_ID("USER_NOT_FOUND_BY_ID", "User not found with id", HttpStatus.NOT_FOUND),
     PHONE_NUMBER_UNCHANGED("PHONE_NUMBER_UNCHANGED", "New phone number cannot be the same as the old one", HttpStatus.BAD_REQUEST),
     PHONE_NUMBER_ALREADY_IN_USE("PHONE_NUMBER_ALREADY_IN_USE", "Phone number is already in use", HttpStatus.CONFLICT),

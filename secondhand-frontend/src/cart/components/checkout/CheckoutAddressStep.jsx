@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 
 const CheckoutAddressStep = ({
     addresses,
@@ -24,10 +25,10 @@ const CheckoutAddressStep = ({
             <div className="space-y-8">
                 {/* Order Name */}
                 <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Order Name (Optional)</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 tracking-tight">Order Name (Optional)</h3>
                     <input
                         type="text"
-                        className="w-full p-4 border-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
                         placeholder="Give your order a name (e.g., Birthday Gift, Office Order)"
                         value={orderName || ''}
                         onChange={(e) => setOrderName(e.target.value)}
@@ -37,44 +38,42 @@ const CheckoutAddressStep = ({
                 </div>
                 {/* Shipping Address */}
                 <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping Address</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 tracking-tight">Shipping Address</h3>
                     {!addresses || addresses.length === 0 ? (
                         <div className="text-gray-500 text-center py-8">
                             No addresses found. Please add an address to continue.
                         </div>
                     ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {addresses?.map((address) => (
+                        {addresses?.map((address) => {
+                            const isSelected = String(selectedShippingAddressId) === String(address.id);
+                            return (
                             <label
                                 key={address.id}
-                                className={`relative p-5 border-2 rounded-2xl cursor-pointer transition-all ${
-                                    String(selectedShippingAddressId) === String(address.id)
-                                        ? 'border-indigo-500 bg-indigo-50/50 shadow-sm'
-                                        : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
+                                className={`relative p-5 rounded-xl cursor-pointer transition-all ${
+                                    isSelected
+                                        ? 'ring-2 ring-indigo-600 ring-offset-2 bg-indigo-50/30 border border-indigo-200'
+                                        : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
                                 }`}
                             >
                                 <input
                                     type="radio"
                                     name="shipping"
                                     value={address.id}
-                                    checked={String(selectedShippingAddressId) === String(address.id)}
+                                    checked={isSelected}
                                     onChange={(e) => setSelectedShippingAddressId(Number(e.target.value))}
                                     className="sr-only"
                                 />
-                                <div className="flex items-start space-x-3">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                        String(selectedShippingAddressId) === String(address.id)
-                                            ? 'border-indigo-500 bg-indigo-500'
-                                            : 'border-slate-300'
-                                    }`}>
-                                        {String(selectedShippingAddressId) === String(address.id) && (
-                                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                                        )}
+                                {isSelected && (
+                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
+                                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                                     </div>
+                                )}
+                                <div className="flex items-start space-x-3 pr-8">
                                     <div className="flex-1">
                                         <div className="font-semibold text-slate-900 tracking-tight">{address.addressLine}</div>
                                         <div className="text-sm text-slate-600 mt-1 tracking-tight">
-                                            {address.addressLine}, {address.city}, {address.state} {address.postalCode}
+                                            {address.city}, {address.state} {address.postalCode}
                                         </div>
                                         <div className="text-sm text-slate-500 tracking-tight">{address.country}</div>
                                         {address.mainAddress && (
@@ -83,51 +82,55 @@ const CheckoutAddressStep = ({
                                     </div>
                                 </div>
                             </label>
-                        ))}
+                        );})}
+                        <button
+                            type="button"
+                            className="p-5 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/20 transition-all flex items-center justify-center gap-2 font-medium"
+                        >
+                            <span className="text-lg">+</span> Add New Address
+                        </button>
                     </div>
                     )}
                 </div>
 
                 {/* Billing Address */}
                 <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Billing Address</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 tracking-tight">Billing Address</h3>
                     {!addresses || addresses.length === 0 ? (
                         <div className="text-gray-500 text-center py-8">
                             No addresses found. Please add an address to continue.
                         </div>
                     ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {addresses?.map((address) => (
+                        {addresses?.map((address) => {
+                            const isSelected = String(selectedBillingAddressId) === String(address.id);
+                            return (
                             <label
                                 key={address.id}
-                                className={`relative p-5 border-2 rounded-2xl cursor-pointer transition-all ${
-                                    String(selectedBillingAddressId) === String(address.id)
-                                        ? 'border-indigo-500 bg-indigo-50/50 shadow-sm'
-                                        : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
+                                className={`relative p-5 rounded-xl cursor-pointer transition-all ${
+                                    isSelected
+                                        ? 'ring-2 ring-indigo-600 ring-offset-2 bg-indigo-50/30 border border-indigo-200'
+                                        : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
                                 }`}
                             >
                                 <input
                                     type="radio"
                                     name="billing"
                                     value={address.id}
-                                    checked={String(selectedBillingAddressId) === String(address.id)}
+                                    checked={isSelected}
                                     onChange={(e) => setSelectedBillingAddressId(Number(e.target.value))}
                                     className="sr-only"
                                 />
-                                <div className="flex items-start space-x-3">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                        String(selectedBillingAddressId) === String(address.id)
-                                            ? 'border-indigo-500 bg-indigo-500'
-                                            : 'border-slate-300'
-                                    }`}>
-                                        {String(selectedBillingAddressId) === String(address.id) && (
-                                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                                        )}
+                                {isSelected && (
+                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
+                                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                                     </div>
+                                )}
+                                <div className="flex items-start space-x-3 pr-8">
                                     <div className="flex-1">
                                         <div className="font-semibold text-slate-900 tracking-tight">{address.addressLine}</div>
                                         <div className="text-sm text-slate-600 mt-1 tracking-tight">
-                                            {address.addressLine}, {address.city}, {address.state} {address.postalCode}
+                                            {address.city}, {address.state} {address.postalCode}
                                         </div>
                                         <div className="text-sm text-slate-500 tracking-tight">{address.country}</div>
                                         {address.mainAddress && (
@@ -136,16 +139,22 @@ const CheckoutAddressStep = ({
                                     </div>
                                 </div>
                             </label>
-                        ))}
+                        );})}
+                        <button
+                            type="button"
+                            className="p-5 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/20 transition-all flex items-center justify-center gap-2 font-medium"
+                        >
+                            <span className="text-lg">+</span> Add New Address
+                        </button>
                     </div>
                     )}
                 </div>
 
                 {/* Notes */}
                 <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Notes</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 tracking-tight">Notes</h3>
                     <textarea
-                        className="w-full p-4 border-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
                         rows="4"
                         placeholder="Add any special instructions or notes for the seller (e.g., color preference, size, etc.)"
                         value={notes}
@@ -163,7 +172,7 @@ const CheckoutAddressStep = ({
                 </button>
                 <button
                     onClick={onNext}
-                    className="px-8 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-200 font-bold shadow-md hover:shadow-lg tracking-tight disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-200 font-semibold shadow-md hover:shadow-lg tracking-tight disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!isStepValid}
                 >
                     Next

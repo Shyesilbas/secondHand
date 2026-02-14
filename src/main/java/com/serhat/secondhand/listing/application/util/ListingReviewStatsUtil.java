@@ -1,40 +1,55 @@
 package com.serhat.secondhand.listing.application.util;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
+import com.serhat.secondhand.review.service.IReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class ListingReviewStatsUtil {
+
     private final IReviewService reviewService;
 
-    public void enrichWithReviewStats(ListingDto dto) {
-        if (dto != null && dto.getId() != null) {
-            Map<UUID, ReviewStatsDto> statsMap = reviewService.getListingReviewStatsDto(List.of(dto.getId()));
-            dto.setReviewStats(statsMap.getOrDefault(dto.getId(), ReviewStatsDto.empty()));
+
+    public ListingDto enrichWithReviewStats(ListingDto dto) {
+        if (dto == null || dto.getId() == null) {
+            return dto;
         }
+
+        Map<UUID, ReviewStatsDto> statsMap = reviewService
+                .getListingReviewStatsDto(List.of(dto.getId()));
+        dto.setReviewStats(statsMap.getOrDefault(dto.getId(), ReviewStatsDto.empty()));
+
+        return dto;
     }
 
-    public void enrichWithReviewStats(List<ListingDto> dtos) {
+    public List<ListingDto> enrichWithReviewStats(List<ListingDto> dtos) {
         if (dtos == null || dtos.isEmpty()) {
-            return;
+            return dtos;
         }
 
         List<UUID> listingIds = dtos.stream()
                 .map(ListingDto::getId)
+                .filter(Objects::nonNull)
                 .toList();
+
+        if (listingIds.isEmpty()) {
+            return dtos;
+        }
 
         Map<UUID, ReviewStatsDto> statsMap = reviewService.getListingReviewStatsDto(listingIds);
 
-        for (ListingDto dto : dtos) {
-            dto.setReviewStats(statsMap.getOrDefault(dto.getId(), ReviewStatsDto.empty()));
-        }
+        dtos.forEach(dto ->
+                dto.setReviewStats(statsMap.getOrDefault(dto.getId(), ReviewStatsDto.empty()))
+        );
+
+        return dtos;
     }
 }

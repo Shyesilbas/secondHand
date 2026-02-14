@@ -32,9 +32,9 @@ export const useBadgeCounts = ({ enabled = true, userId } = {}) => {
 
       return { emailCount, chatCount, cartCount, orderCount };
     },
-    staleTime: 30 * 1000, // Sync with backend cache TTL
+    staleTime: 2 * 60 * 1000, // 2 min - reduce refetches
     gcTime: 10 * 60 * 1000,
-    refetchInterval: 30 * 1000, // Reduced from 60s, matches cache TTL
+    refetchInterval: false, // No polling - rely on focus/mount
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true, // Re-enabled for better UX
     refetchOnMount: true,
