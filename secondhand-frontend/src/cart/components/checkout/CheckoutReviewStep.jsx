@@ -57,12 +57,16 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                         ? (parseFloat(item.offerTotalPrice) || 0)
                         : (parseFloat(unitPrice) * item.quantity);
                     return (
-                        <div key={item.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                            <div className="flex items-start space-x-4">
-                                <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <span className="text-lg font-medium text-gray-600">
-                                        {item.listing.title.charAt(0).toUpperCase()}
-                                    </span>
+                        <div key={item.id} className="p-5 bg-white rounded-xl border border-slate-200 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                                <div className="w-20 h-20 sm:w-20 sm:h-20 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0 border border-slate-200 overflow-hidden">
+                                    {item.listing.imageUrl ? (
+                                        <img src={item.listing.imageUrl} alt={item.listing.title} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-xl font-semibold text-slate-600">
+                                            {item.listing.title.charAt(0).toUpperCase()}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-2">
@@ -104,15 +108,15 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right flex-shrink-0">
-                                    <div className="text-lg font-semibold font-mono text-slate-900 tracking-tight">
+                                <div className="text-right flex-shrink-0 sm:self-end">
+                                    <div className="text-lg font-bold tabular-nums text-slate-900">
                                         {formatCurrency(lineTotal, item.listing.currency)}
                                     </div>
-                                    <div className="text-sm text-slate-500 tracking-tight">
+                                    <div className="text-sm text-slate-500 tabular-nums mt-0.5">
                                         <div className="flex flex-col items-end">
                                             <span>{item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}</span>
                                             {hasCampaign && (
-                                                <span className="text-xs text-emerald-600 font-semibold tracking-tight">{item.listing.campaignName || 'Campaign applied'}</span>
+                                                <span className="text-xs text-emerald-600 font-medium mt-0.5">{item.listing.campaignName || 'Campaign applied'}</span>
                                             )}
                                         </div>
                                     </div>
@@ -132,7 +136,7 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                 </button>
                 <button
                     onClick={onNext}
-                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-bold transition-all duration-200 shadow-md hover:shadow-lg tracking-tight"
+                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-semibold transition-all duration-200 shadow-md hover:shadow-lg tracking-tight"
                 >
                     Continue to Address
                 </button>

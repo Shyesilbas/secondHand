@@ -112,15 +112,15 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
-        <div className="pb-4 border-b border-slate-100 mb-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div className="pb-4 border-b-2 border-slate-100 mb-6">
           <h3 className="text-base font-semibold text-slate-900 tracking-tight">Fotoğraf</h3>
           <p className="text-xs text-slate-500 mt-1 tracking-tight">Ürün fotoğrafınızı yükleyin</p>
         </div>
 
         {imageUrl ? (
           <div className="relative group">
-            <div className="w-full h-80 bg-slate-50 rounded-xl overflow-hidden border-2 border-slate-200 flex items-center justify-center">
+            <div className="w-full h-80 bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm flex items-center justify-center">
               <img
                 src={imageUrl}
                 alt="Product"
@@ -132,7 +132,7 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="bg-white text-red-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-red-50 transition-colors flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 tracking-tight"
+                  className="bg-white text-red-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-red-50 transition-colors flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <X className="w-5 h-5" />
                   Fotoğrafı Kaldır

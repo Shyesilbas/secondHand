@@ -27,6 +27,6 @@ export const PriceInput = ({value, onChange, onBlur, placeholder = '0,00', class
   const baseCls = compact ? 'w-20 px-2 py-1.5 text-sm' : 'w-32 min-w-[8rem] px-3 py-2.5 text-base';
   return (
     <input type="text" inputMode="decimal" value={display} onChange={handleChange} onFocus={() => setFocused(true)} onBlur={handleBlur}
-      placeholder={placeholder} className={`${baseCls} border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className}`} {...rest} />
+      placeholder={placeholder} className={`${baseCls} border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 ${className}`} {...rest} />
   );
 };

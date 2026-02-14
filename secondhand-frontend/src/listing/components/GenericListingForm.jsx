@@ -27,8 +27,8 @@ const FieldError = ({ error }) => {
 
 const SectionCard = ({ title, description, children }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
-      <div className="pb-4 border-b border-slate-100 mb-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+      <div className="pb-4 border-b-2 border-slate-100 mb-6">
         <h3 className="text-base font-semibold text-slate-900 tracking-tight">{title}</h3>
         {description ? <p className="text-xs text-slate-500 mt-1 tracking-tight">{description}</p> : null}
       </div>
@@ -40,7 +40,7 @@ const SectionCard = ({ title, description, children }) => {
 const ToggleCardField = ({ name, label, description, value, onToggle }) => {
   return (
     <div
-      className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer"
+      className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
       onClick={onToggle}
       role="button"
       tabIndex={0}
@@ -57,7 +57,7 @@ const ToggleCardField = ({ name, label, description, value, onToggle }) => {
         name={name}
         checked={Boolean(value)}
         onChange={() => onToggle()}
-        className="h-5 w-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
+        className="h-5 w-5 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500/20"
       />
       <div>
         <label htmlFor={name} className="block text-sm font-semibold text-slate-900 cursor-pointer tracking-tight">
@@ -273,8 +273,8 @@ const GenericListingForm = ({
             onChange={handleInputChange}
             rows={field.rows || 3}
             placeholder={field.placeholder || ''}
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none tracking-tight ${
-              error ? 'border-red-300' : 'border-slate-200'
+            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none tracking-tight ${
+              error ? 'border-red-300 focus:ring-red-500/20' : 'border-slate-200'
             }`}
           />
           <FieldError error={error} />
@@ -295,8 +295,8 @@ const GenericListingForm = ({
           max={field.max}
           step={field.step}
           placeholder={field.placeholder || ''}
-          className={`w-full px-4 py-3 border rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all tracking-tight ${
-            error ? 'border-red-300' : 'border-slate-200'
+          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all tracking-tight ${
+            error ? 'border-red-300 focus:ring-red-500/20' : 'border-slate-200'
           }`}
         />
         <FieldError error={error} />
@@ -384,10 +384,10 @@ const GenericListingForm = ({
 
     return (
       <div className="space-y-10">
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           <div className="flex items-start justify-between gap-6">
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-slate-500 tracking-tight">Listing type</div>
+              <div className="text-xs font-semibold text-slate-500 tracking-tight">İlan tipi</div>
               <div className="mt-1 text-lg font-bold text-slate-900 tracking-tight">{typeLabel}</div>
               {formData?.description ? (
                 <div className="mt-3 text-sm text-slate-700 tracking-tight whitespace-pre-wrap">
@@ -396,7 +396,7 @@ const GenericListingForm = ({
               ) : null}
             </div>
             {formData?.imageUrl ? (
-              <div className="w-28 h-28 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 shrink-0">
+              <div className="w-28 h-28 rounded-xl border border-slate-200 shadow-sm overflow-hidden bg-slate-50 shrink-0">
                 <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
               </div>
             ) : null}
@@ -404,10 +404,10 @@ const GenericListingForm = ({
         </div>
 
         {basics.length ? (
-          <SectionCard title="Basics">
+          <SectionCard title="Temel Bilgiler">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {basics.map((row) => (
-                <div key={row.label} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
                   <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
                   <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
                 </div>
@@ -417,10 +417,10 @@ const GenericListingForm = ({
         ) : null}
 
         {location.length ? (
-          <SectionCard title="Location">
+          <SectionCard title="Konum">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {location.map((row) => (
-                <div key={row.label} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
                   <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
                   <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
                 </div>
@@ -430,10 +430,10 @@ const GenericListingForm = ({
         ) : null}
 
         {detailFields.length ? (
-          <SectionCard title="Details">
+          <SectionCard title="Detaylar">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {detailFields.map((row) => (
-                <div key={`${row.label}:${row.value}`} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div key={`${row.label}:${row.value}`} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
                   <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
                   <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
                 </div>

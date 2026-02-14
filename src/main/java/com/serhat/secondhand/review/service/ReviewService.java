@@ -162,9 +162,8 @@ public class ReviewService implements IReviewService {
         }
         for (Object[] row : rows) {
             UUID listingId = (UUID) row[0];
-            Long total = row[1] != null ? (Long) row[1] : 0L;
-            Double avg = row[2] != null ? (Double) row[2] : 0.0;
-            statsMap.put(listingId, new ReviewStatsDto(total, avg, 0L, 0L, 0L, 0L, 0L, 0L));
+            ReviewStatsDto stats = reviewMapper.mapToReviewStatsDto(row, 1);
+            statsMap.put(listingId, stats);
         }
         return statsMap;
     }

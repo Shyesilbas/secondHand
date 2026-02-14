@@ -31,8 +31,9 @@ const ListingWizard = ({
         <div className="max-w-5xl mx-auto px-6">
           <div className="h-16 flex items-center justify-between">
             <button
+              type="button"
               onClick={onBack}
-              className="group flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors py-2 px-3 -ml-3 rounded-lg hover:bg-slate-50 tracking-tight"
+              className="group flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors py-2 px-3 -ml-3 rounded-lg hover:bg-slate-50 tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
               <span className="font-medium text-sm">İptal & Çıkış</span>
@@ -123,7 +124,7 @@ const ListingWizard = ({
             <button
               type="button"
               onClick={currentStep === 1 ? onBack : onPrev}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 hover:text-slate-900 transition-colors tracking-tight"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 hover:text-slate-900 transition-colors tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               <ChevronLeft className="w-5 h-5" />
               {currentStep === 1 ? 'İptal' : 'Geri'}
@@ -134,7 +135,7 @@ const ListingWizard = ({
                 <button
                   type="button"
                   onClick={onSaveDraft}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 transition-colors tracking-tight border border-slate-200"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 transition-colors tracking-tight border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <Save className="w-4 h-4" />
                   Taslak Olarak Kaydet
@@ -145,7 +146,7 @@ const ListingWizard = ({
                 <button
                   type="button"
                   onClick={(e) => { e.preventDefault(); onNext(); }}
-                  className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200/60 hover:shadow-xl font-bold tracking-tight"
+                  className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200/60 hover:shadow-xl font-semibold tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   İleri
                   <ChevronRight className="w-5 h-5" />
@@ -155,7 +156,7 @@ const ListingWizard = ({
                   type="button"
                   onClick={(e) => { e.preventDefault(); if (onSubmit) onSubmit(e); }}
                   disabled={isLoading || !canSubmit}
-                  className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200/60 hover:shadow-xl hover:shadow-indigo-300/60 font-bold tracking-tight"
+                  className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200/60 hover:shadow-xl font-semibold tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   {isLoading ? (
                     <>

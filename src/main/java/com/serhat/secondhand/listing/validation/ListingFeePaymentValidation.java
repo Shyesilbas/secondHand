@@ -17,24 +17,26 @@ public class ListingFeePaymentValidation {
 
     public Result<Void> validate(PaymentRequest request, Long userId) {
 
-        Listing listing = listingService.findById(request.listingId()).orElse(null);
+        Listing listing = listingService.findById(request.listingId())
+                .orElse(null);
+
         if (listing == null) {
-            return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
+            return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND);
         }
 
-        Result<Void> ownershipResult = listingService.validateOwnership(request.listingId(), userId);
-        if (ownershipResult.isError()) {
-            return Result.error(ownershipResult.getErrorCode(), ownershipResult.getMessage());
+        Result<Void> ownershipValidation = listingService.validateOwnership(
+                listing.getId(),
+                userId
+        );
+
+        if (ownershipValidation.isError()) {
+            return ownershipValidation;
         }
 
-        ListingStatus status = listing.getStatus();
-        if (status == ListingStatus.DRAFT) {
-            return Result.success("Listing fee paid successfully");
+        if (listing.getStatus() != ListingStatus.DRAFT) {
+            return Result.error(PaymentErrorCodes.LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS);
         }
-        else{
-            return Result.error(PaymentErrorCodes.LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS.toString(),
-                    "Listing fee payment is not allowed.");
-        }
+
+        return Result.success();
     }
-
 }

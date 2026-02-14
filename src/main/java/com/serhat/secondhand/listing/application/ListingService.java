@@ -15,6 +15,7 @@ import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
+import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.listing.realestate.RealEstateListingFilterService;
 import com.serhat.secondhand.listing.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,11 +42,14 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ListingService implements IListingService {
 
+    private static final int REVIEWS_PAGE_SIZE = 10;
+
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService enrichmentService;
     private final ListingConfig listingConfig;
     private final ListingViewService listingViewService;
+    private final IReviewService reviewService;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -58,6 +64,7 @@ public class ListingService implements IListingService {
             SportsListingFilterService sportsListingFilterService,
             ListingEnrichmentService enrichmentService,
             ListingViewService listingViewService,
+            IReviewService reviewService,
             ListingConfig listingConfig,
             ApplicationEventPublisher eventPublisher
     ) {
@@ -65,6 +72,7 @@ public class ListingService implements IListingService {
         this.listingMapper = listingMapper;
         this.enrichmentService = enrichmentService;
         this.listingViewService = listingViewService;
+        this.reviewService = reviewService;
         this.listingConfig = listingConfig;
         this.eventPublisher = eventPublisher;
 
@@ -89,7 +97,7 @@ public class ListingService implements IListingService {
             ListingDto dto = listingMapper.toDynamicDto(listing);
 
             CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
-                    enrichmentService.enrich(dto, userId));
+                    enrichmentService.enrichInPlace(dto, userId));
 
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
                 CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
@@ -99,6 +107,13 @@ public class ListingService implements IListingService {
                 dto.setViewStats(statsTask.join());
             } else {
                 enrichTask.join();
+            }
+
+            if (dto.getType() != null && dto.getType() != ListingType.VEHICLE && dto.getType() != ListingType.REAL_ESTATE) {
+                var reviewsResult = reviewService.getReviewsForListing(id.toString(), PageRequest.of(0, REVIEWS_PAGE_SIZE));
+                if (reviewsResult.isSuccess() && reviewsResult.getData() != null) {
+                    dto.setReviews(reviewsResult.getData().getContent());
+                }
             }
 
             return dto;

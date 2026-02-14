@@ -86,12 +86,12 @@ const CheckoutPaymentStep = ({
                             return (
                                 <label
                                     key={method.id}
-                                    className={`relative p-6 border-2 rounded-2xl cursor-pointer transition-all ${
+                                    className={`relative p-6 rounded-xl cursor-pointer transition-all ${
                                         isSelected
-                                            ? 'border-indigo-500 bg-indigo-50/50 shadow-sm'
+                                            ? 'ring-2 ring-indigo-600 ring-offset-2 scale-[1.02] bg-indigo-50/30 border border-indigo-200 shadow-md'
                                             : isDisabled
-                                                ? 'border-slate-100 bg-slate-50 cursor-not-allowed'
-                                                : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
+                                                ? 'bg-slate-50 border border-slate-200 cursor-not-allowed opacity-75'
+                                                : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
                                     }`}
                                 >
                                     <input
@@ -105,14 +105,14 @@ const CheckoutPaymentStep = ({
                                     />
                                     <div className="text-center">
                                         <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all ${
-                                            isSelected ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600'
+                                            isSelected ? 'bg-indigo-100' : 'bg-slate-100'
                                         }`}>
-                                            <Icon className="w-6 h-6" />
+                                            <Icon className={`w-6 h-6 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} />
                                         </div>
                                         <div className="font-semibold text-slate-900 tracking-tight">{method.name}</div>
                                         <div className="text-sm text-slate-500 mt-1 tracking-tight">{method.description}</div>
                                         {isDisabled && (
-                                            <div className="text-xs text-red-600 mt-2 font-semibold tracking-tight">Insufficient balance</div>
+                                            <div className="mt-2 p-2 bg-red-50 text-red-700 rounded-md text-xs font-semibold">Insufficient balance</div>
                                         )}
                                     </div>
                                 </label>
@@ -132,7 +132,7 @@ const CheckoutPaymentStep = ({
                                 <select
                                     value={selectedCardNumber || ''}
                                     onChange={(e) => setSelectedCardNumber(e.target.value)}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white tracking-tight"
+                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tracking-tight"
                                 >
                                     <option value="">Choose a card</option>
                                     {cards?.map((card, index) => (
@@ -157,7 +157,7 @@ const CheckoutPaymentStep = ({
                                 <select
                                     value={selectedBankAccountIban || ''}
                                     onChange={(e) => setSelectedBankAccountIban(e.target.value)}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white tracking-tight"
+                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tracking-tight"
                                 >
                                     <option value="">Choose an account</option>
                                     {bankAccounts?.map((account, index) => (
@@ -175,14 +175,14 @@ const CheckoutPaymentStep = ({
                     <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
                         <h4 className="text-lg font-semibold text-slate-900 mb-4 tracking-tight">E-Wallet Balance</h4>
                         <div className="flex items-center justify-between">
-                            <span className="text-slate-600 tracking-tight">Available Balance</span>
-                            <span className="text-lg font-semibold font-mono text-slate-900 tracking-tight">
+                            <span className="text-sm text-slate-600">Available Balance</span>
+                            <span className="text-base font-semibold tabular-nums text-slate-900">
                                 {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
                             </span>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                            <span className="text-slate-600 tracking-tight">Order Total</span>
-                            <span className="text-lg font-semibold font-mono text-slate-900 tracking-tight">
+                            <span className="text-sm text-slate-600">Order Total</span>
+                            <span className="text-base font-semibold tabular-nums text-slate-900">
                                 {formatCurrency(calculateTotal(), currency || 'TRY')}
                             </span>
                         </div>
@@ -215,7 +215,7 @@ const CheckoutPaymentStep = ({
                 <button
                     onClick={handleNext}
                     disabled={!canProceed()}
-                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-bold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed tracking-tight"
+                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-semibold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed tracking-tight"
                 >
                     Send Verification Code
                 </button>

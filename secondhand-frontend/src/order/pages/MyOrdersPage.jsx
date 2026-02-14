@@ -18,6 +18,7 @@ const MyOrdersPage = () => {
       enums={enums}
       viewMode="buyer"
       emptyText="No orders yet"
+      emptyAction={() => navigate(ROUTES.LISTINGS)}
     />
   );
 };

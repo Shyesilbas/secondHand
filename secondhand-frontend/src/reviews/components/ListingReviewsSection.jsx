@@ -1,102 +1,88 @@
-import { useListingReviews } from '../hooks/useListingReviews.js';
+import { useMemo } from 'react';
 import ReviewCard from './ReviewCard.jsx';
-import { StarIcon } from '@heroicons/react/24/solid';
+import { Star } from 'lucide-react';
 
-const ListingReviewsSection = ({ listingId, listing }) => {
+const STAR_LABELS = ['', 'one', 'two', 'three', 'four', 'five'];
+
+const ListingReviewsSection = ({ listing }) => {
   const stats = listing?.reviewStats || null;
-  const shouldFetchReviews = !stats || stats.totalReviews > 0;
-  
-  const { reviews, isLoading, error, hasReviews } = useListingReviews(listingId, { 
-    enabled: shouldFetchReviews 
-  });
+  const reviews = listing?.reviews ?? [];
+  const hasReviews = reviews.length > 0;
 
-  if (isLoading) {
-    return (
-      <div className="bg-card-bg rounded-card shadow-card-lg border border-card-border p-6">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const ratingBreakdown = useMemo(() => {
+    if (!stats || (stats.totalReviews ?? 0) === 0) return [];
+    const total = Number(stats.totalReviews) || 1;
+    return [5, 4, 3, 2, 1].map((rating) => {
+      const key = `${STAR_LABELS[rating]}StarReviews`;
+      const count = Number(stats[key] ?? 0) || 0;
+      return {
+        rating,
+        count,
+        percentage: total > 0 ? (count / total) * 100 : 0
+      };
+    });
+  }, [stats]);
 
-  if (error && !hasReviews) {
-    return (
-      <div className="bg-card-bg rounded-card shadow-card-lg border border-card-border p-6">
-        <h3 className="text-xl font-semibold text-card-text-primary mb-4">Product Reviews</h3>
-        <p className="text-card-text-muted text-sm">Unable to load reviews at this time.</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="bg-card-bg rounded-card shadow-card-lg border border-card-border p-6">
-      <h3 className="text-xl font-semibold text-card-text-primary mb-4">Product Reviews</h3>
-      
-      {stats && stats.totalReviews > 0 && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center gap-4 mb-3">
+    <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
+      <h3 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Ürün Yorumları</h3>
+
+      {stats && (stats.totalReviews ?? 0) > 0 && (
+        <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-slate-200/40">
+          <div className="flex flex-wrap items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-card-text-primary">
-                {stats.averageRating.toFixed(1)}
+              <span className="text-2xl font-bold text-slate-900">
+                {Number(stats.averageRating ?? 0).toFixed(1)}
               </span>
-              <div className="flex">
+              <div className="flex gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <StarIcon
+                  <Star
                     key={star}
                     className={`w-5 h-5 ${
-                      star <= Math.round(stats.averageRating)
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
+                      star <= Math.round(stats.averageRating ?? 0)
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'fill-transparent text-slate-200'
                     }`}
                   />
                 ))}
               </div>
             </div>
-            <span className="text-card-text-muted text-sm">
-              Based on {stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''}
+            <span className="text-slate-500 text-sm">
+              {stats.totalReviews} yorum
             </span>
           </div>
-          
-          {/* Rating breakdown */}
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map((rating) => {
-              const count = stats[`${['', 'one', 'two', 'three', 'four', 'five'][rating]}StarReviews`] || 0;
-              const percentage = stats.totalReviews > 0 ? (count / stats.totalReviews) * 100 : 0;
-              
-              return (
-                <div key={rating} className="flex items-center gap-2 text-sm">
-                  <span className="w-8 text-card-text-muted">{rating}★</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentage}%` }}
-                    ></div>
+
+          {ratingBreakdown.length > 0 && (
+            <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+              {ratingBreakdown.map(({ rating, count, percentage }) => (
+                <div key={rating} className="flex items-center gap-3 text-sm">
+                  <span className="w-6 text-slate-500 font-medium">{rating}</span>
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />
+                  <div className="flex-1 min-w-0 h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-400 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(percentage, 100)}%` }}
+                    />
                   </div>
-                  <span className="w-8 text-card-text-muted text-right">{count}</span>
+                  <span className="w-8 text-slate-500 text-right shrink-0">{count}</span>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {hasReviews ? (
-        <div className="space-y-4 max-h-96 overflow-y-auto">
+        <div className="space-y-4 max-h-[28rem] overflow-y-auto pr-1">
           {reviews.map((review) => (
             <ReviewCard key={review.id} review={review} compact />
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <div className="text-gray-400 mb-2">
-            <StarIcon className="w-12 h-12 mx-auto" />
-          </div>
-          <p className="text-card-text-muted">No reviews yet for this product</p>
+        <div className="text-center py-12">
+          <Star className="w-12 h-12 mx-auto text-slate-300 mb-3" strokeWidth={1} />
+          <p className="text-slate-500 text-sm">Bu ürün için henüz yorum yok</p>
         </div>
       )}
     </div>

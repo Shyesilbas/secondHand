@@ -3,6 +3,8 @@ package com.serhat.secondhand.core.result;
 import com.serhat.secondhand.core.exception.ErrorCode;
 import lombok.Getter;
 
+import java.util.function.Function;
+
 @Getter
 public class Result<T> {
     private final boolean success;
@@ -17,20 +19,17 @@ public class Result<T> {
         this.errorCode = errorCode;
     }
 
+
+    public static <T> Result<T> success() {
+        return new Result<>(true, null, null, null);
+    }
+
     public static <T> Result<T> success(T data) {
         return new Result<>(true, null, data, null);
     }
 
     public static <T> Result<T> success(T data, String message) {
         return new Result<>(true, message, data, null);
-    }
-
-    public static <T> Result<T> success() {
-        return new Result<>(true, null, null, null);
-    }
-
-    public static <T> Result<T> success(String message) {
-        return new Result<>(true, message, null, null);
     }
 
     public static <T> Result<T> error(String message) {
@@ -45,8 +44,24 @@ public class Result<T> {
         return new Result<>(false, errorCode.getMessage(), null, errorCode.getCode());
     }
 
+
     public boolean isError() {
         return !success;
+    }
+
+
+    public <R> Result<R> map(Function<? super T, ? extends R> mapper) {
+        if (isError()) {
+            return Result.error(this.message, this.errorCode);
+        }
+        return Result.success(mapper.apply(this.data));
+    }
+
+    public <R> Result<R> flatMap(Function<? super T, Result<R>> mapper) {
+        if (isError()) {
+            return Result.error(this.message, this.errorCode);
+        }
+        return mapper.apply(this.data);
     }
 
 }

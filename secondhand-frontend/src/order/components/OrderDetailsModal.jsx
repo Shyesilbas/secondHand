@@ -229,6 +229,7 @@ const OrderDetailsModal = React.memo(
     onOpenReceipt,
     viewMode = 'buyer',
     orderReviews = {},
+    reviewsLoading = false,
     onReviewSuccess,
   }) => {
     const isSellerView = viewMode === 'seller';
@@ -576,6 +577,8 @@ const OrderDetailsModal = React.memo(
                                 <ReviewButton
                                   orderItem={item}
                                   existingReview={orderReviews[item.id]}
+                                  reviewsLoading={reviewsLoading}
+                                  skipIndividualFetch
                                   onReviewCreated={onReviewSuccess}
                                   orderStatus={selectedOrder.status}
                                 />

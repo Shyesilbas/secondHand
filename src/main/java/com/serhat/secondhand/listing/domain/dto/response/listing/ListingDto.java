@@ -18,9 +18,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.serhat.secondhand.review.dto.ReviewDto;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -69,6 +72,7 @@ public abstract class ListingDto {
     
     private FavoriteStatsDto favoriteStats;
     private ReviewStatsDto reviewStats;
+    private List<ReviewDto> reviews;
     private ListingViewStatsDto viewStats;
 
     private BigDecimal campaignPrice;
