@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X, Globe, Lock, List } from 'lucide-react';
-import { useCreateFavoriteList, useUpdateFavoriteList } from '../hooks/useFavoriteLists.js';
+import {useEffect, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {Globe, List, Lock, X} from 'lucide-react';
+import {useCreateFavoriteList, useUpdateFavoriteList} from '../hooks/useFavoriteLists.js';
 
 const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -67,7 +67,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                                 <List className="w-6 h-6 text-white" />
                             </div>
                             <h2 className="text-xl font-bold text-white">
-                                {editList ? 'Listeyi Düzenle' : 'Yeni Liste Oluştur'}
+                                {editList ? 'Edit List' : 'Create New List'}
                             </h2>
                         </div>
                         <button
@@ -83,13 +83,13 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Liste Adı
+                            List Name
                         </label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Örn: Ev Dekorasyonu"
+                            placeholder="e.g. Home Decoration"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
                             maxLength={100}
                             required
@@ -99,12 +99,12 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Açıklama (Opsiyonel)
+                            Description (Optional)
                         </label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="Liste hakkında kısa bir açıklama..."
+                            placeholder="A short description about the list..."
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none outline-none"
                             rows={3}
                             maxLength={500}
@@ -113,7 +113,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-3">
-                            Gizlilik
+                            Privacy
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             <button
@@ -126,7 +126,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                                 }`}
                             >
                                 <Lock className="w-4 h-4" />
-                                <span className="font-medium">Gizli</span>
+                                <span className="font-medium">Private</span>
                             </button>
                             <button
                                 type="button"
@@ -138,13 +138,13 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                                 }`}
                             >
                                 <Globe className="w-4 h-4" />
-                                <span className="font-medium">Herkese Açık</span>
+                                <span className="font-medium">Public</span>
                             </button>
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
                             {formData.isPublic 
-                                ? 'Herkes bu listeyi görebilir ve beğenebilir'
-                                : 'Sadece sen bu listeyi görebilirsin'}
+                                ? 'Everyone can view and like this list'
+                                : 'Only you can view this list'}
                         </p>
                     </div>
 
@@ -154,14 +154,14 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                             onClick={onClose}
                             className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                         >
-                            İptal
+                            Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading || !formData.name.trim()}
                             className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isLoading ? 'Kaydediliyor...' : (editList ? 'Güncelle' : 'Oluştur')}
+                            {isLoading ? 'Saving...' : (editList ? 'Update' : 'Create')}
                         </button>
                     </div>
                 </form>
@@ -190,4 +190,3 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
 };
 
 export default FavoriteListModal;
-

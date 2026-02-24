@@ -2,28 +2,28 @@ package com.serhat.secondhand.auth.api;
 
 import com.serhat.secondhand.auth.application.IAuthService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
-import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
+import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
-import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.serhat.secondhand.core.security.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,12 +38,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request for email: {}", request.getEmail());
-        Result<RegisterResponse> result = authService.register(request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(authService.register(request));
     }
 
     @PostMapping("/login")
@@ -96,7 +91,7 @@ public class AuthController {
         log.info("Token refresh request");
 
         String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found in cookies"));
+                .orElseThrow(() -> new BusinessException("Refresh token not found in cookies", HttpStatus.UNAUTHORIZED, "REFRESH_TOKEN_MISSING"));
 
         LoginResponse response = authService.refreshToken(refreshToken);
 

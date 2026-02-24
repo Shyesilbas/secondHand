@@ -1,11 +1,7 @@
 package com.serhat.secondhand.order.api;
 
-import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.order.dto.CheckoutRequest;
-import com.serhat.secondhand.order.dto.OrderCancelRequest;
-import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.order.dto.OrderRefundRequest;
-import com.serhat.secondhand.order.dto.UpdateOrderNameRequest;
+import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.order.service.*;
 import com.serhat.secondhand.payment.service.CheckoutService;
 import com.serhat.secondhand.review.service.IReviewService;
@@ -21,13 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -57,12 +50,7 @@ public class OrderController {
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to checkout for user: {}", currentUser.getEmail());
-        Result<OrderDto> result = checkoutService.checkout(currentUser.getId(), request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(checkoutService.checkout(currentUser.getId(), request));
     }
 
     @GetMapping
@@ -101,12 +89,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get seller order by ID: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderQueryService.getSellerOrderById(orderId, currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderQueryService.getSellerOrderById(orderId, currentUser.getId()));
     }
 
     @GetMapping("/seller/pending-escrow-amount")
@@ -134,12 +117,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get order by ID: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderQueryService.getOrderById(orderId, currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderQueryService.getOrderById(orderId, currentUser.getId()));
     }
 
     @GetMapping("/pending-completion")
@@ -160,12 +138,7 @@ public class OrderController {
             @PathVariable Long orderItemId,
             @AuthenticationPrincipal User currentUser) {
         log.info("Getting review for order item: {} by user: {}", orderItemId, currentUser.getId());
-        var result = reviewService.getReviewByOrderItem(orderItemId, currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getReviewByOrderItem(orderItemId, currentUser.getId()));
     }
 
     @PutMapping("/{orderId}/cancel")
@@ -181,12 +154,7 @@ public class OrderController {
             @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to cancel order: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderCancellationService.cancelOrder(orderId, request, currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderCancellationService.cancelOrder(orderId, request, currentUser));
     }
 
     @PostMapping("/{orderId}/refund")
@@ -202,12 +170,7 @@ public class OrderController {
             @Valid @RequestBody OrderRefundRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to refund order: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderRefundService.refundOrder(orderId, request, currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderRefundService.refundOrder(orderId, request, currentUser));
     }
 
     @PutMapping("/{orderId}/complete")
@@ -222,12 +185,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to complete order: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderCompletionService.completeOrder(orderId, currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderCompletionService.completeOrder(orderId, currentUser));
     }
 
     @PutMapping("/{orderId}/name")
@@ -243,11 +201,6 @@ public class OrderController {
             @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
-        Result<OrderDto> result = orderNameService.updateOrderName(orderId, request.getName(), currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(orderNameService.updateOrderName(orderId, request.getName(), currentUser));
     }
 }

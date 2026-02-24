@@ -1,5 +1,6 @@
 package com.serhat.secondhand.follow.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
 import com.serhat.secondhand.follow.dto.SellerFollowDto;
 import com.serhat.secondhand.follow.service.SellerFollowService;
@@ -23,36 +24,21 @@ public class SellerFollowController {
     public ResponseEntity<?> follow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        var result = sellerFollowService.follow(currentUser, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(sellerFollowService.follow(currentUser, userId));
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> unfollow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        var result = sellerFollowService.unfollow(currentUser, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(sellerFollowService.unfollow(currentUser, userId));
     }
 
     @PatchMapping("/{userId}/notifications")
     public ResponseEntity<?> toggleNotifications(
             @AuthenticationPrincipal User currentUser,
             @PathVariable Long userId) {
-        var result = sellerFollowService.toggleNotifications(currentUser, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(sellerFollowService.toggleNotifications(currentUser, userId));
     }
 
     @GetMapping("/following")

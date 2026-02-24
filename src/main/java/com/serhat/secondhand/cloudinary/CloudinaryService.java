@@ -2,8 +2,10 @@ package com.serhat.secondhand.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,10 +53,10 @@ public class CloudinaryService {
 
         } catch (IOException e) {
             log.error("IO error uploading image to Cloudinary: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload image. Please check your file and try again.", e);
+            throw new BusinessException("Failed to upload image. Please check your file and try again.", HttpStatus.BAD_REQUEST, "IMAGE_UPLOAD_FAILED");
         } catch (Exception e) {
             log.error("Unexpected error during image upload to Cloudinary: {}", e.getMessage(), e);
-            throw new RuntimeException("An unexpected error occurred while uploading the image. Please try again later.", e);
+            throw new BusinessException("An unexpected error occurred while uploading the image. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE_UPLOAD_UNEXPECTED_ERROR");
         }
     }
 

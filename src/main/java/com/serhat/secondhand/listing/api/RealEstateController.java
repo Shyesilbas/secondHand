@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +42,7 @@ public class RealEstateController {
         var result = realEstateListingService.createRealEstateListing(request, currentUser.getId());
 
         if (result.isError()) {
-            return buildErrorResponse(result);
+            return ResultResponses.ok(result);
         }
 
         URI location = URI.create("/api/v1/realEstates/" + result.getData());
@@ -67,12 +66,7 @@ public class RealEstateController {
 
         log.info("Request to update real estate listing: {} by user: {}", id, currentUser.getId());
 
-        var result = realEstateListingService.updateRealEstateListing(id, request, currentUser.getId());
-
-        if (result.isError()) {
-            return buildErrorResponse(result);
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(realEstateListingService.updateRealEstateListing(id, request, currentUser.getId()));
     }
 
     @GetMapping("/{id}")
@@ -80,13 +74,5 @@ public class RealEstateController {
     public ResponseEntity<RealEstateListingDto> getRealEstateDetails(@PathVariable UUID id) {
         RealEstateListingDto realEstateListingDto = realEstateListingService.getRealEstateDetails(id);
         return ResponseEntity.ok(realEstateListingDto);
-    }
-
-    private ResponseEntity<?> buildErrorResponse(Result<?> result) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "message", result.getMessage() != null ? result.getMessage() : "Unexpected error",
-                        "error", result.getErrorCode() != null ? result.getErrorCode() : "ERROR"
-                ));
     }
 }

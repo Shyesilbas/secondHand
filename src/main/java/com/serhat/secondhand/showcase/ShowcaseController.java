@@ -1,6 +1,6 @@
 package com.serhat.secondhand.showcase;
 
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
@@ -14,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +36,7 @@ public class ShowcaseController {
         var result = showcaseService.createShowcase(currentUser.getId(), request);
 
         if (result.isError()) {
-            return buildErrorResponse(result);
+            return ResultResponses.ok(result);
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -59,39 +58,18 @@ public class ShowcaseController {
             @PathVariable UUID id,
             @RequestParam int days,
             @AuthenticationPrincipal User user) {
-
-        var result = showcaseService.extendShowcase(id, days);
-
-        if (result.isError()) {
-            return buildErrorResponse(result);
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(showcaseService.extendShowcase(id, days));
     }
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<?> cancelShowcase(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {
-
-        var result = showcaseService.cancelShowcase(id);
-
-        if (result.isError()) {
-            return buildErrorResponse(result);
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(showcaseService.cancelShowcase(id));
     }
 
     @GetMapping("/pricing-config")
     public ResponseEntity<ShowcasePricingDto> getShowcasePricingConfig() {
         return ResponseEntity.ok(showcaseService.getShowcasePricingConfig());
-    }
-
-
-    private ResponseEntity<?> buildErrorResponse(Result<?> result) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "error", result.getErrorCode() != null ? result.getErrorCode() : "ERROR",
-                        "message", result.getMessage() != null ? result.getMessage() : "An unexpected error occurred"
-                ));
     }
 }

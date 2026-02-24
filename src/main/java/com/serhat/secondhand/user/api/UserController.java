@@ -4,6 +4,7 @@ import com.serhat.secondhand.complaint.ComplaintDto;
 import com.serhat.secondhand.complaint.IComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -57,12 +58,7 @@ public class UserController {
     @PostMapping("/verification/send")
     public ResponseEntity<?> sendVerificationCode(Authentication authentication) {
         log.info("Sending verification code for user: {}", authentication.getName());
-        var result = verificationService.sendAccountVerificationCode(authentication);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(verificationService.sendAccountVerificationCode(authentication));
     }
 
 
@@ -71,12 +67,7 @@ public class UserController {
             @Valid @RequestBody VerificationRequest request,
             Authentication authentication) {
         log.info("Verifying user account for: {}", authentication.getName());
-        var result = verificationService.verifyUser(request, authentication);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(verificationService.verifyUser(request, authentication));
     }
 
     @GetMapping("/me/reviews/received")
@@ -84,12 +75,7 @@ public class UserController {
             @PageableDefault(size = 10) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
         log.info("Getting reviews received by current user: {}", currentUser.getId());
-        var result = reviewService.getReviewsForUser(currentUser.getId(), pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getReviewsForUser(currentUser.getId(), pageable));
     }
 
     @GetMapping("/me/complaints")
@@ -120,34 +106,19 @@ public class UserController {
     public ResponseEntity<?> getReviewsReceivedByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
-        var result = reviewService.getReviewsForUser(userId, pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getReviewsForUser(userId, pageable));
     }
 
     @GetMapping("/{userId}/reviews/written")
     public ResponseEntity<?> getReviewsWrittenByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
-        var result = reviewService.getReviewsByUser(userId, pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getReviewsByUser(userId, pageable));
     }
 
     @GetMapping("/{userId}/review-stats")
     public ResponseEntity<?> getUserReviewStats(@PathVariable Long userId) {
-        var result = reviewService.getUserReviewStats(userId);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getUserReviewStats(userId));
     }
 
     @GetMapping("/{userId}/listings")
@@ -160,12 +131,7 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        var result = userService.getById(id);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(userService.getById(id));
     }
 
 
@@ -174,12 +140,7 @@ public class UserController {
             @Valid @RequestBody UpdateEmailRequest request,
             Authentication authentication) {
         log.info("Updating email for user: {}", authentication.getName());
-        var result = userService.updateEmail(request, authentication);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(userService.updateEmail(request, authentication));
     }
 
 
@@ -188,12 +149,7 @@ public class UserController {
             @Valid @RequestBody UpdatePhoneRequest request,
             Authentication authentication) {
         log.info("Updating phone for user: {}", authentication.getName());
-        var result = userService.updatePhone(request, authentication);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(userService.updatePhone(request, authentication));
     }
 
     @GetMapping("/search")

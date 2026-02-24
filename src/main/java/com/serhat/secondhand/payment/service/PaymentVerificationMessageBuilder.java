@@ -3,6 +3,7 @@ package com.serhat.secondhand.payment.service;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.offer.entity.Offer;
@@ -62,7 +63,7 @@ public class PaymentVerificationMessageBuilder {
         if (req != null && req.getOfferId() != null) {
             Result<Offer> offerResult = offerService.getAcceptedOfferForCheckout(user.getId(), req.getOfferId());
             if (offerResult.isError()) {
-                throw new RuntimeException(offerResult.getMessage());
+                throw new BusinessException(offerResult.getMessage(), org.springframework.http.HttpStatus.BAD_REQUEST, offerResult.getErrorCode());
             }
             acceptedOffer = offerResult.getData();
             effectiveCartItems = new ArrayList<>();

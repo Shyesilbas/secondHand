@@ -1,5 +1,6 @@
 package com.serhat.secondhand.email.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.dto.EmailDto;
@@ -55,12 +56,7 @@ public class EmailController {
 
     @DeleteMapping("/{emailId}")
     public ResponseEntity<?> delete(@PathVariable UUID emailId) {
-        var result = emailService.deleteEmail(emailId);
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(emailService.deleteEmail(emailId));
     }
 
     @DeleteMapping

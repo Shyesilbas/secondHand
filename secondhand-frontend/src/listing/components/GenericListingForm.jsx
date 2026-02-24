@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEnums } from '../../common/hooks/useEnums.js';
-import { useFormState } from '../../common/forms/hooks/useFormState.js';
-import { useFormSubmission } from '../../common/forms/hooks/useFormSubmission.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import React, {useEffect, useMemo} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import {useFormState} from '../../common/forms/hooks/useFormState.js';
+import {useFormSubmission} from '../../common/forms/hooks/useFormSubmission.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 import ListingWizard from './ListingWizard.jsx';
 import ListingBasics from '../../common/components/forms/ListingBasics.jsx';
 import LocationFields from '../../common/components/forms/LocationFields.jsx';
 import ImageUpload from '../../common/components/ImageUpload.jsx';
 import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
-import { getListingConfig } from '../config/listingConfig.js';
+import {getListingConfig} from '../config/listingConfig.js';
 
 const resolveEnumName = (enums, enumKey, idOrValue) => {
   const list = enums?.[enumKey] || [];
@@ -387,7 +387,7 @@ const GenericListingForm = ({
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           <div className="flex items-start justify-between gap-6">
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-slate-500 tracking-tight">İlan tipi</div>
+              <div className="text-xs font-semibold text-slate-500 tracking-tight">Listing Type</div>
               <div className="mt-1 text-lg font-bold text-slate-900 tracking-tight">{typeLabel}</div>
               {formData?.description ? (
                 <div className="mt-3 text-sm text-slate-700 tracking-tight whitespace-pre-wrap">
@@ -404,7 +404,7 @@ const GenericListingForm = ({
         </div>
 
         {basics.length ? (
-          <SectionCard title="Temel Bilgiler">
+          <SectionCard title="Basic Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {basics.map((row) => (
                 <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
@@ -417,7 +417,7 @@ const GenericListingForm = ({
         ) : null}
 
         {location.length ? (
-          <SectionCard title="Konum">
+          <SectionCard title="Location">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {location.map((row) => (
                 <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
@@ -430,7 +430,7 @@ const GenericListingForm = ({
         ) : null}
 
         {detailFields.length ? (
-          <SectionCard title="Detaylar">
+          <SectionCard title="Details">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {detailFields.map((row) => (
                 <div key={`${row.label}:${row.value}`} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">

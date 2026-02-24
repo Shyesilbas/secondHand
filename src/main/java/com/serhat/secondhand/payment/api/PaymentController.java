@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.payment.dto.*;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.service.IPaymentVerificationService;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +51,7 @@ public class PaymentController {
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
         Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), finalRequest);
 
-        return handleResult(result, HttpStatus.CREATED);
+        return ResultResponses.created(result);
     }
 
     @PostMapping("/initiate-verification")
@@ -77,7 +77,7 @@ public class PaymentController {
         PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(listingFeePaymentRequest, idempotencyKey);
         Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), finalRequest);
 
-        return handleResult(result, HttpStatus.CREATED);
+        return ResultResponses.created(result);
     }
 
     @GetMapping("/my-payments")
@@ -109,13 +109,5 @@ public class PaymentController {
     @Operation(summary = "Get fee configuration", description = "Retrieves the current listing fee settings.")
     public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
         return ResponseEntity.ok(listingFeeService.getListingFeeConfig());
-    }
-
-    private ResponseEntity<?> handleResult(Result<?> result, HttpStatus successStatus) {
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.status(successStatus).body(result.getData());
     }
 }

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.notification.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.notification.dto.NotificationDto;
 import com.serhat.secondhand.notification.service.INotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -65,12 +66,7 @@ public class NotificationController {
     public ResponseEntity<?> markAsRead(@PathVariable UUID id,
                                           @AuthenticationPrincipal User currentUser) {
         log.info("API request to mark notification {} as read for user: {}", id, currentUser.getEmail());
-        var result = notificationService.markAsRead(id, currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(notificationService.markAsRead(id, currentUser.getId()));
     }
 
     @PutMapping("/read-all")

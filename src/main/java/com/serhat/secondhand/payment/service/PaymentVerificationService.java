@@ -1,8 +1,9 @@
 package com.serhat.secondhand.payment.service;
 
+import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
@@ -25,7 +26,7 @@ public class PaymentVerificationService implements IPaymentVerificationService{
     public void initiatePaymentVerification(Long userId, InitiateVerificationRequest req) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
-            throw new RuntimeException(userResult.getMessage());
+            throw new BusinessException(userResult.getMessage(), org.springframework.http.HttpStatus.NOT_FOUND, "USER_NOT_FOUND");
         }
         User user = userResult.getData();
 

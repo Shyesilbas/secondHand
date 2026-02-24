@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.core.config.VerificationConfig;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
@@ -46,7 +47,7 @@ public class PaymentNotificationService {
             log.info("Payment verification notification sent successfully to user: {}", user.getEmail());
         } catch (Exception e) {
             log.error("Failed to send payment verification notification to user {}: {}", user.getEmail(), e.getMessage(), e);
-            throw new RuntimeException("Failed to send payment verification email: " + e.getMessage(), e);
+            throw new BusinessException("Failed to send payment verification email: " + e.getMessage(), org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "PAYMENT_VERIFICATION_EMAIL_FAILED");
         }
     }
 }

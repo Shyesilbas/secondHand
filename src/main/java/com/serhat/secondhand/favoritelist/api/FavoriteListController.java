@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favoritelist.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
 import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
 import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -38,12 +38,7 @@ public class FavoriteListController {
     public ResponseEntity<?> createList(
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody CreateFavoriteListRequest request) {
-        var result = favoriteListService.createList(currentUser.getId(), request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
+        return ResultResponses.created(favoriteListService.createList(currentUser.getId(), request));
     }
 
     @GetMapping("/my")
@@ -83,12 +78,7 @@ public class FavoriteListController {
     public ResponseEntity<?> getListById(
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser) {
-        var result = favoriteListService.getListById(listId, currentUser);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteListService.getListById(listId, currentUser));
     }
 
     @PutMapping("/{listId}")
@@ -97,12 +87,7 @@ public class FavoriteListController {
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateFavoriteListRequest request) {
-        var result = favoriteListService.updateList(currentUser.getId(), listId, request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteListService.updateList(currentUser.getId(), listId, request));
     }
 
     @DeleteMapping("/{listId}")
@@ -110,12 +95,7 @@ public class FavoriteListController {
     public ResponseEntity<?> deleteList(
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser) {
-        var result = favoriteListService.deleteList(currentUser.getId(), listId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(favoriteListService.deleteList(currentUser.getId(), listId));
     }
 
     @PostMapping("/{listId}/items")
@@ -124,12 +104,7 @@ public class FavoriteListController {
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody AddToListRequest request) {
-        var result = favoriteListService.addItemToList(currentUser.getId(), listId, request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(result.getData());
+        return ResultResponses.created(favoriteListService.addItemToList(currentUser.getId(), listId, request));
     }
 
     @DeleteMapping("/{listId}/items/{listingId}")
@@ -138,12 +113,7 @@ public class FavoriteListController {
             @PathVariable Long listId,
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-        var result = favoriteListService.removeItemFromList(currentUser.getId(), listId, listingId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(favoriteListService.removeItemFromList(currentUser.getId(), listId, listingId));
     }
 
     @PostMapping("/{listId}/like")
@@ -151,12 +121,7 @@ public class FavoriteListController {
     public ResponseEntity<?> likeList(
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser) {
-        var result = favoriteListService.likeList(currentUser.getId(), listId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(favoriteListService.likeList(currentUser.getId(), listId));
     }
 
     @DeleteMapping("/{listId}/like")
@@ -164,12 +129,7 @@ public class FavoriteListController {
     public ResponseEntity<?> unlikeList(
             @PathVariable Long listId,
             @AuthenticationPrincipal User currentUser) {
-        var result = favoriteListService.unlikeList(currentUser.getId(), listId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(favoriteListService.unlikeList(currentUser.getId(), listId));
     }
 
     @GetMapping("/listing/{listingId}/lists")
@@ -181,4 +141,3 @@ public class FavoriteListController {
         return ResponseEntity.ok(Map.of("listIds", listIds));
     }
 }
-

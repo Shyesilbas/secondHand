@@ -5,6 +5,7 @@ import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.util.AgreementErrorCodes;
 import com.serhat.secondhand.core.config.AgreementConfig;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,12 +78,12 @@ public class AgreementService {
 
     public Agreement getAgreementByType(AgreementType agreementType) {
         return agreementRepository.findByAgreementType(agreementType)
-                .orElseThrow(() -> new RuntimeException(AgreementErrorCodes.AGREEMENT_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new BusinessException(AgreementErrorCodes.AGREEMENT_NOT_FOUND));
     }
 
     public Agreement getAgreementById(UUID agreementId) {
         return agreementRepository.findById(agreementId)
-                .orElseThrow(() -> new RuntimeException(AgreementErrorCodes.AGREEMENT_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new BusinessException(AgreementErrorCodes.AGREEMENT_NOT_FOUND));
     }
 
     public List<Agreement> getAllAgreements() {

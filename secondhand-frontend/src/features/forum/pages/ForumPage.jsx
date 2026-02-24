@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Heart, Plus, Search, Settings2 } from 'lucide-react';
-import { useForum } from '../hooks/useForum.js';
-import { ThreadCard, ThreadCardSkeleton } from '../components/ThreadCard.jsx';
-import { ThreadDetail, ThreadDetailSkeleton } from '../components/ThreadDetail.jsx';
-import { ThreadComposerModal } from '../components/ThreadComposerModal.jsx';
-import { ForumVisibilitySettingsModal } from '../components/ForumVisibilitySettingsModal.jsx';
-import { useAuthState } from '../../../auth/AuthContext.jsx';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Heart, Plus, Search, Settings2} from 'lucide-react';
+import {useForum} from '../hooks/useForum.js';
+import {ThreadCard, ThreadCardSkeleton} from '../components/ThreadCard.jsx';
+import {ThreadDetail, ThreadDetailSkeleton} from '../components/ThreadDetail.jsx';
+import {ThreadComposerModal} from '../components/ThreadComposerModal.jsx';
+import {ForumVisibilitySettingsModal} from '../components/ForumVisibilitySettingsModal.jsx';
+import {useAuthState} from '../../../auth/AuthContext.jsx';
 
 const categories = [
-  { id: 'SUGGESTIONS', label: 'Öneriler' },
-  { id: 'COMPLAINTS', label: 'Şikayetler' },
+  { id: 'SUGGESTIONS', label: 'Suggestions' },
+  { id: 'COMPLAINTS', label: 'Complaints' },
 ];
 
 const sorts = [
-  { id: 'NEW', label: 'En yeni' },
-  { id: 'TOP', label: 'En çok oy alan' },
+  { id: 'NEW', label: 'Newest' },
+  { id: 'TOP', label: 'Top Voted' },
 ];
 
 const ForumPage = () => {
@@ -99,7 +99,7 @@ const ForumPage = () => {
                     className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold tracking-tight border transition-colors ${listTab === 'LIKED' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
                   >
                     <Heart className="w-4 h-4" />
-                    Beğendiklerim
+                    Liked
                   </button>
                 )}
               </div>
@@ -208,5 +208,4 @@ const ForumPage = () => {
 };
 
 export default ForumPage;
-
 
