@@ -1,5 +1,4 @@
-
-import { LISTING_TYPES } from '../types/index.js';
+import {LISTING_TYPES} from '../types/index.js';
 
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 
@@ -10,19 +9,18 @@ import ClothingCreateForm from '../../clothing/components/ClothingCreateForm.jsx
 import BooksCreateForm from '../../books/components/BooksCreateForm.jsx';
 import SportsCreateForm from '../../sports/components/SportsCreateForm.jsx';
 
-import { vehicleService } from '../../vehicle/services/vehicleService.js';
-import { electronicService } from '../../electronics/electronics/services/electronicService.js';
-import { realEstateService } from '../../realEstate/services/realEstateService.js';
-import { clothingService } from '../../clothing/services/clothingService.js';
-import { booksService } from '../../books/services/booksService.js';
-import { sportsService } from '../../sports/services/sportsService.js';
+import {vehicleService} from '../../vehicle/services/vehicleService.js';
+import {electronicService} from '../../electronics/electronics/services/electronicService.js';
+import {realEstateService} from '../../realEstate/services/realEstateService.js';
+import {clothingService} from '../../clothing/services/clothingService.js';
+import {booksService} from '../../books/services/booksService.js';
+import {sportsService} from '../../sports/services/sportsService.js';
 
-import { VehicleCreateRequestDTO } from '../../vehicle/vehicles.js';
-import { ElectronicCreateRequestDTO } from '../../electronics/electronics.js';
-import { RealEstateCreateRequestDTO } from '../../realEstate/realEstates.js';
+import {VehicleCreateRequestDTO} from '../../vehicle/vehicles.js';
+import {ElectronicCreateRequestDTO} from '../../electronics/electronics.js';
+import {RealEstateCreateRequestDTO} from '../../realEstate/realEstates.js';
 
-import { filterConfigs } from '../components/filters/filterConfigs.js';
-import FilterRenderer from '../components/filters/FilterRenderer.jsx';
+import {filterConfigs} from '../components/filters/filterConfigs.js';
 
 export const listingTypeConfig = {
   [LISTING_TYPES.VEHICLE]: {
@@ -129,12 +127,12 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'vehicle-basic',
-              title: 'Temel Bilgiler',
-              description: 'Araç markası, model ve temel özellikler',
+              title: 'Basic Information',
+              description: 'Brand, model and basic features of the vehicle',
               fields: [
                 {
                   name: 'vehicleTypeId',
-                  label: 'Araç Tipi',
+                  label: 'Vehicle Type',
                   type: 'enum',
                   enumKey: 'vehicleTypes',
                   required: true,
@@ -146,7 +144,7 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'brandId',
-                  label: 'Marka',
+                  label: 'Brand',
                   type: 'enum',
                   enumKey: 'carBrands',
                   required: true,
@@ -207,7 +205,7 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'year',
-                  label: 'Yıl',
+                  label: 'Year',
                   type: 'number',
                   required: true,
                   min: 1950,
@@ -215,7 +213,7 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'fuelType',
-                  label: 'Yakıt Tipi',
+                  label: 'Fuel Type',
                   type: 'enum',
                   enumKey: 'fuelTypes',
                   required: true,
@@ -223,20 +221,20 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'color',
-                  label: 'Renk',
+                  label: 'Color',
                   type: 'enum',
                   enumKey: 'colors',
                 },
                 {
                   name: 'doors',
-                  label: 'Kapı Sayısı',
+                  label: 'Door Count',
                   type: 'enum',
                   enumKey: 'doors',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'gearbox',
-                  label: 'Vites',
+                  label: 'Gearbox',
                   type: 'enum',
                   enumKey: 'gearTypes',
                   required: true,
@@ -244,21 +242,21 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'seatCount',
-                  label: 'Koltuk Sayısı',
+                  label: 'Seat Count',
                   type: 'enum',
                   enumKey: 'seatCounts',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'drivetrain',
-                  label: 'Çekiş',
+                  label: 'Drivetrain',
                   type: 'enum',
                   enumKey: 'drivetrains',
                   visibleWhen: (ctx) => String(ctx.formData?._vehicleTypeName || '').toUpperCase() === 'CAR',
                 },
                 {
                   name: 'bodyType',
-                  label: 'Kasa Tipi',
+                  label: 'Body Type',
                   type: 'enum',
                   enumKey: 'bodyTypes',
                   required: true,
@@ -268,48 +266,48 @@ export const listingTypeConfig = {
             },
             {
               id: 'vehicle-tech',
-              title: 'Teknik Özellikler',
-              description: 'Motor, performans ve diğer teknik detaylar',
+              title: 'Technical Specifications',
+              description: 'Engine, performance and other technical details',
               fields: [
                 {
                   name: 'mileage',
-                  label: 'Kilometre (km)',
+                  label: 'Kilometer (km)',
                   type: 'number',
                   visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'SCOOTER', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'engineCapacity',
-                  label: 'Motor Hacmi (cc)',
+                  label: 'Engine Capacity (cc)',
                   type: 'number',
                   requiredWhen: (ctx) => ['MOTORCYCLE', 'SCOOTER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                   visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'SCOOTER', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'horsePower',
-                  label: 'Beygir Gücü',
+                  label: 'Horse Power',
                   type: 'number',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'wheels',
-                  label: 'Jant Boyutu (inch)',
+                  label: 'Wheel Size (inch)',
                   type: 'number',
                 },
                 {
                   name: 'fuelCapacity',
-                  label: 'Yakıt Kapasitesi (L)',
+                  label: 'Fuel Capacity (L)',
                   type: 'number',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'fuelConsumption',
-                  label: 'Yakıt Tüketimi (L/100km)',
+                  label: 'Fuel Consumption (L/100km)',
                   type: 'number',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
                 {
                   name: 'inspectionValidUntil',
-                  label: 'Muayene Geçerlilik Tarihi',
+                  label: 'Inspection Valid Until',
                   type: 'date',
                   visibleWhen: (ctx) => ['CAR', 'TRUCK', 'VAN', 'OTHER'].includes(String(ctx.formData?._vehicleTypeName || '').toUpperCase()),
                 },
@@ -317,27 +315,27 @@ export const listingTypeConfig = {
             },
             {
               id: 'vehicle-extras',
-              title: 'Ek Bilgiler',
-              description: 'Kaza geçmişi ve takas durumu',
+              title: 'Additional Information',
+              description: 'Accident history and swap status',
               fields: [
                 {
                   name: 'accidentHistory',
-                  label: 'Bu aracın kaza geçmişi var',
+                  label: 'This vehicle has accident history',
                   type: 'toggle',
                 },
                 {
                   name: 'accidentDetails',
-                  label: 'Kaza Detayları',
+                  label: 'Accident Details',
                   type: 'textarea',
                   rows: 3,
-                  placeholder: 'Kaza veya hasar detaylarını açıklayın...',
+                  placeholder: 'Describe the accident or damage details...',
                   fullWidth: true,
                   visibleWhen: (ctx) => Boolean(ctx.formData?.accidentHistory),
                 },
                 {
                   name: 'swap',
-                  label: 'Takasa Açık',
-                  description: 'Takas yapmaya istekliyseniz işaretleyin',
+                  label: 'Open To Swap',
+                  description: 'Check if you are willing to swap',
                   type: 'toggle',
                 },
               ],
@@ -539,12 +537,12 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'electronics-basic',
-              title: 'Temel Bilgiler',
-              description: 'Ürün tipi, marka ve model bilgileri',
+              title: 'Basic Information',
+              description: 'Product type, brand and model information',
               fields: [
                 {
                   name: 'electronicTypeId',
-                  label: 'Tip',
+                  label: 'Type',
                   type: 'enum',
                   enumKey: 'electronicTypes',
                   required: true,
@@ -555,7 +553,7 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'electronicBrandId',
-                  label: 'Marka',
+                  label: 'Brand',
                   type: 'enum',
                   enumKey: 'electronicBrands',
                   required: true,
@@ -584,13 +582,13 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'origin',
-                  label: 'Menşei',
+                  label: 'Origin',
                   type: 'text',
                   placeholder: 'e.g. Apple Store TR',
                 },
                 {
                   name: 'year',
-                  label: 'Yıl',
+                  label: 'Year',
                   type: 'number',
                   required: true,
                   min: 1990,
@@ -599,7 +597,7 @@ export const listingTypeConfig = {
                 },
                 {
                   name: 'color',
-                  label: 'Renk',
+                  label: 'Color',
                   type: 'enum',
                   enumKey: 'colors',
                   required: true,
@@ -608,44 +606,44 @@ export const listingTypeConfig = {
             },
             {
               id: 'electronics-laptop',
-              title: 'Teknik Özellikler',
-              description: 'RAM, depolama ve ekran bilgileri',
+              title: 'Technical Specifications',
+              description: 'RAM, storage and screen information',
               visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'LAPTOP',
               fields: [
                 { name: 'ram', label: 'RAM (GB)', type: 'number', required: true, min: 1, placeholder: '8, 16, 32...' },
-                { name: 'storage', label: 'Depolama (GB)', type: 'number', required: true, min: 1, placeholder: '256, 512, 1024...' },
-                { name: 'storageType', label: 'Depolama Tipi', type: 'enum', enumKey: 'storageTypes', required: true },
-                { name: 'screenSize', label: 'Ekran Boyutu (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '13.3, 15.6...' },
-                { name: 'processor', label: 'İşlemci', type: 'enum', enumKey: 'processors' },
-                { name: 'gpuModel', label: 'Ekran Kartı', type: 'text', placeholder: 'e.g. RTX 3060, M2 10-core' },
-                { name: 'operatingSystem', label: 'İşletim Sistemi', type: 'text', placeholder: 'Windows 11, macOS, Linux...' },
-                { name: 'batteryHealthPercent', label: 'Pil Sağlığı (%)', type: 'number', min: 1, max: 100, placeholder: 'e.g. 90' },
+                { name: 'storage', label: 'Storage (GB)', type: 'number', required: true, min: 1, placeholder: '256, 512, 1024...' },
+                { name: 'storageType', label: 'Storage Type', type: 'enum', enumKey: 'storageTypes', required: true },
+                { name: 'screenSize', label: 'Screen Size (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '13.3, 15.6...' },
+                { name: 'processor', label: 'Processor', type: 'enum', enumKey: 'processors' },
+                { name: 'gpuModel', label: 'GPU Model', type: 'text', placeholder: 'e.g. RTX 3060, M2 10-core' },
+                { name: 'operatingSystem', label: 'Operating System', type: 'text', placeholder: 'Windows 11, macOS, Linux...' },
+                { name: 'batteryHealthPercent', label: 'Battery Health (%)', type: 'number', min: 1, max: 100, placeholder: 'e.g. 90' },
               ],
             },
             {
               id: 'electronics-mobile',
-              title: 'Telefon Özellikleri',
-              description: 'Batarya, ekran ve bağlantı özellikleri',
+              title: 'Phone Specifications',
+              description: 'Battery, screen and connectivity features',
               visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'MOBILE_PHONE',
               fields: [
-                { name: 'storage', label: 'Depolama (GB)', type: 'number', required: true, min: 1, placeholder: '128, 256...' },
-                { name: 'screenSize', label: 'Ekran Boyutu (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '6.1, 6.7...' },
-                { name: 'batteryCapacityMah', label: 'Batarya (mAh)', type: 'number', required: true, min: 1, placeholder: '4000' },
-                { name: 'cameraMegapixels', label: 'Kamera (MP)', type: 'number', min: 1, placeholder: '12, 48...' },
-                { name: 'supports5g', label: '5G Destekli', type: 'toggle' },
-                { name: 'dualSim', label: 'Çift SIM', type: 'toggle' },
+                { name: 'storage', label: 'Storage (GB)', type: 'number', required: true, min: 1, placeholder: '128, 256...' },
+                { name: 'screenSize', label: 'Screen Size (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '6.1, 6.7...' },
+                { name: 'batteryCapacityMah', label: 'Battery (mAh)', type: 'number', required: true, min: 1, placeholder: '4000' },
+                { name: 'cameraMegapixels', label: 'Camera (MP)', type: 'number', min: 1, placeholder: '12, 48...' },
+                { name: 'supports5g', label: '5G Supported', type: 'toggle' },
+                { name: 'dualSim', label: 'Dual SIM', type: 'toggle' },
                 { name: 'hasNfc', label: 'NFC', type: 'toggle' },
               ],
             },
             {
               id: 'electronics-headphones',
-              title: 'Kulaklık Özellikleri',
-              description: 'Bağlantı tipi ve özellikler',
+              title: 'Headphone Specifications',
+              description: 'Connection type and features',
               visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'HEADPHONES',
               fields: [
                 {
                   name: 'connectionType',
-                  label: 'Bağlantı Tipi',
+                  label: 'Connection Type',
                   type: 'enum',
                   enumKey: 'electronicConnectionTypes',
                   required: true,
@@ -657,11 +655,11 @@ export const listingTypeConfig = {
                     if (!wireless) ctx.setValue('batteryLifeHours', '');
                   },
                 },
-                { name: 'noiseCancelling', label: 'Aktif Gürültü Engelleme', type: 'toggle' },
-                { name: 'hasMicrophone', label: 'Mikrofon', type: 'toggle' },
+                { name: 'noiseCancelling', label: 'Active Noise Cancelling', type: 'toggle' },
+                { name: 'hasMicrophone', label: 'Microphone', type: 'toggle' },
                 {
                   name: 'batteryLifeHours',
-                  label: 'Pil Ömrü (saat)',
+                  label: 'Battery Life (hours)',
                   type: 'number',
                   required: true,
                   min: 1,
@@ -672,13 +670,13 @@ export const listingTypeConfig = {
             },
             {
               id: 'electronics-extras',
-              title: 'Ek Bilgiler',
-              description: 'Garanti belgesi durumu',
+              title: 'Additional Information',
+              description: 'Warranty document status',
               fields: [
                 {
                   name: 'warrantyProof',
-                  label: 'Garanti Belgesi Mevcut',
-                  description: 'Orijinal garanti belgeleriniz varsa işaretleyin',
+                  label: 'Warranty Document Available',
+                  description: 'Check if you have the original warranty documents',
                   type: 'toggle',
                 },
               ],
@@ -827,8 +825,8 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'realestate-basic',
-              title: 'Temel Bilgiler',
-              description: 'İlan tipi, gayrimenkul tipi ve sahiplik durumu',
+              title: 'Basic Information',
+              description: 'Ad type, property type and ownership status',
               fields: [
                 { name: 'adTypeId', label: 'Ad Type', type: 'enum', enumKey: 'realEstateAdTypes', required: true },
                 { name: 'realEstateTypeId', label: 'Property Type', type: 'enum', enumKey: 'realEstateTypes', required: true },
@@ -845,8 +843,8 @@ export const listingTypeConfig = {
             },
             {
               id: 'realestate-physical',
-              title: 'Fiziksel Özellikler',
-              description: 'Metrekare, oda sayısı ve diğer detaylar',
+              title: 'Physical Characteristics',
+              description: 'Square meters, number of rooms and other details',
               fields: [
                 { name: 'squareMeters', label: 'Square Meters', type: 'number', required: true, min: 0 },
                 {
@@ -889,11 +887,11 @@ export const listingTypeConfig = {
             },
             {
               id: 'realestate-extras',
-              title: 'Ek Bilgiler',
-              description: 'Eşyalı durumu',
+              title: 'Additional Information',
+              description: 'Furnished status',
               visibleWhen: (ctx) => !['LAND', 'FARM'].includes(String(ctx.formData?._realEstateTypeName || '').toUpperCase()),
               fields: [
-                { name: 'furnished', label: 'Eşyalı', type: 'toggle' },
+                { name: 'furnished', label: 'Furnished', type: 'toggle' },
               ],
             },
           ],
@@ -1076,8 +1074,8 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'clothing-details',
-              title: 'Ürün Detayları',
-              description: 'Kıyafet tipi, marka ve diğer özellikler',
+              title: 'Product Details',
+              description: 'Book information and features',
               fields: [
                 { name: 'brandId', label: 'Brand', type: 'enum', enumKey: 'clothingBrands', required: true },
                 { name: 'clothingTypeId', label: 'Type', type: 'enum', enumKey: 'clothingTypes', required: true },
@@ -1113,7 +1111,7 @@ export const listingTypeConfig = {
                 { name: 'material', label: 'Material', type: 'text' },
                 {
                   name: 'purchaseYear',
-                  label: 'Satın Alma Tarihi',
+                  label: 'Purchase Year',
                   type: 'number',
                   required: true,
                   min: 1900,
@@ -1311,8 +1309,8 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'books-details',
-              title: 'Kitap Detayları',
-              description: 'Kitap bilgileri ve özellikleri',
+              title: 'Book Details',
+              description: 'Book information and features',
               fields: [
                 { name: 'author', label: 'Author', type: 'text', required: true },
                 {
@@ -1533,12 +1531,12 @@ export const listingTypeConfig = {
           sections: [
             {
               id: 'sports-details',
-              title: 'Spor Ekipmanı Detayları',
-              description: 'Spor tipi, ekipman tipi ve durum',
+              title: 'Sports Equipment Details',
+              description: 'Sport type, equipment type and condition',
               fields: [
-                { name: 'disciplineId', label: 'Spor Tipi', type: 'enum', enumKey: 'sportDisciplines', required: true },
-                { name: 'equipmentTypeId', label: 'Ekipman Tipi', type: 'enum', enumKey: 'sportEquipmentTypes', required: true },
-                { name: 'conditionId', label: 'Durum', type: 'enum', enumKey: 'sportConditions', required: true },
+                { name: 'disciplineId', label: 'Sport Type', type: 'enum', enumKey: 'sportDisciplines', required: true },
+                { name: 'equipmentTypeId', label: 'Equipment Type', type: 'enum', enumKey: 'sportEquipmentTypes', required: true },
+                { name: 'conditionId', label: 'Condition', type: 'enum', enumKey: 'sportConditions', required: true },
               ],
             },
           ],

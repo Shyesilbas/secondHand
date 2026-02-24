@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.books.BooksListingService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
@@ -36,8 +37,7 @@ public class BooksListingController {
             @AuthenticationPrincipal User currentUser) {
         var result = booksListingService.createBooksListing(request, currentUser.getId());
         if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return ResultResponses.ok(result);
         }
         URI location = URI.create("/api/v1/books/" + result.getData());
         return ResponseEntity.created(location).build();
@@ -49,12 +49,7 @@ public class BooksListingController {
             @PathVariable UUID id,
             @Valid @RequestBody BooksUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
-        var result = booksListingService.updateBooksListing(id, request, currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                    .body(java.util.Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(booksListingService.updateBooksListing(id, request, currentUser.getId()));
     }
 
     @GetMapping("/{id}")
@@ -71,5 +66,3 @@ public class BooksListingController {
         return ResponseEntity.ok(page);
     }
 }
-
-

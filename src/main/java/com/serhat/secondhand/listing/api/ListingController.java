@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.IListingService;
 import com.serhat.secondhand.listing.application.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
@@ -24,14 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -62,22 +60,12 @@ public class ListingController {
     public ResponseEntity<?> getReviewsForListing(
             @PathVariable String listingId,
             @PageableDefault(size = 10) Pageable pageable) {
-        var result = reviewService.getReviewsForListing(listingId, pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getReviewsForListing(listingId, pageable));
     }
 
     @GetMapping("/{listingId}/review-stats")
     public ResponseEntity<?> getListingReviewStats(@PathVariable String listingId) {
-        var result = reviewService.getListingReviewStats(listingId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(reviewService.getListingReviewStats(listingId));
     }
 
     @PostMapping("/bulk")
@@ -166,8 +154,7 @@ public class ListingController {
     public ResponseEntity<?> deleteListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.deleteListing(id, currentUser.getId());
-        return handleResult(result);
+        return ResultResponses.noContent(listingService.deleteListing(id, currentUser.getId()));
     }
 
     @GetMapping("/my-listings/view-stats")
@@ -200,8 +187,7 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.updateSingleQuantity(id, request.quantity(), currentUser.getId());
-        return handleResult(result);
+        return ResultResponses.noContent(listingService.updateSingleQuantity(id, request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/{id}/price")
@@ -209,36 +195,25 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.updateSinglePrice(id, request.price(), currentUser.getId());
-        return handleResult(result);
+        return ResultResponses.noContent(listingService.updateSinglePrice(id, request.price(), currentUser.getId()));
     }
 
     @PutMapping("/quantity/batch")
     public ResponseEntity<?> updateBatchQuantity(
             @Valid @RequestBody UpdateBatchQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId());
-        return handleResult(result);
+        return ResultResponses.noContent(listingService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/price/batch")
     public ResponseEntity<?> updateBatchPrice(
             @Valid @RequestBody UpdateBatchPriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        Result<Void> result = listingService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId());
-        return handleResult(result);
+        return ResultResponses.noContent(listingService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
         return ResponseEntity.ok(listingService.findByStatusAsDto(status));
-    }
-
-    private ResponseEntity<?> handleResult(Result<?> result) {
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", result.getMessage(), "errorCode", result.getErrorCode()));
-        }
-        return ResponseEntity.noContent().build();
     }
 }

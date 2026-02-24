@@ -1,5 +1,6 @@
 package com.serhat.secondhand.favorite.api;
 
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.favorite.application.FavoriteService;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteRequest;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -11,13 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -37,13 +36,7 @@ public class FavoriteController {
     public ResponseEntity<?> addToFavorites(
             @Valid @RequestBody FavoriteRequest request,
             @AuthenticationPrincipal User currentUser) {
-
-        var result = favoriteService.addToFavorites(currentUser.getId(), request.getListingId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.addToFavorites(currentUser.getId(), request.getListingId()));
     }
     
     @DeleteMapping("/{listingId}")
@@ -53,13 +46,7 @@ public class FavoriteController {
     public ResponseEntity<?> removeFromFavorites(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-
-        var result = favoriteService.removeFromFavorites(currentUser.getId(), listingId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(favoriteService.removeFromFavorites(currentUser.getId(), listingId));
     }
     
     @PostMapping("/toggle")
@@ -68,13 +55,7 @@ public class FavoriteController {
     public ResponseEntity<?> toggleFavorite(
             @Valid @RequestBody FavoriteRequest request,
             @AuthenticationPrincipal User currentUser) {
-
-        var result = favoriteService.toggleFavorite(currentUser.getId(), request.getListingId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.toggleFavorite(currentUser.getId(), request.getListingId()));
     }
     
     @GetMapping
@@ -83,13 +64,7 @@ public class FavoriteController {
     public ResponseEntity<?> getUserFavorites(
             @PageableDefault(size = 20) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
-
-        var result = favoriteService.getUserFavorites(currentUser.getId(), pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getUserFavorites(currentUser.getId(), pageable));
     }
     
     @GetMapping("/stats/{listingId}")
@@ -98,14 +73,8 @@ public class FavoriteController {
     public ResponseEntity<?> getFavoriteStats(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        var result = favoriteService.getFavoriteStats(listingId, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getFavoriteStats(listingId, userId));
     }
     
     @PostMapping("/stats")
@@ -114,14 +83,8 @@ public class FavoriteController {
     public ResponseEntity<?> getFavoriteStatsForListings(
             @RequestBody List<UUID> listingIds,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        var result = favoriteService.getFavoriteStatsForListings(listingIds, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getFavoriteStatsForListings(listingIds, userId));
     }
     
     @GetMapping("/check/{listingId}")
@@ -130,37 +93,21 @@ public class FavoriteController {
     public ResponseEntity<?> isFavorited(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
-
-        var result = favoriteService.isFavorited(currentUser.getId(), listingId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.isFavorited(currentUser.getId(), listingId));
     }
     
     @GetMapping("/count/{listingId}")
     @Operation(summary = "Get favorite count", description = "Get total number of users who favorited a listing")
     @ApiResponse(responseCode = "200", description = "Count retrieved successfully")
     public ResponseEntity<?> getFavoriteCount(@PathVariable UUID listingId) {
-        var result = favoriteService.getFavoriteCount(listingId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getFavoriteCount(listingId));
     }
     
     @GetMapping("/ids")
     @Operation(summary = "Get user's favorite listing IDs", description = "Get list of listing IDs that user has favorited")
     @ApiResponse(responseCode = "200", description = "IDs retrieved successfully")
     public ResponseEntity<?> getUserFavoriteIds(@AuthenticationPrincipal User currentUser) {
-        var result = favoriteService.getUserFavoriteIds(currentUser.getId());
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getUserFavoriteIds(currentUser.getId()));
     }
     
     @GetMapping("/top")
@@ -168,13 +115,7 @@ public class FavoriteController {
     @ApiResponse(responseCode = "200", description = "Top favorites retrieved successfully")
     public ResponseEntity<?> getTopFavoritedListings(
             @PageableDefault(size = 10) Pageable pageable) {
-        
-        var result = favoriteService.getTopFavoritedListings(pageable);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getTopFavoritedListings(pageable));
     }
 
     @GetMapping("/top-listings")
@@ -183,13 +124,7 @@ public class FavoriteController {
     public ResponseEntity<?> getTopFavoritedListingsWithDetails(
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        var result = favoriteService.getTopFavoritedListingsWithDetails(size, userId);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(favoriteService.getTopFavoritedListingsWithDetails(size, userId));
     }
 }

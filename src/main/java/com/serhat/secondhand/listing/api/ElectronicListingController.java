@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.electronic.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class ElectronicListingController {
         var result = electronicListingService.createElectronicListing(request, currentUser.getId());
 
         if (result.isError()) {
-            return buildErrorResponse(result);
+            return ResultResponses.ok(result);
         }
 
         URI location = URI.create("/api/v1/electronics/" + result.getData());
@@ -60,13 +59,7 @@ public class ElectronicListingController {
 
         log.info("Updating electronic listing: {} by user: {}", id, currentUser.getId());
 
-        var result = electronicListingService.updateElectronicListings(id, request, currentUser.getId());
-
-        if (result.isError()) {
-            return buildErrorResponse(result);
-        }
-
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(electronicListingService.updateElectronicListings(id, request, currentUser.getId()));
     }
 
     @GetMapping("/{id}")
@@ -90,13 +83,5 @@ public class ElectronicListingController {
         log.info("Filtering electronics with criteria: {}", filters);
         Page<ListingDto> result = electronicListingService.filterElectronics(filters);
         return ResponseEntity.ok(result);
-    }
-
-    private ResponseEntity<?> buildErrorResponse(Result<?> result) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "message", result.getMessage() != null ? result.getMessage() : "Unexpected error",
-                        "error", result.getErrorCode() != null ? result.getErrorCode() : "ERROR"
-                ));
     }
 }

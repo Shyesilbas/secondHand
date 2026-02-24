@@ -6,13 +6,13 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
     <div className="space-y-10">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
         <div className="pb-4 border-b-2 border-slate-100">
-          <h3 className="text-base font-semibold text-slate-900 tracking-tight">Genel Bilgiler</h3>
-          <p className="text-xs text-slate-500 mt-1 tracking-tight">Temel ilan bilgilerini girin</p>
+          <h3 className="text-base font-semibold text-slate-900 tracking-tight">General Information</h3>
+          <p className="text-xs text-slate-500 mt-1 tracking-tight">Enter the basic listing information</p>
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            İlan Başlığı <span className="text-red-500">*</span>
+            Listing Title <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <input
@@ -34,7 +34,7 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
 
         <div>
           <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            Açıklama <span className="text-red-500">*</span>
+            Description <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <textarea
@@ -43,10 +43,10 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
               onChange={onInputChange}
               rows={6}
               className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all resize-none tracking-tight ${errors.description ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
-              placeholder="Ürününüzü detaylı bir şekilde açıklayın. Durum, özellikler, kullanım geçmişi ve varsa kusurları belirtin..."
+              placeholder="Describe your item in detail. Include condition, features, usage history, and any flaws..."
             />
             <div className="absolute bottom-3 right-3 text-xs text-slate-400 font-medium tracking-tight">
-              {formData.description?.length || 0} karakter / 5000
+              {formData.description?.length || 0} characters / 5000
             </div>
           </div>
           {errors.description && (
@@ -57,14 +57,14 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
         <div className="pb-4 border-b-2 border-slate-100">
-          <h3 className="text-base font-semibold text-slate-900 tracking-tight">Fiyatlandırma</h3>
-          <p className="text-xs text-slate-500 mt-1 tracking-tight">Ürün fiyatını ve miktarını belirleyin</p>
+          <h3 className="text-base font-semibold text-slate-900 tracking-tight">Pricing</h3>
+          <p className="text-xs text-slate-500 mt-1 tracking-tight">Set the item price and quantity</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-              Fiyat <span className="text-red-500">*</span>
+              Price <span className="text-red-500">*</span>
             </label>
             <div className="relative flex">
               <PriceInput
@@ -101,7 +101,7 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
           {showQuantity && (
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-                Miktar <span className="text-red-500">*</span>
+                Quantity <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"

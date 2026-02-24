@@ -4,7 +4,6 @@ import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +21,6 @@ public class ComplaintController {
     @PostMapping
     public ResponseEntity<?> createComplaint(@RequestBody @Valid ComplaintRequest complaintRequest,
                                              @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.okOrError(complaintService.createComplaint(currentUser.getId(),complaintRequest), HttpStatus.BAD_REQUEST);
+        return ResultResponses.ok(complaintService.createComplaint(currentUser.getId(),complaintRequest));
     }
 }

@@ -1,8 +1,10 @@
 package com.serhat.secondhand.exchange;
 
 import com.serhat.secondhand.core.config.ExchangeConfig;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
@@ -42,16 +44,16 @@ public class ExchangeRateService {
             
         } catch (ResourceAccessException e) {
             log.error("Network error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
-            throw new RuntimeException("Failed to connect to exchange rate service. Please try again later.", e);
-            
+            throw new BusinessException("Failed to connect to exchange rate service. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE, "EXCHANGE_SERVICE_UNAVAILABLE");
+
         } catch (RestClientException e) {
 
             log.error("HTTP error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
-            throw new RuntimeException("Exchange rate service returned an error. Please try again later.", e);
-            
+            throw new BusinessException("Exchange rate service returned an error. Please try again later.", HttpStatus.BAD_GATEWAY, "EXCHANGE_SERVICE_ERROR");
+
         } catch (Exception e) {
             log.error("Unexpected error while fetching exchange rate for {} -> {}: {}", from, to, e.getMessage(), e);
-            throw new RuntimeException("An unexpected error occurred while fetching exchange rate.", e);
+            throw new BusinessException("An unexpected error occurred while fetching exchange rate.", HttpStatus.INTERNAL_SERVER_ERROR, "EXCHANGE_UNEXPECTED_ERROR");
         }
     }
 

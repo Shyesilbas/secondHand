@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class VehicleListingController {
         var result = vehicleListingService.createVehicleListing(request, currentUser.getId());
 
         if (result.isError()) {
-            return buildErrorResponse(result);
+            return ResultResponses.ok(result);
         }
 
         URI location = URI.create("/api/v1/vehicles/" + result.getData());
@@ -60,13 +59,7 @@ public class VehicleListingController {
 
         log.info("Updating vehicle listing: {} by user: {}", id, currentUser.getId());
 
-        var result = vehicleListingService.updateVehicleListing(id, request, currentUser.getId());
-
-        if (result.isError()) {
-            return buildErrorResponse(result);
-        }
-
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(vehicleListingService.updateVehicleListing(id, request, currentUser.getId()));
     }
 
     @GetMapping("/{id}")
@@ -91,13 +84,5 @@ public class VehicleListingController {
         log.info("Filtering vehicles with criteria: {}", filters);
         Page<ListingDto> result = vehicleListingService.filterVehicles(filters);
         return ResponseEntity.ok(result);
-    }
-
-    private ResponseEntity<?> buildErrorResponse(Result<?> result) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of(
-                        "message", result.getMessage() != null ? result.getMessage() : "Unexpected error",
-                        "error", result.getErrorCode() != null ? result.getErrorCode() : "ERROR"
-                ));
     }
 }

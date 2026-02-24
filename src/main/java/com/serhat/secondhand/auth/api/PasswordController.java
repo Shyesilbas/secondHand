@@ -4,14 +4,14 @@ import com.serhat.secondhand.auth.application.PasswordService;
 import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
-import io.swagger.v3.oas.annotations.Operation;
 import com.serhat.secondhand.auth.domain.dto.response.ForgotPasswordResponse;
+import com.serhat.secondhand.core.result.ResultResponses;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +29,7 @@ public class PasswordController {
     @PutMapping("/change")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request) {
-
-        var result = passwordService.changePassword(request);
-        if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
-        }
-        return ResponseEntity.ok(result.getData());
+        return ResultResponses.ok(passwordService.changePassword(request));
     }
 
     @PostMapping("/forgot")
@@ -50,8 +44,7 @@ public class PasswordController {
         
         var result = passwordService.forgotPasswordWithCode(request);
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return ResultResponses.ok(result);
         }
 
         return ResponseEntity.ok(ForgotPasswordResponse.builder()
@@ -73,8 +66,7 @@ public class PasswordController {
         
         var result = passwordService.resetPassword(request);
         if (result.isError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", result.getErrorCode(), "message", result.getMessage()));
+            return ResultResponses.ok(result);
         }
         
         return ResponseEntity.ok(Map.of(

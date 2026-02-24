@@ -2,8 +2,10 @@ package com.serhat.secondhand.ai.service;
 
 import com.serhat.secondhand.ai.dto.GeminiRequest;
 import com.serhat.secondhand.ai.dto.GeminiResponse;
+import com.serhat.secondhand.core.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -84,7 +86,7 @@ public class GeminiClient {
                         return "Cevap hazır";
                     }
                     log.error("Rate limit exceeded for model {} after {} attempts: {}", modelName, maxAttempts, e.getMessage(), e);
-                    throw new RuntimeException("The AI service is temporarily unavailable. Please try again in a few minutes.");
+                    throw new BusinessException("The AI service is temporarily unavailable. Please try again in a few minutes.", HttpStatus.TOO_MANY_REQUESTS, "AI_RATE_LIMIT_EXCEEDED");
                 }
                 long waitTime = backoffMillis[attempt];
                 log.warn("Rate limit exceeded for model {}. Attempt {}/{}. Waiting {}ms. Error: {}", 
@@ -94,21 +96,21 @@ public class GeminiClient {
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     log.error("Thread interrupted while waiting for retry: {}", ie.getMessage(), ie);
-                    throw new RuntimeException("The request was interrupted. Please try again.", ie);
+                    throw new BusinessException("The request was interrupted. Please try again.", HttpStatus.INTERNAL_SERVER_ERROR, "AI_REQUEST_INTERRUPTED");
                 }
                 attempt++;
 
             } catch (HttpClientErrorException e) {
                 log.error("HTTP Error calling Gemini API: Status={}, Body={}, Message={}", 
                         e.getStatusCode(), e.getResponseBodyAsString(), e.getMessage(), e);
-                throw new RuntimeException("The AI service encountered an error. Please try again later.");
+                throw new BusinessException("The AI service encountered an error. Please try again later.", HttpStatus.BAD_GATEWAY, "AI_SERVICE_ERROR");
 
             } catch (Exception e) {
                 log.error("Unexpected error calling Gemini API with model {}: {}", modelName, e.getMessage(), e);
-                throw new RuntimeException("An unexpected error occurred. Please try again later.");
+                throw new BusinessException("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR, "AI_UNEXPECTED_ERROR");
             }
         }
 
-        throw new RuntimeException("Request failed after maximum retries.");
+        throw new BusinessException("Request failed after maximum retries.", HttpStatus.SERVICE_UNAVAILABLE, "AI_MAX_RETRIES_EXCEEDED");
     }
 }

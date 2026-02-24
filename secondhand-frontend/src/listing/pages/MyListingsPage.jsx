@@ -147,13 +147,13 @@ const MyListingsPage = () => {
                         <div className="flex flex-wrap items-center gap-2 p-3 bg-slate-50 rounded-lg">
                             {bulkMode === 'quantity' ? (
                                 <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)}
-                                    placeholder="Miktar" className="w-28 px-3 py-2 text-sm border border-slate-200 rounded-lg" />
+                                    placeholder="Quantity" className="w-28 px-3 py-2 text-sm border border-slate-200 rounded-lg" />
                             ) : (
                                 <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')}
-                                    placeholder="Fiyat" className="min-w-[8rem]" />
+                                    placeholder="Price" className="min-w-[8rem]" />
                             )}
                             <button type="button" onClick={applyBulk} disabled={saving} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1">
-                                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null} Uygula
+                                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null} Apply
                             </button>
                             <button type="button" onClick={clearBulk} className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-lg">
                                 <X className="w-4 h-4" />
@@ -192,3 +192,4 @@ const MyListingsPage = () => {
 };
 
 export default MyListingsPage;
+

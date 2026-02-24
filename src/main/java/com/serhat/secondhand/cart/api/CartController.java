@@ -1,10 +1,9 @@
 package com.serhat.secondhand.cart.api;
 
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
-import com.serhat.secondhand.cart.dto.CartDto;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
 import com.serhat.secondhand.cart.service.CartService;
-import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -44,9 +42,7 @@ public class CartController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.debug("Get cart items request - user: {}", currentUser.getEmail());
-
-        Result<Page<CartDto>> result = cartService.getCartItems(currentUser.getId(), pageable);
-        return toResponseEntity(result);
+        return ResultResponses.ok(cartService.getCartItems(currentUser.getId(), pageable));
     }
 
     @PostMapping("/items")
@@ -63,9 +59,7 @@ public class CartController {
 
         log.debug("Add to cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), request.getListingId());
-
-        Result<CartDto> result = cartService.addToCart(currentUser.getId(), request);
-        return toResponseEntity(result);
+        return ResultResponses.ok(cartService.addToCart(currentUser.getId(), request));
     }
 
     @PutMapping("/items/{listingId}")
@@ -83,9 +77,7 @@ public class CartController {
 
         log.debug("Update cart item request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
-
-        Result<CartDto> result = cartService.updateCartItem(currentUser.getId(), listingId, request);
-        return toResponseEntity(result);
+        return ResultResponses.ok(cartService.updateCartItem(currentUser.getId(), listingId, request));
     }
 
     @DeleteMapping("/items/{listingId}")
@@ -101,14 +93,9 @@ public class CartController {
 
         log.debug("Remove from cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
-
-        Result<Void> result = cartService.removeFromCart(currentUser.getId(), listingId);
-
-        if (result.isError()) {
-            return toResponseEntity(result);
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Item removed from cart successfully"));
+        return ResultResponses.okWithBody(
+                cartService.removeFromCart(currentUser.getId(), listingId),
+                Map.of("message", "Item removed from cart successfully"));
     }
 
     @DeleteMapping("/items")
@@ -120,14 +107,9 @@ public class CartController {
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Clear cart request - user: {}", currentUser.getEmail());
-
-        Result<Void> result = cartService.clearCart(currentUser.getId());
-
-        if (result.isError()) {
-            return toResponseEntity(result);
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Cart cleared successfully"));
+        return ResultResponses.okWithBody(
+                cartService.clearCart(currentUser.getId()),
+                Map.of("message", "Cart cleared successfully"));
     }
 
     @GetMapping("/count")
@@ -139,14 +121,8 @@ public class CartController {
     public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Get cart count request - user: {}", currentUser.getEmail());
-
-        Result<Long> result = cartService.getCartItemCount(currentUser.getId());
-
-        if (result.isError()) {
-            return toResponseEntity(result);
-        }
-
-        return ResponseEntity.ok(Map.of("count", result.getData()));
+        var result = cartService.getCartItemCount(currentUser.getId());
+        return ResultResponses.okWithBody(result, Map.of("count", result.getData()));
     }
 
     @GetMapping("/check/{listingId}")
@@ -161,23 +137,7 @@ public class CartController {
 
         log.debug("Check in cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
-
-        Result<Boolean> result = cartService.isInCart(currentUser.getId(), listingId);
-
-        if (result.isError()) {
-            return toResponseEntity(result);
-        }
-
-        return ResponseEntity.ok(Map.of("inCart", result.getData()));
-    }
-
-    private <T> ResponseEntity<?> toResponseEntity(Result<T> result) {
-        if (result.isError()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "error", result.getErrorCode() != null ? result.getErrorCode() : "UNKNOWN_ERROR",
-                    "message", result.getMessage() != null ? result.getMessage() : ""
-            ));
-        }
-        return ResponseEntity.ok(result.getData());
+        var result = cartService.isInCart(currentUser.getId(), listingId);
+        return ResultResponses.okWithBody(result, Map.of("inCart", result.getData()));
     }
 }
