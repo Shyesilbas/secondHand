@@ -10,6 +10,8 @@ public enum OrderErrorCodes implements ErrorCode {
     ADDRESS_NOT_BELONG_TO_USER("ADDRESS_NOT_BELONG_TO_USER", "Address does not belong to user", HttpStatus.FORBIDDEN),
     BILLING_ADDRESS_NOT_BELONG_TO_USER("BILLING_ADDRESS_NOT_BELONG_TO_USER", "Billing address does not belong to user", HttpStatus.FORBIDDEN),
     ORDER_NOT_FOUND("ORDER_NOT_FOUND", "Order not found", HttpStatus.NOT_FOUND),
+    ORDER_ITEM_NOT_FOUND("ORDER_ITEM_NOT_FOUND", "Order item not found", HttpStatus.NOT_FOUND),
+    ADDRESS_NOT_FOUND("ADDRESS_NOT_FOUND", "Address not found", HttpStatus.NOT_FOUND),
     ORDER_NOT_BELONG_TO_USER("ORDER_NOT_BELONG_TO_USER", "Order does not belong to user", HttpStatus.FORBIDDEN),
     ORDER_CANNOT_BE_CANCELLED("ORDER_CANNOT_BE_CANCELLED", "Order cannot be cancelled", HttpStatus.BAD_REQUEST),
     ORDER_CANNOT_BE_REFUNDED("ORDER_CANNOT_BE_REFUNDED", "Order cannot be refunded", HttpStatus.BAD_REQUEST),

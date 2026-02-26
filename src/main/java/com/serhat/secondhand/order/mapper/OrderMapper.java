@@ -1,18 +1,17 @@
 package com.serhat.secondhand.order.mapper;
 
+import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
-import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -65,7 +64,7 @@ public class OrderMapper {
 
         return orders.stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<OrderItemDto> orderItemsToDtoList(List<OrderItem> orderItems) {
@@ -75,7 +74,7 @@ public class OrderMapper {
 
         return orderItems.stream()
                 .map(this::orderItemToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private OrderItemDto orderItemToDto(OrderItem orderItem) {

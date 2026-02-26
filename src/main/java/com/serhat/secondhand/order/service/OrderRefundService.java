@@ -1,21 +1,19 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
-import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,16 +33,18 @@ import java.util.stream.Collectors;
 @Transactional
 public class OrderRefundService {
 
+    private static final int REFUND_WINDOW_HOURS = 48;
+
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final OrderItemRefundRepository orderItemRefundRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
     private final IOrderValidationService orderValidationService;
-    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
-    private final ListingRepository listingRepository;
+    private final PaymentOrchestrator paymentOrchestrator;
+    private final OrderItemHelper orderItemHelper;
+    private final OrderStockService orderStockService;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -65,7 +64,7 @@ public class OrderRefundService {
             return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
         }
 
-        Result<List<OrderItem>> itemsResult = determineItemsToRefund(order, request.getOrderItemIds());
+        Result<List<OrderItem>> itemsResult = orderItemHelper.resolveOrderItems(order, request.getOrderItemIds());
         if (itemsResult.isError()) {
             return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
         }
@@ -77,7 +76,6 @@ public class OrderRefundService {
         }
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
-        BigDecimal escrowRefundAmount = BigDecimal.ZERO;
         List<OrderItemRefund> refundRecords = new ArrayList<>();
 
         for (OrderItem item : itemsToRefund) {
@@ -90,11 +88,6 @@ public class OrderRefundService {
 
             BigDecimal refundAmount = item.getTotalPrice();
             totalRefundAmount = totalRefundAmount.add(refundAmount);
-
-            Optional<OrderItemEscrow> escrowOpt = orderEscrowService.findEscrowByOrderItem(item);
-            if (escrowOpt.isPresent() && escrowOpt.get().getStatus() != OrderItemEscrow.EscrowStatus.REFUNDED) {
-                escrowRefundAmount = escrowRefundAmount.add(escrowOpt.get().getAmount());
-            }
 
             OrderItemRefund refundRecord = OrderItemRefund.builder()
                     .orderItem(item)
@@ -111,14 +104,15 @@ public class OrderRefundService {
         }
 
         orderItemRefundRepository.saveAll(refundRecords);
-        restoreListingStock(refundRecords);
+        refundRecords.forEach(record ->
+                orderStockService.restoreStock(record.getOrderItem(), record.getRefundedQuantity()));
         orderRepository.flush();
 
-        List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToRefund = itemsToRefund.stream()
+        List<OrderItemEscrow> escrowsToRefund = itemsToRefund.stream()
                 .map(item -> orderEscrowService.findEscrowByOrderItem(item))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         Result<Void> orchestratorResult = paymentOrchestrator.refundFromSellersAndEscrows(
                 escrowsToRefund, user, itemsToRefund);
@@ -146,8 +140,8 @@ public class OrderRefundService {
         } else {
             order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
         }
-        if (order.getShipping() != null && order.getShipping().getStatus() != com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED) {
-            order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED);
+        if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
+            order.getShipping().setStatus(ShippingStatus.DELIVERED);
         }
 
         Order savedOrder = orderRepository.save(order);
@@ -183,30 +177,12 @@ public class OrderRefundService {
         Duration duration = Duration.between(order.getShipping().getDeliveredAt(), now);
         long hoursPassed = duration.toHours();
 
-        if (hoursPassed >= 48) {
+        if (hoursPassed >= REFUND_WINDOW_HOURS) {
             return Result.error(OrderErrorCodes.REFUND_TIME_EXPIRED);
         }
         return Result.success();
     }
 
-    private Result<List<OrderItem>> determineItemsToRefund(Order order, List<Long> orderItemIds) {
-        if (orderItemIds == null || orderItemIds.isEmpty()) {
-            return Result.success(order.getOrderItems());
-        }
-        
-        List<OrderItem> items = new ArrayList<>();
-        for (Long id : orderItemIds) {
-            OrderItem item = orderItemRepository.findById(id).orElse(null);
-            if (item == null) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-            }
-            if (!item.getOrder().getId().equals(order.getId())) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-            }
-            items.add(item);
-        }
-        return Result.success(items);
-    }
 
     private Result<Void> validateItemsCanBeRefunded(List<OrderItem> items, Order order) {
         for (OrderItem item : items) {
@@ -231,38 +207,5 @@ public class OrderRefundService {
         return true;
     }
 
-    /**
-     * Restore listing stock for refunded items (except VEHICLE and REAL_ESTATE listings).
-     * For simplicity we assume refunded items are physically returned to inventory.
-     */
-    private void restoreListingStock(List<OrderItemRefund> refundRecords) {
-        if (refundRecords == null || refundRecords.isEmpty()) {
-            return;
-        }
-        for (OrderItemRefund refundRecord : refundRecords) {
-            OrderItem item = refundRecord.getOrderItem();
-            if (item == null) continue;
-
-            Listing listing = item.getListing();
-            if (listing == null) continue;
-
-            ListingType type = item.getListingType();
-            if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) {
-                // Quantity is not meaningful for these listing types
-                continue;
-            }
-
-            if (listing.getQuantity() == null) {
-                continue;
-            }
-
-            int delta = refundRecord.getRefundedQuantity();
-            if (delta <= 0) {
-                continue;
-            }
-
-            listingRepository.incrementQuantity(listing.getId(), delta);
-        }
-    }
 
 }

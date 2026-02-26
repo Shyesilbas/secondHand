@@ -2,10 +2,7 @@ package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.order.entity.enums.CancelRefundReason;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,6 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(exclude = {"orderItem"})
+@ToString(exclude = {"orderItem"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

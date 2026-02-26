@@ -3,12 +3,13 @@ package com.serhat.secondhand.order.service;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
-import com.serhat.secondhand.order.entity.OrderItemEscrow;
+import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class OrderCompletionService {
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
     private final IOrderValidationService orderValidationService;
-    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
+    private final PaymentOrchestrator paymentOrchestrator;
 
     @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
@@ -70,7 +71,7 @@ public class OrderCompletionService {
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
             return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
-        if (order.getStatus() != Order.OrderStatus.DELIVERED) {
+        if (!Order.OrderStatus.COMPLETABLE_STATUSES.contains(order.getStatus())) {
             return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
         }
         return Result.success();

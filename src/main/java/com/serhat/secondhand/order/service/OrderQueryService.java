@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +68,7 @@ public class OrderQueryService {
                     .filter(item -> item.getListing() != null &&
                             item.getListing().getSellerId() != null &&
                             item.getListing().getSellerId().equals(sellerId))
-                    .collect(Collectors.toList());
+                    .toList();
             orderDto.setOrderItems(sellerOrderItems);
         }
         orderDto.setEscrowAmount(null);
@@ -88,15 +87,7 @@ public class OrderQueryService {
         Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
 
         return orders.map(order -> {
-            OrderDto orderDto = orderMapper.toDto(order);
-            if (orderDto.getOrderItems() != null) {
-                List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
-                        .filter(item -> item.getListing() != null &&
-                                item.getListing().getSellerId() != null &&
-                                item.getListing().getSellerId().equals(sellerId))
-                        .collect(Collectors.toList());
-                orderDto.setOrderItems(sellerOrderItems);
-            }
+            OrderDto orderDto = buildSellerOrderDto(order, sellerId);
             BigDecimal escrowAmount = orderEscrowService.getPendingEscrowAmountByOrder(order, seller);
             orderDto.setEscrowAmount(escrowAmount);
             return orderDto;
