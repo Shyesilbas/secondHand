@@ -168,11 +168,11 @@ public class OrderRefundService {
 
 
     private Result<Void> validateOrderCanBeRefunded(Order order) {
-        if (order.getStatus() != Order.OrderStatus.DELIVERED) {
-            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
-        }
         if (order.getStatus() == Order.OrderStatus.COMPLETED) {
             return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+        }
+        if (!Order.OrderStatus.REFUNDABLE_STATUSES.contains(order.getStatus())) {
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
 
         if (order.getShipping() == null || order.getShipping().getDeliveredAt() == null) {

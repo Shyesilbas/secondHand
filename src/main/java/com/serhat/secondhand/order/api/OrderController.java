@@ -35,6 +35,7 @@ public class OrderController {
     private final OrderRefundService orderRefundService;
     private final OrderCompletionService orderCompletionService;
     private final OrderNameService orderNameService;
+    private final OrderModificationService orderModificationService;
     private final OrderEscrowService orderEscrowService;
     private final IReviewService reviewService;
 
@@ -202,5 +203,38 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderNameService.updateOrderName(orderId, request.getName(), currentUser));
+    }
+
+    @PutMapping("/{orderId}/address")
+    @Operation(summary = "Update order address", description = "Update shipping/billing address of a modifiable order (pending or confirmed)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order address updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Order cannot be modified"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order or address not found")
+    })
+    public ResponseEntity<?> updateOrderAddress(
+            @PathVariable Long orderId,
+            @Valid @RequestBody UpdateOrderAddressRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to update order address: {} for user: {}", orderId, currentUser.getEmail());
+        return ResultResponses.ok(orderModificationService.updateOrderAddress(
+                orderId, request.getShippingAddressId(), request.getBillingAddressId(), currentUser));
+    }
+
+    @PutMapping("/{orderId}/notes")
+    @Operation(summary = "Update order notes", description = "Update notes of a modifiable order (pending or confirmed)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order notes updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Order cannot be modified"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    public ResponseEntity<?> updateOrderNotes(
+            @PathVariable Long orderId,
+            @Valid @RequestBody UpdateOrderNotesRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("API request to update order notes: {} for user: {}", orderId, currentUser.getEmail());
+        return ResultResponses.ok(orderModificationService.updateOrderNotes(orderId, request.getNotes(), currentUser));
     }
 }

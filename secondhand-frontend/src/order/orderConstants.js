@@ -46,3 +46,23 @@ export const getLastUpdateInfo = (order) => {
   return { status, updatedAt };
 };
 
+/* ---------- Status helpers driven by backend enums ---------- */
+
+const FALLBACK_CANCELLABLE = ['PENDING', 'CONFIRMED'];
+const FALLBACK_REFUNDABLE  = ['DELIVERED'];
+const FALLBACK_MODIFIABLE  = ['PENDING', 'CONFIRMED'];
+
+export const isCancellableStatus = (status, enums = {}) => {
+  const list = enums?.cancellableOrderStatuses ?? FALLBACK_CANCELLABLE;
+  return list.includes(status);
+};
+
+export const isRefundableStatus = (status, enums = {}) => {
+  const list = enums?.refundableOrderStatuses ?? FALLBACK_REFUNDABLE;
+  return list.includes(status);
+};
+
+export const isModifiableStatus = (status, enums = {}) => {
+  const list = enums?.modifiableOrderStatuses ?? FALLBACK_MODIFIABLE;
+  return list.includes(status);
+};
