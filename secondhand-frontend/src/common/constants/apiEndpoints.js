@@ -68,6 +68,8 @@ export const API_ENDPOINTS = {
         REFUND_ORDER: (id) => `/v1/orders/${id}/refund`,
         COMPLETE_ORDER: (id) => `/v1/orders/${id}/complete`,
         UPDATE_ORDER_NAME: (id) => `/v1/orders/${id}/name`,
+        UPDATE_ORDER_ADDRESS: (id) => `/v1/orders/${id}/address`,
+        UPDATE_ORDER_NOTES: (id) => `/v1/orders/${id}/notes`,
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard

@@ -1,10 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { formatCurrency, formatDateTime, resolveEnumLabel } from '../../common/formatters.js';
-import { ReviewButton } from '../../reviews/index.js';
-import { getLastUpdateInfo, getStatusColor } from '../orderConstants.js';
-import { orderService } from '../services/orderService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useEnums } from '../../common/hooks/useEnums.js';
+import React, {useEffect, useMemo, useState} from 'react';
+import {formatCurrency, formatDateTime, resolveEnumLabel} from '../../common/formatters.js';
+import {ReviewButton} from '../../reviews/index.js';
+import {
+  getLastUpdateInfo,
+  getStatusColor,
+  isCancellableStatus,
+  isModifiableStatus,
+  isRefundableStatus
+} from '../orderConstants.js';
+import {orderService} from '../services/orderService.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import useAddresses from '../../user/hooks/useAddresses.js';
 import {
   AlertCircle,
   Check,
@@ -19,6 +26,7 @@ import {
   Pencil,
   Receipt,
   RotateCcw,
+  Save,
   Tag,
   Timer,
   Truck,
@@ -243,9 +251,27 @@ const OrderDetailsModal = React.memo(
     const [orderName, setOrderName] = useState(selectedOrder?.name || '');
     const [isSavingName, setIsSavingName] = useState(false);
 
+    // --- Address editing state ---
+    const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
+    const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
+    const [isSavingAddress, setIsSavingAddress] = useState(false);
+
+    // --- Notes editing state ---
+    const [isEditingNotes, setIsEditingNotes] = useState(false);
+    const [orderNotes, setOrderNotes] = useState(selectedOrder?.notes || '');
+    const [isSavingNotes, setIsSavingNotes] = useState(false);
+
+    const isModifiable = !isSellerView && isModifiableStatus(selectedOrder?.status, enums);
+
+    const { addresses, loading: addressesLoading } = useAddresses({ enabled: isEditingAddress });
+
     useEffect(() => {
       if (selectedOrder) {
         setOrderName(selectedOrder.name || '');
+        setOrderNotes(selectedOrder.notes || '');
+        setIsEditingAddress(false);
+        setIsEditingNotes(false);
       }
     }, [selectedOrder]);
 
@@ -334,6 +360,62 @@ const OrderDetailsModal = React.memo(
         notification.showError('Error', error?.response?.data?.message || 'Failed to complete order');
       } finally {
         setIsProcessing(false);
+      }
+    };
+
+    const handleStartEditAddress = () => {
+      setSelectedShippingAddressId(selectedOrder.shippingAddress?.id || null);
+      setSelectedBillingAddressId(selectedOrder.billingAddress?.id || null);
+      setIsEditingAddress(true);
+    };
+
+    const handleCancelEditAddress = () => {
+      setIsEditingAddress(false);
+    };
+
+    const handleSaveAddress = async () => {
+      if (!selectedShippingAddressId) {
+        notification.showError('Error', 'Please select a shipping address');
+        return;
+      }
+      setIsSavingAddress(true);
+      try {
+        await orderService.updateOrderAddress(selectedOrder.id, selectedShippingAddressId, selectedBillingAddressId);
+        setIsEditingAddress(false);
+        notification.showSuccess('Success', 'Order address updated successfully');
+        if (onReviewSuccess) onReviewSuccess();
+      } catch (error) {
+        notification.showError('Error', error?.response?.data?.message || 'Failed to update address');
+      } finally {
+        setIsSavingAddress(false);
+      }
+    };
+
+    const handleStartEditNotes = () => {
+      setOrderNotes(selectedOrder.notes || '');
+      setIsEditingNotes(true);
+    };
+
+    const handleCancelEditNotes = () => {
+      setOrderNotes(selectedOrder.notes || '');
+      setIsEditingNotes(false);
+    };
+
+    const handleSaveNotes = async () => {
+      if (orderNotes.length > 1000) {
+        notification.showError('Error', 'Notes must be 1000 characters or less');
+        return;
+      }
+      setIsSavingNotes(true);
+      try {
+        await orderService.updateOrderNotes(selectedOrder.id, orderNotes);
+        setIsEditingNotes(false);
+        notification.showSuccess('Success', 'Order notes updated successfully');
+        if (onReviewSuccess) onReviewSuccess();
+      } catch (error) {
+        notification.showError('Error', error?.response?.data?.message || 'Failed to update notes');
+      } finally {
+        setIsSavingNotes(false);
       }
     };
 
@@ -469,7 +551,7 @@ const OrderDetailsModal = React.memo(
 
                 {!isSellerView ? (
                   <div className="mt-6 flex justify-center gap-3">
-                    {selectedOrder.status === 'CONFIRMED' ? (
+                    {isCancellableStatus(selectedOrder.status, enums) ? (
                       <button
                         onClick={() => setCancelModalOpen(true)}
                         className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-rose-600 bg-white border border-rose-200/60 hover:bg-rose-50/80 rounded-md transition-all"
@@ -477,7 +559,7 @@ const OrderDetailsModal = React.memo(
                         <X className="w-3.5 h-3.5" /> Cancel Order
                       </button>
                     ) : null}
-                    {selectedOrder.status === 'DELIVERED' ? (
+                    {isRefundableStatus(selectedOrder.status, enums) ? (
                       <>
                         <button
                           onClick={handleCompleteOrder}
@@ -592,33 +674,148 @@ const OrderDetailsModal = React.memo(
 
                   {!isSellerView ? (
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {isEditingAddress ? (
                         <GlassCard className="p-4">
-                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
-                            <MapPin className="w-3 h-3" /> Shipping Address
+                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                            <MapPin className="w-3 h-3" /> Edit Addresses
                           </h4>
-                          <p className="text-xs font-semibold text-slate-900">{selectedOrder.shippingAddress?.addressLine}</p>
-                          <p className="text-[11px] text-slate-500 mt-1 font-medium">
-                            {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}
-                          </p>
+                          {addressesLoading ? (
+                            <p className="text-xs text-slate-500">Loading addresses...</p>
+                          ) : (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-[11px] font-medium text-slate-600 mb-1 block">Shipping Address *</label>
+                                <select
+                                  value={selectedShippingAddressId || ''}
+                                  onChange={(e) => setSelectedShippingAddressId(Number(e.target.value))}
+                                  className="w-full px-2.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 bg-white"
+                                >
+                                  <option value="">Select address...</option>
+                                  {addresses.map((addr) => (
+                                    <option key={addr.id} value={addr.id}>
+                                      {addr.addressLine} — {addr.city}, {addr.postalCode}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[11px] font-medium text-slate-600 mb-1 block">Billing Address (optional)</label>
+                                <select
+                                  value={selectedBillingAddressId || ''}
+                                  onChange={(e) => setSelectedBillingAddressId(e.target.value ? Number(e.target.value) : null)}
+                                  className="w-full px-2.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 bg-white"
+                                >
+                                  <option value="">Same as shipping</option>
+                                  {addresses.map((addr) => (
+                                    <option key={addr.id} value={addr.id}>
+                                      {addr.addressLine} — {addr.city}, {addr.postalCode}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="flex items-center gap-2 pt-1">
+                                <button
+                                  onClick={handleSaveAddress}
+                                  disabled={isSavingAddress || addressesLoading}
+                                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <Save className="w-3.5 h-3.5" /> Save Address
+                                </button>
+                                <button
+                                  onClick={handleCancelEditAddress}
+                                  disabled={isSavingAddress}
+                                  className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </GlassCard>
-                        <GlassCard className="p-4">
-                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
-                            <Receipt className="w-3 h-3" /> Billing Details
-                          </h4>
-                          <p className="text-xs font-semibold text-slate-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
-                          <p className="text-[11px] text-slate-500 mt-1 font-medium">TR VAT: {selectedOrder.orderNumber}</p>
-                        </GlassCard>
-                      </div>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <GlassCard className="p-4">
+                              <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                                <MapPin className="w-3 h-3" /> Shipping Address
+                              </h4>
+                              <p className="text-xs font-semibold text-slate-900">{selectedOrder.shippingAddress?.addressLine}</p>
+                              <p className="text-[11px] text-slate-500 mt-1 font-medium">
+                                {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}
+                              </p>
+                            </GlassCard>
+                            <GlassCard className="p-4">
+                              <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                                <Receipt className="w-3 h-3" /> Billing Details
+                              </h4>
+                              <p className="text-xs font-semibold text-slate-900">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
+                              <p className="text-[11px] text-slate-500 mt-1 font-medium">TR VAT: {selectedOrder.orderNumber}</p>
+                            </GlassCard>
+                          </div>
+                          {isModifiable ? (
+                            <button
+                              onClick={handleStartEditAddress}
+                              className="w-full flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 hover:bg-blue-100/80 rounded-lg transition-all"
+                            >
+                              <MapPin className="w-3.5 h-3.5" /> Change Address
+                            </button>
+                          ) : null}
+                        </>
+                      )}
 
-                      {selectedOrder.notes ? (
+                      {isEditingNotes ? (
+                        <GlassCard className="p-4">
+                          <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
+                            <FileText className="w-3 h-3" /> Edit Order Notes
+                          </h4>
+                          <textarea
+                            value={orderNotes}
+                            onChange={(e) => setOrderNotes(e.target.value)}
+                            maxLength={1000}
+                            rows={3}
+                            className="w-full px-2.5 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 bg-white resize-none"
+                            placeholder="Add a note to your order..."
+                          />
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-[10px] text-slate-400">{orderNotes.length}/1000</p>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={handleSaveNotes}
+                                disabled={isSavingNotes}
+                                className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <Save className="w-3.5 h-3.5" /> Save Notes
+                              </button>
+                              <button
+                                onClick={handleCancelEditNotes}
+                                disabled={isSavingNotes}
+                                className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all disabled:opacity-50"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </GlassCard>
+                      ) : (
                         <GlassCard className="p-4">
                           <h4 className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
                             <FileText className="w-3 h-3" /> Order Notes
                           </h4>
-                          <p className="text-xs text-slate-900 font-medium leading-relaxed whitespace-pre-wrap">{selectedOrder.notes}</p>
+                          {selectedOrder.notes ? (
+                            <p className="text-xs text-slate-900 font-medium leading-relaxed whitespace-pre-wrap mb-3">{selectedOrder.notes}</p>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic mb-3">No notes.</p>
+                          )}
+                          {isModifiable ? (
+                            <button
+                              onClick={handleStartEditNotes}
+                              className="w-full flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-blue-600 bg-blue-50/80 border border-blue-200/60 hover:bg-blue-100/80 rounded-lg transition-all"
+                            >
+                              <FileText className="w-3.5 h-3.5" /> {selectedOrder.notes ? 'Edit Notes' : 'Add Note'}
+                            </button>
+                          ) : null}
                         </GlassCard>
-                      ) : null}
+                      )}
                     </>
                   ) : null}
                 </div>

@@ -6,7 +6,10 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.*;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
@@ -16,22 +19,12 @@ import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
-import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
-import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.ListingFeeService;
-import com.serhat.secondhand.showcase.ShowcaseService;
-import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import com.serhat.secondhand.listing.domain.repository.books.*;
+import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.books.BookConditionRepository;
-import com.serhat.secondhand.listing.domain.repository.books.BookFormatRepository;
-import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository;
-import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
-import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
@@ -40,8 +33,14 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
-import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
+import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.payment.service.ListingFeeService;
+import com.serhat.secondhand.showcase.ShowcaseService;
+import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -397,6 +396,24 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(list);
+    }
+
+    private List<String> getCancellableOrderStatuses() {
+        return Order.OrderStatus.CANCELLABLE_STATUSES.stream()
+                .map(Enum::name)
+                .toList();
+    }
+
+    private List<String> getRefundableOrderStatuses() {
+        return Order.OrderStatus.REFUNDABLE_STATUSES.stream()
+                .map(Enum::name)
+                .toList();
+    }
+
+    private List<String> getModifiableOrderStatuses() {
+        return Order.OrderStatus.MODIFIABLE_STATUSES.stream()
+                .map(Enum::name)
+                .toList();
     }
 
     private ResponseEntity<List<Map<String, Object>>> getEmailTypes() {
@@ -768,6 +785,9 @@ public class EnumController {
         allEnums.put("paymentTypes", getPaymentTypes().getBody());
         allEnums.put("shippingStatuses", getShippingStatuses().getBody());
         allEnums.put("orderStatuses", getOrderStatuses().getBody());
+        allEnums.put("cancellableOrderStatuses", getCancellableOrderStatuses());
+        allEnums.put("refundableOrderStatuses", getRefundableOrderStatuses());
+        allEnums.put("modifiableOrderStatuses", getModifiableOrderStatuses());
         allEnums.put("emailTypes", getEmailTypes().getBody());
         allEnums.put("auditEventTypes", getAuditEventTypes().getBody());
         allEnums.put("auditEventStatuses", getAuditEventStatuses().getBody());

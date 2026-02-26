@@ -11,7 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = {"shipping", "orderItems"})
@@ -127,6 +129,35 @@ public class Order {
             this.displayName = displayName;
         }
 
+        /**
+         * Statuses in which an order can be cancelled by the buyer.
+         */
+        public static final Set<OrderStatus> CANCELLABLE_STATUSES =
+                EnumSet.of(PENDING, CONFIRMED);
+
+        /**
+         * Statuses in which an order can be refunded by the buyer.
+         */
+        public static final Set<OrderStatus> REFUNDABLE_STATUSES =
+                EnumSet.of(DELIVERED);
+
+        /**
+         * Statuses in which the order details (address, notes) can still be modified.
+         */
+        public static final Set<OrderStatus> MODIFIABLE_STATUSES =
+                EnumSet.of(PENDING, CONFIRMED);
+
+        public boolean isCancellable() {
+            return CANCELLABLE_STATUSES.contains(this);
+        }
+
+        public boolean isRefundable() {
+            return REFUNDABLE_STATUSES.contains(this);
+        }
+
+        public boolean isModifiable() {
+            return MODIFIABLE_STATUSES.contains(this);
+        }
     }
 
     @Getter

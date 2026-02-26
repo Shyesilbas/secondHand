@@ -1,5 +1,5 @@
-import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { get, post, put } from '../../common/services/api/request.js';
+import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
+import {get, post, put} from '../../common/services/api/request.js';
 
 export const orderService = {
   checkout: async (payload) => {
@@ -35,6 +35,12 @@ export const orderService = {
   },
   updateOrderName: async (id, name) => {
     return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NAME(id), { name });
+  },
+  updateOrderAddress: async (id, shippingAddressId, billingAddressId = null) => {
+    return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_ADDRESS(id), { shippingAddressId, billingAddressId });
+  },
+  updateOrderNotes: async (id, notes) => {
+    return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NOTES(id), { notes });
   },
   sellerOrders: async (page = 0, size = 5, sort = null, direction = 'desc') => {
     let url = `${API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS}?page=${page}&size=${size}`;
