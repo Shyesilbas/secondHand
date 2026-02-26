@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { useAuthState } from '../auth/AuthContext.jsx';
-import { useChat } from './hooks/useChat.js';
+import React, {useState} from 'react';
+import {useAuthState} from '../auth/AuthContext.jsx';
+import {useChat} from './hooks/useChat.js';
 import ChatWindow from './components/ChatWindow.jsx';
 import ChatList from './components/ChatList.jsx';
-import { useNavigate } from 'react-router-dom';
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
-import { MessageCircle } from 'lucide-react';
-import { useNotification } from '../notification/NotificationContext.jsx';
+import {useNavigate} from 'react-router-dom';
+import {EllipsisVertical as EllipsisVerticalIcon, MessageCircle} from 'lucide-react';
+import {useNotification} from '../notification/NotificationContext.jsx';
 
 const ChatPage = () => {
   const { user } = useAuthState();

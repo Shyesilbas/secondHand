@@ -10,6 +10,7 @@ import SecurityActivityList from '../components/SecurityActivityList.jsx';
 import PaginationControls from '../components/PaginationControls.jsx';
 import LogDetailModal from '../components/LogDetailModal.jsx';
 import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
+import logger from '../../common/utils/logger.js';
 
 const SecurityPage = () => {
     const navigate = useNavigate();
@@ -36,7 +37,7 @@ const SecurityPage = () => {
             setShowRevokeModal(false);
             window.location.href = '/login';
         } catch (error) {
-            console.error('Failed to revoke sessions:', error);
+            logger.error('Failed to revoke sessions:', error);
         } finally {
             setIsRevoking(false);
         }

@@ -1,5 +1,6 @@
-import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { get } from '../../common/services/api/request.js';
+import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
+import {get} from '../../common/services/api/request.js';
+import logger from '../../common/utils/logger.js';
 
 
 export const searchUsers = async (query, limit = 10) => {
@@ -8,8 +9,7 @@ export const searchUsers = async (query, limit = 10) => {
     }
 
     try {
-        
-                const response = await get(API_ENDPOINTS.USER.SEARCH, {
+        const response = await get(API_ENDPOINTS.USER.SEARCH, {
             params: {
                 query: query.trim(),
                 limit: limit
@@ -19,10 +19,8 @@ export const searchUsers = async (query, limit = 10) => {
         return response || [];
 
     } catch (error) {
-        console.error('❌ Error searching users:', error);
-        console.error('❌ Error response:', error.response?.data);
-        
-                return [];
+        logger.error('Error searching users:', error);
+        return [];
     }
 };
 

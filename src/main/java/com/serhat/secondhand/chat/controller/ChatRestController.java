@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class ChatRestController {
     
     private final ChatService chatService;
@@ -29,9 +28,9 @@ public class ChatRestController {
 
     @GetMapping("/rooms/user")
     public ResponseEntity<List<ChatRoomDto>> getUserChatRooms(@AuthenticationPrincipal User currentUser) {
-        log.info("Getting chat rooms for user: {}", currentUser.getId());
+        log.debug("Getting chat rooms for user: {}", currentUser.getId());
         List<ChatRoomDto> chatRooms = chatService.getUserChatRooms(currentUser.getId());
-        log.info("Returning {} chat rooms for user {}", chatRooms.size(), currentUser.getId());
+        log.debug("Returning {} chat rooms for user {}", chatRooms.size(), currentUser.getId());
         return ResponseEntity.ok(chatRooms);
     }
 
@@ -70,12 +69,12 @@ public class ChatRestController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        log.info("Getting messages for chat room: {} (page: {}, size: {}) for user: {}", chatRoomId, page, size, currentUser.getId());
-        
+        log.debug("Getting messages for chat room: {} (page: {}, size: {}) for user: {}", chatRoomId, page, size, currentUser.getId());
+
         Pageable pageable = PageRequest.of(page, size);
         Page<ChatMessageDto> messages = chatService.getChatMessages(chatRoomId, currentUser.getId(), pageable);
         
-        log.info("Returning {} messages for chat room {} (total: {})", 
+        log.debug("Returning {} messages for chat room {} (total: {})",
                 messages.getContent().size(), chatRoomId, messages.getTotalElements());
         return ResponseEntity.ok(messages);
     }
@@ -95,19 +94,19 @@ public class ChatRestController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        log.info("Getting all messages for user: {} (page: {}, size: {})", currentUser.getId(), page, size);
-        
+        log.debug("Getting all messages for user: {} (page: {}, size: {})", currentUser.getId(), page, size);
+
         Pageable pageable = PageRequest.of(page, size);
         Page<ChatMessageDto> messages = chatService.getAllUserMessages(currentUser.getId(), pageable);
         
-        log.info("Returning {} messages for user {} (total: {})", 
+        log.debug("Returning {} messages for user {} (total: {})",
                 messages.getContent().size(), currentUser.getId(), messages.getTotalElements());
         return ResponseEntity.ok(messages);
     }
 
     @GetMapping("/messages/unread-count")
     public ResponseEntity<Long> getTotalUnreadMessageCount(@AuthenticationPrincipal User currentUser) {
-        log.info("Getting total unread message count for user: {}", currentUser.getEmail());
+        log.debug("Getting total unread message count for user: {}", currentUser.getEmail());
         Long count = chatService.getTotalUnreadMessageCount(currentUser.getId());
         return ResponseEntity.ok(count);
     }

@@ -3,7 +3,7 @@ import ListingGrid from './ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import FilterStatus from './FilterStatus.jsx';
 import ListingsSkeleton from './ListingsSkeleton.jsx';
-import { PhotoIcon } from '@heroicons/react/24/outline';
+import {Image as PhotoIcon} from 'lucide-react';
 
 const ListingsContent = React.memo(({
     isLoading,

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { reviewService } from '../services/reviewService.js';
+import logger from '../../common/utils/logger.js';
 
 const cache = new Map();
 const pendingRequests = new Map();
@@ -50,7 +51,7 @@ export const useSellerReviewStatsCache = (sellerId) => {
                 return data;
             })
             .catch((err) => {
-                console.error("Failed to fetch seller stats", err);
+                logger.error("Failed to fetch seller stats", err);
                 if (mountedRef.current) {
                     setStats(null);
                 }

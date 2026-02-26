@@ -6,15 +6,16 @@ import {authService} from './services/authService.js';
 import {ROUTES} from '../common/constants/routes.js';
 import {API_BASE_URL} from '../common/constants/apiEndpoints.js';
 import {
-    ArrowRightIcon,
-    CheckCircleIcon,
-    EnvelopeIcon,
-    EyeIcon,
-    EyeSlashIcon,
-    LockClosedIcon,
-    ShieldCheckIcon
-} from '@heroicons/react/24/outline';
+    ArrowRight as ArrowRightIcon,
+    CheckCircle as CheckCircleIcon,
+    Eye as EyeIcon,
+    EyeOff as EyeSlashIcon,
+    Lock as LockClosedIcon,
+    Mail as EnvelopeIcon,
+    ShieldCheck as ShieldCheckIcon
+} from 'lucide-react';
 import {LoginRequestDTO} from './auth.js';
+import logger from '../common/utils/logger.js';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ ...LoginRequestDTO });
@@ -55,7 +56,7 @@ const LoginPage = () => {
             notification.showSuccess('Welcome Back!', 'You have successfully logged in.', { autoCloseDelay: 1000 });
             setTimeout(() => navigate(from, { replace: true }), 1000);
         } catch (error) {
-            console.error('Login error:', error);
+            logger.error('Login error:', error);
             const message = error.response?.data?.message || 'Login failed. Please check your credentials and try again.';
             notification.showError('Login Failed', message, { autoClose: false });
         } finally {

@@ -1,3 +1,4 @@
+import logger from '../../utils/logger.js';
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
 const ENUM_CACHE_VERSION = '4.2';
@@ -94,7 +95,7 @@ export const getCachedEnums = () => {
 
         return data;
     } catch (error) {
-        console.error('Error reading enum cache:', error);
+        logger.error('Error reading enum cache:', error);
         clearEnumCache();
         return null;
     }
@@ -118,7 +119,7 @@ export const setCachedEnums = (enums) => {
         
         localStorage.setItem(ENUM_CACHE_KEY, JSON.stringify(cacheData));
     } catch (error) {
-        console.error('Error caching enums:', error);
+        logger.error('Error caching enums:', error);
     }
 };
 
@@ -126,7 +127,7 @@ export const clearEnumCache = () => {
     try {
         localStorage.removeItem(ENUM_CACHE_KEY);
     } catch (error) {
-        console.error('Error clearing enum cache:', error);
+        logger.error('Error clearing enum cache:', error);
     }
 };
 
@@ -134,6 +135,6 @@ export const forceClearEnumCache = () => {
     try {
         localStorage.removeItem(ENUM_CACHE_KEY);
     } catch (error) {
-        console.error('Error force clearing enum cache:', error);
+        logger.error('Error force clearing enum cache:', error);
     }
 };

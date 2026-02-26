@@ -1,205 +1,120 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ewalletService } from '../services/ewalletService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
+const EWALLET_KEYS = {
+    wallet: ['ewallet'],
+    transactions: (page, size) => ['ewallet', 'transactions', page, size],
+};
+
 export const useEWallet = (options = {}) => {
-    const [eWallet, setEWallet] = useState(null);
-    const [transactions, setTransactions] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const { showNotification } = useNotification();
+    const queryClient = useQueryClient();
     const enabled = options.enabled ?? true;
 
-    useEffect(() => {
-        if (!enabled) return;
-        
-        const fetchEWallet = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const walletData = await ewalletService.getEWallet();
-                setEWallet(walletData);
-            } catch (err) {
-                if (err.response?.status === 404) {
-                    setEWallet(null);
-                } else {
-                    setError(err.message || 'Failed to fetch eWallet');
-                    showNotification('Failed to fetch eWallet information', 'error');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-        
-        fetchEWallet();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [enabled]);
+    // ---- Query: Fetch wallet ----
+    const {
+        data: eWallet = null,
+        isLoading: walletLoading,
+        error: walletError,
+        refetch: refreshWallet,
+    } = useQuery({
+        queryKey: EWALLET_KEYS.wallet,
+        queryFn: ewalletService.getEWallet,
+        enabled,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        retry: (failureCount, error) => {
+            if (error?.response?.status === 404) return false;
+            return failureCount < 2;
+        },
+    });
 
-        const createEWallet = async (options = {}) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const payload = {
-                limit: options.limit ?? 1000,
-                spendingWarningLimit: options.spendingWarningLimit ?? 200
-            };
-            const walletData = await ewalletService.createEWallet(payload);
-            setEWallet(walletData);
-            showNotification('eWallet created successfully', 'success');
-            return walletData;
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to create eWallet';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+    const invalidateWallet = () => queryClient.invalidateQueries({ queryKey: EWALLET_KEYS.wallet });
+
+    // ---- Helper: wrap mutation ----
+    const useMutationWithNotification = (mutationFn, successMsg, errorMsg) =>
+        useMutation({
+            mutationFn,
+            onSuccess: () => {
+                invalidateWallet();
+                if (successMsg) showNotification(successMsg, 'success');
+            },
+            onError: (err) => {
+                const msg = err.response?.data?.message || err.message || errorMsg;
+                showNotification(msg, 'error');
+            },
+        });
+
+    const createMutation = useMutationWithNotification(
+        (opts = {}) => ewalletService.createEWallet({ limit: opts.limit ?? 1000, spendingWarningLimit: opts.spendingWarningLimit ?? 200 }),
+        'eWallet created successfully',
+        'Failed to create eWallet'
+    );
+
+    const updateLimitsMutation = useMutationWithNotification(
+        (newLimit) => ewalletService.updateLimits(newLimit),
+        'Limit updated successfully',
+        'Failed to update limit'
+    );
+
+    const updateSpendingWarningMutation = useMutationWithNotification(
+        (newLimit) => ewalletService.updateSpendingWarningLimit(newLimit),
+        'Spending warning limit updated',
+        'Failed to update spending warning limit'
+    );
+
+    const removeSpendingWarningMutation = useMutationWithNotification(
+        () => ewalletService.removeSpendingWarningLimit(),
+        'Spending warning limit removed',
+        'Failed to remove spending warning limit'
+    );
+
+    const depositMutation = useMutationWithNotification(
+        ({ amount, bankId }) => ewalletService.deposit(amount, bankId),
+        'Deposit successful',
+        'Failed to deposit'
+    );
+
+    const withdrawMutation = useMutationWithNotification(
+        ({ amount, bankId }) => ewalletService.withdraw(amount, bankId),
+        'Withdrawal successful',
+        'Failed to withdraw'
+    );
+
+    // ---- Transactions (on-demand) ----
+    const fetchTransactions = async (page = 0, size = 10) => {
+        const data = await ewalletService.getTransactions(page, size);
+        return data.content || data;
     };
 
-        const updateLimits = async (newLimit) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const updated = await ewalletService.updateLimits(newLimit);
-            setEWallet(updated);
-            showNotification('Limit updated successfully', 'success');
-            return updated;
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to update limit';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEWalletData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const walletData = await ewalletService.getEWallet();
-            setEWallet(walletData);
-        } catch (err) {
-            if (err.response?.status === 404) {
-                setEWallet(null);
-            } else {
-                setError(err.message || 'Failed to fetch eWallet');
-                showNotification('Failed to fetch eWallet information', 'error');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const updateSpendingWarningLimit = async (newLimit) => {
-        setLoading(true);
-        setError(null);
-        try {
-            await ewalletService.updateSpendingWarningLimit(newLimit);
-            await fetchEWalletData();
-            showNotification('Spending warning limit updated', 'success');
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to update spending warning limit';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const removeSpendingWarningLimit = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            await ewalletService.removeSpendingWarningLimit();
-            await fetchEWalletData();
-            showNotification('Spending warning limit removed', 'success');
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to remove spending warning limit';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-        const deposit = async (amount, bankId) => {
-        setLoading(true);
-        setError(null);
-        try {
-            await ewalletService.deposit(amount, bankId);
-            showNotification('Deposit successful', 'success');
-            await fetchEWalletData();
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to deposit';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-        const withdraw = async (amount, bankId) => {
-        setLoading(true);
-        setError(null);
-        try {
-            await ewalletService.withdraw(amount, bankId);
-            showNotification('Withdrawal successful', 'success');
-            await fetchEWalletData();
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to withdraw';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-        const fetchTransactions = async (page = 0, size = 10) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const transactionData = await ewalletService.getTransactions(page, size);
-            setTransactions(transactionData.content || transactionData);
-            return transactionData;
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch transactions';
-            setError(errorMessage);
-            showNotification(errorMessage, 'error');
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-        const checkBalance = async (amount) => {
+    // ---- Balance check (non-mutating) ----
+    const checkBalance = async (amount) => {
         try {
             return await ewalletService.checkBalance(amount);
-        } catch (err) {
-            console.error('Error checking balance:', err);
+        } catch {
             return false;
         }
     };
 
+    const isPending = createMutation.isPending || updateLimitsMutation.isPending ||
+        updateSpendingWarningMutation.isPending || removeSpendingWarningMutation.isPending ||
+        depositMutation.isPending || withdrawMutation.isPending;
+
     return {
         eWallet,
-        transactions,
-        loading,
-        error,
-        createEWallet,
-        updateLimits,
-        updateSpendingWarningLimit,
-        removeSpendingWarningLimit,
-        deposit,
-        withdraw,
+        transactions: [], // Maintained for backward compat - use fetchTransactions
+        loading: walletLoading || isPending,
+        error: walletError?.message || null,
+        createEWallet: (opts) => createMutation.mutateAsync(opts),
+        updateLimits: (newLimit) => updateLimitsMutation.mutateAsync(newLimit),
+        updateSpendingWarningLimit: (newLimit) => updateSpendingWarningMutation.mutateAsync(newLimit),
+        removeSpendingWarningLimit: () => removeSpendingWarningMutation.mutateAsync(),
+        deposit: (amount, bankId) => depositMutation.mutateAsync({ amount, bankId }),
+        withdraw: (amount, bankId) => withdrawMutation.mutateAsync({ amount, bankId }),
         fetchTransactions,
         checkBalance,
-        refreshWallet: fetchEWalletData
+        refreshWallet,
     };
 };

@@ -8,6 +8,7 @@ import {RealEstateEnumProvider} from './RealEstateEnumContext.jsx';
 import {ClothingEnumProvider} from './ClothingEnumContext.jsx';
 import {BookEnumProvider} from './BookEnumContext.jsx';
 import {SportEnumProvider} from './SportEnumContext.jsx';
+import logger from '../utils/logger.js';
 
 const EnumContext = createContext();
 
@@ -183,7 +184,7 @@ export const EnumProvider = ({ children }) => {
             setIsInitialized(true);
         } catch (err) {
             setError(err.response?.data?.message || 'An error occurred while fetching enums.');
-            console.error('Error fetching enums:', err);
+            logger.error('Error fetching enums:', err);
         } finally {
             setIsLoading(false);
         }

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { priceHistoryService } from '../services/listingAddonService.js';
+import logger from '../../common/utils/logger.js';
 
 const usePriceHistory = (listingId) => {
   const [priceHistory, setPriceHistory] = useState([]);
@@ -28,7 +29,7 @@ const usePriceHistory = (listingId) => {
       setPriceHistory([]);
       setLatestChange(null);
       setHasHistory(false);
-      console.error('Failed to fetch price history:', err);
+      logger.error('Failed to fetch price history:', err);
     } finally {
       setLoading(false);
     }

@@ -3,14 +3,6 @@ import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {LISTING_TYPES} from '../types/index.js';
 import {filterConfigs} from '../components/filters/filterConfigs.js';
 
-const withErrorHandling = async (operation, errorMessage) => {
-  try {
-    return await operation();
-  } catch (error) {
-    console.error(errorMessage, error);
-    throw error;
-  }
-};
 
 const serializeFilters = (filters, config, listingType) => {
   const typeUpper = String(listingType || '').toUpperCase();
@@ -167,9 +159,6 @@ export const listingService = {
     const config = filterConfigs[listingType];
     const payload = serializeFilters({ ...filters, listingType, type: listingType }, config, listingType);
 
-    return withErrorHandling(
-        () => post(API_ENDPOINTS.LISTINGS.FILTER, payload),
-        `Error filtering listings for type: ${listingType}`
-    );
+    return post(API_ENDPOINTS.LISTINGS.FILTER, payload);
   }
 };

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { searchUsers } from '../../../user/services/userSearchService.js';
-import { listingService } from '../../../listing/services/listingService.js';
-import { ROUTES } from '../../constants/routes.js';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {searchUsers} from '../../../user/services/userSearchService.js';
+import {listingService} from '../../../listing/services/listingService.js';
+import {ROUTES} from '../../constants/routes.js';
+import logger from '../../utils/logger.js';
 import SearchResults from './SearchResults.jsx';
 
 const UnifiedSearchBar = ({ className = "" }) => {
@@ -67,7 +68,7 @@ const UnifiedSearchBar = ({ className = "" }) => {
             setIsVisible(true);
             setSelectedIndex(-1);
         } catch (error) {
-            console.error('Search error:', error);
+            logger.error('Search error:', error);
             setResults([]);
             setIsVisible(false);
         } finally {

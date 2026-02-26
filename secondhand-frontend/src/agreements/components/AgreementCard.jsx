@@ -1,6 +1,6 @@
-import { CheckIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
-import { formatDate } from '../../common/formatters.js';
+import {Check as CheckIcon, Clock as ClockIcon, FileText as DocumentTextIcon} from 'lucide-react';
+import {AGREEMENT_TYPE_LABELS} from '../agreements.js';
+import {formatDate} from '../../common/formatters.js';
 
 const AgreementCard = ({ agreement, status = {}, onAccept, accepting, onRead }) => {
   const StatusIcon = status.icon || ClockIcon;

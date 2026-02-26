@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { CreditCardIcon, BanknotesIcon, WalletIcon } from '@heroicons/react/24/outline';
+import React from 'react';
+import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon} from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
-import { formatCurrency } from '../../../common/formatters.js';
+import {formatCurrency} from '../../../common/formatters.js';
 
 const CheckoutPaymentStep = ({
     selectedPaymentType,

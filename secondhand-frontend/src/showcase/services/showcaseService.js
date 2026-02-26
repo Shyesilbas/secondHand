@@ -1,32 +1,10 @@
 import { get, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
-const withErrorHandling = async (operation, errorMessage) => {
-  try {
-    return await operation();
-  } catch (error) {
-    if (error.response?.status === 401) {
-    } else {
-      console.error(errorMessage, error);
-    }
-    throw error;
-  }
-};
-
 export const showcaseService = {
-  getActiveShowcases: async () => {
-    return withErrorHandling(
-      () => get(API_ENDPOINTS.SHOWCASES.ACTIVE),
-      'Error fetching active showcases'
-    );
-  },
+  getActiveShowcases: () => get(API_ENDPOINTS.SHOWCASES.ACTIVE),
 
-  getUserShowcases: async () => {
-    return withErrorHandling(
-      () => get(API_ENDPOINTS.SHOWCASES.MY_SHOWCASES),
-      'Error fetching user showcases'
-    );
-  },
+  getUserShowcases: () => get(API_ENDPOINTS.SHOWCASES.MY_SHOWCASES),
 
   createShowcase: async (listingId, days, paymentType, verificationCode, agreementsAccepted = false, acceptedAgreementIds = []) => {
     const payload = {
@@ -38,31 +16,14 @@ export const showcaseService = {
       acceptedAgreementIds,
       idempotencyKey: `showcase-${listingId}-${days}-${Date.now()}`
     };
-    
-    return withErrorHandling(
-      () => post(API_ENDPOINTS.SHOWCASES.CREATE, payload),
-      'Error creating showcase'
-    );
+    return post(API_ENDPOINTS.SHOWCASES.CREATE, payload);
   },
 
-  extendShowcase: async (showcaseId, days) => {
-    return withErrorHandling(
-      () => post(API_ENDPOINTS.SHOWCASES.EXTEND(showcaseId), null, { params: { days } }),
-      'Error extending showcase'
-    );
-  },
+  extendShowcase: (showcaseId, days) =>
+    post(API_ENDPOINTS.SHOWCASES.EXTEND(showcaseId), null, { params: { days } }),
 
-  cancelShowcase: async (showcaseId) => {
-    return withErrorHandling(
-      () => post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),
-      'Error cancelling showcase'
-    );
-  },
+  cancelShowcase: (showcaseId) =>
+    post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),
 
-  getPricingConfig: async () => {
-    return withErrorHandling(
-      () => get(API_ENDPOINTS.SHOWCASES.PRICING_CONFIG),
-      'Error fetching showcase pricing config'
-    );
-  }
+  getPricingConfig: () => get(API_ENDPOINTS.SHOWCASES.PRICING_CONFIG),
 };

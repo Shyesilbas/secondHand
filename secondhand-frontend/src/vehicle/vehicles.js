@@ -1,7 +1,7 @@
 import {ListingDTO} from '../listing/listings.js';
 
 
-export const VehicleCreateRequestDTO = {
+export const VehicleCreateRequestDTO = Object.freeze({
     title: '',
   description: '',
   price: 0,
@@ -35,7 +35,7 @@ export const VehicleCreateRequestDTO = {
   inspectionValidUntil: '',
   drivetrain: '',
   bodyType: '',
-};
+});
 
 
 

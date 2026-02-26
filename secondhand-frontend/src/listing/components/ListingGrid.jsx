@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
+import React, {memo} from 'react';
 import ListingCard from './ListingCard.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
-import { PhotoIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
-import { useAuthState } from '../../auth/AuthContext.jsx';
+import {AlertCircle as ExclamationCircleIcon, Image as PhotoIcon} from 'lucide-react';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 
 const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     const { user } = useAuthState();

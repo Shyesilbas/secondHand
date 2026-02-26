@@ -1,16 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { Bell, CreditCard, MailOpen, Megaphone, RefreshCw, Shield, Tag, Trash2 } from 'lucide-react';
-import { emailService } from './services/emailService.js';
-import { useNotification } from '../notification/NotificationContext.jsx';
-import { parseError, handleError } from '../common/errorHandler.js';
-import { extractSuccessMessage } from '../common/successHandler.js';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {useNavigate} from 'react-router-dom';
+import {
+    ArrowLeft as ArrowLeftIcon,
+    Bell,
+    CreditCard,
+    MailOpen,
+    Megaphone,
+    RefreshCw,
+    Search as MagnifyingGlassIcon,
+    Shield,
+    Tag,
+    Trash2
+} from 'lucide-react';
+import {emailService} from './services/emailService.js';
+import {useNotification} from '../notification/NotificationContext.jsx';
+import {handleError, parseError} from '../common/errorHandler.js';
+import {extractSuccessMessage} from '../common/successHandler.js';
 import EmailListItem from '../emails/components/EmailListItem';
 import EmailContent from '../emails/components/EmailContent';
-import { useAuthState } from '../auth/AuthContext.jsx';
-import { EMAIL_TYPES } from './emails.js';
+import {useAuthState} from '../auth/AuthContext.jsx';
+import {EMAIL_TYPES} from './emails.js';
 
 const EmailsPageLoader = () => (
     <div className="min-h-screen bg-slate-50">

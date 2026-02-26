@@ -1,5 +1,5 @@
 
-export const UserDTO = {
+export const UserDTO = Object.freeze({
   id: '',
   name: '',
   surname: '',
@@ -10,12 +10,12 @@ export const UserDTO = {
   accountVerified: false,
   accountCreationDate: '',
   updatedAt: '',
-};
+});
 
-export const UpdatePhoneRequestDTO = {
+export const UpdatePhoneRequestDTO = Object.freeze({
   newPhone: '',
   password: '',
-};
+});
 
 export const createUpdatePhoneRequest = (data) => {
   return {

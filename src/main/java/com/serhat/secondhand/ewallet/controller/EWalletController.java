@@ -26,7 +26,7 @@ public class EWalletController {
 
     @GetMapping
     public ResponseEntity<EWalletDto> getEWallet() {
-        log.info("Getting eWallet for authenticated user");
+        log.debug("Getting eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.getEWalletByUserId();
         return ResponseEntity.ok(eWallet);
     }
@@ -70,7 +70,7 @@ public class EWalletController {
     @GetMapping("/balance/check")
     public ResponseEntity<Boolean> checkBalance(
             @RequestParam BigDecimal amount) {
-        log.info("Checking balance for authenticated user");
+        log.debug("Checking balance for authenticated user");
         boolean hasBalance = eWalletService.hasSufficientBalance(amount);
         return ResponseEntity.ok(hasBalance);
     }

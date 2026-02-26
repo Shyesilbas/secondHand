@@ -34,8 +34,7 @@ public class GeminiController {
     @GetMapping("/quick")
     public ResponseEntity<AiResponse> quickQuestion(@RequestParam("q") String question) {
         if (question == null || question.isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(AiResponse.error("Question cannot be empty"));
+            throw new IllegalArgumentException("Question cannot be empty");
         }
 
         log.info("Quick question: {}", question.substring(0, Math.min(50, question.length())));

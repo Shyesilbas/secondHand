@@ -1,14 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TrashIcon, ArrowLeftIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../hooks/useCart.js';
+import React, {useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {AlertTriangle as ExclamationTriangleIcon, ArrowLeft as ArrowLeftIcon} from 'lucide-react';
+import {useCart} from '../hooks/useCart.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
-import EmptyState from '../../common/components/ui/EmptyState.jsx';
-import { formatCurrency } from '../../common/formatters.js';
+import {formatCurrency} from '../../common/formatters.js';
 import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 const ShoppingCartPage = () => {
     const navigate = useNavigate();

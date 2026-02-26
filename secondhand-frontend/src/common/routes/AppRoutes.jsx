@@ -92,7 +92,7 @@ const AppRoutes = () => {
     try {
         authContext = useAuth();
     } catch (error) {
-        console.log('AuthContext not available yet, rendering loading state');
+        // AuthContext not available yet, render loading state
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>

@@ -1,168 +1,93 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
 
+const REVIEW_KEYS = {
+    received: (userId, page, size) => ['reviews', 'received', userId, page, size],
+    written: (userId) => ['reviews', 'written', userId],
+    stats: (userId) => ['reviewStats', userId],
+};
+
 export const useReviews = (userId, options = {}) => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [pagination, setPagination] = useState({
-        number: 0,
-        size: 10,
-        totalPages: 0,
-        totalElements: 0,
-        first: true,
-        last: false
-    });
     const enabled = options.enabled ?? true;
     const initialPage = options.page ?? 0;
     const initialSize = options.size ?? 10;
+    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [currentSize, setCurrentSize] = useState(initialSize);
 
-    const fetchReviews = useCallback(async (page = initialPage, size = initialSize) => {
-        if (!userId || !enabled) return;
-        
-        setLoading(true);
-        setError(null);
-        
-        try {
-            // request.js already handles Result pattern, returns data directly on success
-            const data = await reviewService.getReviewsReceivedByUser(userId, page, size);
-            
-            if (data && data.content && Array.isArray(data.content)) {
-                setReviews(data.content);
-                setPagination({
-                    number: data.pageable?.pageNumber || data.number || page,
-                    size: data.pageable?.pageSize || data.size || size,
-                    totalPages: data.totalPages || 0,
-                    totalElements: data.totalElements || 0,
-                    first: data.first !== undefined ? data.first : (page === 0),
-                    last: data.last !== undefined ? data.last : false
-                });
-            } else if (data && Array.isArray(data)) {
-                // Fallback for non-paginated response (shouldn't happen with new backend)
-                setReviews(data);
-                setPagination({
-                    number: 0,
-                    size: data.length,
-                    totalPages: 1,
-                    totalElements: data.length,
-                    first: true,
-                    last: true
-                });
-            } else {
-                setReviews([]);
-                setPagination({
-                    number: 0,
-                    size: size,
-                    totalPages: 0,
-                    totalElements: 0,
-                    first: true,
-                    last: true
-                });
-            }
-        } catch (err) {
-            console.error('Reviews fetch error:', err);
-            setError(err.message || 'Failed to fetch reviews');
-            setReviews([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [userId, enabled, initialPage, initialSize]);
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: REVIEW_KEYS.received(userId, currentPage, currentSize),
+        queryFn: () => reviewService.getReviewsReceivedByUser(userId, currentPage, currentSize),
+        enabled: !!(userId && enabled),
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        placeholderData: (prev) => prev,
+    });
 
-    const loadPage = useCallback((page) => {
-        fetchReviews(page, pagination.size);
-    }, [fetchReviews, pagination.size]);
+    const reviews = data?.content ?? (Array.isArray(data) ? data : []);
+    const pagination = {
+        number: data?.number ?? currentPage,
+        size: data?.size ?? currentSize,
+        totalPages: data?.totalPages ?? 0,
+        totalElements: data?.totalElements ?? 0,
+        first: data?.first ?? (currentPage === 0),
+        last: data?.last ?? false,
+    };
 
+    const loadPage = useCallback((page) => setCurrentPage(page), []);
     const handlePageSizeChange = useCallback((size) => {
-        fetchReviews(0, size);
-    }, [fetchReviews]);
-
-    useEffect(() => {
-        if (enabled) {
-            fetchReviews(initialPage, initialSize);
-        }
-    }, [userId, enabled, fetchReviews, initialPage, initialSize]);
+        setCurrentSize(size);
+        setCurrentPage(0);
+    }, []);
 
     return {
         reviews,
-        loading,
-        error,
+        loading: isLoading,
+        error: error?.message || null,
         pagination,
-        refetch: () => fetchReviews(pagination.number, pagination.size),
+        refetch,
         loadPage,
-        handlePageSizeChange
+        handlePageSizeChange,
     };
 };
 
 export const useReviewsByUser = (userId, options = {}) => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [hasBeenFetched, setHasBeenFetched] = useState(false);
     const enabled = options.enabled ?? true;
 
-    const fetchReviews = async () => {
-        if (!userId || !enabled) return;
-        
-        setLoading(true);
-        setError(null);
-        
-        try {
-            const response = await reviewService.getReviewsByUser(userId, 0, 20);
-            setReviews(response.content || []);
-            setHasBeenFetched(true);
-        } catch (err) {
-            setError(err.message || 'Failed to fetch reviews');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (enabled && !hasBeenFetched) {
-            fetchReviews();
-        }
-    }, [userId, enabled, hasBeenFetched]);
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: REVIEW_KEYS.written(userId),
+        queryFn: () => reviewService.getReviewsByUser(userId, 0, 20),
+        enabled: !!(userId && enabled),
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
     return {
-        reviews,
-        loading,
-        error,
-        refresh: fetchReviews
+        reviews: data?.content ?? [],
+        loading: isLoading,
+        error: error?.message || null,
+        refresh: refetch,
     };
 };
 
 export const useUserReviewStats = (userId, options = {}) => {
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const enabled = options.enabled ?? true;
 
-    const fetchStats = async () => {
-        if (!userId) return;
-        
-        setLoading(true);
-        setError(null);
-        
-        try {
-            const response = await reviewService.getUserReviewStats(userId);
-            setStats(response);
-        } catch (err) {
-            setError(err.message || 'Failed to fetch review stats');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (enabled) {
-            fetchStats();
-        }
-    }, [userId, enabled]);
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: REVIEW_KEYS.stats(userId),
+        queryFn: () => reviewService.getUserReviewStats(userId),
+        enabled: !!(userId && enabled),
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
     return {
-        stats,
-        loading,
-        error,
-        refresh: fetchStats
+        stats: data ?? null,
+        loading: isLoading,
+        error: error?.message || null,
+        refresh: refetch,
     };
 };

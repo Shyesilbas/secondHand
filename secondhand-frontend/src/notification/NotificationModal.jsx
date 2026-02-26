@@ -1,6 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { XMarkIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { CheckCircleIcon as CheckCircleIconSolid, ExclamationTriangleIcon as ExclamationTriangleIconSolid, InformationCircleIcon as InformationCircleIconSolid, XCircleIcon as XCircleIconSolid } from '@heroicons/react/24/solid';
+import React, {useEffect, useState} from 'react';
+import {
+    AlertTriangle as ExclamationTriangleIcon,
+    CheckCircle as CheckCircleIcon,
+    Info as InformationCircleIcon,
+    X as XMarkIcon,
+    XCircle as XCircleIcon
+} from 'lucide-react';
+// Lucide uses the same component for outline/solid — use fill="currentColor" for solid variants
+const CheckCircleIconSolid = (props) => <CheckCircleIcon {...props} fill="currentColor" />;
+const ExclamationTriangleIconSolid = (props) => <ExclamationTriangleIcon {...props} fill="currentColor" />;
+const InformationCircleIconSolid = (props) => <InformationCircleIcon {...props} fill="currentColor" />;
+const XCircleIconSolid = (props) => <XCircleIcon {...props} fill="currentColor" />;
 
 const NotificationModal = ({ 
     isOpen, 

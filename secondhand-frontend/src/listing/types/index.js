@@ -8,6 +8,9 @@ export const LISTING_TYPES = {
   SPORTS: 'SPORTS',
 };
 
+/** Types that cannot be added to cart or receive offers */
+export const NON_PURCHASABLE_TYPES = [LISTING_TYPES.REAL_ESTATE, LISTING_TYPES.VEHICLE];
+
 export const LISTING_STATUS = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE', 

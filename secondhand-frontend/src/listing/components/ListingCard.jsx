@@ -5,7 +5,7 @@ import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
-import { LISTING_STATUS } from '../types/index.js';
+import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
@@ -25,8 +25,8 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
 
     const isInCompare = isInComparison(listing.id);
     const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
-    const canAddToCart = currentUserId && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
-    const canMakeOffer = currentUserId && !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+    const canAddToCart = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
+    const canMakeOffer = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
