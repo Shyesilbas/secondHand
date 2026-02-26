@@ -14,8 +14,8 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.service.OrderCreationService;
-import com.serhat.secondhand.order.service.OrderEscrowService;
 import com.serhat.secondhand.order.service.OrderNotificationService;
+import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.service.IPricingService;
 import com.serhat.secondhand.user.application.IUserService;
@@ -41,7 +41,7 @@ public class CheckoutOrchestrator {
     private final CouponService couponService;
     private final IOfferService offerService;
     private final ListingRepository listingRepository;
-    private final OrderEscrowService orderEscrowService;
+    private final PaymentOrchestrator paymentOrchestrator;
     private final IUserService userService;
 
     @Transactional
@@ -90,7 +90,7 @@ public class CheckoutOrchestrator {
             var paymentProcessingResult = paymentResult.getData();
 
             if (paymentProcessingResult.allSuccessful()) {
-                orderEscrowService.createEscrowsForOrder(order);
+                paymentOrchestrator.createEscrowsForOrder(order);
                 handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
                 orderNotificationService.sendOrderNotifications(user, order, true);
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());

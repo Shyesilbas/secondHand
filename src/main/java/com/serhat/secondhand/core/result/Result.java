@@ -64,4 +64,13 @@ public class Result<T> {
         return mapper.apply(this.data);
     }
 
+    /**
+     * Propagates an error from one Result type to another without data.
+     * Eliminates the repetitive pattern:
+     *   if (result.isError()) return Result.error(result.getMessage(), result.getErrorCode());
+     */
+    public <R> Result<R> propagateError() {
+        return Result.error(this.message, this.errorCode);
+    }
+
 }

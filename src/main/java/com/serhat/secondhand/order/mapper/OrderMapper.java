@@ -57,15 +57,6 @@ public class OrderMapper {
                 .build();
     }
 
-    public List<OrderDto> toDtoList(List<Order> orders) {
-        if (orders == null) {
-            return null;
-        }
-
-        return orders.stream()
-                .map(this::toDto)
-                .toList();
-    }
 
     private List<OrderItemDto> orderItemsToDtoList(List<OrderItem> orderItems) {
         if (orderItems == null) {

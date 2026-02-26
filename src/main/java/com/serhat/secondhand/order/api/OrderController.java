@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,10 +21,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
-@Slf4j
 @Tag(name = "Order Management", description = "Order operations")
 public class OrderController {
 
@@ -38,6 +39,7 @@ public class OrderController {
     private final OrderModificationService orderModificationService;
     private final OrderEscrowService orderEscrowService;
     private final IReviewService reviewService;
+    private final OrderLogService orderLog;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -50,7 +52,7 @@ public class OrderController {
     public ResponseEntity<?> checkout(
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to checkout for user: {}", currentUser.getEmail());
+        orderLog.logApiMutation("checkout", null, currentUser.getEmail());
         return ResultResponses.ok(checkoutService.checkout(currentUser.getId(), request));
     }
 
@@ -65,7 +67,7 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("API request to get orders for user: {}", currentUser.getEmail());
+        orderLog.logApiRequest("getUserOrders", currentUser.getEmail());
         Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
     }
@@ -79,7 +81,7 @@ public class OrderController {
     public ResponseEntity<Page<OrderDto>> getSellerOrders(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
-        log.info("API request to get seller orders for user: {}", currentUser.getEmail());
+        orderLog.logApiRequest("getSellerOrders", currentUser.getEmail());
         Page<OrderDto> orders = orderQueryService.getSellerOrders(currentUser.getId(), pageable);
         return ResponseEntity.ok(orders);
     }
@@ -89,7 +91,7 @@ public class OrderController {
     public ResponseEntity<?> getSellerOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to get seller order by ID: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiRequest("getSellerOrderById", currentUser.getEmail());
         return ResultResponses.ok(orderQueryService.getSellerOrderById(orderId, currentUser.getId()));
     }
 
@@ -99,11 +101,11 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Pending escrow amount retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<java.util.Map<String, java.math.BigDecimal>> getPendingEscrowAmount(
+    public ResponseEntity<Map<String, BigDecimal>> getPendingEscrowAmount(
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to get pending escrow amount for seller: {}", currentUser.getEmail());
-        java.math.BigDecimal amount = orderEscrowService.getPendingEscrowAmount(currentUser);
-        return ResponseEntity.ok(java.util.Map.of("amount", amount));
+        orderLog.logApiRequest("getPendingEscrowAmount", currentUser.getEmail());
+        BigDecimal amount = orderEscrowService.getPendingEscrowAmount(currentUser);
+        return ResponseEntity.ok(Map.of("amount", amount));
     }
 
     @GetMapping("/{orderId}")
@@ -117,7 +119,7 @@ public class OrderController {
     public ResponseEntity<?> getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to get order by ID: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiRequest("getOrderById", currentUser.getEmail());
         return ResultResponses.ok(orderQueryService.getOrderById(orderId, currentUser.getId()));
     }
 
@@ -127,10 +129,10 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<java.util.Map<String, Object>> getPendingCompletionStatus(
+    public ResponseEntity<Map<String, Object>> getPendingCompletionStatus(
             @AuthenticationPrincipal User currentUser) {
-        log.debug("API request to check pending completion orders for user: {}", currentUser.getEmail());
-        java.util.Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
+        orderLog.logApiRequest("getPendingCompletionStatus", currentUser.getEmail());
+        Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
         return ResponseEntity.ok(status);
     }
 
@@ -138,7 +140,7 @@ public class OrderController {
     public ResponseEntity<?> getReviewByOrderItem(
             @PathVariable Long orderItemId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("Getting review for order item: {} by user: {}", orderItemId, currentUser.getId());
+        orderLog.logApiRequest("getReviewByOrderItem", currentUser.getEmail());
         return ResultResponses.ok(reviewService.getReviewByOrderItem(orderItemId, currentUser.getId()));
     }
 
@@ -154,7 +156,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to cancel order: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("cancelOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderCancellationService.cancelOrder(orderId, request, currentUser));
     }
 
@@ -170,7 +172,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody OrderRefundRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to refund order: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("refundOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderRefundService.refundOrder(orderId, request, currentUser));
     }
 
@@ -185,7 +187,7 @@ public class OrderController {
     public ResponseEntity<?> completeOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to complete order: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("completeOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderCompletionService.completeOrder(orderId, currentUser));
     }
 
@@ -201,7 +203,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to update order name: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("updateOrderName", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderNameService.updateOrderName(orderId, request.getName(), currentUser));
     }
 
@@ -217,7 +219,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderAddressRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to update order address: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("updateOrderAddress", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderModificationService.updateOrderAddress(
                 orderId, request.getShippingAddressId(), request.getBillingAddressId(), currentUser));
     }
@@ -234,7 +236,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNotesRequest request,
             @AuthenticationPrincipal User currentUser) {
-        log.info("API request to update order notes: {} for user: {}", orderId, currentUser.getEmail());
+        orderLog.logApiMutation("updateOrderNotes", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderModificationService.updateOrderNotes(orderId, request.getNotes(), currentUser));
     }
 }

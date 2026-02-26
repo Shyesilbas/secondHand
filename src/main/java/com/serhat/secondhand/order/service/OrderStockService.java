@@ -5,7 +5,6 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,10 +13,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OrderStockService {
 
     private final ListingRepository listingRepository;
+    private final OrderLogService orderLog;
 
     /**
      * Restores stock for a single order item by the given quantity delta.
@@ -39,7 +38,7 @@ public class OrderStockService {
         }
 
         listingRepository.incrementQuantity(listing.getId(), delta);
-        log.debug("Restored {} stock for listing {}", delta, listing.getId());
+        orderLog.logStockRestored(listing.getId(), delta);
     }
 }
 

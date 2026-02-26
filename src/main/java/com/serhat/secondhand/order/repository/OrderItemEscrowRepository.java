@@ -17,9 +17,6 @@ public interface OrderItemEscrowRepository extends JpaRepository<OrderItemEscrow
 
     Optional<OrderItemEscrow> findByOrderItem(OrderItem orderItem);
 
-    @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.order = :order")
-    List<OrderItemEscrow> findByOrder(@Param("order") Order order);
-
     @Query("SELECT oie FROM OrderItemEscrow oie " +
            "JOIN FETCH oie.seller " +
            "JOIN FETCH oie.orderItem oi " +
@@ -27,11 +24,6 @@ public interface OrderItemEscrowRepository extends JpaRepository<OrderItemEscrow
            "WHERE oie.order = :order")
     List<OrderItemEscrow> findByOrderWithDetails(@Param("order") Order order);
 
-    @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.status = :status")
-    List<OrderItemEscrow> findByStatus(@Param("status") OrderItemEscrow.EscrowStatus status);
-
-    @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.seller = :seller")
-    List<OrderItemEscrow> findBySeller(@Param("seller") User seller);
 
     @Query("SELECT oie FROM OrderItemEscrow oie " +
            "JOIN FETCH oie.orderItem oi " +
