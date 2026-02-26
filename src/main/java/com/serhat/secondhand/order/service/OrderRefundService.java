@@ -16,7 +16,6 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderRefundService {
 
@@ -45,35 +43,26 @@ public class OrderRefundService {
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderItemHelper orderItemHelper;
     private final OrderStockService orderStockService;
+    private final OrderLogService orderLog;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
         Result<Void> refundValidationResult = validateOrderCanBeRefunded(order);
-        if (refundValidationResult.isError()) {
-            return Result.error(refundValidationResult.getMessage(), refundValidationResult.getErrorCode());
-        }
-        
+        if (refundValidationResult.isError()) return refundValidationResult.propagateError();
+
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
-        if (consistencyResult.isError()) {
-            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
-        }
+        if (consistencyResult.isError()) return consistencyResult.propagateError();
 
         Result<List<OrderItem>> itemsResult = orderItemHelper.resolveOrderItems(order, request.getOrderItemIds());
-        if (itemsResult.isError()) {
-            return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
-        }
-        
+        if (itemsResult.isError()) return itemsResult.propagateError();
+
         List<OrderItem> itemsToRefund = itemsResult.getData();
-        Result<Void> itemsValidationResult = validateItemsCanBeRefunded(itemsToRefund, order);
-        if (itemsValidationResult.isError()) {
-            return Result.error(itemsValidationResult.getMessage(), itemsValidationResult.getErrorCode());
-        }
+        Result<Void> itemsValidationResult = validateItemsCanBeRefunded(itemsToRefund);
+        if (itemsValidationResult.isError()) return itemsValidationResult.propagateError();
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
         List<OrderItemRefund> refundRecords = new ArrayList<>();
@@ -118,13 +107,11 @@ public class OrderRefundService {
                 escrowsToRefund, user, itemsToRefund);
         
         if (orchestratorResult.isError()) {
-            log.error("Failed to process refund via orchestrator for order: {} - {}", 
-                    order.getOrderNumber(), orchestratorResult.getMessage());
+            orderLog.logRefundFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error("Failed to process refund: " + orchestratorResult.getMessage(), "REFUND_FAILED");
         }
 
-        log.info("Successfully refunded {} to buyer {} for order {}", 
-                totalRefundAmount, user.getEmail(), order.getOrderNumber());
+        orderLog.logRefundProcessed(totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
         order = orderRepository.findByIdWithOrderItems(order.getId())
                 .orElse(null);
@@ -156,7 +143,7 @@ public class OrderRefundService {
         
         orderNotificationService.sendOrderRefundNotification(user, savedOrder);
 
-        log.info("Order refunded: {} (partial: {})", order.getOrderNumber(), !allItemsRefunded);
+        orderLog.logOrderRefunded(order.getOrderNumber(), totalRefundAmount, !allItemsRefunded, user.getEmail());
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
@@ -184,11 +171,8 @@ public class OrderRefundService {
     }
 
 
-    private Result<Void> validateItemsCanBeRefunded(List<OrderItem> items, Order order) {
+    private Result<Void> validateItemsCanBeRefunded(List<OrderItem> items) {
         for (OrderItem item : items) {
-            if (!item.getOrder().getId().equals(order.getId())) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-            }
             Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
             if (alreadyRefunded != null && alreadyRefunded >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);

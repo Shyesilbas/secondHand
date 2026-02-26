@@ -23,10 +23,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "WHERE o.user.id = :userId")
     Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId ORDER BY o.createdAt DESC")
-    List<Order> findByUserIdWithOrderItems(@Param("userId") Long userId);
-
-    Optional<Order> findByOrderNumber(String orderNumber);
 
     long countByUserIdAndStatus(Long userId, Order.OrderStatus status);
 
@@ -36,14 +32,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.orderItems oi JOIN FETCH oi.listing l WHERE o.id = :orderId AND l.seller.id = :sellerId")
     Optional<Order> findByIdForSeller(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
 
-    List<Order> findByStatusOrderByCreatedAtDesc(Order.OrderStatus status);
-
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping WHERE o.status = :status ORDER BY o.updatedAt ASC")
     List<Order> findByStatusWithShipping(@Param("status") Order.OrderStatus status);
 
-    long countByUserId(Long userId);
-
-    List<Order> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, Order.OrderStatus status);
 
     // Dashboard Queries
     @Query("SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId AND o.createdAt BETWEEN :startDate AND :endDate")

@@ -43,5 +43,5 @@ public class OrderDto {
     private LocalDateTime updatedAt;
     private List<OrderItemDto> orderItems;
     private ShippingDto shipping;
-    private java.math.BigDecimal escrowAmount;
+    private BigDecimal escrowAmount;
 }

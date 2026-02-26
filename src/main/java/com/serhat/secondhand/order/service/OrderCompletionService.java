@@ -12,7 +12,6 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderCompletionService {
 
@@ -32,25 +30,20 @@ public class OrderCompletionService {
     private final OrderEscrowService orderEscrowService;
     private final IOrderValidationService orderValidationService;
     private final PaymentOrchestrator paymentOrchestrator;
+    private final OrderLogService orderLog;
 
     @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
         Result<Void> completionValidationResult = validateOrderCanBeCompleted(order);
-        if (completionValidationResult.isError()) {
-            return Result.error(completionValidationResult.getMessage(), completionValidationResult.getErrorCode());
-        }
-        
+        if (completionValidationResult.isError()) return completionValidationResult.propagateError();
+
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
-        if (consistencyResult.isError()) {
-            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
-        }
+        if (consistencyResult.isError()) return consistencyResult.propagateError();
 
         order.setStatus(Order.OrderStatus.COMPLETED);
         if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
@@ -62,7 +55,7 @@ public class OrderCompletionService {
 
         orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
 
-        log.info("Order completed manually: {}", order.getOrderNumber());
+        orderLog.logOrderCompleted(order.getOrderNumber(), false);
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
@@ -81,18 +74,15 @@ public class OrderCompletionService {
         List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
         
         if (pendingEscrows.isEmpty()) {
-            log.info("No pending escrows to release for order {}", order.getOrderNumber());
             return;
         }
 
         Result<Void> orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
         
         if (orchestratorResult.isError()) {
-            log.error("Failed to release escrows for order {}: {}", 
-                    order.getOrderNumber(), orchestratorResult.getMessage());
+            orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
         } else {
-            log.info("Successfully released {} escrow(s) for order {}", 
-                    pendingEscrows.size(), order.getOrderNumber());
+            orderLog.logEscrowReleased(pendingEscrows.size(), order.getOrderNumber());
         }
     }
 }

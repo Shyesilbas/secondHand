@@ -9,7 +9,6 @@ import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.repository.ShippingRepository;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OrderCompletionScheduler {
 
     private final OrderRepository orderRepository;
@@ -30,6 +28,7 @@ public class OrderCompletionScheduler {
     private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final PaymentOrchestrator paymentOrchestrator;
+    private final OrderLogService orderLog;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
     private static final int COMPLETION_HOURS = 48;
@@ -37,7 +36,7 @@ public class OrderCompletionScheduler {
     @Scheduled(fixedRate = 5 * 60 * 1000)
     @Transactional
     public void autoUpdateOrderStatus() {
-        log.info("Starting automatic order status update");
+        orderLog.logSchedulerStarted();
 
         LocalDateTime now = LocalDateTime.now();
         int updatedCount = 0;
@@ -51,14 +50,12 @@ public class OrderCompletionScheduler {
                 orderRepository.save(order);
                 sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.PROCESSING);
                 updatedCount++;
-                log.info("Updated order {} status to PROCESSING", order.getOrderNumber());
+                orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "PROCESSING");
             }
         }
 
         List<Order> processingOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.PROCESSING);
-        log.debug("Found {} orders in PROCESSING status", processingOrders.size());
         for (Order order : processingOrders) {
-            log.debug("Checking order {} for SHIPPED update. UpdatedAt: {}", order.getOrderNumber(), order.getUpdatedAt());
             if (shouldUpdateToShipped(order, now)) {
                 Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.SHIPPED);
@@ -72,7 +69,7 @@ public class OrderCompletionScheduler {
                 orderRepository.save(order);
                 sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.SHIPPED);
                 updatedCount++;
-                log.info("Updated order {} status to SHIPPED (Shipping -> IN_TRANSIT)", order.getOrderNumber());
+                orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "SHIPPED");
             }
         }
 
@@ -91,7 +88,7 @@ public class OrderCompletionScheduler {
                 orderRepository.save(order);
                 sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.DELIVERED);
                 updatedCount++;
-                log.info("Updated order {} status to DELIVERED (Shipping -> DELIVERED)", order.getOrderNumber());
+                orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "DELIVERED");
             }
         }
 
@@ -114,66 +111,42 @@ public class OrderCompletionScheduler {
                 if (!pendingEscrows.isEmpty()) {
                     var orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
                     if (orchestratorResult.isError()) {
-                        log.error("Failed to release escrows for auto-completed order {}: {}",
-                                savedOrder.getOrderNumber(), orchestratorResult.getMessage());
+                        orderLog.logEscrowReleaseFailed(savedOrder.getOrderNumber(), orchestratorResult.getMessage());
                     } else {
-                        log.info("Released {} escrow(s) for auto-completed order {}",
-                                pendingEscrows.size(), savedOrder.getOrderNumber());
+                        orderLog.logEscrowReleased(pendingEscrows.size(), savedOrder.getOrderNumber());
                     }
                 }
 
                 orderNotificationService.sendOrderCompletionNotification(order.getUser(), savedOrder, true);
                 sendStatusChangeNotification(savedOrder, oldStatus, Order.OrderStatus.COMPLETED);
                 updatedCount++;
-                log.info("Auto-completed order: {} ({} hours after delivery)", order.getOrderNumber(), hoursPassed);
+                orderLog.logOrderCompleted(order.getOrderNumber(), true);
             }
         }
 
-        if (updatedCount > 0) {
-            log.info("Auto-updated {} orders", updatedCount);
-        } else {
-            log.debug("No orders to auto-update");
-        }
+        orderLog.logSchedulerCompleted(updatedCount);
     }
 
     private boolean shouldUpdateToProcessing(Order order, LocalDateTime now) {
         if (order.getUpdatedAt() == null) {
             if (order.getCreatedAt() == null) {
-                log.warn("Order {} has null createdAt and updatedAt", order.getOrderNumber());
+                orderLog.logDataWarning("Order {} has null createdAt and updatedAt", order.getOrderNumber());
                 return false;
             }
             Duration duration = Duration.between(order.getCreatedAt(), now);
-            long minutesPassed = duration.toMinutes();
-            boolean shouldUpdate = minutesPassed >= STATUS_UPDATE_INTERVAL_MINUTES;
-            if (!shouldUpdate) {
-                log.debug("Order {} not ready for PROCESSING: {} minutes passed since creation (need {})", 
-                        order.getOrderNumber(), minutesPassed, STATUS_UPDATE_INTERVAL_MINUTES);
-            }
-            return shouldUpdate;
+            return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
         }
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        long minutesPassed = duration.toMinutes();
-        boolean shouldUpdate = minutesPassed >= STATUS_UPDATE_INTERVAL_MINUTES;
-        if (!shouldUpdate) {
-            log.debug("Order {} not ready for PROCESSING: {} minutes passed (need {})", 
-                    order.getOrderNumber(), minutesPassed, STATUS_UPDATE_INTERVAL_MINUTES);
-        }
-        return shouldUpdate;
+        return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
     }
 
     private boolean shouldUpdateToShipped(Order order, LocalDateTime now) {
         if (order.getUpdatedAt() == null) {
-            log.warn("Order {} has null updatedAt, cannot update to SHIPPED", order.getOrderNumber());
+            orderLog.logDataWarning("Order {} has null updatedAt, cannot update to SHIPPED", order.getOrderNumber());
             return false;
         }
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        long minutesPassed = duration.toMinutes();
-        boolean shouldUpdate = minutesPassed >= STATUS_UPDATE_INTERVAL_MINUTES;
-        if (!shouldUpdate) {
-            log.debug("Order {} not ready for SHIPPED: {} minutes passed (need {})", 
-                    order.getOrderNumber(), minutesPassed, STATUS_UPDATE_INTERVAL_MINUTES);
-        }
-        return shouldUpdate;
+        return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
     }
 
     private boolean shouldUpdateToDelivered(Order order, LocalDateTime now) {
@@ -199,7 +172,7 @@ public class OrderCompletionScheduler {
         );
         var notificationResult = notificationService.createAndSend(request);
         if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
+            orderLog.logNotificationFailed("statusChange", order.getOrderNumber(), notificationResult.getMessage());
         }
     }
 

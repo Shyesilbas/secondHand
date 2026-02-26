@@ -8,25 +8,22 @@ import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderNameService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final IOrderValidationService orderValidationService;
+    private final OrderLogService orderLog;
 
     public Result<OrderDto> updateOrderName(Long orderId, String name, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
@@ -37,7 +34,7 @@ public class OrderNameService {
         order.setName(name);
         Order savedOrder = orderRepository.save(order);
 
-        log.info("Order name updated: {} for order: {}", name, order.getOrderNumber());
+        orderLog.logOrderModified(order.getOrderNumber(), "name");
         return Result.success(orderMapper.toDto(savedOrder));
     }
 

@@ -10,13 +10,11 @@ import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderModificationService {
 
@@ -24,19 +22,16 @@ public class OrderModificationService {
     private final AddressRepository addressRepository;
     private final OrderMapper orderMapper;
     private final IOrderValidationService orderValidationService;
+    private final OrderLogService orderLog;
 
     public Result<OrderDto> updateOrderAddress(Long orderId, Long shippingAddressId, Long billingAddressId, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
         Result<Void> modifiableResult = validateOrderIsModifiable(order);
-        if (modifiableResult.isError()) {
-            return Result.error(modifiableResult.getMessage(), modifiableResult.getErrorCode());
-        }
+        if (modifiableResult.isError()) return modifiableResult.propagateError();
 
         Address shippingAddress = addressRepository.findById(shippingAddressId).orElse(null);
         if (shippingAddress == null) {
@@ -62,22 +57,18 @@ public class OrderModificationService {
         }
 
         Order savedOrder = orderRepository.save(order);
-        log.info("Order address updated for order: {}", order.getOrderNumber());
+        orderLog.logOrderModified(order.getOrderNumber(), "address");
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
     public Result<OrderDto> updateOrderNotes(Long orderId, String notes, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
         Result<Void> modifiableResult = validateOrderIsModifiable(order);
-        if (modifiableResult.isError()) {
-            return Result.error(modifiableResult.getMessage(), modifiableResult.getErrorCode());
-        }
+        if (modifiableResult.isError()) return modifiableResult.propagateError();
 
         if (notes != null && notes.length() > 1000) {
             return Result.error(OrderErrorCodes.INVALID_ORDER_NOTES);
@@ -86,7 +77,7 @@ public class OrderModificationService {
         order.setNotes(notes);
         Order savedOrder = orderRepository.save(order);
 
-        log.info("Order notes updated for order: {}", order.getOrderNumber());
+        orderLog.logOrderModified(order.getOrderNumber(), "notes");
         return Result.success(orderMapper.toDto(savedOrder));
     }
 

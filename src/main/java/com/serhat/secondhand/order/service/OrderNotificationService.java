@@ -12,16 +12,16 @@ import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OrderNotificationService {
 
     private final EmailService emailService;
@@ -30,11 +30,11 @@ public class OrderNotificationService {
     private final IUserService userService;
     private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final OrderLogService orderLog;
 
     @Async("notificationExecutor")
     public void sendOrderNotifications(User user, Order order, boolean paymentSuccessful) {
         if (!paymentSuccessful) {
-            log.info("Skipping notifications for failed order: {}", order.getOrderNumber());
             return;
         }
 
@@ -43,9 +43,9 @@ public class OrderNotificationService {
             sendCustomerNotification(user, orderDto);
             sendSellerNotifications(orderDto);
             
-            log.info("Successfully sent notifications for order: {}", order.getOrderNumber());
+            orderLog.logNotificationSent("orderConfirmation", order.getOrderNumber());
         } catch (Exception e) {
-            log.error("Failed to send notifications for order {}: {}", order.getOrderNumber(), e.getMessage());
+            orderLog.logNotificationFailed("orderConfirmation", order.getOrderNumber(), e.getMessage());
         }
     }
 
@@ -55,22 +55,22 @@ public class OrderNotificationService {
             String content = buildOrderConfirmationContent(customer, orderDto);
             
             emailService.sendEmail(customer, subject, content, EmailType.NOTIFICATION);
-            log.info("Order confirmation email sent to customer: {}", customer.getEmail());
-            
+            orderLog.logNotificationSent("customerConfirmation", orderDto.getOrderNumber());
+
             var notificationResult = notificationService.createAndSend(
                     notificationTemplateCatalog.orderCreated(customer.getId(), orderDto.getId(), orderDto.getOrderNumber())
             );
             if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
+                orderLog.logNotificationFailed("inAppOrderCreated", orderDto.getOrderNumber(), notificationResult.getMessage());
             }
         } catch (Exception e) {
-            log.warn("Failed to send order confirmation email to customer {}: {}", customer.getEmail(), e.getMessage());
+            orderLog.logNotificationFailed("customerConfirmation", orderDto.getOrderNumber(), e.getMessage());
         }
     }
 
     private void sendSellerNotifications(OrderDto orderDto) {
         if (orderDto.getOrderItems() == null || orderDto.getOrderItems().isEmpty()) {
-            log.warn("No order items found for seller notifications in order: {}", orderDto.getOrderNumber());
+            orderLog.logDataWarning("No order items found for seller notifications in order: {}", orderDto.getOrderNumber());
             return;
         }
 
@@ -94,7 +94,7 @@ public class OrderNotificationService {
         try {
             var sellerResult = userService.findById(sellerId);
             if (sellerResult.isError() || sellerResult.getData() == null) {
-                log.warn("Seller not found for ID: {}", sellerId);
+                orderLog.logDataWarning("Seller not found for ID: {}", sellerId);
                 return;
             }
             
@@ -104,45 +104,41 @@ public class OrderNotificationService {
 
             emailService.sendEmail(seller, subject, content, EmailType.NOTIFICATION);
             
-            log.info("Sale notification sent to seller {} for order {}", 
-                    seller.getEmail(), orderDto.getOrderNumber());
-            
+            orderLog.logNotificationSent("saleNotification", orderDto.getOrderNumber());
+
             OrderItemDto firstItem = sellerItems.isEmpty() ? null : sellerItems.get(0);
             String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
-            java.util.UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
+            UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
             var notificationResult = notificationService.createAndSend(
                     notificationTemplateCatalog.orderReceived(sellerId, orderDto.getId(), orderDto.getOrderNumber(), listingId, listingTitle)
             );
             if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
+                orderLog.logNotificationFailed("inAppOrderReceived", orderDto.getOrderNumber(), notificationResult.getMessage());
             }
         } catch (Exception e) {
-            log.warn("Failed to send sale notification to seller {} for order {}: {}", 
-                    sellerId, orderDto.getOrderNumber(), e.getMessage());
+            orderLog.logNotificationFailed("saleNotification", orderDto.getOrderNumber(), e.getMessage());
         }
     }
 
     @Async("notificationExecutor")
-    public void sendOrderCancellationNotification(User user, com.serhat.secondhand.order.entity.Order order) {
+    public void sendOrderCancellationNotification(User user, Order order) {
         try {
             String subject = "SecondHand - Order Cancelled";
             String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been cancelled.\n";
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
-            log.info("Order cancellation notification sent for order: {}", order.getOrderNumber());
-            
+            orderLog.logNotificationSent("cancellation", order.getOrderNumber());
+
             var notificationResult = notificationService.createAndSend(
                     notificationTemplateCatalog.orderCancelled(user.getId(), order.getId(), order.getOrderNumber())
             );
             if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
+                orderLog.logNotificationFailed("inAppCancellation", order.getOrderNumber(), notificationResult.getMessage());
             }
         } catch (Exception e) {
-            log.warn("Failed to send cancellation notification for order {}: {}", 
-                    order.getOrderNumber(), e.getMessage());
+            orderLog.logNotificationFailed("cancellation", order.getOrderNumber(), e.getMessage());
         }
     }
 
-    @Async("notificationExecutor")
     private String buildOrderConfirmationContent(User user, OrderDto order) {
         StringBuilder sb = new StringBuilder();
         sb.append("Hello ").append(user.getName()).append(",\n\n");
@@ -189,10 +185,10 @@ public class OrderNotificationService {
         sb.append("Order Number: ").append(order.getOrderNumber()).append('\n');
         sb.append("Buyer: ").append(order.getUserId()).append('\n'); // Assuming userId is available in OrderDto
         
-        java.math.BigDecimal total = sellerItems.stream()
+        BigDecimal total = sellerItems.stream()
                 .map(OrderItemDto::getTotalPrice)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-                
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         sb.append("Total Amount: ").append(total)
                 .append(' ').append(order.getCurrency()).append("\n\n");
         
@@ -221,29 +217,27 @@ public class OrderNotificationService {
     }
 
     @Async("notificationExecutor")
-    public void sendOrderRefundNotification(User user, com.serhat.secondhand.order.entity.Order order) {
+    public void sendOrderRefundNotification(User user, Order order) {
         try {
             String subject = "SecondHand - Order Refunded";
             String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been refunded. The refund amount has been credited to your eWallet.\n";
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
-            log.info("Order refund notification sent for order: {}", order.getOrderNumber());
+            orderLog.logNotificationSent("refund", order.getOrderNumber());
         } catch (Exception e) {
-            log.warn("Failed to send refund notification for order {}: {}", 
-                    order.getOrderNumber(), e.getMessage());
+            orderLog.logNotificationFailed("refund", order.getOrderNumber(), e.getMessage());
         }
     }
 
     @Async("notificationExecutor")
-    public void sendOrderCompletionNotification(User user, com.serhat.secondhand.order.entity.Order order, boolean isAutomatic) {
+    public void sendOrderCompletionNotification(User user, Order order, boolean isAutomatic) {
         try {
             String subject = "SecondHand - Order Completed";
             String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been " + 
                     (isAutomatic ? "automatically completed" : "completed") + ".\n";
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
-            log.info("Order completion notification sent for order: {}", order.getOrderNumber());
+            orderLog.logNotificationSent("completion", order.getOrderNumber());
         } catch (Exception e) {
-            log.warn("Failed to send completion notification for order {}: {}", 
-                    order.getOrderNumber(), e.getMessage());
+            orderLog.logNotificationFailed("completion", order.getOrderNumber(), e.getMessage());
         }
     }
 }

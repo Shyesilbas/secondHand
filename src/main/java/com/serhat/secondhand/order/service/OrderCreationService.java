@@ -17,7 +17,6 @@ import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,31 +25,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderCreationService {
 
     private final OrderRepository orderRepository;
     private final AddressService addressService;
+    private final OrderLogService orderLog;
 
     public Result<Order> createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
-        log.info("Creating order for user: {}", user.getEmail());
-
         Result<Void> cartValidationResult = validateCartItems(cartItems);
-        if (cartValidationResult.isError()) {
-            return Result.error(cartValidationResult.getMessage(), cartValidationResult.getErrorCode());
-        }
+        if (cartValidationResult.isError()) return cartValidationResult.propagateError();
 
         Address shippingAddress = resolveShippingAddress(request, user);
         Address billingAddress = resolveBillingAddress(request, user);
 
         Result<Void> addressValidationResult = validateAddresses(user, shippingAddress, billingAddress);
-        if (addressValidationResult.isError()) {
-            return Result.error(addressValidationResult.getMessage(), addressValidationResult.getErrorCode());
-        }
+        if (addressValidationResult.isError()) return addressValidationResult.propagateError();
 
         BigDecimal totalAmount = pricing != null && pricing.getTotal() != null ? pricing.getTotal() : calculateTotalAmount(cartItems);
         BigDecimal subtotal = pricing != null ? pricing.getSubtotalAfterCampaigns() : null;
@@ -76,7 +70,7 @@ public class OrderCreationService {
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
-        log.info("Order created with ID: {} and order number: {}", savedOrder.getId(), orderNumber);
+        orderLog.logOrderCreated(orderNumber, savedOrder.getId(), user.getEmail());
 
         return Result.success(savedOrder);
     }
@@ -85,7 +79,6 @@ public class OrderCreationService {
         if (cartItems == null || cartItems.isEmpty()) {
             return Result.error(OrderErrorCodes.CART_EMPTY);
         }
-        log.debug("Validated {} cart items", cartItems.size());
         return Result.success();
     }
 
@@ -108,7 +101,6 @@ public class OrderCreationService {
             return Result.error(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
         }
 
-        log.debug("Validated addresses for user: {}", user.getEmail());
         return Result.success();
     }
 
@@ -121,7 +113,7 @@ public class OrderCreationService {
     private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         return cartItems.stream()
                 .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
@@ -143,10 +135,10 @@ public class OrderCreationService {
             if (listing.getSeller() != null) {
                 sellerId = listing.getSeller().getId();
             } else {
-                log.warn("Listing {} has no seller, setting sellerId to null for order item", listing.getId());
+                orderLog.logDataWarning("Listing {} has no seller, setting sellerId to null", listing.getId());
             }
         } else {
-            log.warn("Cart item has no listing, creating order item with null listing for order {}", order.getOrderNumber());
+            orderLog.logDataWarning("Cart item has no listing for order {}", order.getOrderNumber());
         }
 
         return OrderItem.builder()

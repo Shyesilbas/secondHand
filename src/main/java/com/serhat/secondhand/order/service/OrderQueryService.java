@@ -10,7 +10,6 @@ import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +24,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional(readOnly = true)
 public class OrderQueryService {
 
@@ -36,8 +34,6 @@ public class OrderQueryService {
     private final IOrderValidationService orderValidationService;
 
     public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
-        log.info("Getting orders for userId: {}", userId);
-
         Pageable finalPageable = ensureSort(pageable);
 
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
@@ -47,9 +43,7 @@ public class OrderQueryService {
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, userId);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
         return Result.success(orderMapper.toDto(orderResult.getData()));
     }
 
@@ -57,8 +51,7 @@ public class OrderQueryService {
         return orderRepository.findByIdForSeller(orderId, sellerId)
                 .map(order -> buildSellerOrderDto(order, sellerId))
                 .map(Result::success)
-                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER.toString(), 
-                                             "You dont have any orders with this id."));
+                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
     
     private OrderDto buildSellerOrderDto(Order order, Long sellerId) {
@@ -77,7 +70,6 @@ public class OrderQueryService {
 
 
     public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
-        log.info("Getting orders for sellerId: {}", sellerId);
 
         var userResult = userService.findById(sellerId);
         if (userResult.isError()) return Page.empty();

@@ -16,7 +16,6 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @Transactional
 public class OrderCancellationService {
 
@@ -41,35 +39,26 @@ public class OrderCancellationService {
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderItemHelper orderItemHelper;
     private final OrderStockService orderStockService;
+    private final OrderLogService orderLog;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
-        if (orderResult.isError()) {
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
-        }
+        if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
 
         Result<Void> cancelValidationResult = validateOrderCanBeCancelled(order);
-        if (cancelValidationResult.isError()) {
-            return Result.error(cancelValidationResult.getMessage(), cancelValidationResult.getErrorCode());
-        }
-        
+        if (cancelValidationResult.isError()) return cancelValidationResult.propagateError();
+
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
-        if (consistencyResult.isError()) {
-            return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
-        }
+        if (consistencyResult.isError()) return consistencyResult.propagateError();
 
         Result<List<OrderItem>> itemsResult = orderItemHelper.resolveOrderItems(order, request.getOrderItemIds());
-        if (itemsResult.isError()) {
-            return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
-        }
-        
+        if (itemsResult.isError()) return itemsResult.propagateError();
+
         List<OrderItem> itemsToCancel = itemsResult.getData();
-        Result<Void> itemsValidationResult = validateItemsCanBeCancelled(itemsToCancel, order);
-        if (itemsValidationResult.isError()) {
-            return Result.error(itemsValidationResult.getMessage(), itemsValidationResult.getErrorCode());
-        }
+        Result<Void> itemsValidationResult = validateItemsCanBeCancelled(itemsToCancel);
+        if (itemsValidationResult.isError()) return itemsValidationResult.propagateError();
 
         BigDecimal totalRefundAmount = BigDecimal.ZERO;
         List<OrderItemCancel> cancelRecords = new ArrayList<>();
@@ -112,13 +101,11 @@ public class OrderCancellationService {
 
         Result<Void> orchestratorResult = paymentOrchestrator.cancelEscrowsAndRefundBuyer(escrowsToCancel, user);
         if (orchestratorResult.isError()) {
-            log.error("Failed to cancel escrows and refund buyer for order: {} - {}", 
-                    order.getOrderNumber(), orchestratorResult.getMessage());
+            orderLog.logEscrowCancelFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error("Failed to process refund. Please contact support.", "REFUND_FAILED");
         }
 
-        log.info("Successfully cancelled escrows and refunded {} to buyer {} for order {}", 
-                totalRefundAmount, user.getEmail(), order.getOrderNumber());
+        orderLog.logRefundProcessed(totalRefundAmount, user.getEmail(), order.getOrderNumber());
 
         return orderRepository.findByIdWithOrderItems(order.getId())
                 .map(refreshedOrder -> processCancellationStatus(refreshedOrder, user))
@@ -143,7 +130,7 @@ public class OrderCancellationService {
         return orderRepository.findByIdWithOrderItems(savedOrder.getId())
                 .map(finalOrder -> {
                     orderNotificationService.sendOrderCancellationNotification(user, finalOrder);
-                    log.info("Order cancelled: {} (partial: {})", order.getOrderNumber(), !allItemsCancelled);
+                    orderLog.logOrderCancelled(order.getOrderNumber(), !allItemsCancelled, user.getEmail());
                     return Result.success(orderMapper.toDto(finalOrder));
                 })
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
@@ -161,11 +148,8 @@ public class OrderCancellationService {
     }
 
 
-    private Result<Void> validateItemsCanBeCancelled(List<OrderItem> items, Order order) {
+    private Result<Void> validateItemsCanBeCancelled(List<OrderItem> items) {
         for (OrderItem item : items) {
-            if (!item.getOrder().getId().equals(order.getId())) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-            }
             Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
             if (alreadyCancelled != null && alreadyCancelled >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
