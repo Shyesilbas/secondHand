@@ -17,6 +17,7 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = {"shipping", "orderItems"})
+@ToString(exclude = {"shipping", "orderItems", "user", "shippingAddress", "billingAddress"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -147,6 +148,12 @@ public class Order {
         public static final Set<OrderStatus> MODIFIABLE_STATUSES =
                 EnumSet.of(PENDING, CONFIRMED);
 
+        /**
+         * Statuses in which an order can be completed (buyer confirms receipt).
+         */
+        public static final Set<OrderStatus> COMPLETABLE_STATUSES =
+                EnumSet.of(DELIVERED);
+
         public boolean isCancellable() {
             return CANCELLABLE_STATUSES.contains(this);
         }
@@ -157,6 +164,10 @@ public class Order {
 
         public boolean isModifiable() {
             return MODIFIABLE_STATUSES.contains(this);
+        }
+
+        public boolean isCompletable() {
+            return COMPLETABLE_STATUSES.contains(this);
         }
     }
 

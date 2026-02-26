@@ -2,11 +2,7 @@ package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(exclude = {"orderItem", "order", "seller"})
+@ToString(exclude = {"orderItem", "order", "seller"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

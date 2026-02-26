@@ -7,6 +7,7 @@ import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.repository.ShippingRepository;
+import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +29,7 @@ public class OrderCompletionScheduler {
     private final OrderEscrowService orderEscrowService;
     private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final PaymentOrchestrator paymentOrchestrator;
 
     private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
     private static final int COMPLETION_HOURS = 48;
@@ -107,7 +109,19 @@ public class OrderCompletionScheduler {
                 Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.COMPLETED);
                 Order savedOrder = orderRepository.save(order);
-                orderEscrowService.releaseEscrowsForOrder(savedOrder);
+
+                var pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(savedOrder);
+                if (!pendingEscrows.isEmpty()) {
+                    var orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
+                    if (orchestratorResult.isError()) {
+                        log.error("Failed to release escrows for auto-completed order {}: {}",
+                                savedOrder.getOrderNumber(), orchestratorResult.getMessage());
+                    } else {
+                        log.info("Released {} escrow(s) for auto-completed order {}",
+                                pendingEscrows.size(), savedOrder.getOrderNumber());
+                    }
+                }
+
                 orderNotificationService.sendOrderCompletionNotification(order.getUser(), savedOrder, true);
                 sendStatusChangeNotification(savedOrder, oldStatus, Order.OrderStatus.COMPLETED);
                 updatedCount++;

@@ -2,6 +2,8 @@ package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -24,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +36,14 @@ public class OrderCreationService {
     private final OrderRepository orderRepository;
     private final AddressService addressService;
 
-        public Result<Order> createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
+    public Result<Order> createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         log.info("Creating order for user: {}", user.getEmail());
 
         Result<Void> cartValidationResult = validateCartItems(cartItems);
         if (cartValidationResult.isError()) {
             return Result.error(cartValidationResult.getMessage(), cartValidationResult.getErrorCode());
         }
-        
+
         Address shippingAddress = resolveShippingAddress(request, user);
         Address billingAddress = resolveBillingAddress(request, user);
 
@@ -58,7 +59,7 @@ public class OrderCreationService {
         BigDecimal discountTotal = pricing != null ? pricing.getDiscountTotal() : null;
         String couponCode = pricing != null ? pricing.getCouponCode() : null;
         String orderNumber = generateOrderNumber();
-        
+
         Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes(), request.getName());
         order.setSubtotal(subtotal);
         order.setCampaignDiscount(campaignDiscount);
@@ -80,7 +81,7 @@ public class OrderCreationService {
         return Result.success(savedOrder);
     }
 
-        private Result<Void> validateCartItems(List<Cart> cartItems) {
+    private Result<Void> validateCartItems(List<Cart> cartItems) {
         if (cartItems == null || cartItems.isEmpty()) {
             return Result.error(OrderErrorCodes.CART_EMPTY);
         }
@@ -88,58 +89,71 @@ public class OrderCreationService {
         return Result.success();
     }
 
-        private Address resolveShippingAddress(CheckoutRequest request, User user) {
+    private Address resolveShippingAddress(CheckoutRequest request, User user) {
         return addressService.getAddressById(request.getShippingAddressId()).orElse(null);
     }
 
-        private Address resolveBillingAddress(CheckoutRequest request, User user) {
-        return request.getBillingAddressId() != null 
-            ? addressService.getAddressById(request.getBillingAddressId()).orElse(null)
-            : null;
+    private Address resolveBillingAddress(CheckoutRequest request, User user) {
+        return request.getBillingAddressId() != null
+                ? addressService.getAddressById(request.getBillingAddressId()).orElse(null)
+                : null;
     }
 
-        private Result<Void> validateAddresses(User user, Address shippingAddress, Address billingAddress) {
+    private Result<Void> validateAddresses(User user, Address shippingAddress, Address billingAddress) {
         if (shippingAddress == null || !shippingAddress.getUser().getId().equals(user.getId())) {
             return Result.error(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
         }
-        
+
         if (billingAddress != null && !billingAddress.getUser().getId().equals(user.getId())) {
             return Result.error(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
         }
-        
+
         log.debug("Validated addresses for user: {}", user.getEmail());
         return Result.success();
     }
 
-        private BigDecimal calculateTotalAmount(List<Cart> cartItems) {
+    private BigDecimal calculateTotalAmount(List<Cart> cartItems) {
         return cartItems.stream()
                 .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-        private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
+    private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         return cartItems.stream()
                 .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-
     private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
-        BigDecimal unitPrice = cart.getListing() != null ? cart.getListing().getPrice() : BigDecimal.ZERO;
+        Listing listing = cart.getListing();
+        BigDecimal unitPrice = listing != null ? listing.getPrice() : BigDecimal.ZERO;
         BigDecimal lineSubtotal = unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity()));
 
-        if (cart.getListing() != null && unitPriceByListingId != null) {
-            unitPrice = unitPriceByListingId.getOrDefault(cart.getListing().getId(), unitPrice);
+        if (listing != null && unitPriceByListingId != null) {
+            unitPrice = unitPriceByListingId.getOrDefault(listing.getId(), unitPrice);
             if (lineSubtotalByListingId != null) {
-                lineSubtotal = lineSubtotalByListingId.getOrDefault(cart.getListing().getId(), lineSubtotal);
+                lineSubtotal = lineSubtotalByListingId.getOrDefault(listing.getId(), lineSubtotal);
             }
+        }
+
+        Long sellerId = null;
+        ListingType listingType = null;
+        if (listing != null) {
+            listingType = listing.getListingType();
+            if (listing.getSeller() != null) {
+                sellerId = listing.getSeller().getId();
+            } else {
+                log.warn("Listing {} has no seller, setting sellerId to null for order item", listing.getId());
+            }
+        } else {
+            log.warn("Cart item has no listing, creating order item with null listing for order {}", order.getOrderNumber());
         }
 
         return OrderItem.builder()
                 .order(order)
-                .listing(cart.getListing())
-                .sellerId(cart.getListing().getSeller().getId())
-                .listingType(cart.getListing().getListingType())
+                .listing(listing)
+                .sellerId(sellerId)
+                .listingType(listingType)
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
                 .totalPrice(lineSubtotal)
@@ -174,8 +188,8 @@ public class OrderCreationService {
         return map;
     }
 
-        private Order buildOrder(User user, Address shippingAddress, Address billingAddress, 
-                           BigDecimal totalAmount, String orderNumber, String notes, String name) {
+    private Order buildOrder(User user, Address shippingAddress, Address billingAddress,
+                             BigDecimal totalAmount, String orderNumber, String notes, String name) {
         return Order.builder()
                 .orderNumber(orderNumber)
                 .name(name)
@@ -197,7 +211,7 @@ public class OrderCreationService {
                 .build();
     }
 
-        private String generateOrderNumber() {
+    private String generateOrderNumber() {
         return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

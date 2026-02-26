@@ -40,7 +40,7 @@ public class OrderModificationService {
 
         Address shippingAddress = addressRepository.findById(shippingAddressId).orElse(null);
         if (shippingAddress == null) {
-            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+            return Result.error(OrderErrorCodes.ADDRESS_NOT_FOUND);
         }
         if (!shippingAddress.getUser().getId().equals(user.getId())) {
             return Result.error(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
@@ -51,7 +51,7 @@ public class OrderModificationService {
         if (billingAddressId != null) {
             Address billingAddress = addressRepository.findById(billingAddressId).orElse(null);
             if (billingAddress == null) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+                return Result.error(OrderErrorCodes.ADDRESS_NOT_FOUND);
             }
             if (!billingAddress.getUser().getId().equals(user.getId())) {
                 return Result.error(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);

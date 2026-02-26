@@ -1,20 +1,19 @@
 package com.serhat.secondhand.order.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
+import com.serhat.secondhand.order.entity.OrderItemEscrow;
+import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
-import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,15 +32,15 @@ import java.util.stream.Collectors;
 public class OrderCancellationService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final OrderItemCancelRepository orderItemCancelRepository;
-    private final ListingRepository listingRepository;
     private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
     private final IOrderValidationService orderValidationService;
-    private final com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator paymentOrchestrator;
+    private final PaymentOrchestrator paymentOrchestrator;
+    private final OrderItemHelper orderItemHelper;
+    private final OrderStockService orderStockService;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -62,7 +60,7 @@ public class OrderCancellationService {
             return Result.error(consistencyResult.getMessage(), consistencyResult.getErrorCode());
         }
 
-        Result<List<OrderItem>> itemsResult = determineItemsToCancel(order, request.getOrderItemIds());
+        Result<List<OrderItem>> itemsResult = orderItemHelper.resolveOrderItems(order, request.getOrderItemIds());
         if (itemsResult.isError()) {
             return Result.error(itemsResult.getMessage(), itemsResult.getErrorCode());
         }
@@ -102,14 +100,15 @@ public class OrderCancellationService {
         }
 
         orderItemCancelRepository.saveAll(cancelRecords);
-        restoreListingStock(cancelRecords);
+        cancelRecords.forEach(record ->
+                orderStockService.restoreStock(record.getOrderItem(), record.getCancelledQuantity()));
         orderRepository.flush();
 
-        List<com.serhat.secondhand.order.entity.OrderItemEscrow> escrowsToCancel = itemsToCancel.stream()
+        List<OrderItemEscrow> escrowsToCancel = itemsToCancel.stream()
                 .map(item -> orderEscrowService.findEscrowByOrderItem(item))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         Result<Void> orchestratorResult = paymentOrchestrator.cancelEscrowsAndRefundBuyer(escrowsToCancel, user);
         if (orchestratorResult.isError()) {
@@ -130,8 +129,8 @@ public class OrderCancellationService {
         boolean allItemsCancelled = areAllItemsCancelled(order);
         if (allItemsCancelled) {
             order.setStatus(Order.OrderStatus.CANCELLED);
-            if (order.getShipping() != null && order.getShipping().getStatus() != com.serhat.secondhand.order.entity.enums.ShippingStatus.DELIVERED) {
-                order.getShipping().setStatus(com.serhat.secondhand.order.entity.enums.ShippingStatus.CANCELLED);
+            if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
+                order.getShipping().setStatus(ShippingStatus.CANCELLED);
             }
             order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
         } else {
@@ -161,24 +160,6 @@ public class OrderCancellationService {
         return Result.success();
     }
 
-    private Result<List<OrderItem>> determineItemsToCancel(Order order, List<Long> orderItemIds) {
-        if (orderItemIds == null || orderItemIds.isEmpty()) {
-            return Result.success(order.getOrderItems());
-        }
-        
-        List<OrderItem> items = new ArrayList<>();
-        for (Long id : orderItemIds) {
-            OrderItem item = orderItemRepository.findById(id).orElse(null);
-            if (item == null) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
-            }
-            if (!item.getOrder().getId().equals(order.getId())) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
-            }
-            items.add(item);
-        }
-        return Result.success(items);
-    }
 
     private Result<Void> validateItemsCanBeCancelled(List<OrderItem> items, Order order) {
         for (OrderItem item : items) {
@@ -203,38 +184,5 @@ public class OrderCancellationService {
         return true;
     }
 
-    /**
-     * Restore listing stock for cancelled items (except VEHICLE and REAL_ESTATE listings).
-     * We only touch listings that actually track quantity (non-null quantity field).
-     */
-    private void restoreListingStock(List<OrderItemCancel> cancelRecords) {
-        if (cancelRecords == null || cancelRecords.isEmpty()) {
-            return;
-        }
-        for (OrderItemCancel cancelRecord : cancelRecords) {
-            OrderItem item = cancelRecord.getOrderItem();
-            if (item == null) continue;
-
-            Listing listing = item.getListing();
-            if (listing == null) continue;
-
-            ListingType type = item.getListingType();
-            if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) {
-                // Quantity is not meaningful for these types
-                continue;
-            }
-
-            if (listing.getQuantity() == null) {
-                continue;
-            }
-
-            int delta = cancelRecord.getCancelledQuantity();
-            if (delta <= 0) {
-                continue;
-            }
-
-            listingRepository.incrementQuantity(listing.getId(), delta);
-        }
-    }
 
 }
