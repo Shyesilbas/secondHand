@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { EllipsisVerticalIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useNavigate } from 'react-router-dom';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import React, {useState} from 'react';
+import {EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon, X as XMarkIcon} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 const ChatHeader = ({ 
   selectedChatRoom, 

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
-import { MessageCircle, Search } from 'lucide-react';
+import React, {useState} from 'react';
+import {MessageCircle, Search} from 'lucide-react';
 import ChatRoomListItem from './ChatRoomListItem.jsx';
 
 const ChatList = ({ 

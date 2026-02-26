@@ -1,6 +1,6 @@
-import { UserCircleIcon } from '@heroicons/react/24/outline';
-import { formatDistanceToNow } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import {CircleUser as UserCircleIcon} from 'lucide-react';
+import {formatDistanceToNow} from 'date-fns';
+import {tr} from 'date-fns/locale';
 
 const AvatarMessageItem = ({
   avatarClassName = 'w-8 h-8 text-text-muted',

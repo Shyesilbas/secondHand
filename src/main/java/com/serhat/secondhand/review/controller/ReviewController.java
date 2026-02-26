@@ -1,5 +1,6 @@
 package com.serhat.secondhand.review.controller;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
 import com.serhat.secondhand.review.service.IReviewService;
@@ -7,13 +8,13 @@ import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -44,7 +45,7 @@ public class ReviewController {
                     .map(Long::parseLong)
                     .toList();
         } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "INVALID_ORDER_ITEM_IDS", "message", "Invalid orderItemIds format"));
+            throw new BusinessException("Invalid orderItemIds format", HttpStatus.BAD_REQUEST, "INVALID_ORDER_ITEM_IDS");
         }
         return ResultResponses.ok(reviewService.getReviewsByOrderItems(ids, currentUser.getId()));
     }

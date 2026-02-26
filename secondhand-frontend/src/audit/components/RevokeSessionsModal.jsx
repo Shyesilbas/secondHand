@@ -1,4 +1,4 @@
-import { XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import {AlertTriangle as ExclamationTriangleIcon, X as XMarkIcon} from 'lucide-react';
 
 const RevokeSessionsModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
     if (!isOpen) return null;

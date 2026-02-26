@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { listingService } from '../../listing/services/listingService.js';
+import {useCallback, useEffect, useState} from 'react';
+import {listingService} from '../../listing/services/listingService.js';
+import logger from '../../common/utils/logger.js';
 
 export const useUserListings = (userId, options = {}) => {
     const [listings, setListings] = useState([]);
@@ -59,9 +60,8 @@ export const useUserListings = (userId, options = {}) => {
                 });
             }
         } catch (err) {
-            console.error('User listings fetch error:', err);
-            console.error('Error details:', err.response?.data);
-            setError(err.message || 'Failed to fetch listings');
+            logger.error('User listings fetch error:', err);
+            setError(err.response?.data?.message || err.message || 'Failed to fetch listings');
             setListings([]);
         } finally {
             setIsLoading(false);

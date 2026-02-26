@@ -1,5 +1,5 @@
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import { AGREEMENT_TYPE_LABELS } from '../agreements.js';
+import {FileText as DocumentTextIcon} from 'lucide-react';
+import {AGREEMENT_TYPE_LABELS} from '../agreements.js';
 
 const AgreementsSection = ({ agreements, acceptedAgreements, onToggle, onRead, error }) => {
     if (!agreements?.length) return null;

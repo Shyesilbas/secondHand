@@ -1,17 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {
-    getUser,
-    getToken,
-    getRefreshToken,
     clearTokens,
-    setUser,
-    setTokens,
+    getUser,
     hasValidTokens,
-    isCookieBasedAuth
+    isCookieBasedAuth,
+    setTokens,
+    setUser
 } from '../common/services/storage/tokenStorage.js';
-import { authService } from './services/authService.js';
-import { UserDTO } from '../common/index.js';
+import {authService} from './services/authService.js';
+import {UserDTO} from '../common/index.js';
+import logger from '../common/utils/logger.js';
 
 const AuthContext = createContext();
 
@@ -23,22 +21,20 @@ export const useAuth = () => {
     return context;
 };
 
-// Global flag to prevent multiple initializations
-let isAuthInitializing = false;
-let isAuthInitialized = false;
-
 export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState({
         user: null,
         isAuthenticated: false,
         isLoading: true
     });
+    const isAuthInitializing = useRef(false);
+    const isAuthInitialized = useRef(false);
 
     useEffect(() => {
-        if (isAuthInitialized || isAuthInitializing) return;
-        
+        if (isAuthInitialized.current || isAuthInitializing.current) return;
+
         const initializeAuth = async () => {
-            isAuthInitializing = true;
+            isAuthInitializing.current = true;
             try {
                 const userData = getUser();
                 const isCookieAuth = isCookieBasedAuth();
@@ -69,11 +65,11 @@ export const AuthProvider = ({ children }) => {
                     setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                 }
             } catch (error) {
-                console.error('Auth initialization error:', error);
+                logger.error('Auth initialization error:', error);
                 setAuthState({ user: null, isAuthenticated: false, isLoading: false });
             } finally {
-                isAuthInitialized = true;
-                isAuthInitializing = false;
+                isAuthInitialized.current = true;
+                isAuthInitializing.current = false;
             }
         };
 
@@ -131,9 +127,9 @@ export const AuthProvider = ({ children }) => {
         } finally {
             clearTokens();
             setAuthState({ user: null, isAuthenticated: false, isLoading: false });
-            // Reset global flags so auth can be re-initialized if needed
-            isAuthInitialized = false;
-            isAuthInitializing = false;
+            // Reset flags so auth can be re-initialized if needed
+            isAuthInitialized.current = false;
+            isAuthInitializing.current = false;
         }
     }, []);
 

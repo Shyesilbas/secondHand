@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import logger from '../../common/utils/logger.js';
 
 const STORAGE_KEY = 'comparison_items';
 const MAX_ITEMS = 4;
@@ -26,7 +27,7 @@ const loadFromStorage = () => {
             }
         }
     } catch (error) {
-        console.error('Failed to load comparison items from storage:', error);
+        logger.error('Failed to load comparison items from storage:', error);
     }
     return { items: [], category: null };
 };
@@ -35,7 +36,7 @@ const saveToStorage = (items) => {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch (error) {
-        console.error('Failed to save comparison items to storage:', error);
+        logger.error('Failed to save comparison items to storage:', error);
     }
 };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { passwordService } from './services/passwordService.js';
 import { ROUTES } from '../common/constants/routes.js';
 import { useNotification } from '../notification/NotificationContext.jsx';
+import logger from '../common/utils/logger.js';
 import AuthInput from '../common/components/ui/AuthInput.jsx';
 import AuthButton from '../common/components/ui/AuthButton.jsx';
 import { ChangePasswordRequestDTO } from './auth.js';
@@ -74,7 +75,7 @@ const ChangePasswordPage = () => {
             setErrors({});
             setTimeout(() => navigate(ROUTES.PROFILE), 1500);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             if (error.response?.data?.message) {
                 const msg = error.response.data.message.toLowerCase();
                 if (msg.includes('current') || msg.includes('mevcut') || msg.includes('wrong') || msg.includes('yanlış')) setErrors({ currentPassword: error.response.data.message });

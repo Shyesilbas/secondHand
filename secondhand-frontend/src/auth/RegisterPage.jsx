@@ -1,19 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../common/constants/routes.js';
-import { API_BASE_URL } from '../common/constants/apiEndpoints.js';
-import { 
-    EyeIcon, 
-    EyeSlashIcon, 
-    EnvelopeIcon, 
-    LockClosedIcon,
-    UserIcon,
-    PhoneIcon,
-    CalendarIcon,
-    ArrowRightIcon,
-    CheckCircleIcon,
-    ShieldCheckIcon
-} from '@heroicons/react/24/outline';
+import {Link} from 'react-router-dom';
+import {ROUTES} from '../common/constants/routes.js';
+import {API_BASE_URL} from '../common/constants/apiEndpoints.js';
+import {
+    ArrowRight as ArrowRightIcon,
+    Calendar as CalendarIcon,
+    CheckCircle as CheckCircleIcon,
+    Eye as EyeIcon,
+    EyeOff as EyeSlashIcon,
+    Lock as LockClosedIcon,
+    Mail as EnvelopeIcon,
+    Phone as PhoneIcon,
+    ShieldCheck as ShieldCheckIcon,
+    User as UserIcon
+} from 'lucide-react';
 import useRegisterForm from "./hooks/useRegisterForm.js";
 import AgreementsSection from '../agreements/components/AgreementsSection.jsx';
 import AgreementModal from '../agreements/components/AgreementModal.jsx';

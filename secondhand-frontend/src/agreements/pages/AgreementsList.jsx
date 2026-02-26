@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import AgreementCard from '../components/AgreementCard.jsx';
 import AgreementModal from '../components/AgreementModal.jsx';
-import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { agreementService } from '../services/agreementService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import {Check as CheckIcon, Clock as ClockIcon} from 'lucide-react';
+import {agreementService} from '../services/agreementService.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 
 const AgreementsList = ({ agreements, userAgreements, loading, filter, setFilter, onAccepted }) => {
     const [acceptingAgreement, setAcceptingAgreement] = useState(null);

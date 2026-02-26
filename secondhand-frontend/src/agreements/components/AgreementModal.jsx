@@ -1,6 +1,12 @@
 import {AGREEMENT_TYPE_LABELS} from '../agreements.js';
 import {formatDate} from '../../common/formatters.js';
-import {CheckCircleIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {
+  CheckCircle as CheckCircleIcon,
+  Clock as ClockIcon,
+  FileText as DocumentTextIcon,
+  ShieldCheck as ShieldCheckIcon,
+  X as XMarkIcon
+} from 'lucide-react';
 
 const AgreementModal = ({ agreement, open, onClose, onAccept, accepting }) => {
   if (!open || !agreement) return null;

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
+import logger from '../../common/utils/logger.js';
 
 const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, orderStatus, shippingStatus, reviewsLoading = false, skipIndividualFetch = false }) => {
     const [showModal, setShowModal] = useState(false);
@@ -21,7 +22,7 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
                 setReview(reviewData);
             } catch (error) {
                 if (error?.response?.status !== 404) {
-                    console.error('Error checking review:', error);
+                    logger.error('Error checking review:', error);
                 }
                 setReview(null);
             }
@@ -70,7 +71,7 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
             .catch(error => {
                 // 404 is expected if review creation failed
                 if (error?.response?.status !== 404) {
-                    console.error('Error fetching review after creation:', error);
+                    logger.error('Error fetching review after creation:', error);
                 }
             })
             .finally(() => setLoading(false));

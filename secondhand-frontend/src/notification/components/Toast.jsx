@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import React, {useEffect, useState} from 'react';
+import {CheckCircle as CheckCircleIcon, X as XMarkIcon} from 'lucide-react';
 
 const Toast = ({ message, title, onClose, autoClose = true, autoCloseDelay = 2500 }) => {
     const [visible, setVisible] = useState(true);

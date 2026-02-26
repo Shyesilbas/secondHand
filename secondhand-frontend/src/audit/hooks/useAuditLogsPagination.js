@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { auditLogService } from '../services/auditLogService.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
+import logger from '../../common/utils/logger.js';
 
 export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
     const { enums } = useEnums();
@@ -39,7 +40,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
             setTotalPages(data.totalPages || 0);
             
         } catch (err) {
-            console.error('API ERROR:', err);
+            logger.error('API ERROR:', err);
             setError(err.response?.data?.message || 'An error occurred while loading security logs');
             setAuditLogs([]);
             setTotalElements(0);
@@ -222,7 +223,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
         }
         
         const browserText = browserVersion ? `${browser} ${browserVersion}` : browser;
-        return `${device} • ${browserText}`;
+        return os ? `${device} • ${browserText} • ${os}` : `${device} • ${browserText}`;
     };
 
     const getLocationFromIP = (ipAddress) => {

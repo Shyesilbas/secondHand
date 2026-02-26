@@ -49,16 +49,18 @@ const ProtectedRoute = ({ children }) => {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <p className="text-sm text-slate-500">Verifying authentication...</p>
             </div>
         );
     }
 
     if (!isAuthenticated) {
+        // Notification modal is already shown via useEffect, render minimal placeholder
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+            <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+                <p className="text-sm text-slate-500">Redirecting to login...</p>
             </div>
         );
     }

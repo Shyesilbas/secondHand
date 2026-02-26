@@ -1,20 +1,20 @@
 
-export const LoginRequestDTO = {
+export const LoginRequestDTO = Object.freeze({
   email: '',
   password: '',
   rememberMe: false,
-};
+});
 
-export const LoginResponseDTO = {
+export const LoginResponseDTO = Object.freeze({
   message: '',
   success: false,
   userId: null,
   email: '',
   accessToken: '',
   refreshToken: '',
-};
+});
 
-export const RegisterRequestDTO = {
+export const RegisterRequestDTO = Object.freeze({
   name: '',
   surname: '',
   email: '',
@@ -24,9 +24,9 @@ export const RegisterRequestDTO = {
   birthdate: '',
   agreementsAccepted: false,
   acceptedAgreementIds: [],
-};
+});
 
-export const RegisterResponseDTO = {
+export const RegisterResponseDTO = Object.freeze({
   welcomeMessage: '',
   importantMessage: '',
   informationMessage: '',
@@ -34,28 +34,28 @@ export const RegisterResponseDTO = {
   email: '',
   name: '',
   surname: '',
-};
+});
 
-export const ForgotPasswordRequestDTO = {
+export const ForgotPasswordRequestDTO = Object.freeze({
   email: '',
-};
+});
 
-export const ResetPasswordRequestDTO = {
+export const ResetPasswordRequestDTO = Object.freeze({
   token: '',
   newPassword: '',
-};
+});
 
-export const ChangePasswordRequestDTO = {
+export const ChangePasswordRequestDTO = Object.freeze({
   currentPassword: '',
   newPassword: '',
   confirmPassword: '',
-};
+});
 
-export const TokenValidationResultDTO = {
+export const TokenValidationResultDTO = Object.freeze({
   valid: false,
   user: null,
   message: '',
-};
+});
 
 export const createLoginRequest = (data) => {
   return {

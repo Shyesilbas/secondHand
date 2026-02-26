@@ -1,62 +1,56 @@
-import {useCallback, useState} from 'react';
-import {createComplaint, getMyComplaints} from '../service/complaintService.js';
-import {useNotification} from '../../notification/NotificationContext.jsx';
+import { useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { createComplaint, getMyComplaints } from '../service/complaintService.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
+
+const COMPLAINT_KEYS = {
+    all: ['complaints'],
+    my: () => [...COMPLAINT_KEYS.all, 'my'],
+};
 
 export const useComplaints = () => {
-    const [complaints, setComplaints] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
     const { showNotification } = useNotification();
+    const queryClient = useQueryClient();
 
     const notify = useCallback((type, title, message) => {
         showNotification({ type, title, message });
     }, [showNotification]);
 
-    const handleCreateComplaint = useCallback(async (complaintData) => {
-        setIsLoading(true);
-        setError(null);
+    const {
+        data: complaints = [],
+        isLoading,
+        error: queryError,
+        refetch,
+    } = useQuery({
+        queryKey: COMPLAINT_KEYS.my(),
+        queryFn: getMyComplaints,
+        enabled: false, // Only fetch when getUserComplaints is called
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
 
-        try {
-            const result = await createComplaint(complaintData);
+    const createMutation = useMutation({
+        mutationFn: createComplaint,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: COMPLAINT_KEYS.all });
             notify('success', 'Complaint Submitted', 'Your complaint has been submitted successfully.' +
                 ' You can Follow your complaints from Profile -> Quick Actions -> Support & Complaints');
-            return result;
-        } catch (err) {
+        },
+        onError: (err) => {
             const errorMessage = err.response?.data?.message || err.message || 'Failed to submit complaint.';
-            setError(errorMessage);
             notify('error', 'Complaint Failed', errorMessage);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    }, [notify]);
+        },
+    });
 
-    const handleGetUserComplaints = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const data = await getMyComplaints();
-            setComplaints(data);
-            return data;
-        } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to load complaints.';
-            setError(errorMessage);
-            notify('error', 'Load Failed', errorMessage);
-            return [];
-        } finally {
-            setIsLoading(false);
-        }
-    }, [notify]);
-
-    const clearError = useCallback(() => setError(null), []);
+    const error = queryError?.message || createMutation.error?.message || null;
 
     return {
         complaints,
-        isLoading,
+        isLoading: isLoading || createMutation.isPending,
         error,
-        createComplaint: handleCreateComplaint,
-        getUserComplaints: handleGetUserComplaints,
-        clearError
+        createComplaint: (data) => createMutation.mutateAsync(data),
+        getUserComplaints: refetch,
+        clearError: () => {},
     };
 };

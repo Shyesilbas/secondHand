@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import React, {useEffect, useState} from 'react';
+import {ShieldCheck as ShieldCheckIcon} from 'lucide-react';
 
 const CheckoutVerificationStep = ({
     paymentVerificationCode,

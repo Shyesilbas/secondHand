@@ -1,8 +1,9 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import useAddresses from '../hooks/useAddresses.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
+import logger from '../../common/utils/logger.js';
 
 const AddressList = memo(({ isActive }) => {
   const { addresses, loading, error, addAddress, updateAddress, selectMainAddress, deleteAddress } = useAddresses({
@@ -51,8 +52,8 @@ const AddressList = memo(({ isActive }) => {
       await selectMainAddress(addressId);
       showSuccess('Main Address Set', 'Address has been set as your main address successfully.');
     } catch (err) {
-      console.error('Failed to select main address:', err);
-      showError('Error', 'Failed to set main address. Please try again.');
+      logger.error('Failed to select main address:', err);
+      showError('Error', err.response?.data?.message || 'Failed to set main address. Please try again.');
     }
   }, [selectMainAddress, showSuccess, showError]);
 
@@ -65,8 +66,8 @@ const AddressList = memo(({ isActive }) => {
           await deleteAddress(addressId);
           showSuccess('Address Deleted', 'Address has been deleted successfully.');
         } catch (err) {
-          console.error('Failed to delete address:', err);
-          showError('Error', 'Failed to delete address. Please try again.');
+          logger.error('Failed to delete address:', err);
+          showError('Error', err.response?.data?.message || 'Failed to delete address. Please try again.');
         }
       }
     );

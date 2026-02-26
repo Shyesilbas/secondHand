@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useComplaints } from '../hooks/useComplaints.js';
+import React, {useRef, useState} from 'react';
+import {AlertTriangle as ExclamationTriangleIcon} from 'lucide-react';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {useComplaints} from '../hooks/useComplaints.js';
 import ComplaintModal from './ComplaintModal.jsx';
-import { ROUTES } from '../../common/constants/routes.js';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {ROUTES} from '../../common/constants/routes.js';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 const ComplaintButton = ({ targetUserId, targetUserName, targetUser, listingId, listingTitle, className = "" }) => {
     const [showModal, setShowModal] = useState(false);

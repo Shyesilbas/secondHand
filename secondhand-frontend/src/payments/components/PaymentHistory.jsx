@@ -1,12 +1,12 @@
 import React from 'react';
-import { BanknotesIcon } from '@heroicons/react/24/outline';
-import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import {Banknote as BanknotesIcon} from 'lucide-react';
+import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {
-  PAYMENT_TYPES,
+  PAYMENT_DIRECTION_LABELS,
   PAYMENT_DIRECTIONS,
   PAYMENT_TYPE_LABELS,
+  PAYMENT_TYPES,
   TRANSACTION_TYPE_LABELS,
-  PAYMENT_DIRECTION_LABELS,
 } from '../paymentSchema.js';
 
 const PaymentItemSkeleton = () => {

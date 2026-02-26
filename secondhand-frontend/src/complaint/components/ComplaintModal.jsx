@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { COMPLAINT_REASONS } from '../types/complaintTypes.js';
-import { useAuthState } from '../../auth/AuthContext.jsx';
-import { AlertCircle, ShieldCheck, Loader2, X } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {COMPLAINT_REASONS} from '../types/complaintTypes.js';
+import {useAuthState} from '../../auth/AuthContext.jsx';
+import {AlertCircle, Loader2, ShieldCheck, X} from 'lucide-react';
+import logger from '../../common/utils/logger.js';
 
 const ComplaintModal = ({
                             isOpen,
@@ -47,7 +48,7 @@ const ComplaintModal = ({
         e.preventDefault();
 
         if (!currentUser) {
-            console.error('User must be logged in to submit a complaint.');
+            logger.error('User must be logged in to submit a complaint.');
             return;
         }
 
@@ -65,7 +66,7 @@ const ComplaintModal = ({
             await onSubmit(complaintData);
             onClose();
         } catch (error) {
-            console.error('Complaint submission failed:', error);
+            logger.error('Complaint submission failed:', error);
         }
     };
 

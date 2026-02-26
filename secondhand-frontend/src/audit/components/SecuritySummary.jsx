@@ -1,4 +1,4 @@
-import { ShieldCheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import {AlertTriangle as ExclamationTriangleIcon, ShieldCheck as ShieldCheckIcon} from 'lucide-react';
 
 const SecuritySummary = ({ totalElements, auditLogs }) => {
     const successfulLogins = auditLogs.filter(log => log.eventType === 'LOGIN_SUCCESS').length;

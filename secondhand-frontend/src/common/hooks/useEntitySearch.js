@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import {useCallback, useState} from 'react';
+import logger from '../utils/logger.js';
 
 export const useEntitySearch = (config) => {
   const { service, entityName = 'Entity', defaultData = [] } = config;
@@ -54,7 +55,7 @@ export const useEntitySearch = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while filtering ${entityName.toLowerCase()}s. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error filtering ${entityName.toLowerCase()}s:`, err);
+      logger.error(`Error filtering ${entityName.toLowerCase()}s:`, err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -75,7 +76,7 @@ export const useEntitySearch = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while searching ${entityName.toLowerCase()}s. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error searching ${entityName.toLowerCase()}s:`, err);
+      logger.error(`Error searching ${entityName.toLowerCase()}s:`, err);
       throw err;
     } finally {
       setIsLoading(false);

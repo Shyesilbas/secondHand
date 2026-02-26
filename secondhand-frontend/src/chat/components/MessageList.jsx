@@ -1,7 +1,7 @@
-import React, { useState, memo } from 'react';
-import { TrashIcon } from '@heroicons/react/24/outline';
-import { formatDistanceToNow } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import React, {memo, useState} from 'react';
+import {Trash2 as TrashIcon} from 'lucide-react';
+import {formatDistanceToNow} from 'date-fns';
+import {enUS} from 'date-fns/locale';
 
 const MessageBubble = memo(({ message, isOwnMessage, onDeleteMessage }) => {
   const [showDeleteButton, setShowDeleteButton] = useState(false);

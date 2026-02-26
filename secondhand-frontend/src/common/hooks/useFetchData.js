@@ -1,3 +1,13 @@
+/**
+ * @deprecated Use React Query's useQuery instead.
+ * This hook is kept for backward compatibility only.
+ *
+ * Example migration:
+ *   const { data, isLoading, error, refetch } = useQuery({
+ *     queryKey: ['myKey'],
+ *     queryFn: fetchFunction,
+ *   });
+ */
 import { useState, useEffect, useCallback } from 'react';
 
 export const useFetchData = (fetchFunction) => {

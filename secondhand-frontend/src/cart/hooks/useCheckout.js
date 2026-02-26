@@ -7,6 +7,7 @@ import useAddresses from '../../user/hooks/useAddresses.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
+import logger from '../../common/utils/logger.js';
 
 export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, offerId) => {
     const navigate = useNavigate();
@@ -58,7 +59,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 setCards(normalized);
             })
             .catch((err) => {
-                console.error('Error loading cards:', err);
+                logger.error('Error loading cards:', err);
                 setCards([]);
             });
 

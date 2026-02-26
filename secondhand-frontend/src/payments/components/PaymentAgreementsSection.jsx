@@ -3,6 +3,7 @@ import { agreementService } from '../../agreements/services/agreementService.js'
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
+import logger from '../../common/utils/logger.js';
 
 const PaymentAgreementsSection = ({ 
   acceptedAgreements, 
@@ -32,7 +33,7 @@ const PaymentAgreementsSection = ({
           onRequiredAgreementsChange(data);
         }
       } catch (error) {
-        console.error('Error fetching payment agreements:', error);
+        logger.error('Error fetching payment agreements:', error);
       } finally {
         setLoading(false);
       }

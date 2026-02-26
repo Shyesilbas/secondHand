@@ -1,12 +1,11 @@
-import React, { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { Menu } from 'lucide-react';
+import React, {useCallback} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Menu, X as XMarkIcon} from 'lucide-react';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import PaymentHistory from '../components/PaymentHistory.jsx';
-import PaymentNavigation, { PaymentPagination } from '../components/PaymentNavigation.jsx';
-import { PaymentInfo } from '../components/WalletOverview.jsx';
-import { usePayments } from '../hooks/usePayments.js';
+import PaymentNavigation, {PaymentPagination} from '../components/PaymentNavigation.jsx';
+import {PaymentInfo} from '../components/WalletOverview.jsx';
+import {usePayments} from '../hooks/usePayments.js';
 
 const PaymentsPage = () => {
     const navigate = useNavigate();

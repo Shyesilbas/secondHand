@@ -1,4 +1,4 @@
-export const ListingDTO = {
+export const ListingDTO = Object.freeze({
   id: '',
   listingNo: '',
   title: '',
@@ -13,16 +13,16 @@ export const ListingDTO = {
   sellerId: 0,
   type: '',   createdAt: '',
   updatedAt: '',
-};
+});
 
-export const ListingStatisticsDTO = {
+export const ListingStatisticsDTO = Object.freeze({
   totalListings: 0,
   activeListings: 0,
   activeSellerCount: 0,
   activeCityCount: 0,
-};
+});
 
-export const ListingResponseDTO = {
+export const ListingResponseDTO = Object.freeze({
   id: '',
   listingNo: '',
   title: '',
@@ -37,4 +37,4 @@ export const ListingResponseDTO = {
   sellerId: 0,
   type: '',   createdAt: '',
   updatedAt: '',
-};
+});

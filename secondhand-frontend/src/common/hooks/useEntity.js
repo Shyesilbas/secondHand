@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import logger from '../utils/logger.js';
 
 export const useEntity = (config) => {
   const { entityId = null, service, defaultData = null, entityName = 'Entity' } = config;
@@ -19,7 +20,7 @@ export const useEntity = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while fetching ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error fetching ${entityName.toLowerCase()}:`, err);
+      logger.error(`Error fetching ${entityName.toLowerCase()}:`, err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -39,7 +40,7 @@ export const useEntity = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while creating ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error creating ${entityName.toLowerCase()}:`, err);
+      logger.error(`Error creating ${entityName.toLowerCase()}:`, err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -64,7 +65,7 @@ export const useEntity = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while updating ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error updating ${entityName.toLowerCase()}:`, err);
+      logger.error(`Error updating ${entityName.toLowerCase()}:`, err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -85,7 +86,7 @@ export const useEntity = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `Error occurred while deleting ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error deleting ${entityName.toLowerCase()}:`, err);
+      logger.error(`Error deleting ${entityName.toLowerCase()}:`, err);
       throw err;
     } finally {
       setIsLoading(false);

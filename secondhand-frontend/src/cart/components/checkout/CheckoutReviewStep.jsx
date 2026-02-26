@@ -1,7 +1,7 @@
-import { formatCurrency } from '../../../common/formatters.js';
+import {formatCurrency} from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
-import { useSellerReviewStatsCache } from '../../../reviews/hooks/useSellerReviewStatsCache.js';
-import { StarIcon } from '@heroicons/react/24/solid';
+import {useSellerReviewStatsCache} from '../../../reviews/hooks/useSellerReviewStatsCache.js';
+import {Star as StarIcon} from 'lucide-react';
 
 const SellerRating = ({ sellerId }) => {
     const { stats, loading } = useSellerReviewStatsCache(sellerId);

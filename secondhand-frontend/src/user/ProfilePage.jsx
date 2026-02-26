@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { useAuthState } from '../auth/AuthContext.jsx';
-import { usePhoneUpdate } from './hooks/usePhoneUpdate.js';
-import { UserIcon, ShieldCheckIcon, MapPinIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import React, {useState} from 'react';
+import {useAuthState} from '../auth/AuthContext.jsx';
+import {usePhoneUpdate} from './hooks/usePhoneUpdate.js';
+import {
+    MapPin as MapPinIcon,
+    Settings as Cog6ToothIcon,
+    ShieldCheck as ShieldCheckIcon,
+    User as UserIcon
+} from 'lucide-react';
 import ProfileHeader from './components/ProfileHeader.jsx';
 import ProfilePersonalInfo from './components/ProfilePersonalInfo.jsx';
 import ProfileAccountStatus from './components/ProfileAccountStatus.jsx';
 import ProfileQuickActions from './components/ProfileQuickActions.jsx';
 import AddressList from './components/AddressList.jsx';
-import { useQueryClient } from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 
 const TABS = [
     { 

@@ -1,16 +1,15 @@
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../hooks/useCart.js';
-import { useCheckout } from '../hooks/index.js';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {ArrowLeft as ArrowLeftIcon} from 'lucide-react';
+import {useCart} from '../hooks/useCart.js';
+import {useCheckout} from '../hooks/index.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
-import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
-import { couponService } from '../services/couponService.js';
+import {couponService} from '../services/couponService.js';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
-import { offerService } from '../../offer/services/offerService.js';
-import { listingService } from '../../listing/services/listingService.js';
+import {offerService} from '../../offer/services/offerService.js';
+import {listingService} from '../../listing/services/listingService.js';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();

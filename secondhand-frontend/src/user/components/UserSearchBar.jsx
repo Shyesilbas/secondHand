@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { searchUsers } from '../services/userSearchService.js';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {searchUsers} from '../services/userSearchService.js';
 import UserSearchResults from './UserSearchResults.jsx';
-import { ROUTES } from '../../common/constants/routes.js';
+import {ROUTES} from '../../common/constants/routes.js';
+import logger from '../../common/utils/logger.js';
 
 const UserSearchBar = ({ className = "" }) => {
     const [query, setQuery] = useState('');
@@ -37,7 +38,7 @@ const UserSearchBar = ({ className = "" }) => {
             setIsVisible(true);
             setSelectedIndex(-1);
         } catch (error) {
-            console.error('Search error:', error);
+            logger.error('Search error:', error);
             setResults([]);
             setIsVisible(false);
         } finally {

@@ -1,8 +1,7 @@
-import { PlusIcon, MinusIcon, XMarkIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { Star } from 'lucide-react';
-import { formatCurrency } from '../../common/formatters.js';
-import { useSellerReviewStatsCache } from '../../reviews/hooks/useSellerReviewStatsCache.js';
-import { useReservationTimer } from '../hooks/useReservationTimer.js';
+import {Clock as ClockIcon, Minus as MinusIcon, Plus as PlusIcon, Star, X as XMarkIcon} from 'lucide-react';
+import {formatCurrency} from '../../common/formatters.js';
+import {useSellerReviewStatsCache} from '../../reviews/hooks/useSellerReviewStatsCache.js';
+import {useReservationTimer} from '../hooks/useReservationTimer.js';
 
 const CartItemCard = ({ 
     item, 

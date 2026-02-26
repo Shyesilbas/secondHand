@@ -1,6 +1,6 @@
 import EmptyState from '../ui/EmptyState.jsx';
-import { formatCurrency } from '../../formatters.js';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {formatCurrency} from '../../formatters.js';
+import {Search as MagnifyingGlassIcon} from 'lucide-react';
 
 const SearchResults = ({ results, activeTab, selectedIndex, isLoading, query, onResultSelect }) => {
 

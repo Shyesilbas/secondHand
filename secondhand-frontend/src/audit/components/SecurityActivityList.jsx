@@ -1,5 +1,5 @@
-import { ClockIcon, MapPinIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
-import { formatDateTime } from '../../common/formatters.js';
+import {Clock as ClockIcon, MapPin as MapPinIcon} from 'lucide-react';
+import {formatDateTime} from '../../common/formatters.js';
 
 const SecurityActivityList = ({ 
     auditLogs, 

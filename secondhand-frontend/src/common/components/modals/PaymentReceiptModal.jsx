@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {createPortal} from 'react-dom';
 import {
-  ArrowDownLeftIcon,
-  ArrowUpRightIcon,
-  CheckBadgeIcon,
-  PrinterIcon,
-  XMarkIcon
-} from '@heroicons/react/24/outline';
+  ArrowDownLeft as ArrowDownLeftIcon,
+  ArrowUpRight as ArrowUpRightIcon,
+  BadgeCheck as CheckBadgeIcon,
+  Printer as PrinterIcon,
+  X as XMarkIcon
+} from 'lucide-react';
 import {formatCurrency, formatDateTime, replaceEnumCodesInHtml, resolveEnumLabel} from '../../formatters.js';
 import {useEnums} from '../../hooks/useEnums.js';
 import {useNotification} from '../../../notification/NotificationContext.jsx';

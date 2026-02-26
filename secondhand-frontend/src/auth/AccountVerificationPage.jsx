@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {useAuth} from './AuthContext.jsx';
 import {useNotification} from '../notification/NotificationContext.jsx';
 import {verificationService} from './services/verificationService.js';
+import logger from '../common/utils/logger.js';
 import {ROUTES} from '../common/constants/routes.js';
 import AuthInput from '../common/components/ui/AuthInput.jsx';
 import AuthButton from '../common/components/ui/AuthButton.jsx';
@@ -68,7 +69,7 @@ const AccountVerificationPage = () => {
             setCountdown(60);
             notification.showSuccess('Success', 'Verification code has been sent to your email!');
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             notification.showError('Error', error.response?.data?.message || 'Failed to send verification code.');
         } finally {
             setIsSendingCode(false);

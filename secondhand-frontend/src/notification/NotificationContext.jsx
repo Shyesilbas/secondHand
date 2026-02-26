@@ -25,7 +25,7 @@ export const NotificationProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
 
     const addNotification = useCallback((notification) => {
-        const id = Math.random().toString(36).substr(2, 9);
+        const id = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 9);
         if (notification.toast) {
             const toast = { id, ...notification };
             setToasts(prev => [...prev, toast]);

@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useChat } from '../hooks/useChat.js';
+import React, {useRef, useState} from 'react';
+import {MessageSquare as ChatBubbleLeftRightIcon} from 'lucide-react';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {useChat} from '../hooks/useChat.js';
 import ChatWindow from './ChatWindow.jsx';
-import { ROUTES } from '../../common/constants/routes.js';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {ROUTES} from '../../common/constants/routes.js';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) => {
     const { authState: { user, isAuthenticated } } = useAuth();

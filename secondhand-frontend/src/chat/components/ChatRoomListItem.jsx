@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {EllipsisVerticalIcon, TrashIcon} from '@heroicons/react/24/outline';
+import {EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon} from 'lucide-react';
 
 const ChatRoomListItem = ({
                             room,

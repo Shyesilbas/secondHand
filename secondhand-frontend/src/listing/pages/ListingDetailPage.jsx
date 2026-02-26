@@ -5,6 +5,7 @@ import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
 import { listingTypeRegistry } from '../config/listingConfig.js';
+import { NON_PURCHASABLE_TYPES, LISTING_STATUS } from '../types/index.js';
 import {ROUTES} from '../../common/constants/routes.js';
 import {trackView} from '../services/listingAddonService.js';
 import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
@@ -72,9 +73,9 @@ const ListingDetailPage = () => {
   if (!listing) return null;
 
   const DetailsComponent = listingTypeRegistry[listing.type]?.detailsComponent;
-  const hasReviews = !['VEHICLE', 'REAL_ESTATE'].includes(listing.type);
-  const canAddToCart = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
-  const canMakeOffer = !isOwner && !['REAL_ESTATE', 'VEHICLE'].includes(listing.type) && listing.status === 'ACTIVE';
+  const hasReviews = !NON_PURCHASABLE_TYPES.includes(listing.type);
+  const canAddToCart = !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+  const canMakeOffer = !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
   const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
   const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
   const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;

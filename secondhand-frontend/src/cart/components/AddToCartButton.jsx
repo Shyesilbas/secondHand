@@ -1,6 +1,7 @@
-import { ShoppingCartIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../hooks/useCart.js';
-import { useAuthState } from '../../auth/AuthContext.jsx';
+import {Check as CheckIcon, ShoppingCart as ShoppingCartIcon} from 'lucide-react';
+import {useCart} from '../hooks/useCart.js';
+import {useAuthState} from '../../auth/AuthContext.jsx';
+import logger from '../../common/utils/logger.js';
 
 const AddToCartButton = ({
                              listing,
@@ -29,7 +30,7 @@ const AddToCartButton = ({
         try {
             await addToCart(listing.id, 1, '');
         } catch (error) {
-            console.error('Failed to add to cart:', error);
+            logger.error('Failed to add to cart:', error);
         }
     };
 

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { agreementService } from '../services/agreementService.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
+import {useCallback, useEffect, useState} from 'react';
+import {agreementService} from '../services/agreementService.js';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import logger from '../../common/utils/logger.js';
 
 export const useRegisterAgreements = () => {
   const [agreements, setAgreements] = useState([]);
@@ -17,7 +18,7 @@ export const useRegisterAgreements = () => {
       const requiredAgreements = await agreementService.getRequiredAgreementsForRegister();
       setAgreements(requiredAgreements);
     } catch (error) {
-            console.error('Error loading agreements:', error);
+            logger.error('Error loading agreements:', error);
       notification.showError('Error', 'Error occurred while listing agreements..');
     } finally {
       setAgreementsLoading(false);

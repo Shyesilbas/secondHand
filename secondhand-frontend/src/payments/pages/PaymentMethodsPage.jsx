@@ -1,14 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeftIcon, BanknotesIcon, CreditCardIcon, WalletIcon } from '@heroicons/react/24/outline';
+import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import {
+    ArrowLeft as ArrowLeftIcon,
+    Banknote as BanknotesIcon,
+    CreditCard as CreditCardIcon,
+    Wallet as WalletIcon
+} from 'lucide-react';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import FinancialCards from '../components/FinancialCards.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { formatCurrency } from '../../common/formatters.js';
-import { useBankAccountMutations, useCreditCard } from '../hooks/useFinancialAccountManager.js';
-import { useBankAccountsQuery, usePaymentStatisticsQuery } from '../hooks/queries.js';
-import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
-import { EWalletActions, EWalletBalance } from '../components/WalletOverview.jsx';
+import {useNotification} from '../../notification/NotificationContext.jsx';
+import {formatCurrency} from '../../common/formatters.js';
+import {useBankAccountMutations, useCreditCard} from '../hooks/useFinancialAccountManager.js';
+import {useBankAccountsQuery, usePaymentStatisticsQuery} from '../hooks/queries.js';
+import {useEWallet} from '../../ewallet/hooks/useEWallet.js';
+import {EWalletActions, EWalletBalance} from '../components/WalletOverview.jsx';
 
 const BankAccountsSection = () => {
     const notification = useNotification();

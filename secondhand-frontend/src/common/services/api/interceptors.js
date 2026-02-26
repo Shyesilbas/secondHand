@@ -1,7 +1,8 @@
 import apiClient from './config.js';
-import { getToken, getRefreshToken, setTokens, clearTokens, isCookieBasedAuth } from '../storage/tokenStorage.js';
+import {clearTokens, getToken, isCookieBasedAuth, setTokens} from '../storage/tokenStorage.js';
 import axios from "axios";
-import { API_ENDPOINTS, API_BASE_URL } from '../../constants/apiEndpoints.js';
+import {API_BASE_URL, API_ENDPOINTS} from '../../constants/apiEndpoints.js';
+import logger from '../../utils/logger.js';
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -18,7 +19,7 @@ const processQueue = (error, token = null) => {
 };
 
 const showTokenExpiredMessage = () => {
-    console.error('Session Expired. Please Login again.');
+    logger.error('Session Expired. Please Login again.');
 };
 
 let authContextRef = null;
@@ -62,7 +63,7 @@ apiClient.interceptors.response.use(
 
         // Hata objesini zenginleştir - Backend'den gelen mesajları extract et
         if (errorData) {
-            error.userMessage = errorData.message || 'An error occurred';
+            error.userMessage = errorData.message || null;
             error.errorCode = errorData.errorCode || errorData.code;
             error.validationErrors = errorData.validationErrors;
             error.errorDetails = {
@@ -89,7 +90,6 @@ apiClient.interceptors.response.use(
         // 403: Permission/CSRF hatası - özel handling
         if (status === 403) {
             if (errorData?.message?.toLowerCase().includes('csrf')) {
-                error.userMessage = 'Security token expired. Please refresh the page.';
                 error.errorCode = 'CSRF_ERROR';
             }
             return Promise.reject(error);

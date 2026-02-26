@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import {Check as CheckIcon} from 'lucide-react';
 
 const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -7,6 +7,7 @@ import { listingTypeRegistry } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { getListingConfig } from '../config/listingConfig.js';
 import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
+import logger from '../../common/utils/logger.js';
 
 // --- Components ---
 
@@ -93,7 +94,7 @@ const EditListingPage = ({
                 setData(fullData);
                 
             } catch (err) {
-                console.error('Failed to fetch listing:', err);
+                logger.error('Failed to fetch listing:', err);
                 setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
             } finally {
                 setIsLoading(false);
@@ -134,7 +135,7 @@ const EditListingPage = ({
             notification.showSuccess('Success', 'Listing updated successfully');
             navigate(ROUTES.MY_LISTINGS);
         } catch (err) {
-            console.error('Update failed:', err);
+            logger.error('Update failed:', err);
             notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
             throw err;
         }

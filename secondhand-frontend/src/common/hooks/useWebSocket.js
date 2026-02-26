@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Stomp } from '@stomp/stompjs';
+import { WS_BASE_URL } from '../constants/apiEndpoints.js';
+import logger from '../utils/logger.js';
+
+const MAX_RECONNECT_ATTEMPTS = 10;
+const INITIAL_RECONNECT_DELAY = 1000; // 1s
+const MAX_RECONNECT_DELAY = 30000; // 30s
 
 const useWebSocket = (userId) => {
     const [isConnected, setIsConnected] = useState(false);
@@ -8,6 +14,8 @@ const useWebSocket = (userId) => {
     const stompClient = useRef(null);
     const subscriptions = useRef(new Map());
     const messageCallbacks = useRef(new Set());
+    const reconnectAttempt = useRef(0);
+    const reconnectTimer = useRef(null);
 
     // ==================== CONNECTION MANAGEMENT ====================
     
@@ -17,7 +25,7 @@ const useWebSocket = (userId) => {
             return;
         }
 
-        const socket = new WebSocket('ws://localhost:8080/ws');
+        const socket = new WebSocket(WS_BASE_URL);
         stompClient.current = Stomp.over(socket);
         
         // Disable debug logs to reduce console noise
@@ -27,22 +35,40 @@ const useWebSocket = (userId) => {
             {},
             (frame) => {
                 setIsConnected(true);
-                
+                reconnectAttempt.current = 0; // Reset on successful connection
+
                 // Kullanıcıya özel mesajları dinle
                 if (userId) {
                     subscribeToUserMessages(userId);
                 }
             },
             (error) => {
-                console.error('❌ WebSocket connection error:', error);
+                logger.error('❌ WebSocket connection error:', error);
                 setIsConnected(false);
-                // 5 saniye sonra tekrar bağlanmayı dene
-                setTimeout(connect, 5000);
+
+                if (reconnectAttempt.current < MAX_RECONNECT_ATTEMPTS) {
+                    const delay = Math.min(
+                        INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempt.current),
+                        MAX_RECONNECT_DELAY
+                    );
+                    reconnectAttempt.current += 1;
+                    console.warn(`WebSocket reconnecting in ${delay}ms (attempt ${reconnectAttempt.current}/${MAX_RECONNECT_ATTEMPTS})`);
+                    reconnectTimer.current = setTimeout(connect, delay);
+                } else {
+                    logger.error(`WebSocket max reconnect attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Giving up.`);
+                }
             }
         );
     }, [userId]);
 
     const disconnect = useCallback(() => {
+        // Clear any pending reconnect timer
+        if (reconnectTimer.current) {
+            clearTimeout(reconnectTimer.current);
+            reconnectTimer.current = null;
+        }
+        reconnectAttempt.current = 0;
+
         if (stompClient.current) {
             // Tüm subscription'ları temizle
             subscriptions.current.forEach((subscription) => {

@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAuth } from '../../auth/AuthContext.jsx';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import logger from '../utils/logger.js';
 
 export const useEntityDetail = (config) => {
   const { entityId, service, entityName = 'Entity', ownerField = 'sellerId' } = config;
@@ -21,7 +22,7 @@ export const useEntityDetail = (config) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || `An error occurred while fetching the ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
-      console.error(`Error fetching ${entityName.toLowerCase()}:`, err);
+      logger.error(`Error fetching ${entityName.toLowerCase()}:`, err);
       throw err;
     } finally {
       setIsLoading(false);

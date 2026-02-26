@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
-import { useAuthState } from '../../auth/AuthContext.jsx';
+import React, {useRef, useState} from 'react';
+import {Image as ImageIcon, Loader2, Upload, X} from 'lucide-react';
+import {API_ENDPOINTS} from '../constants/apiEndpoints.js';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 import apiClient from '../services/api/interceptors.js';
+import logger from '../utils/logger.js';
 
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -51,11 +52,11 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
 
       onImageUpload(response.data.imageUrl);
     } catch (error) {
-      console.error('Image upload error:', error);
+      logger.error('Image upload error:', error);
       if (error.name === 'AbortError' || error.code === 'ECONNABORTED') {
         setError('Upload timed out. Please try again.');
       } else {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to upload image.';
+        const errorMessage = error.response?.data?.message || error.userMessage || 'Failed to upload image.';
         setError(errorMessage);
       }
     } finally {
