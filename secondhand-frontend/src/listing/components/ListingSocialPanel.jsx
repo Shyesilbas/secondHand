@@ -1,56 +1,41 @@
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingReviewsSection from '../../reviews/components/ListingReviewsSection.jsx';
-import { Flag } from 'lucide-react';
+import {Flag} from 'lucide-react';
 
 const ListingSocialPanel = ({ listing, isOwner, tabs, activeTab, onTabChange, DetailsComponent, hasReviews }) => {
   if (!listing) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-      {!isOwner && (
-        <div className="p-6 border-b border-slate-200/60 bg-white">
-          <ComplaintButton
-            targetUserId={listing.sellerId}
-            targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
-            listingId={listing.id}
-            listingTitle={listing.title}
-            className="w-full flex items-center justify-center gap-2 py-3 border border-slate-200/60 text-slate-700 hover:bg-slate-50 hover:border-slate-300/60 rounded-xl text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight"
-          >
-            <Flag className="w-4 h-4" />
-            Report
-          </ComplaintButton>
-        </div>
-      )}
-
-      <div className="flex items-center border-b border-slate-200/60 px-6 bg-slate-50/30">
+    <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+      {/* Tab bar */}
+      <div className="flex items-center border-b border-gray-50 px-5">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={`
-              relative py-4 px-5 text-sm font-semibold transition-all duration-300 ease-in-out tracking-tight
-              ${activeTab === tab.id ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'}
+              relative py-3 px-3 text-[13px] font-medium transition-colors duration-150
+              ${activeTab === tab.id ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}
             `}
           >
             {tab.label}
-            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-900" />}
+            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 rounded-full" />}
           </button>
         ))}
       </div>
 
-      <div className="p-8">
+      {/* Content */}
+      <div className="p-5">
         {activeTab === 'about' && (
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Description</h2>
-            <div className="prose prose-slate max-w-none prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4 prose-headings:font-bold prose-headings:text-slate-900 tracking-tight">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 tracking-tight">{listing.description}</p>
-            </div>
+            <h2 className="text-[13px] font-semibold text-gray-900 mb-3">Description</h2>
+            <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-600">{listing.description}</p>
           </div>
         )}
 
         {activeTab === 'details' && DetailsComponent && (
           <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Specifications</h2>
+            <h2 className="text-[13px] font-semibold text-gray-900 mb-3">Specifications</h2>
             <DetailsComponent listing={listing} />
           </div>
         )}
@@ -61,6 +46,22 @@ const ListingSocialPanel = ({ listing, isOwner, tabs, activeTab, onTabChange, De
           </div>
         )}
       </div>
+
+      {/* Report */}
+      {!isOwner && (
+        <div className="px-5 pb-4 pt-0">
+          <ComplaintButton
+            targetUserId={listing.sellerId}
+            targetUserName={`${listing.sellerName} ${listing.sellerSurname}`}
+            listingId={listing.id}
+            listingTitle={listing.title}
+            className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <Flag className="w-3 h-3" />
+            Report this listing
+          </ComplaintButton>
+        </div>
+      )}
     </div>
   );
 };
