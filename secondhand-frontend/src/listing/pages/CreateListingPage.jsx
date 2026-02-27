@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEnums } from '../../common/hooks/useEnums.js';
-import { getListingConfig, getListingTypeOptions, createFormRegistry } from '../config/listingConfig.js';
-import { ROUTES } from '../../common/constants/routes.js';
+import React, {useCallback, useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useEnums} from '../../common/hooks/useEnums.js';
+import {createFormRegistry, getListingConfig, getListingTypeOptions} from '../config/listingConfig.js';
+import {ROUTES} from '../../common/constants/routes.js';
 import ListingWizard from '../components/ListingWizard.jsx';
-import { ChevronRight, Check } from 'lucide-react';
+import {Check, ChevronRight} from 'lucide-react';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 
 const CreateListingPage = () => {
@@ -124,30 +124,43 @@ const CreateListingPage = () => {
     const renderSelectionStep = useCallback((stepId) => {
         if (stepId === 1) {
             return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {listingTypeOptions.map((type) => (
-                        <button
-                            key={type.value}
-                            type="button"
-                            onClick={() => handleTypeSelect(type.value)}
-                            className="group relative flex flex-col items-center p-6 rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-indigo-300 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 w-full text-center"
-                        >
-                            <div className="w-16 h-16 shrink-0 rounded-2xl bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center mb-4 transition-all duration-300 text-3xl [&>svg]:w-8 [&>svg]:h-8">
-                                {type.icon}
-                            </div>
-                            <div className="flex-1 min-w-0 w-full">
-                                <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2">
-                                    {type.label}
-                                </h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    {type.description}
-                                </p>
-                            </div>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                                <ChevronRight className="w-5 h-5 text-indigo-500" />
-                            </div>
-                        </button>
-                    ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {listingTypeOptions.map((type) => {
+                        const isSelected = selectedType === type.value;
+                        return (
+                            <button
+                                key={type.value}
+                                type="button"
+                                onClick={() => handleTypeSelect(type.value)}
+                                className={`group relative flex items-center gap-3.5 px-4 py-3.5 rounded-lg border transition-all duration-150 w-full text-left focus:outline-none ${
+                                    isSelected
+                                        ? 'border-gray-900 bg-gray-50'
+                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]'
+                                }`}
+                            >
+                                <div className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center text-xl transition-colors duration-150 ${
+                                    isSelected ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-500 group-hover:bg-gray-100'
+                                }`}>
+                                    {type.icon}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">
+                                        {type.label}
+                                    </h3>
+                                    <p className="text-[11px] text-gray-400 mt-0.5 truncate">
+                                        {type.description}
+                                    </p>
+                                </div>
+                                {isSelected ? (
+                                    <div className="w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+                                        <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                    </div>
+                                ) : (
+                                    <ChevronRight className="w-4 h-4 text-gray-200 group-hover:text-gray-400 shrink-0 transition-colors" />
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
             );
         }
@@ -166,7 +179,7 @@ const CreateListingPage = () => {
         if ((selector.kind || 'grid') === 'grid') {
             const options = optionsRaw || [];
             return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     {options.map((opt) => {
                         const id = opt.id || opt.value;
                         const label = opt.label || opt.name;
@@ -176,22 +189,20 @@ const CreateListingPage = () => {
                                 key={id}
                                 type="button"
                                 onClick={() => setSelectionValue(valueKey, id, selectorIndex)}
-                                className={`relative flex flex-col items-start text-left p-5 rounded-xl transition-all duration-200 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+                                className={`relative flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-150 w-full text-left focus:outline-none ${
                                     isSelected
-                                        ? 'ring-2 ring-indigo-600 ring-offset-2 bg-indigo-50/50 border border-indigo-200'
-                                        : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
+                                        ? 'border-gray-900 bg-gray-50'
+                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]'
                                 }`}
                             >
+                                <span className={`text-[13px] font-medium ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
+                                    {label}
+                                </span>
                                 {isSelected && (
-                                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center">
-                                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                                    <div className="w-5 h-5 rounded-full bg-gray-900 flex items-center justify-center shrink-0 ml-2">
+                                        <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                     </div>
                                 )}
-                                <div className="min-w-0 pr-8">
-                                    <h3 className="font-semibold text-slate-900 tracking-tight">
-                                        {label}
-                                    </h3>
-                                </div>
                             </button>
                         );
                     })}
@@ -202,7 +213,7 @@ const CreateListingPage = () => {
         const options = optionsRaw || [];
 
         return (
-            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="bg-white rounded-lg border border-gray-100 p-5">
                 <SearchableDropdown
                     options={options}
                     selectedValues={selectedValue ? [selectedValue] : []}
@@ -211,14 +222,14 @@ const CreateListingPage = () => {
                         setSelectionValue(valueKey, nextValue, selectorIndex);
                     }}
                     label={selector.title || 'Select'}
-                    placeholder={isEnabled ? 'Select...' : 'Complete previous steps first'}
+                    placeholder={isEnabled ? 'Select…' : 'Complete previous steps first'}
                     multiple={false}
                     disabled={!isEnabled}
                 />
             </div>
         );
 
-    }, [handleTypeSelect, listingTypeOptions, resolveStepOptions, selection, selectorSteps, setSelectionValue]);
+    }, [handleTypeSelect, listingTypeOptions, resolveStepOptions, selection, selectedType, selectorSteps, setSelectionValue]);
 
     const isReadyForForm = useMemo(() => {
         if (!SelectedForm) return false;

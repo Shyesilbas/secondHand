@@ -22,15 +22,15 @@ const resolveEnumName = (enums, enumKey, idOrValue) => {
 
 const FieldError = ({ error }) => {
   if (!error) return null;
-  return <p className="mt-2 text-xs text-red-600 tracking-tight">{error}</p>;
+  return <p className="mt-1.5 text-[11px] text-red-500">{error}</p>;
 };
 
 const SectionCard = ({ title, description, children }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-      <div className="pb-4 border-b-2 border-slate-100 mb-6">
-        <h3 className="text-base font-semibold text-slate-900 tracking-tight">{title}</h3>
-        {description ? <p className="text-xs text-slate-500 mt-1 tracking-tight">{description}</p> : null}
+    <div className="bg-white rounded-lg border border-gray-100 p-5">
+      <div className="pb-3 border-b border-gray-50 mb-5">
+        <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">{title}</h3>
+        {description ? <p className="text-[11px] text-gray-400 mt-0.5">{description}</p> : null}
       </div>
       {children}
     </div>
@@ -40,7 +40,9 @@ const SectionCard = ({ title, description, children }) => {
 const ToggleCardField = ({ name, label, description, value, onToggle }) => {
   return (
     <div
-      className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-150 cursor-pointer focus:outline-none ${
+        value ? 'border-gray-900 bg-gray-50' : 'border-gray-100 bg-white hover:border-gray-200'
+      }`}
       onClick={onToggle}
       role="button"
       tabIndex={0}
@@ -57,13 +59,13 @@ const ToggleCardField = ({ name, label, description, value, onToggle }) => {
         name={name}
         checked={Boolean(value)}
         onChange={() => onToggle()}
-        className="h-5 w-5 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500/20"
+        className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-1 focus:ring-gray-300"
       />
       <div>
-        <label htmlFor={name} className="block text-sm font-semibold text-slate-900 cursor-pointer tracking-tight">
+        <label htmlFor={name} className="block text-[13px] font-medium text-gray-900 cursor-pointer">
           {label}
         </label>
-        {description ? <p className="text-xs text-slate-500 tracking-tight mt-1">{description}</p> : null}
+        {description ? <p className="text-[11px] text-gray-400 mt-0.5">{description}</p> : null}
       </div>
     </div>
   );
@@ -266,15 +268,15 @@ const GenericListingForm = ({
     if (field.type === 'textarea') {
       return (
         <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
-          <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{label}</label>
+          <label className="block text-[13px] font-medium text-gray-900 mb-2">{label}</label>
           <textarea
             name={field.name}
             value={value || ''}
             onChange={handleInputChange}
             rows={field.rows || 3}
             placeholder={field.placeholder || ''}
-            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none tracking-tight ${
-              error ? 'border-red-300 focus:ring-red-500/20' : 'border-slate-200'
+            className={`w-full px-3 py-2.5 text-[13px] border rounded-lg focus:outline-none focus:ring-1 transition-colors resize-none ${
+              error ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'
             }`}
           />
           <FieldError error={error} />
@@ -285,7 +287,7 @@ const GenericListingForm = ({
     const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
     return (
       <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
-        <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{label}</label>
+        <label className="block text-[13px] font-medium text-gray-900 mb-2">{label}</label>
         <input
           type={inputType}
           name={field.name}
@@ -295,8 +297,8 @@ const GenericListingForm = ({
           max={field.max}
           step={field.step}
           placeholder={field.placeholder || ''}
-          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all tracking-tight ${
-            error ? 'border-red-300 focus:ring-red-500/20' : 'border-slate-200'
+          className={`w-full px-3 py-2.5 text-[13px] border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
+            error ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'
           }`}
         />
         <FieldError error={error} />
@@ -307,13 +309,13 @@ const GenericListingForm = ({
   const renderDetailsStep = (step) => {
     const sections = step?.sections || [];
     return (
-      <div className="space-y-10">
+      <div className="space-y-6">
         {sections.map((section) => {
           const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
           if (!isVisible) return null;
           return (
             <SectionCard key={section.id || section.title} title={section.title} description={section.description}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {(section.fields || []).map(renderField)}
               </div>
             </SectionCard>
@@ -325,7 +327,7 @@ const GenericListingForm = ({
 
   const renderMediaLocationStep = () => {
     return (
-      <div className="space-y-10">
+      <div className="space-y-6">
         <ImageUpload
           onImageUpload={(imageUrl) => ctx.setValue('imageUrl', imageUrl)}
           onImageRemove={() => ctx.setValue('imageUrl', '')}
@@ -382,21 +384,27 @@ const GenericListingForm = ({
 
     const typeLabel = listingConfig?.label || listingType;
 
+    const SummaryRow = ({ label, value }) => (
+      <div className="flex items-baseline justify-between py-2 border-b border-gray-50 last:border-0">
+        <span className="text-[11px] text-gray-400">{label}</span>
+        <span className="text-[13px] font-medium text-gray-900 text-right ml-4 tabular-nums">{value}</span>
+      </div>
+    );
+
     return (
-      <div className="space-y-10">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-          <div className="flex items-start justify-between gap-6">
+      <div className="space-y-4">
+        {/* Header card */}
+        <div className="bg-white rounded-lg border border-gray-100 p-5">
+          <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-slate-500 tracking-tight">Listing Type</div>
-              <div className="mt-1 text-lg font-bold text-slate-900 tracking-tight">{typeLabel}</div>
+              <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{typeLabel}</span>
+              <h3 className="mt-0.5 text-[15px] font-semibold text-gray-900 tracking-[-0.01em]">{formData?.title || 'Untitled'}</h3>
               {formData?.description ? (
-                <div className="mt-3 text-sm text-slate-700 tracking-tight whitespace-pre-wrap">
-                  {formData.description}
-                </div>
+                <p className="mt-2 text-[12px] text-gray-500 line-clamp-3 whitespace-pre-wrap">{formData.description}</p>
               ) : null}
             </div>
             {formData?.imageUrl ? (
-              <div className="w-28 h-28 rounded-xl border border-slate-200 shadow-sm overflow-hidden bg-slate-50 shrink-0">
+              <div className="w-20 h-20 rounded-lg border border-gray-100 overflow-hidden bg-gray-50 shrink-0">
                 <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
               </div>
             ) : null}
@@ -404,42 +412,30 @@ const GenericListingForm = ({
         </div>
 
         {basics.length ? (
-          <SectionCard title="Basic Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {basics.map((row) => (
-                <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
-                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
-                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
+          <div className="bg-white rounded-lg border border-gray-100 p-5">
+            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Basics</h4>
+            {basics.map((row) => (
+              <SummaryRow key={row.label} label={row.label} value={row.value} />
+            ))}
+          </div>
         ) : null}
 
         {location.length ? (
-          <SectionCard title="Location">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {location.map((row) => (
-                <div key={row.label} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
-                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
-                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
+          <div className="bg-white rounded-lg border border-gray-100 p-5">
+            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Location</h4>
+            {location.map((row) => (
+              <SummaryRow key={row.label} label={row.label} value={row.value} />
+            ))}
+          </div>
         ) : null}
 
         {detailFields.length ? (
-          <SectionCard title="Details">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {detailFields.map((row) => (
-                <div key={`${row.label}:${row.value}`} className="rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3">
-                  <div className="text-xs font-semibold text-slate-500 tracking-tight">{row.label}</div>
-                  <div className="mt-1 text-sm font-semibold text-slate-900 tracking-tight">{row.value}</div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
+          <div className="bg-white rounded-lg border border-gray-100 p-5">
+            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Details</h4>
+            {detailFields.map((row) => (
+              <SummaryRow key={`${row.label}:${row.value}`} label={row.label} value={row.value} />
+            ))}
+          </div>
         ) : null}
       </div>
     );

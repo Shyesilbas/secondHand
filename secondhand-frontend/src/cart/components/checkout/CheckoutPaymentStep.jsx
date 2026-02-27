@@ -68,16 +68,17 @@ const CheckoutPaymentStep = ({
     };
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tighter">Payment Method</h2>
-                <p className="text-slate-500 tracking-tight">Choose how you'd like to pay for your order.</p>
+        <div className="p-5">
+            <div className="mb-5">
+                <h2 className="text-[15px] font-semibold text-gray-900 tracking-[-0.01em] mb-1">Payment</h2>
+                <p className="text-[12px] text-gray-400">Choose how you'd like to pay.</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
+                {/* Payment methods */}
                 <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4 tracking-tight">Select Payment Method</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <h3 className="text-[12px] font-medium text-gray-500 mb-2.5">Method</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                         {paymentMethods.map((method) => {
                             const Icon = method.icon;
                             const isSelected = selectedPaymentType === method.id;
@@ -86,12 +87,12 @@ const CheckoutPaymentStep = ({
                             return (
                                 <label
                                     key={method.id}
-                                    className={`relative p-6 rounded-xl cursor-pointer transition-all ${
+                                    className={`relative flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-150 ${
                                         isSelected
-                                            ? 'ring-2 ring-indigo-600 ring-offset-2 scale-[1.02] bg-indigo-50/30 border border-indigo-200 shadow-md'
+                                            ? 'border border-gray-900 bg-gray-50'
                                             : isDisabled
-                                                ? 'bg-slate-50 border border-slate-200 cursor-not-allowed opacity-75'
-                                                : 'bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md'
+                                                ? 'border border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
+                                                : 'border border-gray-100 bg-white hover:border-gray-200'
                                     }`}
                                 >
                                     <input
@@ -103,16 +104,16 @@ const CheckoutPaymentStep = ({
                                         disabled={isDisabled}
                                         className="sr-only"
                                     />
-                                    <div className="text-center">
-                                        <div className={`w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center transition-all ${
-                                            isSelected ? 'bg-indigo-100' : 'bg-slate-100'
-                                        }`}>
-                                            <Icon className={`w-6 h-6 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} />
-                                        </div>
-                                        <div className="font-semibold text-slate-900 tracking-tight">{method.name}</div>
-                                        <div className="text-sm text-slate-500 mt-1 tracking-tight">{method.description}</div>
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                        isSelected ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-400'
+                                    }`}>
+                                        <Icon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-[13px] font-medium text-gray-900">{method.name}</div>
+                                        <div className="text-[10px] text-gray-400 truncate">{method.description}</div>
                                         {isDisabled && (
-                                            <div className="mt-2 p-2 bg-red-50 text-red-700 rounded-md text-xs font-semibold">Insufficient balance</div>
+                                            <span className="text-[10px] font-medium text-red-500 mt-0.5 inline-block">Insufficient balance</span>
                                         )}
                                     </div>
                                 </label>
@@ -122,82 +123,76 @@ const CheckoutPaymentStep = ({
                 </div>
 
                 {selectedPaymentType === 'CREDIT_CARD' && (
-                    <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
-                        <h4 className="text-lg font-semibold text-slate-900 mb-4 tracking-tight">Card Details</h4>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-tight">
-                                    Select Card
-                                </label>
-                                <select
-                                    value={selectedCardNumber || ''}
-                                    onChange={(e) => setSelectedCardNumber(e.target.value)}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tracking-tight"
-                                >
-                                    <option value="">Choose a card</option>
-                                    {cards?.map((card, index) => (
-                                        <option key={card.id || `card-${index}`} value={card.number || card.cardNumber}>
-                                            •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">Card Details</h4>
+                        <div>
+                            <label className="block text-[12px] font-medium text-gray-600 mb-1.5">Select Card</label>
+                            <select
+                                value={selectedCardNumber || ''}
+                                onChange={(e) => setSelectedCardNumber(e.target.value)}
+                                className="w-full px-3 py-2.5 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-300 bg-white"
+                            >
+                                <option value="">Choose a card</option>
+                                {cards?.map((card, index) => (
+                                    <option key={card.id || `card-${index}`} value={card.number || card.cardNumber}>
+                                        •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4)}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 )}
 
                 {selectedPaymentType === 'TRANSFER' && (
-                    <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
-                        <h4 className="text-lg font-semibold text-slate-900 mb-4 tracking-tight">Bank Account</h4>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-tight">
-                                    Select Account
-                                </label>
-                                <select
-                                    value={selectedBankAccountIban || ''}
-                                    onChange={(e) => setSelectedBankAccountIban(e.target.value)}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tracking-tight"
-                                >
-                                    <option value="">Choose an account</option>
-                                    {bankAccounts?.map((account, index) => (
-                                        <option key={account.id || `account-${index}`} value={account.IBAN}>
-                                            •••• {account.IBAN?.slice(-4)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">Bank Account</h4>
+                        <div>
+                            <label className="block text-[12px] font-medium text-gray-600 mb-1.5">Select Account</label>
+                            <select
+                                value={selectedBankAccountIban || ''}
+                                onChange={(e) => setSelectedBankAccountIban(e.target.value)}
+                                className="w-full px-3 py-2.5 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-300 bg-white"
+                            >
+                                <option value="">Choose an account</option>
+                                {bankAccounts?.map((account, index) => (
+                                    <option key={account.id || `account-${index}`} value={account.IBAN}>
+                                        •••• {account.IBAN?.slice(-4)}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 )}
 
                 {selectedPaymentType === 'EWALLET' && (
-                    <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
-                        <h4 className="text-lg font-semibold text-slate-900 mb-4 tracking-tight">E-Wallet Balance</h4>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">Available Balance</span>
-                            <span className="text-base font-semibold tabular-nums text-slate-900">
-                                {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm text-slate-600">Order Total</span>
-                            <span className="text-base font-semibold tabular-nums text-slate-900">
-                                {formatCurrency(calculateTotal(), currency || 'TRY')}
-                            </span>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">E-Wallet</h4>
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between text-[12px]">
+                                <span className="text-gray-500">Available</span>
+                                <span className="font-medium text-gray-900 tabular-nums">
+                                    {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[12px]">
+                                <span className="text-gray-500">Order Total</span>
+                                <span className="font-medium text-gray-900 tabular-nums">
+                                    {formatCurrency(calculateTotal(), currency || 'TRY')}
+                                </span>
+                            </div>
                         </div>
                         {calculateTotal() > eWallet?.balance && (
-                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                                <p className="text-sm text-red-600 font-semibold tracking-tight">
-                                    Insufficient balance. Please add funds or choose another payment method.
+                            <div className="mt-3 px-3 py-2 bg-red-50 border border-red-100 rounded-lg">
+                                <p className="text-[11px] text-red-600 font-medium">
+                                    Insufficient balance. Add funds or choose another method.
                                 </p>
                             </div>
                         )}
                     </div>
                 )}
 
-                <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
-                    <PaymentAgreementsSection 
+                <div className="bg-gray-50 rounded-lg p-4">
+                    <PaymentAgreementsSection
                         acceptedAgreements={acceptedAgreements}
                         onToggle={onAgreementToggle}
                         onRequiredAgreementsChange={onRequiredAgreementsChange}
@@ -205,33 +200,27 @@ const CheckoutPaymentStep = ({
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pt-8 border-t border-slate-200 mt-8">
+            <div className="flex items-center justify-between pt-4 mt-5 border-t border-gray-50">
                 <button
                     onClick={onBack}
-                    className="px-6 py-3 text-slate-600 hover:text-slate-900 font-semibold transition-colors tracking-tight"
+                    className="px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
                 >
                     Back
                 </button>
-                <button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-semibold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed tracking-tight"
-                >
-                    Send Verification Code
-                </button>
-                
-                {!canProceed() && (
-                    <div className="text-center mt-4">
-                        <p className="text-sm text-slate-500 tracking-tight">
-                            {!isPaymentMethodValid() && !areAllAgreementsAccepted() 
-                                ? "Please select a payment method and accept all agreements to continue"
-                                : !isPaymentMethodValid() 
-                                    ? "Please select a valid payment method to continue"
-                                    : "Please accept all payment agreements to continue"
-                            }
+                <div className="flex items-center gap-3">
+                    {!canProceed() && (
+                        <p className="text-[11px] text-gray-400 max-w-[200px] text-right">
+                            {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
                         </p>
-                    </div>
-                )}
+                    )}
+                    <button
+                        onClick={handleNext}
+                        disabled={!canProceed()}
+                        className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-[13px] font-medium transition-colors disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    >
+                        Send Verification Code
+                    </button>
+                </div>
             </div>
         </div>
     );

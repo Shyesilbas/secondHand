@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
-import { OrdersListLayout } from '../components/shared';
+import {OrdersListLayout} from '../components/shared';
 import {useOrderFlow} from '../hooks/useOrderFlow.js';
 import {ROUTES} from '../../common/constants/routes.js';
 
@@ -12,6 +12,7 @@ const MyOrdersPage = () => {
   return (
     <OrdersListLayout
       title="Orders"
+      stickyHeader
       onAnalytics={() => navigate(ROUTES.BUYER_DASHBOARD)}
       analyticsLabel="Analytics"
       flow={flow}

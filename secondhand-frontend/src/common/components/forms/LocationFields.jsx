@@ -1,43 +1,43 @@
 const LocationFields = ({ formData, errors = {}, onInputChange }) => {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
-      <div className="pb-4 border-b-2 border-slate-100 mb-6">
-        <h3 className="text-base font-semibold text-slate-900 tracking-tight">Location Information</h3>
-        <p className="text-xs text-slate-500 mt-1 tracking-tight">Enter city and district information</p>
+    <div className="bg-white rounded-lg border border-gray-100 p-5">
+      <div className="pb-3 border-b border-gray-50 mb-5">
+        <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">Location</h3>
+        <p className="text-[11px] text-gray-400 mt-0.5">City and district information</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            City <span className="text-red-500">*</span>
+          <label className="block text-[13px] font-medium text-gray-900 mb-2">
+            City <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             name="city"
             value={formData.city}
             onChange={onInputChange}
-            className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.city ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
+            className={`w-full px-3 py-2.5 text-[13px] rounded-lg border focus:outline-none focus:ring-1 transition-colors ${errors.city ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'} text-gray-900 placeholder-gray-300`}
             placeholder="e.g. Istanbul"
           />
           {errors.city && (
-            <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.city}</p>
+            <p className="mt-1.5 text-[11px] text-red-500">{errors.city}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            District <span className="text-red-500">*</span>
+          <label className="block text-[13px] font-medium text-gray-900 mb-2">
+            District <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             name="district"
             value={formData.district}
             onChange={onInputChange}
-            className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.district ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
-            placeholder="e.g. Kadıköy"
+            className={`w-full px-3 py-2.5 text-[13px] rounded-lg border focus:outline-none focus:ring-1 transition-colors ${errors.district ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'} text-gray-900 placeholder-gray-300`}
+            placeholder="e.g. Kadikoy"
           />
           {errors.district && (
-            <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.district}</p>
+            <p className="mt-1.5 text-[11px] text-red-500">{errors.district}</p>
           )}
         </div>
       </div>

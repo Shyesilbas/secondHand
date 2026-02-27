@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Search } from 'lucide-react';
-import { useAuthState } from '../auth/AuthContext.jsx';
-import { getAccountHubSections } from './accountHubSections.js';
-import { filterAccountHubSections } from './accountHubFilter.js';
+import React, {useCallback, useMemo, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {ArrowRight, Search} from 'lucide-react';
+import {useAuthState} from '../auth/AuthContext.jsx';
+import {getAccountHubSections} from './accountHubSections.js';
+import {filterAccountHubSections} from './accountHubFilter.js';
 
 const getInitials = (name) => {
   const value = (name || '').trim();

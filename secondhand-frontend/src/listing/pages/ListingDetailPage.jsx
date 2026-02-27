@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useListingData} from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
-import { listingTypeRegistry } from '../config/listingConfig.js';
-import { NON_PURCHASABLE_TYPES, LISTING_STATUS } from '../types/index.js';
+import {listingTypeRegistry} from '../config/listingConfig.js';
+import {LISTING_STATUS, NON_PURCHASABLE_TYPES} from '../types/index.js';
 import {ROUTES} from '../../common/constants/routes.js';
 import {trackView} from '../services/listingAddonService.js';
 import {getOrCreateSessionId} from '../../common/utils/sessionId.js';
@@ -30,10 +30,6 @@ const ListingDetailPage = () => {
 
   const isOwner = isAuthenticated && user?.id === listing?.sellerId;
 
-  const handleListingChanged = useCallback(() => {
-    fetchListing?.();
-  }, [fetchListing]);
-
   useEffect(() => {
     if (listing && !viewTrackedRef.current && !isOwner) {
       viewTrackedRef.current = true;
@@ -44,26 +40,24 @@ const ListingDetailPage = () => {
   }, [listing, isOwner]);
 
   if (isLoading) return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="flex flex-col items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
-      </div>
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
     </div>
   );
 
   if (error) return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <AlertTriangle className="w-6 h-6 text-gray-500" />
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
+      <div className="text-center max-w-sm">
+        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <AlertTriangle className="w-5 h-5 text-gray-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Unavailable</h3>
-        <p className="text-gray-500 mb-6">{error || "This listing could not be found."}</p>
+        <h3 className="text-[15px] font-semibold text-gray-900 mb-1">Unavailable</h3>
+        <p className="text-[13px] text-gray-400 mb-5">{error || "This listing could not be found."}</p>
         <Link
           to={ROUTES.LISTINGS}
-          className="inline-flex items-center text-sm font-medium text-gray-900 hover:underline"
+          className="inline-flex items-center text-[13px] font-medium text-gray-900 hover:underline"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
           Back to Listings
         </Link>
       </div>
@@ -89,47 +83,45 @@ const ListingDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      <div className="bg-white/70 backdrop-blur-xl border-b border-slate-200/40 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-          <nav className="flex items-center text-xs text-slate-500 font-medium tracking-tight">
-            <Link to={ROUTES.LISTINGS} className="hover:text-slate-900 transition-all duration-300 ease-in-out">Listings</Link>
-            <ChevronRight className="w-3.5 h-3.5 mx-2 text-slate-400" />
-            <span className="text-slate-900 font-semibold truncate max-w-[240px] tracking-tight">{listing.title}</span>
+    <div className="min-h-screen bg-[#fafafa] pb-16">
+      {/* Sticky header */}
+      <div className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
+        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
+          <nav className="flex items-center text-[11px] text-gray-400 min-w-0">
+            <Link to={ROUTES.LISTINGS} className="hover:text-gray-700 transition-colors shrink-0">Listings</Link>
+            <ChevronRight className="w-3 h-3 mx-1.5 text-gray-300 shrink-0" />
+            <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <button
               onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-              className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
+              className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
               title="Ask Aura"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
             </button>
             {canAddToCart && (
               <button
                 onClick={() => addToCart(listing.id)}
                 disabled={isAddingToCart}
-                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
+                className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
                 title="Add to Cart"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-3.5 h-3.5" />
               </button>
             )}
             {canMakeOffer && (
               <button
                 onClick={() => setIsOfferModalOpen(true)}
-                className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
+                className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
                 title="Make Offer"
               >
-                <HandCoins className="w-4 h-4" />
+                <HandCoins className="w-3.5 h-3.5" />
               </button>
             )}
             {!isOwner && (
-              <CompareButton
-                listing={listing}
-                size="md"
-              />
+              <CompareButton listing={listing} size="md" />
             )}
             {!isOwner && (
               <FavoriteButton
@@ -137,17 +129,14 @@ const ListingDetailPage = () => {
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="hover:bg-slate-100/50 rounded-xl p-2.5 border-0 text-slate-500 hover:text-red-600 transition-all duration-300 ease-in-out"
+                className="p-2 border-0 text-gray-400 hover:text-red-500 rounded-md transition-colors"
               />
             )}
-            <button className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out">
-              <Share2 className="w-4 h-4" />
+            <button className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors">
+              <Share2 className="w-3.5 h-3.5" />
             </button>
             {isOwner && (
-               <ListingCardActions
-                 listing={listing}
-                 onChanged={fetchListing}
-               />
+               <ListingCardActions listing={listing} onChanged={fetchListing} />
             )}
           </div>
         </div>
@@ -159,10 +148,11 @@ const ListingDetailPage = () => {
         listing={listing}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid lg:grid-cols-12 gap-6">
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <div className="grid lg:grid-cols-12 gap-5">
 
-          <div className="lg:col-span-8 space-y-5">
+          <div className="lg:col-span-8 space-y-4">
             <ListingHero
               listing={listing}
               variant="main"
@@ -183,8 +173,8 @@ const ListingDetailPage = () => {
             />
           </div>
 
-          <div className="lg:col-span-4 space-y-6">
-             <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 lg:sticky lg:top-20">
+          <div className="lg:col-span-4 space-y-4">
+             <div className="bg-white rounded-lg border border-gray-100 p-5 lg:sticky lg:top-16">
                 <ListingHero
                   listing={listing}
                   variant="sidebar"

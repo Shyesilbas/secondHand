@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import React, {useCallback, useState} from 'react';
+import {BarChart3} from 'lucide-react';
 import ListingInfoModal from './ListingInfoModal.jsx';
 
 const ListingAnalyticsPanel = ({ listing, isOwner, displayPrice }) => {
@@ -11,26 +11,22 @@ const ListingAnalyticsPanel = ({ listing, isOwner, displayPrice }) => {
   if (!listing) return null;
 
   return (
-    <div className="mt-6">
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 p-4">
-            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-              <BarChart3 className="w-4.5 h-4.5 text-slate-700" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-slate-900 tracking-tight">Analytics</div>
-              <div className="text-xs text-slate-500">Price history and exchange rates</div>
-            </div>
+    <div className="mt-4">
+      <div className="flex items-center justify-between py-3 border-t border-gray-50">
+        <div className="flex items-center gap-2.5">
+          <BarChart3 className="w-3.5 h-3.5 text-gray-400" />
+          <div>
+            <p className="text-[12px] font-medium text-gray-700">Analytics</p>
+            <p className="text-[10px] text-gray-400">Price history & rates</p>
           </div>
-          <button
-            type="button"
-            onClick={openInfo}
-            className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors duration-300 mr-4"
-          >
-            Open
-          </button>
         </div>
+        <button
+          type="button"
+          onClick={openInfo}
+          className="px-3 py-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 border border-gray-100 hover:border-gray-200 rounded-lg transition-colors"
+        >
+          View
+        </button>
       </div>
 
       <ListingInfoModal

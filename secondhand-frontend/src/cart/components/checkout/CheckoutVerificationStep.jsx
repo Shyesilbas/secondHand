@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ShieldCheck as ShieldCheckIcon} from 'lucide-react';
+import {Lock, ShieldCheck as ShieldCheckIcon} from 'lucide-react';
 
 const CheckoutVerificationStep = ({
     paymentVerificationCode,
@@ -36,7 +36,6 @@ const CheckoutVerificationStep = ({
             newCode[index] = value;
             setPaymentVerificationCode(newCode.join(''));
             
-            // Auto-focus next input
             if (value && index < 5) {
                 const nextInput = document.querySelector(`input[data-index="${index + 1}"]`);
                 nextInput?.focus();
@@ -44,118 +43,151 @@ const CheckoutVerificationStep = ({
         }
     };
 
+    const handleKeyDown = (index, e) => {
+        if (e.key === 'Backspace' && !paymentVerificationCode[index] && index > 0) {
+            const prevInput = document.querySelector(`input[data-index="${index - 1}"]`);
+            prevInput?.focus();
+        }
+    };
+
     const isCodeComplete = paymentVerificationCode.length === 6;
+    const filledCount = (paymentVerificationCode || '').replace(/\s/g, '').length;
 
     return (
-        <div className="p-8">
-            <div className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tighter">Verification</h2>
-                <p className="text-slate-500 tracking-tight">Enter the verification code sent to your email to complete your purchase.</p>
+        <div className="p-5">
+            {/* Security banner */}
+            <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+                    <Lock className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div>
+                    <h2 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">Secure Verification</h2>
+                    <p className="text-[11px] text-gray-400">A 6-digit code has been sent to your email.</p>
+                </div>
             </div>
 
-            <div className="space-y-8">
-                {/* Verification Code Input */}
+            <div className="space-y-5">
+                {/* Code input */}
                 <div className="text-center">
-                    <label className="block text-lg font-medium text-gray-900 mb-6">
-                        Enter Verification Code
-                    </label>
-                    <div className="flex justify-center space-x-3">
-                        {[0, 1, 2, 3, 4, 5].map((index) => (
-                            <input
-                                key={index}
-                                type="text"
-                                value={paymentVerificationCode[index] || ''}
-                                onChange={(e) => handleCodeChange(index, e.target.value)}
-                                className="w-14 h-14 text-center text-xl font-mono border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 tracking-tight"
-                                maxLength="1"
-                                data-index={index}
+                    <div className="flex justify-center gap-2.5">
+                        {[0, 1, 2, 3, 4, 5].map((index) => {
+                            const hasValue = Boolean(paymentVerificationCode[index]);
+                            return (
+                                <input
+                                    key={index}
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={paymentVerificationCode[index] || ''}
+                                    onChange={(e) => handleCodeChange(index, e.target.value)}
+                                    onKeyDown={(e) => handleKeyDown(index, e)}
+                                    className={`w-11 h-12 text-center text-[16px] font-mono rounded-lg transition-all duration-150 focus:outline-none ${
+                                        hasValue
+                                            ? 'border-gray-900 bg-gray-900 text-white border'
+                                            : 'border border-gray-200 bg-white text-gray-900 focus:border-gray-400 focus:ring-1 focus:ring-gray-200'
+                                    }`}
+                                    maxLength="1"
+                                    data-index={index}
+                                    autoComplete="one-time-code"
+                                />
+                            );
+                        })}
+                    </div>
+                    {/* Progress hint */}
+                    <div className="mt-2.5 flex items-center justify-center gap-1">
+                        {[0, 1, 2, 3, 4, 5].map((i) => (
+                            <div
+                                key={i}
+                                className={`w-1 h-1 rounded-full transition-colors ${
+                                    i < filledCount ? 'bg-gray-900' : 'bg-gray-200'
+                                }`}
                             />
                         ))}
                     </div>
-                    <p className="text-sm text-slate-500 mt-4 tracking-tight">
-                        Enter the 6-digit code sent to your email
-                    </p>
+                    <div className="mt-3">
+                        <button
+                            onClick={handleResendCode}
+                            disabled={!canResend}
+                            className={`text-[12px] font-medium transition-colors ${
+                                canResend
+                                    ? 'text-gray-600 hover:text-gray-900 underline underline-offset-2'
+                                    : 'text-gray-300 cursor-not-allowed'
+                            }`}
+                        >
+                            {canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
+                        </button>
+                    </div>
                 </div>
 
-                <div className="text-center">
-                    <button
-                        onClick={handleResendCode}
-                        disabled={!canResend}
-                        className={`text-sm font-semibold transition-colors tracking-tight ${
-                            canResend
-                                ? 'text-indigo-600 hover:text-indigo-700'
-                                : 'text-slate-400 cursor-not-allowed'
-                        }`}
-                    >
-                        {canResend ? 'Resend Code' : `Resend in ${resendTimer}s`}
-                    </button>
-                </div>
-
-                <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-semibold text-slate-900 tracking-tight">Recent Emails</h4>
+                {/* Recent emails */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-[12px] font-semibold text-gray-700">Recent Emails</h4>
                         <button
                             onClick={fetchEmails}
                             disabled={isEmailsLoading}
-                            className="text-sm text-indigo-600 hover:text-indigo-700 font-semibold disabled:opacity-50 tracking-tight"
+                            className="text-[11px] text-gray-500 hover:text-gray-700 font-medium disabled:opacity-40 transition-colors"
                         >
-                            {isEmailsLoading ? 'Loading...' : 'Refresh'}
+                            {isEmailsLoading ? 'Loading…' : 'Refresh'}
                         </button>
                     </div>
                     
-                    <div className="max-h-64 overflow-y-auto">
+                    <div className="max-h-52 overflow-y-auto">
                         {isEmailsLoading ? (
-                            <div className="flex items-center justify-center py-8">
-                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                            <div className="flex items-center justify-center py-6">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400" />
                             </div>
                         ) : emails && emails.length > 0 ? (
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {emails.slice(0, 2).map((email, index) => (
-                                    <div key={index} className="p-4 bg-white border border-slate-200 rounded-xl">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-sm font-semibold text-slate-900 tracking-tight">
+                                    <div key={index} className="px-3 py-2.5 bg-white border border-gray-100 rounded-lg">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[12px] font-medium text-gray-900">
                                                 {email.subject || 'Verification Code'}
                                             </span>
-                                            <span className="text-xs text-slate-500 tracking-tight">
+                                            <span className="text-[10px] text-gray-400 tabular-nums">
                                                 {email.sentAt || email.createdAt}
                                             </span>
                                         </div>
-                                        <div className="text-sm text-slate-600 font-mono tracking-tight">
+                                        <div className="text-[12px] text-gray-600 font-mono">
                                             {email.body || email.content}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-8 text-slate-500">
-                                <ShieldCheckIcon className="w-12 h-12 mx-auto mb-2 text-slate-400" />
-                                <p className="tracking-tight">No emails found</p>
+                            <div className="text-center py-6">
+                                <ShieldCheckIcon className="w-6 h-6 mx-auto mb-1.5 text-gray-300" />
+                                <p className="text-[12px] text-gray-400">No emails found</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pt-8 border-t border-slate-200 mt-8">
+            <div className="flex items-center justify-between pt-4 mt-5 border-t border-gray-50">
                 <button
                     onClick={onBack}
-                    className="px-6 py-3 text-slate-600 hover:text-slate-900 font-semibold transition-colors tracking-tight"
+                    className="px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
                 >
                     Back
                 </button>
                 <button
                     onClick={onCheckout}
                     disabled={proceedDisabled || isCheckingOut || !isCodeComplete}
-                    className="px-8 py-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 font-bold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 tracking-tight"
+                    className={`px-5 py-2.5 rounded-lg text-[13px] font-medium transition-all flex items-center gap-1.5 ${
+                        isCodeComplete && !proceedDisabled && !isCheckingOut
+                            ? 'bg-gray-900 text-white hover:bg-gray-800'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
                 >
                     {isCheckingOut ? (
                         <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            <span>Processing...</span>
+                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white" />
+                            <span>Processing…</span>
                         </>
                     ) : (
                         <>
-                            <ShieldCheckIcon className="w-4 h-4" />
+                            <ShieldCheckIcon className="w-3.5 h-3.5" />
                             <span>Complete Purchase</span>
                         </>
                     )}

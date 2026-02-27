@@ -3,16 +3,16 @@ import {PriceInput} from '../ui/PriceInput.jsx';
 
 const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = false, showQuantity = true }) => {
   return (
-    <div className="space-y-10">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-        <div className="pb-4 border-b-2 border-slate-100">
-          <h3 className="text-base font-semibold text-slate-900 tracking-tight">General Information</h3>
-          <p className="text-xs text-slate-500 mt-1 tracking-tight">Enter the basic listing information</p>
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg border border-gray-100 p-5 space-y-5">
+        <div className="pb-3 border-b border-gray-50">
+          <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">General Information</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">Basic listing details</p>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            Listing Title <span className="text-red-500">*</span>
+          <label className="block text-[13px] font-medium text-gray-900 mb-2">
+            Listing Title <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <input
@@ -20,65 +20,65 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
               name="title"
               value={formData.title}
               onChange={onInputChange}
-              className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.title ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
+              className={`w-full px-3 py-2.5 text-[13px] rounded-lg border focus:outline-none focus:ring-1 transition-colors ${errors.title ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'} text-gray-900 placeholder-gray-300`}
               placeholder="e.g., iPhone 13 Pro - Excellent Condition"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium tracking-tight">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 tabular-nums">
               {formData.title?.length || 0}/100
-            </div>
+            </span>
           </div>
           {errors.title && (
-            <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.title}</p>
+            <p className="mt-1.5 text-[11px] text-red-500">{errors.title}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-            Description <span className="text-red-500">*</span>
+          <label className="block text-[13px] font-medium text-gray-900 mb-2">
+            Description <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <textarea
               name="description"
               value={formData.description}
               onChange={onInputChange}
-              rows={6}
-              className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all resize-none tracking-tight ${errors.description ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
-              placeholder="Describe your item in detail. Include condition, features, usage history, and any flaws..."
+              rows={5}
+              className={`w-full px-3 py-2.5 text-[13px] rounded-lg border focus:outline-none focus:ring-1 transition-colors resize-none ${errors.description ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'} text-gray-900 placeholder-gray-300`}
+              placeholder="Describe your item in detail — condition, features, usage history, flaws…"
             />
-            <div className="absolute bottom-3 right-3 text-xs text-slate-400 font-medium tracking-tight">
-              {formData.description?.length || 0} characters / 5000
-            </div>
+            <span className="absolute bottom-2.5 right-3 text-[10px] text-gray-300 tabular-nums">
+              {formData.description?.length || 0} / 5000
+            </span>
           </div>
           {errors.description && (
-            <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.description}</p>
+            <p className="mt-1.5 text-[11px] text-red-500">{errors.description}</p>
           )}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-        <div className="pb-4 border-b-2 border-slate-100">
-          <h3 className="text-base font-semibold text-slate-900 tracking-tight">Pricing</h3>
-          <p className="text-xs text-slate-500 mt-1 tracking-tight">Set the item price and quantity</p>
+      <div className="bg-white rounded-lg border border-gray-100 p-5 space-y-5">
+        <div className="pb-3 border-b border-gray-50">
+          <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">Pricing</h3>
+          <p className="text-[11px] text-gray-400 mt-0.5">Set the price and quantity</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-              Price <span className="text-red-500">*</span>
+            <label className="block text-[13px] font-medium text-gray-900 mb-2">
+              Price <span className="text-red-400">*</span>
             </label>
             <div className="relative flex">
               <PriceInput
                 value={parsePrice(formData.price) ?? 0}
                 onChange={(n) => onInputChange({ target: { name: 'price', value: n != null ? String(n) : '' } })}
                 placeholder="0,00"
-                className={`flex-1 min-w-0 rounded-l-xl rounded-r-none border-r-0 py-3 focus:outline-none ${errors.price ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'}`}
+                className={`flex-1 min-w-0 rounded-l-lg rounded-r-none border-r-0 py-2.5 text-[13px] focus:outline-none ${errors.price ? 'border-red-300 focus:ring-1 focus:ring-red-200' : 'border-gray-200 focus:ring-1 focus:ring-gray-200 focus:border-gray-300'}`}
               />
               <div className="flex items-center shrink-0">
                 <select
                   name="currency"
                   value={formData.currency}
                   onChange={onInputChange}
-                  className="h-full py-0 pl-3 pr-8 border-l border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium rounded-r-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:bg-slate-100 transition-colors cursor-pointer tracking-tight"
+                  className="h-full py-0 pl-3 pr-7 border-l border-gray-200 bg-gray-50 text-gray-600 text-[12px] font-medium rounded-r-lg focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-300 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {enums.currencies?.map(currency => (
                     <option key={currency.value} value={currency.value}>
@@ -89,32 +89,32 @@ const ListingBasics = ({ formData, errors = {}, onInputChange, enums, isEdit = f
               </div>
             </div>
             {formData.price && parsePrice(formData.price) != null && (
-              <div className="mt-2 text-xs text-slate-600 font-medium tracking-tight">
-                Preview: <span className="text-indigo-700 font-mono">{formatCurrency(parsePrice(formData.price), formData.currency)}</span>
-              </div>
+              <p className="mt-1.5 text-[11px] text-gray-400">
+                Preview: <span className="text-gray-700 tabular-nums font-medium">{formatCurrency(parsePrice(formData.price), formData.currency)}</span>
+              </p>
             )}
             {errors.price && (
-              <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.price}</p>
+              <p className="mt-1.5 text-[11px] text-red-500">{errors.price}</p>
             )}
           </div>
 
           {showQuantity && (
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">
-                Quantity <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-gray-900 mb-2">
+                Quantity <span className="text-red-400">*</span>
               </label>
               <input
                 type="number"
                 name="quantity"
                 value={formData.quantity ?? ''}
                 onChange={onInputChange}
-                className={`w-full px-4 py-3 rounded-xl border focus:outline-none transition-all tracking-tight ${errors.quantity ? 'border-red-300 focus:ring-2 focus:ring-red-500/20' : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'} text-slate-900 placeholder-slate-400`}
+                className={`w-full px-3 py-2.5 text-[13px] rounded-lg border focus:outline-none focus:ring-1 transition-colors ${errors.quantity ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'} text-gray-900 placeholder-gray-300`}
                 placeholder="e.g. 5"
                 min="1"
                 step="1"
               />
               {errors.quantity && (
-                <p className="mt-2 text-xs text-red-600 tracking-tight">{errors.quantity}</p>
+                <p className="mt-1.5 text-[11px] text-red-500">{errors.quantity}</p>
               )}
             </div>
           )}
