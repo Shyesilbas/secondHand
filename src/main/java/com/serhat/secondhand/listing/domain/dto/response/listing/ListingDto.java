@@ -4,21 +4,22 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
+import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
-import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
-import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
-import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import com.serhat.secondhand.review.dto.ReviewDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,7 +37,9 @@ import java.util.UUID;
     @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE"),
     @JsonSubTypes.Type(value = ElectronicListingDto.class, name = "ELECTRONICS"),
     @JsonSubTypes.Type(value = RealEstateListingDto.class, name = "REAL_ESTATE"),
-    @JsonSubTypes.Type(value = ClothingListingDto.class, name = "CLOTHING")
+    @JsonSubTypes.Type(value = ClothingListingDto.class, name = "CLOTHING"),
+    @JsonSubTypes.Type(value = BooksListingDto.class, name = "BOOKS"),
+    @JsonSubTypes.Type(value = SportsListingDto.class, name = "SPORTS")
 })
 @Data
 @NoArgsConstructor

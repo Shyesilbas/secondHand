@@ -1,11 +1,10 @@
 package com.serhat.secondhand.listing.domain.dto.response.clothing;
 
+import com.serhat.secondhand.listing.domain.dto.response.common.LookupDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import lombok.AllArgsConstructor;
@@ -21,8 +20,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ClothingListingDto extends ListingDto {
 
-    private ClothingBrand brand;
-    private ClothingType clothingType;
+    private LookupDto brand;
+    private LookupDto clothingType;
     private Color color;
     private LocalDate purchaseDate;
     private ClothingCondition condition;
