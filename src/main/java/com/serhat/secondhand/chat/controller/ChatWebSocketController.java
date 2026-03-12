@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -17,10 +19,27 @@ import org.springframework.stereotype.Controller;
 public class ChatWebSocketController {
     
     private final ChatService chatService;
-    
+
+    /**
+     * Resolves the authenticated User from the WebSocket principal.
+     * @AuthenticationPrincipal does not work reliably in STOMP message handlers,
+     * so we extract the principal manually from the accessor.
+     */
+    private User resolveUser(SimpMessageHeaderAccessor accessor) {
+        Principal principal = accessor.getUser();
+        if (principal instanceof UsernamePasswordAuthenticationToken auth) {
+            Object p = auth.getPrincipal();
+            if (p instanceof User user && user.getId() != null) {
+                return user;
+            }
+        }
+        return null;
+    }
 
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(@Payload ChatMessageDto chatMessageDto, @AuthenticationPrincipal User user) {
+    public void sendMessage(@Payload ChatMessageDto chatMessageDto,
+                            SimpMessageHeaderAccessor accessor) {
+        User user = resolveUser(accessor);
         if (user == null) {
             log.warn("Unauthenticated WebSocket message attempt blocked");
             return;
@@ -41,8 +60,8 @@ public class ChatWebSocketController {
 
     @MessageMapping("/chat.joinRoom")
     public void joinRoom(@Payload ChatMessageDto chatMessageDto, 
-                        SimpMessageHeaderAccessor headerAccessor,
-                        @AuthenticationPrincipal User user) {
+                        SimpMessageHeaderAccessor accessor) {
+        User user = resolveUser(accessor);
         if (user == null) {
             log.warn("Unauthenticated WebSocket join attempt blocked");
             return;
@@ -54,31 +73,34 @@ public class ChatWebSocketController {
             return;
         }
         
-        headerAccessor.getSessionAttributes().put("chatRoomId", chatMessageDto.getChatRoomId());
-        headerAccessor.getSessionAttributes().put("userId", user.getId());
-        
+        headerAccessorPut(accessor, chatMessageDto.getChatRoomId(), user.getId());
         log.info("User {} joined room: {}", user.getId(), chatMessageDto.getChatRoomId());
     }
     
 
     @MessageMapping("/chat.leaveRoom")
     public void leaveRoom(@Payload ChatMessageDto chatMessageDto, 
-                         SimpMessageHeaderAccessor headerAccessor,
-                         @AuthenticationPrincipal User user) {
+                         SimpMessageHeaderAccessor accessor) {
+        User user = resolveUser(accessor);
         if (user == null) {
             log.warn("Unauthenticated WebSocket leave attempt blocked");
             return;
         }
         
-        headerAccessor.getSessionAttributes().remove("chatRoomId");
-        headerAccessor.getSessionAttributes().remove("userId");
-        
+        var attrs = accessor.getSessionAttributes();
+        if (attrs != null) {
+            attrs.remove("chatRoomId");
+            attrs.remove("userId");
+        }
+
         log.info("User {} left room: {}", user.getId(), chatMessageDto.getChatRoomId());
     }
     
 
     @MessageMapping("/chat.markAsRead")
-    public void markAsRead(@Payload ChatMessageDto chatMessageDto, @AuthenticationPrincipal User user) {
+    public void markAsRead(@Payload ChatMessageDto chatMessageDto,
+                           SimpMessageHeaderAccessor accessor) {
+        User user = resolveUser(accessor);
         if (user == null) {
             log.warn("Unauthenticated WebSocket markAsRead attempt blocked");
             return;
@@ -94,5 +116,13 @@ public class ChatWebSocketController {
                 user.getId(), chatMessageDto.getChatRoomId());
         
         chatService.markMessagesAsRead(chatMessageDto.getChatRoomId(), user.getId());
+    }
+
+    private void headerAccessorPut(SimpMessageHeaderAccessor accessor, Long chatRoomId, Long userId) {
+        var attrs = accessor.getSessionAttributes();
+        if (attrs != null) {
+            attrs.put("chatRoomId", chatRoomId);
+            attrs.put("userId", userId);
+        }
     }
 }

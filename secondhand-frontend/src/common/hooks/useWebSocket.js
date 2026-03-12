@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { Stomp } from '@stomp/stompjs';
-import { WS_BASE_URL } from '../constants/apiEndpoints.js';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {Stomp} from '@stomp/stompjs';
+import {WS_BASE_URL} from '../constants/apiEndpoints.js';
+import {getToken} from '../services/storage/tokenStorage.js';
 import logger from '../utils/logger.js';
 
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -25,6 +26,9 @@ const useWebSocket = (userId) => {
             return;
         }
 
+        const token = getToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
         const socket = new WebSocket(WS_BASE_URL);
         stompClient.current = Stomp.over(socket);
         
@@ -32,7 +36,7 @@ const useWebSocket = (userId) => {
         stompClient.current.debug = () => {};
         
         stompClient.current.connect(
-            {},
+            headers,
             (frame) => {
                 setIsConnected(true);
                 reconnectAttempt.current = 0; // Reset on successful connection

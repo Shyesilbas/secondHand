@@ -1,11 +1,10 @@
 package com.serhat.secondhand.listing.domain.dto.response.electronics;
 
+import com.serhat.secondhand.listing.domain.dto.response.common.LookupDto;
+import com.serhat.secondhand.listing.domain.dto.response.common.ModelDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import lombok.AllArgsConstructor;
@@ -19,9 +18,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ElectronicListingDto extends ListingDto {
-   private ElectronicType electronicType;
-   private ElectronicBrand electronicBrand;
-   private ElectronicModel model;
+   private LookupDto electronicType;
+   private LookupDto electronicBrand;
+   private ModelDto model;
    private String origin;
    private boolean warrantyProof;
    private Integer year;
@@ -44,5 +43,4 @@ public class ElectronicListingDto extends ListingDto {
    private Boolean noiseCancelling;
    private Boolean hasMicrophone;
    private Integer batteryLifeHours;
-
 }
