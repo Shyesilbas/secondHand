@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
 import { MessageCircle, Send, Sparkles, X } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -14,6 +15,28 @@ const AuraChatWidget = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isGreeting, setIsGreeting] = useState(false);
+  const [agentMode, setAgentMode] = useState(AI_AGENT_MODE_ENABLED);
+
+  const buildPayload = (text) => ({
+    message: text,
+    context: undefined,
+    agentMode,
+    uiContext: {
+      currentPage: 'AuraChatWidget',
+      route: window.location.pathname,
+    },
+  });
+
+  const sendApi = async (payload) => {
+    const message = typeof payload === 'object' && payload != null ? payload.message : payload;
+    const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
+    const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
+    if (AI_AGENT_MODE_ENABLED && agentMode) {
+      return aiChatService.agentQuery({ message, context, uiContext, agentMode: true });
+    }
+    return aiChatService.chat({ message, context });
+  };
+
   const {
     storageKey,
     messages,
@@ -22,7 +45,6 @@ const AuraChatWidget = () => {
     input,
     setInput,
     isSending,
-    setIsSending,
     listRef,
     scrollToBottom,
     sendMessage,
@@ -32,16 +54,17 @@ const AuraChatWidget = () => {
     isAuthenticated,
     initialMessages: [],
     withTyping: true,
-    buildPayload: (text) => text,
+    buildPayload,
+    sendApi,
     echoUserMessageWhenUnauthed: true,
   });
 
   useEffect(() => {
     if (!isOpen) return;
     queueMicrotask(scrollToBottom);
-  }, [isOpen, messages.length]);
+  }, [isOpen, messages.length, scrollToBottom]);
 
-  const ensureGreeting = async () => {
+  const ensureGreeting = useCallback(async () => {
     const started = localStorage.getItem(storageKey) === '1';
     if (started) return;
     if (!isAuthenticated || userId == null) {
@@ -60,7 +83,13 @@ const AuraChatWidget = () => {
 
     setIsGreeting(true);
     try {
-      const response = await aiChatService.chat({ userId, message: 'Hello' });
+      const response = AI_AGENT_MODE_ENABLED && agentMode
+        ? await aiChatService.agentQuery({
+            message: 'Hello',
+            agentMode: true,
+            uiContext: { currentPage: 'AuraChatWidget', route: window.location.pathname },
+          })
+        : await aiChatService.chat({ message: 'Hello' });
       const answer = response?.answer || "Hi, I'm Aura. What are you looking for today?";
       const hasUserMessage = messagesRef.current.some((m) => m.role === 'user');
       if (!hasUserMessage) {
@@ -81,13 +110,13 @@ const AuraChatWidget = () => {
     } finally {
       setIsGreeting(false);
     }
-  };
+  }, [agentMode, isAuthenticated, messagesRef, setMessages, storageKey, userId]);
 
   useEffect(() => {
     if (!isOpen) return;
     if (messages.length > 0) return;
     ensureGreeting();
-  }, [isOpen]);
+  }, [ensureGreeting, isOpen, messages.length]);
 
   return (
     <div className="fixed bottom-5 right-5 z-[120]">
@@ -114,6 +143,16 @@ const AuraChatWidget = () => {
                 <div className="text-xs text-slate-500 tracking-tight">Ayarlar ve geçmiş</div>
               </div>
             </button>
+            {AI_AGENT_MODE_ENABLED ? (
+              <label className="ml-2 inline-flex items-center gap-1 text-[11px] text-slate-500">
+                <input
+                  type="checkbox"
+                  checked={agentMode}
+                  onChange={(e) => setAgentMode(e.target.checked)}
+                />
+                Agent
+              </label>
+            ) : null}
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
@@ -139,7 +178,21 @@ const AuraChatWidget = () => {
                         <span className="w-2 h-2 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '240ms' }} />
                       </div>
                     ) : (
-                      m.content
+                      <>
+                        {m.content}
+                        {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {m.meta.dataSources.map((source) => (
+                              <span
+                                key={`${m.id}-${source.source}`}
+                                className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px] leading-4 text-slate-600"
+                              >
+                                {source.source}:{source.status}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </>
                     )}
                   </div>
                 </div>

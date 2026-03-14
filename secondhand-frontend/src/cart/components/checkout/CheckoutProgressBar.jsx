@@ -3,9 +3,9 @@ import {Check as CheckIcon} from 'lucide-react';
 
 const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
     return (
-        <div className="bg-white border-b border-slate-200/60">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-                <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200/60">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+                <div className="flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto pb-1">
                     {steps.map((step, index) => {
                         const isCompleted = currentStep > step.id;
                         const isCurrent = currentStep === step.id;
@@ -13,11 +13,13 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
 
                         return (
                             <React.Fragment key={step.id}>
-                                <div className="flex items-center">
+                                <div className="flex items-center shrink-0">
                                     <button
                                         onClick={() => isClickable && onStepChange(step.id)}
                                         disabled={!isClickable}
-                                        className={`flex items-center space-x-3 ${
+                                        aria-label={`${step.title} step`}
+                                        aria-current={isCurrent ? 'step' : undefined}
+                                        className={`group flex items-center gap-3 ${
                                             isClickable ? 'cursor-pointer' : 'cursor-default'
                                         }`}
                                     >
@@ -25,8 +27,8 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                                             isCompleted 
                                                 ? 'bg-emerald-500 text-white shadow-sm' 
                                                 : isCurrent 
-                                                    ? 'bg-indigo-600 text-white shadow-md scale-110' 
-                                                    : 'bg-slate-200 text-slate-400'
+                                                    ? 'bg-indigo-600 text-white shadow-md scale-105 ring-4 ring-indigo-100' 
+                                                    : 'bg-slate-200 text-slate-400 group-hover:bg-slate-300'
                                         }`}>
                                             {isCompleted ? (
                                                 <CheckIcon className="w-5 h-5" />
@@ -37,7 +39,7 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
 
                                         <div className="text-left hidden sm:block">
                                             <div className={`text-sm font-semibold tracking-tight ${
-                                                isCurrent || isCompleted ? 'text-slate-900' : 'text-slate-500'
+                                                isCurrent || isCompleted ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'
                                             }`}>
                                                 {step.title}
                                             </div>
@@ -49,8 +51,8 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                                 </div>
 
                                 {index < steps.length - 1 && (
-                                    <div className={`flex-1 h-px mx-4 transition-all duration-300 ${
-                                        currentStep > step.id ? 'bg-emerald-500' : 'bg-slate-200'
+                                    <div className={`hidden md:block flex-1 h-[2px] mx-2 lg:mx-4 rounded-full transition-all duration-300 ${
+                                        currentStep > step.id ? 'bg-emerald-500/80' : 'bg-slate-200'
                                     }`} />
                                 )}
                             </React.Fragment>

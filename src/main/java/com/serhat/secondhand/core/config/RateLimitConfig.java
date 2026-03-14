@@ -11,9 +11,10 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class RateLimitConfig {
     private boolean enabled = true;
-    private Auth auth;
-    private Payment payment;
-    private General general;
+    private Auth auth = new Auth();
+    private Payment payment = new Payment();
+    private General general = new General();
+    private Ai ai = new Ai();
     private int windowSizeSeconds = 60;
 
     @Getter
@@ -32,6 +33,12 @@ public class RateLimitConfig {
     @Setter
     public static class General {
         private int requestsPerSecond = 10;
+    }
+
+    @Getter
+    @Setter
+    public static class Ai {
+        private int requestsPerSecond = 6;
     }
 }
 

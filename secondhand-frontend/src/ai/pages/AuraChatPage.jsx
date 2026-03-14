@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
 import { RotateCcw, Send, Sparkles, Trash2 } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
@@ -10,6 +11,7 @@ const AuraChatPage = () => {
   const { user } = useAuthState();
   const location = useLocation();
   const listing = location?.state?.listing || null;
+  const [agentMode, setAgentMode] = React.useState(AI_AGENT_MODE_ENABLED);
 
   const userId = user?.id ?? null;
 
@@ -31,10 +33,31 @@ const AuraChatPage = () => {
   const buildPayload = useMemo(() => {
     return (text) => {
       const trimmed = text.trim();
-      if (!listingContext) return trimmed;
-      return { message: trimmed, context: listingContext };
+      return {
+        message: trimmed,
+        context: listingContext || undefined,
+        agentMode,
+        uiContext: {
+          currentPage: 'AuraChatPage',
+          route: location.pathname,
+          listingId: listing?.id ? String(listing.id) : undefined,
+        },
+      };
     };
-  }, [listingContext]);
+  }, [agentMode, listing?.id, listingContext, location.pathname]);
+
+  const sendApi = useMemo(() => {
+    return async (payload) => {
+      const message = typeof payload === 'object' && payload != null ? payload.message : payload;
+      const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
+      const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
+
+      if (AI_AGENT_MODE_ENABLED && agentMode) {
+        return aiChatService.agentQuery({ message, context, uiContext, agentMode: true });
+      }
+      return aiChatService.chat({ message, context });
+    };
+  }, [agentMode]);
 
   const {
     storageKey,
@@ -62,6 +85,7 @@ const AuraChatPage = () => {
     ],
     withTyping: true,
     buildPayload,
+    sendApi,
     echoUserMessageWhenUnauthed: false,
   });
 
@@ -72,7 +96,7 @@ const AuraChatPage = () => {
     }
     setIsSending(true);
     try {
-      await aiChatService.newChat({ userId });
+      await aiChatService.newChat();
       localStorage.removeItem(storageKey);
       setMessages([createChatMessage({ role: 'assistant', content: 'New chat created. What are we looking for today?' })]);
       queueMicrotask(scrollToBottom);
@@ -93,7 +117,7 @@ const AuraChatPage = () => {
     }
     setIsSending(true);
     try {
-      await aiChatService.deleteHistory({ userId });
+      await aiChatService.deleteHistory();
       localStorage.removeItem(storageKey);
       setMessages([
         createChatMessage({ role: 'assistant', content: 'History deleted. You can start a new chat with the button above.' }),
@@ -116,7 +140,7 @@ const AuraChatPage = () => {
     }
     setIsSending(true);
     try {
-      await aiChatService.deleteMemory({ userId });
+      await aiChatService.deleteMemory();
       localStorage.removeItem(storageKey);
       setMessages([
         createChatMessage({
@@ -156,6 +180,16 @@ const AuraChatPage = () => {
             <div className="text-sm font-semibold text-slate-900 tracking-tight">
               {userId ?? '—'}
             </div>
+            {AI_AGENT_MODE_ENABLED ? (
+              <label className="mt-3 inline-flex items-center gap-2 text-xs text-slate-600 tracking-tight">
+                <input
+                  type="checkbox"
+                  checked={agentMode}
+                  onChange={(e) => setAgentMode(e.target.checked)}
+                />
+                Agent Mode (Read-only)
+              </label>
+            ) : null}
           </div>
         </div>
 
@@ -217,6 +251,18 @@ const AuraChatPage = () => {
                   }`}
                 >
                   {m.content}
+                  {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {m.meta.dataSources.map((source) => (
+                        <span
+                          key={`${m.id}-${source.source}`}
+                          className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px] leading-4 text-slate-600"
+                        >
+                          {source.source}:{source.status}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ))}

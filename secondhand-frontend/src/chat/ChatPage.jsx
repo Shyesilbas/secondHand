@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useAuthState} from '../auth/AuthContext.jsx';
 import {useChat} from './hooks/useChat.js';
 import ChatWindow from './components/ChatWindow.jsx';
@@ -11,8 +11,6 @@ const ChatPage = () => {
   const { user } = useAuthState();
   const navigate = useNavigate();
   const notification = useNotification();
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  
   const {
     chatRooms,
     selectedChatRoom,
@@ -23,17 +21,11 @@ const ChatPage = () => {
     sendMessage,
     isLoadingMessages,
     deleteMessage,
-    deleteConversation,
-    isDeletingConversation
+    deleteConversation
   } = useChat(user?.id, { enableChatRoomsFetch: true });
 
   const handleChatRoomSelect = (chatRoom) => {
     selectChatRoom(chatRoom);
-    setIsChatOpen(true);
-  };
-
-  const handleCloseChat = () => {
-    setIsChatOpen(false);
   };
 
   const handleListingClick = (listingId, event) => {
@@ -49,7 +41,7 @@ const ChatPage = () => {
       'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
       () => {
         if (selectedChatRoom?.id === roomId) {
-          setIsChatOpen(false);
+          selectChatRoom(null);
         }
         deleteConversation(roomId);
         notification.showSuccess('Success', 'Conversation deleted successfully.');
@@ -114,7 +106,6 @@ const ChatPage = () => {
                         <button
                           onClick={() => {
                             selectChatRoom(null);
-                            setIsChatOpen(false);
                           }}
                           className="lg:hidden p-2 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
                         >
@@ -161,7 +152,6 @@ const ChatPage = () => {
                           isConnected={isConnected}
                           onConversationDeleted={() => {
                             selectChatRoom(null);
-                            setIsChatOpen(false);
                           }}
                           isEmbedded={true}
                       />

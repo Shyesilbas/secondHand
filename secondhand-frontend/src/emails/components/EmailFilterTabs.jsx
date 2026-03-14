@@ -1,4 +1,4 @@
-import { EMAIL_TYPES, EMAIL_TYPE_LABELS } from '../emails.js';
+import { EMAIL_TYPE_LABELS } from '../emails.js';
 
 const EmailFilterTabs = ({ filterType, onFilterChange, onDeleteAll, hasEmails, isDeleting }) => {
     const filterOptions = [];

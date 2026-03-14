@@ -1,5 +1,4 @@
 import { useEnums } from '../../../common/hooks/useEnums.js';
-import { X } from 'lucide-react';
 
 const FilterChipGroup = ({ label, enumKey, value = [], onChange, multiple = true, options = null, maxChips = 999 }) => {
   const { enums } = useEnums();

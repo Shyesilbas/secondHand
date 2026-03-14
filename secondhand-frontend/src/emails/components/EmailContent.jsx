@@ -28,9 +28,9 @@ const EmailContent = ({ email }) => {
 
     return (
         <div className="h-full bg-white flex flex-col">
-            <div className="px-12 pt-8 pb-5 border-b border-slate-200/60">
+            <div className="px-4 sm:px-8 lg:px-12 pt-6 sm:pt-8 pb-5 border-b border-slate-200/60 bg-white">
                 <div className="max-w-3xl">
-                    <h2 className="text-xl font-bold text-slate-900 mb-4 tracking-tight">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 tracking-tight">
                         {email.subject}
                     </h2>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
@@ -45,17 +45,19 @@ const EmailContent = ({ email }) => {
             </div>
 
             {/* Email Content - Prose Typography */}
-            <div className="flex-1 overflow-y-auto px-12 py-10 bg-slate-50/50">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10 bg-slate-50/50">
                 <div className="max-w-3xl">
-                    <div 
-                        className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-ul:text-slate-700 prose-ol:text-slate-700 prose-li:text-slate-700 tracking-tight"
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+                        <div 
+                        className="prose prose-slate prose-sm sm:prose-base lg:prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-ul:text-slate-700 prose-ol:text-slate-700 prose-li:text-slate-700 tracking-tight"
                         dangerouslySetInnerHTML={{ 
                             __html: formatPricesInHtml(
                                 replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>'),
                                 'TRY'
                             )
                         }}
-                    />
+                        />
+                    </div>
                 </div>
             </div>
         </div>

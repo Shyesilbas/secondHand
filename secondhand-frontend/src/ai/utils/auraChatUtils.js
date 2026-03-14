@@ -7,10 +7,11 @@ export const createAuraChatId = (prefix) =>
 export const getApiErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.message || fallback;
 
-export const createChatMessage = ({ role, content, typing = false }) => ({
+export const createChatMessage = ({ role, content, typing = false, meta = undefined }) => ({
   id: createAuraChatId(role === 'user' ? 'user' : 'aura'),
   role,
   content,
   typing,
+  meta,
   createdAt: Date.now(),
 });

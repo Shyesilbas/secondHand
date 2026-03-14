@@ -1,7 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import { OrdersListLayout } from '../components/shared';
-import {useOrderFlow, usePendingEscrowAmount} from '../hooks/useOrderFlow.js';
+import {useOrderFlow} from '../hooks/useOrderFlow.js';
 import {ROUTES} from '../../common/constants/routes.js';
 
 const ISoldPage = () => {
@@ -12,6 +12,7 @@ const ISoldPage = () => {
   return (
     <OrdersListLayout
       title="I Sold"
+      subtitle="Monitor your sales lifecycle and escrow status"
       stickyHeader
       onAnalytics={() => navigate(ROUTES.SELLER_DASHBOARD)}
       analyticsLabel="Analytics"

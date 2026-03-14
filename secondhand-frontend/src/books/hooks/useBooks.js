@@ -1,5 +1,4 @@
 import { useEntity } from '../../common/hooks/useEntity.js';
-import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
 import { createBooksServiceAdapter } from '../../common/services/entityAdapters.js';
 import { booksService } from '../services/booksService.js';
 import { BooksListingDTO } from '../books.js';

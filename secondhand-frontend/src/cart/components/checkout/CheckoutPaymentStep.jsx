@@ -1,4 +1,3 @@
-import React from 'react';
 import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon} from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import {formatCurrency} from '../../../common/formatters.js';
@@ -23,6 +22,8 @@ const CheckoutPaymentStep = ({
     onRequiredAgreementsChange,
     areAllAgreementsAccepted
 }) => {
+    const totalAmount = calculateTotal();
+
     const canProceed = () => {
         return isPaymentMethodValid() && areAllAgreementsAccepted();
     };
@@ -44,7 +45,7 @@ const CheckoutPaymentStep = ({
             id: 'EWALLET',
             name: 'E-Wallet',
             icon: WalletIcon,
-            description: `Pay with e-wallet (Balance: ${formatCurrency(eWallet?.balance || 0, currency || 'TRY')})`
+            description: `Pay with e-wallet (Balance: ${formatCurrency(eWallet?.balance || 0, currency || 'TRY')})`,
         }
     ];
 
@@ -68,31 +69,40 @@ const CheckoutPaymentStep = ({
     };
 
     return (
-        <div className="p-5">
-            <div className="mb-5">
-                <h2 className="text-[15px] font-semibold text-gray-900 tracking-[-0.01em] mb-1">Payment</h2>
-                <p className="text-[12px] text-gray-400">Choose how you'd like to pay.</p>
+        <div className="p-5 sm:p-6 lg:p-7">
+            <div className="mb-6">
+                <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-1">Payment</h2>
+                <p className="text-sm text-slate-500">Choose how you would like to pay for this order.</p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
+                <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100">
+                    <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-700">Amount to authorize</span>
+                        <span className="text-xl font-bold text-indigo-900 tabular-nums">
+                            {formatCurrency(totalAmount, currency || 'TRY')}
+                        </span>
+                    </div>
+                </div>
+
                 {/* Payment methods */}
                 <div>
-                    <h3 className="text-[12px] font-medium text-gray-500 mb-2.5">Method</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <h3 className="text-sm font-semibold text-slate-900 mb-2.5">Method</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {paymentMethods.map((method) => {
                             const Icon = method.icon;
                             const isSelected = selectedPaymentType === method.id;
-                            const isDisabled = method.id === 'EWALLET' && (!eWallet || calculateTotal() > eWallet.balance);
+                            const isDisabled = method.id === 'EWALLET' && (!eWallet || totalAmount > eWallet.balance);
 
                             return (
                                 <label
                                     key={method.id}
-                                    className={`relative flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-150 ${
+                                    className={`relative flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-all duration-150 ${
                                         isSelected
-                                            ? 'border border-gray-900 bg-gray-50'
+                                            ? 'border border-indigo-400 bg-indigo-50/60 ring-2 ring-indigo-100'
                                             : isDisabled
-                                                ? 'border border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
-                                                : 'border border-gray-100 bg-white hover:border-gray-200'
+                                                ? 'border border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'
+                                                : 'border border-slate-200 bg-white hover:border-slate-300'
                                     }`}
                                 >
                                     <input
@@ -104,16 +114,16 @@ const CheckoutPaymentStep = ({
                                         disabled={isDisabled}
                                         className="sr-only"
                                     />
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                                        isSelected ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-400'
+                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                                        isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'
                                     }`}>
-                                        <Icon className="w-3.5 h-3.5" />
+                                        <Icon className="w-4 h-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="text-[13px] font-medium text-gray-900">{method.name}</div>
-                                        <div className="text-[10px] text-gray-400 truncate">{method.description}</div>
+                                        <div className="text-sm font-semibold text-slate-900">{method.name}</div>
+                                        <div className="text-xs text-slate-500 truncate">{method.description}</div>
                                         {isDisabled && (
-                                            <span className="text-[10px] font-medium text-red-500 mt-0.5 inline-block">Insufficient balance</span>
+                                            <span className="text-xs font-semibold text-red-500 mt-0.5 inline-block">Insufficient balance</span>
                                         )}
                                     </div>
                                 </label>
@@ -123,14 +133,14 @@ const CheckoutPaymentStep = ({
                 </div>
 
                 {selectedPaymentType === 'CREDIT_CARD' && (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">Card Details</h4>
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                        <h4 className="text-sm font-semibold text-slate-800 mb-3">Card Details</h4>
                         <div>
-                            <label className="block text-[12px] font-medium text-gray-600 mb-1.5">Select Card</label>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Select Card</label>
                             <select
                                 value={selectedCardNumber || ''}
                                 onChange={(e) => setSelectedCardNumber(e.target.value)}
-                                className="w-full px-3 py-2.5 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-300 bg-white"
+                                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
                             >
                                 <option value="">Choose a card</option>
                                 {cards?.map((card, index) => (
@@ -144,14 +154,14 @@ const CheckoutPaymentStep = ({
                 )}
 
                 {selectedPaymentType === 'TRANSFER' && (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">Bank Account</h4>
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                        <h4 className="text-sm font-semibold text-slate-800 mb-3">Bank Account</h4>
                         <div>
-                            <label className="block text-[12px] font-medium text-gray-600 mb-1.5">Select Account</label>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Select Account</label>
                             <select
                                 value={selectedBankAccountIban || ''}
                                 onChange={(e) => setSelectedBankAccountIban(e.target.value)}
-                                className="w-full px-3 py-2.5 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-300 bg-white"
+                                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
                             >
                                 <option value="">Choose an account</option>
                                 {bankAccounts?.map((account, index) => (
@@ -165,25 +175,25 @@ const CheckoutPaymentStep = ({
                 )}
 
                 {selectedPaymentType === 'EWALLET' && (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                        <h4 className="text-[12px] font-semibold text-gray-700 mb-3">E-Wallet</h4>
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                        <h4 className="text-sm font-semibold text-slate-800 mb-3">E-Wallet</h4>
                         <div className="space-y-1.5">
-                            <div className="flex items-center justify-between text-[12px]">
-                                <span className="text-gray-500">Available</span>
-                                <span className="font-medium text-gray-900 tabular-nums">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500">Available</span>
+                                <span className="font-semibold text-slate-900 tabular-nums">
                                     {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
                                 </span>
                             </div>
-                            <div className="flex items-center justify-between text-[12px]">
-                                <span className="text-gray-500">Order Total</span>
-                                <span className="font-medium text-gray-900 tabular-nums">
-                                    {formatCurrency(calculateTotal(), currency || 'TRY')}
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500">Order Total</span>
+                                <span className="font-semibold text-slate-900 tabular-nums">
+                                    {formatCurrency(totalAmount, currency || 'TRY')}
                                 </span>
                             </div>
                         </div>
-                        {calculateTotal() > eWallet?.balance && (
-                            <div className="mt-3 px-3 py-2 bg-red-50 border border-red-100 rounded-lg">
-                                <p className="text-[11px] text-red-600 font-medium">
+                        {totalAmount > eWallet?.balance && (
+                            <div className="mt-3 px-3 py-2 bg-red-50 border border-red-100 rounded-xl">
+                                <p className="text-xs text-red-600 font-semibold">
                                     Insufficient balance. Add funds or choose another method.
                                 </p>
                             </div>
@@ -191,7 +201,7 @@ const CheckoutPaymentStep = ({
                     </div>
                 )}
 
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                     <PaymentAgreementsSection
                         acceptedAgreements={acceptedAgreements}
                         onToggle={onAgreementToggle}
@@ -200,27 +210,50 @@ const CheckoutPaymentStep = ({
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 mt-5 border-t border-gray-50">
+            <div className="hidden sm:flex items-center justify-between pt-5 mt-6 border-t border-slate-100">
                 <button
                     onClick={onBack}
-                    className="px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
                 >
                     Back
                 </button>
                 <div className="flex items-center gap-3">
                     {!canProceed() && (
-                        <p className="text-[11px] text-gray-400 max-w-[200px] text-right">
+                        <p className="text-xs text-slate-500 max-w-[220px] text-right">
                             {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
                         </p>
                     )}
                     <button
                         onClick={handleNext}
                         disabled={!canProceed()}
-                        className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-[13px] font-medium transition-colors disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        className="px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-semibold transition-colors disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
                     >
                         Send Verification Code
                     </button>
                 </div>
+            </div>
+
+            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-3 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        onClick={onBack}
+                        className="px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 bg-white"
+                    >
+                        Back
+                    </button>
+                    <button
+                        onClick={handleNext}
+                        disabled={!canProceed()}
+                        className="px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                    >
+                        Send Code
+                    </button>
+                </div>
+                {!canProceed() && (
+                    <p className="mt-2 text-xs text-slate-500 text-center">
+                        {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
+                    </p>
+                )}
             </div>
         </div>
     );

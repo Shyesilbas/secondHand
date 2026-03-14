@@ -44,43 +44,43 @@ export const EWalletBalance = ({ eWallet, totalSpent, statisticsLoaded, onLoadSt
   if (!eWallet) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-medium text-gray-900">Wallet Overview</h3>
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base font-semibold tracking-tight text-slate-900">Wallet Overview</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-lg p-4 border border-gray-200">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Current Balance</p>
-          <p className="mt-2 text-2xl font-semibold text-gray-900">
+        <div className="rounded-2xl p-4 border border-slate-200 bg-slate-50/70">
+          <p className="text-xs uppercase tracking-wide text-slate-500">Current Balance</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">
             {formatCurrency(eWallet.balance || 0)}
           </p>
         </div>
-        <div className="rounded-lg p-4 border border-gray-200">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Wallet Limit</p>
-          <p className="mt-2 text-lg font-medium text-gray-900">
+        <div className="rounded-2xl p-4 border border-slate-200 bg-slate-50/70">
+          <p className="text-xs uppercase tracking-wide text-slate-500">Wallet Limit</p>
+          <p className="mt-2 text-lg font-semibold text-slate-900">
             {eWallet.limit ? formatCurrency(eWallet.limit) : 'No limit'}
           </p>
         </div>
-        <div className="rounded-lg p-4 border border-gray-200">
-          <p className="text-xs uppercase tracking-wide text-gray-500">Spending Warning</p>
-          <p className="mt-2 text-lg font-medium text-gray-900">
+        <div className="rounded-2xl p-4 border border-slate-200 bg-slate-50/70">
+          <p className="text-xs uppercase tracking-wide text-slate-500">Spending Warning</p>
+          <p className="mt-2 text-lg font-semibold text-slate-900">
             {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not set'}
           </p>
           {eWallet.spendingWarningLimit && (
-            <div className="mt-3 border-t pt-3">
-              <p className="text-xs uppercase tracking-wide text-gray-500">Total Spent</p>
-              <p className="mt-1 text-sm font-medium text-gray-900">
+            <div className="mt-3 border-t border-slate-200 pt-3">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Total Spent</p>
+              <p className="mt-1 text-sm font-semibold text-slate-900">
                 {statisticsLoaded && totalSpent != null ? formatCurrency(totalSpent) : (
                   <button
                     onClick={onLoadStatistics}
-                    className="text-blue-600 hover:text-blue-800 text-sm underline"
+                    className="text-indigo-600 hover:text-indigo-800 text-sm underline"
                   >
                     Load spending data
                   </button>
                 )}
               </p>
               {statisticsLoaded && totalSpent != null && (
-                <p className="mt-1 text-sm font-medium text-gray-900">
+                <p className="mt-1 text-sm font-medium text-slate-900">
                   ({eWallet.spendingWarningLimit
                     ? `${((totalSpent / eWallet.spendingWarningLimit) * 100).toFixed(2)}%`
                     : '—'})
@@ -114,28 +114,28 @@ export const EWalletActions = ({
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setActiveModal('deposit')}
-          className="px-3 py-2 rounded border border-gray-300 text-sm text-gray-800 hover:bg-gray-100"
+          className="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
         >
           Deposit
         </button>
         <button
           onClick={() => setActiveModal('withdraw')}
-          className="px-3 py-2 rounded border border-gray-300 text-sm text-gray-800 hover:bg-gray-100"
+          className="px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 text-sm font-medium text-amber-700 hover:bg-amber-100"
         >
           Withdraw
         </button>
         <button
           onClick={() => setActiveModal('updateLimit')}
-          className="px-3 py-2 rounded border border-gray-300 text-sm text-gray-800 hover:bg-gray-100"
+          className="px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Update Limits
         </button>
         <button
           onClick={() => setActiveModal('updateWarning')}
-          className="px-3 py-2 rounded border border-gray-300 text-sm text-gray-800 hover:bg-gray-100"
+          className="px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Update Spending Warning
         </button>

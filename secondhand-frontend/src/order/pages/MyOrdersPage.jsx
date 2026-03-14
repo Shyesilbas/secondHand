@@ -12,6 +12,7 @@ const MyOrdersPage = () => {
   return (
     <OrdersListLayout
       title="Orders"
+      subtitle="Track your purchases and delivery progress"
       stickyHeader
       onAnalytics={() => navigate(ROUTES.BUYER_DASHBOARD)}
       analyticsLabel="Analytics"

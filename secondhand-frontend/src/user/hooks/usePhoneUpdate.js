@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { userService } from '../services/userService.js';
-import { UpdatePhoneRequestDTO } from '../users.js';
 
 export const usePhoneUpdate = () => {
     const { updateUser } = useAuth();

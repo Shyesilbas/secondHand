@@ -16,14 +16,7 @@ export const favoriteService = {
     return get(API_ENDPOINTS.FAVORITES.CHECK(listingId));
   },
 
-  getMyFavorites: async (params = {}) => {
-    const query = new URLSearchParams({
-      page: params.page ?? 0,
-      size: params.size ?? 20,
-      sortBy: params.sortBy ?? 'createdAt',
-      sortDirection: params.sortDirection ?? 'DESC',
-    }).toString();
-
+  getMyFavorites: async () => {
     return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES);
   }
 

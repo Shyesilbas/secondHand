@@ -12,8 +12,7 @@ import {
   ShoppingBag, 
   TrendingUp, 
   Star, 
-  Heart,
-  MessageSquare
+  Heart
 } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 

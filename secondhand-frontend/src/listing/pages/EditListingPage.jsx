@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -39,9 +39,7 @@ const PageError = ({ error, onBack }) => (
 
 const EditListingPage = ({
     service = null,
-    type = null,
-    entityName = 'listing',
-    entityNameCapitalized = 'Listing'
+    type = null
 }) => {
     const { id } = useParams();
     const navigate = useNavigate();

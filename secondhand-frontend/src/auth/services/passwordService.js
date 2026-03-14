@@ -2,7 +2,6 @@ import apiClient from '../../common/services/api/interceptors.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { 
     createChangePasswordRequest, 
-    createForgotPasswordRequest, 
     createResetPasswordRequest 
 } from '../auth.js';
 

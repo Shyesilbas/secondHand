@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { CANCEL_REFUND_REASONS, CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
+import { CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
 
 const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
   const [reason, setReason] = useState('');

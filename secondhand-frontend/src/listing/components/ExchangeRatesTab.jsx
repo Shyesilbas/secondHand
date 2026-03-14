@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { fetchExchangeRate } from '../services/listingAddonService.js';
-import { ArrowRightLeft, RefreshCw, DollarSign, Euro, Globe } from 'lucide-react';
+import { ArrowRightLeft, RefreshCw } from 'lucide-react';
 
 const ExchangeRatesTab = ({ price, currency, listingId }) => {
   const [selected, setSelected] = useState(currency === 'USD' ? 'EUR' : 'USD');
