@@ -11,6 +11,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,50 +37,52 @@ public class DashboardService implements IDashboardService {
     private final FavoriteStatisticsPort favoriteStatisticsPort;
     private final DashboardMapper dashboardMapper;
     private final ListingViewStatisticsPort listingViewStatisticsPort;
+    @Qualifier("taskExecutor")
+    private final Executor taskExecutor;
 
     public SellerDashboardDto getSellerDashboard(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Async Seller Dashboard starts: {}", sellerId);
 
         CompletableFuture<BigDecimal> revenueFuture = CompletableFuture.supplyAsync(() ->
-                Optional.ofNullable(salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, startDate, endDate)).orElse(BigDecimal.ZERO));
+                Optional.ofNullable(salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, startDate, endDate)).orElse(BigDecimal.ZERO), taskExecutor);
 
         CompletableFuture<List<Object[]>> revenueTrendRawFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.getDailyRevenueTrend(sellerId, startDate, endDate));
+                salesStatisticsPort.getDailyRevenueTrend(sellerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> ordersByStatusFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.countDistinctOrdersBySellerAndStatusGrouped(sellerId, startDate, endDate));
+                salesStatisticsPort.countDistinctOrdersBySellerAndStatusGrouped(sellerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<Long> totalListingsFuture = CompletableFuture.supplyAsync(() ->
-                listingStatisticsPort.countBySellerId(sellerId));
+                listingStatisticsPort.countBySellerId(sellerId), taskExecutor);
 
         CompletableFuture<Long> activeListingsFuture = CompletableFuture.supplyAsync(() ->
-                listingStatisticsPort.countBySellerIdAndStatus(sellerId, ListingStatus.ACTIVE));
+                listingStatisticsPort.countBySellerIdAndStatus(sellerId, ListingStatus.ACTIVE), taskExecutor);
 
         CompletableFuture<Long> inactiveListingsFuture = CompletableFuture.supplyAsync(() ->
-                listingStatisticsPort.countBySellerIdAndStatus(sellerId, ListingStatus.INACTIVE));
+                listingStatisticsPort.countBySellerIdAndStatus(sellerId, ListingStatus.INACTIVE), taskExecutor);
 
         CompletableFuture<ListingViewStatsDto> viewStatsFuture = CompletableFuture.supplyAsync(() ->
-                listingViewStatisticsPort.getAggregatedViewStatisticsForSeller(sellerId, startDate, endDate));
+                listingViewStatisticsPort.getAggregatedViewStatisticsForSeller(sellerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<Long> totalFavoritesFuture = CompletableFuture.supplyAsync(() ->
-                favoriteStatisticsPort.countByListingSellerId(sellerId));
+                favoriteStatisticsPort.countByListingSellerId(sellerId), taskExecutor);
 
         CompletableFuture<List<Object[]>> categoryRevenueFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.sumRevenueBySellerAndCategory(sellerId, startDate, endDate));
+                salesStatisticsPort.sumRevenueBySellerAndCategory(sellerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> reviewStatsFuture = CompletableFuture.supplyAsync(() ->
-                reviewStatisticsPort.getUserReviewStats(sellerId));
+                reviewStatisticsPort.getUserReviewStats(sellerId), taskExecutor);
 
         CompletableFuture<List<Object[]>> topListingsRawFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.findTopListingsByRevenue(sellerId, startDate, endDate));
+                salesStatisticsPort.findTopListingsByRevenue(sellerId, startDate, endDate), taskExecutor);
 
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         LocalDateTime prevStart = startDate.minusDays(daysBetween);
         CompletableFuture<BigDecimal> prevRevFuture = CompletableFuture.supplyAsync(() ->
-                Optional.ofNullable(salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, prevStart, startDate)).orElse(BigDecimal.ZERO));
+                Optional.ofNullable(salesStatisticsPort.sumRevenueBySellerAndDateRange(sellerId, prevStart, startDate)).orElse(BigDecimal.ZERO), taskExecutor);
 
         CompletableFuture<List<Object[]>> categoryOrderCountRawFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.countOrdersBySellerAndCategory(sellerId, startDate, endDate));
+                salesStatisticsPort.countOrdersBySellerAndCategory(sellerId, startDate, endDate), taskExecutor);
 
         CompletableFuture.allOf(revenueFuture, revenueTrendRawFuture, ordersByStatusFuture,
                 totalListingsFuture, activeListingsFuture, inactiveListingsFuture,
@@ -126,33 +130,33 @@ public class DashboardService implements IDashboardService {
         log.info("Async Buyer Dashboard starts: {}", buyerId);
 
         CompletableFuture<BigDecimal> spendingFuture = CompletableFuture.supplyAsync(() ->
-                Optional.ofNullable(salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, startDate, endDate)).orElse(BigDecimal.ZERO));
+                Optional.ofNullable(salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, startDate, endDate)).orElse(BigDecimal.ZERO), taskExecutor);
 
         CompletableFuture<Long> totalOrdersFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.countOrdersByUserIdAndCreatedAtBetween(buyerId, startDate, endDate));
+                salesStatisticsPort.countOrdersByUserIdAndCreatedAtBetween(buyerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> spendingTrendFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.getDailySpendingTrend(buyerId, startDate, endDate));
+                salesStatisticsPort.getDailySpendingTrend(buyerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> ordersByStatusFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.countOrdersByUserIdAndStatusGrouped(buyerId, startDate, endDate));
+                salesStatisticsPort.countOrdersByUserIdAndStatusGrouped(buyerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> categorySpendingFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.sumSpendingByBuyerAndCategory(buyerId, startDate, endDate));
+                salesStatisticsPort.sumSpendingByBuyerAndCategory(buyerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<List<Object[]>> categoryOrderCountFuture = CompletableFuture.supplyAsync(() ->
-                salesStatisticsPort.countOrdersByBuyerAndCategory(buyerId, startDate, endDate));
+                salesStatisticsPort.countOrdersByBuyerAndCategory(buyerId, startDate, endDate), taskExecutor);
 
         CompletableFuture<Long> reviewsGivenFuture = CompletableFuture.supplyAsync(() ->
-                reviewStatisticsPort.countByReviewerId(buyerId));
+                reviewStatisticsPort.countByReviewerId(buyerId), taskExecutor);
 
         CompletableFuture<Long> totalFavoritesFuture = CompletableFuture.supplyAsync(() ->
-                favoriteStatisticsPort.countByUserId(buyerId));
+                favoriteStatisticsPort.countByUserId(buyerId), taskExecutor);
 
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         LocalDateTime prevStart = startDate.minusDays(daysBetween);
         CompletableFuture<BigDecimal> prevSpendingFuture = CompletableFuture.supplyAsync(() ->
-                Optional.ofNullable(salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, prevStart, startDate)).orElse(BigDecimal.ZERO));
+                Optional.ofNullable(salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, prevStart, startDate)).orElse(BigDecimal.ZERO), taskExecutor);
 
         CompletableFuture.allOf(spendingFuture, totalOrdersFuture, spendingTrendFuture,
                 ordersByStatusFuture, categorySpendingFuture, categoryOrderCountFuture,

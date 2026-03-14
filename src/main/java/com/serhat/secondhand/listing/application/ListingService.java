@@ -20,6 +20,7 @@ import com.serhat.secondhand.listing.realestate.RealEstateListingFilterService;
 import com.serhat.secondhand.listing.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.vehicle.VehicleListingFilterService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 @Service
@@ -52,6 +54,7 @@ public class ListingService implements IListingService {
     private final IReviewService reviewService;
     private final Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
     private final ApplicationEventPublisher eventPublisher;
+    private final Executor taskExecutor;
 
     public ListingService(
             ListingRepository listingRepository,
@@ -66,7 +69,8 @@ public class ListingService implements IListingService {
             ListingViewService listingViewService,
             IReviewService reviewService,
             ListingConfig listingConfig,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            @Qualifier("taskExecutor") Executor taskExecutor
     ) {
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
@@ -75,6 +79,7 @@ public class ListingService implements IListingService {
         this.reviewService = reviewService;
         this.listingConfig = listingConfig;
         this.eventPublisher = eventPublisher;
+        this.taskExecutor = taskExecutor;
 
         this.filterStrategyMap = Map.of(
                 VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f),
@@ -97,11 +102,11 @@ public class ListingService implements IListingService {
             ListingDto dto = listingMapper.toDynamicDto(listing);
 
             CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
-                    enrichmentService.enrichInPlace(dto, userId));
+                    enrichmentService.enrichInPlace(dto, userId), taskExecutor);
 
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
                 CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
-                        listingViewService.getViewStatistics(id, LocalDateTime.now().minusDays(7), LocalDateTime.now()));
+                        listingViewService.getViewStatistics(id, LocalDateTime.now().minusDays(7), LocalDateTime.now()), taskExecutor);
 
                 CompletableFuture.allOf(enrichTask, statsTask).join();
                 dto.setViewStats(statsTask.join());
@@ -265,6 +270,8 @@ public class ListingService implements IListingService {
     public void markAsSold(UUID listingId, Long userId) {
         Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
+        listing.setStatus(ListingStatus.SOLD);
+        listingRepository.save(listing);
         log.info("Listing with id {} has marked as sold.", listingId);
     }
 

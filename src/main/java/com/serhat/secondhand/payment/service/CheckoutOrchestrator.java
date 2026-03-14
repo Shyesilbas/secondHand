@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 
@@ -90,7 +91,12 @@ public class CheckoutOrchestrator {
             var paymentProcessingResult = paymentResult.getData();
 
             if (paymentProcessingResult.allSuccessful()) {
-                paymentOrchestrator.createEscrowsForOrder(order);
+                Result<Void> escrowResult = paymentOrchestrator.createEscrowsForOrder(order);
+                if (escrowResult.isError()) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    log.error("Escrow creation failed for order {}: {}", order.getOrderNumber(), escrowResult.getMessage());
+                    return Result.error("CHECKOUT_ESCROW_FAILED", "Checkout payment succeeded but escrow creation failed. Please contact support.");
+                }
                 handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
                 orderNotificationService.sendOrderNotifications(user, order, true);
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());

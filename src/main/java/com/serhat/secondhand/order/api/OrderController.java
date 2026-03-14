@@ -3,7 +3,7 @@ package com.serhat.secondhand.order.api;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.order.service.*;
-import com.serhat.secondhand.payment.service.CheckoutService;
+import com.serhat.secondhand.payment.service.CheckoutOrchestrator;
 import com.serhat.secondhand.review.service.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +30,7 @@ import java.util.Map;
 @Tag(name = "Order Management", description = "Order operations")
 public class OrderController {
 
-    private final CheckoutService checkoutService;
+    private final CheckoutOrchestrator checkoutOrchestrator;
     private final OrderQueryService orderQueryService;
     private final OrderCancellationService orderCancellationService;
     private final OrderRefundService orderRefundService;
@@ -53,7 +53,7 @@ public class OrderController {
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
         orderLog.logApiMutation("checkout", null, currentUser.getEmail());
-        return ResultResponses.ok(checkoutService.checkout(currentUser.getId(), request));
+        return ResultResponses.ok(checkoutOrchestrator.executeCheckout(currentUser.getId(), request));
     }
 
     @GetMapping

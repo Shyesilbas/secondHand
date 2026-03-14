@@ -7,7 +7,6 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
@@ -18,11 +17,11 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +43,7 @@ public class OrderRefundService {
     private final OrderItemHelper orderItemHelper;
     private final OrderStockService orderStockService;
     private final OrderLogService orderLog;
+    private final OrderItemCompensationPlanner compensationPlanner;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -61,32 +61,12 @@ public class OrderRefundService {
         if (itemsResult.isError()) return itemsResult.propagateError();
 
         List<OrderItem> itemsToRefund = itemsResult.getData();
-        Result<Void> itemsValidationResult = validateItemsCanBeRefunded(itemsToRefund);
+        Result<Void> itemsValidationResult = compensationPlanner.validateRefundableItems(itemsToRefund);
         if (itemsValidationResult.isError()) return itemsValidationResult.propagateError();
 
-        BigDecimal totalRefundAmount = BigDecimal.ZERO;
-        List<OrderItemRefund> refundRecords = new ArrayList<>();
-
-        for (OrderItem item : itemsToRefund) {
-            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            int availableToRefund = item.getQuantity() - (alreadyRefunded != null ? alreadyRefunded : 0);
-            
-            if (availableToRefund <= 0) {
-                continue;
-            }
-
-            BigDecimal refundAmount = item.getTotalPrice();
-            totalRefundAmount = totalRefundAmount.add(refundAmount);
-
-            OrderItemRefund refundRecord = OrderItemRefund.builder()
-                    .orderItem(item)
-                    .reason(request.getReason())
-                    .reasonText(request.getReasonText())
-                    .refundedQuantity(availableToRefund)
-                    .refundAmount(refundAmount)
-                    .build();
-            refundRecords.add(refundRecord);
-        }
+        OrderItemCompensationPlanner.RefundPlan refundPlan = compensationPlanner.buildRefundPlan(itemsToRefund, request);
+        BigDecimal totalRefundAmount = refundPlan.totalRefundAmount();
+        List<OrderItemRefund> refundRecords = refundPlan.records();
 
         if (refundRecords.isEmpty()) {
             return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
@@ -104,9 +84,10 @@ public class OrderRefundService {
                 .toList();
 
         Result<Void> orchestratorResult = paymentOrchestrator.refundFromSellersAndEscrows(
-                escrowsToRefund, user, itemsToRefund);
+                escrowsToRefund, user);
         
         if (orchestratorResult.isError()) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             orderLog.logRefundFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error("Failed to process refund: " + orchestratorResult.getMessage(), "REFUND_FAILED");
         }
@@ -120,17 +101,13 @@ public class OrderRefundService {
             return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
         }
 
-        boolean allItemsRefunded = areAllItemsRefunded(order);
+        boolean allItemsRefunded = compensationPlanner.areAllItemsRefunded(order);
         if (allItemsRefunded) {
             order.setStatus(Order.OrderStatus.REFUNDED);
             order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
         } else {
             order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
         }
-        if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
-            order.getShipping().setStatus(ShippingStatus.DELIVERED);
-        }
-
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
         
@@ -169,27 +146,4 @@ public class OrderRefundService {
         }
         return Result.success();
     }
-
-
-    private Result<Void> validateItemsCanBeRefunded(List<OrderItem> items) {
-        for (OrderItem item : items) {
-            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            if (alreadyRefunded != null && alreadyRefunded >= item.getQuantity()) {
-                return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
-            }
-        }
-        return Result.success();
-    }
-
-    private boolean areAllItemsRefunded(Order order) {
-        for (OrderItem item : order.getOrderItems()) {
-            Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            if (refunded == null || refunded < item.getQuantity()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
 }

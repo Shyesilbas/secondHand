@@ -12,12 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Orchestrates payment operations between buyers, sellers, escrows, and wallets.
@@ -44,22 +43,25 @@ public class PaymentOrchestrator {
 
         for (OrderItem orderItem : order.getOrderItems()) {
             if (orderItem.getListing() == null) {
-                log.warn("Order item {} has no listing, skipping escrow creation", orderItem.getId());
-                continue;
+                log.warn("Order item {} has no listing, escrow creation aborted", orderItem.getId());
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Order item has no listing: " + orderItem.getId(), "ESCROW_CREATE_INVALID_ITEM");
             }
 
             User seller = orderItem.getListing().getSeller();
             if (seller == null) {
-                log.warn("Listing {} has no seller, skipping escrow creation for order item {}", 
+                log.warn("Listing {} has no seller, escrow creation aborted for order item {}", 
                         orderItem.getListing().getId(), orderItem.getId());
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Listing has no seller: " + orderItem.getListing().getId(), "ESCROW_CREATE_INVALID_SELLER");
             }
 
             BigDecimal amount = orderItem.getTotalPrice();
             if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-                log.warn("Order item {} has invalid amount {}, skipping escrow creation", 
+                log.warn("Order item {} has invalid amount {}, escrow creation aborted", 
                         orderItem.getId(), amount);
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Order item has invalid amount: " + orderItem.getId(), "ESCROW_CREATE_INVALID_AMOUNT");
             }
 
             if (orderItemEscrowRepository.findByOrderItem(orderItem).isPresent()) {
@@ -95,7 +97,6 @@ public class PaymentOrchestrator {
         }
 
         int successCount = 0;
-        int failureCount = 0;
 
         for (OrderItemEscrow escrow : escrows) {
             if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
@@ -107,8 +108,8 @@ public class PaymentOrchestrator {
             if (escrow.getStatus() != OrderItemEscrow.EscrowStatus.PENDING) {
                 log.warn("Escrow {} is not in PENDING status ({}), skipping", 
                         escrow.getId(), escrow.getStatus());
-                failureCount++;
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Escrow is not releasable: " + escrow.getId(), "ESCROW_RELEASE_INVALID_STATUS");
             }
 
             try {
@@ -129,15 +130,12 @@ public class PaymentOrchestrator {
             } catch (Exception e) {
                 log.error("Failed to release escrow {} to seller {}: {}", 
                         escrow.getId(), escrow.getSeller().getEmail(), e.getMessage(), e);
-                failureCount++;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Failed to release escrow " + escrow.getId(), "ESCROW_RELEASE_FAILED");
             }
         }
 
-        log.info("Escrow release completed: {} successful, {} failed", successCount, failureCount);
-
-        if (failureCount > 0 && successCount == 0) {
-            return Result.error("Failed to release all escrows", "ESCROW_RELEASE_FAILED");
-        }
+        log.info("Escrow release completed: {} successful", successCount);
 
         return Result.success();
     }
@@ -161,12 +159,14 @@ public class PaymentOrchestrator {
 
             if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.COMPLETED) {
                 log.warn("Cannot cancel completed escrow {}", escrow.getId());
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Escrow cannot be cancelled: " + escrow.getId(), "ESCROW_CANCEL_INVALID_STATUS");
             }
 
             if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.REFUNDED) {
                 log.warn("Cannot cancel refunded escrow {}", escrow.getId());
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Escrow cannot be cancelled: " + escrow.getId(), "ESCROW_CANCEL_INVALID_STATUS");
             }
 
             totalRefundAmount = totalRefundAmount.add(escrow.getAmount());
@@ -194,8 +194,7 @@ public class PaymentOrchestrator {
      */
     public Result<Void> refundFromSellersAndEscrows(
             List<OrderItemEscrow> escrows, 
-            User buyer, 
-            List<OrderItem> refundedItems) {
+            User buyer) {
 
         if (escrows == null || escrows.isEmpty()) {
             return Result.success();
@@ -212,7 +211,8 @@ public class PaymentOrchestrator {
 
             if (escrow.getStatus() == OrderItemEscrow.EscrowStatus.CANCELLED) {
                 log.warn("Cannot refund cancelled escrow {}", escrow.getId());
-                continue;
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Escrow is not refundable: " + escrow.getId(), "ESCROW_REFUND_INVALID_STATUS");
             }
 
             try {
@@ -240,6 +240,8 @@ public class PaymentOrchestrator {
             } catch (Exception e) {
                 log.error("Failed to process refund for escrow {}: {}", 
                         escrow.getId(), e.getMessage(), e);
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.error("Failed to process refund for escrow " + escrow.getId(), "ESCROW_REFUND_FAILED");
             }
         }
 
@@ -251,38 +253,6 @@ public class PaymentOrchestrator {
                     totalRefund, buyer.getEmail(), totalRefundFromEscrow, totalRefundFromSeller);
         }
 
-        if (totalRefundFromSeller.compareTo(BigDecimal.ZERO) > 0) {
-            debitSellersForRefund(refundedItems);
-        }
-
         return Result.success();
-    }
-
-    /**
-     * Debits sellers for refunded items (when escrow was already released).
-     */
-    private void debitSellersForRefund(List<OrderItem> refundedItems) {
-        Map<User, BigDecimal> sellerRefunds = refundedItems.stream()
-                .collect(Collectors.groupingBy(
-                        item -> item.getListing().getSeller(),
-                        Collectors.reducing(BigDecimal.ZERO, OrderItem::getTotalPrice, BigDecimal::add)
-                ));
-
-        for (Map.Entry<User, BigDecimal> entry : sellerRefunds.entrySet()) {
-            User seller = entry.getKey();
-            BigDecimal sellerAmount = entry.getValue();
-            UUID sellerListingId = refundedItems.stream()
-                    .filter(item -> item.getListing().getSeller().getId().equals(seller.getId()))
-                    .findFirst()
-                    .map(item -> item.getListing().getId())
-                    .orElse(null);
-
-            try {
-                eWalletService.debitFromUser(seller, sellerAmount, sellerListingId, PaymentTransactionType.REFUND);
-                log.info("Debited {} from seller's eWallet: {} for refund", sellerAmount, seller.getEmail());
-            } catch (Exception e) {
-                log.error("Failed to debit from seller's eWallet: {} - {}", seller.getEmail(), e.getMessage(), e);
-            }
-        }
     }
 }

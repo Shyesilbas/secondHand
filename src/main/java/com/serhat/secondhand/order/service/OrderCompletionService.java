@@ -45,13 +45,16 @@ public class OrderCompletionService {
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
         if (consistencyResult.isError()) return consistencyResult.propagateError();
 
+        Result<Void> releaseResult = releaseEscrowsForOrder(order);
+        if (releaseResult.isError()) {
+            return Result.error("Order completion failed during escrow release", "ORDER_COMPLETION_ESCROW_RELEASE_FAILED");
+        }
+
         order.setStatus(Order.OrderStatus.COMPLETED);
         if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
             order.getShipping().setStatus(ShippingStatus.DELIVERED);
         }
         Order savedOrder = orderRepository.save(order);
-
-        releaseEscrowsForOrder(savedOrder);
 
         orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
 
@@ -70,19 +73,21 @@ public class OrderCompletionService {
         return Result.success();
     }
 
-    private void releaseEscrowsForOrder(Order order) {
+    private Result<Void> releaseEscrowsForOrder(Order order) {
         List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
         
         if (pendingEscrows.isEmpty()) {
-            return;
+            return Result.success();
         }
 
         Result<Void> orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
         
         if (orchestratorResult.isError()) {
             orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
+            return Result.error(orchestratorResult.getMessage(), orchestratorResult.getErrorCode());
         } else {
             orderLog.logEscrowReleased(pendingEscrows.size(), order.getOrderNumber());
+            return Result.success();
         }
     }
 }
