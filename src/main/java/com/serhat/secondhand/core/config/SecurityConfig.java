@@ -47,6 +47,7 @@ public class SecurityConfig {
     private final RateLimitingFilter rateLimitingFilter;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final CorsConfigProperties corsConfigProperties;
 
     // Public API endpoint groups
     private static final List<String> AUTH_PUBLIC_ENDPOINTS = Arrays.asList(
@@ -100,11 +101,6 @@ public class SecurityConfig {
 
     private static final List<String> PAYMENT_PUBLIC_ENDPOINTS = Arrays.asList(
             "/api/v1/payments/listing-fee-config"
-    );
-
-    private static final List<String> AI_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/ai-test/**",
-            "/api/ai/**"
     );
 
     private static final List<String> ENUM_PUBLIC_ENDPOINTS = Arrays.asList(
@@ -182,8 +178,6 @@ public class SecurityConfig {
                         // Authentication & Authorization endpoints
                         .requestMatchers(AUTH_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
-                        .requestMatchers(AI_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-
                         .requestMatchers(LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
                         
                         // Public category-specific listing endpoints
@@ -209,10 +203,6 @@ public class SecurityConfig {
                         
                         // WebSocket endpoints (HTTP handshake public, message-level auth in WebSocketSecurityConfig)
                         .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()
-                        .requestMatchers("/api/v1/listings/clothing/generator/**").permitAll()
-                        .requestMatchers("/api/v1/listings/electronics/generator/**").permitAll()
-                        .requestMatchers("/api/v1/listings/sports/generator/**").permitAll()
-                        .requestMatchers("/api/v1/listings/books/generator/**").permitAll()
                         
                         // Follow public endpoints (stats can be viewed by anyone)
                         .requestMatchers(FOLLOW_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
@@ -264,11 +254,6 @@ public class SecurityConfig {
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-                response.setHeader("Access-Control-Allow-Credentials", "true");
-                response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept, Origin, X-Requested-With, Cache-Control, X-File-Name, Idempotency-Key");
-
                 String jsonResponse = String.format(
                         "{\"error\":\"UNAUTHORIZED\",\"message\":\"Token expired or invalid\",\"timestamp\":\"%s\",\"path\":\"%s\"}",
                         Instant.now().toString(),
@@ -299,10 +284,6 @@ public class SecurityConfig {
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-                // CORS headers
-                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-                response.setHeader("Access-Control-Allow-Credentials", "true");
-
                 String jsonResponse = String.format(
                         "{\"error\":\"FORBIDDEN\",\"message\":\"Access denied\",\"timestamp\":\"%s\",\"path\":\"%s\"}",
                         Instant.now().toString(),
@@ -321,47 +302,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://127.0.0.1:3000",
-                "http://localhost:3001",
-                "http://localhost:5173",  // Vite default port
-                "http://127.0.0.1:5173"
-        ));
-
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
-        ));
-
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "X-Requested-With",
-                "Accept",
-                "Origin",
-                "Cache-Control",
-                "X-File-Name",
-                "Idempotency-Key",
-                "X-XSRF-TOKEN"
-        ));
-
-        // Allow credentials (important for JWT tokens)
-        configuration.setAllowCredentials(true);
-
-        // Exposed headers
-        configuration.setExposedHeaders(Arrays.asList(
-                "Authorization",
-                "X-Total-Count",
-                "X-RateLimit-Limit",
-                "X-RateLimit-Remaining", 
-                "X-RateLimit-Reset",
-                "Retry-After",
-                "Idempotency-Key",
-                "X-CSRF-TOKEN"
-        ));
-
-        // Max age for preflight requests
-        configuration.setMaxAge(3600L);
+        configuration.setAllowedOrigins(corsConfigProperties.getAllowedOrigins());
+        configuration.setAllowedMethods(corsConfigProperties.getAllowedMethods());
+        configuration.setAllowedHeaders(corsConfigProperties.getAllowedHeaders());
+        configuration.setAllowCredentials(corsConfigProperties.isAllowCredentials());
+        configuration.setExposedHeaders(corsConfigProperties.getExposedHeaders());
+        configuration.setMaxAge(corsConfigProperties.getMaxAge());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -371,9 +317,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setUserDetailsService(userDetailsService);
         return authProvider;
     }
 

@@ -149,38 +149,6 @@ public class AuthController {
         return ResponseEntity.ok(responseMap);
     }
 
-    @GetMapping("/debug/cookies")
-    public ResponseEntity<Map<String, Object>> debugCookies(HttpServletRequest request) {
-        log.info("Debug cookies request");
-        
-        Map<String, Object> debugInfo = new java.util.HashMap<>();
-        
-                var accessToken = cookieUtils.getAccessTokenFromCookies(request);
-        debugInfo.put("hasAccessToken", accessToken.isPresent());
-        if (accessToken.isPresent()) {
-            debugInfo.put("accessTokenLength", accessToken.get().length());
-        }
-        
-                var refreshToken = cookieUtils.getRefreshTokenFromCookies(request);
-        debugInfo.put("hasRefreshToken", refreshToken.isPresent());
-        if (refreshToken.isPresent()) {
-            debugInfo.put("refreshTokenLength", refreshToken.get().length());
-        }
-        
-                if (request.getCookies() != null) {
-            debugInfo.put("totalCookies", request.getCookies().length);
-            java.util.List<String> cookieNames = java.util.Arrays.stream(request.getCookies())
-                    .map(jakarta.servlet.http.Cookie::getName)
-                    .collect(java.util.stream.Collectors.toList());
-            debugInfo.put("cookieNames", cookieNames);
-        } else {
-            debugInfo.put("totalCookies", 0);
-            debugInfo.put("cookieNames", java.util.Collections.emptyList());
-        }
-        
-        return ResponseEntity.ok(debugInfo);
-    }
-
     @PostMapping("/revoke-all-sessions")
     @Operation(summary = "Revoke all user sessions", description = "Invalidates all active sessions for the authenticated user")
     @ApiResponses(value = {

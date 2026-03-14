@@ -18,9 +18,9 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +40,7 @@ public class OrderCancellationService {
     private final OrderItemHelper orderItemHelper;
     private final OrderStockService orderStockService;
     private final OrderLogService orderLog;
+    private final OrderItemCompensationPlanner compensationPlanner;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -57,32 +58,13 @@ public class OrderCancellationService {
         if (itemsResult.isError()) return itemsResult.propagateError();
 
         List<OrderItem> itemsToCancel = itemsResult.getData();
-        Result<Void> itemsValidationResult = validateItemsCanBeCancelled(itemsToCancel);
+        Result<Void> itemsValidationResult = compensationPlanner.validateCancellableItems(itemsToCancel);
         if (itemsValidationResult.isError()) return itemsValidationResult.propagateError();
 
-        BigDecimal totalRefundAmount = BigDecimal.ZERO;
-        List<OrderItemCancel> cancelRecords = new ArrayList<>();
-
-        for (OrderItem item : itemsToCancel) {
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            int availableToCancel = item.getQuantity() - (alreadyCancelled != null ? alreadyCancelled : 0);
-            
-            if (availableToCancel <= 0) {
-                continue;
-            }
-
-            BigDecimal refundAmount = item.getTotalPrice();
-            totalRefundAmount = totalRefundAmount.add(refundAmount);
-
-            OrderItemCancel cancelRecord = OrderItemCancel.builder()
-                    .orderItem(item)
-                    .reason(request.getReason())
-                    .reasonText(request.getReasonText())
-                    .cancelledQuantity(availableToCancel)
-                    .refundAmount(refundAmount)
-                    .build();
-            cancelRecords.add(cancelRecord);
-        }
+        OrderItemCompensationPlanner.CancellationPlan cancellationPlan =
+                compensationPlanner.buildCancellationPlan(itemsToCancel, request);
+        BigDecimal totalRefundAmount = cancellationPlan.totalRefundAmount();
+        List<OrderItemCancel> cancelRecords = cancellationPlan.records();
 
         if (cancelRecords.isEmpty()) {
             return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
@@ -101,6 +83,7 @@ public class OrderCancellationService {
 
         Result<Void> orchestratorResult = paymentOrchestrator.cancelEscrowsAndRefundBuyer(escrowsToCancel, user);
         if (orchestratorResult.isError()) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             orderLog.logEscrowCancelFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error("Failed to process refund. Please contact support.", "REFUND_FAILED");
         }
@@ -113,7 +96,7 @@ public class OrderCancellationService {
     }
     
     private Result<OrderDto> processCancellationStatus(Order order, User user) {
-        boolean allItemsCancelled = areAllItemsCancelled(order);
+        boolean allItemsCancelled = compensationPlanner.areAllItemsCancelled(order);
         if (allItemsCancelled) {
             order.setStatus(Order.OrderStatus.CANCELLED);
             if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
@@ -146,27 +129,4 @@ public class OrderCancellationService {
         }
         return Result.success();
     }
-
-
-    private Result<Void> validateItemsCanBeCancelled(List<OrderItem> items) {
-        for (OrderItem item : items) {
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (alreadyCancelled != null && alreadyCancelled >= item.getQuantity()) {
-                return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
-            }
-        }
-        return Result.success();
-    }
-
-    private boolean areAllItemsCancelled(Order order) {
-        for (OrderItem item : order.getOrderItems()) {
-            Integer cancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (cancelled == null || cancelled < item.getQuantity()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
 }
