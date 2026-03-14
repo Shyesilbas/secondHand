@@ -1,5 +1,4 @@
 import { useEntity } from '../../common/hooks/useEntity.js';
-import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
 import { createClothingServiceAdapter } from '../../common/services/entityAdapters.js';
 import { clothingService } from '../services/clothingService.js';
 import { ClothingListingDTO } from '../clothing.js';

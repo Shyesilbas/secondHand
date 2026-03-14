@@ -22,7 +22,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
 
   const navState = useMemo(() => window.history.state && window.history.state.usr, []);
   const engineModeFromNav = navState?.mode || null;
-  const [mode, setMode] = useState(engineModeFromNav || initialMode || 'browse');
+  const [mode] = useState(engineModeFromNav || initialMode || 'browse');
 
   // Initialize filters sub-hook (onFiltersChange will be set after search hook initialization)
   const filterHook = useListingFilters({

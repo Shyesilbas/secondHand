@@ -1,28 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatCurrency } from '../../common/formatters.js';
+import { Trash2 } from 'lucide-react';
 
 const BaseCard = ({ variant, title, subtitle, onDelete, isDeleting, children }) => {
   const containerClassName = variant === 'creditCard'
-    ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white'
-    : 'bg-white text-text-primary border border-sidebar-border';
+    ? 'bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white border border-indigo-500/40'
+    : 'bg-white text-text-primary border border-slate-200 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.45)]';
 
   const deleteButtonClassName = variant === 'creditCard'
     ? 'text-white/70 hover:text-white hover:bg-white/10'
     : 'text-red-500 hover:text-red-700 hover:bg-red-50';
 
   return (
-    <div className={`rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden ${containerClassName}`}>
+    <div className={`rounded-3xl shadow-sm hover:shadow-md transition-shadow overflow-hidden ${containerClassName}`}>
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
             {title ? (
-              <h3 className={`text-lg font-semibold ${variant === 'creditCard' ? 'text-white' : 'text-text-primary'}`}>
+              <h3 className={`text-lg font-semibold tracking-tight ${variant === 'creditCard' ? 'text-white' : 'text-text-primary'}`}>
                 {title}
               </h3>
             ) : null}
             {subtitle ? (
-              <p className={`text-sm ${variant === 'creditCard' ? 'text-white/70' : 'text-text-muted'}`}>
+              <p className={`text-sm tracking-tight ${variant === 'creditCard' ? 'text-white/70' : 'text-text-muted'}`}>
                 {subtitle}
               </p>
             ) : null}
@@ -33,7 +34,7 @@ const BaseCard = ({ variant, title, subtitle, onDelete, isDeleting, children }) 
             className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${deleteButtonClassName}`}
             title={variant === 'creditCard' ? 'Delete credit card' : 'Delete bank account'}
           >
-            {isDeleting ? '...' : '🗑️'}
+            {isDeleting ? '...' : <Trash2 className="w-4 h-4" />}
           </button>
         </div>
 
@@ -59,11 +60,13 @@ BaseCard.defaultProps = {
 };
 
 const CreditCardContent = ({ card }) => {
+  const number = card.number || card.cardNumber || `**** **** **** ${card.last4 || 'XXXX'}`;
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-lg font-mono tracking-wider">
-          {card.number || card.cardNumber || `**** **** **** ${card.last4 || 'XXXX'}`}
+        <p className="text-[11px] uppercase tracking-[0.16em] text-white/70 mb-1">Card Number</p>
+        <p className="text-lg font-mono tracking-wider truncate" title={number}>
+          {number}
         </p>
       </div>
 
@@ -107,23 +110,24 @@ CreditCardContent.propTypes = {
 };
 
 const BankAccountContent = ({ account }) => {
+  const holder = `${account.holderName || ''} ${account.holderSurname || ''}`.trim() || '—';
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <span className="text-sm text-text-secondary">IBAN</span>
-        <span className="text-sm font-mono text-text-primary">{account.IBAN}</span>
+        <span className="text-sm text-slate-500">IBAN</span>
+        <span className="text-sm font-mono text-text-primary max-w-[65%] truncate" title={account.IBAN}>{account.IBAN}</span>
       </div>
 
       {typeof account.balance !== 'undefined' ? (
         <div className="flex justify-between items-center">
-          <span className="text-sm text-text-secondary">Balance</span>
+          <span className="text-sm text-slate-500">Balance</span>
           <span className="text-sm font-mono text-text-primary">{formatCurrency(account.balance)}</span>
         </div>
       ) : null}
 
       <div className="flex justify-between items-center">
-        <span className="text-sm text-text-secondary">Account Holder</span>
-        <span className="text-sm font-mono text-text-primary">{`${account.holderName} ${account.holderSurname}`}</span>
+        <span className="text-sm text-slate-500">Account Holder</span>
+        <span className="text-sm font-medium text-text-primary max-w-[65%] truncate text-right" title={holder}>{holder}</span>
       </div>
     </div>
   );

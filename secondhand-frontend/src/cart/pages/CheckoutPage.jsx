@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {ArrowLeft as ArrowLeftIcon} from 'lucide-react';
 import {useCart} from '../hooks/useCart.js';
@@ -21,7 +21,6 @@ const CheckoutPage = () => {
     }, [location.search]);
 
     const [offerContext, setOfferContext] = useState(null);
-    const [isOfferLoading, setIsOfferLoading] = useState(false);
 
     const [couponInput, setCouponInput] = useState('');
     const [appliedCouponCode, setAppliedCouponCode] = useState(null);
@@ -40,7 +39,6 @@ const CheckoutPage = () => {
             setOfferContext(null);
             return;
         }
-        setIsOfferLoading(true);
         offerService
             .getById(offerId)
             .then(async (offer) => {
@@ -56,8 +54,7 @@ const CheckoutPage = () => {
             .catch((e) => {
                 setOfferContext(null);
                 setCouponError(e?.response?.data?.message || 'Offer could not be loaded');
-            })
-            .finally(() => setIsOfferLoading(false));
+            });
     }, [offerId]);
 
     const displayCartItems = useMemo(() => {

@@ -47,7 +47,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         
         log.info("RateLimitingFilter initialized - Enabled: {}, Auth: {}/s, Payment: {}/s, General: {}/s, Window: {}s",
                 rateLimitConfig.isEnabled(), rateLimitConfig.getAuth().getRequestsPerSecond(), 
-                rateLimitConfig.getPayment().getRequestsPerSecond(), rateLimitConfig.getGeneral().getRequestsPerSecond(), 
+                rateLimitConfig.getPayment().getRequestsPerSecond(), rateLimitConfig.getGeneral().getRequestsPerSecond(),
                 rateLimitConfig.getWindowSizeSeconds());
     }
 
@@ -115,6 +115,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private int determineRateLimit(String requestURI) {
         if (requestURI.startsWith("/api/auth/")) {
             return rateLimitConfig.getAuth().getRequestsPerSecond();
+        } else if (requestURI.startsWith("/api/ai/")) {
+            return rateLimitConfig.getAi().getRequestsPerSecond();
         } else if (requestURI.startsWith("/api/payment/") || 
                    requestURI.startsWith("/api/v1/payments/") || 
                    requestURI.contains("payment")) {
@@ -127,6 +129,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     private String getRateLimitCategory(String requestURI) {
         if (requestURI.startsWith("/api/auth/")) {
             return "auth";
+        } else if (requestURI.startsWith("/api/ai/")) {
+            return "ai";
         } else if (requestURI.startsWith("/api/payment/") || 
                    requestURI.startsWith("/api/v1/payments/") || 
                    requestURI.contains("payment")) {

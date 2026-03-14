@@ -6,6 +6,7 @@ import { Trash2 } from 'lucide-react';
 const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) => {
     const [isHovered, setIsHovered] = useState(false);
     const formatDate = (dateString) => formatDateTime(dateString);
+    const previewText = String(email?.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
     const dotClass = (() => {
         if (email?.emailType === EMAIL_TYPES.VERIFICATION_CODE) return 'bg-green-500';
@@ -49,10 +50,23 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                                 <span className="text-xs text-slate-500 tracking-tight">
                                     {formatDate(email.sentAt)}
                                 </span>
+                                {isUnread && (
+                                    <>
+                                        <span className="text-xs text-slate-300">•</span>
+                                        <span className="inline-flex items-center rounded-full bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-600">
+                                            New
+                                        </span>
+                                    </>
+                                )}
                             </div>
                             <div className="flex items-center gap-2 text-xs text-slate-500 truncate">
                                 <span className="truncate">{email.senderEmail}</span>
                             </div>
+                            {previewText && (
+                                <p className="mt-1 text-xs text-slate-500 line-clamp-2 pr-2">
+                                    {previewText}
+                                </p>
+                            )}
                         </div>
                         
                         <button

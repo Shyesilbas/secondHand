@@ -3,8 +3,7 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { 
     createLoginRequest, 
     createRegisterRequest, 
-    createForgotPasswordRequest, 
-    createResetPasswordRequest 
+    createForgotPasswordRequest
 } from '../auth.js';
 
 export const authService = {

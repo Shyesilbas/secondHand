@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Lock, ShieldCheck as ShieldCheckIcon} from 'lucide-react';
 
 const CheckoutVerificationStep = ({
@@ -7,6 +7,7 @@ const CheckoutVerificationStep = ({
     emails,
     isEmailsLoading,
     fetchEmails,
+    sendVerificationCode,
     onCheckout,
     onBack,
     proceedDisabled,
@@ -14,6 +15,8 @@ const CheckoutVerificationStep = ({
 }) => {
     const [resendTimer, setResendTimer] = useState(0);
     const [canResend, setCanResend] = useState(true);
+    const [isResending, setIsResending] = useState(false);
+    const codeValue = paymentVerificationCode || '';
 
     useEffect(() => {
         if (resendTimer > 0) {
@@ -27,12 +30,18 @@ const CheckoutVerificationStep = ({
     const handleResendCode = async () => {
         setCanResend(false);
         setResendTimer(60);
-        await fetchEmails();
+        setIsResending(true);
+        try {
+            await sendVerificationCode();
+            await fetchEmails();
+        } finally {
+            setIsResending(false);
+        }
     };
 
     const handleCodeChange = (index, value) => {
         if (value.length <= 1 && /^\d*$/.test(value)) {
-            const newCode = paymentVerificationCode.split('');
+            const newCode = codeValue.split('');
             newCode[index] = value;
             setPaymentVerificationCode(newCode.join(''));
             
@@ -44,46 +53,61 @@ const CheckoutVerificationStep = ({
     };
 
     const handleKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !paymentVerificationCode[index] && index > 0) {
+        if (e.key === 'Backspace' && !codeValue[index] && index > 0) {
             const prevInput = document.querySelector(`input[data-index="${index - 1}"]`);
             prevInput?.focus();
         }
     };
 
-    const isCodeComplete = paymentVerificationCode.length === 6;
-    const filledCount = (paymentVerificationCode || '').replace(/\s/g, '').length;
+    const handleCodePaste = (e) => {
+        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+        if (!pasted) {
+            return;
+        }
+        e.preventDefault();
+        setPaymentVerificationCode(pasted);
+        if (pasted.length === 6) {
+            const lastInput = document.querySelector('input[data-index="5"]');
+            lastInput?.focus();
+        }
+    };
+
+    const isCodeComplete = codeValue.length === 6;
+    const filledCount = codeValue.replace(/\s/g, '').length;
 
     return (
-        <div className="p-5">
+        <div className="p-5 sm:p-6 lg:p-7">
             {/* Security banner */}
-            <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 mb-6 px-4 py-3.5 bg-gradient-to-r from-slate-50 to-indigo-50 rounded-2xl border border-slate-200">
+                <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
                     <Lock className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
-                    <h2 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">Secure Verification</h2>
-                    <p className="text-[11px] text-gray-400">A 6-digit code has been sent to your email.</p>
+                    <h2 className="text-sm font-semibold text-slate-900 tracking-tight">Secure Verification</h2>
+                    <p className="text-xs text-slate-500">A 6-digit code has been sent to your email.</p>
                 </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
                 {/* Code input */}
                 <div className="text-center">
                     <div className="flex justify-center gap-2.5">
                         {[0, 1, 2, 3, 4, 5].map((index) => {
-                            const hasValue = Boolean(paymentVerificationCode[index]);
+                            const hasValue = Boolean(codeValue[index]);
                             return (
                                 <input
                                     key={index}
                                     type="text"
                                     inputMode="numeric"
-                                    value={paymentVerificationCode[index] || ''}
+                                    value={codeValue[index] || ''}
                                     onChange={(e) => handleCodeChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
-                                    className={`w-11 h-12 text-center text-[16px] font-mono rounded-lg transition-all duration-150 focus:outline-none ${
+                                    onPaste={handleCodePaste}
+                                    aria-label={`Verification digit ${index + 1}`}
+                                    className={`w-11 h-12 text-center text-[16px] font-mono rounded-xl transition-all duration-150 focus:outline-none ${
                                         hasValue
-                                            ? 'border-gray-900 bg-gray-900 text-white border'
-                                            : 'border border-gray-200 bg-white text-gray-900 focus:border-gray-400 focus:ring-1 focus:ring-gray-200'
+                                            ? 'border-indigo-600 bg-indigo-600 text-white border'
+                                            : 'border border-slate-200 bg-white text-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100'
                                     }`}
                                     maxLength="1"
                                     data-index={index}
@@ -106,26 +130,26 @@ const CheckoutVerificationStep = ({
                     <div className="mt-3">
                         <button
                             onClick={handleResendCode}
-                            disabled={!canResend}
-                            className={`text-[12px] font-medium transition-colors ${
-                                canResend
-                                    ? 'text-gray-600 hover:text-gray-900 underline underline-offset-2'
-                                    : 'text-gray-300 cursor-not-allowed'
+                            disabled={!canResend || isResending}
+                            className={`text-xs font-semibold transition-colors ${
+                                canResend && !isResending
+                                    ? 'text-slate-600 hover:text-slate-900 underline underline-offset-2'
+                                    : 'text-slate-300 cursor-not-allowed'
                             }`}
                         >
-                            {canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
+                            {isResending ? 'Sending…' : (canResend ? 'Resend code' : `Resend in ${resendTimer}s`)}
                         </button>
                     </div>
                 </div>
 
                 {/* Recent emails */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                     <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-[12px] font-semibold text-gray-700">Recent Emails</h4>
+                        <h4 className="text-sm font-semibold text-slate-700">Recent Emails</h4>
                         <button
                             onClick={fetchEmails}
                             disabled={isEmailsLoading}
-                            className="text-[11px] text-gray-500 hover:text-gray-700 font-medium disabled:opacity-40 transition-colors"
+                            className="text-xs text-slate-500 hover:text-slate-700 font-semibold disabled:opacity-40 transition-colors"
                         >
                             {isEmailsLoading ? 'Loading…' : 'Refresh'}
                         </button>
@@ -139,16 +163,16 @@ const CheckoutVerificationStep = ({
                         ) : emails && emails.length > 0 ? (
                             <div className="space-y-2">
                                 {emails.slice(0, 2).map((email, index) => (
-                                    <div key={index} className="px-3 py-2.5 bg-white border border-gray-100 rounded-lg">
+                                    <div key={index} className="px-3 py-2.5 bg-white border border-slate-200 rounded-xl">
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="text-[12px] font-medium text-gray-900">
+                                            <span className="text-xs font-semibold text-slate-900">
                                                 {email.subject || 'Verification Code'}
                                             </span>
-                                            <span className="text-[10px] text-gray-400 tabular-nums">
+                                            <span className="text-[11px] text-slate-500 tabular-nums">
                                                 {email.sentAt || email.createdAt}
                                             </span>
                                         </div>
-                                        <div className="text-[12px] text-gray-600 font-mono">
+                                        <div className="text-xs text-slate-600 font-mono">
                                             {email.body || email.content}
                                         </div>
                                     </div>
@@ -157,27 +181,27 @@ const CheckoutVerificationStep = ({
                         ) : (
                             <div className="text-center py-6">
                                 <ShieldCheckIcon className="w-6 h-6 mx-auto mb-1.5 text-gray-300" />
-                                <p className="text-[12px] text-gray-400">No emails found</p>
+                                <p className="text-xs text-slate-500">No emails found</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 mt-5 border-t border-gray-50">
+            <div className="hidden sm:flex items-center justify-between pt-5 mt-6 border-t border-slate-100">
                 <button
                     onClick={onBack}
-                    className="px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
                 >
                     Back
                 </button>
                 <button
                     onClick={onCheckout}
                     disabled={proceedDisabled || isCheckingOut || !isCodeComplete}
-                    className={`px-5 py-2.5 rounded-lg text-[13px] font-medium transition-all flex items-center gap-1.5 ${
+                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
                         isCodeComplete && !proceedDisabled && !isCheckingOut
-                            ? 'bg-gray-900 text-white hover:bg-gray-800'
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            ? 'bg-slate-900 text-white hover:bg-slate-800'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                     }`}
                 >
                     {isCheckingOut ? (
@@ -192,6 +216,24 @@ const CheckoutVerificationStep = ({
                         </>
                     )}
                 </button>
+            </div>
+
+            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-3 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        onClick={onBack}
+                        className="px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 bg-white"
+                    >
+                        Back
+                    </button>
+                    <button
+                        onClick={onCheckout}
+                        disabled={proceedDisabled || isCheckingOut || !isCodeComplete}
+                        className="px-4 py-3 rounded-xl text-sm font-semibold bg-slate-900 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                    >
+                        {isCheckingOut ? 'Processing…' : 'Complete'}
+                    </button>
+                </div>
             </div>
         </div>
     );

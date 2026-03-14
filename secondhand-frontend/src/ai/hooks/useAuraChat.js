@@ -8,6 +8,7 @@ export const useAuraChat = ({
   initialMessages = [],
   withTyping = false,
   buildPayload = (text) => text,
+  sendApi = null,
   echoUserMessageWhenUnauthed = false,
 }) => {
   const [messages, setMessages] = useState(() => initialMessages);
@@ -56,16 +57,16 @@ export const useAuraChat = ({
     setMessages((prev) => prev.filter((m) => m.id !== typingId));
   }, []);
 
-  const replaceTypingWith = useCallback((typingId, content) => {
+  const replaceTypingWith = useCallback((typingId, content, meta) => {
     setMessages((prev) => {
       const idx = prev.findIndex((m) => m.id === typingId);
       const without = idx >= 0 ? prev.filter((_, i) => i !== idx) : prev;
-      return [...without, createChatMessage({ role: 'assistant', content })];
+      return [...without, createChatMessage({ role: 'assistant', content, meta })];
     });
   }, []);
 
-  const appendAssistant = useCallback((content) => {
-    setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content })]);
+  const appendAssistant = useCallback((content, meta) => {
+    setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content, meta })]);
   }, []);
 
   const sendMessage = useCallback(
@@ -94,15 +95,21 @@ export const useAuraChat = ({
 
       try {
         const payload = buildPayload(trimmed);
-        const message = typeof payload === 'object' && payload != null && 'message' in payload ? payload.message : payload;
-        const context = typeof payload === 'object' && payload != null && 'context' in payload ? payload.context : undefined;
-        const response = await aiChatService.chat({ userId, message, context });
+        const response = sendApi
+          ? await sendApi(payload)
+          : await aiChatService.chat(
+              typeof payload === 'object' && payload != null
+                ? { message: payload.message, context: payload.context }
+                : { message: payload }
+            );
         const answer = response?.answer || response?.message || 'No response.';
+        const dataSources = Array.isArray(response?.dataSources) ? response.dataSources : undefined;
+        const meta = dataSources?.length ? { dataSources } : undefined;
 
         if (typingId) {
-          replaceTypingWith(typingId, answer);
+          replaceTypingWith(typingId, answer, meta);
         } else {
-          appendAssistant(answer);
+          appendAssistant(answer, meta);
         }
       } catch (e) {
         if (typingId) {
@@ -127,6 +134,7 @@ export const useAuraChat = ({
       isSending,
       removeTyping,
       replaceTypingWith,
+      sendApi,
       userId,
       withTyping,
     ]

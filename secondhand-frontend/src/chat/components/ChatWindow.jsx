@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useChatWindow} from '../hooks/useChatWindow.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';

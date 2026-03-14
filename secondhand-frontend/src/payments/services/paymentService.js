@@ -1,6 +1,6 @@
 import { get, post, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { BankDto, PaymentDto, ListingFeeConfigDTO, createPaymentRequest } from '../paymentSchema.js';
+import { BankDto, PaymentDto, createPaymentRequest } from '../paymentSchema.js';
 
 export const paymentService = {
 

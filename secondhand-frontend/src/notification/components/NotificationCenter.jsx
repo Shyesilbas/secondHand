@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useInAppNotificationsContext } from '../InAppNotificationContext.jsx';
 import NotificationItem from './NotificationItem.jsx';
 import { X, CheckCheck } from 'lucide-react';

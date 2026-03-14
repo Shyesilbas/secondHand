@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ROUTES } from '../common/constants/routes.js';
 import { useAuth } from './AuthContext.jsx';
 import { authService } from './services/authService.js';
-import { API_ENDPOINTS } from '../common/constants/apiEndpoints.js';
 
 const OAuthCompletePage = () => {
     const [params] = useSearchParams();

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { couponService } from '../../services/couponService.js';
 import { formatCurrency } from '../../../common/formatters.js';

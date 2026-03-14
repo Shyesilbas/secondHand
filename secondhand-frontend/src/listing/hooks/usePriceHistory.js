@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { priceHistoryService } from '../services/listingAddonService.js';
 import logger from '../../common/utils/logger.js';
 

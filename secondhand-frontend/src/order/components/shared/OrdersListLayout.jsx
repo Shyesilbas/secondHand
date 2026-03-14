@@ -33,12 +33,12 @@ const Header = React.memo(
     const headerContent = (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-[15px] font-semibold text-gray-900 tracking-[-0.01em]">{title}</h1>
+          <h1 className="text-lg font-semibold text-slate-900 tracking-tight">{title}</h1>
           {showIndicator ? <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> : null}
           {subtitle ? (
-            <span className="text-xs text-gray-400 font-normal hidden sm:inline">{subtitle}</span>
+            <span className="text-sm text-slate-500 font-normal hidden sm:inline">{subtitle}</span>
           ) : countText ? (
-            <span className="text-[11px] text-gray-400 font-normal tabular-nums hidden sm:inline">· {countText}</span>
+            <span className="text-xs text-slate-500 font-normal tabular-nums hidden sm:inline">· {countText}</span>
           ) : null}
         </div>
         <div className="flex items-center gap-1">
@@ -46,7 +46,7 @@ const Header = React.memo(
             <button
               type="button"
               onClick={onAnalytics}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 rounded-md transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
             >
               <BarChart3 className="w-3.5 h-3.5" />
               <span>{analyticsLabel}</span>
@@ -57,7 +57,7 @@ const Header = React.memo(
               type="button"
               onClick={onRefresh}
               disabled={loading}
-              className="p-1.5 text-gray-400 hover:text-gray-600 rounded-md transition-colors disabled:opacity-40"
+              className="p-2 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors disabled:opacity-40"
               title="Refresh"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -68,42 +68,42 @@ const Header = React.memo(
     );
 
     if (!sticky) {
-      return <div className="mb-6">{headerContent}</div>;
+      return <div className="mb-6 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.45)]">{headerContent}</div>;
     }
 
     return (
-      <div className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-3">{headerContent}</div>
+      <div className="bg-white/90 backdrop-blur-md border-b border-slate-200/70 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 py-4">{headerContent}</div>
       </div>
     );
   }
 );
 
 const OrderItemSkeleton = () => (
-  <div className="bg-white rounded-lg border border-gray-100 p-4 animate-pulse">
+  <div className="bg-white rounded-2xl border border-slate-200/70 p-4 animate-pulse">
     <div className="flex items-center justify-between gap-4 mb-3">
       <div className="flex items-center gap-2.5 flex-1 min-w-0">
-        <div className="h-[14px] w-28 bg-gray-100 rounded-sm" />
-        <div className="h-[12px] w-14 bg-gray-50 rounded-sm" />
+        <div className="h-[14px] w-28 bg-slate-200 rounded-sm" />
+        <div className="h-[12px] w-14 bg-slate-100 rounded-sm" />
       </div>
       <div className="flex items-center gap-1">
-        <div className="w-7 h-7 rounded bg-gray-50" />
-        <div className="w-7 h-7 rounded bg-gray-50" />
+        <div className="w-7 h-7 rounded bg-slate-100" />
+        <div className="w-7 h-7 rounded bg-slate-100" />
       </div>
     </div>
     <div className="flex items-center gap-3 mb-3">
-      <div className="h-[10px] w-16 bg-gray-100 rounded-sm" />
-      <div className="h-[10px] w-14 bg-gray-50 rounded-sm" />
-      <div className="h-[10px] w-10 bg-gray-50 rounded-sm" />
-      <div className="h-[10px] w-20 bg-gray-50 rounded-sm" />
+      <div className="h-[10px] w-16 bg-slate-200 rounded-sm" />
+      <div className="h-[10px] w-14 bg-slate-100 rounded-sm" />
+      <div className="h-[10px] w-10 bg-slate-100 rounded-sm" />
+      <div className="h-[10px] w-20 bg-slate-100 rounded-sm" />
     </div>
-    <div className="flex items-center gap-2.5 pt-3 border-t border-gray-50">
-      <div className="w-9 h-9 rounded bg-gray-100" />
+    <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100">
+      <div className="w-9 h-9 rounded bg-slate-200" />
       <div className="flex-1 min-w-0">
-        <div className="h-[12px] w-2/3 bg-gray-100 rounded-sm" />
-        <div className="h-[10px] w-1/3 bg-gray-50 rounded-sm mt-1.5" />
+        <div className="h-[12px] w-2/3 bg-slate-200 rounded-sm" />
+        <div className="h-[10px] w-1/3 bg-slate-100 rounded-sm mt-1.5" />
       </div>
-      <div className="h-[14px] w-14 bg-gray-100 rounded-sm" />
+      <div className="h-[14px] w-14 bg-slate-200 rounded-sm" />
     </div>
   </div>
 );
@@ -124,11 +124,11 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
   const { searchTerm, setSearchTerm, searchLoading, searchError, isSearchMode, statusFilter, setStatusFilter } = search;
 
   return (
-    <div>
+    <div className="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-[0_20px_50px_-40px_rgba(15,23,42,0.45)]">
       <form onSubmit={onSearch} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <div className="flex-1 flex gap-2">
           <div className="flex-1 relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -136,14 +136,14 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by order number"
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-[13px] placeholder:text-gray-300 focus:bg-white focus:ring-1 focus:ring-gray-200 focus:border-gray-200 transition-colors"
+              className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-colors"
               disabled={searchLoading}
             />
           </div>
           <select
             value={statusFilter || ''}
             onChange={(e) => setStatusFilter?.(e.target.value || '')}
-            className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-[13px] text-gray-600 focus:bg-white focus:ring-1 focus:ring-gray-200 focus:border-gray-200 transition-colors min-w-[130px]"
+            className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-colors min-w-[130px]"
           >
             {ORDER_STATUS_OPTIONS.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
@@ -154,7 +154,7 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
           <button
             type="submit"
             disabled={searchLoading || !searchTerm.trim()}
-            className="px-4 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2.5 bg-slate-900 text-white text-[13px] font-semibold rounded-xl hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
           >
             {searchLoading ? 'Searching…' : 'Search'}
           </button>
@@ -162,7 +162,7 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
             <button
               type="button"
               onClick={onClearSearch}
-              className="px-4 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-700 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors"
+              className="px-4 py-2.5 text-[13px] font-medium text-slate-600 hover:text-slate-800 border border-slate-200 rounded-xl hover:border-slate-300 transition-colors"
             >
               Clear
             </button>
@@ -170,7 +170,7 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
         </div>
       </form>
       {searchError ? (
-        <div className="mt-2 px-3 py-2 bg-red-50/80 border border-red-100 rounded-lg">
+        <div className="mt-2 px-3 py-2 bg-red-50/80 border border-red-100 rounded-xl">
           <p className="text-[13px] text-red-600">{searchError}</p>
         </div>
       ) : null}
@@ -191,8 +191,8 @@ const Pagination = React.memo(({ pagination, isSearchMode, loading, onPageChange
   const endItem = Math.min((currentPage + 1) * pageSize, totalElements);
 
   return (
-    <div className="flex items-center justify-between flex-wrap gap-3 mt-4 px-1">
-      <p className="text-[11px] text-gray-400 tabular-nums">
+    <div className="flex items-center justify-between flex-wrap gap-3 mt-4 px-1 rounded-2xl border border-slate-200/70 bg-white p-3">
+      <p className="text-[11px] text-slate-500 tabular-nums">
         {startItem}–{endItem} of {totalElements}
       </p>
 
@@ -200,28 +200,28 @@ const Pagination = React.memo(({ pagination, isSearchMode, loading, onPageChange
         <button
           onClick={() => onPageChange(Math.max(0, currentPage - 1))}
           disabled={currentPage === 0 || totalPages <= 1}
-          className="px-2.5 py-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600 hover:text-slate-900 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Prev
         </button>
 
-        <span className="text-[11px] text-gray-400 tabular-nums px-2">
+        <span className="text-[11px] text-slate-500 tabular-nums px-2">
           {currentPage + 1} / {totalPages}
         </span>
 
         <button
           onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))}
           disabled={currentPage >= totalPages - 1 || totalPages <= 1}
-          className="px-2.5 py-1.5 text-[11px] font-medium text-gray-500 hover:text-gray-900 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-2.5 py-1.5 text-[11px] font-medium text-slate-600 hover:text-slate-900 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Next
         </button>
 
-        <span className="w-px h-3.5 bg-gray-100 mx-1.5" />
+        <span className="w-px h-3.5 bg-slate-200 mx-1.5" />
 
         <select
           id="pageSize"
-          className="px-2 py-1 text-[11px] text-gray-500 border border-gray-100 rounded bg-transparent focus:outline-none focus:ring-1 focus:ring-gray-200 cursor-pointer"
+          className="px-2 py-1 text-[11px] text-slate-600 border border-slate-200 rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-indigo-100 cursor-pointer"
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
         >
@@ -276,8 +276,8 @@ const UnifiedOrderItem = React.memo(
     return (
       <div
         onClick={() => onOpenOrder(order)}
-        className={`group bg-white border border-gray-100 border-l-2 ${accentClass} rounded-lg px-4 py-3.5 cursor-pointer transition-all duration-150
-          hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:border-gray-150
+        className={`group bg-white border border-slate-200/70 border-l-2 ${accentClass} rounded-2xl px-4 py-3.5 cursor-pointer transition-all duration-150
+          hover:shadow-[0_14px_40px_-30px_rgba(15,23,42,0.45)] hover:border-slate-300
           ${isCompleted ? 'bg-emerald-50/30' : ''}`}
       >
         {/* Row 1 — Order title + Actions */}
@@ -289,31 +289,31 @@ const UnifiedOrderItem = React.memo(
                   type="text"
                   value={editingOrderName}
                   onChange={(e) => setEditingOrderName(e.target.value)}
-                  className="flex-1 px-2 py-1 text-[13px] font-medium text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className="flex-1 px-2 py-1 text-[13px] font-medium text-slate-900 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   placeholder="Order name"
                   maxLength={100}
                   autoFocus
                   onClick={(e) => e.stopPropagation()}
                 />
-                <button onClick={(e) => onSaveOrderName(order.id, e)} className="p-1 hover:bg-gray-50 rounded text-gray-600 transition-colors">
+                <button onClick={(e) => onSaveOrderName(order.id, e)} className="p-1 hover:bg-slate-50 rounded text-slate-600 transition-colors">
                   <CheckCircle className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={onCancelEditName} className="p-1 hover:bg-gray-50 rounded text-gray-400 transition-colors">
+                <button onClick={onCancelEditName} className="p-1 hover:bg-slate-50 rounded text-slate-400 transition-colors">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-2 min-w-0">
-                <h3 className="text-[13px] font-semibold text-gray-900 truncate tracking-[-0.01em]">
+                <h3 className="text-[13px] font-semibold text-slate-900 truncate tracking-tight">
                   {viewMode === 'seller' ? `#${order.orderNumber}` : order.name || `#${order.orderNumber}`}
                 </h3>
                 {viewMode === 'buyer' && order.name ? (
-                  <span className="text-[10px] text-gray-400 font-mono shrink-0">#{order.orderNumber}</span>
+                  <span className="text-[10px] text-slate-500 font-mono shrink-0">#{order.orderNumber}</span>
                 ) : null}
                 {viewMode === 'buyer' ? (
                   <button
                     onClick={(e) => onStartEditName(order, e)}
-                    className="p-0.5 text-gray-300 hover:text-gray-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                    className="p-0.5 text-slate-300 hover:text-slate-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                     title="Edit order name"
                   >
                     <Pencil className="w-2.5 h-2.5" />
@@ -328,7 +328,7 @@ const UnifiedOrderItem = React.memo(
               <button
                 type="button"
                 onClick={(e) => onCompleteOrder(order.id, e)}
-                className="px-2.5 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded transition-colors flex items-center gap-1 mr-1"
+                className="px-2.5 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors flex items-center gap-1 mr-1"
                 title="Confirm Order"
               >
                 <CheckCircle className="w-3 h-3" /> Confirm
@@ -337,7 +337,7 @@ const UnifiedOrderItem = React.memo(
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onOpenOrder(order); }}
-              className="p-1.5 text-gray-300 hover:text-gray-600 rounded transition-colors"
+              className="p-1.5 text-slate-300 hover:text-slate-600 rounded-lg transition-colors"
               title="View Details"
             >
               <Eye className="w-3.5 h-3.5" />
@@ -346,52 +346,51 @@ const UnifiedOrderItem = React.memo(
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onOpenReceipt(order.paymentReference); }}
-                className="p-1.5 text-gray-300 hover:text-gray-600 rounded transition-colors"
+                className="p-1.5 text-slate-300 hover:text-slate-600 rounded-lg transition-colors"
                 title="View Receipt"
               >
                 <Receipt className="w-3.5 h-3.5" />
               </button>
             ) : null}
-            <ChevronRight className="w-3.5 h-3.5 text-gray-200 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all duration-150 ml-0.5" />
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all duration-150 ml-0.5" />
           </div>
         </div>
 
-        {/* Row 2 — Status + meta data inline */}
-        <div className="flex items-center gap-3 flex-wrap text-[11px] mb-2.5">
-          <span className={`font-medium ${getStatusColor(order.status)}`}>
+        {/* Row 2 — Status + meta */}
+        <div className="flex items-center justify-between gap-3 flex-wrap text-[11px] mb-2.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium bg-slate-100 ${getStatusColor(order.status)}`}>
             {resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status}
-          </span>
-          <span className="w-px h-3 bg-gray-100" />
-          <span className={`font-medium ${getStatusColor(order.paymentStatus)}`}>
+            </span>
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium bg-slate-100 ${getStatusColor(order.paymentStatus)}`}>
             {resolveEnumLabel(enums, 'paymentStatuses', order.paymentStatus) || order.paymentStatus}
-          </span>
-          <span className="w-px h-3 bg-gray-100" />
-          <span className="text-gray-400 tabular-nums">{itemsCount} {itemsCount === 1 ? 'item' : 'items'}</span>
-          <span className="w-px h-3 bg-gray-100" />
-          <span className="text-gray-400 tabular-nums">{formatDateTime(order.createdAt)}</span>
+            </span>
+            <span className="text-slate-500 tabular-nums">{itemsCount} {itemsCount === 1 ? 'item' : 'items'}</span>
+          </div>
+          <span className="text-slate-500 tabular-nums">{formatDateTime(order.createdAt)}</span>
         </div>
 
         {/* Row 3 — Product preview + price */}
         {firstItem ? (
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-gray-50">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-slate-100">
             {firstItem?.listing?.imageUrl ? (
               <img
                 src={firstItem.listing.imageUrl}
                 alt={firstItem.listing.title}
-                className="w-8 h-8 rounded object-cover border border-gray-100 flex-shrink-0"
+                className="w-8 h-8 rounded object-cover border border-slate-200 flex-shrink-0"
               />
             ) : (
-              <div className="w-8 h-8 rounded bg-gray-50 flex items-center justify-center flex-shrink-0">
-                <Package className="w-3.5 h-3.5 text-gray-300" />
+              <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <Package className="w-3.5 h-3.5 text-slate-400" />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] text-gray-700 truncate">{firstItem?.listing?.title || 'Item'}</p>
+              <p className="text-[12px] text-slate-700 truncate">{firstItem?.listing?.title || 'Item'}</p>
               {itemsCount > 1 ? (
-                <p className="text-[10px] text-gray-400 mt-0.5">+{itemsCount - 1} more</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">+{itemsCount - 1} more</p>
               ) : null}
             </div>
-            <p className={`text-[13px] font-semibold tabular-nums tracking-tight ${isCompleted ? 'text-emerald-600' : 'text-gray-900'}`}>
+            <p className={`text-[13px] font-semibold tabular-nums tracking-tight ${isCompleted ? 'text-emerald-600' : 'text-slate-900'}`}>
               {formatCurrency(viewMode === 'seller' ? sellerTotalAmount : order.totalAmount, order.currency)}
             </p>
           </div>
@@ -439,16 +438,16 @@ const OrdersListLayout = ({
   const computedShowIndicator = showIndicator ?? (isBuyerView && flow.orders.some((o) => o.status === 'DELIVERED' && o.status !== 'COMPLETED'));
 
   const banner = isBuyerView && flow.ui.showNameBanner ? (
-    <div className="bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 flex items-center justify-between">
+    <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-2.5">
-        <Sparkles className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-        <p className="text-[12px] text-gray-500">
-          <span className="font-medium text-gray-700">Tip:</span> Click the edit icon to name your orders for easier identification.
+        <Sparkles className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+        <p className="text-[12px] text-slate-600">
+          <span className="font-medium text-slate-800">Tip:</span> Click the edit icon to name your orders for easier identification.
         </p>
       </div>
       <button
         onClick={flow.ui.dismissNameBanner}
-        className="p-0.5 hover:bg-gray-100 rounded text-gray-300 hover:text-gray-500 transition-colors ml-3"
+        className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 transition-colors ml-3"
         aria-label="Dismiss"
       >
         <X className="w-3.5 h-3.5" />
@@ -457,24 +456,24 @@ const OrdersListLayout = ({
   ) : null;
 
   const topSlot = isSellerView && !flow.escrow.isLoading ? (
-    <div className={`px-4 py-3.5 rounded-lg border ${flow.escrow.pendingEscrowAmount > 0 ? 'bg-gray-50 border-gray-100' : 'bg-gray-50/50 border-gray-100'}`}>
+    <div className={`px-4 py-3.5 rounded-2xl border ${flow.escrow.pendingEscrowAmount > 0 ? 'bg-slate-50 border-slate-200' : 'bg-slate-50/60 border-slate-200'}`}>
       <div className="flex items-start gap-3">
-        <Wallet className={`w-4 h-4 mt-0.5 flex-shrink-0 ${flow.escrow.pendingEscrowAmount > 0 ? 'text-gray-600' : 'text-gray-300'}`} />
+        <Wallet className={`w-4 h-4 mt-0.5 flex-shrink-0 ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-600' : 'text-slate-300'}`} />
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-0.5">
-            <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Escrow</span>
-            <span className={`text-lg font-semibold tabular-nums tracking-tight ${flow.escrow.pendingEscrowAmount > 0 ? 'text-gray-900' : 'text-gray-400'}`}>
+            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">Escrow</span>
+            <span className={`text-lg font-semibold tabular-nums tracking-tight ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-900' : 'text-slate-400'}`}>
               {formatCurrency(flow.escrow.pendingEscrowAmount)}
             </span>
           </div>
-          <p className="text-[11px] text-gray-400 mb-0">
+          <p className="text-[11px] text-slate-500 mb-0">
             {flow.escrow.pendingEscrowAmount > 0
               ? 'Released to your wallet when orders are completed'
               : 'No pending escrow'}
           </p>
           {flow.escrow.pendingEscrowAmount > 0 && flow.orders.length > 0 ? (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <div className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-2">By Order</div>
+            <div className="mt-3 pt-3 border-t border-slate-200">
+              <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-2">By Order</div>
               <div className="space-y-2">
                 {flow.orders
                   .filter((order) => (parseFloat(order.escrowAmount) || 0) > 0)
@@ -518,31 +517,31 @@ const OrdersListLayout = ({
                           <div className="flex items-center gap-1.5">
                             <button
                               onClick={() => flow.modal.openOrderModal(order)}
-                              className="text-gray-700 hover:text-gray-900 hover:underline cursor-pointer text-left font-medium tabular-nums"
+                              className="text-slate-700 hover:text-slate-900 hover:underline cursor-pointer text-left font-medium tabular-nums"
                             >
                               #{order.orderNumber}
                             </button>
                             <div className="relative group">
-                              <Info className="w-2.5 h-2.5 text-gray-300 cursor-help hover:text-gray-500 transition-colors" />
-                              <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 w-56 p-2.5 bg-gray-900 text-white text-[11px] rounded-lg shadow-lg">
+                              <Info className="w-2.5 h-2.5 text-slate-400 cursor-help hover:text-slate-600 transition-colors" />
+                              <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 w-56 p-2.5 bg-slate-900 text-white text-[11px] rounded-lg shadow-lg">
                                 <p className="leading-relaxed">{tooltipText}</p>
                                 <div className="absolute left-3 bottom-0 transform translate-y-full">
-                                  <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-gray-900" />
+                                  <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-slate-900" />
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <span className="font-semibold tabular-nums text-gray-700">{formatCurrency(escrowAmt, order.currency)}</span>
+                          <span className="font-semibold tabular-nums text-slate-700">{formatCurrency(escrowAmt, order.currency)}</span>
                         </div>
                         {deliveredAt && !isAutoReleased && (
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gray-400 rounded-full transition-all duration-500"
+                                className="h-full bg-slate-500 rounded-full transition-all duration-500"
                                 style={{ width: `${Math.min(100, progressPercent)}%` }}
                               />
                             </div>
-                            <span className="text-[10px] text-gray-400 tabular-nums whitespace-nowrap">
+                            <span className="text-[10px] text-slate-500 tabular-nums whitespace-nowrap">
                               {Math.ceil((autoReleaseDate - now) / (60 * 60 * 1000))}h
                             </span>
                           </div>
@@ -559,7 +558,7 @@ const OrdersListLayout = ({
   ) : null;
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Header
         title={title}
         subtitle={subtitle}
@@ -590,12 +589,12 @@ const OrdersListLayout = ({
           </div>
         ) : !flow.orders?.length && !flow.search?.isSearchMode ? (
           <div className="py-16 text-center">
-            <Package className="w-8 h-8 text-gray-200 mx-auto mb-3" />
-            <p className="text-[13px] text-gray-400 mb-4">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</p>
+            <Package className="w-8 h-8 text-slate-300 mx-auto mb-3" />
+            <p className="text-[13px] text-slate-500 mb-4">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</p>
             {isBuyerView && emptyAction ? (
               <button
                 onClick={emptyAction}
-                className="px-4 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                className="px-4 py-2 bg-slate-900 text-white text-[13px] font-medium rounded-xl hover:bg-slate-800 transition-colors"
               >
                 Start Shopping
               </button>

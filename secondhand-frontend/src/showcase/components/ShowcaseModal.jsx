@@ -26,13 +26,6 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     
     const showcasePricing = enums.showcasePricingConfig;
 
-    const today = useMemo(() => new Date(), []);
-    const startDate = useMemo(() => today.toLocaleDateString('tr-TR'), [today]);
-    const endDate = useMemo(() => 
-        new Date(today.getTime() + (days - 1) * 24 * 60 * 60 * 1000).toLocaleDateString('tr-TR'), 
-        [today, days]
-    );
-    
     const calculateTotal = useCallback(() => {
         if (!showcasePricing) return 0;
         return showcasePricing.totalDailyCost * days;
@@ -73,13 +66,6 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
             onClose();
         }
     }, [step, onClose]);
-
-    const canProceedToPayment = useCallback(() => {
-        if (step === 2) {
-            return allAgreementsAccepted;
-        }
-        return true;
-    }, [step, allAgreementsAccepted]);
 
     const renderStepContent = useCallback(() => {
         if (step === 1) {

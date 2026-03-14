@@ -225,6 +225,11 @@ const EmailsPage = () => {
             return acc;
         }, {});
     }, [emails, folderItems]);
+    const unreadCount = useMemo(() => (emails || []).filter((e) => !e?.read).length, [emails]);
+    const selectedFolderLabel = useMemo(
+        () => folderItems.find((item) => item.id === filterType)?.label || 'Inbox',
+        [folderItems, filterType]
+    );
 
     const onSelectEmail = useCallback((email) => {
         setSelectedEmail(email);
@@ -245,6 +250,13 @@ const EmailsPage = () => {
                         <ArrowLeftIcon className="w-5 h-5" />
                         <span className="text-sm font-medium tracking-tight hidden sm:inline">Back</span>
                     </button>
+
+                    <div className="hidden xl:flex flex-col pr-2 border-r border-slate-200">
+                        <span className="text-sm font-semibold tracking-tight text-slate-900">Mailbox</span>
+                        <span className="text-[11px] text-slate-500">
+                            {unreadCount} unread • {pageInfo.totalElements} total
+                        </span>
+                    </div>
 
                     <div className="flex-1">
                         <div className="relative">
@@ -279,9 +291,55 @@ const EmailsPage = () => {
                         </button>
                     </div>
                 </div>
+
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-3">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        {folderItems.map((item) => {
+                            const Icon = item.icon;
+                            const active = filterType === item.id;
+                            return (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setFilterType(item.id);
+                                        setSelectedEmail(null);
+                                        setMobileDetailOpen(false);
+                                    }}
+                                    className={`shrink-0 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                        active
+                                            ? 'bg-slate-900 text-white'
+                                            : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                                    }`}
+                                >
+                                    <Icon className="w-3.5 h-3.5" />
+                                    <span>{item.label}</span>
+                                    <span className={`tabular-nums ${active ? 'text-slate-200' : 'text-slate-500'}`}>
+                                        {counts[item.id] ?? 0}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
 
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm">
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">Total</p>
+                        <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{pageInfo.totalElements}</p>
+                    </div>
+                    <div className="rounded-2xl border border-indigo-200 bg-indigo-50/60 px-4 py-3 shadow-sm">
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-indigo-700 font-medium">Unread</p>
+                        <p className="mt-1 text-2xl font-semibold text-indigo-900 tabular-nums">{unreadCount}</p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm">
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">Visible</p>
+                        <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{filteredEmails.length}</p>
+                    </div>
+                </div>
+
                 <EmailsPageFeedback
                     error={error ? parseError(error).message : null}
                     emails={filteredEmails}
@@ -322,14 +380,16 @@ const EmailsPage = () => {
                             <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</p>
-                                        <p className="text-xs text-slate-500 mt-0.5">{pageInfo.totalElements} total</p>
+                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">{selectedFolderLabel}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">
+                                            {filteredEmails.length} shown • {unreadCount} unread
+                                        </p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
                                             disabled={pageInfo.page === 0}
                                             onClick={() => setPage(pageInfo.page - 1)}
-                                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                                            className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                             type="button"
                                         >
                                             Prev
@@ -340,7 +400,7 @@ const EmailsPage = () => {
                                         <button
                                             disabled={pageInfo.page + 1 >= pageInfo.totalPages}
                                             onClick={() => setPage(pageInfo.page + 1)}
-                                            className="px-2 py-1 text-xs rounded border border-slate-200 disabled:opacity-40"
+                                            className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                             type="button"
                                         >
                                             Next
@@ -378,7 +438,10 @@ const EmailsPage = () => {
                         {!mobileDetailOpen && (
                             <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                                    <p className="text-sm font-semibold text-slate-900 tracking-tight">Inbox</p>
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">{selectedFolderLabel}</p>
+                                        <p className="text-xs text-slate-500">{filteredEmails.length} shown • {unreadCount} unread</p>
+                                    </div>
                                     <span className="text-xs text-slate-500 tabular-nums">{filteredEmails.length}</span>
                                 </div>
                                 <div className="max-h-[70vh] overflow-y-auto">

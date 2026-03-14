@@ -4,6 +4,7 @@ import {
     ArrowLeft as ArrowLeftIcon,
     Banknote as BanknotesIcon,
     CreditCard as CreditCardIcon,
+    Plus as PlusIcon,
     Wallet as WalletIcon
 } from 'lucide-react';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
@@ -58,49 +59,46 @@ const BankAccountsSection = () => {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-semibold text-text-primary">
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900">
                         Bank Accounts ({bankAccounts.length})
                     </h2>
                     {totalSpent != null && (
-                        <div className="mt-2 text-sm text-text-secondary">
+                        <div className="mt-2 text-sm text-slate-500">
                             Total Spent (Bank Transfer):
-                            <span className="ml-2 font-medium text-text-primary">{formatCurrency(totalSpent)}</span>
+                            <span className="ml-2 font-semibold text-slate-900">{formatCurrency(totalSpent)}</span>
                         </div>
                     )}
                 </div>
                 <button
                     onClick={handleCreateBankAccount}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
                     disabled={isCreating}
                 >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                    <PlusIcon className="w-4 h-4" />
                     {isCreating ? 'Creating...' : 'Add Bank Account'}
                 </button>
             </div>
 
             {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                     <p className="text-red-600">{error?.response?.data?.message || error?.message || error}</p>
                 </div>
             )}
 
             {isLoading ? (
-                <div className="animate-pulse space-y-6">
-                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+                <div className="animate-pulse space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-lg border p-6">
-                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-3"></div>
-                            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                        <div className="bg-white rounded-3xl border border-slate-200 p-6">
+                            <div className="h-5 bg-slate-200 rounded w-3/4 mb-3"></div>
+                            <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                            <div className="h-4 bg-slate-200 rounded w-2/3"></div>
                         </div>
-                        <div className="bg-white rounded-lg border p-6">
-                            <div className="h-5 bg-gray-200 rounded w-3/4 mb-3"></div>
-                            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                        <div className="bg-white rounded-3xl border border-slate-200 p-6">
+                            <div className="h-5 bg-slate-200 rounded w-3/4 mb-3"></div>
+                            <div className="h-4 bg-slate-200 rounded w-full mb-2"></div>
+                            <div className="h-4 bg-slate-200 rounded w-2/3"></div>
                         </div>
                     </div>
                 </div>
@@ -176,23 +174,21 @@ const CreditCardsSection = () => {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-text-primary">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                <h2 className="text-xl font-semibold tracking-tight text-slate-900">
                     Credit Cards ({creditCards.length})
                 </h2>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-btn-primary text-white px-6 py-3 rounded-lg hover:bg-btn-primary-hover transition-colors flex items-center"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
                 >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m-6-6h6m-6 0H6" />
-                    </svg>
+                    <PlusIcon className="w-4 h-4" />
                     Create Credit Card
                 </button>
             </div>
 
             {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                     <p className="text-red-600">{error}</p>
                 </div>
             )}
@@ -222,14 +218,14 @@ const CreditCardsSection = () => {
             )}
 
             {showCreateModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+                <div className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 border border-slate-200">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Create Credit Card</h3>
+                                <h3 className="text-lg font-semibold tracking-tight text-slate-900">Create Credit Card</h3>
                                 <button
                                     onClick={() => setShowCreateModal(false)}
-                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                    className="text-slate-400 hover:text-slate-600 transition-colors"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -238,20 +234,20 @@ const CreditCardsSection = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Credit Limit
                                 </label>
                                 <input
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-btn-primary focus:border-transparent"
+                                    className="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500"
                                     placeholder="Enter credit limit"
                                     value={creditCardLimit}
                                     onChange={(e) => setCreditCardLimit(e.target.value)}
                                 />
                                 {creditCardLimit && !isNaN(parseFloat(creditCardLimit)) && (
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-slate-500 mt-1">
                                         Preview: {formatCurrency(parseFloat(creditCardLimit))}
                                     </p>
                                 )}
@@ -260,14 +256,14 @@ const CreditCardsSection = () => {
                             <div className="flex space-x-3">
                                 <button
                                     onClick={() => setShowCreateModal(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleCreateCreditCard}
                                     disabled={isLoading}
-                                    className="flex-1 bg-btn-primary text-white px-4 py-2 rounded-lg hover:bg-btn-primary-hover transition-colors disabled:opacity-50"
+                                    className="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 font-semibold"
                                 >
                                     {isLoading ? 'Creating...' : 'Create Card'}
                                 </button>
@@ -298,10 +294,10 @@ const EWalletSection = () => {
 
     return (
         <div>
-            <div className="flex items-start justify-between mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900">eWallet</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage your wallet balance, limits and transfers</p>
+                    <h2 className="text-xl font-semibold tracking-tight text-slate-900">eWallet</h2>
+                    <p className="text-sm text-slate-500 mt-1">Manage your wallet balance, limits and transfers</p>
                 </div>
                 {eWallet && (
                     <EWalletActions
@@ -317,7 +313,7 @@ const EWalletSection = () => {
             </div>
 
             {error && (
-                <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+                <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
                     {error}
                 </div>
             )}
@@ -387,21 +383,22 @@ const PaymentMethodsPage = () => {
     return (
         <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md mb-6 group"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
-                    </button>
-
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-semibold text-slate-900 mb-2 tracking-tight">
-                            Payment Methods
-                        </h1>
-                        <p className="text-sm text-slate-500 tracking-tight">
-                            Manage your payment methods and financial information
-                        </p>
+                <div className="mb-8 rounded-3xl border border-slate-200/70 bg-white p-5 sm:p-6 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.45)]">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md mb-5 group border border-slate-200"
+                            >
+                                <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
+                            </button>
+                            <h1 className="text-3xl font-semibold text-slate-900 mb-2 tracking-tight">
+                                Payment Methods
+                            </h1>
+                            <p className="text-sm text-slate-500 tracking-tight">
+                                Manage cards, bank accounts, and wallet limits in one secure place.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -431,7 +428,7 @@ const PaymentMethodsPage = () => {
                         </nav>
                     </div>
 
-                    <div className="px-6 pb-6">
+                    <div className="px-4 sm:px-6 pb-6">
                         <div key={activeTab} className="opacity-0 animate-[fadeIn_0.25s_ease-in-out_forwards]">
                             {activeTab === 'bank-accounts' && <BankAccountsSection />}
                             {activeTab === 'credit-cards' && <CreditCardsSection />}

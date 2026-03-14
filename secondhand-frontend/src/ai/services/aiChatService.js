@@ -1,30 +1,21 @@
 import { post, del } from '../../common/services/api/request.js';
 
 export const aiChatService = {
-  chat: async ({ userId, message, context }) => {
-    if (userId == null) {
-      throw new Error('userId is required');
-    }
+  chat: async ({ message, context }) => {
     const body = context ? { message, context } : { message };
-    return post('/ai/chat', body, { params: { userId }, timeout: 10000 });
+    return post('/ai/chat', body, { timeout: 10000 });
   },
-  newChat: async ({ userId }) => {
-    if (userId == null) {
-      throw new Error('userId is required');
-    }
-    return post('/ai/chat/new', {}, { params: { userId }, timeout: 10000 });
+  agentQuery: async ({ message, context, uiContext, agentMode = true }) => {
+    return post('/ai/agent/query', { message, context, uiContext, agentMode }, { timeout: 10000 });
   },
-  deleteHistory: async ({ userId }) => {
-    if (userId == null) {
-      throw new Error('userId is required');
-    }
-    return del('/ai/chat/history', { params: { userId }, timeout: 10000 });
+  newChat: async () => {
+    return post('/ai/chat/new', {}, { timeout: 10000 });
   },
-  deleteMemory: async ({ userId }) => {
-    if (userId == null) {
-      throw new Error('userId is required');
-    }
-    return del('/ai/memory', { params: { userId }, timeout: 10000 });
+  deleteHistory: async () => {
+    return del('/ai/chat/history', { timeout: 10000 });
+  },
+  deleteMemory: async () => {
+    return del('/ai/memory', { timeout: 10000 });
   },
 };
 

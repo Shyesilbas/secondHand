@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
 import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
 import MetricCard from '../components/MetricCard.jsx';

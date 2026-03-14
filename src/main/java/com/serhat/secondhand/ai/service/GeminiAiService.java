@@ -1,5 +1,7 @@
 package com.serhat.secondhand.ai.service;
 
+import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
+import com.serhat.secondhand.ai.agent.prompt.AgentPromptBuilder;
 import com.serhat.secondhand.ai.config.AuraProductKnowledge;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserMemory;
@@ -15,10 +17,12 @@ public class GeminiAiService {
 
     private final MemoryService memoryService;
     private final GeminiClient geminiClient;
+    private final AgentPromptBuilder agentPromptBuilder;
 
-    public GeminiAiService(MemoryService memoryService, GeminiClient geminiClient) {
+    public GeminiAiService(MemoryService memoryService, GeminiClient geminiClient, AgentPromptBuilder agentPromptBuilder) {
         this.memoryService = memoryService;
         this.geminiClient = geminiClient;
+        this.agentPromptBuilder = agentPromptBuilder;
     }
 
     public String testConnection(String message) {
@@ -61,6 +65,37 @@ public class GeminiAiService {
             return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {
             log.error("Error while processing memory-aware question: ", e);
+            return AiResponse.error("Failed to get response: " + e.getMessage());
+        }
+    }
+
+    public AiResponse askAgentQuestion(
+            Long userId,
+            UserQuestionRequest request,
+            String memoryData,
+            String domainContext,
+            AgentUiContextRequest uiContext
+    ) {
+        if (userId == null) {
+            return AiResponse.error("userId is required");
+        }
+        if (request == null || request.question() == null || request.question().isBlank()) {
+            return AiResponse.error("Question cannot be empty");
+        }
+
+        try {
+            String prompt = agentPromptBuilder.buildPrompt(memoryData, domainContext, request, uiContext);
+            String answer = geminiClient.generateText(prompt);
+
+            memoryService.storeMessage(userId, ChatRole.USER, request.question());
+            memoryService.storeMessage(userId, ChatRole.ASSISTANT, answer);
+            if (memoryService.shouldUpdateMemory(userId, request.question())) {
+                memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
+            }
+
+            return AiResponse.success(answer, geminiClient.model());
+        } catch (Exception e) {
+            log.error("Error while processing agent-mode question: ", e);
             return AiResponse.error("Failed to get response: " + e.getMessage());
         }
     }

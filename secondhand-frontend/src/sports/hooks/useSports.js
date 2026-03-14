@@ -1,5 +1,4 @@
 import { useEntity } from '../../common/hooks/useEntity.js';
-import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
 import { createSportsServiceAdapter } from '../../common/services/entityAdapters.js';
 import { sportsService } from '../services/sportsService.js';
 import { SportsListingDTO } from '../sports.js';

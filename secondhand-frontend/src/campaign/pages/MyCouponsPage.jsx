@@ -6,7 +6,7 @@ import {listingService} from '../../listing/services/listingService.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
 import {formatDateTime} from '../../common/formatters.js';
-import {ArrowLeft, CalendarDays, Clock, Edit2, Layers, Plus, RefreshCw, Tag, Target, Trash2} from 'lucide-react';
+import {ArrowLeft, CalendarDays, Clock, Edit2, Layers, Plus, RefreshCw, Search, Tag, Target, Trash2} from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 
 const MyCouponsPage = () => {
@@ -19,6 +19,8 @@ const MyCouponsPage = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const size = 5;
 
   const load = async (nextPage = page) => {
@@ -81,6 +83,36 @@ const MyCouponsPage = () => {
     };
   }, [campaigns, totalElements]);
 
+  const filteredCampaigns = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    return campaigns.filter((campaign) => {
+      const statusMatch =
+          statusFilter === 'ALL' ||
+          (statusFilter === 'ACTIVE' && campaign.active) ||
+          (statusFilter === 'INACTIVE' && !campaign.active);
+
+      if (!statusMatch) {
+        return false;
+      }
+
+      if (!q) {
+        return true;
+      }
+
+      const typeText = Array.isArray(campaign.eligibleTypes) ? campaign.eligibleTypes.join(' ') : '';
+      return [
+        campaign.name,
+        campaign.discountKind,
+        String(campaign.value ?? ''),
+        typeText,
+      ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(q);
+    });
+  }, [campaigns, searchTerm, statusFilter]);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 pb-8">
@@ -134,7 +166,7 @@ const MyCouponsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
           <div className="rounded-2xl bg-white border border-slate-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(15,23,42,0.03)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+              <span className="text-xs font-medium text-slate-500">
                 Total
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
@@ -150,7 +182,7 @@ const MyCouponsPage = () => {
           </div>
           <div className="rounded-2xl bg-white border border-emerald-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(16,185,129,0.08)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-emerald-700">
+              <span className="text-xs font-medium text-emerald-700">
                 Active
               </span>
               <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5">
@@ -169,7 +201,7 @@ const MyCouponsPage = () => {
           </div>
           <div className="rounded-2xl bg-white border border-slate-100 px-4 py-3 shadow-sm/50 shadow-[0_18px_45px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+              <span className="text-xs font-medium text-slate-500">
                 Inactive
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
@@ -184,6 +216,50 @@ const MyCouponsPage = () => {
             </div>
           </div>
         </div>
+
+        {!isLoading && campaigns.length > 0 && (
+          <div className="mb-4 rounded-3xl border border-slate-100 bg-white px-4 py-3 sm:px-5 shadow-sm/50 shadow-[0_18px_45px_rgba(15,23,42,0.03)]">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search campaign name, type or discount..."
+                  className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                {[
+                  { id: 'ALL', label: 'All' },
+                  { id: 'ACTIVE', label: 'Active' },
+                  { id: 'INACTIVE', label: 'Inactive' },
+                ].map((item) => {
+                  const isSelected = statusFilter === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setStatusFilter(item.id)}
+                      className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        isSelected
+                          ? 'bg-slate-900 text-white'
+                          : 'border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-2 text-xs text-slate-500">
+              Showing {filteredCampaigns.length} of {campaigns.length} campaign(s) on this page
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="space-y-3">
@@ -219,12 +295,46 @@ const MyCouponsPage = () => {
               </button>
             </div>
           </div>
+        ) : filteredCampaigns.length === 0 ? (
+          <div className="mt-6 rounded-3xl border border-dashed border-slate-200 bg-white/70 px-6 py-10 sm:px-10 sm:py-14 text-center">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-100">
+              <Search className="w-7 h-7 text-slate-500" />
+            </div>
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-900">
+              No campaigns match your filter
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+              Try changing status or search query to see more campaigns.
+            </p>
+            <div className="mt-5 flex justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-300"
+              >
+                Clear Search
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusFilter('ALL')}
+                className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Reset Filter
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="mt-4">
             <div className="space-y-3">
-              {campaigns.map((c) => {
+              {filteredCampaigns.map((c) => {
               const hasListings = c.eligibleListingIds && c.eligibleListingIds.length > 0;
               const hasTypes = c.eligibleTypes && c.eligibleTypes.length > 0;
+              const eligibleListingTitles = hasListings
+                ? c.eligibleListingIds
+                    .slice(0, 3)
+                    .map((listingId) => listingTitleById[listingId] || `Listing #${listingId}`)
+                : [];
+              const hiddenListingCount = hasListings ? Math.max(c.eligibleListingIds.length - eligibleListingTitles.length, 0) : 0;
 
               return (
                 <div
@@ -267,7 +377,7 @@ const MyCouponsPage = () => {
 
                       <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                         <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                          <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                          <div className="text-xs font-medium text-slate-500">
                             Discount
                           </div>
                           <div className="mt-1 flex items-baseline gap-1.5">
@@ -281,7 +391,7 @@ const MyCouponsPage = () => {
                         </div>
 
                         <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                             <CalendarDays className="w-3 h-3" />
                             <span>Period</span>
                           </div>
@@ -293,7 +403,7 @@ const MyCouponsPage = () => {
                         </div>
 
                         <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                             {hasListings ? (
                               <Target className="w-3 h-3" />
                             ) : (
@@ -308,6 +418,24 @@ const MyCouponsPage = () => {
                                 ? c.eligibleTypes.join(', ')
                                 : 'All listings'}
                           </div>
+                          {eligibleListingTitles.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {eligibleListingTitles.map((title) => (
+                                <span
+                                  key={`${c.id}-${title}`}
+                                  className="inline-flex max-w-full truncate rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] text-slate-600"
+                                  title={title}
+                                >
+                                  {title}
+                                </span>
+                              ))}
+                              {hiddenListingCount > 0 && (
+                                <span className="inline-flex rounded-full border border-indigo-100 bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-600">
+                                  +{hiddenListingCount} more
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
