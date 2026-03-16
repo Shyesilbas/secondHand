@@ -9,6 +9,7 @@ import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.BankMapper;
 import com.serhat.secondhand.payment.repo.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class BankService {
 
     public BankDto createBankAccount(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        bankValidator.validateForCreate(user);
+        ensureValid(bankValidator.validateForCreate(user));
 
         Bank bank = bankMapper.fromCreateRequest(user);
         bank = bankRepository.save(bank);
@@ -53,11 +54,11 @@ public class BankService {
 
     public Map<String, Object> checkBankAccountExists(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        Optional<Bank> bankOpt = findByUser(user);
-        return Map.of(
-                "hasBankAccount", bankOpt.isPresent(),
-                "iban", Objects.requireNonNull(bankOpt.map(Bank::getIBAN).orElse(null))
-        );
+        java.util.Optional<Bank> bankOpt = findByUser(user);
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasBankAccount", bankOpt.isPresent());
+        response.put("iban", bankOpt.map(Bank::getIBAN).orElse(null));
+        return response;
     }
 
     public Map<String, Object> getBankBalance(Authentication authentication) {
@@ -66,21 +67,21 @@ public class BankService {
         return Map.of(
                 "balance", bank.getBalance(),
                 "iban", bank.getIBAN(),
-                "currency", "TRY"
+                "currency", PaymentProcessingConstants.DEFAULT_CURRENCY
         );
     }
 
     public void deleteBankAccount(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         Bank bank = findByUserMandatory(user);
-        bankValidator.validateAccountNotEmpty(bank);
+        ensureValid(bankValidator.validateAccountNotEmpty(bank));
 
         bankRepository.delete(bank);
         log.info("Bank account deleted for user: {}", user.getEmail());
     }
 
 
-    public Optional<Bank> findByUser(User user) {
+    public java.util.Optional<Bank> findByUser(User user) {
         return bankRepository.findByAccountHolder(user);
     }
 
@@ -95,7 +96,7 @@ public class BankService {
     }
 
     public void credit(User user, BigDecimal amount) {
-        bankValidator.validateCreditAmount(amount);
+        ensureValid(bankValidator.validateCreditAmount(amount));
         Bank bank = findByUserMandatoryWithLock(user);
         bank.setBalance(bank.getBalance().add(amount));
         bankRepository.save(bank);
@@ -103,9 +104,9 @@ public class BankService {
     }
 
     public void debit(User user, BigDecimal amount) {
-        bankValidator.validateDebitAmount(amount);
+        ensureValid(bankValidator.validateDebitAmount(amount));
         Bank bank = findByUserMandatoryWithLock(user);
-        bankValidator.validateSufficientBalance(bank, amount);
+        ensureValid(bankValidator.validateSufficientBalance(bank, amount));
         bank.setBalance(bank.getBalance().subtract(amount));
         bankRepository.save(bank);
         log.info("Debited {} from user {}. New balance: {}", amount, user.getEmail(), bank.getBalance());
@@ -141,6 +142,16 @@ public class BankService {
                     listingId,
                     fromUser.getId(),
                     toUser != null ? toUser.getId() : null);
+        }
+    }
+
+    private void ensureValid(com.serhat.secondhand.core.result.Result<Void> validationResult) {
+        if (validationResult.isError()) {
+            throw new BusinessException(
+                    validationResult.getMessage(),
+                    HttpStatus.BAD_REQUEST,
+                    validationResult.getErrorCode()
+            );
         }
     }
 

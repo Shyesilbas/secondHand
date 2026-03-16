@@ -7,6 +7,7 @@ import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.repository.ShippingRepository;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,10 +31,7 @@ public class OrderCompletionScheduler {
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
 
-    private static final int STATUS_UPDATE_INTERVAL_MINUTES = 5;
-    private static final int COMPLETION_HOURS = 48;
-
-    @Scheduled(fixedRate = 5 * 60 * 1000)
+    @Scheduled(fixedRate = OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES * 60 * 1000L)
     @Transactional
     public void autoUpdateOrderStatus() {
         orderLog.logSchedulerStarted();
@@ -102,7 +100,7 @@ public class OrderCompletionScheduler {
             Duration duration = Duration.between(shipping.getDeliveredAt(), now);
             long hoursPassed = duration.toHours();
 
-            if (hoursPassed >= COMPLETION_HOURS) {
+            if (hoursPassed >= OrderBusinessConstants.AUTO_COMPLETION_HOURS) {
                 Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.COMPLETED);
                 Order savedOrder = orderRepository.save(order);
@@ -134,10 +132,10 @@ public class OrderCompletionScheduler {
                 return false;
             }
             Duration duration = Duration.between(order.getCreatedAt(), now);
-            return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+            return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
         }
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
     }
 
     private boolean shouldUpdateToShipped(Order order, LocalDateTime now) {
@@ -146,7 +144,7 @@ public class OrderCompletionScheduler {
             return false;
         }
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
     }
 
     private boolean shouldUpdateToDelivered(Order order, LocalDateTime now) {
@@ -156,10 +154,10 @@ public class OrderCompletionScheduler {
                 return false;
             }
             Duration duration = Duration.between(order.getUpdatedAt(), now);
-            return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+            return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
         }
         Duration duration = Duration.between(shipping.getInTransitAt(), now);
-        return duration.toMinutes() >= STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
     }
 
     private void sendStatusChangeNotification(Order order, Order.OrderStatus oldStatus, Order.OrderStatus newStatus) {

@@ -26,8 +26,8 @@ public class OrderItemCompensationPlanner {
 
     public Result<Void> validateCancellableItems(List<OrderItem> items) {
         for (OrderItem item : items) {
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (alreadyCancelled != null && alreadyCancelled >= item.getQuantity()) {
+            int alreadyCancelled = cancelledQuantity(item);
+            if (alreadyCancelled >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
             }
         }
@@ -36,8 +36,8 @@ public class OrderItemCompensationPlanner {
 
     public Result<Void> validateRefundableItems(List<OrderItem> items) {
         for (OrderItem item : items) {
-            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            if (alreadyRefunded != null && alreadyRefunded >= item.getQuantity()) {
+            int alreadyRefunded = refundedQuantity(item);
+            if (alreadyRefunded >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
             }
         }
@@ -49,8 +49,7 @@ public class OrderItemCompensationPlanner {
         List<OrderItemCancel> cancelRecords = new ArrayList<>();
 
         for (OrderItem item : items) {
-            Integer alreadyCancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            int availableToCancel = item.getQuantity() - (alreadyCancelled != null ? alreadyCancelled : 0);
+            int availableToCancel = item.getQuantity() - cancelledQuantity(item);
             if (availableToCancel <= 0) {
                 continue;
             }
@@ -76,8 +75,7 @@ public class OrderItemCompensationPlanner {
         List<OrderItemRefund> refundRecords = new ArrayList<>();
 
         for (OrderItem item : items) {
-            Integer alreadyRefunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            int availableToRefund = item.getQuantity() - (alreadyRefunded != null ? alreadyRefunded : 0);
+            int availableToRefund = item.getQuantity() - refundedQuantity(item);
             if (availableToRefund <= 0) {
                 continue;
             }
@@ -100,8 +98,7 @@ public class OrderItemCompensationPlanner {
 
     public boolean areAllItemsCancelled(Order order) {
         for (OrderItem item : order.getOrderItems()) {
-            Integer cancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-            if (cancelled == null || cancelled < item.getQuantity()) {
+            if (!isFullyCancelled(item)) {
                 return false;
             }
         }
@@ -110,12 +107,29 @@ public class OrderItemCompensationPlanner {
 
     public boolean areAllItemsRefunded(Order order) {
         for (OrderItem item : order.getOrderItems()) {
-            Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-            if (refunded == null || refunded < item.getQuantity()) {
+            if (!isFullyRefunded(item)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private int cancelledQuantity(OrderItem item) {
+        Integer cancelled = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
+        return cancelled != null ? cancelled : 0;
+    }
+
+    private int refundedQuantity(OrderItem item) {
+        Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
+        return refunded != null ? refunded : 0;
+    }
+
+    private boolean isFullyCancelled(OrderItem item) {
+        return cancelledQuantity(item) >= item.getQuantity();
+    }
+
+    private boolean isFullyRefunded(OrderItem item) {
+        return refundedQuantity(item) >= item.getQuantity();
     }
 
     public record CancellationPlan(List<OrderItemCancel> records, BigDecimal totalRefundAmount) {
