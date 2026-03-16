@@ -20,6 +20,7 @@ public class ListingCampaignPricingUtil {
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     private static final int SCALE = 2;
     private static final int PRECISION = 6;
+    private static final Set<ListingType> NON_CAMPAIGNABLE_TYPES = EnumSet.of(ListingType.REAL_ESTATE, ListingType.VEHICLE);
 
     private final ICampaignService campaignService;
 
@@ -86,7 +87,7 @@ public class ListingCampaignPricingUtil {
     }
 
     private boolean isNonCampaignableType(ListingType type) {
-        return type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE;
+        return NON_CAMPAIGNABLE_TYPES.contains(type);
     }
 
     private Campaign findBestCampaign(List<Campaign> campaigns, UUID listingId, ListingType type, BigDecimal unitPrice) {

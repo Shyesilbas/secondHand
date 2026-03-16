@@ -11,6 +11,7 @@ import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.mapper.CreditCardMapper;
 import com.serhat.secondhand.payment.repo.CreditCardRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,7 +39,7 @@ public class CreditCardService {
 
     public CreditCardDto createCreditCard(CreditCardRequest creditCardRequest, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        creditCardValidator.validateForCreate(user, creditCardRequest);
+        ensureValid(creditCardValidator.validateForCreate(user, creditCardRequest));
 
         CreditCard creditCard = creditCardMapper.fromCreateRequest(creditCardRequest, user);
         creditCard = creditCardRepository.save(creditCard);
@@ -60,10 +61,10 @@ public class CreditCardService {
         }
 
         CreditCard card = findByUserMandatoryWithLock(fromUser);
-        creditCardValidator.validateSufficientCredit(card, amount);
+        ensureValid(creditCardValidator.validateSufficientCredit(card, amount));
 
         try {
-            boolean isSuccessful = Math.random() > 0.05;
+            boolean isSuccessful = Math.random() < PaymentProcessingConstants.CREDIT_CARD_SIMULATION_SUCCESS_RATE;
             if (!isSuccessful) {
                 return PaymentResult.failure("Payment processing failed", amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
             }
@@ -78,7 +79,7 @@ public class CreditCardService {
         }
     }
 
-    public Optional<CreditCard> findByUser(User user) {
+    public java.util.Optional<CreditCard> findByUser(User user) {
         return creditCardRepository.findByCardHolder(user);
     }
 
@@ -94,11 +95,11 @@ public class CreditCardService {
     
     public Map<String, Object> checkCreditCardExists(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        Optional<CreditCard> cardOpt = findByUser(user);
-        return Map.of(
-                "hasCreditCard", cardOpt.isPresent(),
-                "maskedCardNumber", Objects.requireNonNull(cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null))
-        );
+        java.util.Optional<CreditCard> cardOpt = findByUser(user);
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasCreditCard", cardOpt.isPresent());
+        response.put("maskedCardNumber", cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null));
+        return response;
     }
     
     public Map<String, Object> getAvailableCredit(Authentication authentication) {
@@ -121,4 +122,13 @@ public class CreditCardService {
         log.info("Credit card deleted for user: {}", user.getEmail());
     }
 
+    private void ensureValid(com.serhat.secondhand.core.result.Result<Void> validationResult) {
+        if (validationResult.isError()) {
+            throw new BusinessException(
+                    validationResult.getMessage(),
+                    HttpStatus.BAD_REQUEST,
+                    validationResult.getErrorCode()
+            );
+        }
     }
+}

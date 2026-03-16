@@ -4,6 +4,7 @@ import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.listing.application.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.TrackViewRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
+import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,7 +57,7 @@ public class ListingViewController {
             @AuthenticationPrincipal User currentUser) {
 
         if (endDate == null) endDate = LocalDateTime.now();
-        if (startDate == null) startDate = endDate.minusDays(7);
+        if (startDate == null) startDate = endDate.minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS);
 
         ListingViewStatsDto stats = listingViewService.getViewStatistics(id, startDate, endDate);
         return ResponseEntity.ok(stats);

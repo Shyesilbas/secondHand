@@ -11,6 +11,7 @@ import com.serhat.secondhand.payment.repo.PaymentRepository;
 import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
+import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class PaymentProcessor {
 
         PaymentRequest requestWithIdempotency = paymentIdempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
 
-        int maxRetries = 3;
+        int maxRetries = PaymentProcessingConstants.MAX_OPTIMISTIC_LOCK_RETRIES;
         int attempt = 0;
 
         while (attempt < maxRetries) {
@@ -55,7 +56,7 @@ public class PaymentProcessor {
                 }
 
                 try {
-                    Thread.sleep(50 * attempt);
+                    sleepBeforeRetry(attempt);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     return Result.error(PaymentErrorCodes.PAYMENT_ERROR.toString(), "Processing payment interrupted.");
@@ -116,5 +117,9 @@ public class PaymentProcessor {
             return Result.error(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString(), "Processed already.");
         }
         return Result.success();
+    }
+
+    private void sleepBeforeRetry(int attempt) throws InterruptedException {
+        Thread.sleep(PaymentProcessingConstants.BASE_RETRY_BACKOFF_MS * attempt);
     }
 }

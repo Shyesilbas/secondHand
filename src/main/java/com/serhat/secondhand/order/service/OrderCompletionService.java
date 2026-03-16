@@ -4,10 +4,10 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
+import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
-import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -31,6 +31,8 @@ public class OrderCompletionService {
     private final IOrderValidationService orderValidationService;
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
+    private final OrderCompletionPolicy orderCompletionPolicy;
+    private final OrderStateTransitionPolicy orderStateTransitionPolicy;
 
     @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
@@ -39,7 +41,7 @@ public class OrderCompletionService {
 
         Order order = orderResult.getData();
 
-        Result<Void> completionValidationResult = validateOrderCanBeCompleted(order);
+        Result<Void> completionValidationResult = orderCompletionPolicy.validateCompletable(order);
         if (completionValidationResult.isError()) return completionValidationResult.propagateError();
 
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
@@ -50,27 +52,13 @@ public class OrderCompletionService {
             return Result.error("Order completion failed during escrow release", "ORDER_COMPLETION_ESCROW_RELEASE_FAILED");
         }
 
-        order.setStatus(Order.OrderStatus.COMPLETED);
-        if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
-            order.getShipping().setStatus(ShippingStatus.DELIVERED);
-        }
+        orderStateTransitionPolicy.applyCompletion(order);
         Order savedOrder = orderRepository.save(order);
 
         orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
 
         orderLog.logOrderCompleted(order.getOrderNumber(), false);
         return Result.success(orderMapper.toDto(savedOrder));
-    }
-
-
-    private Result<Void> validateOrderCanBeCompleted(Order order) {
-        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
-        }
-        if (!Order.OrderStatus.COMPLETABLE_STATUSES.contains(order.getStatus())) {
-            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
-        }
-        return Result.success();
     }
 
     private Result<Void> releaseEscrowsForOrder(Order order) {

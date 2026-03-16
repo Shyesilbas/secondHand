@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.ListingView;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingViewRepository;
+import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class ListingViewService {
             }
 
             String ipHash = hashIpAddress(ipAddress);
-            LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+            LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(ListingBusinessConstants.VIEW_DUPLICATE_WINDOW_HOURS);
             boolean isDuplicate = false;
 
             if (userId != null) {
@@ -63,7 +64,7 @@ public class ListingViewService {
                     .user(user)
                     .sessionId(sessionId)
                     .ipHash(ipHash)
-                    .userAgent(userAgent != null && userAgent.length() > 500 ? userAgent.substring(0, 500) : userAgent)
+                    .userAgent(truncateUserAgent(userAgent))
                     .viewedAt(LocalDateTime.now())
                     .build();
 
@@ -106,6 +107,13 @@ public class ListingViewService {
         } catch (NoSuchAlgorithmException e) {
             return "";
         }
+    }
+
+    private String truncateUserAgent(String userAgent) {
+        if (userAgent == null || userAgent.length() <= ListingBusinessConstants.MAX_USER_AGENT_LENGTH) {
+            return userAgent;
+        }
+        return userAgent.substring(0, ListingBusinessConstants.MAX_USER_AGENT_LENGTH);
     }
 
     @Transactional(readOnly = true)

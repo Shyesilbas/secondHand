@@ -7,8 +7,9 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.policy.OrderCancellationPolicy;
+import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -41,6 +42,8 @@ public class OrderCancellationService {
     private final OrderStockService orderStockService;
     private final OrderLogService orderLog;
     private final OrderItemCompensationPlanner compensationPlanner;
+    private final OrderCancellationPolicy orderCancellationPolicy;
+    private final OrderStateTransitionPolicy orderStateTransitionPolicy;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -48,7 +51,7 @@ public class OrderCancellationService {
 
         Order order = orderResult.getData();
 
-        Result<Void> cancelValidationResult = validateOrderCanBeCancelled(order);
+        Result<Void> cancelValidationResult = orderCancellationPolicy.validateCancellable(order);
         if (cancelValidationResult.isError()) return cancelValidationResult.propagateError();
 
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
@@ -97,15 +100,7 @@ public class OrderCancellationService {
     
     private Result<OrderDto> processCancellationStatus(Order order, User user) {
         boolean allItemsCancelled = compensationPlanner.areAllItemsCancelled(order);
-        if (allItemsCancelled) {
-            order.setStatus(Order.OrderStatus.CANCELLED);
-            if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
-                order.getShipping().setStatus(ShippingStatus.CANCELLED);
-            }
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
-        } else {
-            order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
-        }
+        orderStateTransitionPolicy.applyCancellation(order, allItemsCancelled);
 
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
@@ -119,14 +114,4 @@ public class OrderCancellationService {
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
     }
 
-
-    private Result<Void> validateOrderCanBeCancelled(Order order) {
-        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
-        }
-        if (!Order.OrderStatus.CANCELLABLE_STATUSES.contains(order.getStatus())) {
-            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
-        }
-        return Result.success();
-    }
 }
