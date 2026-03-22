@@ -1,7 +1,7 @@
 package com.serhat.secondhand.exchange.api;
 
 import com.serhat.secondhand.exchange.ExchangeRateDto;
-import com.serhat.secondhand.exchange.ExchangeRateService;
+import com.serhat.secondhand.exchange.application.ExchangeRateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

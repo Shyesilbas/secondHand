@@ -3,7 +3,7 @@ package com.serhat.secondhand.offer.api;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
-import com.serhat.secondhand.offer.service.IOfferService;
+import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

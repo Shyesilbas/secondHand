@@ -10,7 +10,7 @@ import com.serhat.secondhand.ai.memory.ChatRole;
 import com.serhat.secondhand.ai.memory.dto.MemoryExtraction;
 import com.serhat.secondhand.ai.memory.repository.ChatMessageRepository;
 import com.serhat.secondhand.ai.memory.repository.UserMemoryRepository;
-import com.serhat.secondhand.ai.service.GeminiClient;
+import com.serhat.secondhand.ai.application.GeminiClient;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

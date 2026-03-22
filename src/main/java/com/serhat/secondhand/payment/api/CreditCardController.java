@@ -2,7 +2,7 @@ package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.payment.dto.CreditCardDto;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
-import com.serhat.secondhand.payment.service.CreditCardService;
+import com.serhat.secondhand.payment.application.CreditCardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

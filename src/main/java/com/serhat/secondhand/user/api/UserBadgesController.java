@@ -1,8 +1,8 @@
 package com.serhat.secondhand.user.api;
 
-import com.serhat.secondhand.chat.service.ChatService;
-import com.serhat.secondhand.notification.service.NotificationService;
-import com.serhat.secondhand.order.service.OrderQueryService;
+import com.serhat.secondhand.chat.application.ChatService;
+import com.serhat.secondhand.notification.application.NotificationService;
+import com.serhat.secondhand.order.application.OrderQueryService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

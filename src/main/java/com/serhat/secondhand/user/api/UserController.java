@@ -1,15 +1,15 @@
 package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.complaint.ComplaintDto;
-import com.serhat.secondhand.complaint.IComplaintService;
+import com.serhat.secondhand.complaint.application.IComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
-import com.serhat.secondhand.offer.service.IOfferService;
-import com.serhat.secondhand.review.service.IReviewService;
+import com.serhat.secondhand.offer.application.IOfferService;
+import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;

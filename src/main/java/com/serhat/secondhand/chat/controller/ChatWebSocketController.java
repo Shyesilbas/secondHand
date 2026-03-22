@@ -1,7 +1,7 @@
 package com.serhat.secondhand.chat.controller;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
-import com.serhat.secondhand.chat.service.ChatService;
+import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

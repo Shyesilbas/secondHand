@@ -5,7 +5,7 @@ import com.serhat.secondhand.ai.agent.dto.AgentQueryResponse;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
 import com.serhat.secondhand.ai.agent.query.AgentQueryService;
-import com.serhat.secondhand.ai.service.GeminiAiService;
+import com.serhat.secondhand.ai.application.GeminiAiService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

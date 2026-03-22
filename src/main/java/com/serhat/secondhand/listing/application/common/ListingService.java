@@ -14,7 +14,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.review.service.IReviewService;
+import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.listing.application.realestate.RealEstateListingFilterService;
 import com.serhat.secondhand.listing.application.sports.SportsListingFilterService;
 import com.serhat.secondhand.listing.application.vehicle.VehicleListingFilterService;

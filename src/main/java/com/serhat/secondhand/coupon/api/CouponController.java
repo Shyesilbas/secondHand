@@ -2,7 +2,7 @@ package com.serhat.secondhand.coupon.api;
 
 import com.serhat.secondhand.coupon.dto.ActiveCouponDto;
 import com.serhat.secondhand.coupon.dto.CouponPreviewRequest;
-import com.serhat.secondhand.coupon.service.CouponService;
+import com.serhat.secondhand.coupon.application.CouponService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;

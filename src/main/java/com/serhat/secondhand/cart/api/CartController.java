@@ -2,7 +2,7 @@ package com.serhat.secondhand.cart.api;
 
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
-import com.serhat.secondhand.cart.service.CartService;
+import com.serhat.secondhand.cart.application.CartService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;

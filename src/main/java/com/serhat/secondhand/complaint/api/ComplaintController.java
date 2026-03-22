@@ -1,7 +1,7 @@
 package com.serhat.secondhand.complaint.api;
 
 import com.serhat.secondhand.complaint.ComplaintRequest;
-import com.serhat.secondhand.complaint.ComplaintService;
+import com.serhat.secondhand.complaint.application.ComplaintService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;

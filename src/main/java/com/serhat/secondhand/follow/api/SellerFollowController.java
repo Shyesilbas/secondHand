@@ -3,7 +3,7 @@ package com.serhat.secondhand.follow.api;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
 import com.serhat.secondhand.follow.dto.SellerFollowDto;
-import com.serhat.secondhand.follow.service.SellerFollowService;
+import com.serhat.secondhand.follow.application.SellerFollowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -38,8 +38,8 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeReposi
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.service.ListingFeeService;
-import com.serhat.secondhand.showcase.ShowcaseService;
+import com.serhat.secondhand.payment.application.ListingFeeService;
+import com.serhat.secondhand.showcase.application.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

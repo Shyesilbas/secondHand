@@ -3,7 +3,7 @@ package com.serhat.secondhand.order.validator;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
-import com.serhat.secondhand.order.service.OrderLogService;
+import com.serhat.secondhand.order.application.OrderLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

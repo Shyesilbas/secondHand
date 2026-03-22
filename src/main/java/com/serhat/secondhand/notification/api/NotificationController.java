@@ -2,7 +2,7 @@ package com.serhat.secondhand.notification.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.notification.dto.NotificationDto;
-import com.serhat.secondhand.notification.service.INotificationService;
+import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
