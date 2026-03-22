@@ -74,8 +74,6 @@ public class OrderPaymentService {
         log.error("Order {} marked as failed due to payment error", order.getOrderNumber());
     }
 
-
-    @Transactional
     public Result<List<PaymentDto>> processPaymentBatch(Long userId, List<PaymentRequest> paymentRequests) {
         if (paymentRequests == null || paymentRequests.isEmpty()) {
             return Result.error("Payment List cannot be empty.");
