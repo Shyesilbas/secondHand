@@ -1,4 +1,4 @@
-package com.serhat.secondhand.review.controller;
+package com.serhat.secondhand.review.api;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.ResultResponses;

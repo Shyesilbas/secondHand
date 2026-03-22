@@ -1,4 +1,4 @@
-package com.serhat.secondhand.ai.agent;
+package com.serhat.secondhand.ai.agent.api;
 
 import com.serhat.secondhand.ai.agent.dto.AgentQueryRequest;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryResponse;

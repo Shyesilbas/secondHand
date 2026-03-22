@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.repo;
+package com.serhat.secondhand.payment.repository;
 
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.user.domain.entity.User;

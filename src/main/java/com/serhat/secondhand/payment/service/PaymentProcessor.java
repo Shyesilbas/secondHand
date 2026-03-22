@@ -7,7 +7,7 @@ import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
-import com.serhat.secondhand.payment.repo.PaymentRepository;
+import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;

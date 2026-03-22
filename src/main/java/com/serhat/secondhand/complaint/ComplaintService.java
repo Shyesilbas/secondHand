@@ -1,5 +1,6 @@
 package com.serhat.secondhand.complaint;
 
+import com.serhat.secondhand.complaint.repository.ComplaintRepository;
 import com.serhat.secondhand.complaint.validator.ComplaintValidator;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.IListingService;

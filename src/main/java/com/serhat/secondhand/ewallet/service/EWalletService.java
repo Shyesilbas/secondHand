@@ -10,7 +10,7 @@ import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.repo.PaymentRepository;
+import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.service.BankService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;

@@ -1,4 +1,4 @@
-package com.serhat.secondhand.core.security;
+package com.serhat.secondhand.core.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

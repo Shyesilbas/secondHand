@@ -1,5 +1,7 @@
-package com.serhat.secondhand.core.verification;
+package com.serhat.secondhand.core.verification.repository;
 
+import com.serhat.secondhand.core.verification.CodeType;
+import com.serhat.secondhand.core.verification.Verification;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

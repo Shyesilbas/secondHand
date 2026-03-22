@@ -1,5 +1,7 @@
-package com.serhat.secondhand.showcase;
+package com.serhat.secondhand.showcase.repository;
 
+import com.serhat.secondhand.showcase.Showcase;
+import com.serhat.secondhand.showcase.ShowcaseStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
