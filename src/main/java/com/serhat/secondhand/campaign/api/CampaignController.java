@@ -2,7 +2,7 @@ package com.serhat.secondhand.campaign.api;
 
 import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
-import com.serhat.secondhand.campaign.service.ICampaignService;
+import com.serhat.secondhand.campaign.application.ICampaignService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;

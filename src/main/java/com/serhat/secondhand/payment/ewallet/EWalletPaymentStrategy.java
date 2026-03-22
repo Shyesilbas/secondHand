@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.ewallet;
 
-import com.serhat.secondhand.ewallet.service.IEWalletService;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;

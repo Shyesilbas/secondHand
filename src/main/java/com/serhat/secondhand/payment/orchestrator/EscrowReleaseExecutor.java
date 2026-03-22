@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.orchestrator;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.ewallet.service.IEWalletService;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.repository.OrderItemEscrowRepository;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;

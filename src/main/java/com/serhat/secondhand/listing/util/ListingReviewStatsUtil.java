@@ -2,7 +2,7 @@ package com.serhat.secondhand.listing.util;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
-import com.serhat.secondhand.review.service.IReviewService;
+import com.serhat.secondhand.review.application.IReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

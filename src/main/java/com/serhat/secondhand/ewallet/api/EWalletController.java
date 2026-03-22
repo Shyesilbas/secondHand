@@ -1,7 +1,7 @@
 package com.serhat.secondhand.ewallet.api;
 
 import com.serhat.secondhand.ewallet.dto.*;
-import com.serhat.secondhand.ewallet.service.IEWalletService;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

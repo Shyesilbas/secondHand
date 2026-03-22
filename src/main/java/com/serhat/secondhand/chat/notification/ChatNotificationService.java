@@ -1,7 +1,7 @@
 package com.serhat.secondhand.chat.notification;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
-import com.serhat.secondhand.notification.service.INotificationService;
+import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;

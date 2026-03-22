@@ -13,7 +13,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisti
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.review.service.IReviewService;
+import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +42,7 @@ public class ListingController {
     private final IListingService listingService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    private final com.serhat.secondhand.dashboard.service.DashboardService dashboardService;
+    private final com.serhat.secondhand.dashboard.application.DashboardService dashboardService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(

@@ -2,7 +2,7 @@ package com.serhat.secondhand.chat.api;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
-import com.serhat.secondhand.chat.service.ChatService;
+import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

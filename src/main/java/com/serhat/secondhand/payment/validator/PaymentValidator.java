@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.validator;
 
-import com.serhat.secondhand.agreements.service.AgreementRequirementService;
+import com.serhat.secondhand.agreements.application.AgreementRequirementService;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;

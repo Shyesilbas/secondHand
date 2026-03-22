@@ -2,7 +2,7 @@ package com.serhat.secondhand.dashboard.api;
 
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
-import com.serhat.secondhand.dashboard.service.IDashboardService;
+import com.serhat.secondhand.dashboard.application.IDashboardService;
 import com.serhat.secondhand.dashboard.util.DateRangeHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;

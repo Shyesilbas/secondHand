@@ -2,7 +2,7 @@ package com.serhat.secondhand.ai.api;
 
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
-import com.serhat.secondhand.ai.service.GeminiAiService;
+import com.serhat.secondhand.ai.application.GeminiAiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

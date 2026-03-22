@@ -2,9 +2,9 @@ package com.serhat.secondhand.auth.application;
 
 import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
 import com.serhat.secondhand.agreements.entity.Agreement;
-import com.serhat.secondhand.agreements.service.AgreementRequirementService;
-import com.serhat.secondhand.agreements.service.AgreementUpdateNotificationService;
-import com.serhat.secondhand.agreements.service.UserAgreementService;
+import com.serhat.secondhand.agreements.application.AgreementRequirementService;
+import com.serhat.secondhand.agreements.application.AgreementUpdateNotificationService;
+import com.serhat.secondhand.agreements.application.UserAgreementService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;

@@ -2,7 +2,7 @@ package com.serhat.secondhand.ai.agent.query;
 
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
-import com.serhat.secondhand.order.service.OrderQueryService;
+import com.serhat.secondhand.order.application.OrderQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

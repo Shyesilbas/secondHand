@@ -2,7 +2,7 @@ package com.serhat.secondhand.ai.agent.query;
 
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
 import com.serhat.secondhand.notification.dto.NotificationDto;
-import com.serhat.secondhand.notification.service.INotificationService;
+import com.serhat.secondhand.notification.application.INotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

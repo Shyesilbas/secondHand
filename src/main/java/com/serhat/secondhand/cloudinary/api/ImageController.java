@@ -1,6 +1,6 @@
 package com.serhat.secondhand.cloudinary.api;
 
-import com.serhat.secondhand.cloudinary.CloudinaryService;
+import com.serhat.secondhand.cloudinary.application.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -8,7 +8,7 @@ import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
-import com.serhat.secondhand.payment.service.PaymentNotificationService;
+import com.serhat.secondhand.payment.application.PaymentNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

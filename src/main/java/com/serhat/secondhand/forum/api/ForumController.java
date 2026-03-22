@@ -6,7 +6,7 @@ import com.serhat.secondhand.forum.dto.ForumThreadDto;
 import com.serhat.secondhand.forum.dto.request.*;
 import com.serhat.secondhand.forum.entity.enums.ForumCategory;
 import com.serhat.secondhand.forum.entity.enums.ForumThreadStatus;
-import com.serhat.secondhand.forum.service.ForumService;
+import com.serhat.secondhand.forum.application.ForumService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

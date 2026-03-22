@@ -2,7 +2,7 @@ package com.serhat.secondhand.offer.email;
 
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
-import com.serhat.secondhand.notification.service.INotificationService;
+import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;

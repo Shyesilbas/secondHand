@@ -5,7 +5,7 @@ import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
 import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
 import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
 import com.serhat.secondhand.favoritelist.dto.UpdateFavoriteListRequest;
-import com.serhat.secondhand.favoritelist.service.FavoriteListService;
+import com.serhat.secondhand.favoritelist.application.FavoriteListService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

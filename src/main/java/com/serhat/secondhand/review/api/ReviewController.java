@@ -3,7 +3,7 @@ package com.serhat.secondhand.review.api;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
-import com.serhat.secondhand.review.service.IReviewService;
+import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
