@@ -1,7 +1,7 @@
 package com.serhat.secondhand.review.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.order.entity.OrderItem;

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.offer.service;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.IListingService;
+import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;

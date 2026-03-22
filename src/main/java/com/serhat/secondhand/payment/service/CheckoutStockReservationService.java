@@ -2,7 +2,7 @@ package com.serhat.secondhand.payment.service;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;

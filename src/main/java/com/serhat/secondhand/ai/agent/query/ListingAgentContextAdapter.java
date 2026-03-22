@@ -1,7 +1,7 @@
 package com.serhat.secondhand.ai.agent.query;
 
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
-import com.serhat.secondhand.listing.application.ListingService;
+import com.serhat.secondhand.listing.application.common.ListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

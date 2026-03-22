@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
-import com.serhat.secondhand.listing.application.PriceHistoryService;
+import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.PriceHistoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

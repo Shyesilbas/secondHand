@@ -1,7 +1,7 @@
 package com.serhat.secondhand.showcase;
 
-import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
-import com.serhat.secondhand.listing.application.util.ListingFavoriteStatsUtil;
+import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
+import com.serhat.secondhand.listing.util.ListingFavoriteStatsUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.service;
 
-import com.serhat.secondhand.listing.application.IListingService;
+import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.audit.service.AuditLogService;
-import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.TrackViewRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
