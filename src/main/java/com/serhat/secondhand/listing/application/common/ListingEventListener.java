@@ -46,6 +46,8 @@ public class ListingEventListener {
             User fromUser = payment.getFromUser();
             Long userId = fromUser != null ? fromUser.getId() : null;
             if (userId != null) {
+                listing.setListingFeePaid(true);
+                listingRepository.save(listing);
                 listingService.publish(listing.getId(), userId);
             }
 

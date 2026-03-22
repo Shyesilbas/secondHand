@@ -208,7 +208,9 @@ public class ListingService implements IListingService {
     public void publish(UUID listingId, Long userId) {
         Listing listing = findAndValidateOwner(listingId, userId);
         validateStatus(listing, ListingStatus.DRAFT);
-        listing.setListingFeePaid(true);
+        if (!listing.isListingFeePaid()) {
+            throw new BusinessException(ListingErrorCodes.LISTING_FEE_NOT_PAID);
+        }
         listing.setStatus(ListingStatus.ACTIVE);
         listingRepository.save(listing);
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
