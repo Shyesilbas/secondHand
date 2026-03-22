@@ -1,7 +1,7 @@
 package com.serhat.secondhand.dashboard.service.adapter;
 
 import com.serhat.secondhand.dashboard.service.port.ListingViewStatisticsPort;
-import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

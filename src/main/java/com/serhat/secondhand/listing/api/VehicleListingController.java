@@ -6,7 +6,7 @@ import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateReq
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
-import com.serhat.secondhand.listing.vehicle.VehicleListingService;
+import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -2,8 +2,8 @@ package com.serhat.secondhand.showcase;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.IListingService;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;

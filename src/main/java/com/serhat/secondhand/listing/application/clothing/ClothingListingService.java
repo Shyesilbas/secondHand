@@ -1,8 +1,8 @@
 package com.serhat.secondhand.listing.application.clothing;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.AbstractListingService;
-import com.serhat.secondhand.listing.application.IListingService;
+import com.serhat.secondhand.listing.application.common.AbstractListingService;
+import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
@@ -12,7 +12,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
-import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.clothing.ClothingSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;

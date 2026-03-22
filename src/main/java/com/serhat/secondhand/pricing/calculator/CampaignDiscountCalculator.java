@@ -3,7 +3,7 @@ package com.serhat.secondhand.pricing.calculator;
 import com.serhat.secondhand.campaign.mapper.CampaignMapper;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
-import com.serhat.secondhand.listing.application.util.ListingCampaignPricingUtil;
+import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;

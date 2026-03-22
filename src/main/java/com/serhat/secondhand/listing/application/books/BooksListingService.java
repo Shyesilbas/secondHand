@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application.books;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.AbstractListingService;
+import com.serhat.secondhand.listing.application.common.AbstractListingService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
-import com.serhat.secondhand.listing.application.IListingService;
-import com.serhat.secondhand.listing.application.PriceHistoryService;
+import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
@@ -13,7 +13,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
-import com.serhat.secondhand.listing.validation.ListingValidationEngine;
+import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.books.BooksSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
-import com.serhat.secondhand.listing.application.electronic.ElectronicListingService;
+import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;

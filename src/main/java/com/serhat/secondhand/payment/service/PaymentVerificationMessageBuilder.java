@@ -5,7 +5,7 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.IListingService;
+import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.service.IOfferService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;

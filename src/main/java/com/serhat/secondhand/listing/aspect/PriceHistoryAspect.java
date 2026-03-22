@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.aspect;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.PriceHistoryService;
+import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;

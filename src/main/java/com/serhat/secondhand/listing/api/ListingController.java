@@ -1,8 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
-import com.serhat.secondhand.listing.application.IListingService;
-import com.serhat.secondhand.listing.application.ListingViewService;
+import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdatePriceRequest;

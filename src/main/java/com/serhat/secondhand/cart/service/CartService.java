@@ -13,7 +13,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.listing.enrich.ListingEnrichmentService;
+import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.util.UserErrorCodes;

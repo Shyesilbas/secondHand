@@ -2,7 +2,7 @@ package com.serhat.secondhand.cart.validator;
 
 import com.serhat.secondhand.cart.util.CartErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

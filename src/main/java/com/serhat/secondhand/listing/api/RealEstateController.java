@@ -6,7 +6,7 @@ import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpd
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.RealEstateFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
-import com.serhat.secondhand.listing.realestate.RealEstateListingService;
+import com.serhat.secondhand.listing.application.realestate.RealEstateListingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
