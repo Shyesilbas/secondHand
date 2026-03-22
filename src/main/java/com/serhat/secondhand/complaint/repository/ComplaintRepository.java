@@ -1,5 +1,7 @@
-package com.serhat.secondhand.complaint;
+package com.serhat.secondhand.complaint.repository;
 
+import com.serhat.secondhand.complaint.Complaint;
+import com.serhat.secondhand.complaint.ComplaintStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

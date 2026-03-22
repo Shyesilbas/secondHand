@@ -1,4 +1,4 @@
-package com.serhat.secondhand.ai;
+package com.serhat.secondhand.ai.api;
 
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;

@@ -1,4 +1,4 @@
-package com.serhat.secondhand.ewallet.controller;
+package com.serhat.secondhand.ewallet.api;
 
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.service.IEWalletService;

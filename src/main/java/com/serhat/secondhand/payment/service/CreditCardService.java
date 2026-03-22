@@ -9,7 +9,7 @@ import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.helper.CreditCardHelper;
 import com.serhat.secondhand.payment.mapper.CreditCardMapper;
-import com.serhat.secondhand.payment.repo.CreditCardRepository;
+import com.serhat.secondhand.payment.repository.CreditCardRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.user.application.IUserService;

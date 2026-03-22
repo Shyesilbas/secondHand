@@ -1,4 +1,4 @@
-package com.serhat.secondhand.chat.controller;
+package com.serhat.secondhand.chat.api;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;

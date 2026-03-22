@@ -7,7 +7,7 @@ import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.BankMapper;
-import com.serhat.secondhand.payment.repo.BankRepository;
+import com.serhat.secondhand.payment.repository.BankRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.user.application.IUserService;

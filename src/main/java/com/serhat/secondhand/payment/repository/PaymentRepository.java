@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.repo;
+package com.serhat.secondhand.payment.repository;
 
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;

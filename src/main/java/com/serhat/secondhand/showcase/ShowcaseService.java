@@ -8,6 +8,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
 import com.serhat.secondhand.payment.service.PaymentProcessor;
+import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;

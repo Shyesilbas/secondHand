@@ -1,4 +1,4 @@
-package com.serhat.secondhand.agreements.controller;
+package com.serhat.secondhand.agreements.api;
 
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.dto.AgreementDto;

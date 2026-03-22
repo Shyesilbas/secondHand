@@ -1,6 +1,6 @@
 package com.serhat.secondhand.complaint.validator;
 
-import com.serhat.secondhand.complaint.ComplaintRepository;
+import com.serhat.secondhand.complaint.repository.ComplaintRepository;
 import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.complaint.util.ComplaintErrorCodes;
 import com.serhat.secondhand.core.result.Result;

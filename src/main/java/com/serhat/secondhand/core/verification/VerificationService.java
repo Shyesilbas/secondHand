@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.verification;
 
+import com.serhat.secondhand.core.verification.repository.VerificationRepository;
 import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
 import com.serhat.secondhand.core.result.Result;

@@ -1,6 +1,8 @@
-package com.serhat.secondhand.showcase;
+package com.serhat.secondhand.showcase.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.showcase.IShowcaseService;
+import com.serhat.secondhand.showcase.ShowcaseMapper;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
