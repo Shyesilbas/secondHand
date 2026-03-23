@@ -29,7 +29,7 @@ import java.util.UUID;
 public class ClothingListingService extends AbstractListingService<ClothingListing, ClothingCreateRequest> {
 
     private final ClothingListingRepository clothingRepository;
-    private final ClothingListingFilterService clothingListingFilterService;
+    private final IClothingListingFilterService clothingListingFilterService;
     private final List<ClothingSpecValidator> clothingSpecValidators;
     private final ClothingMapper clothingMapper;
     private final ClothingListingResolver clothingListingResolver;
@@ -38,7 +38,7 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
             ClothingListingRepository clothingRepository,
             IListingService listingService,
             ListingMapper listingMapper,
-            ClothingListingFilterService clothingListingFilterService,
+            IClothingListingFilterService clothingListingFilterService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<ClothingSpecValidator> clothingSpecValidators,

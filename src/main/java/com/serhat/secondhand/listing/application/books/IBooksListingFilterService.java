@@ -4,8 +4,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFil
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import org.springframework.data.domain.Page;
 
-public interface BooksListingFilterService {
+public interface IBooksListingFilterService {
     Page<ListingDto> filterBooks(BooksListingFilterDto filters);
 }
-
 

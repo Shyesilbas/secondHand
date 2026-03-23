@@ -29,7 +29,7 @@ import java.util.UUID;
 public class VehicleListingService extends AbstractListingService<VehicleListing, VehicleCreateRequest> {
 
     private final VehicleListingRepository vehicleRepository;
-    private final VehicleListingFilterService vehicleListingFilterService;
+    private final IVehicleListingFilterService vehicleListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final List<VehicleSpecValidator> vehicleSpecValidators;
     private final VehicleMapper vehicleMapper;
@@ -39,7 +39,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
             VehicleListingRepository vehicleRepository,
             IListingService listingService,
             ListingMapper listingMapper,
-            VehicleListingFilterService vehicleListingFilterService,
+            IVehicleListingFilterService vehicleListingFilterService,
             PriceHistoryService priceHistoryService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,

@@ -29,7 +29,7 @@ import java.util.UUID;
 public class SportsListingService extends AbstractListingService<SportsListing, SportsCreateRequest> {
 
     private final SportsListingRepository sportsRepository;
-    private final SportsListingFilterService sportsListingFilterService;
+    private final ISportsListingFilterService sportsListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final List<SportsSpecValidator> sportsSpecValidators;
     private final SportsMapper sportsMapper;
@@ -39,7 +39,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
             SportsListingRepository sportsRepository,
             IListingService listingService,
             ListingMapper listingMapper,
-            SportsListingFilterService sportsListingFilterService,
+            ISportsListingFilterService sportsListingFilterService,
             PriceHistoryService priceHistoryService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,

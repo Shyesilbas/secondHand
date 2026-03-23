@@ -42,7 +42,6 @@ public class ListingController {
     private final IListingService listingService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    private final com.serhat.secondhand.dashboard.application.DashboardService dashboardService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -171,7 +170,7 @@ public class ListingController {
 
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        return ResponseEntity.ok(dashboardService.getGlobalListingStatistics());
+        return ResponseEntity.ok(listingService.getGlobalListingStatistics());
     }
 
     @PutMapping("/{id}/mark-sold")

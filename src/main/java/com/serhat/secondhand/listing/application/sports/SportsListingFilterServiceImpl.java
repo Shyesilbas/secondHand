@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SportsListingFilterServiceImpl implements SportsListingFilterService {
+public class SportsListingFilterServiceImpl implements ISportsListingFilterService {
 
     private final GenericListingFilterService<SportsListing, SportsListingFilterDto> genericFilterService;
     private final SportsFilterPredicateBuilder predicateBuilder;
