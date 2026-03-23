@@ -3,9 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { listingTypeRegistry } from '../config/listingConfig.js';
+import { listingTypeRegistry, getListingConfig } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { getListingConfig } from '../config/listingConfig.js';
 import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
 import logger from '../../common/utils/logger.js';
 

@@ -2,7 +2,7 @@ import GenericListingDetails from '../components/details/GenericListingDetails.j
 import VehicleCreateForm from '../../vehicle/components/VehicleCreateForm.jsx';
 import {vehicleService} from '../../vehicle/services/vehicleService.js';
 import {VehicleCreateRequestDTO} from '../../vehicle/vehicles.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const vehicleConfig = {
   label: 'Vehicle',

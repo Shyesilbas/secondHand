@@ -1,7 +1,7 @@
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 import SportsCreateForm from '../../sports/components/SportsCreateForm.jsx';
 import {sportsService} from '../../sports/services/sportsService.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const sportsConfig = {
   label: 'Sports',

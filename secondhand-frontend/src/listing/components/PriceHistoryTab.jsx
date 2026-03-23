@@ -20,7 +20,7 @@ import {
   getHistoryCurrency,
   sortPriceHistoryAsc,
   sortPriceHistoryDesc
-} from './priceHistoryUtils.js';
+} from '../utils/priceHistoryUtils.js';
 
 ChartJS.register(
   CategoryScale,

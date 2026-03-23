@@ -1,8 +1,21 @@
 import {del, get, post, put} from '../../common/services/api/request.js';
 import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {LISTING_TYPES} from '../types/index.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
+import {getMinKey, getMaxKey} from '../filters/filterRangeKeys.js';
 
+const toInt = (value) => {
+  if (value === null || value === undefined || value === '' || value === 0 || value === '0') return null;
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) ? n : null;
+};
+
+const toText = (value) => {
+  const t = String(value ?? '').trim();
+  return t || null;
+};
+
+const ensureArray = (value) => (Array.isArray(value) ? value : []);
 
 const serializeFilters = (filters, config, listingType) => {
   const typeUpper = String(listingType || '').toUpperCase();
@@ -24,20 +37,6 @@ const serializeFilters = (filters, config, listingType) => {
 
   const fields = config?.getFields?.() || [];
 
-  const toInt = (value) => {
-    if (value === null || value === undefined || value === '') return null;
-    if (value === 0 || value === '0') return null;
-    const n = Number.parseInt(value, 10);
-    return Number.isFinite(n) ? n : null;
-  };
-
-  const toText = (value) => {
-    const t = String(value ?? '').trim();
-    return t ? t : null;
-  };
-
-  const ensureArray = (value) => (Array.isArray(value) ? value : []);
-
   fields.forEach((field) => {
     if (!field?.key) return;
 
@@ -54,35 +53,27 @@ const serializeFilters = (filters, config, listingType) => {
     }
 
     if (field.type === 'numericRange') {
-      const minKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      const maxKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-
-      if (field.key === 'mileage') {
-        payload.maxMileage = toInt(filters[maxKey]);
-        return;
-      }
-
-      if (field.key === 'floor') {
-        payload.floor = toInt(filters[maxKey] ?? filters[minKey]);
-        return;
-      }
-
+      const minKey = getMinKey(field.key);
+      const maxKey = getMaxKey(field.key);
+      // mileage: backend only accepts maxMileage
+      if (field.key === 'mileage') { payload.maxMileage = toInt(filters[maxKey]); return; }
+      // floor: single value, use max if present
+      if (field.key === 'floor') { payload.floor = toInt(filters[maxKey] ?? filters[minKey]); return; }
       payload[minKey] = toInt(filters[minKey]);
       payload[maxKey] = toInt(filters[maxKey]);
       return;
     }
 
     if (field.type === 'dateRange') {
-      const minDateKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      const maxDateKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      payload[minDateKey] = toText(filters[minDateKey]);
-      payload[maxDateKey] = toText(filters[maxDateKey]);
+      const minKey = getMinKey(field.key);
+      const maxKey = getMaxKey(field.key);
+      payload[minKey] = toText(filters[minKey]);
+      payload[maxKey] = toText(filters[maxKey]);
       return;
     }
 
     if (field.type === 'text') {
       payload[field.key] = toText(filters[field.key]);
-      return;
     }
   });
 

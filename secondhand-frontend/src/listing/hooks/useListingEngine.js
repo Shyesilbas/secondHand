@@ -80,13 +80,10 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
   }, [filterHook.mineStatus, mode, rawListings]);
   const error = queryError?.message || null;
 
-  // Initialize pagination sub-hook
   const paginationHook = useListingPagination({
     data,
     filters: filterHook.filters,
-    onPageChange: (page) => {
-      filterHook.updateFilters({ page });
-    },
+    onPageChange: (page) => filterHook.updateFilters({ page }),
   });
 
   // Initialize search sub-hook
@@ -148,12 +145,12 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
     totalPages: paginationHook.totalPages,
     totalElements: paginationHook.totalElements,
     currentPage: paginationHook.currentPage,
+    handlePageChange: paginationHook.handlePageChange,
     isLoading,
     error,
     filters: filterHook.filters,
     selectedCategory: filterHook.selectedCategory,
     updateFilters: wrappedUpdateFilters,
-    updatePage: paginationHook.updatePage,
     resetFilters: wrappedResetFilters,
     refresh,
     onCategoryChange: wrappedOnCategoryChange,
@@ -188,7 +185,6 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
           },
         }
       : null,
-    handlePageChange: paginationHook.handlePageChange,
   };
 };
 

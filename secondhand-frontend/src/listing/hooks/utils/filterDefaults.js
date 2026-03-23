@@ -1,4 +1,5 @@
 import { getListingConfig } from '../../config/listingConfig.js';
+import { getMinKey, getMaxKey } from '../../filters/filterRangeKeys.js';
 
 /**
  * Builds default filter values from listing config fields
@@ -15,19 +16,9 @@ export const buildDefaultsFromFilterConfig = (config) => {
       return;
     }
 
-    if (field.type === 'numericRange') {
-      const minKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      const maxKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      defaults[minKey] = null;
-      defaults[maxKey] = null;
-      return;
-    }
-
-    if (field.type === 'dateRange') {
-      const minDateKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      const maxDateKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-      defaults[minDateKey] = null;
-      defaults[maxDateKey] = null;
+    if (field.type === 'numericRange' || field.type === 'dateRange') {
+      defaults[getMinKey(field.key)] = null;
+      defaults[getMaxKey(field.key)] = null;
       return;
     }
 

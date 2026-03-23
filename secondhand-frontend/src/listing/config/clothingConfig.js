@@ -1,7 +1,7 @@
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 import ClothingCreateForm from '../../clothing/components/ClothingCreateForm.jsx';
 import {clothingService} from '../../clothing/services/clothingService.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const clothingConfig = {
   label: 'Clothing',

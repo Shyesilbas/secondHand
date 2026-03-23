@@ -11,9 +11,9 @@ import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
 
 // Critical Routes - Eager loaded (always needed on initial load)
-import HomePage from '../../user/HomePage.jsx';
-import LoginPage from '../../auth/LoginPage.jsx';
-import RegisterPage from '../../auth/RegisterPage.jsx';
+import HomePage from '../../home/pages/HomePage.jsx';
+import LoginPage from '../../auth/pages/LoginPage.jsx';
+import RegisterPage from '../../auth/pages/RegisterPage.jsx';
 
 // High Priority - Lazy loaded (frequently accessed)
 const ListingsPage = lazy(() => import('../../listing/pages/ListingsPage.jsx'));
@@ -21,35 +21,34 @@ const ListingDetailPage = lazy(() => import('../../listing/pages/ListingDetailPa
 const ListingsPrefilterPage = lazy(() => import('../../listing/pages/ListingsPrefilterPage.jsx'));
 
 // Auth Pages - Lazy loaded
-const ForgotPasswordPage = lazy(() => import('../../auth/ForgotPasswordPage.jsx'));
-const ChangePasswordPage = lazy(() => import('../../auth/ChangePasswordPage.jsx'));
-const AccountVerificationPage = lazy(() => import('../../auth/AccountVerificationPage.jsx'));
-const OAuthCallbackPage = lazy(() => import('../../auth/OAuthCallbackPage.jsx'));
-const OAuthErrorPage = lazy(() => import('../../auth/OAuthErrorPage.jsx'));
-const OAuthCompletePage = lazy(() => import('../../auth/OAuthCompletePage.jsx'));
+const ForgotPasswordPage = lazy(() => import('../../auth/pages/ForgotPasswordPage.jsx'));
+const ChangePasswordPage = lazy(() => import('../../auth/pages/ChangePasswordPage.jsx'));
+const AccountVerificationPage = lazy(() => import('../../auth/pages/AccountVerificationPage.jsx'));
+const OAuthCallbackPage = lazy(() => import('../../auth/pages/OAuthCallbackPage.jsx'));
+const OAuthErrorPage = lazy(() => import('../../auth/pages/OAuthErrorPage.jsx'));
+const OAuthCompletePage = lazy(() => import('../../auth/pages/OAuthCompletePage.jsx'));
 
 // User Pages - Lazy loaded
-const AccountHubPage = lazy(() => import('../../user/AccountHubPage.jsx'));
-const ProfilePage = lazy(() => import('../../user/ProfilePage.jsx'));
-const UserProfilePage = lazy(() => import('../../user/UserProfilePage.jsx'));
+const AccountHubPage = lazy(() => import('../../user/pages/AccountHubPage.jsx'));
+const ProfilePage = lazy(() => import('../../user/pages/ProfilePage.jsx'));
+const UserProfilePage = lazy(() => import('../../user/pages/UserProfilePage.jsx'));
 
 // Listing Management - Lazy loaded
 const MyListingsPage = lazy(() => import('../../listing/pages/MyListingsPage.jsx'));
 const CreateListingPage = lazy(() => import('../../listing/pages/CreateListingPage.jsx'));
 const EditListingPage = lazy(() => import('../../listing/pages/EditListingPage.jsx'));
-const ListingSubtypeSelectionPage = lazy(() => import('../../listing/pages/ListingSubtypeSelectionPage.jsx'));
 
 // Dashboard Pages - Lazy loaded (heavy with charts)
 const SellerDashboardPage = lazy(() => import('../../dashboard/pages/SellerDashboardPage.jsx'));
 const BuyerDashboardPage = lazy(() => import('../../dashboard/pages/BuyerDashboardPage.jsx'));
 
 // Chat & Communication - Lazy loaded
-const ChatPage = lazy(() => import('../../chat/ChatPage.jsx'));
+const ChatPage = lazy(() => import('../../chat/pages/ChatPage.jsx'));
 const AuraChatPage = lazy(() => import('../../ai/pages/AuraChatPage.jsx'));
-const EmailsPage = lazy(() => import('../../emails/EmailsPage'));
+const EmailsPage = lazy(() => import('../../emails/pages/EmailsPage'));
 
 // Forum - Lazy loaded
-const ForumPage = lazy(() => import('../../features/forum/pages/ForumPage.jsx'));
+const ForumPage = lazy(() => import('../../forum/pages/ForumPage.jsx'));
 
 // Shopping & Orders - Lazy loaded
 const ShoppingCartPage = lazy(() => import('../../cart/pages/ShoppingCartPage.jsx'));
@@ -58,7 +57,7 @@ const MyOrdersPage = lazy(() => import('../../order/pages/MyOrdersPage.jsx'));
 const ISoldPage = lazy(() => import('../../order/pages/ISoldPage.jsx'));
 
 // Favorites & Lists - Lazy loaded
-const FavoritesPage = lazy(() => import('../../favorites/FavoritesPage'));
+const FavoritesPage = lazy(() => import('../../favorites/pages/FavoritesPage'));
 const FavoriteListDetailPage = lazy(() => import('../../favoritelist/pages/FavoriteListDetailPage.jsx'));
 
 // Payments - Lazy loaded
@@ -306,13 +305,9 @@ const AppRoutes = () => {
                             </Suspense>
                         } 
                     />
-                    <Route 
-                        path="/listings/create/:listingType/subtype" 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
-                                <ListingSubtypeSelectionPage />
-                            </Suspense>
-                        } 
+                    <Route
+                      path="/listings/create/:listingType/subtype"
+                      element={<Navigate to={ROUTES.CREATE_LISTING} replace />}
                     />
                     <Route 
                         path={ROUTES.PAY_LISTING_FEE} 

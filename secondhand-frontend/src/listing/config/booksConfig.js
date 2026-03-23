@@ -1,7 +1,7 @@
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 import BooksCreateForm from '../../books/components/BooksCreateForm.jsx';
 import {booksService} from '../../books/services/booksService.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const booksConfig = {
   label: 'Books',

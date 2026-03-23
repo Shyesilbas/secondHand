@@ -1,4 +1,4 @@
-import {ListingDTO} from '../listing/listings.js';
+import { ListingDTO } from '../listing/types/index.js';
 
 
 export const VehicleCreateRequestDTO = Object.freeze({
