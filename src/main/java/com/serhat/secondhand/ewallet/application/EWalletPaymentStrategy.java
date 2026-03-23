@@ -1,11 +1,10 @@
-package com.serhat.secondhand.payment.ewallet;
+package com.serhat.secondhand.ewallet.application;
 
-import com.serhat.secondhand.ewallet.application.IEWalletService;
-import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
+import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +15,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class EWalletPaymentStrategy implements PaymentStrategy {
+
     private final IEWalletService eWalletService;
     private final EWalletValidator eWalletValidator;
 

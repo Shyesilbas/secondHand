@@ -3,7 +3,7 @@ package com.serhat.secondhand.payment.creditcard;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.application.CreditCardService;
+import com.serhat.secondhand.payment.creditcard.CreditCardService;
 import com.serhat.secondhand.payment.strategy.PaymentStrategy;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;

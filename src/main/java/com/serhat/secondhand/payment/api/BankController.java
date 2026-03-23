@@ -1,7 +1,7 @@
 package com.serhat.secondhand.payment.api;
 
 import com.serhat.secondhand.payment.dto.BankDto;
-import com.serhat.secondhand.payment.application.BankService;
+import com.serhat.secondhand.payment.bank.BankService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

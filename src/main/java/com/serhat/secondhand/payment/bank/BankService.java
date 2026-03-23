@@ -1,7 +1,7 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.payment.bank;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.payment.bank.BankValidator;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.BankDto;
 import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.entity.PaymentResult;
@@ -14,14 +14,16 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,6 @@ public class BankService {
     private final IUserService userService;
     private final BankMapper bankMapper;
     private final BankValidator bankValidator;
-
 
     public BankDto getBankInfo(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
@@ -54,7 +55,7 @@ public class BankService {
 
     public Map<String, Object> checkBankAccountExists(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        java.util.Optional<Bank> bankOpt = findByUser(user);
+        Optional<Bank> bankOpt = findByUser(user);
         Map<String, Object> response = new HashMap<>();
         response.put("hasBankAccount", bankOpt.isPresent());
         response.put("iban", bankOpt.map(Bank::getIBAN).orElse(null));
@@ -80,8 +81,7 @@ public class BankService {
         log.info("Bank account deleted for user: {}", user.getEmail());
     }
 
-
-    public java.util.Optional<Bank> findByUser(User user) {
+    public Optional<Bank> findByUser(User user) {
         return bankRepository.findByAccountHolder(user);
     }
 
@@ -118,16 +118,17 @@ public class BankService {
     }
 
     @Transactional
-    public PaymentResult processBankPayment(User fromUser, User toUser, BigDecimal amount, java.util.UUID listingId) {
+    public PaymentResult processBankPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
         if (fromUser == null) {
-            return PaymentResult.failure("User not found", amount, PaymentType.TRANSFER, listingId, null, toUser != null ? toUser.getId() : null);
+            return PaymentResult.failure("User not found", amount, PaymentType.TRANSFER, listingId, null,
+                    toUser != null ? toUser.getId() : null);
         }
 
         try {
             debit(fromUser, amount);
             log.info("Bank transfer processed successfully for user: {}, amount: {}", fromUser.getEmail(), amount);
             return PaymentResult.success(
-                    java.util.UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
                     amount,
                     PaymentType.TRANSFER,
                     listingId,
@@ -145,7 +146,7 @@ public class BankService {
         }
     }
 
-    private void ensureValid(com.serhat.secondhand.core.result.Result<Void> validationResult) {
+    private void ensureValid(Result<Void> validationResult) {
         if (validationResult.isError()) {
             throw new BusinessException(
                     validationResult.getMessage(),
@@ -154,5 +155,4 @@ public class BankService {
             );
         }
     }
-
 }

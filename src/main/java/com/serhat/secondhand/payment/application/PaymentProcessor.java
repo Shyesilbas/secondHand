@@ -88,11 +88,11 @@ public class PaymentProcessor {
             return Result.success(paymentMapper.toDto(existingPayment));
         }
 
-        Result<PaymentPreCheckContext> preCheckResult = paymentPreCheckService.preCheck(userId, paymentRequest);
+        Result<PaymentPreCheckService.PreCheckContext> preCheckResult = paymentPreCheckService.preCheck(userId, paymentRequest);
         if (preCheckResult.isError()) {
             return Result.error(preCheckResult.getMessage(), preCheckResult.getErrorCode());
         }
-        PaymentPreCheckContext context = preCheckResult.getData();
+        PaymentPreCheckService.PreCheckContext context = preCheckResult.getData();
 
         var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
 

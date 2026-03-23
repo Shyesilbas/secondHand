@@ -1,15 +1,15 @@
 package com.serhat.secondhand.payment.helper;
 
-import org.springframework.stereotype.Component;
-
 import java.security.SecureRandom;
 
-@Component
-public class IbanGenerator {
+public final class IbanGenerator {
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final String COUNTRY_CODE = "TR";
     private static final int IBAN_NUMERIC_LENGTH = 16;
 
+    private IbanGenerator() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static String generateIban() {
         StringBuilder iban = new StringBuilder(COUNTRY_CODE);

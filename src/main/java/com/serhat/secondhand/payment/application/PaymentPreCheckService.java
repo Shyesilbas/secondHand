@@ -18,7 +18,7 @@ public class PaymentPreCheckService {
     private final PaymentValidationHelper paymentValidationHelper;
     private final IPaymentVerificationService paymentVerificationService;
 
-    public Result<PaymentPreCheckContext> preCheck(Long userId, PaymentRequest paymentRequest) {
+    public Result<PreCheckContext> preCheck(Long userId, PaymentRequest paymentRequest) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getErrorCode(), userResult.getMessage());
@@ -42,7 +42,9 @@ public class PaymentPreCheckService {
             return Result.error(requestValidationResult.getErrorCode(), requestValidationResult.getMessage());
         }
 
-        return Result.success(new PaymentPreCheckContext(fromUser, toUser));
+        return Result.success(new PreCheckContext(fromUser, toUser));
     }
+
+    public record PreCheckContext(User fromUser, User toUser) {}
 }
 
