@@ -96,11 +96,7 @@ public class OrderCompletionScheduler {
             if (shipping == null || shipping.getDeliveredAt() == null) {
                 continue;
             }
-
-            Duration duration = Duration.between(shipping.getDeliveredAt(), now);
-            long hoursPassed = duration.toHours();
-
-            if (hoursPassed >= OrderBusinessConstants.AUTO_COMPLETION_HOURS) {
+            if (shouldAutoCompleteOrder(shipping, now)) {
                 Order.OrderStatus oldStatus = order.getStatus();
                 order.setStatus(Order.OrderStatus.COMPLETED);
                 Order savedOrder = orderRepository.save(order);
@@ -172,6 +168,15 @@ public class OrderCompletionScheduler {
         if (notificationResult.isError()) {
             orderLog.logNotificationFailed("statusChange", order.getOrderNumber(), notificationResult.getMessage());
         }
+    }
+
+    private boolean shouldAutoCompleteOrder(Shipping shipping, LocalDateTime now) {
+        LocalDateTime deliveredAt = shipping.getDeliveredAt();
+        if (deliveredAt == null) {
+            return false;
+        }
+        Duration duration = Duration.between(deliveredAt, now);
+        return duration.toHours() >= OrderBusinessConstants.AUTO_COMPLETION_HOURS;
     }
 
 }

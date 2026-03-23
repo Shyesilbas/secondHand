@@ -35,7 +35,6 @@ public class OrderController {
     private final OrderCancellationService orderCancellationService;
     private final OrderRefundService orderRefundService;
     private final OrderCompletionService orderCompletionService;
-    private final OrderNameService orderNameService;
     private final OrderModificationService orderModificationService;
     private final OrderEscrowService orderEscrowService;
     private final IReviewService reviewService;
@@ -49,6 +48,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Address not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> checkout(
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -63,6 +63,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found when querying by orderNumber")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserOrders(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -78,6 +79,7 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Seller orders retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<OrderDto>> getSellerOrders(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
@@ -88,6 +90,7 @@ public class OrderController {
 
     @GetMapping("/seller/{orderId}")
     @Operation(summary = "Get seller order by ID", description = "Retrieve specific order details for seller (only if order contains seller items)")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSellerOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
@@ -101,6 +104,7 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Pending escrow amount retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, BigDecimal>> getPendingEscrowAmount(
             @AuthenticationPrincipal User currentUser) {
         orderLog.logApiRequest("getPendingEscrowAmount", currentUser.getEmail());
@@ -129,6 +133,7 @@ public class OrderController {
         @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> getPendingCompletionStatus(
             @AuthenticationPrincipal User currentUser) {
         orderLog.logApiRequest("getPendingCompletionStatus", currentUser.getEmail());
@@ -137,6 +142,7 @@ public class OrderController {
     }
 
     @GetMapping("/items/{orderItemId}/review")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getReviewByOrderItem(
             @PathVariable Long orderItemId,
             @AuthenticationPrincipal User currentUser) {
@@ -152,6 +158,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> cancelOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
@@ -168,6 +175,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> refundOrder(
             @PathVariable Long orderId,
             @Valid @RequestBody OrderRefundRequest request,
@@ -184,6 +192,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> completeOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
@@ -199,12 +208,13 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderName(
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
         orderLog.logApiMutation("updateOrderName", orderId, currentUser.getEmail());
-        return ResultResponses.ok(orderNameService.updateOrderName(orderId, request.getName(), currentUser));
+        return ResultResponses.ok(orderModificationService.updateOrderName(orderId, request.getName(), currentUser));
     }
 
     @PutMapping("/{orderId}/address")
@@ -215,6 +225,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order or address not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderAddress(
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderAddressRequest request,
@@ -232,6 +243,7 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized"),
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderNotes(
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNotesRequest request,

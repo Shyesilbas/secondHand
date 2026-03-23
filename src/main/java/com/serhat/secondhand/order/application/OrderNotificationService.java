@@ -9,6 +9,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -123,8 +124,8 @@ public class OrderNotificationService {
     @Async("notificationExecutor")
     public void sendOrderCancellationNotification(User user, Order order) {
         try {
-            String subject = "SecondHand - Order Cancelled";
-            String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been cancelled.\n";
+            String subject = OrderBusinessConstants.EMAIL_SUBJECT_ORDER_CANCELLED;
+            String content = buildOrderCancellationContent(user, order);
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("cancellation", order.getOrderNumber());
 
@@ -219,8 +220,8 @@ public class OrderNotificationService {
     @Async("notificationExecutor")
     public void sendOrderRefundNotification(User user, Order order) {
         try {
-            String subject = "SecondHand - Order Refunded";
-            String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been refunded. The refund amount has been credited to your eWallet.\n";
+            String subject = OrderBusinessConstants.EMAIL_SUBJECT_ORDER_REFUNDED;
+            String content = buildOrderRefundContent(user, order);
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("refund", order.getOrderNumber());
         } catch (Exception e) {
@@ -231,13 +232,25 @@ public class OrderNotificationService {
     @Async("notificationExecutor")
     public void sendOrderCompletionNotification(User user, Order order, boolean isAutomatic) {
         try {
-            String subject = "SecondHand - Order Completed";
-            String content = "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been " + 
-                    (isAutomatic ? "automatically completed" : "completed") + ".\n";
+            String subject = OrderBusinessConstants.EMAIL_SUBJECT_ORDER_COMPLETED;
+            String content = buildOrderCompletionContent(user, order, isAutomatic);
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("completion", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("completion", order.getOrderNumber(), e.getMessage());
         }
+    }
+
+    private String buildOrderCancellationContent(User user, Order order) {
+        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been cancelled.\n";
+    }
+
+    private String buildOrderRefundContent(User user, Order order) {
+        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been refunded. The refund amount has been credited to your eWallet.\n";
+    }
+
+    private String buildOrderCompletionContent(User user, Order order, boolean isAutomatic) {
+        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been " +
+                (isAutomatic ? "automatically completed" : "completed") + ".\n";
     }
 }

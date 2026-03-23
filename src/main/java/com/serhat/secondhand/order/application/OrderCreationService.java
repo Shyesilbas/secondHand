@@ -10,6 +10,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
@@ -149,7 +150,7 @@ public class OrderCreationService {
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
                 .totalPrice(lineSubtotal)
-                .currency("TRY")
+                .currency(OrderBusinessConstants.ORDER_CURRENCY)
                 .notes(cart.getNotes())
                 .build();
     }
@@ -188,7 +189,7 @@ public class OrderCreationService {
                 .user(user)
                 .status(Order.OrderStatus.PENDING)
                 .totalAmount(totalAmount)
-                .currency("TRY")
+                .currency(OrderBusinessConstants.ORDER_CURRENCY)
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
                 .notes(notes)
@@ -204,6 +205,9 @@ public class OrderCreationService {
     }
 
     private String generateOrderNumber() {
-        return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return OrderBusinessConstants.ORDER_NUMBER_PREFIX
+                + System.currentTimeMillis()
+                + "-"
+                + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

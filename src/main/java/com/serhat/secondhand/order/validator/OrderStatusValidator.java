@@ -7,20 +7,12 @@ import com.serhat.secondhand.order.application.OrderLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumSet;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class OrderStatusValidator {
 
     private final OrderLogService orderLog;
-
-    /**
-     * Terminal statuses — orders in these states cannot transition to any other state.
-     */
-    private static final Set<Order.OrderStatus> TERMINAL_STATUSES =
-            EnumSet.of(Order.OrderStatus.COMPLETED, Order.OrderStatus.CANCELLED, Order.OrderStatus.REFUNDED);
 
     public Result<Void> validateStatusConsistency(Order order) {
         Order.OrderStatus orderStatus = order.getStatus();
