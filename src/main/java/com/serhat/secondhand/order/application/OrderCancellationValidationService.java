@@ -22,14 +22,12 @@ public class OrderCancellationValidationService {
     private final IOrderValidationService orderValidationService;
     private final OrderCancellationPolicy orderCancellationPolicy;
     private final OrderStatusValidator orderStatusValidator;
-    private final OrderItemHelper orderItemHelper;
     private final OrderItemCompensationPlanner compensationPlanner;
 
     public CancellationValidationResult validate(Order order, OrderCancelRequest request, User user) {
         if (order == null || order.getId() == null) {
             return new CancellationValidationResult(
                     null,
-                    List.of(),
                     List.of(),
                     Result.error(OrderErrorCodes.ORDER_NOT_FOUND)
             );
@@ -40,7 +38,6 @@ public class OrderCancellationValidationService {
             return new CancellationValidationResult(
                     null,
                     List.of(),
-                    List.of(),
                     orderResult.propagateError()
             );
         }
@@ -49,19 +46,18 @@ public class OrderCancellationValidationService {
 
         Result<Void> cancelValidationResult = orderCancellationPolicy.validateCancellable(validatedOrder);
         if (cancelValidationResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, List.of(), List.of(), cancelValidationResult);
+            return new CancellationValidationResult(validatedOrder, List.of(), cancelValidationResult);
         }
 
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(validatedOrder);
         if (consistencyResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, List.of(), List.of(), consistencyResult);
+            return new CancellationValidationResult(validatedOrder, List.of(), consistencyResult);
         }
 
-        Result<List<OrderItem>> itemsResult = orderItemHelper.resolveOrderItems(validatedOrder, request.getOrderItemIds());
+        Result<List<OrderItem>> itemsResult = compensationPlanner.resolveOrderItems(validatedOrder, request.getOrderItemIds());
         if (itemsResult.isError()) {
             return new CancellationValidationResult(
                     validatedOrder,
-                    List.of(),
                     List.of(),
                     itemsResult.propagateError()
             );
@@ -71,12 +67,11 @@ public class OrderCancellationValidationService {
 
         Result<Void> itemsValidationResult = compensationPlanner.validateCancellableItems(itemsToCancel);
         if (itemsValidationResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, itemsToCancel, List.of(), itemsValidationResult);
+            return new CancellationValidationResult(validatedOrder, itemsToCancel, itemsValidationResult);
         }
 
         return new CancellationValidationResult(
                 validatedOrder,
-                itemsToCancel,
                 itemsToCancel,
                 Result.<Void>success()
         );

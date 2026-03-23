@@ -6,7 +6,6 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
-import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +20,9 @@ import java.util.List;
 @Transactional
 public class OrderCancellationService {
 
-    private final OrderRepository orderRepository;
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCancellationValidationService validationService;
-    private final OrderCancellationPersistenceService persistenceService;
-    private final OrderCancellationRefundService refundService;
-    private final OrderCancellationFinalizationService finalizationService;
+    private final OrderCancellationExecutionService executionService;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Order orderStub = new Order();
@@ -49,18 +45,7 @@ public class OrderCancellationService {
             return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
         }
 
-        persistenceService.persist(cancelRecords, order);
-
-        try {
-            refundService.processRefund(cancelRecords, totalRefundAmount, order);
-        } catch (OrderCancellationRefundService.RefundFailedException e) {
-            return Result.error(OrderCancellationRefundService.getRefundFailedMessage(),
-                    OrderCancellationRefundService.getRefundFailedCode());
-        }
-
-        return orderRepository.findByIdWithOrderItems(order.getId())
-                .map(refreshedOrder -> finalizationService.finalize(refreshedOrder, user).result())
-                .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
+        return executionService.executeCancellation(cancelRecords, totalRefundAmount, order, user);
     }
 
 }

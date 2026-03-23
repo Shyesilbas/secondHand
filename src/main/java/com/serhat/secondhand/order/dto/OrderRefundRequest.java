@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRefundRequest {
+public class OrderRefundRequest implements OrderCompensationRequest {
 
     private List<Long> orderItemIds;
 

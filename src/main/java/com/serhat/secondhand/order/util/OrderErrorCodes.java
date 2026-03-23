@@ -22,7 +22,10 @@ public enum OrderErrorCodes implements ErrorCode {
     REFUND_TIME_EXPIRED("REFUND_TIME_EXPIRED", "Refund time has expired (48 hours passed)", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_NAME("INVALID_ORDER_NAME", "Order name must be 100 characters or less", HttpStatus.BAD_REQUEST),
     ORDER_NOT_MODIFIABLE("ORDER_NOT_MODIFIABLE", "Order can only be modified in pending or confirmed status", HttpStatus.BAD_REQUEST),
-    INVALID_ORDER_NOTES("INVALID_ORDER_NOTES", "Order notes must be 1000 characters or less", HttpStatus.BAD_REQUEST);
+    INVALID_ORDER_NOTES("INVALID_ORDER_NOTES", "Order notes must be 1000 characters or less", HttpStatus.BAD_REQUEST),
+    ESCROW_ALREADY_EXISTS("ESCROW_ALREADY_EXISTS", "Escrow already exists for this order item", HttpStatus.CONFLICT),
+    REFUND_FAILED("REFUND_FAILED", "Failed to process refund. Please contact support.", HttpStatus.BAD_REQUEST),
+    ORDER_COMPLETION_ESCROW_RELEASE_FAILED("ORDER_COMPLETION_ESCROW_RELEASE_FAILED", "Order completion failed during escrow release", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

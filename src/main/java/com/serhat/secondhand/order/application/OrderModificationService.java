@@ -81,6 +81,23 @@ public class OrderModificationService {
         return Result.success(orderMapper.toDto(savedOrder));
     }
 
+    public Result<OrderDto> updateOrderName(Long orderId, String name, User user) {
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
+        if (orderResult.isError()) return orderResult.propagateError();
+
+        Order order = orderResult.getData();
+
+        if (name != null && name.length() > 100) {
+            return Result.error(OrderErrorCodes.INVALID_ORDER_NAME);
+        }
+
+        order.setName(name);
+        Order savedOrder = orderRepository.save(order);
+
+        orderLog.logOrderModified(order.getOrderNumber(), "name");
+        return Result.success(orderMapper.toDto(savedOrder));
+    }
+
     private Result<Void> validateOrderIsModifiable(Order order) {
         if (!Order.OrderStatus.MODIFIABLE_STATUSES.contains(order.getStatus())) {
             return Result.error(OrderErrorCodes.ORDER_NOT_MODIFIABLE);

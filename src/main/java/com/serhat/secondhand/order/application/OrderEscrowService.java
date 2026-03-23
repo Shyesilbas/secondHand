@@ -6,6 +6,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.repository.OrderItemEscrowRepository;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.order.util.OrderErrorCodes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class OrderEscrowService {
 
     public Result<OrderItemEscrow> createEscrowForOrderItem(OrderItem orderItem, User seller, BigDecimal amount) {
         if (orderItemEscrowRepository.findByOrderItem(orderItem).isPresent()) {
-            return Result.error("Escrow already exists for this order item", "ESCROW_ALREADY_EXISTS");
+            return Result.error("Escrow already exists for this order item", OrderErrorCodes.ESCROW_ALREADY_EXISTS.getCode());
         }
 
         OrderItemEscrow escrow = OrderItemEscrow.builder()
@@ -50,6 +51,14 @@ public class OrderEscrowService {
 
     public Optional<OrderItemEscrow> findEscrowByOrderItem(OrderItem orderItem) {
         return orderItemEscrowRepository.findByOrderItem(orderItem);
+    }
+
+    public List<OrderItemEscrow> findExistingEscrowsByOrderItems(List<OrderItem> orderItems) {
+        return orderItems.stream()
+                .map(this::findEscrowByOrderItem)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
 

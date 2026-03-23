@@ -8,7 +8,6 @@ import java.util.List;
 
 public record CancellationValidationResult(
         Order validatedOrder,
-        List<OrderItem> resolvedItems,
         List<OrderItem> cancellableItems,
         Result<Void> validationResult) {
 }

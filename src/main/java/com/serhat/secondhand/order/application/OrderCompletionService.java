@@ -8,6 +8,7 @@ import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -36,8 +37,26 @@ public class OrderCompletionService {
 
     @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
-        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
+        Result<Order> orderResult = validateOrderForCompletion(orderId, user);
         if (orderResult.isError()) return orderResult.propagateError();
+
+        Order order = orderResult.getData();
+
+        Result<Void> releaseResult = releaseEscrowsForOrder(order);
+        if (releaseResult.isError()) return escrowReleaseFailed();
+
+        orderStateTransitionPolicy.applyCompletion(order);
+        Order savedOrder = orderRepository.save(order);
+
+        orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
+
+        orderLog.logOrderCompleted(order.getOrderNumber(), false);
+        return Result.success(orderMapper.toDto(savedOrder));
+    }
+
+    private Result<Order> validateOrderForCompletion(Long orderId, User user) {
+        Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
+        if (orderResult.isError()) return orderResult;
 
         Order order = orderResult.getData();
 
@@ -47,18 +66,14 @@ public class OrderCompletionService {
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
         if (consistencyResult.isError()) return consistencyResult.propagateError();
 
-        Result<Void> releaseResult = releaseEscrowsForOrder(order);
-        if (releaseResult.isError()) {
-            return Result.error("Order completion failed during escrow release", "ORDER_COMPLETION_ESCROW_RELEASE_FAILED");
-        }
+        return Result.success(order);
+    }
 
-        orderStateTransitionPolicy.applyCompletion(order);
-        Order savedOrder = orderRepository.save(order);
-
-        orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
-
-        orderLog.logOrderCompleted(order.getOrderNumber(), false);
-        return Result.success(orderMapper.toDto(savedOrder));
+    private Result<OrderDto> escrowReleaseFailed() {
+        return Result.error(
+                "Order completion failed during escrow release",
+                OrderErrorCodes.ORDER_COMPLETION_ESCROW_RELEASE_FAILED.getCode()
+        );
     }
 
     private Result<Void> releaseEscrowsForOrder(Order order) {
