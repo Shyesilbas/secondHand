@@ -29,7 +29,7 @@ public class OrderCompletionService {
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
-    private final IOrderValidationService orderValidationService;
+    private final OrderValidationService orderValidationService;
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
     private final OrderCompletionPolicy orderCompletionPolicy;

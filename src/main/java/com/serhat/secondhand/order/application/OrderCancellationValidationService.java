@@ -19,62 +19,52 @@ import java.util.List;
 @Slf4j
 public class OrderCancellationValidationService {
 
-    private final IOrderValidationService orderValidationService;
+    public record ValidationResult(
+            Order validatedOrder,
+            List<OrderItem> cancellableItems,
+            Result<Void> validationResult) {
+    }
+
+    private final OrderValidationService orderValidationService;
     private final OrderCancellationPolicy orderCancellationPolicy;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderItemCompensationPlanner compensationPlanner;
 
-    public CancellationValidationResult validate(Order order, OrderCancelRequest request, User user) {
+    public ValidationResult validate(Order order, OrderCancelRequest request, User user) {
         if (order == null || order.getId() == null) {
-            return new CancellationValidationResult(
-                    null,
-                    List.of(),
-                    Result.error(OrderErrorCodes.ORDER_NOT_FOUND)
-            );
+            return new ValidationResult(null, List.of(), Result.error(OrderErrorCodes.ORDER_NOT_FOUND));
         }
 
         Result<Order> orderResult = orderValidationService.validateOwnership(order.getId(), user);
         if (orderResult.isError()) {
-            return new CancellationValidationResult(
-                    null,
-                    List.of(),
-                    orderResult.propagateError()
-            );
+            return new ValidationResult(null, List.of(), orderResult.propagateError());
         }
 
         Order validatedOrder = orderResult.getData();
 
         Result<Void> cancelValidationResult = orderCancellationPolicy.validateCancellable(validatedOrder);
         if (cancelValidationResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, List.of(), cancelValidationResult);
+            return new ValidationResult(validatedOrder, List.of(), cancelValidationResult);
         }
 
         Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(validatedOrder);
         if (consistencyResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, List.of(), consistencyResult);
+            return new ValidationResult(validatedOrder, List.of(), consistencyResult);
         }
 
         Result<List<OrderItem>> itemsResult = compensationPlanner.resolveOrderItems(validatedOrder, request.getOrderItemIds());
         if (itemsResult.isError()) {
-            return new CancellationValidationResult(
-                    validatedOrder,
-                    List.of(),
-                    itemsResult.propagateError()
-            );
+            return new ValidationResult(validatedOrder, List.of(), itemsResult.propagateError());
         }
 
         List<OrderItem> itemsToCancel = itemsResult.getData();
 
         Result<Void> itemsValidationResult = compensationPlanner.validateCancellableItems(itemsToCancel);
         if (itemsValidationResult.isError()) {
-            return new CancellationValidationResult(validatedOrder, itemsToCancel, itemsValidationResult);
+            return new ValidationResult(validatedOrder, itemsToCancel, itemsValidationResult);
         }
 
-        return new CancellationValidationResult(
-                validatedOrder,
-                itemsToCancel,
-                Result.<Void>success()
-        );
+        return new ValidationResult(validatedOrder, itemsToCancel, Result.<Void>success());
     }
 }
 

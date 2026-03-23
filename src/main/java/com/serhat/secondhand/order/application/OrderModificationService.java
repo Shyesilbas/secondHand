@@ -21,7 +21,7 @@ public class OrderModificationService {
     private final OrderRepository orderRepository;
     private final AddressRepository addressRepository;
     private final OrderMapper orderMapper;
-    private final IOrderValidationService orderValidationService;
+    private final OrderValidationService orderValidationService;
     private final OrderLogService orderLog;
 
     public Result<OrderDto> updateOrderAddress(Long orderId, Long shippingAddressId, Long billingAddressId, User user) {

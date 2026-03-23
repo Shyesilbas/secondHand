@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OrderValidationService implements IOrderValidationService {
+public class OrderValidationService {
     
     private final OrderRepository orderRepository;
     
-    @Override
     public Result<Order> validateOwnership(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElse(null);
@@ -30,7 +29,6 @@ public class OrderValidationService implements IOrderValidationService {
         return Result.success(order);
     }
     
-    @Override
     public Result<Order> validateOwnership(Long orderId, User user) {
         return validateOwnership(orderId, user.getId());
     }
