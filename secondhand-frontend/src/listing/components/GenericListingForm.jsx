@@ -11,14 +11,7 @@ import ImageUpload from '../../common/components/ImageUpload.jsx';
 import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 import {getListingConfig} from '../config/listingConfig.js';
-
-const resolveEnumName = (enums, enumKey, idOrValue) => {
-  const list = enums?.[enumKey] || [];
-  const target = String(idOrValue ?? '');
-  if (!target) return '';
-  const found = list.find((x) => String(x?.id ?? x?.value ?? '') === target);
-  return String(found?.name || found?.label || '').trim();
-};
+import {resolveEnumLabel, toDisplayText} from '../utils/listingDisplayFormat.js';
 
 const FieldError = ({ error }) => {
   if (!error) return null;
@@ -148,7 +141,7 @@ const GenericListingForm = ({
     const setValue = (field, value) => handleDropdownChange(field, value);
     const setChecked = (field, checked) => handleInputChange({ target: { name: field, checked, type: 'checkbox' } });
     const getName = (enumKey, idOrValue, { upper = false } = {}) => {
-      const n = resolveEnumName(enums, enumKey, idOrValue);
+      const n = resolveEnumLabel(enums, enumKey, idOrValue);
       return upper ? n.toUpperCase() : n;
     };
 
@@ -340,18 +333,8 @@ const GenericListingForm = ({
   };
 
   const formatSummaryValue = (field, rawValue) => {
-    if (rawValue === null || rawValue === undefined) return '';
-    if (typeof rawValue === 'boolean') return rawValue ? 'Yes' : 'No';
-    if (Array.isArray(rawValue)) return rawValue.filter(Boolean).join(', ');
-    const value = String(rawValue);
-    if (!value.trim()) return '';
-
-    if (field?.enumKey) {
-      const label = resolveEnumName(enums, field.enumKey, rawValue);
-      return label || value;
-    }
-
-    return value;
+    const text = toDisplayText(rawValue, enums, field?.enumKey);
+    return text ?? '';
   };
 
   const renderSummaryStep = () => {

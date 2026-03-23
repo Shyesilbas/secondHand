@@ -1,41 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
-
-const toDisplayText = (value, enums, enumKey) => {
-  if (value === null || value === undefined) return null;
-
-  if (Array.isArray(value)) {
-    const parts = value
-      .map((v) => toDisplayText(v, enums, enumKey))
-      .filter((v) => v !== null && v !== undefined && String(v).trim() !== '');
-    return parts.length ? parts.join(', ') : null;
-  }
-
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
-  }
-
-  if (typeof value === 'object') {
-    if (value.label) return String(value.label);
-    if (value.name) return String(value.name);
-    if (value.value) return String(value.value);
-    if (value.id != null && enumKey) {
-      const list = enums?.[enumKey] || [];
-      const found = list.find((o) => (o.id || o.value) === value.id);
-      return found?.label || found?.name || String(value.id);
-    }
-    return null;
-  }
-
-  if (enumKey) {
-    const list = enums?.[enumKey] || [];
-    const found = list.find((o) => (o.id || o.value) === value);
-    if (found) return found.label || found.name || String(value);
-  }
-
-  return String(value);
-};
+import { toDisplayText } from '../../utils/listingDisplayFormat.js';
 
 const getValueByPath = (obj, path) => {
   if (!obj || !path) return undefined;

@@ -1,6 +1,7 @@
 import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
 import FilterChipGroup from './FilterChipGroup.jsx';
 import { Calendar, Hash, Type } from 'lucide-react';
+import { getMinKey, getMaxKey } from '../../filters/filterRangeKeys.js';
 
 const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
   if (!config || !config.getFields) return null;
@@ -44,8 +45,8 @@ const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
         );
 
       case 'numericRange': {
-        const minKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-        const maxKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+        const minKey = getMinKey(field.key);
+        const maxKey = getMaxKey(field.key);
         return (
           <div key={field.key} className="space-y-2 min-w-0">
             <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{field.label}</label>
@@ -77,8 +78,8 @@ const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
       }
 
       case 'dateRange': {
-        const minDateKey = `min${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
-        const maxDateKey = `max${field.key.charAt(0).toUpperCase() + field.key.slice(1)}`;
+        const minDateKey = getMinKey(field.key);
+        const maxDateKey = getMaxKey(field.key);
         return (
           <div key={field.key} className="space-y-2">
             <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{field.label}</label>

@@ -8,7 +8,7 @@ import {
     setUser
 } from '../common/services/storage/tokenStorage.js';
 import {authService} from './services/authService.js';
-import {UserDTO} from '../common/index.js';
+import {UserDTO} from '../user/users.js';
 import logger from '../common/utils/logger.js';
 
 const AuthContext = createContext();

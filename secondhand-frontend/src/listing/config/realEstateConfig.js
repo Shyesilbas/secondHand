@@ -2,7 +2,7 @@ import GenericListingDetails from '../components/details/GenericListingDetails.j
 import RealEstateCreateForm from '../../realEstate/components/RealEstateCreateForm.jsx';
 import {realEstateService} from '../../realEstate/services/realEstateService.js';
 import {RealEstateCreateRequestDTO} from '../../realEstate/realEstates.js';
-import {filterConfigs} from '../components/filters/filterConfigs.js';
+import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const realEstateConfig = {
   label: 'Real Estate',

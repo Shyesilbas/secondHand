@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createComplaint, getMyComplaints } from '../service/complaintService.js';
+import { createComplaint, getMyComplaints } from '../services/complaintService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 
 const COMPLAINT_KEYS = {

@@ -5,7 +5,7 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useRegisterAgreements} from '../../agreements/hooks/useRegisterAgreements.js';
-import {validateRegisterForm} from '../registerValidator.js';
+import {validateRegisterForm} from '../utils/registerValidator.js';
 import {useGenderEnum} from '../../common/hooks/useGenderEnum.js';
 import {formatPhoneNumber} from '../../common/utils/phoneFormatter.js';
 
