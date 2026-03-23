@@ -25,7 +25,7 @@ public class ListingEventListener {
     private final ListingRepository listingRepository;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentMapper paymentMapper;
-    private final IListingService listingService;
+    private final ListingCommandService listingCommandService;
 
     @EventListener
     @Transactional
@@ -40,7 +40,7 @@ public class ListingEventListener {
 
         Listing listing = listingRepository.findById(payment.getListingId())
                 .orElseThrow(() -> new BusinessException("Listing not found for payment: " + payment.getId(),
-                                                         HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
+                        HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
         if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION) {
             User fromUser = payment.getFromUser();
@@ -48,9 +48,8 @@ public class ListingEventListener {
             if (userId != null) {
                 listing.setListingFeePaid(true);
                 listingRepository.save(listing);
-                listingService.publish(listing.getId(), userId);
+                listingCommandService.publish(listing.getId(), userId);
             }
-
         } else if (payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
             if (listing.getStatus() != null) {
                 log.info("Purchase completed for listing {}. Status change disabled; keeping {}.", listing.getId(), listing.getStatus());

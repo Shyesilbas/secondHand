@@ -117,6 +117,6 @@ public class PriceHistoryService {
     }
 
     public boolean hasPriceHistory(UUID listingId) {
-        return !priceHistoryRepository.findByListingIdOrderByChangeDateDesc(listingId).isEmpty();
+        return priceHistoryRepository.existsByListingId(listingId);
     }
 }

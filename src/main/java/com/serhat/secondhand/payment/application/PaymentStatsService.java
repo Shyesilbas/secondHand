@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.application;
 
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
@@ -30,7 +30,7 @@ public class PaymentStatsService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-    private final IListingService listingService;
+    private final ListingQueryService listingService;
 
     public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
         log.info("Calculating payment statistics via DB for userId: {}", userId);

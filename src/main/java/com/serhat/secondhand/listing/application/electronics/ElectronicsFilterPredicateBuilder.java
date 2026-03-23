@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application.electronics;
 
-import com.serhat.secondhand.listing.application.common.FilterPredicateBuilder;
+import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

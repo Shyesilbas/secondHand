@@ -32,8 +32,4 @@ public class ListingEnrichmentService {
         return dto;
     }
 
-    public ListingDto enrichSafe(ListingDto dto, Long userId) {
-        if (dto == null) return null;
-        return enrichInPlace(dto, userId);
-    }
 }

@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application.vehicle;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.AbstractListingService;
+import com.serhat.secondhand.listing.application.category.AbstractListingService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
+import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
-import com.serhat.secondhand.listing.application.common.IListingService;
-import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -29,46 +29,43 @@ import java.util.UUID;
 public class VehicleListingService extends AbstractListingService<VehicleListing, VehicleCreateRequest> {
 
     private final VehicleListingRepository vehicleRepository;
-    private final IVehicleListingFilterService vehicleListingFilterService;
-    private final PriceHistoryService priceHistoryService;
+    private final GenericListingFilterService<VehicleListing, VehicleListingFilterDto> genericFilterService;
+    private final VehicleFilterPredicateBuilder predicateBuilder;
     private final List<VehicleSpecValidator> vehicleSpecValidators;
-    private final VehicleMapper vehicleMapper;
     private final VehicleListingResolver vehicleListingResolver;
-    
+
     public VehicleListingService(
             VehicleListingRepository vehicleRepository,
-            IListingService listingService,
+            ListingValidationService listingValidationService,
             ListingMapper listingMapper,
-            IVehicleListingFilterService vehicleListingFilterService,
-            PriceHistoryService priceHistoryService,
+            GenericListingFilterService<VehicleListing, VehicleListingFilterDto> genericFilterService,
+            VehicleFilterPredicateBuilder predicateBuilder,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<VehicleSpecValidator> vehicleSpecValidators,
-            VehicleMapper vehicleMapper,
             VehicleListingResolver vehicleListingResolver) {
-        super(userService, listingService, listingMapper, listingValidationEngine);
+        super(userService, listingValidationService, listingMapper, listingValidationEngine);
         this.vehicleRepository = vehicleRepository;
-        this.vehicleListingFilterService = vehicleListingFilterService;
-        this.priceHistoryService = priceHistoryService;
+        this.genericFilterService = genericFilterService;
+        this.predicateBuilder = predicateBuilder;
         this.vehicleSpecValidators = vehicleSpecValidators;
-        this.vehicleMapper = vehicleMapper;
         this.vehicleListingResolver = vehicleListingResolver;
     }
 
     public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
-    
+
     @Override
     protected String getListingType() {
         return "Vehicle";
     }
-    
+
     @Override
     protected VehicleListing mapRequestToEntity(VehicleCreateRequest request) {
         return listingMapper.toVehicleEntity(request);
     }
-    
+
     @Override
     protected Result<VehicleResolution> resolveEntities(VehicleCreateRequest request) {
         return vehicleListingResolver.resolve(
@@ -77,7 +74,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
                 request.vehicleModelId()
         );
     }
-    
+
     @Override
     protected void applyResolution(VehicleListing entity, Object resolution) {
         VehicleResolution res = (VehicleResolution) resolution;
@@ -85,12 +82,12 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         entity.setBrand(res.brand());
         entity.setModel(res.model());
     }
-    
+
     @Override
     protected Result<Void> validate(VehicleListing entity) {
         return listingValidationEngine.cleanupAndValidate(entity, vehicleSpecValidators);
     }
-    
+
     @Override
     protected VehicleListing save(VehicleListing entity) {
         return vehicleRepository.save(entity);
@@ -100,34 +97,25 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateVehicleListing(UUID id, VehicleUpdateRequest request, Long currentUserId) {
         log.info("Updating vehicle listing: {} by user: {}", id, currentUserId);
-
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) {
-            return ownershipResult;
-        }
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) return ownershipResult;
 
         return vehicleRepository.findById(id)
                 .map(existing -> performUpdate(existing, request))
                 .orElseGet(() -> Result.error("Vehicle listing not found", "LISTING_NOT_FOUND"));
     }
-    
+
     private Result<Void> performUpdate(VehicleListing existing, VehicleUpdateRequest request) {
-        Result<Void> statusResult = listingService.validateEditableStatus(existing);
-        if (statusResult.isError()) {
-            return statusResult;
-        }
+        Result<Void> statusResult = validateEditableStatus(existing);
+        if (statusResult.isError()) return statusResult;
 
         Result<Void> applyResult = vehicleListingResolver.apply(existing, request.vehicleTypeId(), request.brandId(), request.vehicleModelId());
-        if (applyResult.isError()) {
-            return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
-        }
-        
-        vehicleMapper.updateEntityFromRequest(existing, request);
+        if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
+
+        listingMapper.updateVehicle(existing, request);
 
         Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, vehicleSpecValidators);
-        if (specResult.isError()) {
-            return Result.error(specResult.getMessage(), specResult.getErrorCode());
-        }
+        if (specResult.isError()) return Result.error(specResult.getMessage(), specResult.getErrorCode());
 
         vehicleRepository.save(existing);
         log.info("Vehicle listing updated: {}", existing.getId());
@@ -135,10 +123,8 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
     }
 
     public List<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId) {
-        List<VehicleListing> vehicles = vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId);
-        return vehicles.stream()
-                .map(listingMapper::toVehicleDto)
-                .toList();
+        return vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId)
+                .stream().map(listingMapper::toVehicleDto).toList();
     }
 
     public VehicleListingDto getVehicleDetails(UUID id) {
@@ -148,8 +134,6 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
     }
 
     public Page<ListingDto> filterVehicles(VehicleListingFilterDto filters) {
-        log.info("Filtering vehicle listings with criteria: {}", filters);
-        return vehicleListingFilterService.filterVehicles(filters);
+        return genericFilterService.filter(filters, VehicleListing.class, predicateBuilder);
     }
-
 }

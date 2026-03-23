@@ -1,7 +1,8 @@
 package com.serhat.secondhand.listing.validation.common;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
+import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -13,18 +14,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ListingFeePaymentValidation {
 
-    private final IListingService listingService;
+    private final ListingQueryService listingQueryService;
+    private final ListingValidationService listingValidationService;
 
     public Result<Void> validate(PaymentRequest request, Long userId) {
 
-        Listing listing = listingService.findById(request.listingId())
+        Listing listing = listingQueryService.findById(request.listingId())
                 .orElse(null);
 
         if (listing == null) {
             return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND);
         }
 
-        Result<Void> ownershipValidation = listingService.validateOwnership(
+        Result<Void> ownershipValidation = listingValidationService.validateOwnership(
                 listing.getId(),
                 userId
         );

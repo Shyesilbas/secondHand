@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application.electronics;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.AbstractListingService;
+import com.serhat.secondhand.listing.application.category.AbstractListingService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
+import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
-import com.serhat.secondhand.listing.application.common.IListingService;
-import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicListingDto;
@@ -27,47 +27,45 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class ElectronicListingService extends AbstractListingService<ElectronicListing, ElectronicCreateRequest> {
+
     private final ElectronicListingRepository repository;
-    private final IElectronicListingFilterService electronicListingFilterService;
-    private final PriceHistoryService priceHistoryService;
+    private final GenericListingFilterService<ElectronicListing, ElectronicListingFilterDto> genericFilterService;
+    private final ElectronicsFilterPredicateBuilder predicateBuilder;
     private final List<ElectronicSpecValidator> electronicSpecValidators;
-    private final ElectronicMapper electronicMapper;
     private final ElectronicListingResolver electronicListingResolver;
-    
+
     public ElectronicListingService(
             ElectronicListingRepository repository,
-            IListingService listingService,
+            ListingValidationService listingValidationService,
             ListingMapper listingMapper,
-            IElectronicListingFilterService electronicListingFilterService,
-            PriceHistoryService priceHistoryService,
+            GenericListingFilterService<ElectronicListing, ElectronicListingFilterDto> genericFilterService,
+            ElectronicsFilterPredicateBuilder predicateBuilder,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<ElectronicSpecValidator> electronicSpecValidators,
-            ElectronicMapper electronicMapper,
             ElectronicListingResolver electronicListingResolver) {
-        super(userService, listingService, listingMapper, listingValidationEngine);
+        super(userService, listingValidationService, listingMapper, listingValidationEngine);
         this.repository = repository;
-        this.electronicListingFilterService = electronicListingFilterService;
-        this.priceHistoryService = priceHistoryService;
+        this.genericFilterService = genericFilterService;
+        this.predicateBuilder = predicateBuilder;
         this.electronicSpecValidators = electronicSpecValidators;
-        this.electronicMapper = electronicMapper;
         this.electronicListingResolver = electronicListingResolver;
     }
 
     public Result<UUID> createElectronicListing(ElectronicCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
-    
+
     @Override
     protected String getListingType() {
         return "Electronic";
     }
-    
+
     @Override
     protected ElectronicListing mapRequestToEntity(ElectronicCreateRequest request) {
         return listingMapper.toElectronicEntity(request);
     }
-    
+
     @Override
     protected Result<ElectronicResolution> resolveEntities(ElectronicCreateRequest request) {
         return electronicListingResolver.resolve(
@@ -76,7 +74,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
                 request.electronicModelId()
         );
     }
-    
+
     @Override
     protected void applyResolution(ElectronicListing entity, Object resolution) {
         ElectronicResolution res = (ElectronicResolution) resolution;
@@ -84,12 +82,12 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         entity.setElectronicBrand(res.brand());
         entity.setModel(res.model());
     }
-    
+
     @Override
     protected Result<Void> validate(ElectronicListing entity) {
         return listingValidationEngine.cleanupAndValidate(entity, electronicSpecValidators);
     }
-    
+
     @Override
     protected ElectronicListing save(ElectronicListing entity) {
         return repository.save(entity);
@@ -98,26 +96,20 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateElectronicListings(UUID id, ElectronicUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) {
-            return ownershipResult;
-        }
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) return ownershipResult;
 
         return repository.findById(id)
                 .map(existing -> performUpdate(existing, request))
                 .orElseGet(() -> Result.error("Electronic listing not found", "LISTING_NOT_FOUND"));
     }
-    
-    private Result<Void> performUpdate(ElectronicListing existing, ElectronicUpdateRequest request) {
-        Result<Void> statusResult = listingService.validateEditableStatus(existing);
-        if (statusResult.isError()) {
-            return statusResult;
-        }
 
-        Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) {
-            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
-        }
+    private Result<Void> performUpdate(ElectronicListing existing, ElectronicUpdateRequest request) {
+        Result<Void> statusResult = validateEditableStatus(existing);
+        if (statusResult.isError()) return statusResult;
+
+        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
+        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
 
         Result<Void> resolutionResult = electronicListingResolver.apply(
                 existing,
@@ -125,16 +117,12 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
                 request.electronicBrandId(),
                 request.electronicModelId()
         );
-        if (resolutionResult.isError()) {
-            return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
-        }
+        if (resolutionResult.isError()) return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
 
-        electronicMapper.updateEntityFromRequest(existing, request);
+        listingMapper.updateElectronic(existing, request);
 
         Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators);
-        if (specResult.isError()) {
-            return Result.error(specResult.getMessage(), specResult.getErrorCode());
-        }
+        if (specResult.isError()) return Result.error(specResult.getMessage(), specResult.getErrorCode());
 
         repository.save(existing);
         log.info("Electronic listing updated: {}", existing.getId());
@@ -142,10 +130,8 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     }
 
     public List<ElectronicListingDto> findByElectronicType(UUID electronicTypeId) {
-        List<ElectronicListing> electronicListings = repository.findByElectronicType_Id(electronicTypeId);
-        return electronicListings.stream()
-                .map(listingMapper::toElectronicDto)
-                .toList();
+        return repository.findByElectronicType_Id(electronicTypeId)
+                .stream().map(listingMapper::toElectronicDto).toList();
     }
 
     public ElectronicListingDto getElectronicDetails(UUID id) {
@@ -155,7 +141,6 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     }
 
     public Page<ListingDto> filterElectronics(ElectronicListingFilterDto filters) {
-        log.info("Filtering electronics listings with criteria: {}", filters);
-        return electronicListingFilterService.filterElectronics(filters);
+        return genericFilterService.filter(filters, ElectronicListing.class, predicateBuilder);
     }
 }

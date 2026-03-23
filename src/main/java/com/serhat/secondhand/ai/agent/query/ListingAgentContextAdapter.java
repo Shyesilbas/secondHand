@@ -1,7 +1,7 @@
 package com.serhat.secondhand.ai.agent.query;
 
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
-import com.serhat.secondhand.listing.application.common.ListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class ListingAgentContextAdapter implements AgentContextAdapter {
     private static final String SOURCE = "listings";
     private static final int MAX_ITEMS = 5;
 
-    private final ListingService listingService;
+    private final ListingQueryService listingService;
 
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {

@@ -1,7 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingCommandService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
@@ -39,7 +40,8 @@ import java.util.UUID;
 @Tag(name = "Listing Management", description = "General listing operations")
 public class ListingController {
 
-    private final IListingService listingService;
+    private final ListingQueryService listingQueryService;
+    private final ListingCommandService listingCommandService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
 
@@ -47,10 +49,8 @@ public class ListingController {
     public ResponseEntity<ListingDto> getListingById(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-
-        return listingService.findByIdAsDto(id, userId, userId)
+        return listingQueryService.findByIdAsDto(id, userId, userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -72,9 +72,8 @@ public class ListingController {
     public ResponseEntity<List<ListingDto>> getListingsByIds(
             @Valid @RequestBody List<UUID> ids,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingService.findByIds(ids, userId));
+        return ResponseEntity.ok(listingQueryService.findByIds(ids, userId));
     }
 
     @PostMapping("/filter")
@@ -83,12 +82,10 @@ public class ListingController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal User currentUser) {
-
         filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
         filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingService.filterByCategory(filters, userId));
+        return ResponseEntity.ok(listingQueryService.filterByCategory(filters, userId));
     }
 
     @GetMapping("/search")
@@ -97,9 +94,8 @@ public class ListingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal User currentUser) {
-
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingService.globalSearch(query, page, size, userId));
+        return ResponseEntity.ok(listingQueryService.globalSearch(query, page, size, userId));
     }
 
     @GetMapping("/my-listings")
@@ -108,10 +104,9 @@ public class ListingController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) ListingType listingType,
             @AuthenticationPrincipal User currentUser) {
-
         Page<ListingDto> myListings = listingType != null
-                ? listingService.getMyListings(currentUser.getId(), page, size, listingType)
-                : listingService.getMyListings(currentUser.getId(), page, size);
+                ? listingQueryService.getMyListings(currentUser.getId(), page, size, listingType)
+                : listingQueryService.getMyListings(currentUser.getId(), page, size);
         return ResponseEntity.ok(myListings);
     }
 
@@ -121,15 +116,14 @@ public class ListingController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        Page<ListingDto> result = listingService.getMyListingsByStatus(currentUser.getId(), status, page, size);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(listingQueryService.getMyListingsByStatus(currentUser.getId(), status, page, size));
     }
 
     @PutMapping("/{id}/publish")
     public ResponseEntity<Void> publishListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.publish(id, currentUser.getId());
+        listingCommandService.publish(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -137,7 +131,7 @@ public class ListingController {
     public ResponseEntity<Void> reactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.reactivate(id, currentUser.getId());
+        listingCommandService.reactivate(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -145,7 +139,7 @@ public class ListingController {
     public ResponseEntity<Void> deactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.deactivate(id, currentUser.getId());
+        listingCommandService.deactivate(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -153,7 +147,7 @@ public class ListingController {
     public ResponseEntity<?> deleteListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingService.deleteListing(id, currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.deleteListing(id, currentUser.getId()));
     }
 
     @GetMapping("/my-listings/view-stats")
@@ -161,23 +155,21 @@ public class ListingController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @AuthenticationPrincipal User currentUser) {
-
         if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = endDate.minusDays(7);
-
         return ResponseEntity.ok(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate));
     }
 
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        return ResponseEntity.ok(listingService.getGlobalListingStatistics());
+        return ResponseEntity.ok(listingQueryService.getGlobalListingStatistics());
     }
 
     @PutMapping("/{id}/mark-sold")
     public ResponseEntity<Void> markListingAsSold(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingService.markAsSold(id, currentUser.getId());
+        listingCommandService.markAsSold(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -186,7 +178,7 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdateQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingService.updateSingleQuantity(id, request.quantity(), currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.updateSingleQuantity(id, request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/{id}/price")
@@ -194,25 +186,25 @@ public class ListingController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingService.updateSinglePrice(id, request.price(), currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.updateSinglePrice(id, request.price(), currentUser.getId()));
     }
 
     @PutMapping("/quantity/batch")
     public ResponseEntity<?> updateBatchQuantity(
             @Valid @RequestBody UpdateBatchQuantityRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.updateBatchQuantity(request.listingIds(), request.quantity(), currentUser.getId()));
     }
 
     @PutMapping("/price/batch")
     public ResponseEntity<?> updateBatchPrice(
             @Valid @RequestBody UpdateBatchPriceRequest request,
             @AuthenticationPrincipal User currentUser) {
-        return ResultResponses.noContent(listingService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
+        return ResultResponses.noContent(listingCommandService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
-        return ResponseEntity.ok(listingService.findByStatusAsDto(status));
+        return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status));
     }
 }

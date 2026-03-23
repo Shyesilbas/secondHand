@@ -26,4 +26,6 @@ public interface PriceHistoryRepository extends JpaRepository<PriceHistory, Long
 
     @Query("SELECT ph FROM PriceHistory ph WHERE ph.changeDate >= :since")
     List<PriceHistory> findAllChangedSince(@Param("since") LocalDateTime since);
+
+    boolean existsByListingId(UUID listingId);
 }

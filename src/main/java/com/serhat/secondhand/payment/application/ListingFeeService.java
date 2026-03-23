@@ -2,7 +2,8 @@ package com.serhat.secondhand.payment.application;
 
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingCommandService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.validation.common.ListingFeePaymentValidation;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
@@ -27,7 +28,8 @@ public class ListingFeeService {
     private final ListingConfig listingConfig;
     private final ListingFeePaymentValidation listingFeePaymentValidation;
     private final IUserService userService;
-    private final IListingService listingService;
+    private final ListingQueryService listingQueryService;
+    private final ListingCommandService listingCommandService;
     private final PaymentProcessor paymentProcessor;
     private final PaymentRequestMapper paymentRequestMapper;
 
@@ -46,12 +48,12 @@ public class ListingFeeService {
             return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
         }
 
-        Listing listing = listingService.findById(request.listingId()).orElse(null);
+        Listing listing = listingQueryService.findById(request.listingId()).orElse(null);
         if (listing == null) {
             return Result.error(PaymentErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
         }
 
-        BigDecimal totalFee = listingService.calculateTotalListingFee();
+        BigDecimal totalFee = listingCommandService.calculateTotalListingFee();
         PaymentRequest paymentRequest = paymentRequestMapper.buildListingFeePaymentRequest(user, listing, request, totalFee);
 
         return paymentProcessor.executeSinglePayment(user.getId(), paymentRequest);
@@ -59,7 +61,7 @@ public class ListingFeeService {
 
     @Transactional(readOnly = true)
     public ListingFeeConfigDto getListingFeeConfig() {
-        BigDecimal totalFee = listingService.calculateTotalListingFee();
+        BigDecimal totalFee = listingCommandService.calculateTotalListingFee();
         return ListingFeeConfigDto.builder()
                 .creationFee(listingConfig.getCreation().getFee())
                 .taxPercentage(listingConfig.getFee().getTax())

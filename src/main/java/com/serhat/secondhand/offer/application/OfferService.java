@@ -1,7 +1,7 @@
 package com.serhat.secondhand.offer.application;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
@@ -33,7 +33,7 @@ import java.util.UUID;
 public class OfferService implements IOfferService {
 
     private final OfferRepository offerRepository;
-    private final IListingService listingService;
+    private final ListingQueryService listingService;
     private final IUserService userService;
     private final OfferEmailNotificationService offerEmailNotificationService;
     private final OfferValidator offerValidator;

@@ -2,7 +2,7 @@ package com.serhat.secondhand.showcase.application;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
@@ -37,7 +37,7 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseConfig showcaseConfig;
     private final ShowcaseRepository showcaseRepository;
     private final ShowcaseMapper showcaseMapper;
-    private final IListingService listingService;
+    private final ListingQueryService listingService;
     private final PaymentProcessor paymentProcessor;
     private final IUserService userService;
     private final ShowcaseValidator showcaseValidator;

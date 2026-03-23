@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application.common;
 
+import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -25,6 +26,7 @@ public class ListingCommandService {
     private final ListingRepository listingRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final ListingValidationService listingValidationService;
+    private final ListingConfig listingConfig;
 
     public void publish(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
@@ -103,6 +105,16 @@ public class ListingCommandService {
         }
         listingRepository.updatePriceBatch(listingIds, price, userId);
         return Result.success();
+    }
+
+    public BigDecimal calculateTotalListingFee() {
+        BigDecimal fee = listingConfig.getCreation().getFee();
+        BigDecimal tax = listingConfig.getFee().getTax();
+        BigDecimal taxAmount = fee.multiply(tax).divide(
+                ListingBusinessConstants.PERCENT_DIVISOR,
+                ListingBusinessConstants.FEE_TAX_CALCULATION_SCALE,
+                ListingBusinessConstants.FEE_TAX_ROUNDING_MODE);
+        return fee.add(taxAmount);
     }
 }
 

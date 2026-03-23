@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application.sports;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.AbstractListingService;
+import com.serhat.secondhand.listing.application.category.AbstractListingService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
+import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
-import com.serhat.secondhand.listing.application.common.IListingService;
-import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -29,51 +29,48 @@ import java.util.UUID;
 public class SportsListingService extends AbstractListingService<SportsListing, SportsCreateRequest> {
 
     private final SportsListingRepository sportsRepository;
-    private final ISportsListingFilterService sportsListingFilterService;
-    private final PriceHistoryService priceHistoryService;
+    private final GenericListingFilterService<SportsListing, SportsListingFilterDto> genericFilterService;
+    private final SportsFilterPredicateBuilder predicateBuilder;
     private final List<SportsSpecValidator> sportsSpecValidators;
-    private final SportsMapper sportsMapper;
     private final SportsListingResolver sportsListingResolver;
-    
+
     public SportsListingService(
             SportsListingRepository sportsRepository,
-            IListingService listingService,
+            ListingValidationService listingValidationService,
             ListingMapper listingMapper,
-            ISportsListingFilterService sportsListingFilterService,
-            PriceHistoryService priceHistoryService,
+            GenericListingFilterService<SportsListing, SportsListingFilterDto> genericFilterService,
+            SportsFilterPredicateBuilder predicateBuilder,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<SportsSpecValidator> sportsSpecValidators,
-            SportsMapper sportsMapper,
             SportsListingResolver sportsListingResolver) {
-        super(userService, listingService, listingMapper, listingValidationEngine);
+        super(userService, listingValidationService, listingMapper, listingValidationEngine);
         this.sportsRepository = sportsRepository;
-        this.sportsListingFilterService = sportsListingFilterService;
-        this.priceHistoryService = priceHistoryService;
+        this.genericFilterService = genericFilterService;
+        this.predicateBuilder = predicateBuilder;
         this.sportsSpecValidators = sportsSpecValidators;
-        this.sportsMapper = sportsMapper;
         this.sportsListingResolver = sportsListingResolver;
     }
 
     public Result<UUID> createSportsListing(SportsCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
-    
+
     @Override
     protected String getListingType() {
         return "Sports";
     }
-    
+
     @Override
     protected SportsListing mapRequestToEntity(SportsCreateRequest request) {
         return listingMapper.toSportsEntity(request);
     }
-    
+
     @Override
     protected boolean requiresQuantityValidation() {
         return true;
     }
-    
+
     @Override
     protected Result<SportsResolution> resolveEntities(SportsCreateRequest request) {
         return sportsListingResolver.resolve(
@@ -82,7 +79,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
                 request.conditionId()
         );
     }
-    
+
     @Override
     protected void applyResolution(SportsListing entity, Object resolution) {
         SportsResolution res = (SportsResolution) resolution;
@@ -90,12 +87,12 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
         entity.setEquipmentType(res.equipmentType());
         entity.setCondition(res.condition());
     }
-    
+
     @Override
     protected Result<Void> validate(SportsListing entity) {
         return listingValidationEngine.cleanupAndValidate(entity, sportsSpecValidators);
     }
-    
+
     @Override
     protected SportsListing save(SportsListing entity) {
         return sportsRepository.save(entity);
@@ -104,38 +101,28 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) {
-            return ownershipResult;
-        }
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) return ownershipResult;
 
         return sportsRepository.findById(id)
                 .map(existing -> performUpdate(existing, request))
                 .orElseGet(() -> Result.error("Sports listing not found", "LISTING_NOT_FOUND"));
     }
-    
-    private Result<Void> performUpdate(SportsListing existing, SportsUpdateRequest request) {
-        Result<Void> statusResult = listingService.validateEditableStatus(existing);
-        if (statusResult.isError()) {
-            return statusResult;
-        }
 
-        Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) {
-            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
-        }
-        
+    private Result<Void> performUpdate(SportsListing existing, SportsUpdateRequest request) {
+        Result<Void> statusResult = validateEditableStatus(existing);
+        if (statusResult.isError()) return statusResult;
+
+        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
+        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+
         Result<Void> applyResult = sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId());
-        if (applyResult.isError()) {
-            return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
-        }
-        
-        sportsMapper.updateEntityFromRequest(existing, request);
+        if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
+
+        listingMapper.updateSports(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators);
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
+        if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
 
         sportsRepository.save(existing);
         log.info("Sports listing updated: {}", existing.getId());
@@ -149,6 +136,6 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
     }
 
     public Page<ListingDto> filterSports(SportsListingFilterDto filters) {
-        return sportsListingFilterService.filterSports(filters);
+        return genericFilterService.filter(filters, SportsListing.class, predicateBuilder);
     }
 }
