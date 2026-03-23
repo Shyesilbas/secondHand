@@ -4,6 +4,6 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListing
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import org.springframework.data.domain.Page;
 
-public interface ClothingListingFilterService {
+public interface IClothingListingFilterService {
     Page<ListingDto> filterClothing(ClothingListingFilterDto filters);
 }

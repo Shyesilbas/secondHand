@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.common;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
@@ -56,6 +57,8 @@ public interface IListingService {
     Result<Void> deleteListing(UUID listingId, Long userId);
     
     BigDecimal calculateTotalListingFee();
+
+    ListingStatisticsDto getGlobalListingStatistics();
 
     Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId);
 

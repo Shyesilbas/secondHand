@@ -29,7 +29,7 @@ import java.util.UUID;
 public class BooksListingService extends AbstractListingService<BooksListing, BooksCreateRequest> {
 
     private final BooksListingRepository booksRepository;
-    private final BooksListingFilterService booksListingFilterService;
+    private final IBooksListingFilterService booksListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final List<BooksSpecValidator> booksSpecValidators;
     private final BooksMapper booksMapper;
@@ -39,7 +39,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
             BooksListingRepository booksRepository,
             IListingService listingService,
             ListingMapper listingMapper,
-            BooksListingFilterService booksListingFilterService,
+            IBooksListingFilterService booksListingFilterService,
             PriceHistoryService priceHistoryService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,

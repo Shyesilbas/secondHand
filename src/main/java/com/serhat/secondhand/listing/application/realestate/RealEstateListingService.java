@@ -29,7 +29,7 @@ import java.util.List;
 public class RealEstateListingService extends AbstractListingService<RealEstateListing, RealEstateCreateRequest> {
 
     private final RealEstateRepository realEstateRepository;
-    private final RealEstateListingFilterService realEstateListingFilterService;
+    private final IRealEstateListingFilterService realEstateListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final List<RealEstateSpecValidator> realEstateSpecValidators;
     private final RealEstateMapper realEstateMapper;
@@ -39,7 +39,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
             RealEstateRepository realEstateRepository,
             IListingService listingService,
             ListingMapper listingMapper,
-            RealEstateListingFilterService realEstateListingFilterService,
+            IRealEstateListingFilterService realEstateListingFilterService,
             PriceHistoryService priceHistoryService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,

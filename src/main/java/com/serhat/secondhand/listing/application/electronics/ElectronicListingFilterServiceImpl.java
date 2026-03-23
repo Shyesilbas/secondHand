@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ElectronicListingFilterServiceImpl implements ElectronicListingFilterService {
+public class ElectronicListingFilterServiceImpl implements IElectronicListingFilterService {
 
     private final GenericListingFilterService<ElectronicListing, ElectronicListingFilterDto> genericFilterService;
     private final ElectronicsFilterPredicateBuilder predicateBuilder;

@@ -28,7 +28,7 @@ import java.util.UUID;
 @Slf4j
 public class ElectronicListingService extends AbstractListingService<ElectronicListing, ElectronicCreateRequest> {
     private final ElectronicListingRepository repository;
-    private final ElectronicListingFilterService electronicListingFilterService;
+    private final IElectronicListingFilterService electronicListingFilterService;
     private final PriceHistoryService priceHistoryService;
     private final List<ElectronicSpecValidator> electronicSpecValidators;
     private final ElectronicMapper electronicMapper;
@@ -38,7 +38,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
             ElectronicListingRepository repository,
             IListingService listingService,
             ListingMapper listingMapper,
-            ElectronicListingFilterService electronicListingFilterService,
+            IElectronicListingFilterService electronicListingFilterService,
             PriceHistoryService priceHistoryService,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,

@@ -4,6 +4,6 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListi
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import org.springframework.data.domain.Page;
 
-public interface ElectronicListingFilterService {
+public interface IElectronicListingFilterService {
     Page<ListingDto> filterElectronics(ElectronicListingFilterDto filters);
 }
