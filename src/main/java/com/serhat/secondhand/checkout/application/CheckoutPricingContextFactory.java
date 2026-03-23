@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
@@ -46,14 +46,7 @@ public class CheckoutPricingContextFactory {
         return Result.success(new CheckoutPricingContext(user, effectiveCartItems, acceptedOffer, pricing));
     }
 
-    private Result<Offer> resolveAcceptedOffer(Long userId, CheckoutRequest request) {
-        if (request.getOfferId() == null) {
-            return Result.success(null);
-        }
-        return offerService.getAcceptedOfferForCheckout(userId, request.getOfferId());
-    }
-
-    private List<Cart> buildEffectiveCartItems(List<Cart> cartItems, Offer acceptedOffer, User user) {
+    public List<Cart> buildEffectiveCartItems(List<Cart> cartItems, Offer acceptedOffer, User user) {
         if (acceptedOffer == null) {
             return cartItems;
         }
@@ -75,6 +68,13 @@ public class CheckoutPricingContextFactory {
                 .build());
 
         return effectiveCartItems;
+    }
+
+    private Result<Offer> resolveAcceptedOffer(Long userId, CheckoutRequest request) {
+        if (request.getOfferId() == null) {
+            return Result.success(null);
+        }
+        return offerService.getAcceptedOfferForCheckout(userId, request.getOfferId());
     }
 
     private PricingResultDto calculatePricing(

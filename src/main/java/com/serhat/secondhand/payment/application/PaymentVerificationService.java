@@ -6,6 +6,7 @@ import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.checkout.application.PaymentVerificationMessageBuilder;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;

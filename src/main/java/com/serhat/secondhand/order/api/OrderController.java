@@ -3,7 +3,7 @@ package com.serhat.secondhand.order.api;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.order.application.*;
-import com.serhat.secondhand.payment.application.CheckoutOrchestrator;
+import com.serhat.secondhand.checkout.application.CheckoutOrchestrator;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;

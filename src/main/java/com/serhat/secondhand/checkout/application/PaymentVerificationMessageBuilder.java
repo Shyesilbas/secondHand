@@ -1,13 +1,11 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
-import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.IListingService;
 import com.serhat.secondhand.offer.entity.Offer;
-import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
@@ -17,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,9 +23,8 @@ public class PaymentVerificationMessageBuilder {
 
     private final ListingConfig listingConfig;
     private final IListingService listingService;
-    private final CartRepository cartRepository;
     private final IPricingService pricingService;
-    private final IOfferService offerService;
+    private final CheckoutPricingContextFactory checkoutPricingContextFactory;
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
         StringBuilder details = new StringBuilder("\n\nPayment Details:\n");
@@ -55,35 +51,38 @@ public class PaymentVerificationMessageBuilder {
     }
 
     private void appendCartDetails(StringBuilder details, User user, InitiateVerificationRequest req) {
-        List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
         String couponCode = req != null ? req.getCouponCode() : null;
         Offer acceptedOffer = null;
-        List<Cart> effectiveCartItems = cartItems;
 
         if (req != null && req.getOfferId() != null) {
-            Result<Offer> offerResult = offerService.getAcceptedOfferForCheckout(user.getId(), req.getOfferId());
-            if (offerResult.isError()) {
-                throw new BusinessException(offerResult.getMessage(), org.springframework.http.HttpStatus.BAD_REQUEST, offerResult.getErrorCode());
+            // Reuse CheckoutPricingContextFactory offer resolution to avoid duplication
+            com.serhat.secondhand.order.dto.CheckoutRequest syntheticRequest =
+                    com.serhat.secondhand.order.dto.CheckoutRequest.builder()
+                            .offerId(req.getOfferId())
+                            .couponCode(couponCode)
+                            .build();
+
+            Result<CheckoutPricingContextFactory.CheckoutPricingContext> contextResult =
+                    checkoutPricingContextFactory.build(user.getId(), syntheticRequest);
+
+            if (contextResult.isError()) {
+                throw new BusinessException(contextResult.getMessage(),
+                        org.springframework.http.HttpStatus.BAD_REQUEST, contextResult.getErrorCode());
             }
-            acceptedOffer = offerResult.getData();
-            effectiveCartItems = new ArrayList<>();
-            for (Cart ci : cartItems) {
-                if (ci.getListing() != null && acceptedOffer.getListing().getId().equals(ci.getListing().getId())) {
-                    continue;
-                }
-                effectiveCartItems.add(ci);
-            }
-            effectiveCartItems.add(Cart.builder()
-                    .user(user)
-                    .listing(acceptedOffer.getListing())
-                    .quantity(acceptedOffer.getQuantity())
-                    .build());
+
+            CheckoutPricingContextFactory.CheckoutPricingContext ctx = contextResult.getData();
+            appendPricingSummary(details, ctx.pricing());
+            return;
         }
 
-        PricingResultDto pricing = acceptedOffer != null
-                ? pricingService.priceCart(user, effectiveCartItems, couponCode, acceptedOffer.getListing().getId(), acceptedOffer.getQuantity(), acceptedOffer.getTotalPrice())
-                : pricingService.priceCart(user, effectiveCartItems, couponCode);
+        // No offer — price cart directly
+        List<Cart> cartItems = checkoutPricingContextFactory.buildEffectiveCartItems(
+                new java.util.ArrayList<>(), null, user);
+        PricingResultDto pricing = pricingService.priceCart(user, cartItems, couponCode);
+        appendPricingSummary(details, pricing);
+    }
 
+    private void appendPricingSummary(StringBuilder details, PricingResultDto pricing) {
         details.append("Order Summary:\n");
         if (pricing.getItems() != null) {
             for (var item : pricing.getItems()) {
@@ -96,9 +95,8 @@ public class PaymentVerificationMessageBuilder {
 
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {
         if (req != null && req.getListingId() != null) {
-            listingService.findById(req.getListingId()).ifPresent(listing -> {
-                details.append("Listing: ").append(listing.getTitle()).append("\n");
-            });
+            listingService.findById(req.getListingId()).ifPresent(listing ->
+                    details.append("Listing: ").append(listing.getTitle()).append("\n"));
         }
         if (amount != null) {
             details.append("Amount: ").append(amount).append(" TRY\n");
@@ -112,4 +110,3 @@ public class PaymentVerificationMessageBuilder {
         return fee.add(taxAmount);
     }
 }
-

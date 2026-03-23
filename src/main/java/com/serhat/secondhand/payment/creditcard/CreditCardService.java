@@ -1,7 +1,7 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.payment.creditcard;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.payment.creditcard.CreditCardValidator;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.CreditCardDto;
 import com.serhat.secondhand.payment.dto.CreditCardRequest;
 import com.serhat.secondhand.payment.entity.CreditCard;
@@ -16,14 +16,15 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,7 +44,8 @@ public class CreditCardService {
 
         CreditCard creditCard = creditCardMapper.fromCreateRequest(creditCardRequest, user);
         creditCard = creditCardRepository.save(creditCard);
-        log.info("Credit card created for user: {} with masked number: {}", user.getEmail(), CreditCardHelper.maskCardNumber(creditCard.getNumber()));
+        log.info("Credit card created for user: {} with masked number: {}", user.getEmail(),
+                CreditCardHelper.maskCardNumber(creditCard.getNumber()));
 
         return creditCardMapper.toDto(creditCard);
     }
@@ -54,10 +56,10 @@ public class CreditCardService {
         return creditCardMapper.toDto(creditCard);
     }
 
-
     public PaymentResult processCreditCardPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
         if (fromUser == null) {
-            return PaymentResult.failure("User not found", amount, PaymentType.CREDIT_CARD, listingId, null, toUser != null ? toUser.getId() : null);
+            return PaymentResult.failure("User not found", amount, PaymentType.CREDIT_CARD, listingId, null,
+                    toUser != null ? toUser.getId() : null);
         }
 
         CreditCard card = findByUserMandatoryWithLock(fromUser);
@@ -66,20 +68,23 @@ public class CreditCardService {
         try {
             boolean isSuccessful = Math.random() < PaymentProcessingConstants.CREDIT_CARD_SIMULATION_SUCCESS_RATE;
             if (!isSuccessful) {
-                return PaymentResult.failure("Payment processing failed", amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
+                return PaymentResult.failure("Payment processing failed", amount, PaymentType.CREDIT_CARD,
+                        listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
             }
 
             card.setAmount(card.getAmount().add(amount));
             creditCardRepository.save(card);
             log.info("Credit card payment processed successfully for user: {}, amount: {}", fromUser.getEmail(), amount);
-            return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
+            return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.CREDIT_CARD,
+                    listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         } catch (Exception e) {
             log.error("Error processing credit card payment for user: {}", fromUser.getEmail(), e);
-            return PaymentResult.failure(e.getMessage(), amount, PaymentType.CREDIT_CARD, listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
+            return PaymentResult.failure(e.getMessage(), amount, PaymentType.CREDIT_CARD,
+                    listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         }
     }
 
-    public java.util.Optional<CreditCard> findByUser(User user) {
+    public Optional<CreditCard> findByUser(User user) {
         return creditCardRepository.findByCardHolder(user);
     }
 
@@ -92,26 +97,24 @@ public class CreditCardService {
         return creditCardRepository.findByCardHolderWithLock(user)
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND));
     }
-    
+
     public Map<String, Object> checkCreditCardExists(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        java.util.Optional<CreditCard> cardOpt = findByUser(user);
+        Optional<CreditCard> cardOpt = findByUser(user);
         Map<String, Object> response = new HashMap<>();
         response.put("hasCreditCard", cardOpt.isPresent());
         response.put("maskedCardNumber", cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null));
         return response;
     }
-    
+
     public Map<String, Object> getAvailableCredit(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
         CreditCard creditCard = findByUserMandatory(user);
-
         BigDecimal availableCredit = creditCard.getLimit().subtract(creditCard.getAmount());
-
         return Map.of(
-            "availableCredit", availableCredit,
-            "creditLimit", creditCard.getLimit(),
-            "currentUsage", creditCard.getAmount()
+                "availableCredit", availableCredit,
+                "creditLimit", creditCard.getLimit(),
+                "currentUsage", creditCard.getAmount()
         );
     }
 
@@ -122,7 +125,7 @@ public class CreditCardService {
         log.info("Credit card deleted for user: {}", user.getEmail());
     }
 
-    private void ensureValid(com.serhat.secondhand.core.result.Result<Void> validationResult) {
+    private void ensureValid(Result<Void> validationResult) {
         if (validationResult.isError()) {
             throw new BusinessException(
                     validationResult.getMessage(),

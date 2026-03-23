@@ -1,4 +1,4 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
