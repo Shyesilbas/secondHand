@@ -7,7 +7,7 @@ import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.complaint.repository.ComplaintRepository;
 import com.serhat.secondhand.complaint.validator.ComplaintValidator;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -26,7 +26,7 @@ public class ComplaintService implements IComplaintService {
     private final ComplaintRepository complaintRepository;
     private final ComplaintMapper complaintMapper;
     private final IUserService userService;
-    private final IListingService listingService;
+    private final ListingQueryService listingService;
     private final ComplaintValidator complaintValidator;
 
 

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application.clothing;
 
-import com.serhat.secondhand.listing.application.common.FilterPredicateBuilder;
+import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;

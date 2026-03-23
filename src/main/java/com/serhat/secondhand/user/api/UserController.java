@@ -6,7 +6,7 @@ import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.verification.VerificationService;
-import com.serhat.secondhand.listing.application.common.IListingService;
+import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.review.application.IReviewService;
@@ -44,7 +44,7 @@ public class UserController {
     private final AuditLogService auditLogService;
     private final VerificationService verificationService;
     private final IReviewService reviewService;
-    private final IListingService listingService;
+    private final ListingQueryService listingService;
     private final IComplaintService complaintService;
     private final IOfferService offerService;
 
@@ -125,7 +125,7 @@ public class UserController {
     public ResponseEntity<Page<ListingDto>> getListingsByUser(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(listingService.getListingsByUser(userId, pageable.getPageNumber(), pageable.getPageSize()));
+        return ResponseEntity.ok(listingService.getMyListings(userId, pageable.getPageNumber(), pageable.getPageSize()));
     }
 
     @GetMapping("/{id}")

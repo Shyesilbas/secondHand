@@ -1,10 +1,10 @@
 package com.serhat.secondhand.listing.application.books;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.AbstractListingService;
+import com.serhat.secondhand.listing.application.category.AbstractListingService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
+import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
-import com.serhat.secondhand.listing.application.common.IListingService;
-import com.serhat.secondhand.listing.application.common.PriceHistoryService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
@@ -29,51 +29,48 @@ import java.util.UUID;
 public class BooksListingService extends AbstractListingService<BooksListing, BooksCreateRequest> {
 
     private final BooksListingRepository booksRepository;
-    private final IBooksListingFilterService booksListingFilterService;
-    private final PriceHistoryService priceHistoryService;
+    private final GenericListingFilterService<BooksListing, BooksListingFilterDto> genericFilterService;
+    private final BooksFilterPredicateBuilder predicateBuilder;
     private final List<BooksSpecValidator> booksSpecValidators;
-    private final BooksMapper booksMapper;
     private final BooksListingResolver booksListingResolver;
-    
+
     public BooksListingService(
             BooksListingRepository booksRepository,
-            IListingService listingService,
+            ListingValidationService listingValidationService,
             ListingMapper listingMapper,
-            IBooksListingFilterService booksListingFilterService,
-            PriceHistoryService priceHistoryService,
+            GenericListingFilterService<BooksListing, BooksListingFilterDto> genericFilterService,
+            BooksFilterPredicateBuilder predicateBuilder,
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<BooksSpecValidator> booksSpecValidators,
-            BooksMapper booksMapper,
             BooksListingResolver booksListingResolver) {
-        super(userService, listingService, listingMapper, listingValidationEngine);
+        super(userService, listingValidationService, listingMapper, listingValidationEngine);
         this.booksRepository = booksRepository;
-        this.booksListingFilterService = booksListingFilterService;
-        this.priceHistoryService = priceHistoryService;
+        this.genericFilterService = genericFilterService;
+        this.predicateBuilder = predicateBuilder;
         this.booksSpecValidators = booksSpecValidators;
-        this.booksMapper = booksMapper;
         this.booksListingResolver = booksListingResolver;
     }
 
     public Result<UUID> createBooksListing(BooksCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
-    
+
     @Override
     protected String getListingType() {
         return "Books";
     }
-    
+
     @Override
     protected BooksListing mapRequestToEntity(BooksCreateRequest request) {
         return listingMapper.toBooksEntity(request);
     }
-    
+
     @Override
     protected boolean requiresQuantityValidation() {
         return true;
     }
-    
+
     @Override
     protected Result<BooksResolution> resolveEntities(BooksCreateRequest request) {
         return booksListingResolver.resolve(
@@ -84,7 +81,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
                 request.conditionId()
         );
     }
-    
+
     @Override
     protected void applyResolution(BooksListing entity, Object resolution) {
         BooksResolution res = (BooksResolution) resolution;
@@ -94,12 +91,12 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         entity.setFormat(res.format());
         entity.setCondition(res.condition());
     }
-    
+
     @Override
     protected Result<Void> validate(BooksListing entity) {
         return listingValidationEngine.cleanupAndValidate(entity, booksSpecValidators);
     }
-    
+
     @Override
     protected BooksListing save(BooksListing entity) {
         return booksRepository.save(entity);
@@ -108,27 +105,22 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = listingService.validateOwnership(id, currentUserId);
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {
             return ownershipResult;
         }
-
         return booksRepository.findById(id)
                 .map(existing -> performUpdate(existing, request, currentUserId))
                 .orElseGet(() -> Result.error("Books listing not found", "LISTING_NOT_FOUND"));
     }
-    
-    private Result<Void> performUpdate(BooksListing existing, BooksUpdateRequest request, Long currentUserId) {
-        Result<Void> statusResult = listingService.validateEditableStatus(existing);
-        if (statusResult.isError()) {
-            return statusResult;
-        }
 
-        Result<Void> quantityResult = listingService.applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) {
-            return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
-        }
-        
+    private Result<Void> performUpdate(BooksListing existing, BooksUpdateRequest request, Long currentUserId) {
+        Result<Void> statusResult = validateEditableStatus(existing);
+        if (statusResult.isError()) return statusResult;
+
+        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
+        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+
         Result<Void> applyResult = booksListingResolver.apply(
                 existing,
                 request.bookTypeId(),
@@ -137,16 +129,12 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
                 request.formatId(),
                 request.conditionId()
         );
-        if (applyResult.isError()) {
-            return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
-        }
-        
-        booksMapper.updateEntityFromRequest(existing, request);
+        if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
+
+        listingMapper.updateBooks(existing, request);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, booksSpecValidators);
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
+        if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
 
         booksRepository.save(existing);
         log.info("Books listing updated: {}", existing.getId());
@@ -160,6 +148,6 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
     }
 
     public Page<ListingDto> filterBooks(BooksListingFilterDto filters) {
-        return booksListingFilterService.filterBooks(filters);
+        return genericFilterService.filter(filters, BooksListing.class, predicateBuilder);
     }
 }

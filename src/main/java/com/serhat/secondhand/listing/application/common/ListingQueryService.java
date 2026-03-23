@@ -1,11 +1,12 @@
 package com.serhat.secondhand.listing.application.common;
 
-import com.serhat.secondhand.listing.application.books.IBooksListingFilterService;
-import com.serhat.secondhand.listing.application.clothing.IClothingListingFilterService;
-import com.serhat.secondhand.listing.application.electronics.IElectronicListingFilterService;
-import com.serhat.secondhand.listing.application.realestate.IRealEstateListingFilterService;
-import com.serhat.secondhand.listing.application.sports.ISportsListingFilterService;
-import com.serhat.secondhand.listing.application.vehicle.IVehicleListingFilterService;
+import com.serhat.secondhand.dashboard.application.DashboardService;
+import com.serhat.secondhand.listing.application.books.BooksListingService;
+import com.serhat.secondhand.listing.application.clothing.ClothingListingService;
+import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
+import com.serhat.secondhand.listing.application.realestate.RealEstateListingService;
+import com.serhat.secondhand.listing.application.sports.SportsListingService;
+import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -15,9 +16,10 @@ import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.review.application.IReviewService;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ListingQueryService {
 
@@ -41,27 +42,57 @@ public class ListingQueryService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    @Qualifier("taskExecutor")
+    private final DashboardService dashboardService;
     private final Executor taskExecutor;
 
-    private final IVehicleListingFilterService vehicleListingFilterService;
-    private final IElectronicListingFilterService electronicListingFilterService;
-    private final IBooksListingFilterService bookListingFilterService;
-    private final IClothingListingFilterService clothingListingFilterService;
-    private final IRealEstateListingFilterService realEstateListingFilterService;
-    private final ISportsListingFilterService sportsListingFilterService;
+    private final BooksListingService booksListingService;
+    private final ClothingListingService clothingListingService;
+    private final ElectronicListingService electronicListingService;
+    private final RealEstateListingService realEstateListingService;
+    private final SportsListingService sportsListingService;
+    private final VehicleListingService vehicleListingService;
+
+    @Autowired
+    public ListingQueryService(
+            ListingRepository listingRepository,
+            ListingMapper listingMapper,
+            ListingEnrichmentService enrichmentService,
+            ListingViewService listingViewService,
+            IReviewService reviewService,
+            DashboardService dashboardService,
+            @Qualifier("taskExecutor") Executor taskExecutor,
+            @Lazy BooksListingService booksListingService,
+            @Lazy ClothingListingService clothingListingService,
+            @Lazy ElectronicListingService electronicListingService,
+            @Lazy RealEstateListingService realEstateListingService,
+            @Lazy SportsListingService sportsListingService,
+            @Lazy VehicleListingService vehicleListingService) {
+        this.listingRepository = listingRepository;
+        this.listingMapper = listingMapper;
+        this.enrichmentService = enrichmentService;
+        this.listingViewService = listingViewService;
+        this.reviewService = reviewService;
+        this.dashboardService = dashboardService;
+        this.taskExecutor = taskExecutor;
+        this.booksListingService = booksListingService;
+        this.clothingListingService = clothingListingService;
+        this.electronicListingService = electronicListingService;
+        this.realEstateListingService = realEstateListingService;
+        this.sportsListingService = sportsListingService;
+        this.vehicleListingService = vehicleListingService;
+    }
 
     private Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
 
     @PostConstruct
     void initFilterStrategyMap() {
         this.filterStrategyMap = Map.of(
-                VehicleListingFilterDto.class, f -> vehicleListingFilterService.filterVehicles((VehicleListingFilterDto) f),
-                ElectronicListingFilterDto.class, f -> electronicListingFilterService.filterElectronics((ElectronicListingFilterDto) f),
-                BooksListingFilterDto.class, f -> bookListingFilterService.filterBooks((BooksListingFilterDto) f),
-                ClothingListingFilterDto.class, f -> clothingListingFilterService.filterClothing((ClothingListingFilterDto) f),
-                RealEstateFilterDto.class, f -> realEstateListingFilterService.filterRealEstates((RealEstateFilterDto) f),
-                SportsListingFilterDto.class, f -> sportsListingFilterService.filterSports((SportsListingFilterDto) f)
+                VehicleListingFilterDto.class, f -> vehicleListingService.filterVehicles((VehicleListingFilterDto) f),
+                ElectronicListingFilterDto.class, f -> electronicListingService.filterElectronics((ElectronicListingFilterDto) f),
+                BooksListingFilterDto.class, f -> booksListingService.filterBooks((BooksListingFilterDto) f),
+                ClothingListingFilterDto.class, f -> clothingListingService.filterClothing((ClothingListingFilterDto) f),
+                RealEstateFilterDto.class, f -> realEstateListingService.filterRealEstate((RealEstateFilterDto) f),
+                SportsListingFilterDto.class, f -> sportsListingService.filterSports((SportsListingFilterDto) f)
         );
     }
 
@@ -78,7 +109,9 @@ public class ListingQueryService {
 
             if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
                 CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
-                        listingViewService.getViewStatistics(id, LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS), LocalDateTime.now()), taskExecutor);
+                        listingViewService.getViewStatistics(id,
+                                LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
+                                LocalDateTime.now()), taskExecutor);
 
                 CompletableFuture.allOf(enrichTask, statsTask).join();
                 dto.setViewStats(statsTask.join());
@@ -152,13 +185,6 @@ public class ListingQueryService {
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
-    public Page<ListingDto> getListingsByUser(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
-    }
-
     public Page<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
@@ -174,6 +200,10 @@ public class ListingQueryService {
         );
     }
 
+    public ListingStatisticsDto getGlobalListingStatistics() {
+        return dashboardService.getGlobalListingStatistics();
+    }
+
     private List<ListingDto> enrichList(List<ListingDto> dtos, Long userId) {
         return enrichmentService.enrich(dtos, userId);
     }
@@ -182,4 +212,3 @@ public class ListingQueryService {
         return new PageImpl<>(enrichmentService.enrich(page.getContent(), userId), page.getPageable(), page.getTotalElements());
     }
 }
-

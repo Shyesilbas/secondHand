@@ -17,6 +17,13 @@ import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateLi
 import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.*;
+import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Labelable;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
@@ -29,7 +36,7 @@ import org.mapstruct.*;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public abstract class ListingMapper implements BaseListingMapper {
+public abstract class ListingMapper {
 
     // ──────────────────────────────────────────────
     //  Shared nested mapping methods
@@ -228,6 +235,111 @@ public abstract class ListingMapper implements BaseListingMapper {
     @Mapping(target = "district", source = "base.district")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
+
+    // ──────────────────────────────────────────────
+    //  Update request → Entity (manual Optional handling)
+    // ──────────────────────────────────────────────
+
+    public void updateBooks(BooksListing entity, BooksUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+        if (request.author() != null) request.author().ifPresent(entity::setAuthor);
+        if (request.publicationYear() != null) request.publicationYear().ifPresent(entity::setPublicationYear);
+        if (request.pageCount() != null) request.pageCount().ifPresent(entity::setPageCount);
+        if (request.isbn() != null) request.isbn().ifPresent(entity::setIsbn);
+    }
+
+    public void updateClothing(ClothingListing entity, ClothingUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+        if (request.color() != null) request.color().ifPresent(entity::setColor);
+        if (request.purchaseYear() != null) request.purchaseYear().ifPresent(y -> entity.setPurchaseDate(java.time.LocalDate.of(y, 1, 1)));
+        if (request.condition() != null) request.condition().ifPresent(entity::setCondition);
+        if (request.size() != null) request.size().ifPresent(entity::setSize);
+        if (request.shoeSizeEu() != null) request.shoeSizeEu().ifPresent(entity::setShoeSizeEu);
+        if (request.material() != null) request.material().ifPresent(entity::setMaterial);
+        if (request.clothingGender() != null) request.clothingGender().ifPresent(entity::setClothingGender);
+        if (request.clothingCategory() != null) request.clothingCategory().ifPresent(entity::setClothingCategory);
+    }
+
+    public void updateElectronic(ElectronicListing entity, ElectronicUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+        if (request.origin() != null) request.origin().ifPresent(entity::setOrigin);
+        if (request.warrantyProof() != null) request.warrantyProof().ifPresent(entity::setWarrantyProof);
+        if (request.color() != null) request.color().ifPresent(entity::setColor);
+        if (request.year() != null) request.year().ifPresent(entity::setYear);
+        if (request.ram() != null) request.ram().ifPresent(entity::setRam);
+        if (request.storage() != null) request.storage().ifPresent(entity::setStorage);
+        if (request.storageType() != null) request.storageType().ifPresent(entity::setStorageType);
+        if (request.processor() != null) request.processor().ifPresent(entity::setProcessor);
+        if (request.screenSize() != null) request.screenSize().ifPresent(entity::setScreenSize);
+        if (request.gpuModel() != null) request.gpuModel().ifPresent(entity::setGpuModel);
+        if (request.operatingSystem() != null) request.operatingSystem().ifPresent(entity::setOperatingSystem);
+        if (request.batteryHealthPercent() != null) request.batteryHealthPercent().ifPresent(entity::setBatteryHealthPercent);
+        if (request.batteryCapacityMah() != null) request.batteryCapacityMah().ifPresent(entity::setBatteryCapacityMah);
+        if (request.cameraMegapixels() != null) request.cameraMegapixels().ifPresent(entity::setCameraMegapixels);
+        if (request.supports5g() != null) request.supports5g().ifPresent(entity::setSupports5g);
+        if (request.dualSim() != null) request.dualSim().ifPresent(entity::setDualSim);
+        if (request.hasNfc() != null) request.hasNfc().ifPresent(entity::setHasNfc);
+        if (request.connectionType() != null) request.connectionType().ifPresent(entity::setConnectionType);
+        if (request.wireless() != null) request.wireless().ifPresent(entity::setWireless);
+        if (request.noiseCancelling() != null) request.noiseCancelling().ifPresent(entity::setNoiseCancelling);
+        if (request.hasMicrophone() != null) request.hasMicrophone().ifPresent(entity::setHasMicrophone);
+        if (request.batteryLifeHours() != null) request.batteryLifeHours().ifPresent(entity::setBatteryLifeHours);
+    }
+
+    public void updateRealEstate(RealEstateListing entity, RealEstateUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+        if (request.squareMeters() != null) request.squareMeters().ifPresent(entity::setSquareMeters);
+        if (request.roomCount() != null) request.roomCount().ifPresent(entity::setRoomCount);
+        if (request.bathroomCount() != null) request.bathroomCount().ifPresent(entity::setBathroomCount);
+        if (request.floor() != null) request.floor().ifPresent(entity::setFloor);
+        if (request.buildingAge() != null) request.buildingAge().ifPresent(entity::setBuildingAge);
+        if (request.furnished() != null) request.furnished().ifPresent(entity::setFurnished);
+        if (request.zoningStatus() != null) request.zoningStatus().ifPresent(entity::setZoningStatus);
+    }
+
+    public void updateSports(SportsListing entity, SportsUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+    }
+
+    public void updateVehicle(VehicleListing entity, VehicleUpdateRequest request) {
+        if (entity == null || request == null) return;
+        applyBase(entity, request.base());
+        if (request.year() != null) request.year().ifPresent(entity::setYear);
+        if (request.mileage() != null) request.mileage().ifPresent(entity::setMileage);
+        if (request.engineCapacity() != null) request.engineCapacity().ifPresent(entity::setEngineCapacity);
+        if (request.gearbox() != null) request.gearbox().ifPresent(entity::setGearbox);
+        if (request.seatCount() != null) request.seatCount().ifPresent(entity::setSeatCount);
+        if (request.doors() != null) request.doors().ifPresent(entity::setDoors);
+        if (request.wheels() != null) request.wheels().ifPresent(entity::setWheels);
+        if (request.color() != null) request.color().ifPresent(entity::setColor);
+        if (request.fuelCapacity() != null) request.fuelCapacity().ifPresent(entity::setFuelCapacity);
+        if (request.fuelConsumption() != null) request.fuelConsumption().ifPresent(entity::setFuelConsumption);
+        if (request.horsePower() != null) request.horsePower().ifPresent(entity::setHorsePower);
+        if (request.kilometersPerLiter() != null) request.kilometersPerLiter().ifPresent(entity::setKilometersPerLiter);
+        if (request.fuelType() != null) request.fuelType().ifPresent(entity::setFuelType);
+        if (request.swap() != null) request.swap().ifPresent(entity::setSwap);
+        if (request.accidentHistory() != null) request.accidentHistory().ifPresent(entity::setAccidentHistory);
+        if (request.accidentDetails() != null) request.accidentDetails().ifPresent(entity::setAccidentDetails);
+        if (request.inspectionValidUntil() != null) request.inspectionValidUntil().ifPresent(entity::setInspectionValidUntil);
+        if (request.drivetrain() != null) request.drivetrain().ifPresent(entity::setDrivetrain);
+        if (request.bodyType() != null) request.bodyType().ifPresent(entity::setBodyType);
+    }
+
+    private void applyBase(Listing entity, BaseListingUpdateRequest base) {
+        if (base == null) return;
+        if (base.title() != null) base.title().ifPresent(entity::setTitle);
+        if (base.description() != null) base.description().ifPresent(entity::setDescription);
+        if (base.price() != null) base.price().ifPresent(entity::setPrice);
+        if (base.currency() != null) base.currency().ifPresent(entity::setCurrency);
+        if (base.city() != null) base.city().ifPresent(entity::setCity);
+        if (base.district() != null) base.district().ifPresent(entity::setDistrict);
+        if (base.imageUrl() != null) base.imageUrl().ifPresent(entity::setImageUrl);
+    }
 
     // ──────────────────────────────────────────────
     //  Dynamic dispatch (polymorphic Listing → DTO)

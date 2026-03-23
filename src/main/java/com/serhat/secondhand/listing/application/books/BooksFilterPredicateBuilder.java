@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.application.books;
 
-import com.serhat.secondhand.listing.application.common.FilterPredicateBuilder;
+import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.BooksListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
