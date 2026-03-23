@@ -13,11 +13,13 @@ import java.time.LocalDateTime;
 public class OrderRefundPolicy {
 
     public Result<Void> validateRefundable(Order order) {
-        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
-            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
-        }
-        if (!Order.OrderStatus.REFUNDABLE_STATUSES.contains(order.getStatus())) {
-            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
+        Result<Void> transitionGuard = OrderPolicyGuards.validateNotCompletedAndInAllowedStatuses(
+                order,
+                Order.OrderStatus.REFUNDABLE_STATUSES,
+                OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED
+        );
+        if (transitionGuard.isError()) {
+            return transitionGuard;
         }
 
         if (order.getShipping() == null || order.getShipping().getDeliveredAt() == null) {

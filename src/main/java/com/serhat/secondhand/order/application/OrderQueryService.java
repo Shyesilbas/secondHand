@@ -31,7 +31,7 @@ public class OrderQueryService {
     private final OrderMapper orderMapper;
     private final OrderEscrowService orderEscrowService;
     private final IUserService userService;
-    private final IOrderValidationService orderValidationService;
+    private final OrderValidationService orderValidationService;
 
     public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
