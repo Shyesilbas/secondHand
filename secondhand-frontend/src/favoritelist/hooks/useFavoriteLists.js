@@ -4,8 +4,9 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { handleError } from '../../common/errorHandler.js';
 import { extractSuccessMessage } from '../../common/successHandler.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { FAVORITE_LIST_PAGING, FAVORITE_LIST_QUERY } from '../favoriteListConstants.js';
 
-export const useMyFavoriteLists = (page = 0, size = 5) => {
+export const useMyFavoriteLists = (page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.MY_SIZE) => {
     const { user, isAuthenticated } = useAuthState();
     return useQuery({
         queryKey: ['favoriteLists', 'my', user?.id, page, size],
@@ -16,11 +17,11 @@ export const useMyFavoriteLists = (page = 0, size = 5) => {
             if (Array.isArray(res?.content)) return res.content;
             return [];
         },
-        staleTime: 30000,
+        staleTime: FAVORITE_LIST_QUERY.STALE_MY_MS,
     });
 };
 
-export const useUserFavoriteLists = (userId, isOwnProfile = false, options = {}, page = 0, size = 5) => {
+export const useUserFavoriteLists = (userId, isOwnProfile = false, options = {}, page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.USER_SIZE) => {
     return useQuery({
         queryKey: ['favoriteLists', 'user', userId, isOwnProfile, page, size],
         queryFn: () => isOwnProfile 
@@ -32,7 +33,7 @@ export const useUserFavoriteLists = (userId, isOwnProfile = false, options = {},
             if (Array.isArray(res?.content)) return res.content;
             return [];
         },
-        staleTime: 60000,
+        staleTime: FAVORITE_LIST_QUERY.STALE_USER_MS,
     });
 };
 
@@ -41,15 +42,15 @@ export const useFavoriteListById = (listId) => {
         queryKey: ['favoriteLists', listId],
         queryFn: () => favoriteListService.getListById(listId),
         enabled: !!listId,
-        staleTime: 30000,
+        staleTime: FAVORITE_LIST_QUERY.STALE_BY_ID_MS,
     });
 };
 
-export const usePopularLists = (page = 0, size = 10) => {
+export const usePopularLists = (page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.POPULAR_SIZE) => {
     return useQuery({
         queryKey: ['favoriteLists', 'popular', page, size],
         queryFn: () => favoriteListService.getPopularLists(page, size),
-        staleTime: 60000,
+        staleTime: FAVORITE_LIST_QUERY.STALE_POPULAR_MS,
     });
 };
 
@@ -65,7 +66,7 @@ export const useListsContainingListing = (listingId) => {
             }
         },
         enabled: !!listingId,
-        staleTime: 30000,
+        staleTime: FAVORITE_LIST_QUERY.STALE_CONTAINING_MS,
     });
 };
 

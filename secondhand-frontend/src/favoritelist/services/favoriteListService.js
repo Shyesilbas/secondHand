@@ -1,17 +1,20 @@
 import { get, post, put, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { FAVORITE_LIST_PAGING } from '../favoriteListConstants.js';
+
+const buildPagedUrl = (basePath, page, size) => `${basePath}?page=${page}&size=${size}`;
 
 export const favoriteListService = {
     createList: (data) => post(API_ENDPOINTS.FAVORITE_LISTS.CREATE, data),
     
-    getMyLists: (page = 0, size = 5) => 
-        get(`${API_ENDPOINTS.FAVORITE_LISTS.MY_LISTS}?page=${page}&size=${size}`),
+    getMyLists: (page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.MY_SIZE) => 
+        get(buildPagedUrl(API_ENDPOINTS.FAVORITE_LISTS.MY_LISTS, page, size)),
     
-    getUserLists: (userId, page = 0, size = 5) => 
-        get(`${API_ENDPOINTS.FAVORITE_LISTS.USER_LISTS(userId)}?page=${page}&size=${size}`),
+    getUserLists: (userId, page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.USER_SIZE) => 
+        get(buildPagedUrl(API_ENDPOINTS.FAVORITE_LISTS.USER_LISTS(userId), page, size)),
     
-    getPopularLists: (page = 0, size = 10) => 
-        get(`${API_ENDPOINTS.FAVORITE_LISTS.POPULAR}?page=${page}&size=${size}`),
+    getPopularLists: (page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.POPULAR_SIZE) => 
+        get(buildPagedUrl(API_ENDPOINTS.FAVORITE_LISTS.POPULAR, page, size)),
     
     getListById: (listId) => get(API_ENDPOINTS.FAVORITE_LISTS.BY_ID(listId)),
     

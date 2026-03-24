@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
+import { REVIEW_DEFAULTS, REVIEW_MESSAGES } from '../reviewConstants.js';
 
 const REVIEW_KEYS = {
   all: ['reviews'],
@@ -18,16 +19,17 @@ export const useListingReviews = (listingId, options = {}) => {
       return reviewService.getReviewsForListing(listingId);
     },
     enabled: !!listingId && (options.enabled !== undefined ? options.enabled : true),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
+    cacheTime: REVIEW_DEFAULTS.LISTING_CACHE_TIME_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    retry: 2,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: REVIEW_DEFAULTS.RETRY_COUNT,
+    retryDelay: attemptIndex =>
+      Math.min(REVIEW_DEFAULTS.RETRY_BASE_DELAY_MS * 2 ** attemptIndex, REVIEW_DEFAULTS.RETRY_MAX_DELAY_MS),
   });
 
   const reviews = reviewsResponse?.content || [];
-  const error = isError ? (queryError?.message || 'Failed to load reviews') : null;
+  const error = isError ? (queryError?.message || REVIEW_MESSAGES.LOAD_FAILED) : null;
 
   return {
     reviews,

@@ -6,23 +6,20 @@ import {ThreadDetail, ThreadDetailSkeleton} from '../components/ThreadDetail.jsx
 import {ThreadComposerModal} from '../components/ThreadComposerModal.jsx';
 import {ForumVisibilitySettingsModal} from '../components/ForumVisibilitySettingsModal.jsx';
 import {useAuthState} from '../../auth/AuthContext.jsx';
-
-const categories = [
-  { id: 'SUGGESTIONS', label: 'Suggestions' },
-  { id: 'COMPLAINTS', label: 'Complaints' },
-];
-
-const sorts = [
-  { id: 'NEW', label: 'Newest' },
-  { id: 'TOP', label: 'Top Voted' },
-];
+import {
+  FORUM_CATEGORY_OPTIONS,
+  FORUM_LIST_TABS,
+  FORUM_MESSAGES,
+  FORUM_REACTIONS,
+  FORUM_SORT_OPTIONS,
+} from '../forumConstants.js';
 
 const ForumPage = () => {
   const forum = useForum();
   const { isAuthenticated, user } = useAuthState();
   const [composerOpen, setComposerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [listTab, setListTab] = useState('ALL');
+  const [listTab, setListTab] = useState(FORUM_LIST_TABS.ALL);
 
   useEffect(() => {
     forum.resetThreads();
@@ -31,8 +28,8 @@ const ForumPage = () => {
 
   const showListSkeleton = forum.threadsLoading && forum.threads.length === 0;
   const visibleThreads = useMemo(() => {
-    if (!isAuthenticated || listTab !== 'LIKED') return forum.threads;
-    return (forum.threads || []).filter((t) => forum.threadReactions?.[t?.id] === 'LIKE');
+    if (!isAuthenticated || listTab !== FORUM_LIST_TABS.LIKED) return forum.threads;
+    return (forum.threads || []).filter((t) => forum.threadReactions?.[t?.id] === FORUM_REACTIONS.LIKE);
   }, [forum.threadReactions, forum.threads, isAuthenticated, listTab]);
 
   return (
@@ -79,7 +76,7 @@ const ForumPage = () => {
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-wrap gap-2">
-                {categories.map((c) => {
+                {FORUM_CATEGORY_OPTIONS.map((c) => {
                   const active = forum.category === c.id;
                   return (
                     <button
@@ -95,8 +92,8 @@ const ForumPage = () => {
                 {isAuthenticated && (
                   <button
                     type="button"
-                    onClick={() => setListTab(listTab === 'LIKED' ? 'ALL' : 'LIKED')}
-                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold tracking-tight border transition-colors ${listTab === 'LIKED' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+                    onClick={() => setListTab(listTab === FORUM_LIST_TABS.LIKED ? FORUM_LIST_TABS.ALL : FORUM_LIST_TABS.LIKED)}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold tracking-tight border transition-colors ${listTab === FORUM_LIST_TABS.LIKED ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
                   >
                     <Heart className="w-4 h-4" />
                     Liked
@@ -111,7 +108,7 @@ const ForumPage = () => {
                   onChange={(e) => forum.setSort(e.target.value)}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                  {sorts.map((s) => (
+                  {FORUM_SORT_OPTIONS.map((s) => (
                     <option key={s.id} value={s.id}>{s.label}</option>
                   ))}
                 </select>
@@ -137,8 +134,10 @@ const ForumPage = () => {
               </>
             ) : visibleThreads.length === 0 ? (
               <div className="rounded-xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-                <p className="text-sm font-semibold text-slate-900">{listTab === 'LIKED' ? 'No liked threads' : 'No threads found'}</p>
-                <p className="text-sm text-slate-500 mt-1">{listTab === 'LIKED' ? 'Like a thread to see it here.' : 'Try changing filters or search.'}</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  {listTab === FORUM_LIST_TABS.LIKED ? FORUM_MESSAGES.NO_LIKED_THREADS : FORUM_MESSAGES.NO_THREADS_FOUND}
+                </p>
+                <p className="text-sm text-slate-500 mt-1">{listTab === FORUM_LIST_TABS.LIKED ? 'Like a thread to see it here.' : 'Try changing filters or search.'}</p>
               </div>
             ) : (
               <>
@@ -151,7 +150,7 @@ const ForumPage = () => {
                     reaction={forum.threadReactions?.[t?.id] || null}
                   />
                 ))}
-                {forum.threadsHasMore && listTab !== 'LIKED' && (
+                {forum.threadsHasMore && listTab !== FORUM_LIST_TABS.LIKED && (
                   <div className="flex justify-center pt-2">
                     <button
                       type="button"
@@ -159,7 +158,7 @@ const ForumPage = () => {
                       disabled={forum.threadsLoading}
                       className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Load more
+                      {FORUM_MESSAGES.LOAD_MORE}
                     </button>
                   </div>
                 )}

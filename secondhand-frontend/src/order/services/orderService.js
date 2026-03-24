@@ -1,5 +1,14 @@
 import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {get, post, put} from '../../common/services/api/request.js';
+import { ORDER_DEFAULTS } from '../constants/orderUiConstants.js';
+
+const buildPagedOrdersUrl = (endpoint, page, size, sort, direction) => {
+  let url = `${endpoint}?page=${page}&size=${size}`;
+  if (sort) {
+    url += `&sort=${sort},${direction}`;
+  }
+  return url;
+};
 
 export const orderService = {
   checkout: async (payload) => {
@@ -8,12 +17,13 @@ export const orderService = {
   initiatePaymentVerification: async (payload) => {
     return post(API_ENDPOINTS.PAYMENTS.INITIATE_VERIFICATION, payload);
   },
-  myOrders: async (page = 0, size = 5, sort = null, direction = 'desc') => {
-    let url = `${API_ENDPOINTS.ORDERS.LIST_MY_ORDERS}?page=${page}&size=${size}`;
-    if (sort) {
-      url += `&sort=${sort},${direction}`;
-    }
-    return get(url);
+  myOrders: async (
+    page = ORDER_DEFAULTS.INITIAL_PAGE,
+    size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
+    sort = null,
+    direction = ORDER_DEFAULTS.SORT_DIRECTION
+  ) => {
+    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, page, size, sort, direction));
   },
   getByOrderNumber: async (orderNumber) => {
     return get(API_ENDPOINTS.ORDERS.GET_BY_ORDER_NUMBER(orderNumber));
@@ -42,12 +52,13 @@ export const orderService = {
   updateOrderNotes: async (id, notes) => {
     return put(API_ENDPOINTS.ORDERS.UPDATE_ORDER_NOTES(id), { notes });
   },
-  sellerOrders: async (page = 0, size = 5, sort = null, direction = 'desc') => {
-    let url = `${API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS}?page=${page}&size=${size}`;
-    if (sort) {
-      url += `&sort=${sort},${direction}`;
-    }
-    return get(url);
+  sellerOrders: async (
+    page = ORDER_DEFAULTS.INITIAL_PAGE,
+    size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
+    sort = null,
+    direction = ORDER_DEFAULTS.SORT_DIRECTION
+  ) => {
+    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS, page, size, sort, direction));
   },
   getPendingEscrowAmount: async () => {
     return get(API_ENDPOINTS.ORDERS.GET_PENDING_ESCROW_AMOUNT);

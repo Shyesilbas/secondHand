@@ -4,6 +4,14 @@ import PaymentReceiptModal from '../../../common/components/modals/PaymentReceip
 import {getStatusColor} from '../../orderConstants.js';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import {
+  ORDER_DEFAULTS,
+  ORDER_STATUSES,
+  ORDER_STATUS_ACCENT,
+  ORDER_STATUS_FILTER_OPTIONS,
+  ORDER_TIME,
+  ORDER_VIEW_MODES,
+} from '../../constants/orderUiConstants.js';
+import {
   BarChart3,
   CheckCircle,
   ChevronRight,
@@ -108,18 +116,6 @@ const OrderItemSkeleton = () => (
   </div>
 );
 
-const ORDER_STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'PROCESSING', label: 'Processing' },
-  { value: 'SHIPPED', label: 'Shipped' },
-  { value: 'DELIVERED', label: 'Delivered' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
-  { value: 'REFUNDED', label: 'Refunded' },
-];
-
 const Search = React.memo(({ search, onSearch, onClearSearch }) => {
   const { searchTerm, setSearchTerm, searchLoading, searchError, isSearchMode, statusFilter, setStatusFilter } = search;
 
@@ -145,7 +141,7 @@ const Search = React.memo(({ search, onSearch, onClearSearch }) => {
             onChange={(e) => setStatusFilter?.(e.target.value || '')}
             className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[13px] text-slate-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-colors min-w-[130px]"
           >
-            {ORDER_STATUS_OPTIONS.map((opt) => (
+            {ORDER_STATUS_FILTER_OPTIONS.map((opt) => (
               <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
             ))}
           </select>
@@ -184,7 +180,7 @@ const Pagination = React.memo(({ pagination, isSearchMode, loading, onPageChange
 
   const currentPage = pagination.number || 0;
   const totalPages = pagination.totalPages || 1;
-  const pageSize = pagination.size || 5;
+  const pageSize = pagination.size || ORDER_DEFAULTS.INITIAL_PAGE_SIZE;
   const totalElements = pagination.totalElements || 0;
 
   const startItem = totalElements === 0 ? 0 : currentPage * pageSize + 1;
@@ -225,26 +221,14 @@ const Pagination = React.memo(({ pagination, isSearchMode, loading, onPageChange
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
         >
-          <option value={5}>5 / page</option>
-          <option value={10}>10 / page</option>
-          <option value={20}>20 / page</option>
-          <option value={50}>50 / page</option>
+          {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map((option) => (
+            <option key={option} value={option}>{option} / page</option>
+          ))}
         </select>
       </div>
     </div>
   );
 });
-
-const STATUS_ACCENT = {
-  COMPLETED: 'border-l-emerald-400',
-  DELIVERED: 'border-l-blue-400',
-  SHIPPED: 'border-l-indigo-400',
-  PROCESSING: 'border-l-amber-400',
-  CONFIRMED: 'border-l-green-400',
-  PENDING: 'border-l-gray-300',
-  CANCELLED: 'border-l-red-300',
-  REFUNDED: 'border-l-rose-300',
-};
 
 const UnifiedOrderItem = React.memo(
   ({
@@ -263,15 +247,15 @@ const UnifiedOrderItem = React.memo(
   }) => {
     const itemsCount = order.orderItems?.length || 0;
     const firstItem = order.orderItems?.[0];
-    const isCompleted = order.status === 'COMPLETED';
-    const isDelivered = order.status === 'DELIVERED';
+    const isCompleted = order.status === ORDER_STATUSES.COMPLETED;
+    const isDelivered = order.status === ORDER_STATUSES.DELIVERED;
 
     const sellerTotalAmount =
-      viewMode === 'seller'
+      viewMode === ORDER_VIEW_MODES.SELLER
         ? (order.orderItems || []).reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0)
         : null;
 
-    const accentClass = STATUS_ACCENT[order.status] || 'border-l-gray-200';
+    const accentClass = ORDER_STATUS_ACCENT[order.status] || 'border-l-gray-200';
 
     return (
       <div
@@ -283,7 +267,7 @@ const UnifiedOrderItem = React.memo(
         {/* Row 1 — Order title + Actions */}
         <div className="flex items-center justify-between gap-3 mb-2.5">
           <div className="flex-1 min-w-0">
-            {viewMode === 'buyer' && editingOrderId === order.id ? (
+            {viewMode === ORDER_VIEW_MODES.BUYER && editingOrderId === order.id ? (
               <div className="flex items-center gap-1.5 flex-1" onClick={(e) => e.stopPropagation()}>
                 <input
                   type="text"
@@ -305,12 +289,12 @@ const UnifiedOrderItem = React.memo(
             ) : (
               <div className="flex items-center gap-2 min-w-0">
                 <h3 className="text-[13px] font-semibold text-slate-900 truncate tracking-tight">
-                  {viewMode === 'seller' ? `#${order.orderNumber}` : order.name || `#${order.orderNumber}`}
+                  {viewMode === ORDER_VIEW_MODES.SELLER ? `#${order.orderNumber}` : order.name || `#${order.orderNumber}`}
                 </h3>
-                {viewMode === 'buyer' && order.name ? (
+                {viewMode === ORDER_VIEW_MODES.BUYER && order.name ? (
                   <span className="text-[10px] text-slate-500 font-mono shrink-0">#{order.orderNumber}</span>
                 ) : null}
-                {viewMode === 'buyer' ? (
+                {viewMode === ORDER_VIEW_MODES.BUYER ? (
                   <button
                     onClick={(e) => onStartEditName(order, e)}
                     className="p-0.5 text-slate-300 hover:text-slate-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
@@ -324,7 +308,7 @@ const UnifiedOrderItem = React.memo(
           </div>
 
           <div className="flex items-center gap-0.5 flex-shrink-0">
-            {viewMode === 'buyer' && isDelivered && (
+            {viewMode === ORDER_VIEW_MODES.BUYER && isDelivered && (
               <button
                 type="button"
                 onClick={(e) => onCompleteOrder(order.id, e)}
@@ -391,7 +375,7 @@ const UnifiedOrderItem = React.memo(
               ) : null}
             </div>
             <p className={`text-[13px] font-semibold tabular-nums tracking-tight ${isCompleted ? 'text-emerald-600' : 'text-slate-900'}`}>
-              {formatCurrency(viewMode === 'seller' ? sellerTotalAmount : order.totalAmount, order.currency)}
+              {formatCurrency(viewMode === ORDER_VIEW_MODES.SELLER ? sellerTotalAmount : order.totalAmount, order.currency)}
             </p>
           </div>
         ) : null}
@@ -425,8 +409,8 @@ const OrdersListLayout = ({
     flow.fetchOrders(0, size, flow.sortField, flow.sortDirection);
   };
 
-  const isBuyerView = viewMode === 'buyer';
-  const isSellerView = viewMode === 'seller';
+  const isBuyerView = viewMode === ORDER_VIEW_MODES.BUYER;
+  const isSellerView = viewMode === ORDER_VIEW_MODES.SELLER;
 
   const computedCountText = countText || (() => {
     if (!flow.orders.length) return null;
@@ -435,7 +419,12 @@ const OrdersListLayout = ({
     return `${total} ${total === 1 ? 'order' : 'orders'}`;
   })();
 
-  const computedShowIndicator = showIndicator ?? (isBuyerView && flow.orders.some((o) => o.status === 'DELIVERED' && o.status !== 'COMPLETED'));
+  const computedShowIndicator = showIndicator ?? (
+    isBuyerView &&
+    flow.orders.some(
+      (o) => o.status === ORDER_STATUSES.DELIVERED && o.status !== ORDER_STATUSES.COMPLETED
+    )
+  );
 
   const banner = isBuyerView && flow.ui.showNameBanner ? (
     <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex items-center justify-between">
@@ -480,7 +469,9 @@ const OrdersListLayout = ({
                   .map((order) => {
                     const escrowAmt = parseFloat(order.escrowAmount) || 0;
                     const deliveredAt = order.shipping?.deliveredAt;
-                    const autoReleaseDate = deliveredAt ? new Date(new Date(deliveredAt).getTime() + 48 * 60 * 60 * 1000) : null;
+                    const autoReleaseDate = deliveredAt
+                      ? new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS)
+                      : null;
                     const now = new Date();
                     const isAutoReleased = autoReleaseDate && now >= autoReleaseDate;
 
@@ -491,7 +482,7 @@ const OrdersListLayout = ({
                       tooltipText = 'Auto-released (48h after delivery).';
                     } else {
                       const diffMs = autoReleaseDate - now;
-                      const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                      const totalMinutes = Math.floor(diffMs / ORDER_TIME.MINUTE_MS);
                       const daysLeft = Math.floor(totalMinutes / (24 * 60));
                       const remainingMinutes = totalMinutes % (24 * 60);
                       const hoursLeft = Math.floor(remainingMinutes / 60);
@@ -508,7 +499,9 @@ const OrdersListLayout = ({
                     }
 
                     const progressPercent = deliveredAt && autoReleaseDate
-                      ? isAutoReleased ? 100 : Math.max(0, 100 - ((autoReleaseDate - now) / (48 * 60 * 60 * 1000)) * 100)
+                      ? isAutoReleased
+                        ? 100
+                        : Math.max(0, 100 - ((autoReleaseDate - now) / ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS) * 100)
                       : 0;
 
                     return (
@@ -542,7 +535,7 @@ const OrdersListLayout = ({
                               />
                             </div>
                             <span className="text-[10px] text-slate-500 tabular-nums whitespace-nowrap">
-                              {Math.ceil((autoReleaseDate - now) / (60 * 60 * 1000))}h
+                              {Math.ceil((autoReleaseDate - now) / (60 * ORDER_TIME.MINUTE_MS))}h
                             </span>
                           </div>
                         )}

@@ -1,5 +1,7 @@
 import { formatCurrency } from '../../common/formatters.js';
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
+import { PAYMENT_TYPES } from '../paymentSchema.js';
+import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
 
 const PaymentPanel = ({
     selectedListing,
@@ -14,8 +16,6 @@ const PaymentPanel = ({
     onAgreementToggle,
     onRequiredAgreementsChange
 }) => {
-    const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
     return (
         <div className="lg:col-span-1">
             <div className="sticky top-4 rounded-3xl border border-slate-200/60 bg-white px-5 py-6 shadow-[0_18px_45px_rgba(15,23,42,0.06)]">
@@ -58,13 +58,13 @@ const PaymentPanel = ({
                                         <div className="flex items-center justify-between text-xs text-slate-600">
                                             <span>Listing fee</span>
                                             <span className="font-mono text-sm tracking-tight text-slate-800">
-                                                {formatPrice(feeConfig.creationFee)}
+                                                {formatPaymentAmount(feeConfig.creationFee)}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between text-xs text-slate-600">
                                             <span>Tax {`(${feeConfig.taxPercentage}%)`}</span>
                                             <span className="font-mono text-sm tracking-tight text-slate-800">
-                                                {formatPrice(feeConfig.creationFee * feeConfig.taxPercentage / 100)}
+                                                {formatPaymentAmount(feeConfig.creationFee * feeConfig.taxPercentage / 100)}
                                             </span>
                                         </div>
                                     </div>
@@ -74,7 +74,7 @@ const PaymentPanel = ({
                                                 Total due
                                             </span>
                                             <span className="font-mono text-lg font-semibold tracking-tighter text-slate-900">
-                                                {formatPrice(feeConfig.totalCreationFee)}
+                                                {formatPaymentAmount(feeConfig.totalCreationFee)}
                                             </span>
                                         </div>
                                     </div>
@@ -91,8 +91,8 @@ const PaymentPanel = ({
                                     <input
                                         type="radio"
                                         name="paymentType"
-                                        value="CREDIT_CARD"
-                                        checked={paymentType === 'CREDIT_CARD'}
+                                            value={PAYMENT_TYPES.CREDIT_CARD}
+                                            checked={paymentType === PAYMENT_TYPES.CREDIT_CARD}
                                         onChange={(e) => onPaymentTypeChange(e.target.value)}
                                         className="text-slate-900 focus:ring-indigo-500"
                                     />
@@ -109,8 +109,8 @@ const PaymentPanel = ({
                                     <input
                                         type="radio"
                                         name="paymentType"
-                                        value="TRANSFER"
-                                        checked={paymentType === 'TRANSFER'}
+                                            value={PAYMENT_TYPES.TRANSFER}
+                                            checked={paymentType === PAYMENT_TYPES.TRANSFER}
                                         onChange={(e) => onPaymentTypeChange(e.target.value)}
                                         className="text-slate-900 focus:ring-indigo-500"
                                     />
@@ -127,8 +127,8 @@ const PaymentPanel = ({
                                     <input
                                         type="radio"
                                         name="paymentType"
-                                        value="EWALLET"
-                                        checked={paymentType === 'EWALLET'}
+                                            value={PAYMENT_TYPES.EWALLET}
+                                            checked={paymentType === PAYMENT_TYPES.EWALLET}
                                         onChange={(e) => onPaymentTypeChange(e.target.value)}
                                         className="text-slate-900 focus:ring-indigo-500"
                                     />
@@ -142,7 +142,7 @@ const PaymentPanel = ({
                                             </span>
                                             {eWallet && (
                                                 <span className="text-xs text-slate-500">
-                                                    Balance: {formatPrice(eWallet.balance)}
+                                                    Balance: {formatPaymentAmount(eWallet.balance)}
                                                 </span>
                                             )}
                                         </div>
@@ -152,7 +152,7 @@ const PaymentPanel = ({
                         </div>
 
                         {/* eWallet Balance Warning */}
-                        {paymentType === 'EWALLET' && feeConfig && eWallet && (
+                        {paymentType === PAYMENT_TYPES.EWALLET && feeConfig && eWallet && (
                             <div className="mb-4">
                                 {eWallet.balance >= feeConfig.totalCreationFee ? (
                                     <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
@@ -172,7 +172,7 @@ const PaymentPanel = ({
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                             </svg>
                                             <span className="text-xs text-red-800">
-                                                Insufficient balance. You need {formatPrice(feeConfig.totalCreationFee - eWallet.balance)} more.
+                                                Insufficient balance. You need {formatPaymentAmount(feeConfig.totalCreationFee - eWallet.balance)} more.
                                             </span>
                                         </div>
                                     </div>
@@ -197,7 +197,7 @@ const PaymentPanel = ({
                             disabled={
                                 isProcessingPayment || 
                                 !agreementsAccepted ||
-                                (paymentType === 'EWALLET' && eWallet && eWallet.balance < feeConfig?.totalCreationFee)
+                                (paymentType === PAYMENT_TYPES.EWALLET && eWallet && eWallet.balance < feeConfig?.totalCreationFee)
                             }
                             className="w-full rounded-2xl bg-slate-900 px-4 py-4 text-sm font-bold tracking-tight text-white shadow-md transition-transform transition-shadow hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                         >
@@ -210,7 +210,7 @@ const PaymentPanel = ({
                                    Processing...
                                 </div>
                             ) : (
-                                feeConfig ? `Pay ${formatPrice(feeConfig.totalCreationFee)}` : 'Pay Listing Fee'
+                                feeConfig ? `Pay ${formatPaymentAmount(feeConfig.totalCreationFee)}` : 'Pay Listing Fee'
                             )}
                         </button>
 

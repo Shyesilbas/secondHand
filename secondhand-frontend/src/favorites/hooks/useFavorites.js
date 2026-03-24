@@ -3,15 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { favoriteService } from '../services/favoriteService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { FAVORITE_DEFAULTS, FAVORITE_MESSAGES } from '../favoriteConstants.js';
 
-export const useFavorites = (page = 0, size = 20) => {
+export const useFavorites = (page = FAVORITE_DEFAULTS.PAGE, size = FAVORITE_DEFAULTS.PAGE_SIZE) => {
   const { user, isAuthenticated } = useAuthState();
   const [currentPage, setCurrentPage] = useState(page);
   const notification = useNotification();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setCurrentPage(0);
+    setCurrentPage(FAVORITE_DEFAULTS.PAGE);
   }, [user?.id]);
 
   const {
@@ -23,8 +24,8 @@ export const useFavorites = (page = 0, size = 20) => {
     queryKey: ['favorites', user?.id, currentPage, size],
     queryFn: () => favoriteService.getMyFavorites({ page: currentPage, size }),
     enabled: !!(isAuthenticated && user?.id),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    staleTime: FAVORITE_DEFAULTS.STALE_TIME_MS,
+    gcTime: FAVORITE_DEFAULTS.GC_TIME_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     placeholderData: (previousData) => previousData
@@ -32,10 +33,10 @@ export const useFavorites = (page = 0, size = 20) => {
 
   const favorites = favoritesData?.content || [];
   const pagination = {
-    number: favoritesData?.number || 0,
-    size: favoritesData?.size || 20,
-    totalPages: favoritesData?.totalPages || 0,
-    totalElements: favoritesData?.totalElements || 0
+    number: favoritesData?.number ?? FAVORITE_DEFAULTS.PAGE,
+    size: favoritesData?.size ?? size,
+    totalPages: favoritesData?.totalPages ?? 0,
+    totalElements: favoritesData?.totalElements ?? 0,
   };
 
   const loadPage = useCallback((newPage) => {
@@ -48,8 +49,8 @@ export const useFavorites = (page = 0, size = 20) => {
       queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
       
       notification.showSuccess(
-          'Success',
-          response.isFavorited ? 'Added to favorites' : 'Removed from favorites'
+          FAVORITE_MESSAGES.SUCCESS_TITLE,
+          response.isFavorited ? FAVORITE_MESSAGES.ADDED_TO_FAVORITES : FAVORITE_MESSAGES.REMOVED_FROM_FAVORITES
       );
       
       return {
@@ -59,7 +60,10 @@ export const useFavorites = (page = 0, size = 20) => {
       };
     },
     onError: (err) => {
-      notification.showError('Error', err.response?.data?.message || 'Failed to toggle favorite');
+      notification.showError(
+        FAVORITE_MESSAGES.ERROR_TITLE,
+        err.response?.data?.message || FAVORITE_MESSAGES.TOGGLE_FAVORITE_FAILED
+      );
     }
   });
 

@@ -7,6 +7,8 @@ import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
 import {useNotification} from '../../notification/NotificationContext.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
+import { CART_MESSAGES } from '../cartConstants.js';
 
 const ShoppingCartPage = () => {
     const navigate = useNavigate();
@@ -141,12 +143,12 @@ const ShoppingCartPage = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                     </div>
-                    <p className="text-[13px] font-medium text-gray-900 mb-1">Your cart is empty</p>
+                    <p className="text-[13px] font-medium text-gray-900 mb-1">{CART_MESSAGES.EMPTY_CART_TITLE}</p>
                     <p className="text-[12px] text-gray-400 mb-5">
                         Browse listings and add items to get started.
                     </p>
                     <button
-                        onClick={() => navigate('/listings')}
+                        onClick={() => navigate(ROUTES.LISTINGS)}
                         className="px-4 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
                     >
                         Browse Listings
@@ -216,7 +218,7 @@ const ShoppingCartPage = () => {
                             cartItems={cartItems}
                             cartCount={cartCount}
                             calculateTotal={calculateTotal}
-                            onCheckout={() => navigate('/checkout')}
+                            onCheckout={() => navigate(ROUTES.CHECKOUT)}
                             disabled={cartCount === 0}
                         />
                     </div>

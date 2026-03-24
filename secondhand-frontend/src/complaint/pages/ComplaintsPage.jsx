@@ -82,7 +82,7 @@ const ComplaintsPage = () => {
                                 {error}
                             </p>
                             <button
-                                onClick={() => window.location.reload()}
+                                onClick={() => getUserComplaints()}
                                 className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg"
                             >
                                 Try Again

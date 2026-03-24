@@ -8,7 +8,6 @@ import logger from '../../common/utils/logger.js';
 const PaymentAgreementsSection = ({ 
   acceptedAgreements, 
   onToggle, 
-  onRead, 
   error,
   onRequiredAgreementsChange
 }) => {

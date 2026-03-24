@@ -6,9 +6,13 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency } from '../../common/formatters.js';
 import FavoriteListModal from './FavoriteListModal.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
+import logger from '../../common/utils/logger.js';
+import { FAVORITE_LIST_MESSAGES } from '../favoriteListConstants.js';
 
 const FavoriteListCard = ({ list, showOwner = false }) => {
     const { user } = useAuthState();
+    const notification = useNotification();
     const [showMenu, setShowMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 
@@ -32,18 +36,22 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                 await likeMutation.mutateAsync(list.id);
             }
         } catch (error) {
-            console.error('Error toggling like:', error);
+            logger.error('Error toggling like:', error);
         }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm('Bu listeyi silmek istediğinize emin misiniz?')) {
-            try {
-                await deleteMutation.mutateAsync(list.id);
-            } catch (error) {
-                console.error('Error deleting list:', error);
+    const handleDelete = () => {
+        notification.showConfirmation(
+            FAVORITE_LIST_MESSAGES.DELETE_LIST_TITLE,
+            FAVORITE_LIST_MESSAGES.DELETE_LIST_CONFIRM,
+            async () => {
+                try {
+                    await deleteMutation.mutateAsync(list.id);
+                } catch (error) {
+                    logger.error('Error deleting list:', error);
+                }
             }
-        }
+        );
         setShowMenu(false);
     };
 

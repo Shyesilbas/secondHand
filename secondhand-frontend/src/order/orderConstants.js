@@ -1,3 +1,5 @@
+import { ORDER_STATUSES } from './constants/orderUiConstants.js';
+
 export const ORDER_QUERY_KEYS = Object.freeze({
   orders: ['orders'],
   myOrders: (userId, page, size, sort, direction) => [
@@ -24,18 +26,18 @@ export const ORDER_QUERY_KEYS = Object.freeze({
 export const getStatusColor = (status) => {
   const value = String(status || '').toUpperCase();
 
-  if (value === 'COMPLETED') return 'text-emerald-600';
-  if (value === 'DELIVERED') return 'text-blue-600';
-  if (value === 'SHIPPED') return 'text-indigo-600';
-  if (value === 'PROCESSING') return 'text-amber-600';
-  if (value === 'CONFIRMED') return 'text-green-600';
-  if (value === 'PENDING') return 'text-slate-600';
+  if (value === ORDER_STATUSES.COMPLETED) return 'text-emerald-600';
+  if (value === ORDER_STATUSES.DELIVERED) return 'text-blue-600';
+  if (value === ORDER_STATUSES.SHIPPED) return 'text-indigo-600';
+  if (value === ORDER_STATUSES.PROCESSING) return 'text-amber-600';
+  if (value === ORDER_STATUSES.CONFIRMED) return 'text-green-600';
+  if (value === ORDER_STATUSES.PENDING) return 'text-slate-600';
 
-  if (value === 'PAID') return 'text-emerald-600';
-  if (value === 'PARTIALLY_REFUNDED') return 'text-amber-600';
-  if (value === 'REFUNDED') return 'text-rose-600';
-  if (value === 'FAILED') return 'text-rose-600';
-  if (value === 'CANCELLED') return 'text-rose-600';
+  if (value === ORDER_STATUSES.PAID) return 'text-emerald-600';
+  if (value === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-600';
+  if (value === ORDER_STATUSES.REFUNDED) return 'text-rose-600';
+  if (value === ORDER_STATUSES.FAILED) return 'text-rose-600';
+  if (value === ORDER_STATUSES.CANCELLED) return 'text-rose-600';
 
   return 'text-slate-600';
 };
@@ -48,9 +50,9 @@ export const getLastUpdateInfo = (order) => {
 
 /* ---------- Status helpers driven by backend enums ---------- */
 
-const FALLBACK_CANCELLABLE = ['PENDING', 'CONFIRMED'];
-const FALLBACK_REFUNDABLE  = ['DELIVERED'];
-const FALLBACK_MODIFIABLE  = ['PENDING', 'CONFIRMED'];
+const FALLBACK_CANCELLABLE = [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED];
+const FALLBACK_REFUNDABLE  = [ORDER_STATUSES.DELIVERED];
+const FALLBACK_MODIFIABLE  = [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED];
 
 export const isCancellableStatus = (status, enums = {}) => {
   const list = enums?.cancellableOrderStatuses ?? FALLBACK_CANCELLABLE;

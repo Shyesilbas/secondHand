@@ -1,7 +1,9 @@
 
+import { REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
+
 const ReviewStats = ({ stats, loading }) => {
     const renderStars = (rating) => {
-        return Array.from({ length: 5 }, (_, index) => (
+        return Array.from({ length: REVIEW_LIMITS.MAX_RATING }, (_, index) => (
             <svg
                 key={index}
                 className={`w-4 h-4 ${index < rating ? 'text-yellow-400' : 'text-gray-300'}`}
@@ -37,7 +39,7 @@ const ReviewStats = ({ stats, loading }) => {
     if (!stats) {
         return (
             <div className="bg-white rounded-lg shadow-md border p-6">
-                <p className="text-gray-500">No Review information found.</p>
+                <p className="text-gray-500">{REVIEW_MESSAGES.NO_REVIEW_INFO}</p>
             </div>
         );
     }

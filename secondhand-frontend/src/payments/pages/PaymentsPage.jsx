@@ -5,6 +5,7 @@ import PaymentHistory from '../components/PaymentHistory.jsx';
 import PaymentNavigation, {PaymentPagination} from '../components/PaymentNavigation.jsx';
 import {PaymentInfo} from '../components/WalletOverview.jsx';
 import {usePayments} from '../hooks/usePayments.js';
+import {PAYMENT_DIRECTIONS} from '../paymentSchema.js';
 
 const PaymentsPage = () => {
     const {
@@ -39,8 +40,8 @@ const PaymentsPage = () => {
         setShowFilters(false);
     }, [setShowFilters]);
 
-    const incomingCount = payments.filter((p) => p.paymentDirection === 'INCOMING').length;
-    const outgoingCount = payments.filter((p) => p.paymentDirection === 'OUTGOING').length;
+    const incomingCount = payments.filter((p) => p.paymentDirection === PAYMENT_DIRECTIONS.INCOMING).length;
+    const outgoingCount = payments.filter((p) => p.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING).length;
 
     if (isLoading) {
         return (

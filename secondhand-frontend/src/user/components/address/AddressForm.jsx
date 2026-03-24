@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { USER_ADDRESS_TYPES } from '../../userConstants.js';
 
 const defaultAddress = {
   addressLine: '',
@@ -6,7 +7,7 @@ const defaultAddress = {
   state: '',
   postalCode: '',
   country: '',
-  addressType: 'HOME',
+  addressType: USER_ADDRESS_TYPES.HOME,
   mainAddress: false,
 };
 
@@ -128,9 +129,9 @@ const AddressForm = ({
               value={formData.addressType}
               onChange={(e) => handleInputChange('addressType', e.target.value)}
             >
-              <option value="HOME">🏠 Home</option>
-              <option value="WORK">🏢 Work</option>
-              <option value="OTHER">📍 Other</option>
+              <option value={USER_ADDRESS_TYPES.HOME}>🏠 Home</option>
+              <option value={USER_ADDRESS_TYPES.WORK}>🏢 Work</option>
+              <option value={USER_ADDRESS_TYPES.OTHER}>📍 Other</option>
             </select>
           </div>
           

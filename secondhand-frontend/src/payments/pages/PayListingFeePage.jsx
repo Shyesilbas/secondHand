@@ -12,6 +12,7 @@ import PaymentPanel from '../components/PaymentPanel.jsx';
 import PaymentVerificationModal from '../components/PaymentVerificationModal.jsx';
 import LoadingIndicator from "../../common/components/ui/LoadingIndicator.jsx";
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const PayListingFeePage = () => {
     const navigate = useNavigate();
@@ -90,7 +91,7 @@ const PayListingFeePage = () => {
                                 <>
                                     No draft listings found. You can create a new listing by{' '}
                                     <button
-                                        onClick={() => navigate('/listings/create')}
+                                        onClick={() => navigate(ROUTES.CREATE_LISTING)}
                                         className="font-medium text-indigo-600 underline transition-colors hover:text-indigo-700"
                                     >
                                         clicking here

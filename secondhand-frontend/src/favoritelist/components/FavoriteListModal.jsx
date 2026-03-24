@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {Globe, List, Lock, X} from 'lucide-react';
 import {useCreateFavoriteList, useUpdateFavoriteList} from '../hooks/useFavoriteLists.js';
+import logger from '../../common/utils/logger.js';
+import { FAVORITE_LIST_MODAL_LIMITS } from '../favoriteListConstants.js';
 
 const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -44,7 +46,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
             onSuccess?.();
             onClose();
         } catch (error) {
-            console.error('Error saving list:', error);
+            logger.error('Error saving list:', error);
         }
     };
 
@@ -91,7 +93,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="e.g. Home Decoration"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-                            maxLength={100}
+                            maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX}
                             required
                             autoFocus
                         />
@@ -107,7 +109,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                             placeholder="A short description about the list..."
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none outline-none"
                             rows={3}
-                            maxLength={500}
+                            maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX}
                         />
                     </div>
 

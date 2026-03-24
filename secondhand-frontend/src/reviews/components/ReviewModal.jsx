@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { reviewService } from '../services/reviewService.js';
+import { REVIEW_DEFAULTS, REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
+import { getReviewErrorMessage } from '../utils/reviewError.js';
 
 const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
-    const [rating, setRating] = useState(0);
+    const [rating, setRating] = useState(REVIEW_DEFAULTS.INITIAL_RATING);
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
-            setRating(0);
+            setRating(REVIEW_DEFAULTS.INITIAL_RATING);
             setComment('');
             setError(null);
         }
@@ -37,7 +39,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
             onReviewCreated?.();
             onClose();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'An error occurred.');
+            setError(getReviewErrorMessage(err, REVIEW_MESSAGES.UNKNOWN_ERROR));
         } finally {
             setLoading(false);
         }
@@ -45,14 +47,14 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
 
     const handleStarClick = (starIndex) => {
                 if (rating === starIndex) {
-            setRating(0);
+            setRating(REVIEW_DEFAULTS.INITIAL_RATING);
         } else {
             setRating(starIndex);
         }
     };
 
     const renderStars = () => {
-        return Array.from({ length: 5 }, (_, index) => {
+        return Array.from({ length: REVIEW_LIMITS.MAX_RATING }, (_, index) => {
             const starNumber = index + 1;
             const isFilled = starNumber <= rating;
             
@@ -115,7 +117,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                                 {renderStars()}
                             </div>
                             <p className="text-center text-sm text-gray-600">
-                                {rating === 0 ? 'Click the stars for rating' : `${rating}/5 stars`}
+                                {rating === REVIEW_DEFAULTS.INITIAL_RATING ? 'Click the stars for rating' : `${rating}/${REVIEW_LIMITS.MAX_RATING} stars`}
                             </p>
                         </div>
 
@@ -129,12 +131,12 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                                 rows={4}
-                                maxLength={1000}
+                                maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                                 placeholder="Share your thoughts about this product..."
                             />
                             <p className="text-xs text-gray-500 mt-1 text-right">
-                                {comment.length}/1000 Characters
+                                {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH} Characters
                             </p>
                         </div>
 
@@ -164,7 +166,7 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
                                 disabled={loading}
                                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                             >
-                                {loading ? 'Send...' : 'Send Review'}
+                                {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
                             </button>
                         </div>
                     </form>

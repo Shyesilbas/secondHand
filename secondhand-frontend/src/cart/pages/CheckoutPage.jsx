@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {ArrowLeft as ArrowLeftIcon} from 'lucide-react';
 import {useCart} from '../hooks/useCart.js';
-import {useCheckout} from '../hooks/index.js';
+import {useCheckout} from '../hooks/useCheckout.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
@@ -10,6 +10,8 @@ import {couponService} from '../services/couponService.js';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
 import {offerService} from '../../offer/services/offerService.js';
 import {listingService} from '../../listing/services/listingService.js';
+import { ROUTES } from '../../common/constants/routes.js';
+import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -53,7 +55,7 @@ const CheckoutPage = () => {
             })
             .catch((e) => {
                 setOfferContext(null);
-                setCouponError(e?.response?.data?.message || 'Offer could not be loaded');
+                setCouponError(e?.response?.data?.message || CART_MESSAGES.OFFER_LOAD_FAILED);
             });
     }, [offerId]);
 
@@ -90,7 +92,7 @@ const CheckoutPage = () => {
     
     const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
     const checkout = useCheckout(effectiveCartCount, calculateTotal, clearCart, appliedCouponCode, offerId);
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(CART_CHECKOUT_DEFAULTS.INITIAL_STEP);
 
     const refreshPreviewRef = useRef(null);
     const isRefreshingRef = useRef(false);
@@ -106,7 +108,7 @@ const CheckoutPage = () => {
             setPricing(data);
             setCouponError(null);
         } catch (e) {
-            const message = e?.response?.data?.message || e?.response?.data?.error || 'Coupon could not be applied';
+            const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
             setCouponError(message);
             setAppliedCouponCode(null);
             const data = await couponService.preview(null, offerId);
@@ -145,12 +147,7 @@ const CheckoutPage = () => {
         await refreshPreview(null);
     };
 
-    const steps = [
-        { id: 1, title: 'Review', description: 'Review your order' },
-        { id: 2, title: 'Address & Note', description: 'Shipping and billing' },
-        { id: 3, title: 'Payment Method', description: 'Choose payment option' },
-        { id: 4, title: 'Verification', description: 'Confirm your purchase' }
-    ];
+    const steps = CART_CHECKOUT_STEPS;
 
     const handleStepChange = (step) => {
         setCurrentStep(step);
@@ -160,7 +157,7 @@ const CheckoutPage = () => {
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
         } else {
-            navigate('/cart');
+            navigate(ROUTES.SHOPPING_CART);
         }
     };
 
@@ -174,10 +171,10 @@ const CheckoutPage = () => {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-2xl font-medium text-gray-900 mb-4">Your cart is empty</h1>
-                    <p className="text-gray-600 mb-8">Add some items to your cart to get started.</p>
+                    <h1 className="text-2xl font-medium text-gray-900 mb-4">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
+                    <p className="text-gray-600 mb-8">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
                     <button
-                        onClick={() => navigate('/listings')}
+                        onClick={() => navigate(ROUTES.LISTINGS)}
                         className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         Browse Listings
@@ -193,7 +190,7 @@ const CheckoutPage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center space-x-4">
                         <button
-                            onClick={() => navigate('/cart')}
+                            onClick={() => navigate(ROUTES.SHOPPING_CART)}
                             className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md"
                         >
                             <ArrowLeftIcon className="w-5 h-5" />

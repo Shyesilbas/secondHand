@@ -1,18 +1,19 @@
 
+import { USER_ADDRESS_TYPES } from '../../userConstants.js';
+
 const AddressCard = ({ 
   address, 
   onEdit, 
   onDelete, 
-  onSetMain, 
   onSelectAsMain 
 }) => {
   const getAddressTypeIcon = (type) => {
     switch (type) {
-      case 'HOME':
+      case USER_ADDRESS_TYPES.HOME:
         return '🏠';
-      case 'WORK':
+      case USER_ADDRESS_TYPES.WORK:
         return '🏢';
-      case 'OTHER':
+      case USER_ADDRESS_TYPES.OTHER:
         return '📍';
       default:
         return '📍';
@@ -21,11 +22,11 @@ const AddressCard = ({
 
   const getAddressTypeLabel = (type) => {
     switch (type) {
-      case 'HOME':
+      case USER_ADDRESS_TYPES.HOME:
         return 'Home';
-      case 'WORK':
+      case USER_ADDRESS_TYPES.WORK:
         return 'Work';
-      case 'OTHER':
+      case USER_ADDRESS_TYPES.OTHER:
         return 'Other';
       default:
         return 'Other';

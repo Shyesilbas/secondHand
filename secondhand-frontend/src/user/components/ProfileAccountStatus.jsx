@@ -1,10 +1,12 @@
 
+import { USER_ACCOUNT_STATUSES, USER_DEFAULTS } from '../userConstants.js';
+
 const ProfileAccountStatus = ({ user }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InfoBadge
             label="Account Status"
-            value={user?.accountStatus || 'Unknown'}
+            value={user?.accountStatus || USER_DEFAULTS.UNKNOWN_STATUS}
             type={user?.accountStatus}
           />
           <InfoBadge
@@ -25,9 +27,9 @@ const InfoBadge = ({ label, value, type, isVerified }) => {
       : 'bg-red-50 text-red-700 border border-red-200';
   } else {
     const colors = {
-      ACTIVE: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-      SUSPENDED: 'bg-red-50 text-red-700 border border-red-200',
-      PENDING: 'bg-amber-50 text-amber-700 border border-amber-200',
+      [USER_ACCOUNT_STATUSES.ACTIVE]: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+      [USER_ACCOUNT_STATUSES.SUSPENDED]: 'bg-red-50 text-red-700 border border-red-200',
+      [USER_ACCOUNT_STATUSES.PENDING]: 'bg-amber-50 text-amber-700 border border-amber-200',
     };
     colorClasses =
       colors[type] || 'bg-slate-50 text-slate-700 border border-slate-200';

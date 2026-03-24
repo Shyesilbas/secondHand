@@ -6,6 +6,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useListingFilters } from './useListingFilters.js';
 import { useListingPagination } from './useListingPagination.js';
 import { useListingSearch } from './useListingSearch.js';
+import { LISTING_DEFAULTS, LISTING_TYPES, NON_PURCHASABLE_TYPES } from '../types/index.js';
 
 const LISTING_ENGINE_QUERY_KEYS = {
   listings: ['listings'],
@@ -16,7 +17,7 @@ const LISTING_ENGINE_QUERY_KEYS = {
 /**
  * Orchestrates listing filters, pagination, and search sub-hooks
  */
-export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initialMode = 'browse' } = {}) => {
+export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, mode: initialMode = 'browse' } = {}) => {
   const location = useLocation();
   const { user, isAuthenticated } = useAuthState();
 
@@ -40,7 +41,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
       return LISTING_ENGINE_QUERY_KEYS.mine(
         user?.id,
         filterHook.cleanedFilters?.page ?? 0,
-        filterHook.cleanedFilters?.size ?? 10,
+        filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
         filterHook.cleanedFilters?.listingType || null
       );
     }
@@ -57,7 +58,7 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
       if (mode === 'mine') {
         return listingService.getMyListings(
           filterHook.cleanedFilters?.page ?? 0,
-          filterHook.cleanedFilters?.size ?? 10,
+          filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
           filterHook.cleanedFilters?.listingType || null
         );
       }
@@ -124,11 +125,11 @@ export const useListingEngine = ({ initialListingType = 'VEHICLE', mode: initial
     if (!Array.isArray(source)) return [];
     return source.filter((listing) => {
       if (!listing) return false;
-      if (['VEHICLE', 'REAL_ESTATE'].includes(listing.type)) return false;
+      if (NON_PURCHASABLE_TYPES.includes(listing.type)) return false;
       if (listing.quantity == null) return false;
       const qty = Number(listing.quantity);
       if (!Number.isFinite(qty)) return false;
-      return qty > 0 && qty < 10;
+      return qty > 0 && qty < LISTING_DEFAULTS.LOW_STOCK_MAX_QUANTITY;
     });
   }, [mode, rawListings, searchHook.filteredListings, searchHook.title.allPagesLoaded]);
 

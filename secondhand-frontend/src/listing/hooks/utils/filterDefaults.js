@@ -1,5 +1,6 @@
 import { getListingConfig } from '../../config/listingConfig.js';
 import { getMinKey, getMaxKey } from '../../filters/filterRangeKeys.js';
+import { LISTING_DEFAULTS } from '../../types/index.js';
 
 /**
  * Builds default filter values from listing config fields
@@ -40,16 +41,16 @@ export const getDefaultFiltersForType = (listingType, initialFilters) => {
   const base = {
     type,
     listingType: type,
-    status: 'ACTIVE',
+    status: LISTING_DEFAULTS.STATUS,
     city: '',
     district: '',
-    minPrice: 0,
-    maxPrice: 0,
-    currency: '',
-    sortBy: 'createdAt',
-    sortDirection: 'DESC',
-    page: 0,
-    size: 10,
+    minPrice: LISTING_DEFAULTS.MIN_PRICE,
+    maxPrice: LISTING_DEFAULTS.MAX_PRICE,
+    currency: LISTING_DEFAULTS.CURRENCY,
+    sortBy: LISTING_DEFAULTS.SORT_BY,
+    sortDirection: LISTING_DEFAULTS.SORT_DIRECTION,
+    page: LISTING_DEFAULTS.PAGE,
+    size: LISTING_DEFAULTS.FILTER_PAGE_SIZE,
   };
 
   const dynamic = buildDefaultsFromFilterConfig(cfg?.filterConfig);

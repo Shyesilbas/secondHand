@@ -10,6 +10,7 @@ import ListingCard from '../../listing/components/ListingCard.jsx';
 import UserProfileHeader from '../components/UserProfileHeader.jsx';
 import UserReviews from '../components/UserReviews.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const TABS = [
     { key: 'listings', label: 'Listings' },
@@ -193,7 +194,7 @@ const UserProfilePage = () => {
                                             </p>
                                             {isOwnProfile && (
                                                 <button
-                                                    onClick={() => navigate('/listings/create')}
+                                                        onClick={() => navigate(ROUTES.CREATE_LISTING)}
                                                     className="mt-6 px-6 py-3 bg-slate-900 text-white font-semibold rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-md hover:shadow-lg tracking-tight"
                                                 >
                                                     Create Your First Listing

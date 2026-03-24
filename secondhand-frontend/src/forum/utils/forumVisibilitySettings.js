@@ -1,9 +1,11 @@
+import { FORUM_AUTHOR_VISIBILITY } from '../forumConstants.js';
+
 const THREAD_KEY = 'forum.threadAuthorVisibility';
 const COMMENT_KEY = 'forum.commentAuthorVisibility';
 
 const normalizeVisibility = (value) => {
-  if (value === 'DISPLAY_NAME') return 'DISPLAY_NAME';
-  return 'ANONYMOUS';
+  if (value === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME) return FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME;
+  return FORUM_AUTHOR_VISIBILITY.ANONYMOUS;
 };
 
 const safeGet = (key) => {

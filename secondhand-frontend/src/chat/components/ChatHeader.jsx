@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon, X as XMarkIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import {useNotification} from '../../notification/NotificationContext.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
+import { CHAT_DEFAULTS, CHAT_MESSAGES, CHAT_ROOM_TYPES } from '../chatConstants.js';
 
 const ChatHeader = ({ 
   selectedChatRoom, 
@@ -16,27 +18,27 @@ const ChatHeader = ({
 
   const handleListingTitleClick = () => {
     if (selectedChatRoom?.listingId) {
-      navigate(`/listings/${selectedChatRoom.listingId}`);
+      navigate(ROUTES.LISTING_DETAIL(selectedChatRoom.listingId));
       onClose();
     }
   };
 
   const handleUserClick = () => {
     if (selectedChatRoom?.otherParticipantId) {
-      navigate(`/users/${selectedChatRoom.otherParticipantId}`);
+      navigate(ROUTES.USER_PROFILE(selectedChatRoom.otherParticipantId));
       onClose();
     }
   };
 
   const handleDeleteConversation = () => {
     notification.showConfirmation(
-      'Delete Conversation',
-      'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
+      CHAT_MESSAGES.DELETE_CONVERSATION_TITLE,
+      CHAT_MESSAGES.DELETE_CONVERSATION_CONFIRMATION,
       () => {
         onDeleteConversation?.(selectedChatRoom.id);
         onConversationDeleted?.(selectedChatRoom.id);
         onClose();
-        notification.showSuccess('Success', 'Conversation deleted successfully.');
+        notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.CONVERSATION_DELETED);
       }
     );
     setShowOptions(false);
@@ -46,7 +48,7 @@ const ChatHeader = ({
     if (selectedChatRoom?.otherParticipantName) {
       return selectedChatRoom.otherParticipantName;
     }
-    if (selectedChatRoom?.roomType === 'LISTING') {
+    if (selectedChatRoom?.roomType === CHAT_ROOM_TYPES.LISTING) {
       return 'Seller';
     }
     return selectedChatRoom?.roomName || 'Chat';
@@ -70,11 +72,13 @@ const ChatHeader = ({
               className="block text-xs text-slate-500 hover:text-slate-700 hover:underline cursor-pointer transition-all duration-300 ease-in-out mt-0.5 tracking-tight"
               title={`View listing: ${selectedChatRoom.listingTitle}`}
             >
-              📦 {selectedChatRoom.listingTitle.length > 10 ? `${selectedChatRoom.listingTitle.substring(0, 10)}...` : selectedChatRoom.listingTitle}
+              📦 {selectedChatRoom.listingTitle.length > CHAT_DEFAULTS.MAX_LISTING_TITLE_PREVIEW
+                ? `${selectedChatRoom.listingTitle.substring(0, CHAT_DEFAULTS.MAX_LISTING_TITLE_PREVIEW)}...`
+                : selectedChatRoom.listingTitle}
             </button>
           )}
           <p className="text-xs font-medium text-slate-500 mt-1 tracking-tight">
-            {isConnected ? 'Online' : 'Offline'}
+            {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
           </p>
         </div>
       </div>

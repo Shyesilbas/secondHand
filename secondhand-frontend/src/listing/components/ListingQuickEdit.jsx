@@ -2,15 +2,14 @@ import React, {useCallback, useState} from 'react';
 import {listingService} from '../services/listingService.js';
 import {PriceInput} from '../../common/components/ui/PriceInput.jsx';
 import {Check, Loader2} from 'lucide-react';
-
-const TYPES_WITHOUT_QUANTITY = ['VEHICLE', 'REAL_ESTATE'];
+import { NON_PURCHASABLE_TYPES } from '../types/index.js';
 
 export const ListingQuickEdit = ({listing, onChanged, showSuccess, showError, compact = false}) => {
     const [qty, setQty] = useState(String(listing.quantity ?? 0));
     const [priceVal, setPriceVal] = useState(listing.price ?? 0);
     const [savingQty, setSavingQty] = useState(false);
     const [savingPrice, setSavingPrice] = useState(false);
-    const showQty = !TYPES_WITHOUT_QUANTITY.includes(listing?.type);
+    const showQty = !NON_PURCHASABLE_TYPES.includes(listing?.type);
 
     const save = useCallback(async (field, value) => {
         const num = field === 'quantity' ? parseInt(value, 10) : (typeof value === 'number' ? value : parseFloat(String(value).replace(',', '.')));

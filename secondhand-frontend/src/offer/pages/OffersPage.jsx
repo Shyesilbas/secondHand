@@ -7,18 +7,20 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
 import {RefreshCw, CheckCircle2, XCircle, Clock, ShoppingCart, Handshake} from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
+import { OFFER_DEFAULTS, OFFER_MESSAGES, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
+import { getOfferErrorMessage } from '../utils/offerError.js';
 
 const statusBadge = (status) => {
   switch (status) {
-    case 'PENDING':
+    case OFFER_STATUSES.PENDING:
       return 'bg-amber-50/60 text-amber-700 border-amber-200/60';
-    case 'ACCEPTED':
+    case OFFER_STATUSES.ACCEPTED:
       return 'bg-emerald-50/60 text-emerald-700 border-emerald-200/60';
-    case 'REJECTED':
+    case OFFER_STATUSES.REJECTED:
       return 'bg-red-50/60 text-red-700 border-red-200/60';
-    case 'EXPIRED':
+    case OFFER_STATUSES.EXPIRED:
       return 'bg-slate-50/70 text-slate-600 border-slate-200/70';
-    case 'COMPLETED':
+    case OFFER_STATUSES.COMPLETED:
       return 'bg-indigo-50/60 text-indigo-700 border-indigo-200/60';
     default:
       return 'bg-slate-50/60 text-slate-600 border-slate-200/60';
@@ -28,18 +30,18 @@ const statusBadge = (status) => {
 const OffersPage = () => {
   const notification = useNotification();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('made');
+  const [activeTab, setActiveTab] = useState(OFFER_TABS.MADE);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [made, setMade] = useState([]);
   const [received, setReceived] = useState([]);
-  const [madePage, setMadePage] = useState(0);
+  const [madePage, setMadePage] = useState(OFFER_DEFAULTS.PAGE);
   const [madeTotalPages, setMadeTotalPages] = useState(0);
   const [madeTotalElements, setMadeTotalElements] = useState(0);
-  const [receivedPage, setReceivedPage] = useState(0);
+  const [receivedPage, setReceivedPage] = useState(OFFER_DEFAULTS.PAGE);
   const [receivedTotalPages, setReceivedTotalPages] = useState(0);
   const [receivedTotalElements, setReceivedTotalElements] = useState(0);
-  const size = 5;
+  const size = OFFER_DEFAULTS.PAGE_SIZE;
   const [counterTarget, setCounterTarget] = useState(null);
 
   const refresh = async (opts = {}) => {
@@ -74,7 +76,7 @@ const OffersPage = () => {
       setMadeTotalElements(0);
       setReceivedTotalPages(0);
       setReceivedTotalElements(0);
-      setError(e?.response?.data?.message || 'Failed to load offers');
+      setError(getOfferErrorMessage(e, OFFER_MESSAGES.LOAD_FAILED));
     } finally {
       setIsLoading(false);
     }
@@ -85,30 +87,30 @@ const OffersPage = () => {
   }, []);
 
   const items = useMemo(() => {
-    return activeTab === 'received' ? received : made;
+    return activeTab === OFFER_TABS.RECEIVED ? received : made;
   }, [activeTab, made, received]);
 
-  const totalPages = activeTab === 'received' ? receivedTotalPages : madeTotalPages;
-  const page = activeTab === 'received' ? receivedPage : madePage;
-  const totalElements = activeTab === 'received' ? receivedTotalElements : madeTotalElements;
+  const totalPages = activeTab === OFFER_TABS.RECEIVED ? receivedTotalPages : madeTotalPages;
+  const page = activeTab === OFFER_TABS.RECEIVED ? receivedPage : madePage;
+  const totalElements = activeTab === OFFER_TABS.RECEIVED ? receivedTotalElements : madeTotalElements;
 
   const handleAccept = async (offerId) => {
     try {
       await offerService.accept(offerId);
-      notification?.showSuccess('Successful', 'Offer accepted');
+      notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.OFFER_ACCEPTED);
       await refresh();
     } catch (e) {
-      notification?.showError('Error', e?.response?.data?.message || 'Failed to accept offer');
+      notification?.showError(OFFER_MESSAGES.ERROR_TITLE, getOfferErrorMessage(e, OFFER_MESSAGES.ACCEPT_FAILED));
     }
   };
 
   const handleReject = async (offerId) => {
     try {
       await offerService.reject(offerId);
-      notification?.showSuccess('Successful', 'Offer rejected');
+      notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.OFFER_REJECTED);
       await refresh();
     } catch (e) {
-      notification?.showError('Error', e?.response?.data?.message || 'Failed to reject offer');
+      notification?.showError(OFFER_MESSAGES.ERROR_TITLE, getOfferErrorMessage(e, OFFER_MESSAGES.REJECT_FAILED));
     }
   };
 
@@ -124,7 +126,7 @@ const OffersPage = () => {
             <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">Offers</h1>
             {items.length > 0 && (
               <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                {activeTab === 'made' ? 'Offers you made' : 'Offers you received'} • {totalElements} total
+                {activeTab === OFFER_TABS.MADE ? 'Offers you made' : 'Offers you received'} • {totalElements} total
               </p>
             )}
           </div>
@@ -144,9 +146,9 @@ const OffersPage = () => {
             <div className="inline-flex items-center rounded-2xl bg-slate-100 p-1">
               <button
                 type="button"
-                onClick={() => setActiveTab('made')}
+                onClick={() => setActiveTab(OFFER_TABS.MADE)}
                 className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
-                  activeTab === 'made'
+                  activeTab === OFFER_TABS.MADE
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
@@ -157,9 +159,9 @@ const OffersPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('received')}
+                onClick={() => setActiveTab(OFFER_TABS.RECEIVED)}
                 className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
-                  activeTab === 'received'
+                  activeTab === OFFER_TABS.RECEIVED
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
@@ -170,7 +172,7 @@ const OffersPage = () => {
               </button>
             </div>
             <div className="text-[11px] text-slate-500 tracking-tight">
-              {activeTab === 'made'
+              {activeTab === OFFER_TABS.MADE
                 ? 'Track offers you send to other sellers.'
                 : 'Review and respond to incoming offers.'}
             </div>
@@ -197,7 +199,7 @@ const OffersPage = () => {
                 <Handshake className="h-7 w-7 text-indigo-500" />
               </div>
               <h2 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                No {activeTab === 'made' ? 'offers made' : 'offers received'} yet
+                No {activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'} yet
               </h2>
               <p className="mt-2 max-w-sm text-xs sm:text-sm text-slate-500 tracking-tight">
                 Start negotiating prices to unlock better deals on high quality items.
@@ -207,11 +209,11 @@ const OffersPage = () => {
             <>
               <div className="space-y-3">
                 {items.map((o) => {
-                  const currency = 'TRY';
-                  const isExpired = o.status === 'EXPIRED';
-                  const canActAsSeller = !isExpired && activeTab === 'received' && o.status === 'PENDING';
-                  const canCheckout = !isExpired && activeTab === 'made' && o.status === 'ACCEPTED';
-                  const personName = activeTab === 'made'
+                  const currency = OFFER_DEFAULTS.FALLBACK_CURRENCY;
+                  const isExpired = o.status === OFFER_STATUSES.EXPIRED;
+                  const canActAsSeller = !isExpired && activeTab === OFFER_TABS.RECEIVED && o.status === OFFER_STATUSES.PENDING;
+                  const canCheckout = !isExpired && activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.ACCEPTED;
+                  const personName = activeTab === OFFER_TABS.MADE
                     ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
                     : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
 
@@ -230,7 +232,7 @@ const OffersPage = () => {
                                 {o.listingTitle || 'Listing'}
                               </p>
                               <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                                {activeTab === 'made' ? 'To' : 'From'} {personName}
+                                {activeTab === OFFER_TABS.MADE ? 'To' : 'From'} {personName}
                               </p>
                             </div>
                             <span
@@ -333,7 +335,7 @@ const OffersPage = () => {
                   totalPages={totalPages}
                   onPageChange={(p) => {
                     const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
-                    if (activeTab === 'made') {
+                    if (activeTab === OFFER_TABS.MADE) {
                       setMadePage(next);
                       refresh({ madePage: next });
                       return;

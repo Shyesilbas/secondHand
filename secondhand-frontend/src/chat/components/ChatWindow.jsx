@@ -5,6 +5,7 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import ChatHeader from './ChatHeader.jsx';
 import MessageList from './MessageList.jsx';
 import ChatInput from './ChatInput.jsx';
+import { CHAT_DEFAULTS, CHAT_MESSAGES } from '../chatConstants.js';
 
 const ChatWindow = ({
                         isOpen,
@@ -44,14 +45,14 @@ const ChatWindow = ({
             prevLenRef.current = 0;
             setTimeout(() => {
                 scrollToBottom();
-            }, 100);
+            }, CHAT_DEFAULTS.INITIAL_SCROLL_DELAY_MS);
         } else if (messages?.length > 0 && !isLoadingMessages) {
             const prev = prevLenRef.current;
             const curr = messages?.length || 0;
             if (prev === 0 || curr > prev) {
                 setTimeout(() => {
                     scrollToBottom();
-                }, 50);
+                }, CHAT_DEFAULTS.NEW_MESSAGE_SCROLL_DELAY_MS);
                 prevLenRef.current = curr;
             }
         }
@@ -59,7 +60,7 @@ const ChatWindow = ({
 
     const handleDeleteMessage = (messageId) => {
         onDeleteMessage?.(messageId);
-        notification.showSuccess('Success', 'Message deleted successfully.');
+        notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.MESSAGE_DELETED);
     };
 
     if (!isOpen) return null;

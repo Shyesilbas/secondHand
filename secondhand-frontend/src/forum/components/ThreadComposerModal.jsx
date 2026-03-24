@@ -2,10 +2,11 @@ import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { getForumVisibilitySettings } from '../utils/forumVisibilitySettings.js';
+import { FORUM_AUTHOR_VISIBILITY, FORUM_CATEGORIES, FORUM_MESSAGES } from '../forumConstants.js';
 
 const categoryLabel = {
-  SUGGESTIONS: 'Öneriler',
-  COMPLAINTS: 'Şikayetler',
+  [FORUM_CATEGORIES.SUGGESTIONS]: 'Öneriler',
+  [FORUM_CATEGORIES.COMPLAINTS]: 'Şikayetler',
 };
 
 export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => {
@@ -25,7 +26,7 @@ export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => 
     const authorVisibility = getForumVisibilitySettings().threadAuthorVisibility;
     const name = String(user?.name || '').trim();
     const surname = String(user?.surname || '').trim();
-    if (authorVisibility === 'ANONYMOUS') return 'Anonymous';
+    if (authorVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS) return 'Anonymous';
     const initial = surname ? `${surname.slice(0, 1).toUpperCase()}.` : '';
     const display = `${name}${initial ? ` ${initial}` : ''}`.trim();
     return display || 'User';
@@ -55,14 +56,14 @@ export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => 
         description: String(description || '').trim(),
       });
       if (res?.ok === false) {
-        setError(res?.error || 'Unable to publish thread');
+        setError(res?.error || FORUM_MESSAGES.PUBLISH_THREAD_FAILED);
         setSubmitting(false);
         return;
       }
       reset();
       onClose?.();
     } catch (e) {
-      setError(e?.message || 'Unable to publish thread');
+      setError(e?.message || FORUM_MESSAGES.PUBLISH_THREAD_FAILED);
       setSubmitting(false);
     }
   };
@@ -75,7 +76,7 @@ export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => 
       <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 tracking-tight truncate">New thread</p>
+            <p className="text-sm font-semibold text-slate-900 tracking-tight truncate">{FORUM_MESSAGES.NEW_THREAD}</p>
             <p className="text-xs text-slate-500 mt-0.5 truncate">{catLabel}</p>
           </div>
           <button
@@ -135,7 +136,7 @@ export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => 
             disabled={submitting}
             className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancel
+            {FORUM_MESSAGES.CLOSE}
           </button>
           <button
             type="button"
@@ -143,7 +144,7 @@ export const ThreadComposerModal = ({ isOpen, onClose, category, onSubmit }) => 
             disabled={!canSubmit}
             className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Publishing...' : 'Publish'}
+            {submitting ? FORUM_MESSAGES.PUBLISHING : FORUM_MESSAGES.PUBLISH}
           </button>
         </div>
       </div>

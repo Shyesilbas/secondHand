@@ -5,16 +5,22 @@ import { useMyFavoriteLists, FavoriteListModal, FavoriteListCard } from '../../f
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import { formatDate } from '../../common/formatters.js';
+import { FAVORITE_DEFAULTS, FAVORITES_PAGE_TABS } from '../favoriteConstants.js';
 
 const FavoritesPage = () => {
-    const [activeTab, setActiveTab] = useState('favorites');
+    const [activeTab, setActiveTab] = useState(FAVORITES_PAGE_TABS.FAVORITES);
     const [showCreateListModal, setShowCreateListModal] = useState(false);
 
     const {
         favorites = [],
         isLoading = false,
         error = null,
-        pagination = { number: 0, size: 20, totalPages: 0, totalElements: 0 },
+        pagination = {
+            number: FAVORITE_DEFAULTS.PAGE,
+            size: FAVORITE_DEFAULTS.PAGE_SIZE,
+            totalPages: 0,
+            totalElements: 0,
+        },
         fetchFavorites,
         loadPage
     } = useFavorites();
@@ -54,9 +60,9 @@ const FavoritesPage = () => {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
                     <button
-                        onClick={() => setActiveTab('favorites')}
+                        onClick={() => setActiveTab(FAVORITES_PAGE_TABS.FAVORITES)}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                            activeTab === 'favorites'
+                            activeTab === FAVORITES_PAGE_TABS.FAVORITES
                                 ? 'bg-white text-slate-900 shadow-sm'
                                 : 'text-slate-600 hover:text-slate-900'
                         }`}
@@ -64,9 +70,9 @@ const FavoritesPage = () => {
                         Favoriler ({pagination.totalElements})
                     </button>
                     <button
-                        onClick={() => setActiveTab('lists')}
+                        onClick={() => setActiveTab(FAVORITES_PAGE_TABS.LISTS)}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                            activeTab === 'lists'
+                            activeTab === FAVORITES_PAGE_TABS.LISTS
                                 ? 'bg-white text-slate-900 shadow-sm'
                                 : 'text-slate-600 hover:text-slate-900'
                         }`}
@@ -76,7 +82,7 @@ const FavoritesPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {activeTab === 'lists' && (
+                    {activeTab === FAVORITES_PAGE_TABS.LISTS && (
                         <button
                             onClick={() => setShowCreateListModal(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
@@ -85,7 +91,7 @@ const FavoritesPage = () => {
                             Yeni Liste
                         </button>
                     )}
-                    {activeTab === 'favorites' && (
+                    {activeTab === FAVORITES_PAGE_TABS.FAVORITES && (
                         <button
                             onClick={handleRefresh}
                             disabled={isLoading}
@@ -98,7 +104,7 @@ const FavoritesPage = () => {
                 </div>
             </div>
 
-            {activeTab === 'favorites' && (
+            {activeTab === FAVORITES_PAGE_TABS.FAVORITES && (
                 <>
                     <div className="mb-8">
                         <ListingGrid
@@ -122,7 +128,7 @@ const FavoritesPage = () => {
                 </>
             )}
 
-            {activeTab === 'lists' && (
+            {activeTab === FAVORITES_PAGE_TABS.LISTS && (
                 <div>
                     {listsLoading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

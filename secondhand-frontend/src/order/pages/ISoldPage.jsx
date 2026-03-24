@@ -3,10 +3,15 @@ import {useEnums} from '../../common/hooks/useEnums.js';
 import { OrdersListLayout } from '../components/shared';
 import {useOrderFlow} from '../hooks/useOrderFlow.js';
 import {ROUTES} from '../../common/constants/routes.js';
+import { ORDER_DEFAULTS, ORDER_VIEW_MODES } from '../constants/orderUiConstants.js';
 
 const ISoldPage = () => {
   const { enums } = useEnums();
-  const flow = useOrderFlow({ viewMode: 'seller', initialPage: 0, initialSize: 5 });
+  const flow = useOrderFlow({
+    viewMode: ORDER_VIEW_MODES.SELLER,
+    initialPage: ORDER_DEFAULTS.INITIAL_PAGE,
+    initialSize: ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
+  });
   const navigate = useNavigate();
 
   return (
@@ -18,7 +23,7 @@ const ISoldPage = () => {
       analyticsLabel="Analytics"
       flow={flow}
       enums={enums}
-      viewMode="seller"
+      viewMode={ORDER_VIEW_MODES.SELLER}
       emptyText="No sales yet"
     />
   );

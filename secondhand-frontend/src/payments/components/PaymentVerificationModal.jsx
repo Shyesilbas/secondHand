@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 
-const formatPrice = (price, currency = 'TRY') =>
-  formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+import { EMAIL_TYPES } from '../../emails/emails.js';
+import { OTP_CODE_LENGTH, VERIFICATION_STEPS, PAYMENT_TYPES } from '../paymentSchema.js';
+import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
+import { sanitizeOtpInput, extractVerificationCodeFromEmail } from '../utils/otp.js';
 
 const toNumber = (value) => {
   const n = Number(value);
@@ -141,7 +143,7 @@ const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
           </div>
           <div className="text-right">
             <p className="text-lg font-semibold text-gray-900">
-              {formatPrice(balance, 'TRY')}
+              {formatPaymentAmount(balance)}
             </p>
             <p className={`text-sm ${hasSufficientBalance ? 'text-green-600' : 'text-red-600'}`}>
               {hasSufficientBalance ? 'Sufficient Balance' : 'Insufficient Balance'}
@@ -151,7 +153,7 @@ const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
         {!hasSufficientBalance && (
           <div className="mt-3 p-2 bg-red-100 rounded border border-red-200">
             <p className="text-sm text-red-800">
-              You need {formatPrice(totalFee - balance, 'TRY')} more to complete this payment.
+              You need {formatPaymentAmount(totalFee - balance)} more to complete this payment.
             </p>
           </div>
         )}
@@ -175,13 +177,13 @@ const PaymentMethodDetails = ({
   const creditCards = paymentMethods?.creditCards ?? [];
   const bankAccounts = paymentMethods?.bankAccounts ?? [];
 
-  if (paymentType === 'CREDIT_CARD') {
-    return <CreditCardPaymentMethods creditCards={creditCards} onAdd={() => onNavigateToPaymentMethods('CREDIT_CARD')} />;
+  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) {
+    return <CreditCardPaymentMethods creditCards={creditCards} onAdd={() => onNavigateToPaymentMethods(PAYMENT_TYPES.CREDIT_CARD)} />;
   }
-  if (paymentType === 'TRANSFER') {
-    return <TransferPaymentMethods bankAccounts={bankAccounts} onAdd={() => onNavigateToPaymentMethods('TRANSFER')} />;
+  if (paymentType === PAYMENT_TYPES.TRANSFER) {
+    return <TransferPaymentMethods bankAccounts={bankAccounts} onAdd={() => onNavigateToPaymentMethods(PAYMENT_TYPES.TRANSFER)} />;
   }
-  if (paymentType === 'EWALLET') {
+  if (paymentType === PAYMENT_TYPES.EWALLET) {
     return <EWalletPaymentMethod eWallet={eWallet} feeConfig={feeConfig} />;
   }
   return null;
@@ -193,9 +195,9 @@ const canProceedWithPaymentMethod = ({ paymentType, paymentMethods, isLoadingPay
   const creditCards = paymentMethods?.creditCards ?? [];
   const bankAccounts = paymentMethods?.bankAccounts ?? [];
 
-  if (paymentType === 'CREDIT_CARD') return creditCards.length > 0;
-  if (paymentType === 'TRANSFER') return bankAccounts.length > 0;
-  if (paymentType === 'EWALLET') return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
+  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) return creditCards.length > 0;
+  if (paymentType === PAYMENT_TYPES.TRANSFER) return bankAccounts.length > 0;
+  if (paymentType === PAYMENT_TYPES.EWALLET) return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
   return false;
 };
 
@@ -206,12 +208,6 @@ const typeBadgeStyles = {
 };
 
 const getTypeBadgeClass = (type) => typeBadgeStyles[type] || 'bg-gray-100 text-text-secondary ring-gray-200';
-
-const extractVerificationCode = (email) => {
-  if (email?.emailType !== 'PAYMENT_VERIFICATION') return null;
-  const match = (email.content || '').match(/\b\d{6}\b/);
-  return match ? match[0] : null;
-};
 
 const formatEmailDate = (date) => {
   try {
@@ -245,18 +241,20 @@ const PaymentVerificationModal = ({
   onClearEmails,
   onNavigateToPaymentMethods,
 }) => {
-  const [step, setStep] = useState('REVIEW');
+  const [step, setStep] = useState(VERIFICATION_STEPS.REVIEW);
   const [showEmailHistory, setShowEmailHistory] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    setStep('REVIEW');
+    setStep(VERIFICATION_STEPS.REVIEW);
     setShowEmailHistory(false);
   }, [isOpen]);
 
   const verificationEmails = useMemo(() => {
     const list = Array.isArray(emails) ? emails : [];
-    return list.filter((e) => e?.emailType === 'PAYMENT_VERIFICATION').slice(0, 3);
+    return list
+      .filter((e) => e?.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION)
+      .slice(0, 3);
   }, [emails]);
 
   const canStartPayment = canProceedWithPaymentMethod({
@@ -283,7 +281,7 @@ const PaymentVerificationModal = ({
   const handleStart = async () => {
     const ok = await onStartVerification?.();
     if (!ok) return;
-    setStep('VERIFY');
+    setStep(VERIFICATION_STEPS.VERIFY);
     try {
       await onFetchEmails?.();
     } catch {}
@@ -311,7 +309,7 @@ const PaymentVerificationModal = ({
         <div className="px-6 py-5 border-b border-slate-100 bg-white/70">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-              {step === 'REVIEW' ? 'Payment Confirmation' : 'Verification'}
+              {step === VERIFICATION_STEPS.REVIEW ? 'Payment Confirmation' : 'Verification'}
             </h3>
             <button onClick={handleClose} className="text-slate-400 hover:text-slate-600">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,13 +329,13 @@ const PaymentVerificationModal = ({
               <div className="text-right">
                 <p className="text-[11px] text-indigo-700/70">Amount</p>
                 <p className="font-mono text-sm font-semibold tracking-tight text-slate-900">
-                  {feeConfig ? formatPrice(feeConfig.totalCreationFee) : ''}
+                  {feeConfig ? formatPaymentAmount(feeConfig.totalCreationFee) : ''}
                 </p>
               </div>
             </div>
           </div>
 
-          {step === 'REVIEW' ? (
+          {step === VERIFICATION_STEPS.REVIEW ? (
             <div className="mb-6">
               <p className="mb-3 text-sm font-medium text-slate-700">Payment Method</p>
               <PaymentMethodDetails
@@ -358,12 +356,11 @@ const PaymentVerificationModal = ({
                     type="text"
                     value={verificationCode}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                      onChangeVerificationCode?.(value);
+                      onChangeVerificationCode?.(sanitizeOtpInput(e.target.value, OTP_CODE_LENGTH));
                     }}
                     className="flex-1 rounded-2xl border border-slate-300 px-3 py-2 text-center font-mono text-lg tracking-[0.3em] text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="6-digit code"
-                    maxLength={6}
+                    maxLength={OTP_CODE_LENGTH}
                   />
                   <button
                     onClick={handleResend}
@@ -411,7 +408,10 @@ const PaymentVerificationModal = ({
                       </div>
                     ) : (
                       verificationEmails.map((email, index) => {
-                        const code = extractVerificationCode(email);
+                        const code = extractVerificationCodeFromEmail(
+                          email,
+                          EMAIL_TYPES.PAYMENT_VERIFICATION
+                        );
                         return (
                           <div key={index} className="rounded-xl border bg-white shadow-sm hover:shadow-md transition-shadow">
                             <div className="px-4 py-3 border-b flex items-start justify-between gap-3">
@@ -466,7 +466,7 @@ const PaymentVerificationModal = ({
           <button onClick={handleClose} className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-white">
             Cancel
           </button>
-          {step === 'REVIEW' ? (
+          {step === VERIFICATION_STEPS.REVIEW ? (
             <button
               onClick={handleStart}
               disabled={!canStartPayment || isProcessing}
@@ -477,7 +477,7 @@ const PaymentVerificationModal = ({
           ) : (
             <button
               onClick={handleVerify}
-              disabled={isProcessing || (verificationCode || '').length !== 6}
+              disabled={isProcessing || (verificationCode || '').length !== OTP_CODE_LENGTH}
               className="ml-auto rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold tracking-tight text-white shadow-md hover:bg-emerald-700 disabled:opacity-60"
             >
               {isProcessing ? 'Verifying...' : 'Verify & Pay'}

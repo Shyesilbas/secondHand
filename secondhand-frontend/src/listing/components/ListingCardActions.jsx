@@ -4,6 +4,7 @@ import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useListingActions } from '../hooks/useListingActions.js';
 import { ListingQuickEdit } from './ListingQuickEdit.jsx';
+import { LISTING_STATUS } from '../types/index.js';
 
 const ListingCardActions = ({ listing, onChanged }) => {
   const { user } = useAuthState();
@@ -34,7 +35,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
   if (!isOwner) return null;
 
   const listingInShowcase = isInShowcase(listing.id);
-  const canEdit = listing.status !== 'SOLD';
+  const canEdit = listing.status !== LISTING_STATUS.SOLD;
 
   return (
     <>
@@ -73,7 +74,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
-            {listing.status === 'DRAFT' && (
+            {listing.status === LISTING_STATUS.DRAFT && (
               <button
                 onClick={actions.handlePayListingFee}
                 className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2"
@@ -85,7 +86,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
-            {listing.status === 'ACTIVE' && (
+            {listing.status === LISTING_STATUS.ACTIVE && (
               <button
                 onClick={actions.handleDeactivate}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -97,7 +98,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
-            {listing.status === 'INACTIVE' && (
+            {listing.status === LISTING_STATUS.INACTIVE && (
               <button
                 onClick={actions.handleReactivate}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -109,7 +110,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
-            {listing.status !== 'SOLD' && (
+            {listing.status !== LISTING_STATUS.SOLD && (
               <button
                 onClick={actions.handleMarkAsSold}
                 className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -121,7 +122,7 @@ const ListingCardActions = ({ listing, onChanged }) => {
               </button>
             )}
 
-            {listing.status === 'ACTIVE' && !listingInShowcase && (
+            {listing.status === LISTING_STATUS.ACTIVE && !listingInShowcase && (
               <button
                 onClick={actions.handleOpenShowcase}
                 className="w-full px-4 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 flex items-center gap-2"

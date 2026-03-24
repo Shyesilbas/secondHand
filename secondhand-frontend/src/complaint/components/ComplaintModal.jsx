@@ -3,6 +3,7 @@ import {COMPLAINT_REASONS} from '../types/complaintTypes.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {AlertCircle, Loader2, ShieldCheck, X} from 'lucide-react';
 import logger from '../../common/utils/logger.js';
+import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES } from '../complaintConstants.js';
 
 const ComplaintModal = ({
                             isOpen,
@@ -31,12 +32,12 @@ const ComplaintModal = ({
     const validateForm = () => {
         const newErrors = {};
         if (!formData.reason.trim()) {
-            newErrors.reason = 'You must select a reason';
+            newErrors.reason = COMPLAINT_MESSAGES.REASON_REQUIRED;
         }
         if (!formData.description.trim()) {
-            newErrors.description = 'Description is required';
-        } else if (formData.description.trim().length < 10) {
-            newErrors.description = 'Description must be at least 10 characters';
+            newErrors.description = COMPLAINT_MESSAGES.DESCRIPTION_REQUIRED;
+        } else if (formData.description.trim().length < COMPLAINT_DEFAULTS.MIN_DESCRIPTION_LENGTH) {
+            newErrors.description = COMPLAINT_MESSAGES.DESCRIPTION_TOO_SHORT;
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -152,7 +153,7 @@ const ComplaintModal = ({
                                     }`}
                                     placeholder="Please explain your complaint in detail..."
                                     disabled={isLoading}
-                                    maxLength={500}
+                                    maxLength={COMPLAINT_DEFAULTS.MAX_DESCRIPTION_LENGTH}
                                 />
                                 <div className="mt-2 flex items-start justify-between">
                                     {errors.description ? (
@@ -166,7 +167,7 @@ const ComplaintModal = ({
                                         </p>
                                     )}
                                     <p className="text-xs font-mono text-slate-400 tracking-tight">
-                                        {formData.description.length}/500
+                                        {formData.description.length}/{COMPLAINT_DEFAULTS.MAX_DESCRIPTION_LENGTH}
                                     </p>
                                 </div>
                             </div>

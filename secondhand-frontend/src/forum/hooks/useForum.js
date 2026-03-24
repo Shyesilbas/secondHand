@@ -1,25 +1,33 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { forumService } from '../services/forumService.js';
 import { getForumVisibilitySettings } from '../utils/forumVisibilitySettings.js';
+import {
+  FORUM_AUTHOR_VISIBILITY,
+  FORUM_CATEGORIES,
+  FORUM_DEFAULTS,
+  FORUM_MESSAGES,
+  FORUM_REACTIONS,
+  FORUM_THREAD_STATUSES,
+} from '../forumConstants.js';
 
 const clampReaction = (v) => {
-  if (v === 'LIKE' || v === 'DISLIKE') return v;
+  if (v === FORUM_REACTIONS.LIKE || v === FORUM_REACTIONS.DISLIKE) return v;
   return null;
 };
 
 const reactionToRequest = (reaction) => {
-  if (reaction === 'LIKE' || reaction === 'DISLIKE') return reaction;
-  return 'CLEAR';
+  if (reaction === FORUM_REACTIONS.LIKE || reaction === FORUM_REACTIONS.DISLIKE) return reaction;
+  return FORUM_REACTIONS.CLEAR;
 };
 
 const applyDelta = ({ likes, dislikes, prev, next }) => {
   let l = Number(likes) || 0;
   let d = Number(dislikes) || 0;
 
-  if (prev === 'LIKE') l -= 1;
-  if (prev === 'DISLIKE') d -= 1;
-  if (next === 'LIKE') l += 1;
-  if (next === 'DISLIKE') d += 1;
+  if (prev === FORUM_REACTIONS.LIKE) l -= 1;
+  if (prev === FORUM_REACTIONS.DISLIKE) d -= 1;
+  if (next === FORUM_REACTIONS.LIKE) l += 1;
+  if (next === FORUM_REACTIONS.DISLIKE) d += 1;
 
   return { likes: Math.max(0, l), dislikes: Math.max(0, d) };
 };
@@ -34,8 +42,8 @@ const normalizePage = (pageData, fallbackPage, fallbackSize) => {
 };
 
 export const useForum = () => {
-  const [category, setCategory] = useState('SUGGESTIONS');
-  const [sort, setSort] = useState('NEW');
+  const [category, setCategory] = useState(FORUM_DEFAULTS.CATEGORY);
+  const [sort, setSort] = useState(FORUM_DEFAULTS.SORT);
   const [search, setSearch] = useState('');
 
   const [threads, setThreads] = useState([]);
@@ -83,13 +91,13 @@ export const useForum = () => {
     setThreadsError(null);
     try {
       const page = reset ? 0 : threadsPage;
-      const data = await forumService.listThreads({ ...listParams, page, size: 20 });
-      const normalized = normalizePage(data, page, 20);
+      const data = await forumService.listThreads({ ...listParams, page, size: FORUM_DEFAULTS.PAGE_SIZE });
+      const normalized = normalizePage(data, page, FORUM_DEFAULTS.PAGE_SIZE);
       setThreads((prev) => reset ? normalized.content : [...prev, ...normalized.content]);
       setThreadsPage(normalized.number);
       setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
-      setThreadsError(e?.message || 'Unable to load threads');
+      setThreadsError(e?.message || FORUM_MESSAGES.LOAD_THREADS_FAILED);
     } finally {
       setThreadsLoading(false);
     }
@@ -101,13 +109,13 @@ export const useForum = () => {
     setThreadsLoading(true);
     setThreadsError(null);
     try {
-      const data = await forumService.listThreads({ ...listParams, page: next, size: 20 });
-      const normalized = normalizePage(data, next, 20);
+      const data = await forumService.listThreads({ ...listParams, page: next, size: FORUM_DEFAULTS.PAGE_SIZE });
+      const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
       setThreads((prev) => [...prev, ...normalized.content]);
       setThreadsPage(normalized.number);
       setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
-      setThreadsError(e?.message || 'Unable to load threads');
+      setThreadsError(e?.message || FORUM_MESSAGES.LOAD_THREADS_FAILED);
     } finally {
       setThreadsLoading(false);
     }
@@ -131,20 +139,23 @@ export const useForum = () => {
       const data = await forumService.getThreadById(threadId);
       setSelectedThread(data || null);
     } catch (e) {
-      setThreadError(e?.message || 'Unable to load thread');
+      setThreadError(e?.message || FORUM_MESSAGES.LOAD_THREAD_FAILED);
     } finally {
       setThreadLoading(false);
     }
 
     setCommentsLoading(true);
     try {
-      const data = await forumService.listComments(threadId, { page: 0, size: 20 });
-      const normalized = normalizePage(data, 0, 20);
+      const data = await forumService.listComments(threadId, {
+        page: FORUM_DEFAULTS.PAGE,
+        size: FORUM_DEFAULTS.PAGE_SIZE,
+      });
+      const normalized = normalizePage(data, FORUM_DEFAULTS.PAGE, FORUM_DEFAULTS.PAGE_SIZE);
       setComments(normalized.content);
       setCommentsPage(normalized.number);
       setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
-      setCommentsError(e?.message || 'Unable to load comments');
+      setCommentsError(e?.message || FORUM_MESSAGES.LOAD_COMMENTS_FAILED);
     } finally {
       setCommentsLoading(false);
     }
@@ -156,13 +167,16 @@ export const useForum = () => {
     setCommentsLoading(true);
     setCommentsError(null);
     try {
-      const data = await forumService.listComments(selectedThreadId, { page: next, size: 20 });
-      const normalized = normalizePage(data, next, 20);
+      const data = await forumService.listComments(selectedThreadId, {
+        page: next,
+        size: FORUM_DEFAULTS.PAGE_SIZE,
+      });
+      const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
       setComments((prev) => [...prev, ...normalized.content]);
       setCommentsPage(normalized.number);
       setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
-      setCommentsError(e?.message || 'Unable to load comments');
+      setCommentsError(e?.message || FORUM_MESSAGES.LOAD_COMMENTS_FAILED);
     } finally {
       setCommentsLoading(false);
     }
@@ -195,7 +209,7 @@ export const useForum = () => {
         await selectThread(selectedThreadId);
       }
     } catch (e) {
-      setCommentsError(e?.message || 'Unable to add comment');
+      setCommentsError(e?.message || FORUM_MESSAGES.ADD_COMMENT_FAILED);
     }
   }, [draftComment.content, draftComment.parentCommentId, selectThread, selectedThreadId]);
 
@@ -204,7 +218,9 @@ export const useForum = () => {
     const safeDescription = String(description || '').trim();
     const safeCategory = String(category || '').trim();
     const fromSettings = getForumVisibilitySettings().threadAuthorVisibility;
-    const safeVisibility = String(authorVisibility || '').trim() || fromSettings || 'ANONYMOUS';
+    const safeVisibility = String(authorVisibility || '').trim()
+      || fromSettings
+      || FORUM_AUTHOR_VISIBILITY.ANONYMOUS;
     const tempId = `temp-${Date.now()}`;
     const nowIso = new Date().toISOString();
 
@@ -213,9 +229,9 @@ export const useForum = () => {
       title: safeTitle,
       description: safeDescription,
       category: safeCategory,
-      status: 'OPEN',
+      status: FORUM_THREAD_STATUSES.OPEN,
       authorVisibility: safeVisibility,
-      authorDisplayName: safeVisibility === 'ANONYMOUS' ? 'Anonymous' : 'You',
+      authorDisplayName: safeVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS ? 'Anonymous' : 'You',
       totalLikes: 0,
       totalDislikes: 0,
       createdAt: nowIso,
@@ -245,7 +261,7 @@ export const useForum = () => {
         setThreads((prev) => prev.filter((t) => t?.id !== tempId));
         setSelectedThreadId(null);
         setSelectedThread(null);
-        return { ok: false, error: 'Unable to publish thread' };
+        return { ok: false, error: FORUM_MESSAGES.PUBLISH_THREAD_FAILED };
       }
 
       setThreads((prev) => prev.map((t) => (t?.id === tempId ? created : t)));
@@ -257,7 +273,7 @@ export const useForum = () => {
       setThreads((prev) => prev.filter((t) => t?.id !== tempId));
       setSelectedThreadId(null);
       setSelectedThread(null);
-      return { ok: false, error: e?.message || 'Unable to publish thread' };
+      return { ok: false, error: e?.message || FORUM_MESSAGES.PUBLISH_THREAD_FAILED };
     }
   }, [selectThread]);
 
@@ -289,7 +305,7 @@ export const useForum = () => {
     } catch (e) {
       if (rollbackThreads) setThreads(rollbackThreads);
       if (rollbackSelected !== null) setSelectedThread(rollbackSelected);
-      return { ok: false, error: e?.message || 'Unable to change status' };
+      return { ok: false, error: e?.message || FORUM_MESSAGES.CHANGE_STATUS_FAILED };
     } finally {
       pendingKeysRef.current.delete(key);
     }
@@ -323,7 +339,7 @@ export const useForum = () => {
       return { ok: true };
     } catch (e) {
       if (rollbackThreads) setThreads(rollbackThreads);
-      return { ok: false, error: e?.message || 'Unable to delete thread' };
+      return { ok: false, error: e?.message || FORUM_MESSAGES.DELETE_THREAD_FAILED };
     } finally {
       pendingKeysRef.current.delete(key);
     }

@@ -5,6 +5,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../favorites.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FAVORITE_MESSAGES } from '../favoriteConstants.js';
 
 const FavoriteButton = ({
                           listingId,
@@ -98,15 +99,15 @@ const FavoriteButton = ({
       setFavoriteCount(statsDto.favoriteCount);
 
       showSuccess(
-          'Success',
-          statsDto.isFavorited ? 'Added to Favorites!' : 'Removed from Favorites!'
+          FAVORITE_MESSAGES.SUCCESS_TITLE,
+          statsDto.isFavorited ? FAVORITE_MESSAGES.BUTTON_ADDED : FAVORITE_MESSAGES.BUTTON_REMOVED
       );
 
       if (onToggle) onToggle(statsDto);
 
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update favorites';
-      showError('Error', message);
+      const message = error.response?.data?.message || FAVORITE_MESSAGES.UPDATE_FAVORITES_FAILED;
+      showError(FAVORITE_MESSAGES.ERROR_TITLE, message);
     } finally {
       setIsLoading(false);
     }
