@@ -1,3 +1,6 @@
+import { normalizeArrayResponse } from '../common/utils/normalizeArrayResponse.js';
+import { OTP_CODE_LENGTH as COMMON_OTP_CODE_LENGTH } from '../common/constants/otp.js';
+
 export const DEFAULT_PAYMENT_FILTERS = Object.freeze({
   seller: '',
   transactionType: '',
@@ -19,12 +22,7 @@ export const PAYMENT_QUERY_KEYS = Object.freeze({
   draftListings: ['draftListings'],
 });
 
-export const normalizeArrayResponse = (data) => {
-  if (!data) return [];
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data.content)) return data.content;
-  return [data];
-};
+export { normalizeArrayResponse };
 
 export const PAYMENT_TYPES = {
   CREDIT_CARD: 'CREDIT_CARD',
@@ -36,6 +34,7 @@ export const PAYMENT_TRANSACTION_TYPES = {
   LISTING_CREATION: 'LISTING_CREATION',
   ITEM_PURCHASE: 'ITEM_PURCHASE',
   ITEM_SALE: 'ITEM_SALE',
+  REFUND: 'REFUND',
   EWALLET_DEPOSIT: 'EWALLET_DEPOSIT',
   EWALLET_WITHDRAWAL: 'EWALLET_WITHDRAWAL',
   EWALLET_PAYMENT_RECEIVED: 'EWALLET_PAYMENT_RECEIVED',
@@ -46,6 +45,24 @@ export const PAYMENT_DIRECTIONS = {
   INCOMING: 'INCOMING',
   OUTGOING: 'OUTGOING'
 };
+
+export const DEFAULT_CURRENCY = 'TRY';
+export const DEFAULT_CURRENCY_SYMBOL = '₺';
+
+export const OTP_CODE_LENGTH = COMMON_OTP_CODE_LENGTH;
+export const OTP_TTL_MINUTES = 3;
+
+export const VERIFICATION_STEPS = Object.freeze({
+  REVIEW: 'REVIEW',
+  VERIFY: 'VERIFY',
+});
+
+export const WALLET_OPERATION_MODES = Object.freeze({
+  DEPOSIT: 'deposit',
+  WITHDRAW: 'withdraw',
+  UPDATE_LIMIT: 'updateLimit',
+  UPDATE_WARNING: 'updateWarning',
+});
 
 export const PaymentDto = (data) => ({
   paymentId: data.paymentId || null,
@@ -91,22 +108,6 @@ export const TRANSACTION_TYPE_LABELS = {
 export const PAYMENT_DIRECTION_LABELS = {
   [PAYMENT_DIRECTIONS.INCOMING]: 'Incoming',
   [PAYMENT_DIRECTIONS.OUTGOING]: 'Outgoing'
-};
-
-export const PAYMENT_STATUS_BADGE_COLORS = {
-  success: 'bg-green-100 text-green-800',
-  failed: 'bg-red-100 text-red-800'
-};
-
-export const PAYMENT_DIRECTION_BADGE_COLORS = {
-  [PAYMENT_DIRECTIONS.INCOMING]: 'bg-green-100 text-green-600',
-  [PAYMENT_DIRECTIONS.OUTGOING]: 'bg-blue-100 text-btn-primary'
-};
-
-export const ListingFeeConfigDTO = {
-  creationFee: undefined,
-  taxPercentage: undefined,
-  currency: undefined,
 };
 
 export const createPaymentRequest = (data) => {

@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { 
   createFavoriteRequest
 } from '../favorites.js';
+import { FAVORITE_DEFAULTS } from '../favoriteConstants.js';
 
 export const favoriteService = {
 
@@ -16,8 +17,11 @@ export const favoriteService = {
     return get(API_ENDPOINTS.FAVORITES.CHECK(listingId));
   },
 
-  getMyFavorites: async () => {
-    return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES);
-  }
+  getMyFavorites: async ({
+    page = FAVORITE_DEFAULTS.PAGE,
+    size = FAVORITE_DEFAULTS.PAGE_SIZE,
+  } = {}) => {
+    return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES, { params: { page, size } });
+  },
 
 };

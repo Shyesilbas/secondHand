@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {listingService} from '../../listing/services/listingService.js';
 import logger from '../../common/utils/logger.js';
+import { normalizeArrayResponse } from '../../common/utils/normalizeArrayResponse.js';
 
 export const useUserListings = (userId, options = {}) => {
     const [listings, setListings] = useState([]);
@@ -26,9 +27,10 @@ export const useUserListings = (userId, options = {}) => {
         try {
             const response = await listingService.getListingByUserId(userId, page, size);
             const data = response.data || response;
+            const content = normalizeArrayResponse(data);
 
             if (data && data.content && Array.isArray(data.content)) {
-                setListings(data.content);
+                setListings(content);
                 setPagination({
                     number: data.pageable?.pageNumber || data.number || page,
                     size: data.pageable?.pageSize || data.size || size,
@@ -39,7 +41,7 @@ export const useUserListings = (userId, options = {}) => {
                 });
             } else if (data && Array.isArray(data)) {
                 // Fallback for non-paginated response (shouldn't happen with new backend)
-                setListings(data);
+                setListings(content);
                 setPagination({
                     number: 0,
                     size: data.length,

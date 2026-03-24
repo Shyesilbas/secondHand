@@ -1,6 +1,7 @@
 import {del, get, post, put} from '../../common/services/api/request.js';
 import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {LISTING_TYPES} from '../types/index.js';
+import { LISTING_DEFAULTS } from '../types/index.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 import {getMinKey, getMaxKey} from '../filters/filterRangeKeys.js';
 
@@ -23,11 +24,11 @@ const serializeFilters = (filters, config, listingType) => {
   const payload = {
     listingType: typeUpper,
     type: typeUpper,
-    status: filters.status || 'ACTIVE',
-    page: parseInt(filters.page) || 0,
-    size: parseInt(filters.size) || 20,
-    sortBy: filters.sortBy || 'createdAt',
-    sortDirection: filters.sortDirection || 'DESC',
+    status: filters.status || LISTING_DEFAULTS.STATUS,
+    page: parseInt(filters.page) || LISTING_DEFAULTS.PAGE,
+    size: parseInt(filters.size) || LISTING_DEFAULTS.SERVICE_FILTER_PAGE_SIZE,
+    sortBy: filters.sortBy || LISTING_DEFAULTS.SORT_BY,
+    sortDirection: filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION,
     city: filters.city?.trim() || null,
     district: filters.district?.trim() || null,
     minPrice: filters.minPrice ? parseFloat(filters.minPrice) : null,
@@ -82,14 +83,14 @@ const serializeFilters = (filters, config, listingType) => {
 
 export const listingService = {
 
-  getMyListings: async (page = 0, size = 10, listingType = null) => {
+  getMyListings: async (page = 0, size = LISTING_DEFAULTS.FILTER_PAGE_SIZE, listingType = null) => {
     let url = `${API_ENDPOINTS.LISTINGS.MY_LISTINGS}?page=${page}&size=${size}`;
     if (listingType) {
       url += `&listingType=${encodeURIComponent(listingType)}`;
     }
     return get(url);
   },
-  getMyListingsByStatus: async (status, page = 0, size = 20) => {
+  getMyListingsByStatus: async (status, page = 0, size = LISTING_DEFAULTS.SERVICE_FILTER_PAGE_SIZE) => {
     const url = `${API_ENDPOINTS.LISTINGS.MY_LISTINGS}/status/${status}?page=${page}&size=${size}`;
     return get(url);
   },
@@ -101,7 +102,7 @@ export const listingService = {
     return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
   },
 
-  getListingByUserId: async (userId, page = 0, size = 10) => {
+  getListingByUserId: async (userId, page = 0, size = LISTING_DEFAULTS.FILTER_PAGE_SIZE) => {
     return get(`${API_ENDPOINTS.LISTINGS.BY_USER(userId)}?page=${page}&size=${size}`);
   },
   getListingByNo: async (no) => {
@@ -140,7 +141,7 @@ export const listingService = {
         totalPages: 0,
         totalElements: 0,
         number: 0,
-        size: filters.size || 10,
+        size: filters.size || LISTING_DEFAULTS.FILTER_PAGE_SIZE,
         first: true,
         last: true,
         empty: true

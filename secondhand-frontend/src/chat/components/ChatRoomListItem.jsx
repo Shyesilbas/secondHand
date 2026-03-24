@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon} from 'lucide-react';
+import { CHAT_ROOM_TYPES } from '../chatConstants.js';
 
 const ChatRoomListItem = ({
                             room,
@@ -27,8 +28,8 @@ const ChatRoomListItem = ({
   };
 
   const getRoomSubtitle = () => {
-    if (room.roomType === 'LISTING') return 'Listing Chat';
-    if (room.roomType === 'DIRECT') return 'Direct Message';
+    if (room.roomType === CHAT_ROOM_TYPES.LISTING) return 'Listing Chat';
+    if (room.roomType === CHAT_ROOM_TYPES.DIRECT) return 'Direct Message';
     return '';
   };
 

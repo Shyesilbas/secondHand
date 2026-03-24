@@ -1,13 +1,15 @@
 import { get, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { EmailDto } from '../emails.js';
+import logger from '../../common/utils/logger.js';
+import { EMAIL_DEFAULTS } from '../emailConstants.js';
 
 export const emailService = {
     getUnreadCount: async () => {
         const data = await get(API_ENDPOINTS.EMAILS.UNREAD_COUNT);
         return data?.count ?? 0;
     },
-    getMyEmails: async (page = 0, size = 20) => {
+    getMyEmails: async (page = EMAIL_DEFAULTS.PAGE, size = EMAIL_DEFAULTS.PAGE_SIZE) => {
         try {
             const timestamp = new Date().getTime();
             const query = new URLSearchParams({
@@ -27,11 +29,11 @@ export const emailService = {
                 content: [],
                 totalElements: 0,
                 totalPages: 0,
-                number: 0,
+                number: EMAIL_DEFAULTS.PAGE,
                 size
             };
         } catch (error) {
-            console.error('Error fetching emails:', error);
+            logger.error('Error fetching emails:', error);
             throw error;
         }
     },

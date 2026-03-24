@@ -148,7 +148,6 @@ const AddressList = memo(({ isActive }) => {
               address={address}
               onEdit={handleEditAddress}
               onDelete={handleDeleteAddress}
-              onSetMain={handleSelectAsMain}
               onSelectAsMain={handleSelectAsMain}
             />
           ))}

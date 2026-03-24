@@ -5,11 +5,13 @@ import {useAuthState} from '../../auth/AuthContext.jsx';
 import {getAccountHubSections} from '../utils/accountHubSections.js';
 import {filterAccountHubSections} from '../utils/accountHubFilter.js';
 
+import { USER_DEFAULTS } from '../userConstants.js';
+
 const getInitials = (name) => {
   const value = (name || '').trim();
-  if (!value) return 'U';
+  if (!value) return USER_DEFAULTS.FALLBACK_NAME_INITIAL;
   const parts = value.split(/\s+/).filter(Boolean);
-  const first = parts[0]?.[0] || 'U';
+  const first = parts[0]?.[0] || USER_DEFAULTS.FALLBACK_NAME_INITIAL;
   const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : '';
   return `${first}${last}`.toUpperCase();
 };

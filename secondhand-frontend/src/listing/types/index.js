@@ -27,6 +27,32 @@ export const LISTING_STATUSES = [
   { value: 'RESERVED', label: 'Reserved' },
 ];
 
+// Shared defaults to avoid scattered magic strings across UI and service layers.
+export const LISTING_DEFAULTS = Object.freeze({
+  STATUS: LISTING_STATUS.ACTIVE,
+  SORT_BY: 'createdAt',
+  SORT_DIRECTION: 'DESC',
+  PAGE: 0,
+  // Used by UI filter state (see getDefaultFiltersForType)
+  FILTER_PAGE_SIZE: 10,
+  // Used by service payload serialization when size is not present
+  SERVICE_FILTER_PAGE_SIZE: 20,
+  MIN_PRICE: 0,
+  MAX_PRICE: 0,
+  CURRENCY: '',
+  // Mine-mode: "low stock" alert threshold (exclusive upper bound).
+  LOW_STOCK_MAX_QUANTITY: 10,
+});
+
+export const LISTING_SORT_FIELDS = Object.freeze({
+  DATE: 'createdAt',
+  PRICE: 'price',
+  YEAR: 'year',
+  MILEAGE: 'mileage',
+  BRAND: 'brand',
+  TYPE: 'type',
+});
+
 export const ERROR_MESSAGES = {
   LISTING_NOT_FOUND: 'Listing not found',
   INVALID_LISTING_TYPE: 'Invalid listing type',

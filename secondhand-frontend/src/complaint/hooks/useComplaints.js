@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createComplaint, getMyComplaints } from '../services/complaintService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES } from '../complaintConstants.js';
+import { getComplaintErrorMessage } from '../utils/complaintError.js';
 
 const COMPLAINT_KEYS = {
     all: ['complaints'],
@@ -25,8 +27,8 @@ export const useComplaints = () => {
         queryKey: COMPLAINT_KEYS.my(),
         queryFn: getMyComplaints,
         enabled: false, // Only fetch when getUserComplaints is called
-        staleTime: 5 * 60 * 1000,
-        gcTime: 15 * 60 * 1000,
+        staleTime: COMPLAINT_DEFAULTS.STALE_TIME_MS,
+        gcTime: COMPLAINT_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
     });
 
@@ -34,12 +36,10 @@ export const useComplaints = () => {
         mutationFn: createComplaint,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: COMPLAINT_KEYS.all });
-            notify('success', 'Complaint Submitted', 'Your complaint has been submitted successfully.' +
-                ' You can Follow your complaints from Profile -> Quick Actions -> Support & Complaints');
+            notify('success', COMPLAINT_MESSAGES.SUBMITTED_TITLE, COMPLAINT_MESSAGES.SUBMITTED_SUCCESS);
         },
         onError: (err) => {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit complaint.';
-            notify('error', 'Complaint Failed', errorMessage);
+            notify('error', COMPLAINT_MESSAGES.SUBMIT_FAILED_TITLE, getComplaintErrorMessage(err));
         },
     });
 

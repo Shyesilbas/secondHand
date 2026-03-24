@@ -1,5 +1,6 @@
 import { get, post, put, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { CHAT_DEFAULTS } from '../chatConstants.js';
 
 export const chatService = {
 
@@ -19,7 +20,7 @@ export const chatService = {
         return post(API_ENDPOINTS.CHAT.SEND_MESSAGE, messageData);
     },
 
-    getChatMessages: async (chatRoomId, page = 0, size = 20) => {
+    getChatMessages: async (chatRoomId, page = CHAT_DEFAULTS.MESSAGE_PAGE, size = CHAT_DEFAULTS.MESSAGE_PAGE_SIZE) => {
         return get(API_ENDPOINTS.CHAT.ROOM_MESSAGES(chatRoomId), { params: { page, size } });
     },
 
@@ -27,7 +28,7 @@ export const chatService = {
         return put(API_ENDPOINTS.CHAT.MARK_READ(chatRoomId));
     },
 
-    getAllUserMessages: async (page = 0, size = 20) => {
+    getAllUserMessages: async (page = CHAT_DEFAULTS.MESSAGE_PAGE, size = CHAT_DEFAULTS.MESSAGE_PAGE_SIZE) => {
         return get(API_ENDPOINTS.CHAT.ALL_USER_MESSAGES, { params: { page, size } });
     },
 

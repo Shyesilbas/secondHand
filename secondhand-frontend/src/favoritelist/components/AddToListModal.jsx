@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Plus, Check, List, Loader2, Globe, Lock, Package } from 'lucide-react';
 import { useMyFavoriteLists, useAddItemToList, useRemoveItemFromList, useListsContainingListing } from '../hooks/useFavoriteLists.js';
 import FavoriteListModal from './FavoriteListModal.jsx';
+import logger from '../../common/utils/logger.js';
 
 const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -37,13 +38,14 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                 await addMutation.mutateAsync({ listId, listingId });
             }
         } catch (error) {
-            console.error('Error toggling list:', error);
+            logger.error('Error toggling list:', error);
         }
     };
 
-    const handleCreateSuccess = () => {
-        setShowCreateModal(false);
+    const handleCreateListSuccess = () => {
         refetch();
+        refetchContaining();
+        setShowCreateModal(false);
     };
 
     if (!isOpen) return null;
@@ -189,7 +191,8 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
             {showCreateModal && (
                 <FavoriteListModal
                     isOpen={showCreateModal}
-                    onClose={handleCreateSuccess}
+                    onClose={() => setShowCreateModal(false)}
+                    onSuccess={handleCreateListSuccess}
                 />
             )}
 

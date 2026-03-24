@@ -3,23 +3,25 @@ import ReactDOM from 'react-dom';
 import { offerService } from '../services/offerService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
+import { OFFER_DEFAULTS, OFFER_MESSAGES } from '../offerConstants.js';
+import { getOfferErrorMessage } from '../utils/offerError.js';
 
 const MakeOfferModal = ({ isOpen, onClose, listing }) => {
   const notification = useNotification();
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(OFFER_DEFAULTS.MIN_QUANTITY);
   const [totalPrice, setTotalPrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
-    setQuantity(1);
+    setQuantity(OFFER_DEFAULTS.MIN_QUANTITY);
     setTotalPrice('');
     setError(null);
   }, [isOpen]);
 
-  const listingTitle = listing?.title || 'Listing';
-  const currency = listing?.currency || 'TRY';
+  const listingTitle = listing?.title || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE;
+  const currency = listing?.currency || OFFER_DEFAULTS.FALLBACK_CURRENCY;
   const listingUnitPrice = listing?.price != null ? Number(listing.price) : null;
 
   const previewTotal = useMemo(() => {
@@ -39,15 +41,15 @@ const MakeOfferModal = ({ isOpen, onClose, listing }) => {
     const t = Number(totalPrice);
 
     if (!listing?.id) {
-      setError('Listing not found');
+      setError(OFFER_MESSAGES.LISTING_NOT_FOUND);
       return;
     }
-    if (!Number.isFinite(q) || q < 1) {
-      setError('Quantity must be at least 1');
+    if (!Number.isFinite(q) || q < OFFER_DEFAULTS.MIN_QUANTITY) {
+      setError(OFFER_MESSAGES.INVALID_QUANTITY);
       return;
     }
-    if (!Number.isFinite(t) || t <= 0) {
-      setError('Total price must be greater than 0');
+    if (!Number.isFinite(t) || t <= OFFER_DEFAULTS.MIN_TOTAL_PRICE_EXCLUSIVE) {
+      setError(OFFER_MESSAGES.INVALID_TOTAL_PRICE);
       return;
     }
 
@@ -58,12 +60,12 @@ const MakeOfferModal = ({ isOpen, onClose, listing }) => {
         quantity: q,
         totalPrice: t,
       });
-      notification?.showSuccess('Successful', 'Offer sent');
+      notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.OFFER_SENT);
       onClose?.();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to send offer';
+      const msg = getOfferErrorMessage(err, OFFER_MESSAGES.SEND_FAILED);
       setError(msg);
-      notification?.showError('Error', msg);
+      notification?.showError(OFFER_MESSAGES.ERROR_TITLE, msg);
     } finally {
       setIsSubmitting(false);
     }

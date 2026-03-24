@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { reviewService } from '../services/reviewService.js';
+import { REVIEW_DEFAULTS, REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
+import { getReviewErrorMessage } from '../utils/reviewError.js';
 
 const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) => {
-    const [rating, setRating] = useState(0);
+    const [rating, setRating] = useState(REVIEW_DEFAULTS.INITIAL_RATING);
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -10,8 +12,8 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (rating === 0) {
-            setError('Please rate the product before submitting a review');
+        if (rating < REVIEW_LIMITS.MIN_RATING) {
+            setError(REVIEW_MESSAGES.RATING_REQUIRED);
             return;
         }
 
@@ -27,14 +29,14 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
 
             onReviewCreated?.();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'An error occurred.');
+            setError(getReviewErrorMessage(err, REVIEW_MESSAGES.UNKNOWN_ERROR));
         } finally {
             setLoading(false);
         }
     };
 
     const renderStars = (currentRating, onStarClick) => {
-        return Array.from({ length: 5 }, (_, index) => (
+        return Array.from({ length: REVIEW_LIMITS.MAX_RATING }, (_, index) => (
             <button
                 key={index}
                 type="button"
@@ -68,7 +70,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
                     <div className="flex items-center space-x-1">
                         {renderStars(rating, setRating)}
                         <span className="ml-3 text-sm text-gray-600">
-                            {rating === 0 ? 'Rate' : `${rating}/5`}
+                            {rating === REVIEW_DEFAULTS.INITIAL_RATING ? 'Rate' : `${rating}/${REVIEW_LIMITS.MAX_RATING}`}
                         </span>
                     </div>
                 </div>
@@ -82,12 +84,12 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         rows={4}
-                        maxLength={1000}
+                        maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Ürün hakkında görüşlerinizi paylaşın..."
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        {comment.length}/1000 Characters
+                        {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH} Characters
                     </p>
                 </div>
 
@@ -107,10 +109,10 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
                     </button>
                     <button
                         type="submit"
-                        disabled={loading || rating === 0}
+                        disabled={loading || rating === REVIEW_DEFAULTS.INITIAL_RATING}
                         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        {loading ? 'Sending...' : 'Send Review'}
+                        {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
                     </button>
                 </div>
             </form>

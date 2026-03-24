@@ -5,8 +5,13 @@ import {
   setForumCommentAuthorVisibility,
   setForumThreadAuthorVisibility,
 } from '../utils/forumVisibilitySettings.js';
+import { FORUM_AUTHOR_VISIBILITY, FORUM_MESSAGES } from '../forumConstants.js';
 
-const normalize = (value) => (value === 'DISPLAY_NAME' ? 'DISPLAY_NAME' : 'ANONYMOUS');
+const normalize = (value) => (
+  value === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME
+    ? FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME
+    : FORUM_AUTHOR_VISIBILITY.ANONYMOUS
+);
 
 const ChoiceButton = ({ active, disabled, onClick, children }) => {
   return (
@@ -52,9 +57,9 @@ export const ForumVisibilitySettingsModal = ({ isOpen, onClose }) => {
       <div className="relative w-full max-w-xl rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 tracking-tight truncate">Forum settings</p>
+            <p className="text-sm font-semibold text-slate-900 tracking-tight truncate">{FORUM_MESSAGES.FORUM_SETTINGS}</p>
             <p className="text-xs text-slate-500 mt-0.5 truncate">Choose how your name appears when posting</p>
-            <p className="text-xs text-slate-500 mt-0.5 truncate">! Updates not effects the current threads or comments</p>
+            <p className="text-xs text-slate-500 mt-0.5 truncate">Updates do not affect existing threads or comments.</p>
           </div>
           <button
             type="button"
@@ -69,10 +74,16 @@ export const ForumVisibilitySettingsModal = ({ isOpen, onClose }) => {
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">New thread author</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <ChoiceButton active={threadVisibility === 'ANONYMOUS'} onClick={() => setThread('ANONYMOUS')}>
+              <ChoiceButton
+                active={threadVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS}
+                onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}
+              >
                 Anonymous
               </ChoiceButton>
-              <ChoiceButton active={threadVisibility === 'DISPLAY_NAME'} onClick={() => setThread('DISPLAY_NAME')}>
+              <ChoiceButton
+                active={threadVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME}
+                onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}
+              >
                 Display name
               </ChoiceButton>
             </div>
@@ -81,10 +92,16 @@ export const ForumVisibilitySettingsModal = ({ isOpen, onClose }) => {
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Comment author</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <ChoiceButton active={commentVisibility === 'ANONYMOUS'} onClick={() => setComment('ANONYMOUS')}>
+              <ChoiceButton
+                active={commentVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS}
+                onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}
+              >
                 Anonymous
               </ChoiceButton>
-              <ChoiceButton active={commentVisibility === 'DISPLAY_NAME'} onClick={() => setComment('DISPLAY_NAME')}>
+              <ChoiceButton
+                active={commentVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME}
+                onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}
+              >
                 Display name
               </ChoiceButton>
             </div>

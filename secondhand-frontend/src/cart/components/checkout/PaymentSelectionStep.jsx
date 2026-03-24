@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../../../common/formatters.js';
+import { ROUTES } from '../../../common/constants/routes.js';
+import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
 
 const PaymentSelectionStep = ({ 
     selectedPaymentType, 
@@ -25,8 +27,8 @@ const PaymentSelectionStep = ({
                     <input 
                         type="radio" 
                         name="paymentType" 
-                        value="CREDIT_CARD" 
-                        checked={selectedPaymentType === 'CREDIT_CARD'} 
+                        value={CART_PAYMENT_TYPES.CREDIT_CARD}
+                        checked={selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD}
                         onChange={(e) => setSelectedPaymentType(e.target.value)} 
                     />
                     <span>Credit Card</span>
@@ -35,8 +37,8 @@ const PaymentSelectionStep = ({
                     <input 
                         type="radio" 
                         name="paymentType" 
-                        value="TRANSFER" 
-                        checked={selectedPaymentType === 'TRANSFER'} 
+                        value={CART_PAYMENT_TYPES.TRANSFER}
+                        checked={selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER}
                         onChange={(e) => setSelectedPaymentType(e.target.value)} 
                     />
                     <span>Bank Transfer</span>
@@ -45,8 +47,8 @@ const PaymentSelectionStep = ({
                     <input 
                         type="radio" 
                         name="paymentType" 
-                        value="EWALLET" 
-                        checked={selectedPaymentType === 'EWALLET'} 
+                        value={CART_PAYMENT_TYPES.EWALLET}
+                        checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET}
                         onChange={(e) => setSelectedPaymentType(e.target.value)} 
                     />
                     <span className="flex items-center">
@@ -62,7 +64,7 @@ const PaymentSelectionStep = ({
             </div>
 
             {/* Credit Card Selection */}
-            {selectedPaymentType === 'CREDIT_CARD' && (
+            {selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && (
                 <div className="mt-3">
                     <div className="text-sm text-gray-600 mb-2">Select a credit card</div>
                     {(!Array.isArray(cards) || cards.length === 0) ? (
@@ -113,7 +115,7 @@ const PaymentSelectionStep = ({
             )}
 
             {/* Bank Transfer Selection */}
-            {selectedPaymentType === 'TRANSFER' && (
+            {selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && (
                 <div className="mt-3">
                     <div className="text-sm text-gray-600 mb-2">Select a bank account</div>
                     {(!Array.isArray(bankAccounts) || bankAccounts.length === 0) ? (
@@ -160,7 +162,7 @@ const PaymentSelectionStep = ({
             )}
 
             {/* eWallet Selection */}
-            {selectedPaymentType === 'EWALLET' && (
+            {selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && (
                 <div className="mt-3">
                     {!eWallet ? (
                         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -168,7 +170,7 @@ const PaymentSelectionStep = ({
                                 <div className="font-medium mb-1">No eWallet Found</div>
                                 <div>You need to create an eWallet first. Go to Payment Methods to create one.</div>
                                 <button 
-                                    onClick={() => navigate('/payment-methods')}
+                                    onClick={() => navigate(ROUTES.PAYMENT_METHODS)}
                                     className="mt-2 text-blue-600 hover:text-blue-800 underline"
                                 >
                                     Go to Payment Methods

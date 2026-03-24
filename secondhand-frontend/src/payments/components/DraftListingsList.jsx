@@ -1,9 +1,7 @@
-import { formatCurrency } from '../../common/formatters.js';
 import ListingCardActions from '../../listing/components/ListingCardActions.jsx';
+import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
 
 const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListingChanged }) => {
-    const formatPrice = (price, currency = 'TRY') => formatCurrency(price, currency, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
     return (
         <div className="lg:col-span-2">
             <div className="rounded-3xl border border-slate-200/60 bg-white/80 px-5 py-5 shadow-[0_18px_45px_rgba(15,23,42,0.04)]">
@@ -36,7 +34,7 @@ const DraftListingsList = ({ listings, selectedListing, onSelectListing, onListi
                                 </p>
                                 <div className="flex items-center space-x-4 text-sm text-slate-500">
                                     <span className="font-mono tracking-tight">
-                                        {formatPrice(listing.price, listing.currency)}
+                                        {formatPaymentAmount(listing.price, listing.currency)}
                                     </span>
                                     <span>•</span>
                                     <span className="truncate max-w-[120px]">{listing.city}</span>

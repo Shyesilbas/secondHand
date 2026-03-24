@@ -1,5 +1,6 @@
 import { del, get, patch, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { FORUM_DEFAULTS } from '../forumConstants.js';
 
 const buildQuery = (params = {}) => {
   const query = new URLSearchParams();
@@ -14,7 +15,14 @@ const buildQuery = (params = {}) => {
 };
 
 export const forumService = {
-  listThreads: async ({ category, status, q, sort, page = 0, size = 20 } = {}) => {
+  listThreads: async ({
+    category,
+    status,
+    q,
+    sort,
+    page = FORUM_DEFAULTS.PAGE,
+    size = FORUM_DEFAULTS.PAGE_SIZE,
+  } = {}) => {
     const query = buildQuery({ category, status, q, sort, page, size });
     return await get(`${API_ENDPOINTS.FORUM.THREADS}${query}`);
   },
@@ -33,7 +41,10 @@ export const forumService = {
   reactToThread: async (threadId, payload) => {
     return await post(API_ENDPOINTS.FORUM.THREAD_REACTION(threadId), payload);
   },
-  listComments: async (threadId, { page = 0, size = 20 } = {}) => {
+  listComments: async (
+    threadId,
+    { page = FORUM_DEFAULTS.PAGE, size = FORUM_DEFAULTS.PAGE_SIZE } = {}
+  ) => {
     const query = buildQuery({ page, size });
     return await get(`${API_ENDPOINTS.FORUM.THREAD_COMMENTS(threadId)}${query}`);
   },

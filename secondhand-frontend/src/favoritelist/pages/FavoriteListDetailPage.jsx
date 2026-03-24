@@ -9,11 +9,15 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency } from '../../common/formatters.js';
 import FavoriteListModal from '../components/FavoriteListModal.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
+import logger from '../../common/utils/logger.js';
+import { FAVORITE_LIST_LISTING_STATUS, FAVORITE_LIST_MESSAGES } from '../favoriteListConstants.js';
 
 const FavoriteListDetailPage = () => {
     const { listId } = useParams();
     const navigate = useNavigate();
     const { user } = useAuthState();
+    const notification = useNotification();
     
     const [showMenu, setShowMenu] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -37,30 +41,38 @@ const FavoriteListDetailPage = () => {
                 await likeMutation.mutateAsync(list.id);
             }
         } catch (error) {
-            console.error('Error toggling like:', error);
+            logger.error('Error toggling like:', error);
         }
     };
 
-    const handleDelete = async () => {
-        if (window.confirm('Bu listeyi silmek istediğinize emin misiniz?')) {
-            try {
-                await deleteMutation.mutateAsync(list.id);
-                navigate(-1);
-            } catch (error) {
-                console.error('Error deleting list:', error);
+    const handleDelete = () => {
+        notification.showConfirmation(
+            FAVORITE_LIST_MESSAGES.DELETE_LIST_TITLE,
+            FAVORITE_LIST_MESSAGES.DELETE_LIST_CONFIRM,
+            async () => {
+                try {
+                    await deleteMutation.mutateAsync(list.id);
+                    navigate(-1);
+                } catch (error) {
+                    logger.error('Error deleting list:', error);
+                }
             }
-        }
+        );
         setShowMenu(false);
     };
 
-    const handleRemoveItem = async (listingId) => {
-        if (window.confirm('Bu ürünü listeden çıkarmak istediğinize emin misiniz?')) {
-            try {
-                await removeItemMutation.mutateAsync({ listId: list.id, listingId });
-            } catch (error) {
-                console.error('Error removing item:', error);
+    const handleRemoveItem = (listingId) => {
+        notification.showConfirmation(
+            FAVORITE_LIST_MESSAGES.REMOVE_ITEM_TITLE,
+            FAVORITE_LIST_MESSAGES.REMOVE_ITEM_CONFIRM,
+            async () => {
+                try {
+                    await removeItemMutation.mutateAsync({ listId: list.id, listingId });
+                } catch (error) {
+                    logger.error('Error removing item:', error);
+                }
             }
-        }
+        );
     };
 
     const handleShare = async () => {
@@ -73,11 +85,11 @@ const FavoriteListDetailPage = () => {
                     url: url,
                 });
             } catch (error) {
-                console.error('Error sharing:', error);
+                logger.error('Error sharing:', error);
             }
         } else {
             navigator.clipboard.writeText(url);
-            alert('Link kopyalandı!');
+            notification.showSuccess(FAVORITE_LIST_MESSAGES.LINK_COPIED_TITLE, FAVORITE_LIST_MESSAGES.LINK_COPIED);
         }
     };
 
@@ -115,13 +127,13 @@ const FavoriteListDetailPage = () => {
                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Package className="w-10 h-10 text-gray-400" />
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">Liste Bulunamadı</h2>
-                    <p className="text-gray-500 mb-6">Bu liste silinmiş veya size özel olabilir.</p>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
+                    <p className="text-gray-500 mb-6">{FAVORITE_LIST_MESSAGES.NOT_FOUND_BODY}</p>
                     <button
                         onClick={() => navigate(-1)}
                         className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                     >
-                        Geri Dön
+                        {FAVORITE_LIST_MESSAGES.BACK}
                     </button>
                 </div>
             </div>
@@ -272,10 +284,12 @@ const FavoriteListDetailPage = () => {
                                         </div>
                                     )}
                                     
-                                    {item.listingStatus !== 'ACTIVE' && (
+                                    {item.listingStatus !== FAVORITE_LIST_LISTING_STATUS.ACTIVE && (
                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                             <span className="px-3 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
-                                                {item.listingStatus === 'SOLD' ? 'Satıldı' : 'Pasif'}
+                                                {item.listingStatus === FAVORITE_LIST_LISTING_STATUS.SOLD
+                                                    ? FAVORITE_LIST_MESSAGES.SOLD_LABEL
+                                                    : FAVORITE_LIST_MESSAGES.INACTIVE_LABEL}
                                             </span>
                                         </div>
                                     )}

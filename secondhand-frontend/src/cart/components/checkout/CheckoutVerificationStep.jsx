@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Lock, ShieldCheck as ShieldCheckIcon} from 'lucide-react';
+import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../../common/constants/otp.js';
 
 const CheckoutVerificationStep = ({
     paymentVerificationCode,
@@ -45,7 +46,7 @@ const CheckoutVerificationStep = ({
             newCode[index] = value;
             setPaymentVerificationCode(newCode.join(''));
             
-            if (value && index < 5) {
+            if (value && index < OTP_CODE_LENGTH - 1) {
                 const nextInput = document.querySelector(`input[data-index="${index + 1}"]`);
                 nextInput?.focus();
             }
@@ -60,19 +61,19 @@ const CheckoutVerificationStep = ({
     };
 
     const handleCodePaste = (e) => {
-        const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+        const pasted = sanitizeOtpInput(e.clipboardData.getData('text'), OTP_CODE_LENGTH);
         if (!pasted) {
             return;
         }
         e.preventDefault();
         setPaymentVerificationCode(pasted);
-        if (pasted.length === 6) {
-            const lastInput = document.querySelector('input[data-index="5"]');
+        if (pasted.length === OTP_CODE_LENGTH) {
+            const lastInput = document.querySelector(`input[data-index="${OTP_CODE_LENGTH - 1}"]`);
             lastInput?.focus();
         }
     };
 
-    const isCodeComplete = codeValue.length === 6;
+    const isCodeComplete = codeValue.length === OTP_CODE_LENGTH;
     const filledCount = codeValue.replace(/\s/g, '').length;
 
     return (
@@ -84,7 +85,7 @@ const CheckoutVerificationStep = ({
                 </div>
                 <div>
                     <h2 className="text-sm font-semibold text-slate-900 tracking-tight">Secure Verification</h2>
-                    <p className="text-xs text-slate-500">A 6-digit code has been sent to your email.</p>
+                    <p className="text-xs text-slate-500">{`A ${OTP_CODE_LENGTH}-digit code has been sent to your email.`}</p>
                 </div>
             </div>
 
@@ -92,7 +93,7 @@ const CheckoutVerificationStep = ({
                 {/* Code input */}
                 <div className="text-center">
                     <div className="flex justify-center gap-2.5">
-                        {[0, 1, 2, 3, 4, 5].map((index) => {
+                        {Array.from({ length: OTP_CODE_LENGTH }, (_, index) => index).map((index) => {
                             const hasValue = Boolean(codeValue[index]);
                             return (
                                 <input
@@ -118,7 +119,7 @@ const CheckoutVerificationStep = ({
                     </div>
                     {/* Progress hint */}
                     <div className="mt-2.5 flex items-center justify-center gap-1">
-                        {[0, 1, 2, 3, 4, 5].map((i) => (
+                        {Array.from({ length: OTP_CODE_LENGTH }, (_, i) => i).map((i) => (
                             <div
                                 key={i}
                                 className={`w-1 h-1 rounded-full transition-colors ${

@@ -1,11 +1,7 @@
 import React, { useMemo } from 'react';
 import { CornerDownRight, ThumbsDown, ThumbsUp } from 'lucide-react';
-
-const formatDateTime = (v) => {
-  const d = v ? new Date(v) : null;
-  if (!d || Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-};
+import { FORUM_REACTIONS } from '../forumConstants.js';
+import { formatForumDateTime } from '../utils/forumDateFormat.js';
 
 export const CommentSkeleton = ({ depth = 0 }) => (
   <div className="px-4 py-3">
@@ -56,7 +52,7 @@ export const CommentItem = ({
             <div className="min-w-0 flex-1">
               <div className="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span className="font-semibold text-slate-800">{String(comment?.authorDisplayName || 'Anonymous')}</span>
-                <span className="tabular-nums">{formatDateTime(comment?.createdAt)}</span>
+                <span className="tabular-nums">{formatForumDateTime(comment?.createdAt)}</span>
                 {isNested ? (
                   <span className="inline-flex items-center rounded-full bg-slate-200/70 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                     Reply
@@ -70,7 +66,7 @@ export const CommentItem = ({
                 <button
                   type="button"
                   className="inline-flex items-center gap-1 hover:text-slate-900 transition-colors"
-                  onClick={() => onReact?.(threadId, comment?.id, 'LIKE')}
+                  onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.LIKE)}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
                   <span className="font-semibold tabular-nums">{Number(comment?.totalLikes) || 0}</span>
@@ -78,7 +74,7 @@ export const CommentItem = ({
                 <button
                   type="button"
                   className="inline-flex items-center gap-1 hover:text-slate-900 transition-colors"
-                  onClick={() => onReact?.(threadId, comment?.id, 'DISLIKE')}
+                  onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.DISLIKE)}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />
                   <span className="font-semibold tabular-nums">{Number(comment?.totalDislikes) || 0}</span>

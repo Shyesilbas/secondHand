@@ -3,11 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
-import { createListingFeePaymentRequest } from '../paymentSchema.js';
+import {
+  createListingFeePaymentRequest,
+  OTP_TTL_MINUTES,
+  PAYMENT_TRANSACTION_TYPES,
+  PAYMENT_TYPES,
+  PAYMENT_QUERY_KEYS,
+} from '../paymentSchema.js';
 import { handleError } from '../../common/errorHandler.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
-import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
+import { normalizeArrayResponse } from '../../common/utils/normalizeArrayResponse.js';
 
 export const useAgreementsState = () => {
   const [acceptedAgreements, setAcceptedAgreements] = useState(new Set());
@@ -63,14 +69,7 @@ export const useDraftListings = () => {
   const queryFn = useCallback(async () => {
     // İlk sayfadan (page=0) makul bir limit ile taslak ilanları çek
     const data = await listingService.getMyListingsByStatus('DRAFT', 0, 50);
-
-    // Backend artık Page döndürüyor; content dizisini kullan
-    if (data && Array.isArray(data.content)) {
-      return data.content;
-    }
-
-    // Eski/non-paginated response için geri dönüş uyumluluğu
-    return Array.isArray(data) ? data : [];
+    return normalizeArrayResponse(data);
   }, []);
 
   const {
@@ -99,7 +98,7 @@ export const useDraftListings = () => {
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess }) => {
   const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
-  const [paymentType, setPaymentType] = useState('CREDIT_CARD');
+  const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.CREDIT_CARD);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -162,13 +161,13 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
     try {
       await orderService.initiatePaymentVerification({
-        transactionType: 'LISTING_CREATION',
+        transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
         listingId: selectedListing.id,
         amount: feeConfig.totalCreationFee
       });
       showInfo('Verification Required', 'Enter the verification code sent to your email.');
       const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+      expiryTime.setMinutes(expiryTime.getMinutes() + OTP_TTL_MINUTES);
       setCodeExpiryTime(expiryTime);
       return true;
     } catch (err) {
@@ -225,14 +224,14 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     setIsResendingCode(true);
     try {
       await orderService.initiatePaymentVerification({
-        transactionType: 'LISTING_CREATION',
+        transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
         listingId: selectedListing.id,
         amount: feeConfig?.totalCreationFee
       });
       showSuccess('Success', 'A new verification code has been sent to your email.');
       setVerificationCode('');
       const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + 3);
+      expiryTime.setMinutes(expiryTime.getMinutes() + OTP_TTL_MINUTES);
       setCodeExpiryTime(expiryTime);
     } catch (err) {
       handleError(err, showError);

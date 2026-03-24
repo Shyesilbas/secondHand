@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
+import { REVIEW_DEFAULTS } from '../reviewConstants.js';
 
 const REVIEW_KEYS = {
     received: (userId, page, size) => ['reviews', 'received', userId, page, size],
@@ -10,8 +11,8 @@ const REVIEW_KEYS = {
 
 export const useReviews = (userId, options = {}) => {
     const enabled = options.enabled ?? true;
-    const initialPage = options.page ?? 0;
-    const initialSize = options.size ?? 10;
+    const initialPage = options.page ?? REVIEW_DEFAULTS.RECEIVED_PAGE;
+    const initialSize = options.size ?? REVIEW_DEFAULTS.RECEIVED_SIZE;
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [currentSize, setCurrentSize] = useState(initialSize);
 
@@ -19,8 +20,8 @@ export const useReviews = (userId, options = {}) => {
         queryKey: REVIEW_KEYS.received(userId, currentPage, currentSize),
         queryFn: () => reviewService.getReviewsReceivedByUser(userId, currentPage, currentSize),
         enabled: !!(userId && enabled),
-        staleTime: 5 * 60 * 1000,
-        gcTime: 15 * 60 * 1000,
+        staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
+        gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
         placeholderData: (prev) => prev,
     });
@@ -31,14 +32,14 @@ export const useReviews = (userId, options = {}) => {
         size: data?.size ?? currentSize,
         totalPages: data?.totalPages ?? 0,
         totalElements: data?.totalElements ?? 0,
-        first: data?.first ?? (currentPage === 0),
+        first: data?.first ?? (currentPage === REVIEW_DEFAULTS.RECEIVED_PAGE),
         last: data?.last ?? false,
     };
 
     const loadPage = useCallback((page) => setCurrentPage(page), []);
     const handlePageSizeChange = useCallback((size) => {
         setCurrentSize(size);
-        setCurrentPage(0);
+        setCurrentPage(REVIEW_DEFAULTS.RECEIVED_PAGE);
     }, []);
 
     return {
@@ -57,10 +58,10 @@ export const useReviewsByUser = (userId, options = {}) => {
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: REVIEW_KEYS.written(userId),
-        queryFn: () => reviewService.getReviewsByUser(userId, 0, 20),
+        queryFn: () => reviewService.getReviewsByUser(userId, REVIEW_DEFAULTS.WRITTEN_PAGE, REVIEW_DEFAULTS.WRITTEN_SIZE),
         enabled: !!(userId && enabled),
-        staleTime: 5 * 60 * 1000,
-        gcTime: 15 * 60 * 1000,
+        staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
+        gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
     });
 
@@ -79,8 +80,8 @@ export const useUserReviewStats = (userId, options = {}) => {
         queryKey: REVIEW_KEYS.stats(userId),
         queryFn: () => reviewService.getUserReviewStats(userId),
         enabled: !!(userId && enabled),
-        staleTime: 5 * 60 * 1000,
-        gcTime: 15 * 60 * 1000,
+        staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
+        gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
     });
 

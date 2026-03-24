@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { MessageSquarePlus, ThumbsDown, ThumbsUp, Trash2, X } from 'lucide-react';
 import { CommentItem, CommentSkeleton } from './CommentItem.jsx';
-
-const formatDate = (v) => {
-  const d = v ? new Date(v) : null;
-  if (!d || Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-};
+import {
+  FORUM_MESSAGES,
+  FORUM_REACTIONS,
+  FORUM_THREAD_STATUS_OPTIONS,
+  FORUM_THREAD_STATUSES,
+} from '../forumConstants.js';
+import { formatForumDateTime } from '../utils/forumDateFormat.js';
 
 export const ThreadDetailSkeleton = () => (
   <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden animate-pulse">
@@ -48,8 +49,8 @@ export const ThreadDetail = ({
 }) => {
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
-  const isLiked = threadReaction === 'LIKE';
-  const isDisliked = threadReaction === 'DISLIKE';
+  const isLiked = threadReaction === FORUM_REACTIONS.LIKE;
+  const isDisliked = threadReaction === FORUM_REACTIONS.DISLIKE;
 
   const isOwner = useMemo(() => {
     const a = Number(thread?.userId);
@@ -63,8 +64,8 @@ export const ThreadDetail = ({
   if (!threadId) {
     return (
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-10 text-center">
-        <p className="text-sm font-semibold text-slate-900">Select a thread</p>
-        <p className="text-sm text-slate-500 mt-1">Choose a thread from the list to view details.</p>
+        <p className="text-sm font-semibold text-slate-900">{FORUM_MESSAGES.SELECT_THREAD_TITLE}</p>
+        <p className="text-sm text-slate-500 mt-1">{FORUM_MESSAGES.SELECT_THREAD_DESCRIPTION}</p>
       </div>
     );
   }
@@ -74,9 +75,11 @@ export const ThreadDetail = ({
       <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-slate-900 tracking-tight truncate">{thread?.title || 'Thread'}</div>
+                <div className="text-sm font-semibold text-slate-900 tracking-tight truncate">
+                  {thread?.title || FORUM_MESSAGES.SELECT_THREAD_TITLE}
+                </div>
             <div className="mt-1 text-xs text-slate-500 tabular-nums">
-              {formatDate(thread?.createdAt)}
+              {formatForumDateTime(thread?.createdAt)}
               {thread?.authorDisplayName ? <span className="ml-2">• by {thread.authorDisplayName}</span> : null}
             </div>
           </div>
@@ -84,7 +87,7 @@ export const ThreadDetail = ({
           {canManage && (
             <div className="flex items-center gap-2">
               <select
-                value={thread?.status || 'OPEN'}
+                value={thread?.status || FORUM_THREAD_STATUSES.OPEN}
                 onChange={async (e) => {
                   const next = e.target.value;
                   setStatusUpdating(true);
@@ -97,14 +100,14 @@ export const ThreadDetail = ({
                 disabled={statusUpdating}
                 className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="OPEN">Open</option>
-                <option value="IN_PROGRESS">In progress</option>
-                <option value="RESOLVED">Resolved</option>
+                {FORUM_THREAD_STATUS_OPTIONS.map((statusOption) => (
+                  <option key={statusOption.id} value={statusOption.id}>{statusOption.label}</option>
+                ))}
               </select>
               <button
                 type="button"
                 onClick={async () => {
-                  const ok = window.confirm('Delete this thread?');
+                  const ok = window.confirm(FORUM_MESSAGES.DELETE_THREAD_CONFIRM);
                   if (!ok) return;
                   await onDeleteThread?.(threadId);
                 }}
@@ -127,7 +130,7 @@ export const ThreadDetail = ({
           <button
             type="button"
             className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${isLiked ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-900'}`}
-            onClick={() => onReactThread?.(threadId, 'LIKE')}
+            onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.LIKE)}
           >
             <ThumbsUp className={`w-4 h-4 ${isLiked ? 'text-white' : 'text-slate-700'}`} />
             <span className={`font-semibold tabular-nums ${isLiked ? 'text-white' : 'text-slate-900'}`}>{Number(thread?.totalLikes) || 0}</span>
@@ -135,7 +138,7 @@ export const ThreadDetail = ({
           <button
             type="button"
             className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${isDisliked ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-900'}`}
-            onClick={() => onReactThread?.(threadId, 'DISLIKE')}
+            onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)}
           >
             <ThumbsDown className={`w-4 h-4 ${isDisliked ? 'text-white' : 'text-slate-700'}`} />
             <span className={`font-semibold tabular-nums ${isDisliked ? 'text-white' : 'text-slate-900'}`}>{Number(thread?.totalDislikes) || 0}</span>
@@ -166,7 +169,7 @@ export const ThreadDetail = ({
             type="button"
             onClick={() => setComposerOpen((v) => !v)}
             className="h-9 w-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300"
-            title={composerOpen ? 'Close' : 'Write a comment'}
+            title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}
           >
             {composerOpen ? <X className="w-4 h-4" /> : <MessageSquarePlus className="w-4 h-4" />}
           </button>
@@ -232,8 +235,8 @@ export const ThreadDetail = ({
               </div>
             ) : (
               <div className="px-5 py-10 text-center">
-                <p className="text-sm font-semibold text-slate-900">No comments yet</p>
-                <p className="text-sm text-slate-500 mt-1">Be the first to comment.</p>
+                <p className="text-sm font-semibold text-slate-900">{FORUM_MESSAGES.NO_COMMENTS_YET}</p>
+                <p className="text-sm text-slate-500 mt-1">{FORUM_MESSAGES.BE_FIRST_TO_COMMENT}</p>
               </div>
             )}
           </div>
@@ -247,7 +250,7 @@ export const ThreadDetail = ({
               disabled={commentsLoading}
               className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Load more
+              {FORUM_MESSAGES.LOAD_MORE}
             </button>
           </div>
         )}

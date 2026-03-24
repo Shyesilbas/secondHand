@@ -6,6 +6,8 @@ import ChatList from '../components/ChatList.jsx';
 import {useNavigate} from 'react-router-dom';
 import {EllipsisVertical as EllipsisVerticalIcon, MessageCircle} from 'lucide-react';
 import {useNotification} from '../../notification/NotificationContext.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
+import { CHAT_MESSAGES } from '../chatConstants.js';
 
 const ChatPage = () => {
   const { user } = useAuthState();
@@ -31,20 +33,24 @@ const ChatPage = () => {
   const handleListingClick = (listingId, event) => {
     event.stopPropagation();
     if (listingId) {
-      navigate(`/listings/${listingId}`);
+      navigate(ROUTES.LISTING_DETAIL(listingId));
     }
+  };
+
+  const handleBrowseListings = () => {
+    navigate(ROUTES.LISTINGS);
   };
 
   const handleDeleteConversation = (roomId) => {
     notification.showConfirmation(
-      'Delete Conversation',
-      'Are you sure you want to delete this conversation and all messages? This action cannot be undone.',
+      CHAT_MESSAGES.DELETE_CONVERSATION_TITLE,
+      CHAT_MESSAGES.DELETE_CONVERSATION_CONFIRMATION,
       () => {
         if (selectedChatRoom?.id === roomId) {
           selectChatRoom(null);
         }
         deleteConversation(roomId);
-        notification.showSuccess('Success', 'Conversation deleted successfully.');
+        notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.CONVERSATION_DELETED);
       }
     );
   };
@@ -74,7 +80,7 @@ const ChatPage = () => {
               <div className="flex items-center space-x-2 bg-white px-5 py-2.5 rounded-xl border border-slate-200/60 shadow-sm">
                 <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`}></div>
                 <span className="text-sm font-semibold text-slate-700 tracking-tight">
-                  {isConnected ? 'Online' : 'Offline'}
+                  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                 </span>
               </div>
             </div>
@@ -91,6 +97,7 @@ const ChatPage = () => {
                 isConnected={isConnected}
                 onChatRoomSelect={handleChatRoomSelect}
                 onListingClick={handleListingClick}
+                onBrowseListings={handleBrowseListings}
                 onDeleteConversation={handleDeleteConversation}
               />
             </div>
@@ -126,7 +133,7 @@ const ChatPage = () => {
                           <div className="flex items-center space-x-2 mt-1">
                             <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>
                             <span className="text-xs font-medium text-slate-500 tracking-tight">
-                              {isConnected ? 'Online' : 'Offline'}
+                              {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                             </span>
                           </div>
                         </div>

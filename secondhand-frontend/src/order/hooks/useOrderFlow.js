@@ -5,20 +5,27 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
+import {
+  ORDER_DEFAULTS,
+  ORDER_MESSAGES,
+  ORDER_STATUSES,
+  ORDER_TIME,
+  ORDER_VIEW_MODES,
+} from '../constants/orderUiConstants.js';
 
 const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
   const { user } = useAuthState();
   const queryClient = useQueryClient();
 
   const queryKey = useMemo(() => {
-    if (mode === 'seller') {
+    if (mode === ORDER_VIEW_MODES.SELLER) {
       return ORDER_QUERY_KEYS.sellerOrdersList(user?.id, page, size, sort, direction);
     }
     return ORDER_QUERY_KEYS.myOrders(user?.id, page, size, sort, direction);
   }, [mode, user?.id, page, size, sort, direction]);
 
   const queryFn = useCallback(async () => {
-    if (mode === 'seller') {
+    if (mode === ORDER_VIEW_MODES.SELLER) {
       return await orderService.sellerOrders(page, size, sort, direction);
     }
     return await orderService.myOrders(page, size, sort, direction);
@@ -29,14 +36,14 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
     queryFn,
     enabled: !!user?.id,
     staleTime: 0,
-    gcTime: 10 * 60 * 1000,
+    gcTime: ORDER_TIME.ORDERS_QUERY_GC_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: 'always',
   });
 
   const refresh = useCallback(() => {
     queryClient.invalidateQueries({
-      queryKey: mode === 'seller' ? ORDER_QUERY_KEYS.sellerOrders : ORDER_QUERY_KEYS.orders,
+      queryKey: mode === ORDER_VIEW_MODES.SELLER ? ORDER_QUERY_KEYS.sellerOrders : ORDER_QUERY_KEYS.orders,
     });
     refetch();
   }, [queryClient, refetch, mode]);
@@ -59,14 +66,16 @@ export const usePendingCompletionOrders = (options = {}) => {
     location.pathname.includes('/dashboard') ||
     location.pathname === '/';
 
-  const refetchInterval = isRelevantPage ? 2 * 60 * 1000 : 5 * 60 * 1000;
+  const refetchInterval = isRelevantPage
+    ? ORDER_TIME.PENDING_COMPLETION_REFRESH_ACTIVE_MS
+    : ORDER_TIME.PENDING_COMPLETION_REFRESH_IDLE_MS;
 
   const { data, isLoading } = useQuery({
     queryKey: ORDER_QUERY_KEYS.pendingCompletion(user?.id),
     queryFn: () => orderService.getPendingCompletionStatus(),
     enabled,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: ORDER_TIME.PENDING_COMPLETION_STALE_MS,
+    gcTime: ORDER_TIME.ORDERS_QUERY_GC_MS,
     refetchInterval,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -91,9 +100,9 @@ export const usePendingEscrowAmount = (options = {}) => {
       return response.amount || 0;
     },
     enabled,
-    staleTime: 30 * 1000,
-    gcTime: 5 * 60 * 1000,
-    refetchInterval: 30 * 1000,
+    staleTime: ORDER_TIME.PENDING_ESCROW_STALE_MS,
+    gcTime: ORDER_TIME.ESCROW_QUERY_GC_MS,
+    refetchInterval: ORDER_TIME.PENDING_ESCROW_REFRESH_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
   });
@@ -107,13 +116,13 @@ export const usePendingEscrowAmount = (options = {}) => {
 };
 
 export const useOrderFlow = ({
-  viewMode = 'buyer',
-  initialPage = 0,
-  initialSize = 5,
+  viewMode = ORDER_VIEW_MODES.BUYER,
+  initialPage = ORDER_DEFAULTS.INITIAL_PAGE,
+  initialSize = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
   initialSortField = null,
-  initialSortDirection = 'desc',
+  initialSortDirection = ORDER_DEFAULTS.SORT_DIRECTION,
 }) => {
-  const mode = viewMode === 'seller' ? 'seller' : 'buyer';
+  const mode = viewMode === ORDER_VIEW_MODES.SELLER ? ORDER_VIEW_MODES.SELLER : ORDER_VIEW_MODES.BUYER;
 
   const [page, setPage] = useState(initialPage);
   const [size, setSize] = useState(initialSize);
@@ -157,7 +166,7 @@ export const useOrderFlow = ({
           setSearchTerm('');
         }
       })
-      .catch(() => setSearchError('Order not found. Please check the order number.'))
+      .catch(() => setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND))
       .finally(() => setSearchLoading(false));
   }, [urlQ]);
 
@@ -174,7 +183,7 @@ export const useOrderFlow = ({
     direction: sortDirection,
   });
 
-  const escrow = usePendingEscrowAmount({ enabled: viewMode === 'seller' });
+  const escrow = usePendingEscrowAmount({ enabled: viewMode === ORDER_VIEW_MODES.SELLER });
 
   useEffect(() => {
     setPage(initialPage);
@@ -245,7 +254,7 @@ export const useOrderFlow = ({
           });
         }
       } catch (err) {
-        setSearchError('Order not found. Please check the order number.');
+        setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
       } finally {
         setSearchLoading(false);
       }
@@ -269,7 +278,10 @@ export const useOrderFlow = ({
 
   const openReceipt = useCallback(async (paymentReference) => {
     try {
-      const payments = await paymentService.getMyPayments(0, 20);
+      const payments = await paymentService.getMyPayments(
+        ORDER_DEFAULTS.INITIAL_PAGE,
+        ORDER_DEFAULTS.SEARCH_PAYMENT_FETCH_SIZE
+      );
       const list = payments.content || [];
       const payment = list.find((p) => String(p.paymentId) === String(paymentReference));
       if (payment) {
@@ -289,7 +301,7 @@ export const useOrderFlow = ({
 
     setReviewsLoading(true);
     try {
-      if (order.status !== 'DELIVERED' && order.status !== 'COMPLETED') {
+      if (order.status !== ORDER_STATUSES.DELIVERED && order.status !== ORDER_STATUSES.COMPLETED) {
         setOrderReviews({});
         return;
       }
@@ -320,10 +332,12 @@ export const useOrderFlow = ({
   const openOrderModal = useCallback(
     async (order) => {
       try {
-        const freshOrder = mode === 'seller' ? await orderService.getSellerOrderById(order.id) : await orderService.getById(order.id);
+        const freshOrder = mode === ORDER_VIEW_MODES.SELLER
+          ? await orderService.getSellerOrderById(order.id)
+          : await orderService.getById(order.id);
         setSelectedOrder(freshOrder);
         setOrderModalOpen(true);
-        if (mode !== 'seller') {
+        if (mode !== ORDER_VIEW_MODES.SELLER) {
           await fetchReviewsData(freshOrder);
         }
       } catch (e) {
@@ -341,9 +355,11 @@ export const useOrderFlow = ({
 
   const refreshSelectedOrder = useCallback(async () => {
     if (!selectedOrder?.id) return;
-    const updatedOrder = mode === 'seller' ? await orderService.getSellerOrderById(selectedOrder.id) : await orderService.getById(selectedOrder.id);
+    const updatedOrder = mode === ORDER_VIEW_MODES.SELLER
+      ? await orderService.getSellerOrderById(selectedOrder.id)
+      : await orderService.getById(selectedOrder.id);
     setSelectedOrder(updatedOrder);
-    if (mode !== 'seller') {
+    if (mode !== ORDER_VIEW_MODES.SELLER) {
       await fetchReviewsData(updatedOrder);
     }
   }, [selectedOrder?.id, mode, fetchReviewsData]);
@@ -377,7 +393,7 @@ export const useOrderFlow = ({
   const completeOrder = useCallback(
     async (orderId, e) => {
       if (e?.stopPropagation) e.stopPropagation();
-      const ok = window.confirm('Are you sure you want to complete this order? This action cannot be undone.');
+      const ok = window.confirm(ORDER_MESSAGES.CONFIRM_COMPLETE_ORDER);
       if (!ok) return;
       await orderService.completeOrder(orderId);
       refresh();
@@ -391,7 +407,7 @@ export const useOrderFlow = ({
 
   const refreshAll = useCallback(() => {
     refresh();
-    if (viewMode === 'seller') {
+    if (viewMode === ORDER_VIEW_MODES.SELLER) {
       escrow.refetch();
     }
   }, [refresh, escrow, viewMode]);

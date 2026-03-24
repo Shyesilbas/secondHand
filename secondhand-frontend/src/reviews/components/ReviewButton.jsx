@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {reviewService} from '../services/reviewService.js';
 import ReviewModal from './ReviewModal.jsx';
 import logger from '../../common/utils/logger.js';
+import { ORDER_STATUSES } from '../../order/constants/orderUiConstants.js';
+import { REVIEW_MESSAGES } from '../reviewConstants.js';
 
 const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, orderStatus, shippingStatus, reviewsLoading = false, skipIndividualFetch = false }) => {
     const [showModal, setShowModal] = useState(false);
@@ -30,7 +32,11 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
         checkExistingReview();
     }, [orderItem?.id, existingReview, reviewsLoading, skipIndividualFetch]);
 
-    const canReview = orderStatus === 'COMPLETED' || orderStatus === 'DELIVERED' || shippingStatus === 'DELIVERED' || orderItem?.shippingStatus === 'DELIVERED';
+    const canReview =
+      orderStatus === ORDER_STATUSES.COMPLETED ||
+      orderStatus === ORDER_STATUSES.DELIVERED ||
+      shippingStatus === ORDER_STATUSES.DELIVERED ||
+      orderItem?.shippingStatus === ORDER_STATUSES.DELIVERED;
 
     if (!canReview) {
         return null;
@@ -84,7 +90,7 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
                 disabled={loading}
                 className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-                {loading ? 'Checking...' : 'Review'}
+                {loading ? REVIEW_MESSAGES.CHECKING : REVIEW_MESSAGES.REVIEW}
             </button>
             
             <ReviewModal

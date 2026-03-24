@@ -1,3 +1,4 @@
+import { LISTING_DEFAULTS, LISTING_SORT_FIELDS } from '../types/index.js';
 
 const FilterStatus = ({ 
   totalElements, 
@@ -10,11 +11,11 @@ const FilterStatus = ({
 }) => {
     const getSortLabel = (sortBy) => {
         switch (sortBy) {
-            case 'price': return 'Sorted by price';
-            case 'year': return 'Sorted by year';
-            case 'mileage': return 'Sorted by mileage';
-            case 'brand': return 'Sorted by brand';
-            case 'type': return 'Sorted by type';
+            case LISTING_SORT_FIELDS.PRICE: return 'Sorted by price';
+            case LISTING_SORT_FIELDS.YEAR: return 'Sorted by year';
+            case LISTING_SORT_FIELDS.MILEAGE: return 'Sorted by mileage';
+            case LISTING_SORT_FIELDS.BRAND: return 'Sorted by brand';
+            case LISTING_SORT_FIELDS.TYPE: return 'Sorted by type';
             default: return 'Sorted by date';
         }
     };
@@ -185,28 +186,28 @@ const FilterStatus = ({
                 </span>
                 <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
                     <button
-                        onClick={() => updateFilters({ sortBy: 'createdAt', sortDirection: 'DESC' })}
+                        onClick={() => updateFilters({ sortBy: LISTING_SORT_FIELDS.DATE, sortDirection: LISTING_DEFAULTS.SORT_DIRECTION })}
                         className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
-                            filters.sortBy === 'createdAt' 
+                            filters.sortBy === LISTING_SORT_FIELDS.DATE 
                                 ? 'text-white bg-gray-900' 
                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                         }`}
                     >
                         Date
-                        {filters.sortBy === 'createdAt' && (
+                        {filters.sortBy === LISTING_SORT_FIELDS.DATE && (
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
                         )}
                     </button>
                     <button
-                        onClick={() => updateFilters({ sortBy: 'price', sortDirection: 'DESC' })}
+                        onClick={() => updateFilters({ sortBy: LISTING_SORT_FIELDS.PRICE, sortDirection: LISTING_DEFAULTS.SORT_DIRECTION })}
                         className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
-                            filters.sortBy === 'price' 
+                            filters.sortBy === LISTING_SORT_FIELDS.PRICE 
                                 ? 'text-white bg-gray-900' 
                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
                         }`}
                     >
                         Price
-                        {filters.sortBy === 'price' && (
+                        {filters.sortBy === LISTING_SORT_FIELDS.PRICE && (
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
                         )}
                     </button>

@@ -4,6 +4,7 @@ import { chatService } from '../services/chatService.js';
 import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { UNREAD_COUNT_KEYS } from './useUnreadCount.js';
+import { CHAT_DEFAULTS, CHAT_MESSAGE_TYPES } from '../chatConstants.js';
 
 export const useChat = (userId, options = {}) => {
     const { user } = useAuthState();
@@ -33,8 +34,8 @@ export const useChat = (userId, options = {}) => {
         queryKey: ['chatRooms', user?.id],
         queryFn: () => chatService.getUserChatRooms(),
         enabled: !!user?.id && enableChatRoomsFetch,
-        staleTime: 10 * 60 * 1000,
-        cacheTime: 30 * 60 * 1000,
+        staleTime: CHAT_DEFAULTS.ROOM_STALE_TIME_MS,
+        cacheTime: CHAT_DEFAULTS.ROOM_CACHE_TIME_MS,
         refetchInterval: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
@@ -51,8 +52,8 @@ export const useChat = (userId, options = {}) => {
         queryKey: ['chatMessages', user?.id, selectedChatRoom?.id],
         queryFn: () => chatService.getChatMessages(selectedChatRoom.id),
         enabled: !!(user?.id && selectedChatRoom?.id),
-        staleTime: 5 * 60 * 1000,
-        cacheTime: 15 * 60 * 1000,
+        staleTime: CHAT_DEFAULTS.MESSAGE_STALE_TIME_MS,
+        cacheTime: CHAT_DEFAULTS.MESSAGE_CACHE_TIME_MS,
         refetchInterval: false,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
@@ -129,7 +130,7 @@ export const useChat = (userId, options = {}) => {
             if (chatRoom.unreadCount > 0) {
                 setTimeout(() => {
                     markAsReadMutation.mutate({ chatRoomId: chatRoom.id });
-                }, 1000); // Increased delay to ensure messages are loaded
+                }, CHAT_DEFAULTS.MARK_READ_DELAY_MS);
             }
         }
     }, [selectedChatRoom, user?.id, leaveRoom, joinRoom, subscribeToChatRoom, unsubscribeFromChatRoom, markAsReadMutation]);
@@ -145,7 +146,7 @@ export const useChat = (userId, options = {}) => {
             senderId: user.id,
             recipientId: otherParticipant,
             chatRoomId: selectedChatRoom.id,
-            messageType: 'TEXT'
+            messageType: CHAT_MESSAGE_TYPES.TEXT
         };
 
         sendMessageMutation.mutate(messageData);

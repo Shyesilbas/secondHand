@@ -6,7 +6,15 @@ import {
     Wallet,
     X
 } from "lucide-react";
-import { DEFAULT_PAYMENT_FILTERS } from "../paymentSchema.js";
+import DataPagination from '../../common/components/ui/DataPagination.jsx';
+import { PAGE_SIZE_OPTIONS_5_10_20_50 } from '../../common/constants/pagination.js';
+import {
+    DEFAULT_CURRENCY_SYMBOL,
+    DEFAULT_PAYMENT_FILTERS,
+    PAYMENT_DIRECTIONS,
+    PAYMENT_TRANSACTION_TYPES,
+    PAYMENT_TYPES,
+} from "../paymentSchema.js";
 
 const PaymentFilterSidebar = ({
     isOpen,
@@ -66,9 +74,9 @@ const PaymentFilterSidebar = ({
                             <h3 className="text-sm font-semibold text-slate-900 mb-3">Quick Filters</h3>
                             <div className="space-y-2">
                                 <button
-                                    onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === 'INCOMING' ? '' : 'INCOMING')}
+                                    onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '' : PAYMENT_DIRECTIONS.INCOMING)}
                                     className={`w-full p-2.5 rounded-xl border transition-all duration-200 text-left ${
-                                        localFilters.paymentDirection === 'INCOMING'
+                                        localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING
                                             ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
                                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                                     }`}
@@ -79,9 +87,9 @@ const PaymentFilterSidebar = ({
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === 'OUTGOING' ? '' : 'OUTGOING')}
+                                    onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING ? '' : PAYMENT_DIRECTIONS.OUTGOING)}
                                     className={`w-full p-2.5 rounded-xl border transition-all duration-200 text-left ${
-                                        localFilters.paymentDirection === 'OUTGOING'
+                                        localFilters.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING
                                             ? 'border-rose-400 bg-rose-50 text-rose-700'
                                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                                     }`}
@@ -92,9 +100,9 @@ const PaymentFilterSidebar = ({
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleInputChange('transactionType', localFilters.transactionType === 'ITEM_PURCHASE' ? '' : 'ITEM_PURCHASE')}
+                                    onClick={() => handleInputChange('transactionType', localFilters.transactionType === PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE ? '' : PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE)}
                                     className={`w-full p-2.5 rounded-xl border transition-all duration-200 text-left ${
-                                        localFilters.transactionType === 'ITEM_PURCHASE'
+                                        localFilters.transactionType === PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE
                                             ? 'border-indigo-400 bg-indigo-50 text-indigo-700'
                                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                                     }`}
@@ -105,9 +113,9 @@ const PaymentFilterSidebar = ({
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => handleInputChange('paymentType', localFilters.paymentType === 'EWALLET' ? '' : 'EWALLET')}
+                                    onClick={() => handleInputChange('paymentType', localFilters.paymentType === PAYMENT_TYPES.EWALLET ? '' : PAYMENT_TYPES.EWALLET)}
                                     className={`w-full p-2.5 rounded-xl border transition-all duration-200 text-left ${
-                                        localFilters.paymentType === 'EWALLET'
+                                        localFilters.paymentType === PAYMENT_TYPES.EWALLET
                                             ? 'border-violet-400 bg-violet-50 text-violet-700'
                                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                                     }`}
@@ -144,10 +152,10 @@ const PaymentFilterSidebar = ({
                                 className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                             >
                                 <option value="">All Transaction Types</option>
-                                <option value="ITEM_PURCHASE">Item Purchase</option>
-                                <option value="LISTING_CREATION">Listing Creation</option>
-                                <option value="SHOWCASE_PAYMENT">Showcase Payment</option>
-                                <option value="REFUND">Refund</option>
+                                <option value={PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE}>Item Purchase</option>
+                                <option value={PAYMENT_TRANSACTION_TYPES.LISTING_CREATION}>Listing Creation</option>
+                                <option value={PAYMENT_TRANSACTION_TYPES.SHOWCASE_PAYMENT}>Showcase Payment</option>
+                                <option value={PAYMENT_TRANSACTION_TYPES.REFUND}>Refund</option>
                             </select>
                         </div>
 
@@ -159,9 +167,9 @@ const PaymentFilterSidebar = ({
                                 className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                             >
                                 <option value="">All Payment Methods</option>
-                                <option value="CREDIT_CARD">Credit Card</option>
-                                <option value="TRANSFER">Bank Transfer</option>
-                                <option value="EWALLET">eWallet</option>
+                                <option value={PAYMENT_TYPES.CREDIT_CARD}>Credit Card</option>
+                                <option value={PAYMENT_TYPES.TRANSFER}>Bank Transfer</option>
+                                <option value={PAYMENT_TYPES.EWALLET}>eWallet</option>
                             </select>
                         </div>
 
@@ -173,8 +181,8 @@ const PaymentFilterSidebar = ({
                                 className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                             >
                                 <option value="">All Directions</option>
-                                <option value="INCOMING">Incoming</option>
-                                <option value="OUTGOING">Outgoing</option>
+                                <option value={PAYMENT_DIRECTIONS.INCOMING}>Incoming</option>
+                                <option value={PAYMENT_DIRECTIONS.OUTGOING}>Outgoing</option>
                             </select>
                         </div>
 
@@ -215,7 +223,7 @@ const PaymentFilterSidebar = ({
                                         onChange={(e) => handleInputChange('amountMin', e.target.value)}
                                         className="w-full pl-6 pr-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                                     />
-                                    <span className="absolute left-2 top-2.5 text-slate-400 text-xs">₺</span>
+                                    <span className="absolute left-2 top-2.5 text-slate-400 text-xs">{DEFAULT_CURRENCY_SYMBOL}</span>
                                 </div>
                                 <div className="relative">
                                     <input
@@ -227,7 +235,7 @@ const PaymentFilterSidebar = ({
                                         onChange={(e) => handleInputChange('amountMax', e.target.value)}
                                         className="w-full pl-6 pr-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                                     />
-                                    <span className="absolute left-2 top-2.5 text-slate-400 text-xs">₺</span>
+                                    <span className="absolute left-2 top-2.5 text-slate-400 text-xs">{DEFAULT_CURRENCY_SYMBOL}</span>
                                 </div>
                             </div>
                         </div>
@@ -261,49 +269,18 @@ const PaymentPagination = React.memo(({
     const endItem = Math.min((currentPage + 1) * pageSize, totalItems);
 
     return (
-        <div className="mt-6 rounded-2xl border border-slate-200/70 bg-white p-3 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center space-x-2">
-                <button
-                    onClick={() => onPageChange(Math.max(0, currentPage - 1))}
-                    disabled={currentPage === 0}
-                    className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    Previous
-                </button>
-
-                <span className="text-xs text-slate-500 tabular-nums">
-                    Page {currentPage + 1} of {totalPages}
-                </span>
-
-                <button
-                    onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))}
-                    disabled={currentPage >= totalPages - 1}
-                    className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    Next
-                </button>
-            </div>
-
-            <div className="flex items-center space-x-4">
-                <div className="text-xs text-slate-500 tabular-nums">
-                    Showing {startItem} to {endItem} of {totalItems} results
-                </div>
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="pageSize" className="text-xs text-slate-500">Per page:</label>
-                    <select
-                        id="pageSize"
-                        className="px-2 py-1 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                        value={pageSize}
-                        onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                    >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={50}>50</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+        <DataPagination
+            shouldShowPagination={true}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            startItem={startItem}
+            endItem={endItem}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizeOptions={PAGE_SIZE_OPTIONS_5_10_20_50}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+        />
     );
 });
 

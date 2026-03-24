@@ -3,23 +3,25 @@ import ReactDOM from 'react-dom';
 import { offerService } from '../services/offerService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
+import { OFFER_DEFAULTS, OFFER_MESSAGES } from '../offerConstants.js';
+import { getOfferErrorMessage } from '../utils/offerError.js';
 
 const CounterOfferModal = ({ isOpen, onClose, offer, onSuccess }) => {
   const notification = useNotification();
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(OFFER_DEFAULTS.MIN_QUANTITY);
   const [totalPrice, setTotalPrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
-    setQuantity(Number(offer?.quantity) || 1);
+    setQuantity(Number(offer?.quantity) || OFFER_DEFAULTS.MIN_QUANTITY);
     setTotalPrice(offer?.totalPrice != null ? String(offer.totalPrice) : '');
     setError(null);
   }, [isOpen, offer]);
 
-  const currency = offer?.currency || offer?.listingCurrency || 'TRY';
-  const listingTitle = offer?.listingTitle || 'Listing';
+  const currency = offer?.currency || offer?.listingCurrency || OFFER_DEFAULTS.FALLBACK_CURRENCY;
+  const listingTitle = offer?.listingTitle || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE;
 
   const previewTotal = useMemo(() => {
     const n = Number(totalPrice);
@@ -38,28 +40,28 @@ const CounterOfferModal = ({ isOpen, onClose, offer, onSuccess }) => {
     const t = Number(totalPrice);
 
     if (!offer?.id) {
-      setError('Offer not found');
+      setError(OFFER_MESSAGES.OFFER_NOT_FOUND);
       return;
     }
-    if (!Number.isFinite(q) || q < 1) {
-      setError('Quantity must be at least 1');
+    if (!Number.isFinite(q) || q < OFFER_DEFAULTS.MIN_QUANTITY) {
+      setError(OFFER_MESSAGES.INVALID_QUANTITY);
       return;
     }
-    if (!Number.isFinite(t) || t <= 0) {
-      setError('Total price must be greater than 0');
+    if (!Number.isFinite(t) || t <= OFFER_DEFAULTS.MIN_TOTAL_PRICE_EXCLUSIVE) {
+      setError(OFFER_MESSAGES.INVALID_TOTAL_PRICE);
       return;
     }
 
     setIsSubmitting(true);
     try {
       await offerService.counter(offer.id, { quantity: q, totalPrice: t });
-      notification?.showSuccess('Successful', 'Counter offer sent');
+      notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.COUNTER_SENT);
       onSuccess?.();
       onClose?.();
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to counter offer';
+      const msg = getOfferErrorMessage(err, OFFER_MESSAGES.COUNTER_FAILED);
       setError(msg);
-      notification?.showError('Error', msg);
+      notification?.showError(OFFER_MESSAGES.ERROR_TITLE, msg);
     } finally {
       setIsSubmitting(false);
     }

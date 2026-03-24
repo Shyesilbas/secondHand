@@ -1,14 +1,29 @@
 import { AlertTriangle, Lightbulb, ThumbsDown, ThumbsUp } from 'lucide-react';
+import {
+  FORUM_CATEGORIES,
+  FORUM_REACTIONS,
+  FORUM_THREAD_STATUSES,
+} from '../forumConstants.js';
+import { formatForumDate } from '../utils/forumDateFormat.js';
 
 const categoryMeta = {
-  SUGGESTIONS: { label: 'Suggestions', icon: Lightbulb },
-  COMPLAINTS: { label: 'Complaints', icon: AlertTriangle },
+  [FORUM_CATEGORIES.SUGGESTIONS]: { label: 'Suggestions', icon: Lightbulb },
+  [FORUM_CATEGORIES.COMPLAINTS]: { label: 'Complaints', icon: AlertTriangle },
 };
 
 const statusMeta = {
-  OPEN: { label: 'Open', className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  IN_PROGRESS: { label: 'In progress', className: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-  RESOLVED: { label: 'Resolved', className: 'bg-slate-50 text-slate-700 border-slate-200' },
+  [FORUM_THREAD_STATUSES.OPEN]: {
+    label: 'Open',
+    className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  },
+  [FORUM_THREAD_STATUSES.IN_PROGRESS]: {
+    label: 'In progress',
+    className: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  },
+  [FORUM_THREAD_STATUSES.RESOLVED]: {
+    label: 'Resolved',
+    className: 'bg-slate-50 text-slate-700 border-slate-200',
+  },
 };
 
 export const ThreadCardSkeleton = () => (
@@ -28,20 +43,14 @@ export const ThreadCardSkeleton = () => (
   </div>
 );
 
-const formatDate = (v) => {
-  const d = v ? new Date(v) : null;
-  if (!d || Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
-};
-
 export const ThreadCard = ({ thread, isSelected, onSelect, reaction }) => {
-  const category = thread?.category || 'SUGGESTIONS';
-  const status = thread?.status || 'OPEN';
+  const category = thread?.category || FORUM_CATEGORIES.SUGGESTIONS;
+  const status = thread?.status || FORUM_THREAD_STATUSES.OPEN;
   const CatIcon = categoryMeta[category]?.icon || Lightbulb;
-  const statusInfo = statusMeta[status] || statusMeta.OPEN;
+  const statusInfo = statusMeta[status] || statusMeta[FORUM_THREAD_STATUSES.OPEN];
   const author = String(thread?.authorDisplayName || '').trim();
-  const isLiked = reaction === 'LIKE';
-  const isDisliked = reaction === 'DISLIKE';
+  const isLiked = reaction === FORUM_REACTIONS.LIKE;
+  const isDisliked = reaction === FORUM_REACTIONS.DISLIKE;
 
   return (
     <button
@@ -57,7 +66,7 @@ export const ThreadCard = ({ thread, isSelected, onSelect, reaction }) => {
               <span className="font-semibold">{categoryMeta[category]?.label || category}</span>
             </span>
             <span className="text-slate-300">•</span>
-            <span className="tabular-nums">{formatDate(thread?.createdAt)}</span>
+            <span className="tabular-nums">{formatForumDate(thread?.createdAt)}</span>
             {author ? (
               <>
                 <span className="text-slate-300">•</span>

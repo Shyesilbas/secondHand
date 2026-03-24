@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useBankAccountsQuery } from '../../hooks/queries.js';
 import { formatCurrency } from '../../../common/formatters.js';
+import { WALLET_OPERATION_MODES } from '../../paymentSchema.js';
 
 const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWallet }) => {
-  const needsBankAccount = mode === 'deposit' || mode === 'withdraw';
+  const needsBankAccount =
+    mode === WALLET_OPERATION_MODES.DEPOSIT || mode === WALLET_OPERATION_MODES.WITHDRAW;
   const { data: bankAccounts = [] } = useBankAccountsQuery({ enabled: isOpen && needsBankAccount });
 
   const [amount, setAmount] = useState('');
@@ -24,52 +26,58 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
   };
 
   const title = (() => {
-    if (mode === 'withdraw') return 'Withdraw Money';
-    if (mode === 'deposit') return 'Deposit Money';
-    if (mode === 'updateLimit') return 'Update Wallet Limit';
+    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw Money';
+    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit Money';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Update Wallet Limit';
     return 'Update Spending Warning Limit';
   })();
 
   const description = (() => {
-    if (mode === 'withdraw') return 'Transfer money from your eWallet to your bank account.';
-    if (mode === 'deposit') return 'Add money from your bank account to your eWallet.';
-    if (mode === 'updateLimit') return 'Set the maximum allowed balance for your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Transfer money from your eWallet to your bank account.';
+    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Add money from your bank account to your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Set the maximum allowed balance for your eWallet.';
     return 'Set a threshold to warn you before overspending.';
   })();
 
   const submitLabel = (() => {
-    if (mode === 'withdraw') return 'Withdraw';
-    if (mode === 'deposit') return 'Deposit';
+    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw';
+    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit';
     return 'Update';
   })();
 
   const currentValueLabel = (() => {
-    if (mode === 'updateLimit') return 'Current:';
-    if (mode === 'updateWarning') return 'Current:';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Current:';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'Current:';
     return null;
   })();
 
   const currentValue = (() => {
-    if (mode === 'updateLimit') return eWallet?.limit ? formatCurrency(eWallet.limit) : 'No limit';
-    if (mode === 'updateWarning') return eWallet?.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not set';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT)
+      return eWallet?.limit ? formatCurrency(eWallet.limit) : 'No limit';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING)
+      return eWallet?.spendingWarningLimit
+        ? formatCurrency(eWallet.spendingWarningLimit)
+        : 'Not set';
     return null;
   })();
 
   const amountLabel = (() => {
-    if (mode === 'updateLimit') return 'New Wallet Limit (TRY)';
-    if (mode === 'updateWarning') return 'New Spending Warning Limit (TRY)';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'New Wallet Limit (TRY)';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'New Spending Warning Limit (TRY)';
     return 'Amount (TRY)';
   })();
 
   const amountPlaceholder = (() => {
-    if (mode === 'updateLimit') return 'Enter new limit';
-    if (mode === 'updateWarning') return 'Enter warning limit';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Enter new limit';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'Enter warning limit';
     return 'Enter amount';
   })();
 
   const amountHelp = (() => {
-    if (mode === 'updateLimit') return 'This defines the maximum balance your eWallet can hold.';
-    if (mode === 'updateWarning') return 'You will be notified when your spending approaches this limit.';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT)
+      return 'This defines the maximum balance your eWallet can hold.';
+    if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING)
+      return 'You will be notified when your spending approaches this limit.';
     return null;
   })();
 

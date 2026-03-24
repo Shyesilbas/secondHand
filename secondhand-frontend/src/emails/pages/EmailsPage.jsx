@@ -21,6 +21,7 @@ import EmailListItem from '../components/EmailListItem';
 import EmailContent from '../components/EmailContent';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {EMAIL_TYPES} from '../emails.js';
+import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES } from '../emailConstants.js';
 
 const EmailsPageLoader = () => (
     <div className="min-h-screen bg-slate-50">
@@ -77,7 +78,7 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
                     </svg>
                 </div>
                 <div className="ml-3">
-                    <h3 className="text-sm font-medium text-status-error-text">Error loading emails</h3>
+                    <h3 className="text-sm font-medium text-status-error-text">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
                     <p className="text-sm text-status-error-text mt-1">{error}</p>
                 </div>
             </div>
@@ -90,11 +91,11 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
                     <MailOpen className="w-12 h-12 text-slate-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2 tracking-tight">
-                    No Emails Found
+                    {EMAIL_MESSAGES.NO_EMAILS_TITLE}
                 </h3>
                 <p className="text-slate-500 tracking-tight">
-                    {filterType === 'ALL'
-                        ? "You haven't received any emails yet."
+                    {filterType === EMAIL_FILTERS.ALL
+                        ? EMAIL_MESSAGES.NO_EMAILS_ALL
                         : `No ${filterType?.toLowerCase?.() || ''} emails found.`}
                 </p>
             </div>
@@ -104,9 +105,9 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
 };
 
 const getEmailMatchesFilter = (email, filterType) => {
-    if (filterType === 'ALL') return true;
-    if (filterType === 'OFFER') return String(email?.emailType || '').startsWith('OFFER_');
-    if (filterType === 'SECURITY') return [EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.PASSWORD_RESET].includes(email?.emailType);
+    if (filterType === EMAIL_FILTERS.ALL) return true;
+    if (filterType === EMAIL_FILTERS.OFFER) return String(email?.emailType || '').startsWith('OFFER_');
+    if (filterType === EMAIL_FILTERS.SECURITY) return [EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.PASSWORD_RESET].includes(email?.emailType);
     return email?.emailType === filterType;
 };
 
@@ -116,18 +117,18 @@ const EmailsPage = () => {
     const queryClient = useQueryClient();
     const { user, isAuthenticated } = useAuthState();
     const [selectedEmail, setSelectedEmail] = useState(null);
-    const [filterType, setFilterType] = useState('ALL');
+    const [filterType, setFilterType] = useState(EMAIL_FILTERS.ALL);
     const [isDeleting, setIsDeleting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [page, setPage] = useState(0);
-    const pageSize = 20;
+    const [page, setPage] = useState(EMAIL_DEFAULTS.PAGE);
+    const pageSize = EMAIL_DEFAULTS.PAGE_SIZE;
     const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
 
     useEffect(() => {
         setSelectedEmail(null);
-        setFilterType('ALL');
+        setFilterType(EMAIL_FILTERS.ALL);
         setSearchTerm('');
-        setPage(0);
+        setPage(EMAIL_DEFAULTS.PAGE);
     }, [user?.id]);
 
     const { 
@@ -174,7 +175,7 @@ const EmailsPage = () => {
 
     const handleDeleteEmail = (emailId, emailSubject) => {
         if (!emailId) {
-            notification.showError('Email ID missing.');
+            notification.showError(EMAIL_MESSAGES.EMAIL_ID_MISSING);
             return;
         }
         handleDelete({
@@ -210,9 +211,9 @@ const EmailsPage = () => {
     );
 
     const folderItems = useMemo(() => ([
-        { id: 'ALL', label: 'Inbox', icon: MailOpen },
-        { id: 'OFFER', label: 'Offers', icon: Tag },
-        { id: 'SECURITY', label: 'Security', icon: Shield },
+        { id: EMAIL_FILTERS.ALL, label: 'Inbox', icon: MailOpen },
+        { id: EMAIL_FILTERS.OFFER, label: 'Offers', icon: Tag },
+        { id: EMAIL_FILTERS.SECURITY, label: 'Security', icon: Shield },
         { id: EMAIL_TYPES.PAYMENT_VERIFICATION, label: 'Payments', icon: CreditCard },
         { id: EMAIL_TYPES.NOTIFICATION, label: 'Notifications', icon: Bell },
         { id: EMAIL_TYPES.PROMOTIONAL, label: 'Promotions', icon: Megaphone },

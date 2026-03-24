@@ -1,6 +1,7 @@
 import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon} from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import {formatCurrency} from '../../../common/formatters.js';
+import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
 
 const CheckoutPaymentStep = ({
     selectedPaymentType,
@@ -30,19 +31,19 @@ const CheckoutPaymentStep = ({
 
     const paymentMethods = [
         {
-            id: 'CREDIT_CARD',
+            id: CART_PAYMENT_TYPES.CREDIT_CARD,
             name: 'Credit/Debit Card',
             icon: CreditCardIcon,
             description: 'Pay with your credit or debit card'
         },
         {
-            id: 'TRANSFER',
+            id: CART_PAYMENT_TYPES.TRANSFER,
             name: 'Bank Transfer',
             icon: BanknotesIcon,
             description: 'Transfer from your bank account'
         },
         {
-            id: 'EWALLET',
+            id: CART_PAYMENT_TYPES.EWALLET,
             name: 'E-Wallet',
             icon: WalletIcon,
             description: `Pay with e-wallet (Balance: ${formatCurrency(eWallet?.balance || 0, currency || 'TRY')})`,
@@ -50,18 +51,18 @@ const CheckoutPaymentStep = ({
     ];
 
     const isPaymentMethodValid = () => {
-        if (selectedPaymentType === 'CREDIT_CARD') {
+        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD) {
             return selectedCardNumber && cards?.length > 0;
-        } else if (selectedPaymentType === 'TRANSFER') {
+        } else if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER) {
             return selectedBankAccountIban && bankAccounts?.length > 0;
-        } else if (selectedPaymentType === 'EWALLET') {
+        } else if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET) {
             return eWallet && calculateTotal() <= eWallet.balance;
         }
         return false;
     };
 
     const handleNext = async () => {
-        if (selectedPaymentType === 'EWALLET' && calculateTotal() > eWallet.balance) {
+        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && calculateTotal() > eWallet.balance) {
             return; // Show error
         }
         await sendVerificationCode();
@@ -92,7 +93,7 @@ const CheckoutPaymentStep = ({
                         {paymentMethods.map((method) => {
                             const Icon = method.icon;
                             const isSelected = selectedPaymentType === method.id;
-                            const isDisabled = method.id === 'EWALLET' && (!eWallet || totalAmount > eWallet.balance);
+                            const isDisabled = method.id === CART_PAYMENT_TYPES.EWALLET && (!eWallet || totalAmount > eWallet.balance);
 
                             return (
                                 <label
@@ -132,7 +133,7 @@ const CheckoutPaymentStep = ({
                     </div>
                 </div>
 
-                {selectedPaymentType === 'CREDIT_CARD' && (
+                {selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && (
                     <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                         <h4 className="text-sm font-semibold text-slate-800 mb-3">Card Details</h4>
                         <div>
@@ -153,7 +154,7 @@ const CheckoutPaymentStep = ({
                     </div>
                 )}
 
-                {selectedPaymentType === 'TRANSFER' && (
+                {selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && (
                     <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                         <h4 className="text-sm font-semibold text-slate-800 mb-3">Bank Account</h4>
                         <div>
@@ -174,7 +175,7 @@ const CheckoutPaymentStep = ({
                     </div>
                 )}
 
-                {selectedPaymentType === 'EWALLET' && (
+                {selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && (
                     <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                         <h4 className="text-sm font-semibold text-slate-800 mb-3">E-Wallet</h4>
                         <div className="space-y-1.5">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
+import { ORDER_MESSAGES } from '../constants/orderUiConstants.js';
 
 const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
   const [reason, setReason] = useState('');
@@ -63,7 +64,7 @@ const CancelRefundModal = ({ isOpen, onClose, onSubmit, type, order }) => {
       await onSubmit(payload);
       handleClose();
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'An error occurred');
+      setError(err.response?.data?.message || err.message || ORDER_MESSAGES.UNKNOWN_ERROR);
     } finally {
       setIsSubmitting(false);
     }
