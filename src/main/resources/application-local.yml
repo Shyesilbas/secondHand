@@ -1,0 +1,12 @@
+# Yerel geliştirme (spring.profiles.default=local veya SPRING_PROFILES_ACTIVE=local)
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.core: DEBUG

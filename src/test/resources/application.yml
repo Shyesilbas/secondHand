@@ -1,0 +1,22 @@
+# Testlerde prod/local default yerine izole profil
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secretKey: test-secret-key-that-is-long-enough-for-hs256
+  accessToken:
+    expiration: 900000
+  refreshToken:
+    expiration: 86400000
+  passwordReset:
+    expiration: 3600000
