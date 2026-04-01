@@ -1,0 +1,19 @@
+# Üretim: SPRING_PROFILES_ACTIVE=prod
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+    org.springframework.security.oauth2.client: INFO
+    org.springframework.security.oauth2.core: INFO
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
