@@ -11,6 +11,15 @@ import java.util.Map;
 @Service
 public class SeedRunnerService {
 
+    private static final List<String> LISTING_TYPE_SEED_KEYS = List.of(
+            "vehicle",
+            "electronics",
+            "realestate",
+            "clothing",
+            "books",
+            "sports"
+    );
+
     private final Map<String, SeedTask> tasksByKey;
 
     public SeedRunnerService(List<SeedTask> tasks) {
@@ -64,6 +73,10 @@ public class SeedRunnerService {
             results.put(k, run(k));
         }
         return results;
+    }
+
+    public Map<String, Result<Void>> runListingTypes() {
+        return runMany(LISTING_TYPE_SEED_KEYS);
     }
 
     private String normalizeKey(String key) {

@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
@@ -14,6 +15,7 @@ import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,6 @@ import java.util.List;
 public class OrderCompletionService {
 
     private final OrderRepository orderRepository;
-    private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderEscrowService orderEscrowService;
@@ -34,6 +35,7 @@ public class OrderCompletionService {
     private final OrderLogService orderLog;
     private final OrderCompletionPolicy orderCompletionPolicy;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
+    private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(value = "pendingOrders", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
@@ -48,7 +50,7 @@ public class OrderCompletionService {
         orderStateTransitionPolicy.applyCompletion(order);
         Order savedOrder = orderRepository.save(order);
 
-        orderNotificationService.sendOrderCompletionNotification(user, savedOrder, false);
+        eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, user, false));
 
         orderLog.logOrderCompleted(order.getOrderNumber(), false);
         return Result.success(orderMapper.toDto(savedOrder));

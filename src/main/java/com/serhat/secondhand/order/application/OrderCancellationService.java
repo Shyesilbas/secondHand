@@ -8,12 +8,14 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -36,8 +38,8 @@ public class OrderCancellationService {
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
-    private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Order orderStub = new Order();
@@ -102,7 +104,7 @@ public class OrderCancellationService {
         }
 
         Order finalOrder = savedOrderResult.getData();
-        orderNotificationService.sendOrderCancellationNotification(user, finalOrder);
+        eventPublisher.publishEvent(new OrderCancelledEvent(finalOrder, user));
         orderLog.logOrderCancelled(order.getOrderNumber(), !allItemsCancelled, user.getEmail());
         return Result.success(orderMapper.toDto(finalOrder));
     }

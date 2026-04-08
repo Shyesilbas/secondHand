@@ -11,13 +11,14 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.application.OrderCreationService;
-import com.serhat.secondhand.order.application.OrderNotificationService;
+import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.payment.application.OrderPaymentService;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -32,13 +33,13 @@ public class CheckoutOrchestrator {
     private final CartRepository cartRepository;
     private final OrderCreationService orderCreationService;
     private final OrderPaymentService orderPaymentService;
-    private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final CouponService couponService;
     private final IOfferService offerService;
     private final PaymentOrchestrator paymentOrchestrator;
     private final CheckoutPricingContextFactory checkoutPricingContextFactory;
     private final CheckoutStockReservationService checkoutStockReservationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Result<OrderDto> executeCheckout(Long userId, CheckoutRequest request) {
@@ -88,11 +89,11 @@ public class CheckoutOrchestrator {
                     return Result.error("CHECKOUT_ESCROW_FAILED", "Checkout payment succeeded but escrow creation failed. Please contact support.");
                 }
                 handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
-                orderNotificationService.sendOrderNotifications(user, order, true);
+                eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
                 checkoutStockReservationService.releaseReservedStock(reserved);
-                orderNotificationService.sendOrderNotifications(user, order, false);
+                eventPublisher.publishEvent(new OrderCreatedEvent(order, user, false));
                 log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
                 return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
             }

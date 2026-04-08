@@ -12,7 +12,7 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -46,8 +46,8 @@ public class FavoriteService {
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService listingEnrichmentService;
     private final IUserService userService;
-    private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final NotificationEventPublisher notificationEventPublisher;
     
 
     @Transactional
@@ -95,18 +95,18 @@ public class FavoriteService {
             if (sellerId != null) {
                 String actorName = (user.getName() == null ? "" : user.getName()) + " " + (user.getSurname() == null ? "" : user.getSurname());
                 actorName = actorName.trim();
-                var notificationResult = notificationService.createAndSend(
-                        notificationTemplateCatalog.listingFavorited(
-                                sellerId,
-                                listing.getId(),
-                                listing.getTitle(),
-                                userId,
-                                actorName
-                        )
+                var request = notificationTemplateCatalog.listingFavorited(
+                        sellerId,
+                        listing.getId(),
+                        listing.getTitle(),
+                        userId,
+                        actorName
                 );
-                if (notificationResult.isError()) {
-                    log.error("Failed to create listing favorited notification: {}", notificationResult.getMessage());
-                }
+                notificationEventPublisher.publishDispatch(
+                        request,
+                        "favorite",
+                        "listing-favorited:" + sellerId + ":" + listing.getId() + ":" + userId
+                );
             }
         } catch (Exception e) {
             log.error("Failed to create in-app notification for listing favorited: {}", e.getMessage());

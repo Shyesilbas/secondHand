@@ -28,6 +28,7 @@ public class Agreement {
 
     private String version;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @JsonFormat(pattern = "dd/MM/yyyy")

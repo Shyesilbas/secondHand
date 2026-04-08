@@ -39,5 +39,10 @@ public class AdminSeedController {
         }
         return seedRunnerService.runMany(keys);
     }
+
+    @PostMapping("/listing-types")
+    public Map<String, Result<Void>> runListingTypeSeeds() {
+        return seedRunnerService.runListingTypes();
+    }
 }
 

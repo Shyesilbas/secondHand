@@ -6,24 +6,40 @@ const AuthButton = ({
                         isLoading = false,
                         disabled = false,
                         variant = 'primary',
+                        size = 'md',
+                        leftIcon = null,
+                        rightIcon = null,
                         className = ''
                     }) => {
     const baseClasses = `
-    w-full flex justify-center py-2.5 px-4 border border-transparent 
-    rounded text-sm font-medium focus:outline-none 
-    focus:ring-2 focus:ring-offset-2 transition-colors
-    disabled:opacity-50 disabled:cursor-not-allowed
+    w-full inline-flex items-center justify-center gap-2 border
+    rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2
+    transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
     const variants = {
         primary: `
-      text-button-primary-text bg-button-primary-bg hover:bg-button-primary-hover 
-      focus:ring-primary-500 active:bg-secondary-800
+      text-white bg-slate-900 border-slate-900 hover:bg-slate-800
+      focus:ring-slate-700/30
     `,
         secondary: `
-      text-button-secondary-text bg-button-secondary-bg hover:bg-button-secondary-hover 
-      focus:ring-primary-500 active:bg-secondary-200
+      text-slate-700 bg-white border-slate-200 hover:bg-slate-50
+      focus:ring-slate-300
+    `,
+        outline: `
+      text-slate-800 bg-white border-slate-300 hover:bg-slate-50
+      focus:ring-slate-300
+    `,
+        ghost: `
+      text-slate-700 bg-transparent border-transparent hover:bg-slate-100
+      focus:ring-slate-300
     `
+    };
+
+    const sizes = {
+        sm: 'py-2 px-3 text-sm',
+        md: 'py-2.5 px-4 text-sm',
+        lg: 'py-3.5 px-5 text-sm'
     };
 
     return (
@@ -31,12 +47,12 @@ const AuthButton = ({
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`${baseClasses} ${variants[variant]} ${className}`}
+            className={`${baseClasses} ${sizes[size] || sizes.md} ${variants[variant] || variants.primary} ${className}`}
         >
             {isLoading ? (
                 <div className="flex items-center">
                     <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        className="animate-spin h-5 w-5"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -58,7 +74,11 @@ const AuthButton = ({
                     Processing...
                 </div>
             ) : (
-                children
+                <>
+                    {leftIcon}
+                    {children}
+                    {rightIcon}
+                </>
             )}
         </button>
     );

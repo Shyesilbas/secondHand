@@ -1,44 +1,38 @@
-import {Outlet, useLocation} from 'react-router-dom';
-import {Sparkles as SparklesIcon} from 'lucide-react';
-import {getPageName} from '../../utils/getPageName.js';
+import { Outlet, useLocation } from 'react-router-dom';
+import { getPageName } from '../../utils/getPageName.js';
 
 const AuthLayout = () => {
     const { pathname } = useLocation();
     const pageName = getPageName(pathname);
+    const isRegisterPage = pageName === 'RegisterPage';
+
+    // Register kendi tam ekran layout'unu yönetiyor
+    if (isRegisterPage) {
+        return (
+            <div className="min-h-screen" data-page={pageName} data-path={pathname}>
+                <Outlet />
+            </div>
+        );
+    }
+
+    // Diğer auth sayfaları: beyaz, ortalanmış, sade
     return (
         <div
-            className="min-h-screen bg-gray-50"
+            className="min-h-screen bg-white flex flex-col"
             data-page={pageName ?? undefined}
             data-path={pathname}
         >
-            <div className="flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                    <div className="text-center">
-                        <div className="mx-auto h-12 w-12 bg-gray-900 rounded-xl flex items-center justify-center mb-4">
-                            <SparklesIcon className="h-8 w-8 text-white" />
-                        </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            SecondHand
-                        </h1>
-                        <p className="text-sm text-gray-600">
-                            Marketplace Platform
-                        </p>
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+            <div className="flex flex-1 flex-col justify-center px-6 py-12">
+                <div className="mx-auto w-full max-w-sm">
                     <Outlet />
                 </div>
-
-                {/* Footer */}
-                <div className="mt-8 text-center">
-                    <p className="text-xs text-gray-500">
-                        © 2024 SecondHand. All rights reserved.
-                    </p>
-                </div>
             </div>
+
+            <footer className="pb-6 text-center">
+                <p className="text-xs text-secondary-400">
+                    © 2025 SecondHand. All rights reserved.
+                </p>
+            </footer>
         </div>
     );
 };

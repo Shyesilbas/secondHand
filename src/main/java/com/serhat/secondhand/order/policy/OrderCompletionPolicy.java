@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 public class OrderCompletionPolicy {
 
     public Result<Void> validateCompletable(Order order) {
-        return OrderPolicyGuards.validateNotCompletedAndInAllowedStatuses(
-                order,
-                Order.OrderStatus.COMPLETABLE_STATUSES,
-                OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED
-        );
+        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
+            return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
+        }
+        if (!Order.OrderStatus.COMPLETABLE_STATUSES.contains(order.getStatus())) {
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED);
+        }
+        return Result.success();
     }
 }

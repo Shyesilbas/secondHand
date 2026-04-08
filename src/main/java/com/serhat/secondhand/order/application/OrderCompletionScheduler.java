@@ -1,7 +1,7 @@
 package com.serhat.secondhand.order.application;
 
-import com.serhat.secondhand.notification.application.INotificationService;
-import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
+import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
+import com.serhat.secondhand.order.application.event.OrderStatusChangedEvent;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.Shipping;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
@@ -10,6 +10,7 @@ import com.serhat.secondhand.order.repository.ShippingRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +25,10 @@ public class OrderCompletionScheduler {
 
     private final OrderRepository orderRepository;
     private final ShippingRepository shippingRepository;
-    private final OrderNotificationService orderNotificationService;
     private final OrderEscrowService orderEscrowService;
-    private final INotificationService notificationService;
-    private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Scheduled(fixedRate = OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES * 60 * 1000L)
     @Transactional
@@ -46,7 +45,7 @@ public class OrderCompletionScheduler {
                 order.setStatus(Order.OrderStatus.PROCESSING);
                 order.setUpdatedAt(now);
                 orderRepository.save(order);
-                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.PROCESSING);
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.PROCESSING.name()));
                 updatedCount++;
                 orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "PROCESSING");
             }
@@ -65,7 +64,7 @@ public class OrderCompletionScheduler {
                     shippingRepository.save(shipping);
                 }
                 orderRepository.save(order);
-                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.SHIPPED);
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.SHIPPED.name()));
                 updatedCount++;
                 orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "SHIPPED");
             }
@@ -84,7 +83,7 @@ public class OrderCompletionScheduler {
                     shippingRepository.save(shipping);
                 }
                 orderRepository.save(order);
-                sendStatusChangeNotification(order, oldStatus, Order.OrderStatus.DELIVERED);
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.DELIVERED.name()));
                 updatedCount++;
                 orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "DELIVERED");
             }
@@ -111,8 +110,8 @@ public class OrderCompletionScheduler {
                     }
                 }
 
-                orderNotificationService.sendOrderCompletionNotification(order.getUser(), savedOrder, true);
-                sendStatusChangeNotification(savedOrder, oldStatus, Order.OrderStatus.COMPLETED);
+                eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, savedOrder.getUser(), true));
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), Order.OrderStatus.COMPLETED.name()));
                 updatedCount++;
                 orderLog.logOrderCompleted(order.getOrderNumber(), true);
             }
@@ -154,20 +153,6 @@ public class OrderCompletionScheduler {
         }
         Duration duration = Duration.between(shipping.getInTransitAt(), now);
         return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
-    }
-
-    private void sendStatusChangeNotification(Order order, Order.OrderStatus oldStatus, Order.OrderStatus newStatus) {
-        var request = notificationTemplateCatalog.orderStatusChanged(
-                order.getUser().getId(),
-                order.getId(),
-                order.getOrderNumber(),
-                oldStatus != null ? oldStatus.name() : "",
-                newStatus.name()
-        );
-        var notificationResult = notificationService.createAndSend(request);
-        if (notificationResult.isError()) {
-            orderLog.logNotificationFailed("statusChange", order.getOrderNumber(), notificationResult.getMessage());
-        }
     }
 
     private boolean shouldAutoCompleteOrder(Shipping shipping, LocalDateTime now) {
