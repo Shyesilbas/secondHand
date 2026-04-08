@@ -8,7 +8,9 @@ public interface IPaymentVerificationService {
 
     void initiatePaymentVerification(Long userId, InitiateVerificationRequest req);
 
-    Result<Void> validateOrGenerateVerification(User user, String code);
+    boolean isVerificationRequired(String code);
 
+    void generateAndSendVerification(User user);
 
+    Result<Void> validateCode(User user, String code);
 }

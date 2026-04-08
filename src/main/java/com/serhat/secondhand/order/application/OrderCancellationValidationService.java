@@ -5,7 +5,7 @@ import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.policy.OrderCancellationPolicy;
-import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class OrderCancellationValidationService {
 
     private final OrderValidationService orderValidationService;
     private final OrderCancellationPolicy orderCancellationPolicy;
-    private final OrderStatusValidator orderStatusValidator;
+    private final OrderStatusConsistencyLogger orderStatusConsistencyLogger;
     private final OrderItemCompensationPlanner compensationPlanner;
 
     public ValidationResult validate(Order order, OrderCancelRequest request, User user) {
@@ -47,10 +47,7 @@ public class OrderCancellationValidationService {
             return new ValidationResult(validatedOrder, List.of(), cancelValidationResult);
         }
 
-        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(validatedOrder);
-        if (consistencyResult.isError()) {
-            return new ValidationResult(validatedOrder, List.of(), consistencyResult);
-        }
+        orderStatusConsistencyLogger.logIfInconsistent(validatedOrder);
 
         Result<List<OrderItem>> itemsResult = compensationPlanner.resolveOrderItems(validatedOrder, request.getOrderItemIds());
         if (itemsResult.isError()) {

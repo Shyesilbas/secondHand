@@ -67,7 +67,12 @@ public class OrderCreationService {
 
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
         Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
-        List<OrderItem> orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
+        List<OrderItem> orderItems;
+        try {
+            orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
+        } catch (IllegalStateException e) {
+            return Result.error(e.getMessage(), OrderErrorCodes.ORDER_ITEM_MISSING_SELLER.getCode());
+        }
         order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
@@ -129,18 +134,18 @@ public class OrderCreationService {
             }
         }
 
-        Long sellerId = null;
-        ListingType listingType = null;
-        if (listing != null) {
-            listingType = listing.getListingType();
-            if (listing.getSeller() != null) {
-                sellerId = listing.getSeller().getId();
-            } else {
-                orderLog.logDataWarning("Listing {} has no seller, setting sellerId to null", listing.getId());
-            }
-        } else {
+        if (listing == null) {
             orderLog.logDataWarning("Cart item has no listing for order {}", order.getOrderNumber());
+            throw new IllegalStateException("Cannot create order item: cart item has no listing");
         }
+
+        if (listing.getSeller() == null) {
+            orderLog.logDataWarning("Listing {} has no seller — cannot create order item", listing.getId());
+            throw new IllegalStateException("Cannot create order item: listing " + listing.getId() + " has no seller");
+        }
+
+        Long sellerId = listing.getSeller().getId();
+        ListingType listingType = listing.getListingType();
 
         return OrderItem.builder()
                 .order(order)

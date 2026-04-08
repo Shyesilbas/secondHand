@@ -39,7 +39,8 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
 
     @Query("SELECT p FROM Payment p " +
-            "LEFT JOIN p.toUser tu " +
+            "LEFT JOIN FETCH p.fromUser " +
+            "LEFT JOIN FETCH p.toUser tu " +
             "WHERE " +
             "(p.fromUser.id = :userId OR p.toUser.id = :userId) AND " +
             "(:transactionType IS NULL OR p.transactionType = :transactionType) AND " +

@@ -2,6 +2,7 @@ package com.serhat.secondhand.payment.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentValidationHelper;
 import com.serhat.secondhand.payment.validator.PaymentValidator;
 import com.serhat.secondhand.user.application.IUserService;
@@ -32,7 +33,12 @@ public class PaymentPreCheckService {
             return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
         }
 
-        Result<Void> verificationResult = paymentVerificationService.validateOrGenerateVerification(fromUser, paymentRequest.verificationCode());
+        if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
+            paymentVerificationService.generateAndSendVerification(fromUser);
+            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
+        }
+
+        Result<Void> verificationResult = paymentVerificationService.validateCode(fromUser, paymentRequest.verificationCode());
         if (verificationResult.isError()) {
             return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
         }

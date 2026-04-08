@@ -15,15 +15,10 @@ public class PaymentCompletedHandlerRegistry {
     private final DefaultPaymentCompletedHandler defaultHandler;
 
     public PaymentCompletedHandleResult handle(Payment payment) {
-        for (PaymentCompletedHandler handler : handlers) {
-            if (handler == defaultHandler) {
-                continue;
-            }
-            if (handler.supports(payment)) {
-                return handler.handle(payment);
-            }
-        }
-        return defaultHandler.handle(payment);
+        return handlers.stream()
+                .filter(h -> h != defaultHandler && h.supports(payment))
+                .findFirst()
+                .orElse(defaultHandler)
+                .handle(payment);
     }
 }
-

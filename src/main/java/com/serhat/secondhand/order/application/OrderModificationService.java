@@ -86,11 +86,6 @@ public class OrderModificationService {
         if (orderResult.isError()) return orderResult.propagateError();
 
         Order order = orderResult.getData();
-
-        if (name != null && name.length() > 100) {
-            return Result.error(OrderErrorCodes.INVALID_ORDER_NAME);
-        }
-
         order.setName(name);
         Order savedOrder = orderRepository.save(order);
 

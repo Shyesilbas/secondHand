@@ -10,4 +10,8 @@ public final class PaymentProcessingConstants {
 
     public static final double CREDIT_CARD_SIMULATION_SUCCESS_RATE = 0.95d;
     public static final String DEFAULT_CURRENCY = "TRY";
+
+    public static final String SYSTEM_RECEIVER_NAME = "System";
+    public static final String ESCROW_RECEIVER_SURNAME = "Escrow";
+    public static final String PAYMENT_RECEIVER_SURNAME = "Payment";
 }

@@ -137,19 +137,19 @@ const ShoppingCartPage = () => {
             <div className="max-w-5xl mx-auto px-6 py-6">
 
             {cartCount === 0 ? (
-                <div className="py-20 text-center">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="py-24 sm:py-32 text-center rounded-2xl bg-white border border-gray-100 shadow-sm mt-8">
+                    <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                     </div>
-                    <p className="text-[13px] font-medium text-gray-900 mb-1">{CART_MESSAGES.EMPTY_CART_TITLE}</p>
-                    <p className="text-[12px] text-gray-400 mb-5">
+                    <p className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">{CART_MESSAGES.EMPTY_CART_TITLE}</p>
+                    <p className="text-sm sm:text-base text-gray-500 mb-8 max-w-sm mx-auto">
                         Browse listings and add items to get started.
                     </p>
                     <button
                         onClick={() => navigate(ROUTES.LISTINGS)}
-                        className="px-4 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                        className="inline-flex items-center justify-center px-8 py-3.5 bg-gray-900 text-white text-base font-semibold rounded-xl hover:bg-gray-800 hover:scale-105 active:scale-95 shadow-md shadow-gray-200 transition-all duration-200"
                     >
                         Browse Listings
                     </button>
@@ -238,3 +238,4 @@ const ShoppingCartPage = () => {
 };
 
 export default ShoppingCartPage;
+

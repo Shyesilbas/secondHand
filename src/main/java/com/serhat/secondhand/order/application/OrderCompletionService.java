@@ -10,7 +10,7 @@ import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class OrderCompletionService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final OrderStatusValidator orderStatusValidator;
+    private final OrderStatusConsistencyLogger orderStatusConsistencyLogger;
     private final OrderEscrowService orderEscrowService;
     private final OrderValidationService orderValidationService;
     private final PaymentOrchestrator paymentOrchestrator;
@@ -65,8 +65,7 @@ public class OrderCompletionService {
         Result<Void> completionValidationResult = orderCompletionPolicy.validateCompletable(order);
         if (completionValidationResult.isError()) return completionValidationResult.propagateError();
 
-        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
-        if (consistencyResult.isError()) return consistencyResult.propagateError();
+        orderStatusConsistencyLogger.logIfInconsistent(order);
 
         return Result.success(order);
     }

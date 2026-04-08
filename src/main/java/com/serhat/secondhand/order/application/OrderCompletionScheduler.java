@@ -97,23 +97,25 @@ public class OrderCompletionScheduler {
             }
             if (shouldAutoCompleteOrder(shipping, now)) {
                 Order.OrderStatus oldStatus = order.getStatus();
-                order.setStatus(Order.OrderStatus.COMPLETED);
-                Order savedOrder = orderRepository.save(order);
 
-                var pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(savedOrder);
+                // Release escrows first; only mark COMPLETED if release succeeds.
+                var pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
                 if (!pendingEscrows.isEmpty()) {
                     var orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
                     if (orchestratorResult.isError()) {
-                        orderLog.logEscrowReleaseFailed(savedOrder.getOrderNumber(), orchestratorResult.getMessage());
-                    } else {
-                        orderLog.logEscrowReleased(pendingEscrows.size(), savedOrder.getOrderNumber());
+                        orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
+                        continue; // skip completing this order; will retry on next scheduler run
                     }
+                    orderLog.logEscrowReleased(pendingEscrows.size(), order.getOrderNumber());
                 }
+
+                order.setStatus(Order.OrderStatus.COMPLETED);
+                Order savedOrder = orderRepository.save(order);
 
                 eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, savedOrder.getUser(), true));
                 eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), Order.OrderStatus.COMPLETED.name()));
                 updatedCount++;
-                orderLog.logOrderCompleted(order.getOrderNumber(), true);
+                orderLog.logOrderCompleted(savedOrder.getOrderNumber(), true);
             }
         }
 

@@ -17,13 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentVerificationService implements IPaymentVerificationService{
+public class PaymentVerificationService implements IPaymentVerificationService {
 
     private final IVerificationService verificationService;
     private final IUserService userService;
     private final PaymentNotificationService paymentNotificationService;
     private final PaymentVerificationMessageBuilder paymentVerificationMessageBuilder;
 
+    @Override
     public void initiatePaymentVerification(Long userId, InitiateVerificationRequest req) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
@@ -51,13 +52,21 @@ public class PaymentVerificationService implements IPaymentVerificationService{
         }
     }
 
-    public Result<Void> validateOrGenerateVerification(User user, String code) {
-        if (code == null || code.isBlank()) {
-            String generatedCode = verificationService.generateCode();
-            verificationService.generateVerification(user, generatedCode, CodeType.PAYMENT_VERIFICATION);
-            paymentNotificationService.sendPaymentVerificationNotification(user, generatedCode, "Payment verification code generated.");
-            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
-        }
+    @Override
+    public boolean isVerificationRequired(String code) {
+        return code == null || code.isBlank();
+    }
+
+    @Override
+    public void generateAndSendVerification(User user) {
+        String code = verificationService.generateCode();
+        verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
+        paymentNotificationService.sendPaymentVerificationNotification(user, code, "Payment verification code generated.");
+        log.info("Payment verification code generated and sent to user: {}", user.getEmail());
+    }
+
+    @Override
+    public Result<Void> validateCode(User user, String code) {
         boolean valid = verificationService.validateVerificationCode(user, code, CodeType.PAYMENT_VERIFICATION);
         if (!valid) {
             return Result.error(PaymentErrorCodes.INVALID_VERIFICATION_CODE.toString(), "Invalid verification code.");

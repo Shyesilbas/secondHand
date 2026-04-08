@@ -12,7 +12,7 @@ import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.policy.OrderRefundPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.order.validator.OrderStatusValidator;
+import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import java.util.List;
 public class OrderRefundService {
 
     private final OrderMapper orderMapper;
-    private final OrderStatusValidator orderStatusValidator;
+    private final OrderStatusConsistencyLogger orderStatusConsistencyLogger;
     private final OrderValidationService orderValidationService;
     private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
@@ -49,8 +49,7 @@ public class OrderRefundService {
         Result<Void> refundValidationResult = orderRefundPolicy.validateRefundable(order);
         if (refundValidationResult.isError()) return refundValidationResult.propagateError();
 
-        Result<Void> consistencyResult = orderStatusValidator.validateStatusConsistency(order);
-        if (consistencyResult.isError()) return consistencyResult.propagateError();
+        orderStatusConsistencyLogger.logIfInconsistent(order);
 
         Result<List<OrderItem>> itemsResult = compensationPlanner.resolveOrderItems(order, request.getOrderItemIds());
         if (itemsResult.isError()) return itemsResult.propagateError();

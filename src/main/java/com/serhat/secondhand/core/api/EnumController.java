@@ -37,8 +37,8 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepos
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.application.ListingFeeService;
 import com.serhat.secondhand.showcase.application.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,7 +57,7 @@ import java.util.*;
 @Tag(name = "Enum Values", description = "Endpoints for getting enum values from backend")
 public class EnumController {
 
-    private final ListingFeeService paymentService;
+    private final ListingFeePaymentService listingFeePaymentService;
     private final ShowcaseService showcaseService;
     private final ElectronicTypeRepository electronicTypeRepository;
     private final ElectronicBrandRepository electronicBrandRepository;
@@ -703,7 +703,7 @@ public class EnumController {
     }
 
     private ResponseEntity<Map<String, Object>> getListingFeeConfig() {
-        var config = paymentService.getListingFeeConfig();
+        var config = listingFeePaymentService.getListingFeeConfig();
         Map<String, Object> configMap = new LinkedHashMap<>();
         configMap.put("creationFee", config.getCreationFee());
         configMap.put("taxPercentage", config.getTaxPercentage());
