@@ -41,6 +41,15 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
+    @PostMapping("/initialize")
+    @Operation(summary = "Initialize agreements", description = "Creates default agreements and required agreement-group mappings")
+    public ResponseEntity<List<AgreementDto>> initializeAgreements() {
+        agreementService.createAgreements();
+        agreementRequirementService.initializeDefaultRequirements();
+        var agreementDtos = agreementMapper.toDtoList(agreementService.getAllAgreements());
+        return ResponseEntity.ok(agreementDtos);
+    }
+
     @GetMapping("/required")
     @Operation(summary = "Get required agreements for a group", description = "Retrieves agreements required for a specific group (e.g. registration, payment, etc.)")
     public ResponseEntity<List<AgreementDto>> getRequiredAgreements(

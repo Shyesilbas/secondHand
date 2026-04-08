@@ -18,8 +18,8 @@ import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.event.UserRegisteredEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
@@ -27,6 +27,7 @@ import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,11 +56,11 @@ public class AuthService implements IAuthService {
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final UserNotificationService userNotificationService;
     private final UserAgreementService userAgreementService;
     private final AgreementUpdateNotificationService agreementUpdateNotificationService;
     private final AuditLogService auditLogService;
     private final AgreementRequirementService agreementRequirementService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Result<RegisterResponse> register(RegisterRequest request) {
         log.info("User registration attempt: {}", request.getEmail());
@@ -96,7 +97,7 @@ public class AuthService implements IAuthService {
 
         log.info("User registered successfully: {}", user.getEmail());
 
-        userNotificationService.sendWelcomeNotification(user);
+        eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
         return Result.success(new RegisterResponse(
                 "Registration Successful.",
@@ -294,7 +295,7 @@ public class AuthService implements IAuthService {
                 .build();
 
         userService.save(user);
-        userNotificationService.sendWelcomeNotification(user);
+        eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user, false);

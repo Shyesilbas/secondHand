@@ -5,8 +5,8 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.repository.OrderItemEscrowRepository;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,14 +53,13 @@ public class OrderEscrowService {
         return orderItemEscrowRepository.findByOrderItem(orderItem);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderItemEscrow> findExistingEscrowsByOrderItems(List<OrderItem> orderItems) {
         return orderItems.stream()
-                .map(this::findEscrowByOrderItem)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .map(orderItemEscrowRepository::findByOrderItem)
+                .flatMap(Optional::stream)
                 .toList();
     }
-
 
     @Transactional(readOnly = true)
     public BigDecimal getPendingEscrowAmount(User seller) {

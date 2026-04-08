@@ -4,7 +4,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.follow.dto.SellerFollowDto;
 import com.serhat.secondhand.follow.entity.SellerFollow;
@@ -34,7 +34,7 @@ public class SellerFollowService {
     private final UserRepository userRepository;
     private final SellerFollowMapper sellerFollowMapper;
     private final EmailService emailService;
-    private final INotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     public Result<SellerFollowDto> follow(User currentUser, Long userIdToFollow) {
@@ -190,17 +190,17 @@ public class SellerFollowService {
                 emailService.sendEmail(follow.getFollower(), subject, content, EmailType.NEW_LISTING_NOTIFICATION);
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
                 
-                Result<?> notificationResult = notificationService.createAndSend(
-                        notificationTemplateCatalog.listingNewFromFollowed(
-                                follow.getFollower().getId(),
-                                listing.getId(),
-                                seller.getId(),
-                                listing.getTitle()
-                        )
+                var request = notificationTemplateCatalog.listingNewFromFollowed(
+                        follow.getFollower().getId(),
+                        listing.getId(),
+                        seller.getId(),
+                        listing.getTitle()
                 );
-                if (notificationResult.isError()) {
-                    log.error("Failed to create notification: {}", notificationResult.getMessage());
-                }
+                notificationEventPublisher.publishDispatch(
+                        request,
+                        "follow",
+                        "follow-new-listing:" + follow.getFollower().getId() + ":" + listing.getId() + ":" + seller.getId()
+                );
             } catch (Exception e) {
                 log.error("Failed to send new listing notification to user {}: {}", 
                     follow.getFollower().getId(), e.getMessage());

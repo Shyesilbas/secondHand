@@ -23,8 +23,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -73,6 +73,11 @@ public class SecurityConfig {
             "/api/v1/listings/type/{listingType}/active",
             "/api/v1/listings/type/{listingType}/ordered",
             "/api/v1/listings/{id}/view"
+    );
+
+    private static final List<String> SEED_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/api/v1/admin/seeds/**",
+            "/api/agreements/initialize"
     );
 
     private static final List<String> CATEGORY_LISTING_PUBLIC_ENDPOINTS = Arrays.asList(
@@ -167,7 +172,9 @@ public class SecurityConfig {
                                 "/api/v1/clothing/filter",
                                 "/api/v1/electronics/filter",
                                 "/api/v1/sports/filter",
-                                "/api/v1/listings/{id}/view"
+                                "/api/v1/listings/{id}/view",
+                                "/api/v1/admin/seeds/**",
+                                "/api/agreements/initialize"
                         )
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -179,6 +186,9 @@ public class SecurityConfig {
                         .requestMatchers(AUTH_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .requestMatchers(LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+
+                        // Public seed endpoints
+                        .requestMatchers(SEED_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
                         
                         // Public category-specific listing endpoints
                         .requestMatchers(CATEGORY_LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()

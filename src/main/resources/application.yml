@@ -90,6 +90,8 @@ app:
       cost: 10.00
     fee:
       tax: 18.00
+  seed:
+    startup-enabled: ${SEED_STARTUP_ENABLED:true}
 
 springdoc:
   api-docs:

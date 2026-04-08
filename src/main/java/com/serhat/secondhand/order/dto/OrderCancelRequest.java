@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderCancelRequest implements OrderCompensationRequest {
+public class OrderCancelRequest {
 
     private List<Long> orderItemIds;
 

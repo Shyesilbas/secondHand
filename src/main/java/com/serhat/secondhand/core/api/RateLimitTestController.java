@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/test/rate-limit")
-@ConditionalOnProperty(name = "app.rate-limit.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.test-endpoints.enabled", havingValue = "true")
 @Slf4j
 public class RateLimitTestController {
 

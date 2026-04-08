@@ -8,6 +8,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.policy.OrderRefundPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -15,6 +16,7 @@ import com.serhat.secondhand.order.validator.OrderStatusValidator;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -27,7 +29,6 @@ import java.util.List;
 @Transactional
 public class OrderRefundService {
 
-    private final OrderNotificationService orderNotificationService;
     private final OrderMapper orderMapper;
     private final OrderStatusValidator orderStatusValidator;
     private final OrderValidationService orderValidationService;
@@ -38,6 +39,7 @@ public class OrderRefundService {
     private final OrderRefundPolicy orderRefundPolicy;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
     private final OrderEscrowService orderEscrowService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, user);
@@ -92,7 +94,7 @@ public class OrderRefundService {
         if (savedOrderResult.isError()) return savedOrderResult.propagateError();
         Order savedOrder = savedOrderResult.getData();
 
-        orderNotificationService.sendOrderRefundNotification(user, savedOrder);
+        eventPublisher.publishEvent(new OrderRefundedEvent(savedOrder, user));
         orderLog.logOrderRefunded(order.getOrderNumber(), totalRefundAmount, !allItemsRefunded, user.getEmail());
         return Result.success(orderMapper.toDto(savedOrder));
     }

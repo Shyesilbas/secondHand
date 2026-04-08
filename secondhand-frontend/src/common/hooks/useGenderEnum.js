@@ -4,7 +4,7 @@ export const useGenderEnum = () => {
   const { enums, isLoading } = useEnumContext();
 
   return { 
-    genders: enums.genders || [], 
+    genders: enums.general?.genders || [], 
     isLoading 
   };
 };

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.chat.notification;
 
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class ChatNotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final INotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final IUserService userService;
 
@@ -38,18 +38,18 @@ public class ChatNotificationService {
                 ? dto.getContent().substring(0, 50) + "..."
                 : dto.getContent();
 
-        var notificationResult = notificationService.createAndSend(
-                notificationTemplateCatalog.chatMessageReceived(
-                        dto.getRecipientId(),
-                        dto.getChatRoomId() != null ? dto.getChatRoomId().toString() : "",
-                        dto.getSenderId() != null ? dto.getSenderId().toString() : "",
-                        dto.getId() != null ? dto.getId().toString() : "",
-                        senderName,
-                        messagePreview
-                )
+        var request = notificationTemplateCatalog.chatMessageReceived(
+                dto.getRecipientId(),
+                dto.getChatRoomId() != null ? dto.getChatRoomId().toString() : "",
+                dto.getSenderId() != null ? dto.getSenderId().toString() : "",
+                dto.getId() != null ? dto.getId().toString() : "",
+                senderName,
+                messagePreview
         );
-        if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
-        }
+        notificationEventPublisher.publishDispatch(
+                request,
+                "chat",
+                "chat-message:" + dto.getRecipientId() + ":" + (dto.getId() != null ? dto.getId() : "no-id")
+        );
     }
 }

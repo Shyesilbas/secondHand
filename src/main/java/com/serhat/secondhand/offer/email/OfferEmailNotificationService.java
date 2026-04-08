@@ -2,7 +2,7 @@ package com.serhat.secondhand.offer.email;
 
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;
@@ -19,7 +19,7 @@ public class OfferEmailNotificationService {
 
     private final EmailService emailService;
     private final OfferEmailTemplateService templateService;
-    private final INotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Async("notificationExecutor")
@@ -31,17 +31,17 @@ public class OfferEmailNotificationService {
         var t = templateService.offerReceived(offer);
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_RECEIVED);
         
-        var notificationResult = notificationService.createAndSend(
-                notificationTemplateCatalog.offerReceived(
-                        recipient.getId(),
-                        offer.getId(),
-                        offer.getListing().getId(),
-                        offer.getListing() != null ? offer.getListing().getTitle() : null
-                )
+        var request = notificationTemplateCatalog.offerReceived(
+                recipient.getId(),
+                offer.getId(),
+                offer.getListing().getId(),
+                offer.getListing() != null ? offer.getListing().getTitle() : null
         );
-        if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
-        }
+        notificationEventPublisher.publishDispatch(
+                request,
+                "offer",
+                "offer-received:" + recipient.getId() + ":" + offer.getId()
+        );
     }
 
     @Async("notificationExecutor")
@@ -54,17 +54,17 @@ public class OfferEmailNotificationService {
         var t = templateService.counterReceived(offer);
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_COUNTER_RECEIVED);
         
-        var notificationResult = notificationService.createAndSend(
-                notificationTemplateCatalog.offerCountered(
-                        recipient.getId(),
-                        offer.getId(),
-                        offer.getListing().getId(),
-                        offer.getListing() != null ? offer.getListing().getTitle() : null
-                )
+        var request = notificationTemplateCatalog.offerCountered(
+                recipient.getId(),
+                offer.getId(),
+                offer.getListing().getId(),
+                offer.getListing() != null ? offer.getListing().getTitle() : null
         );
-        if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
-        }
+        notificationEventPublisher.publishDispatch(
+                request,
+                "offer",
+                "offer-countered:" + recipient.getId() + ":" + offer.getId()
+        );
     }
 
     @Async("notificationExecutor")
@@ -77,17 +77,17 @@ public class OfferEmailNotificationService {
         var t = templateService.offerAccepted(offer);
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_ACCEPTED);
         
-        var notificationResult = notificationService.createAndSend(
-                notificationTemplateCatalog.offerAccepted(
-                        recipient.getId(),
-                        offer.getId(),
-                        offer.getListing().getId(),
-                        offer.getListing() != null ? offer.getListing().getTitle() : null
-                )
+        var request = notificationTemplateCatalog.offerAccepted(
+                recipient.getId(),
+                offer.getId(),
+                offer.getListing().getId(),
+                offer.getListing() != null ? offer.getListing().getTitle() : null
         );
-        if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
-        }
+        notificationEventPublisher.publishDispatch(
+                request,
+                "offer",
+                "offer-accepted:" + recipient.getId() + ":" + offer.getId()
+        );
     }
 
     @Async("notificationExecutor")
@@ -100,17 +100,17 @@ public class OfferEmailNotificationService {
         var t = templateService.offerRejected(offer);
         emailService.sendEmail(recipient, t.subject(), t.content(), EmailType.OFFER_REJECTED);
         
-        var notificationResult = notificationService.createAndSend(
-                notificationTemplateCatalog.offerRejected(
-                        recipient.getId(),
-                        offer.getId(),
-                        offer.getListing().getId(),
-                        offer.getListing() != null ? offer.getListing().getTitle() : null
-                )
+        var request = notificationTemplateCatalog.offerRejected(
+                recipient.getId(),
+                offer.getId(),
+                offer.getListing().getId(),
+                offer.getListing() != null ? offer.getListing().getTitle() : null
         );
-        if (notificationResult.isError()) {
-            log.error("Failed to create notification: {}", notificationResult.getMessage());
-        }
+        notificationEventPublisher.publishDispatch(
+                request,
+                "offer",
+                "offer-rejected:" + recipient.getId() + ":" + offer.getId()
+        );
     }
 
     @Async("notificationExecutor")
@@ -122,34 +122,34 @@ public class OfferEmailNotificationService {
         
         if (offer.getBuyer() != null) {
             emailService.sendEmail(offer.getBuyer(), t.subject(), t.content(), EmailType.OFFER_EXPIRED);
-            var buyerNotificationResult = notificationService.createAndSend(
-                    notificationTemplateCatalog.offerExpired(
-                            offer.getBuyer().getId(),
-                            offer.getId(),
-                            offer.getListing().getId(),
-                            offer.getListing() != null ? offer.getListing().getTitle() : null,
-                            true
-                    )
+            var buyerRequest = notificationTemplateCatalog.offerExpired(
+                    offer.getBuyer().getId(),
+                    offer.getId(),
+                    offer.getListing().getId(),
+                    offer.getListing() != null ? offer.getListing().getTitle() : null,
+                    true
             );
-            if (buyerNotificationResult.isError()) {
-                log.error("Failed to create notification: {}", buyerNotificationResult.getMessage());
-            }
-        }
-        if (offer.getSeller() != null) {
-            emailService.sendEmail(offer.getSeller(), t.subject(), t.content(), EmailType.OFFER_EXPIRED);
-            var sellerNotificationResult = notificationService.createAndSend(
-                    notificationTemplateCatalog.offerExpired(
-                            offer.getSeller().getId(),
-                            offer.getId(),
-                            offer.getListing().getId(),
-                            offer.getListing() != null ? offer.getListing().getTitle() : null,
-                            false
-                    )
+            notificationEventPublisher.publishDispatch(
+                    buyerRequest,
+                    "offer",
+                    "offer-expired:" + offer.getBuyer().getId() + ":" + offer.getId() + ":buyer"
             );
-            if (sellerNotificationResult.isError()) {
-                log.error("Failed to create notification: {}", sellerNotificationResult.getMessage());
-            }
-        }
+         }
+         if (offer.getSeller() != null) {
+             emailService.sendEmail(offer.getSeller(), t.subject(), t.content(), EmailType.OFFER_EXPIRED);
+            var sellerRequest = notificationTemplateCatalog.offerExpired(
+                    offer.getSeller().getId(),
+                    offer.getId(),
+                    offer.getListing().getId(),
+                    offer.getListing() != null ? offer.getListing().getTitle() : null,
+                    false
+            );
+            notificationEventPublisher.publishDispatch(
+                    sellerRequest,
+                    "offer",
+                    "offer-expired:" + offer.getSeller().getId() + ":" + offer.getId() + ":seller"
+            );
+         }
     }
 
     @Async("notificationExecutor")

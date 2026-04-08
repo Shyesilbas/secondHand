@@ -5,7 +5,7 @@ import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
 import com.serhat.secondhand.notification.repository.NotificationRepository;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class AgreementUpdateNotificationService {
     private final AgreementRequirementService agreementRequirementService;
     private final AgreementService agreementService;
     private final UserAgreementRepository userAgreementRepository;
-    private final INotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationRepository notificationRepository;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
@@ -55,7 +55,7 @@ public class AgreementUpdateNotificationService {
                 continue;
             }
 
-            notificationService.createAndSend(request);
+            notificationEventPublisher.publishDispatch(request, "agreements", "agreement-updated:" + userId + ":" + type.name() + ":" + currentVersion);
         }
     }
 
@@ -70,4 +70,3 @@ public class AgreementUpdateNotificationService {
     }
 
 }
-

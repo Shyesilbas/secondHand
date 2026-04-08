@@ -2,11 +2,13 @@ package com.serhat.secondhand.agreements.application;
 
 import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.AgreementRequirement;
+import com.serhat.secondhand.agreements.entity.enums.AgreementGroup;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementRepository;
 import com.serhat.secondhand.agreements.repository.AgreementRequirementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +57,27 @@ public class AgreementRequirementService {
                 .map(AgreementRequirement::getAgreementType)
                 .distinct()
                 .toList();
+    }
+
+    @Transactional
+    public void initializeDefaultRequirements() {
+        for (AgreementGroup group : AgreementGroup.values()) {
+            AgreementType[] requiredTypes = group.getRequiredTypes();
+            for (int i = 0; i < requiredTypes.length; i++) {
+                upsertRequirement(group.name(), requiredTypes[i], i + 1);
+            }
+        }
+    }
+
+    private void upsertRequirement(String groupCode, AgreementType agreementType, int displayOrder) {
+        AgreementRequirement requirement = agreementRequirementRepository
+                .findByGroupCodeIgnoreCaseAndAgreementType(groupCode, agreementType)
+                .orElseGet(AgreementRequirement::new);
+        requirement.setGroupCode(groupCode);
+        requirement.setAgreementType(agreementType);
+        requirement.setActive(true);
+        requirement.setDisplayOrder(displayOrder);
+        agreementRequirementRepository.save(requirement);
     }
 
     private String normalizeGroupCode(String groupCode) {

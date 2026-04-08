@@ -3,13 +3,9 @@ package com.serhat.secondhand.listing.application.common;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
-import com.serhat.secondhand.payment.mapper.PaymentMapper;
-import com.serhat.secondhand.payment.application.PaymentNotificationService;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -23,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ListingEventListener {
 
     private final ListingRepository listingRepository;
-    private final PaymentNotificationService paymentNotificationService;
-    private final PaymentMapper paymentMapper;
     private final ListingCommandService listingCommandService;
 
     @EventListener
@@ -43,7 +37,7 @@ public class ListingEventListener {
                         HttpStatus.NOT_FOUND, "LISTING_NOT_FOUND"));
 
         if (payment.getTransactionType() == PaymentTransactionType.LISTING_CREATION) {
-            User fromUser = payment.getFromUser();
+            var fromUser = payment.getFromUser();
             Long userId = fromUser != null ? fromUser.getId() : null;
             if (userId != null) {
                 listing.setListingFeePaid(true);
@@ -55,10 +49,5 @@ public class ListingEventListener {
                 log.info("Purchase completed for listing {}. Status change disabled; keeping {}.", listing.getId(), listing.getStatus());
             }
         }
-
-        User user = payment.getFromUser();
-        PaymentDto paymentDto = paymentMapper.toDto(payment);
-        paymentNotificationService.sendPaymentSuccessNotification(user, paymentDto, listing.getTitle());
-        log.info("Payment success email sent for payment ID: {}", payment.getId());
     }
 }

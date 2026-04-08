@@ -3,13 +3,16 @@ package com.serhat.secondhand.user.application;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
-import com.serhat.secondhand.notification.application.INotificationService;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
+import com.serhat.secondhand.user.application.event.UserRegisteredEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.UUID;
 
@@ -20,10 +23,15 @@ public class UserNotificationService {
 
     private final EmailService emailService;
     private final EmailConfig emailConfig;
-    private final INotificationService notificationService;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Async("notificationExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onUserRegistered(UserRegisteredEvent event) {
+        sendWelcomeNotification(event.user());
+    }
+
     public void sendWelcomeNotification(User user) {
         try {
             String subject = emailConfig.getWelcomeSubject();
@@ -66,18 +74,18 @@ public class UserNotificationService {
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             log.info("Price change notification sent to user: {}", user.getEmail());
             
-            var notificationResult = notificationService.createAndSend(
-                    notificationTemplateCatalog.listingPriceDropped(
-                            user.getId(),
-                            listingId,
-                            oldPriceStr,
-                            newPriceStr,
-                            listingTitle
-                    )
+            var request = notificationTemplateCatalog.listingPriceDropped(
+                    user.getId(),
+                    listingId,
+                    oldPriceStr,
+                    newPriceStr,
+                    listingTitle
             );
-            if (notificationResult.isError()) {
-                log.error("Failed to create notification: {}", notificationResult.getMessage());
-            }
+            notificationEventPublisher.publishDispatch(
+                    request,
+                    "user",
+                    "price-dropped:" + user.getId() + ":" + (listingId != null ? listingId : "no-listing") + ":" + newPriceStr
+            );
         } catch (Exception e) {
             log.warn("Failed to send price change notification to user {}: {}", user.getEmail(), e.getMessage());
         }
