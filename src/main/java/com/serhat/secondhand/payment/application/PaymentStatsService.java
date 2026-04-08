@@ -5,8 +5,6 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
@@ -31,6 +29,7 @@ public class PaymentStatsService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final ListingQueryService listingService;
+    private final PaymentContextResolver paymentContextResolver;
 
     public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
         log.info("Calculating payment statistics via DB for userId: {}", userId);
@@ -90,8 +89,7 @@ public class PaymentStatsService {
         PaymentDto baseDto = paymentMapper.toDto(payment);
 
         ListingInfo listingInfo = listingMap.getOrDefault(payment.getListingId(), new ListingInfo(null, null));
-
-        var inferredData = inferTransactionContext(payment, currentUserId);
+        var inferredData = paymentContextResolver.resolve(payment, currentUserId);
 
         return new PaymentDto(
                 baseDto.paymentId(),
@@ -111,46 +109,5 @@ public class PaymentStatsService {
         );
     }
 
-    private InferredPaymentData inferTransactionContext(Payment payment, Long currentUserId) {
-        if (payment.getTransactionType() == PaymentTransactionType.ITEM_SALE || payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
-            boolean isSender = payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUserId);
-            boolean isReceiver = payment.getToUser() != null && payment.getToUser().getId().equals(currentUserId);
-
-            if (isSender && isReceiver) {
-                if (payment.getTransactionType() == PaymentTransactionType.ITEM_SALE) {
-                    return new InferredPaymentData(PaymentDirection.INCOMING, PaymentTransactionType.ITEM_SALE);
-                }
-                return new InferredPaymentData(PaymentDirection.OUTGOING, PaymentTransactionType.ITEM_PURCHASE);
-            }
-
-            return new InferredPaymentData(
-                    isSender ? PaymentDirection.OUTGOING : PaymentDirection.INCOMING,
-                    isSender ? PaymentTransactionType.ITEM_PURCHASE : PaymentTransactionType.ITEM_SALE
-            );
-        }
-
-        boolean isSpecialFlow = List.of(
-                PaymentTransactionType.LISTING_CREATION,
-                PaymentTransactionType.SHOWCASE_PAYMENT,
-                PaymentTransactionType.REFUND,
-                PaymentTransactionType.EWALLET_DEPOSIT,
-                PaymentTransactionType.EWALLET_WITHDRAWAL,
-                PaymentTransactionType.EWALLET_PAYMENT_RECEIVED,
-                PaymentTransactionType.ITEM_SALE,
-                PaymentTransactionType.ITEM_PURCHASE
-        ).contains(payment.getTransactionType());
-
-        if (isSpecialFlow) {
-            return new InferredPaymentData(payment.getPaymentDirection(), payment.getTransactionType());
-        }
-
-        boolean isSender = payment.getFromUser() != null && payment.getFromUser().getId().equals(currentUserId);
-        return new InferredPaymentData(
-                isSender ? PaymentDirection.OUTGOING : PaymentDirection.INCOMING,
-                isSender ? PaymentTransactionType.ITEM_PURCHASE : PaymentTransactionType.ITEM_SALE
-        );
-    }
-
     private record ListingInfo(String title, String no) {}
-    private record InferredPaymentData(PaymentDirection direction, PaymentTransactionType transactionType) {}
 }

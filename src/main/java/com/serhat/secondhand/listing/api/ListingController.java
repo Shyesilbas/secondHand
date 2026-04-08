@@ -2,8 +2,12 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.common.ListingCommandService;
+import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
+import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
+import com.serhat.secondhand.payment.dto.PaymentRequest;
+import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdatePriceRequest;
@@ -28,6 +32,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +49,8 @@ public class ListingController {
     private final ListingCommandService listingCommandService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
+    private final ListingFeePaymentService listingFeePaymentService;
+    private final PaymentIdempotencyHelper idempotencyHelper;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -206,5 +213,22 @@ public class ListingController {
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
         return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status));
+    }
+
+    @PostMapping("/pay-fee")
+    @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fee.")
+    public ResponseEntity<?> payListingCreationFee(
+            @Valid @RequestBody PaymentRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Processing listing fee payment for user ID {}", currentUser.getId());
+        var finalRequest = idempotencyHelper.withIdempotencyKey(request, idempotencyKey);
+        return ResultResponses.created(listingFeePaymentService.payListingCreationFee(currentUser.getId(), finalRequest));
+    }
+
+    @GetMapping("/fee-config")
+    @Operation(summary = "Get listing fee configuration")
+    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
+        return ResponseEntity.ok(listingFeePaymentService.getListingFeeConfig());
     }
 }

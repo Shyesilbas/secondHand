@@ -5,13 +5,12 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
-import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -20,10 +19,13 @@ public class OrderMapper {
     private final ListingMapper listingMapper;
     private final AddressMapper addressMapper;
     private final ShippingMapper shippingMapper;
-    private final OrderItemCancelRepository orderItemCancelRepository;
-    private final OrderItemRefundRepository orderItemRefundRepository;
 
-    public OrderDto toDto(Order order) {
+    /**
+     * Maps an Order to OrderDto.
+     * cancelledByItemId and refundedByItemId provide pre-computed quantities per OrderItem ID,
+     * avoiding repository calls inside the mapper.
+     */
+    public OrderDto toDto(Order order, Map<Long, Integer> cancelledByItemId, Map<Long, Integer> refundedByItemId) {
         if (order == null) {
             return null;
         }
@@ -52,29 +54,36 @@ public class OrderMapper {
                 .paymentMethod(order.getPaymentMethod())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
-                .orderItems(orderItemsToDtoList(order.getOrderItems()))
+                .orderItems(orderItemsToDtoList(order.getOrderItems(), cancelledByItemId, refundedByItemId))
                 .shipping(shippingMapper.toDto(order.getShipping()))
                 .build();
     }
 
+    /** Convenience overload when no cancellation/refund data is needed (e.g. write-path responses). */
+    public OrderDto toDto(Order order) {
+        return toDto(order, Map.of(), Map.of());
+    }
 
-    private List<OrderItemDto> orderItemsToDtoList(List<OrderItem> orderItems) {
+    private List<OrderItemDto> orderItemsToDtoList(List<OrderItem> orderItems,
+                                                    Map<Long, Integer> cancelledByItemId,
+                                                    Map<Long, Integer> refundedByItemId) {
         if (orderItems == null) {
             return null;
         }
-
         return orderItems.stream()
-                .map(this::orderItemToDto)
+                .map(item -> orderItemToDto(item, cancelledByItemId, refundedByItemId))
                 .toList();
     }
 
-    private OrderItemDto orderItemToDto(OrderItem orderItem) {
+    private OrderItemDto orderItemToDto(OrderItem orderItem,
+                                         Map<Long, Integer> cancelledByItemId,
+                                         Map<Long, Integer> refundedByItemId) {
         if (orderItem == null) {
             return null;
         }
 
-        Integer cancelledQuantity = orderItemCancelRepository.sumCancelledQuantityByOrderItem(orderItem);
-        Integer refundedQuantity = orderItemRefundRepository.sumRefundedQuantityByOrderItem(orderItem);
+        Integer cancelledQuantity = cancelledByItemId.getOrDefault(orderItem.getId(), 0);
+        Integer refundedQuantity = refundedByItemId.getOrDefault(orderItem.getId(), 0);
 
         String sellerName = null;
         String sellerSurname = null;
@@ -95,8 +104,8 @@ public class OrderMapper {
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())
-                .cancelledQuantity(cancelledQuantity != null && cancelledQuantity > 0 ? cancelledQuantity : null)
-                .refundedQuantity(refundedQuantity != null && refundedQuantity > 0 ? refundedQuantity : null)
+                .cancelledQuantity(cancelledQuantity > 0 ? cancelledQuantity : null)
+                .refundedQuantity(refundedQuantity > 0 ? refundedQuantity : null)
                 .build();
     }
 }

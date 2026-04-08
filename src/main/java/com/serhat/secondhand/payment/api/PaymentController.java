@@ -5,7 +5,6 @@ import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.payment.dto.*;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.application.IPaymentVerificationService;
-import com.serhat.secondhand.payment.application.ListingFeeService;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.payment.application.PaymentStatsService;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
@@ -34,7 +33,6 @@ public class PaymentController {
 
     private final PaymentProcessor paymentProcessor;
     private final PaymentStatsService paymentStatsService;
-    private final ListingFeeService listingFeeService;
     private final IPaymentVerificationService paymentVerificationService;
     private final PaymentIdempotencyHelper idempotencyHelper;
 
@@ -65,21 +63,6 @@ public class PaymentController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/listings/pay-fee")
-    @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fees.")
-    public ResponseEntity<?> payListingCreationFee(
-            @Valid @RequestBody PaymentRequest listingFeePaymentRequest,
-            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
-            @AuthenticationPrincipal User currentUser) {
-
-        log.info("Processing listing fee payment for user ID {}", currentUser.getId());
-
-        PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(listingFeePaymentRequest, idempotencyKey);
-        Result<PaymentDto> result = listingFeeService.payListingCreationFee(currentUser.getId(), finalRequest);
-
-        return ResultResponses.created(result);
-    }
-
     @GetMapping("/my-payments")
     @Operation(summary = "Get user payments", description = "Retrieve paginated and filtered history of payments.")
     public ResponseEntity<Page<PaymentDto>> getMyPayments(
@@ -105,9 +88,4 @@ public class PaymentController {
         return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId(), paymentType));
     }
 
-    @GetMapping("/listing-fee-config")
-    @Operation(summary = "Get fee configuration", description = "Retrieves the current listing fee settings.")
-    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
-        return ResponseEntity.ok(listingFeeService.getListingFeeConfig());
-    }
 }

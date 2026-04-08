@@ -43,7 +43,7 @@ public class OrderItemCompensationPlanner {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_NOT_FOUND);
             }
             if (!item.getOrder().getId().equals(order.getId())) {
-                return Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER);
+                return Result.error(OrderErrorCodes.ORDER_ITEM_NOT_BELONG_TO_ORDER);
             }
             items.add(item);
         }

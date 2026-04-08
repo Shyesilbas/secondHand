@@ -1,15 +1,14 @@
-package com.serhat.secondhand.payment.application;
+package com.serhat.secondhand.listing.application.common;
 
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.application.common.ListingCommandService;
-import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.validation.common.ListingFeePaymentValidation;
+import com.serhat.secondhand.payment.application.PaymentProcessor;
+import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -23,7 +22,7 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ListingFeeService {
+public class ListingFeePaymentService {
 
     private final ListingConfig listingConfig;
     private final ListingFeePaymentValidation listingFeePaymentValidation;
@@ -31,7 +30,7 @@ public class ListingFeeService {
     private final ListingQueryService listingQueryService;
     private final ListingCommandService listingCommandService;
     private final PaymentProcessor paymentProcessor;
-    private final PaymentRequestMapper paymentRequestMapper;
+    private final PaymentRequestFactory paymentRequestFactory;
 
     @Transactional
     public Result<PaymentDto> payListingCreationFee(Long userId, PaymentRequest request) {
@@ -54,7 +53,7 @@ public class ListingFeeService {
         }
 
         BigDecimal totalFee = listingCommandService.calculateTotalListingFee();
-        PaymentRequest paymentRequest = paymentRequestMapper.buildListingFeePaymentRequest(user, listing, request, totalFee);
+        PaymentRequest paymentRequest = paymentRequestFactory.buildListingFeePaymentRequest(user, listing, request, totalFee);
 
         return paymentProcessor.executeSinglePayment(user.getId(), paymentRequest);
     }

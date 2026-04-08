@@ -10,7 +10,7 @@ public class DefaultPaymentCompletedHandler implements PaymentCompletedHandler {
 
     @Override
     public boolean supports(Payment payment) {
-        return true;
+        return false;
     }
 
     @Override

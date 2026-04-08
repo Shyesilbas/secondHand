@@ -6,7 +6,7 @@ import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.mapper.PaymentRequestMapper;
+import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.showcase.Showcase;
 import com.serhat.secondhand.showcase.ShowcaseMapper;
@@ -41,7 +41,7 @@ public class ShowcaseService implements IShowcaseService {
     private final PaymentProcessor paymentProcessor;
     private final IUserService userService;
     private final ShowcaseValidator showcaseValidator;
-    private final PaymentRequestMapper paymentRequestMapper;
+    private final PaymentRequestFactory paymentRequestFactory;
 
     @Override
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
@@ -73,7 +73,7 @@ public class ShowcaseService implements IShowcaseService {
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
 
         // Payment Processing
-        PaymentRequest paymentRequest = paymentRequestMapper.buildShowcasePaymentRequest(user, listing, request, totalCost);
+        PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, listing, request, totalCost);
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
         if (paymentResult.isError()) {

@@ -33,6 +33,9 @@ public interface OrderItemEscrowRepository extends JpaRepository<OrderItemEscrow
 
     @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.order = :order AND oie.status = :status")
     List<OrderItemEscrow> findByOrderAndStatus(@Param("order") Order order, @Param("status") OrderItemEscrow.EscrowStatus status);
+
+    @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.orderItem.id IN :ids")
+    List<OrderItemEscrow> findByOrderItemIdIn(@Param("ids") List<Long> ids);
 }
 
 

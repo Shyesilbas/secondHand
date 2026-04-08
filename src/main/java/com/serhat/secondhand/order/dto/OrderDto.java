@@ -43,5 +43,7 @@ public class OrderDto {
     private LocalDateTime updatedAt;
     private List<OrderItemDto> orderItems;
     private ShippingDto shipping;
+
+    /** Populated only in seller view (getSellerOrders / getSellerOrderById). Null in buyer view. */
     private BigDecimal escrowAmount;
 }
