@@ -12,6 +12,7 @@ public record EmailDto(
         String subject,
         String content,
         EmailType emailType,
-        LocalDateTime sentAt
+        LocalDateTime sentAt,
+        boolean isRead
 ) {
 }

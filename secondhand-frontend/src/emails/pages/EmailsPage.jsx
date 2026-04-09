@@ -226,16 +226,30 @@ const EmailsPage = () => {
             return acc;
         }, {});
     }, [emails, folderItems]);
-    const unreadCount = useMemo(() => (emails || []).filter((e) => !e?.read).length, [emails]);
+    const unreadCount = useMemo(() => (emails || []).filter((e) => !e?.read && !e?.isRead).length, [emails]);
     const selectedFolderLabel = useMemo(
         () => folderItems.find((item) => item.id === filterType)?.label || 'Inbox',
         [folderItems, filterType]
     );
 
-    const onSelectEmail = useCallback((email) => {
+    const onSelectEmail = useCallback(async (email) => {
         setSelectedEmail(email);
         setMobileDetailOpen(true);
-    }, []);
+        if (!email.read && !email.isRead) {
+            try {
+                await emailService.markAsRead(email.id);
+                queryClient.setQueryData(['myEmails', user?.id, page], (oldData) => {
+                    if (!oldData || !oldData.content) return oldData;
+                    return {
+                        ...oldData,
+                        content: oldData.content.map(e => e.id === email.id ? { ...e, isRead: true, read: true } : e)
+                    };
+                });
+            } catch (err) {
+                console.error("Error marking email as read", err);
+            }
+        }
+    }, [queryClient, user?.id, page]);
 
     if (isLoading) return <EmailsPageLoader />;
 

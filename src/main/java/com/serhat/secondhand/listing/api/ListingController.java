@@ -5,9 +5,10 @@ import com.serhat.secondhand.listing.application.common.ListingCommandService;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
+import com.serhat.secondhand.listing.application.query.ListingSearchService;
+import com.serhat.secondhand.listing.application.query.ListingStatisticsService;
+import com.serhat.secondhand.listing.domain.dto.request.listing.ListingFeePaymentRequest;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
-import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchPriceRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdateBatchQuantityRequest;
 import com.serhat.secondhand.listing.domain.dto.request.UpdatePriceRequest;
@@ -32,7 +33,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,11 +46,12 @@ import java.util.UUID;
 public class ListingController {
 
     private final ListingQueryService listingQueryService;
+    private final ListingSearchService listingSearchService;
+    private final ListingStatisticsService listingStatisticsService;
     private final ListingCommandService listingCommandService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
     private final ListingFeePaymentService listingFeePaymentService;
-    private final PaymentIdempotencyHelper idempotencyHelper;
 
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
@@ -92,7 +93,7 @@ public class ListingController {
         filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
         filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingQueryService.filterByCategory(filters, userId));
+        return ResponseEntity.ok(listingSearchService.filterByCategory(filters, userId));
     }
 
     @GetMapping("/search")
@@ -102,7 +103,7 @@ public class ListingController {
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingQueryService.globalSearch(query, page, size, userId));
+        return ResponseEntity.ok(listingSearchService.globalSearch(query, page, size, userId));
     }
 
     @GetMapping("/my-listings")
@@ -169,7 +170,7 @@ public class ListingController {
 
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        return ResponseEntity.ok(listingQueryService.getGlobalListingStatistics());
+        return ResponseEntity.ok(listingStatisticsService.getGlobalListingStatistics());
     }
 
     @PutMapping("/{id}/mark-sold")
@@ -218,12 +219,10 @@ public class ListingController {
     @PostMapping("/pay-fee")
     @Operation(summary = "Pay listing creation fee", description = "Processes payment for listing creation fee.")
     public ResponseEntity<?> payListingCreationFee(
-            @Valid @RequestBody PaymentRequest request,
-            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody ListingFeePaymentRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("Processing listing fee payment for user ID {}", currentUser.getId());
-        var finalRequest = idempotencyHelper.withIdempotencyKey(request, idempotencyKey);
-        return ResultResponses.created(listingFeePaymentService.payListingCreationFee(currentUser.getId(), finalRequest));
+        return ResultResponses.created(listingFeePaymentService.payListingCreationFee(currentUser.getId(), request));
     }
 
     @GetMapping("/fee-config")

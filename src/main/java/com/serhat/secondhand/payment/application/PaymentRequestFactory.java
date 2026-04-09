@@ -57,25 +57,6 @@ public class PaymentRequestFactory {
                 .build();
     }
 
-    public PaymentRequest buildListingFeePaymentRequest(User user, Listing listing,
-                                                        PaymentRequest request, BigDecimal totalFee) {
-        return PaymentRequest.builder()
-                .fromUserId(user.getId())
-                .toUserId(null)
-                .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
-                .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
-                .listingId(listing.getId())
-                .amount(totalFee)
-                .paymentType(request.paymentType())
-                .transactionType(PaymentTransactionType.LISTING_CREATION)
-                .paymentDirection(PaymentDirection.OUTGOING)
-                .verificationCode(request.verificationCode())
-                .agreementsAccepted(request.agreementsAccepted())
-                .acceptedAgreementIds(request.acceptedAgreementIds())
-                .idempotencyKey(request.idempotencyKey())
-                .build();
-    }
-
     public PaymentRequest buildShowcasePaymentRequest(User user, Listing listing,
                                                       ShowcasePaymentRequest request, BigDecimal totalCost) {
         return PaymentRequest.builder()

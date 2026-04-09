@@ -53,10 +53,6 @@ public class EmailService {
 
         Page<Email> emailsPage = emailRepository.findByUserId(userId, pageable);
 
-        if (pageable.getPageNumber() == 0 && !emailsPage.isEmpty()) {
-            emailRepository.markAllRead(emailsPage.getContent().get(0).getUser(), LocalDateTime.now());
-        }
-
         return emailsPage.map(emailMapper::toDto);
     }
 
@@ -85,5 +81,23 @@ public class EmailService {
     public String deleteAllEmails(Long userId) {
         emailRepository.deleteAllByUserId(userId);
         return "Emails deleted for userId: " + userId;
+    }
+
+    public EmailDto markAsRead(UUID emailId, String userEmail) {
+        Email email = emailRepository.findByIdAndRecipientEmail(emailId, userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Email not found or unauthorized"));
+                
+        if (email.getReadAt() == null) {
+            email.setReadAt(LocalDateTime.now());
+            email = emailRepository.save(email);
+            log.info("Email {} marked as read", emailId);
+        }
+        return emailMapper.toDto(email);
+    }
+    
+    @Transactional(readOnly = true)
+    public Result<Page<EmailDto>> getEmailsByUser(String email, Pageable pageable) {
+        Page<Email> emailsPage = emailRepository.findByRecipientEmail(email, pageable);
+        return Result.success(emailsPage.map(emailMapper::toDto));
     }
 }

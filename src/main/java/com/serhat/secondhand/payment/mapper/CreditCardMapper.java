@@ -16,23 +16,31 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CreditCardMapper {
 
-    @Mapping(target = "number", source = "number", qualifiedByName = "mask")
-    @Mapping(target = "cvv", constant = "***")
+    @Mapping(target = "id",         source = "id")
+    @Mapping(target = "cardLabel",  source = "cardLabel")
+    @Mapping(target = "number",     source = "number", qualifiedByName = "mask")
+    @Mapping(target = "cvv",        constant = "***")
     @Mapping(target = "expiryMonth", expression = "java(String.valueOf(card.getExpiryMonth()))")
-    @Mapping(target = "expiryYear", expression = "java(String.valueOf(card.getExpiryYear()))")
-    @Mapping(target = "amount", expression = "java(card.getAmount().toString())")
-    @Mapping(target = "limit", expression = "java(card.getLimit().toString())")
-    @Mapping(target = "totalSpent", expression = "java(card.getAmount().toString())")
-    @Mapping(target = "limitLeft", expression = "java(card.getLimit().subtract(card.getAmount()).toString())")
+    @Mapping(target = "expiryYear",  expression = "java(String.valueOf(card.getExpiryYear()))")
+    @Mapping(target = "amount",      expression = "java(card.getAmount().toString())")
+    @Mapping(target = "limit",       expression = "java(card.getLimit().toString())")
+    @Mapping(target = "totalSpent",  expression = "java(card.getAmount().toString())")
+    @Mapping(target = "limitLeft",   expression = "java(card.getLimit().subtract(card.getAmount()).toString())")
     CreditCardDto toDto(CreditCard card);
 
     default CreditCard fromCreateRequest(CreditCardRequest request, User user) {
+        String number   = request.isManual() ? request.cardNumber().replaceAll("[\\s-]", "") : CreditCardHelper.generateCardNumber();
+        String cvv      = request.isManual() ? request.cvv()         : CreditCardHelper.generateCvv();
+        int expiryMonth = request.isManual() ? request.expiryMonth() : CreditCardHelper.generateExpiryMonth();
+        int expiryYear  = request.isManual() ? request.expiryYear()  : CreditCardHelper.generateExpiryYear();
+
         return CreditCard.builder()
                 .cardHolder(user)
-                .number(CreditCardHelper.generateCardNumber())
-                .cvv(CreditCardHelper.generateCvv())
-                .expiryMonth(CreditCardHelper.generateExpiryMonth())
-                .expiryYear(CreditCardHelper.generateExpiryYear())
+                .cardLabel(request.cardLabel())
+                .number(number)
+                .cvv(cvv)
+                .expiryMonth(expiryMonth)
+                .expiryYear(expiryYear)
                 .amount(BigDecimal.ZERO)
                 .limit(request.limit())
                 .createdAt(LocalDateTime.now())
@@ -44,5 +52,3 @@ public interface CreditCardMapper {
         return CreditCardHelper.maskCardNumber(number);
     }
 }
-
-

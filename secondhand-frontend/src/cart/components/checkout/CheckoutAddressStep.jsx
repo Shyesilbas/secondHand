@@ -1,4 +1,6 @@
-import {Check} from 'lucide-react';
+import {Check, Plus} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+import {ROUTES} from '../../../common/constants/routes.js';
 
 const CheckoutAddressStep = ({
     addresses,
@@ -13,6 +15,7 @@ const CheckoutAddressStep = ({
     onNext,
     onBack
 }) => {
+    const navigate = useNavigate();
     const isStepValid = selectedShippingAddressId && selectedBillingAddressId;
     const hasAddresses = Array.isArray(addresses) && addresses.length > 0;
 
@@ -45,7 +48,15 @@ const CheckoutAddressStep = ({
                     </div>
                     {!hasAddresses ? (
                         <div className="text-sm text-slate-500 text-center py-6 bg-slate-50 rounded-2xl border border-slate-200">
-                            No addresses found. Please add an address to continue.
+                            <p className="mb-3">No addresses found. Please add an address to continue.</p>
+                            <button
+                                type="button"
+                                onClick={() => navigate(ROUTES.PROFILE)}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors"
+                            >
+                                <Plus className="w-3.5 h-3.5" />
+                                Add Address
+                            </button>
                         </div>
                     ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -104,7 +115,15 @@ const CheckoutAddressStep = ({
                     </div>
                     {!hasAddresses ? (
                         <div className="text-sm text-slate-500 text-center py-6 bg-slate-50 rounded-2xl border border-slate-200">
-                            No addresses found. Please add an address to continue.
+                            <p className="mb-3">No addresses found. Please add an address to continue.</p>
+                            <button
+                                type="button"
+                                onClick={() => navigate(ROUTES.PROFILE)}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors"
+                            >
+                                <Plus className="w-3.5 h-3.5" />
+                                Add Address
+                            </button>
                         </div>
                     ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

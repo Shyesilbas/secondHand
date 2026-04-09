@@ -27,6 +27,7 @@ public interface NotificationFeedRepository extends Repository<com.serhat.second
                       n.created_at as createdAt
                     from notifications n
                     where n.user_id = :userId
+                      and n.type <> 'AGREEMENT_UPDATED'
                     
                     union all
                     
@@ -44,13 +45,14 @@ public interface NotificationFeedRepository extends Repository<com.serhat.second
                     from notification_events e
                     left join notification_event_reads r
                       on r.event_id = e.id and r.user_id = :userId
+                    where e.type <> 'AGREEMENT_UPDATED'
                     
                     order by createdAt desc
                     """,
             countQuery = """
                     select
-                      (select count(*) from notifications n where n.user_id = :userId) +
-                      (select count(*) from notification_events e)
+                      (select count(*) from notifications n where n.user_id = :userId and n.type <> 'AGREEMENT_UPDATED') +
+                      (select count(*) from notification_events e where e.type <> 'AGREEMENT_UPDATED')
                     """,
             nativeQuery = true
     )

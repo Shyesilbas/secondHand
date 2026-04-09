@@ -21,6 +21,10 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     Page<Notification> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId, Pageable pageable);
     
     Long countByUserIdAndIsReadFalse(Long userId);
+
+    Long countByUser_IdAndIsReadFalseAndTypeNot(
+            Long userId,
+            com.serhat.secondhand.notification.entity.enums.NotificationType excludedType);
     
     List<Notification> findByUserIdAndIsReadFalseOrderByCreatedAtDesc(Long userId);
     

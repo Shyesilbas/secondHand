@@ -49,10 +49,10 @@ export const API_ENDPOINTS = {
     },
     PAYMENTS: {
         CREATE: '/v1/payments/pay',
-        LISTING_FEE_PAYMENT: '/v1/payments/listings/pay-fee',
+        LISTING_FEE_PAYMENT: '/v1/listings/pay-fee',
+        LISTING_FEE_CONFIG: '/v1/listings/fee-config',
         MY_PAYMENTS: '/v1/payments/my-payments',
         STATISTICS: '/v1/payments/statistics',
-        LISTING_FEE_CONFIG: '/v1/payments/listing-fee-config',
         INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
     },
     ORDERS: {
@@ -78,7 +78,7 @@ export const API_ENDPOINTS = {
     CREDIT_CARDS: {
         GET_ALL: '/v1/credit-card',
         CREATE: '/v1/credit-card',
-        DELETE: '/v1/credit-card',
+        DELETE: (cardId) => `/v1/credit-card/${cardId}`,
         EXISTS: '/v1/credit-card/exists',
         AVAILABLE_CREDIT: '/v1/credit-card/available-credit',
     },
@@ -99,6 +99,7 @@ export const API_ENDPOINTS = {
         UNREAD_COUNT: '/v1/emails/unread-count',
         DELETE: (emailId) => `/v1/emails/${emailId}`,
         DELETE_ALL: '/v1/emails',
+        MARK_READ: (emailId) => `/v1/emails/${emailId}/read`,
     },
     ENUMS: {
         LISTING_TYPES: '/v1/enums/listing-types',

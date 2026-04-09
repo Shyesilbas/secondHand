@@ -4,13 +4,10 @@ import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.AgreementUpdateEvent;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementUpdateEventRepository;
-import com.serhat.secondhand.notification.application.INotificationService;
-import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,11 +19,9 @@ public class AgreementUpdateWatcher {
     private final AgreementRequirementService agreementRequirementService;
     private final AgreementService agreementService;
     private final AgreementUpdateEventRepository agreementUpdateEventRepository;
-    private final INotificationService notificationService;
-    private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final AgreementEmailNotificationService agreementEmailNotificationService;
 
     @Scheduled(fixedDelay = 30 * 60 * 1000)
-    @Transactional
     public void checkAndNotifyAgreementUpdates() {
         List<AgreementType> requiredTypes = agreementRequirementService.getAllRequiredAgreementTypes();
         if (requiredTypes.isEmpty()) {
@@ -48,14 +43,9 @@ public class AgreementUpdateWatcher {
                     .version(version)
                     .build());
 
-            notifyAgreementUpdate(type, version);
+            // In-app bildirim yok; tüm kullanıcılara gelen kutusu e-postası
+            agreementEmailNotificationService.notifyAllUsersAgreementPublished(type, version);
+            log.info("Agreement update emails triggered for type={} version={}", type, version);
         }
     }
-
-    private void notifyAgreementUpdate(AgreementType type, String version) {
-        var request = notificationTemplateCatalog.agreementUpdatedBroadcast(type.name(), version);
-        notificationService.createBroadcast(request);
-        log.info("Agreement update broadcast created for type={} version={}", type, version);
-    }
 }
-

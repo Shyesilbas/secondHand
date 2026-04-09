@@ -1,11 +1,20 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {Link} from 'react-router-dom';
-import {ArrowRight, Search, X, Inbox, LayoutDashboard, ShoppingBag, MapPin, CreditCard, User, Heart, Bell, Settings, Package, TrendingUp} from 'lucide-react';
-import {useAuthState} from '../../auth/AuthContext.jsx';
-import {getAccountHubSections} from '../utils/accountHubSections.js';
-import {filterAccountHubSections} from '../utils/accountHubFilter.js';
-
+import React, { useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  ArrowRight,
+  ChevronDown,
+  Package,
+  ShoppingBag,
+  TrendingUp,
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuthState } from '../../auth/AuthContext.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
 import { USER_DEFAULTS } from '../userConstants.js';
+import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
+import { dashboardService } from '../../dashboard/services/dashboardService.js';
+import { orderService } from '../../order/services/orderService.js';
+import { formatCurrency } from '../../common/formatters.js';
 
 const getInitials = (name) => {
   const value = (name || '').trim();
@@ -16,208 +25,276 @@ const getInitials = (name) => {
   return `${first}${last}`.toUpperCase();
 };
 
+const isRouteActive = (pathname, route) => pathname === route;
+
+const StatCard = ({ label, value, icon: Icon, iconBg, loading }) => (
+  <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between min-h-[132px]">
+    <div className="flex justify-between items-start mb-4">
+      <span className="text-[12px] font-semibold text-gray-500 leading-tight max-w-[110px]">{label}</span>
+      <div className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center text-white shrink-0`}>
+        <Icon className="w-4.5 h-4.5" />
+      </div>
+    </div>
+    <div className="text-[28px] font-bold text-gray-900 leading-none tracking-tight">
+      {loading ? <span className="inline-block w-14 h-7 bg-gray-200 rounded animate-pulse" /> : value}
+    </div>
+  </div>
+);
+
 const AccountHubPage = () => {
   const { user } = useAuthState();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { pathname } = useLocation();
+  const [openGroups, setOpenGroups] = useState(() => new Set(['overview', 'buying']));
 
-  const allSections = useMemo(() => getAccountHubSections({ userId: user?.id }), [user?.id]);
+  const navGroups = useMemo(() => {
+    const id = user?.id;
+    const groups = getAccountHubNavGroups(id ?? 0);
+    if (!id) return groups.filter((g) => g.id !== 'reviews');
+    return groups;
+  }, [user?.id]);
 
-  const filteredSections = useMemo(() => filterAccountHubSections(allSections, searchQuery), [allSections, searchQuery]);
+  const toggleGroup = (id) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
-  const flatItems = useMemo(
-    () => allSections.flatMap((section) => section.items.map((item) => ({ ...item, sectionTitle: section.title }))),
-    [allSections]
-  );
+  const { data: buyerData, isLoading: buyerLoading } = useQuery({
+    queryKey: ['buyerDashboard', user?.id],
+    queryFn: () => dashboardService.getBuyerDashboard(),
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-  const totalItemsCount = flatItems.length;
+  const { data: sellerData, isLoading: sellerLoading } = useQuery({
+    queryKey: ['sellerDashboard', user?.id],
+    queryFn: () => dashboardService.getSellerDashboard(),
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-  const visibleItemsCount = useMemo(
-    () => filteredSections.reduce((acc, section) => acc + section.items.length, 0),
-    [filteredSections]
-  );
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({
+    queryKey: ['myOrders', user?.id, 0, 5],
+    queryFn: () => orderService.myOrders(0, 5),
+    enabled: !!user?.id,
+    staleTime: 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-  const quickItems = useMemo(() => {
-    const byTitle = new Map(flatItems.map((item) => [item.title, item]));
-    const prioritizedTitles = ['Profile', 'My Listings', 'Create Listing', 'My Orders'];
-    return prioritizedTitles.map((t) => byTitle.get(t)).filter(Boolean).slice(0, 4);
-  }, [flatItems]);
+  const recentOrders = useMemo(() => ordersData?.content || [], [ordersData]);
 
-  const handleSearchChange = useCallback((e) => {
-    setSearchQuery(e.target.value);
-  }, []);
+  const totalOrders = buyerData?.totalOrders ?? buyerData?.orderCount ?? null;
+  const totalSpent = buyerData?.totalSpent ?? buyerData?.totalAmount ?? null;
+  const activeOrders = buyerData?.activeOrders ?? buyerData?.pendingOrders ?? null;
+  const activeListings = sellerData?.activeListings ?? sellerData?.listingCount ?? null;
 
-  const clearSearch = useCallback(() => {
-    setSearchQuery('');
-  }, []);
+  const statsLoading = buyerLoading || sellerLoading;
 
   if (!user) {
     return (
       <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
       </div>
     );
   }
 
-  // Sidebar mock datası (Gerçek veride flatItems kullanılabilir, görseldeki menü referans alınmıştır)
-  const sidebarNav = [
-    { name: 'Dashboard', icon: LayoutDashboard, route: '#', active: true },
-    { name: 'My Orders', icon: ShoppingBag, route: '/orders', active: false },
-    { name: 'Addresses', icon: MapPin, route: '#', active: false },
-    { name: 'Payment Methods', icon: CreditCard, route: '#', active: false },
-    { name: 'Profile', icon: User, route: '/profile', active: false },
-    { name: 'Wishlist', icon: Heart, route: '/favorites', active: false },
-    { name: 'Notifications', icon: Bell, route: '/notifications', active: false },
-    { name: 'Settings', icon: Settings, route: '/settings', active: false },
-  ];
-
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col lg:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full lg:w-[320px] bg-white border-r border-gray-200 flex-shrink-0 flex flex-col">
-        <div className="p-6">
+      <aside className="w-full lg:w-[300px] bg-white border-r border-gray-200 flex-shrink-0 flex flex-col max-h-[100dvh] lg:max-h-none lg:min-h-screen">
+        <div className="p-5 border-b border-gray-100">
           <div className="flex items-center gap-4 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
-            <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+            <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xl shadow-md overflow-hidden">
               {user?.profilePicture ? (
-                <img src={user.profilePicture} alt="Profile" className="h-full w-full object-cover rounded-full" />
+                <img src={user.profilePicture} alt="" className="h-full w-full object-cover" />
               ) : (
-                getInitials(user?.name)
+                getInitials(`${user?.name || ''} ${user?.surname || ''}`)
               )}
             </div>
-            <div className="overflow-hidden">
-              <h2 className="text-base font-bold text-gray-900 truncate">{user?.name || 'User'}</h2>
-              <p className="text-sm text-gray-500 truncate">{user?.email || 'user@example.com'}</p>
+            <div className="overflow-hidden min-w-0">
+              <h2 className="text-base font-bold text-gray-900 truncate">
+                {user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User'}
+              </h2>
+              <p className="text-sm text-gray-500 truncate">{user?.email || ''}</p>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1 pb-8 overflow-y-auto">
-          {sidebarNav.map((item) => (
-            <Link
-              key={item.name}
-              to={item.route}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-colors ${
-                item.active 
-                  ? 'bg-[#0f111a] text-white' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <item.icon className={`h-5 w-5 ${item.active ? 'text-gray-300' : 'text-gray-400'}`} />
-              <span className="text-sm">{item.name}</span>
-            </Link>
-          ))}
+        <nav className="flex-1 px-3 py-2 pb-8 overflow-y-auto">
+          <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Menu</p>
+          {navGroups.map((group) => {
+            const GroupIcon = group.icon;
+            const isOpen = openGroups.has(group.id);
+            return (
+              <div key={group.id} className="mb-1">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  <ChevronDown
+                    className={`h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
+                  />
+                  <GroupIcon className="h-4 w-4 text-gray-500 shrink-0" />
+                  <span className="truncate">{group.label}</span>
+                </button>
+                {isOpen && (
+                  <div className="mt-0.5 ml-2 pl-2 border-l border-gray-100 space-y-0.5">
+                    {group.items.map((item) => {
+                      const ItemIcon = item.icon;
+                      const active = isRouteActive(pathname, item.route);
+                      return (
+                        <Link
+                          key={`${group.id}-${item.route}`}
+                          to={item.route}
+                          title={item.description}
+                          className={`flex items-start gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                            active
+                              ? 'bg-[#0f111a] text-white'
+                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          }`}
+                        >
+                          <ItemIcon className={`h-4 w-4 shrink-0 mt-0.5 ${active ? 'text-gray-300' : 'text-gray-400'}`} />
+                          <span className="leading-snug">
+                            <span className="font-medium block">{item.name}</span>
+                            {!active && (
+                              <span className="text-[11px] text-gray-400 font-normal line-clamp-1">{item.description}</span>
+                            )}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-10 lg:pl-12 overflow-y-auto">
+      <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
         <div className="max-w-5xl">
-          <div className="mb-10">
-            <h1 className="text-3xl lg:text-[40px] font-bold text-gray-900 tracking-tight flex items-center gap-3">
-              Welcome back, {user?.name?.split(' ')[0] || 'User'}! <span>👋</span>
+          <div className="mb-7">
+            <h1 className="text-2xl lg:text-[30px] font-bold text-gray-900 tracking-tight">
+              Welcome back, {user?.name?.split(' ')[0] || 'User'}
             </h1>
-            <p className="mt-2 text-lg text-gray-500">
-              Here's what's happening with your account today.
-            </p>
+            <p className="mt-1.5 text-sm text-gray-500">Here&apos;s what&apos;s happening with your account today.</p>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-            {/* Card 1 */}
-            <div className="bg-white p-6 rounded-[24px] border border-gray-200 shadow-sm flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-6">
-                <span className="text-[15px] font-medium text-gray-500 w-20">Total Orders</span>
-                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white">
-                  <ShoppingBag className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[40px] font-bold text-gray-900 leading-none">24</div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-emerald-600">+12%</span>
-                  <span className="text-sm text-gray-500">from last month</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div className="bg-white p-6 rounded-[24px] border border-gray-200 shadow-sm flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-6">
-                <span className="text-[15px] font-medium text-gray-500 w-20">Active Orders</span>
-                <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white">
-                  <Package className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[40px] font-bold text-gray-900 leading-none">3</div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-emerald-600">+2</span>
-                  <span className="text-sm text-gray-500">from last month</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div className="bg-white p-6 rounded-[24px] border border-gray-200 shadow-sm flex flex-col justify-between overflow-hidden relative">
-              <div className="flex justify-between items-start mb-6">
-                <span className="text-[15px] font-medium text-gray-500 w-20">Total Spent</span>
-                <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white absolute -right-2 -top-2 scale-125">
-                  <TrendingUp className="w-5 h-5 absolute bottom-3 left-3" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[40px] font-bold text-gray-900 leading-none tracking-tight">$3,450</div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-emerald-600">+8%</span>
-                  <span className="text-sm text-gray-500">from last month</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 4 */}
-            <div className="bg-white p-6 rounded-[24px] border border-gray-200 shadow-sm flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-6">
-                <span className="text-[15px] font-medium text-gray-500 w-20">Wishlist Items</span>
-                <div className="w-12 h-12 rounded-xl bg-pink-500 flex items-center justify-center text-white">
-                  <Heart className="w-6 h-6" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[40px] font-bold text-gray-900 leading-none">12</div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-emerald-600">+3</span>
-                  <span className="text-sm text-gray-500">from last month</span>
-                </div>
-              </div>
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
+            <StatCard
+              label="Total Orders"
+              value={totalOrders ?? '—'}
+              icon={ShoppingBag}
+              iconBg="bg-blue-500"
+              loading={statsLoading && totalOrders === null}
+            />
+            <StatCard
+              label="Active Orders"
+              value={activeOrders ?? '—'}
+              icon={Package}
+              iconBg="bg-purple-500"
+              loading={statsLoading && activeOrders === null}
+            />
+            <StatCard
+              label="Total Spent"
+              value={totalSpent != null ? formatCurrency(totalSpent) : '—'}
+              icon={TrendingUp}
+              iconBg="bg-emerald-500"
+              loading={statsLoading && totalSpent === null}
+            />
+            <StatCard
+              label="Active Listings"
+              value={activeListings ?? '—'}
+              icon={Package}
+              iconBg="bg-pink-500"
+              loading={sellerLoading && activeListings === null}
+            />
           </div>
 
-          {/* Recent Orders Section */}
           <div className="bg-white rounded-[24px] border border-gray-200 p-6 lg:p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
-              <Link to="/orders" className="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-indigo-600 transition-colors">
+              <Link
+                to={ROUTES.MY_ORDERS}
+                className="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-indigo-600 transition-colors"
+              >
                 View All <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
-            {/* Dummy Order Item */}
-            <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
-                  <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=200&auto=format&fit=crop" alt="Headphones" className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-base">Premium Wireless Headphones</h3>
-                  <div className="text-sm text-gray-500 mt-1">ORD-2024-001 • Apr 5, 2024</div>
-                  <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold">
-                    Delivered
-                  </div>
-                </div>
+            {ordersLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+                ))}
               </div>
-              <div className="text-right">
-                <div className="text-xl font-bold text-gray-900 tracking-tight">$299.99</div>
+            ) : recentOrders.length === 0 ? (
+              <div className="text-center py-10 text-gray-400">
+                <ShoppingBag className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No orders yet.</p>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-3">
+                {recentOrders.map((order) => {
+                  const items = order.orderItems || order.items || [];
+                  const firstItem = items[0];
+                  const listing = firstItem?.listing;
+                  const thumbUrl = listing?.imageUrl || firstItem?.imageUrl;
+                  const lineTitle = listing?.title || firstItem?.title;
+                  const statusColor =
+                    order.status === 'DELIVERED' || order.status === 'COMPLETED'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : order.status === 'CANCELLED'
+                        ? 'bg-red-50 text-red-700'
+                        : 'bg-yellow-50 text-yellow-700';
+
+                  return (
+                    <Link
+                      key={order.id}
+                      to={ROUTES.MY_ORDERS}
+                      className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          {thumbUrl ? (
+                            <img src={thumbUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <ShoppingBag className="w-6 h-6 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">
+                            {order.name || lineTitle || `Order #${order.orderNumber}`}
+                          </h3>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {order.orderNumber} •{' '}
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : ''}
+                          </p>
+                          <span
+                            className={`mt-1.5 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${statusColor}`}
+                          >
+                            {order.status?.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0 ml-4">
+                        <p className="text-base font-bold text-gray-900 tracking-tight">
+                          {formatCurrency(order.totalAmount ?? order.total ?? 0, order.currency)}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </main>

@@ -5,6 +5,7 @@ import com.serhat.secondhand.notification.dto.NotificationDto;
 import com.serhat.secondhand.notification.util.NotificationErrorCodes;
 import com.serhat.secondhand.notification.dto.NotificationRequest;
 import com.serhat.secondhand.notification.entity.Notification;
+import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.notification.entity.NotificationEvent;
 import com.serhat.secondhand.notification.entity.NotificationEventRead;
 import com.serhat.secondhand.notification.mapper.NotificationMapper;
@@ -105,9 +106,9 @@ public class NotificationService implements INotificationService {
     @Transactional(readOnly = true)
     @Cacheable(value = "notificationCount", key = "#userId")
     public Long getUnreadCount(Long userId) {
-        long personal = notificationRepository.countByUserIdAndIsReadFalse(userId);
-        long totalEvents = notificationEventRepository.count();
-        long reads = notificationEventReadRepository.countByUserId(userId);
+        long personal = notificationRepository.countByUser_IdAndIsReadFalseAndTypeNot(userId, NotificationType.AGREEMENT_UPDATED);
+        long totalEvents = notificationEventRepository.countByTypeNot(NotificationType.AGREEMENT_UPDATED);
+        long reads = notificationEventReadRepository.countByUserIdForEventsWithTypeNot(userId, NotificationType.AGREEMENT_UPDATED);
         long broadcastUnread = Math.max(0, totalEvents - reads);
         return personal + broadcastUnread;
     }

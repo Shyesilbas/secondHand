@@ -16,6 +16,13 @@ const PaymentSelectionStep = ({
     calculateTotal
 }) => {
     const navigate = useNavigate();
+    const getCardSelectValue = (card) => (
+        card?.id
+        || card?.cardId
+        || card?.number
+        || card?.cardNumber
+        || null
+    );
 
     return (
         <div>
@@ -75,6 +82,7 @@ const PaymentSelectionStep = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {cards.map((c, idx) => {
                                 const number = c.number || c.cardNumber || null;
+                                const selectionValue = getCardSelectValue(c);
                                 const last4 = number ? number.slice(-4) : (c.last4 || 'XXXX');
                                 const label = `**** **** **** ${last4}`;
                                 const expiry = `${c.expiryMonth || 'MM'}/${c.expiryYear || 'YY'}`;
@@ -83,9 +91,9 @@ const PaymentSelectionStep = ({
                                 
                                 return (
                                     <label 
-                                        key={number || idx} 
+                                        key={selectionValue || idx} 
                                         className={`p-4 rounded-lg border cursor-pointer ${
-                                            selectedCardNumber === number 
+                                            selectedCardNumber === selectionValue 
                                                 ? 'border-blue-500 bg-blue-50' 
                                                 : 'border-gray-200 bg-white hover:shadow-sm'
                                         }`}
@@ -95,8 +103,8 @@ const PaymentSelectionStep = ({
                                                 type="radio" 
                                                 className="mr-3 mt-1" 
                                                 name="creditCard" 
-                                                checked={selectedCardNumber === number} 
-                                                onChange={() => setSelectedCardNumber(number)} 
+                                                checked={selectedCardNumber === selectionValue} 
+                                                onChange={() => setSelectedCardNumber(selectionValue)} 
                                             />
                                             <div>
                                                 <div className="font-medium text-text-primary">{label}</div>

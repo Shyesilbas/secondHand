@@ -12,6 +12,14 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_MESSAGES, CART_PAYMENT_TYPES } from '../cartConstants.js';
 import { getCheckoutErrorMessage } from '../utils/checkoutError.js';
 
+const getCardSelectValue = (card) => (
+    card?.id
+    || card?.cardId
+    || card?.number
+    || card?.cardNumber
+    || null
+);
+
 export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, offerId) => {
     const navigate = useNavigate();
     const { showError, showSuccess } = useNotification();
@@ -38,6 +46,28 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const [notes, setNotes] = useState('');
     const [orderName, setOrderName] = useState('');
 
+    const findAddressById = (id) => {
+        if (!id || !Array.isArray(addresses)) return null;
+        return addresses.find((address) => String(address.id) === String(id)) || null;
+    };
+
+    const navigateToOrderSuccess = (checkoutResult) => {
+        const orderId = checkoutResult?.id || checkoutResult?.orderId || null;
+        const orderNumber = checkoutResult?.orderNumber || checkoutResult?.orderNo || null;
+        const shippingAddress = findAddressById(selectedShippingAddressId);
+        navigate(ROUTES.ORDER_SUCCESS, {
+            state: {
+                order: checkoutResult || null,
+                orderId,
+                orderNumber,
+                totalAmount: calculateTotal(),
+                createdAt: new Date().toISOString(),
+                itemCount: cartCount,
+                shippingAddress,
+            },
+        });
+    };
+
     const {
         acceptedAgreements,
         onAgreementToggle,
@@ -56,7 +86,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                     normalized = data;
                 } else if (data && Array.isArray(data.content)) {
                     normalized = data.content;
-                } else if (data && (data.number || data.cardNumber)) {
+                } else if (data && (data.id || data.cardId || data.number || data.cardNumber)) {
                     normalized = [data];
                 }
                 setCards(normalized);
@@ -89,8 +119,15 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
             Array.isArray(cards) &&
             cards.length > 0 &&
             !selectedCardNumber) {
-            const number = cards[0].number || cards[0].cardNumber || null;
-            setSelectedCardNumber(number);
+            setSelectedCardNumber(getCardSelectValue(cards[0]));
+        }
+
+        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD &&
+            Array.isArray(cards) &&
+            cards.length > 0 &&
+            selectedCardNumber &&
+            !cards.some(card => getCardSelectValue(card) === selectedCardNumber)) {
+            setSelectedCardNumber(getCardSelectValue(cards[0]));
         }
     }, [selectedPaymentType, bankAccounts, selectedBankAccountIban, cards, selectedCardNumber]);
 
@@ -129,10 +166,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 couponCode: couponCode?.trim() || null,
                 offerId: offerId || null
             };
-            await orderService.checkout(payload);
+            const checkoutResult = await orderService.checkout(payload);
             await clearCart();
             showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
-            navigate(ROUTES.MY_ORDERS);
+            navigateToOrderSuccess(checkoutResult);
         } catch (e) {
             showError(
                 CART_MESSAGES.CHECKOUT_FAILED_TITLE,
@@ -200,10 +237,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 couponCode: couponCode?.trim() || null,
                 offerId: offerId || null
             };
-            await orderService.checkout(payload);
-            clearCart();
+            const checkoutResult = await orderService.checkout(payload);
+            await clearCart();
             showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
-            navigate(ROUTES.MY_ORDERS);
+            navigateToOrderSuccess(checkoutResult);
         } catch (e) {
             showError(
                 CART_MESSAGES.CHECKOUT_FAILED_TITLE,

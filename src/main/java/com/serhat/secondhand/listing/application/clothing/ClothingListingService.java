@@ -18,6 +18,7 @@ import com.serhat.secondhand.listing.validation.clothing.ClothingSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -131,9 +132,9 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
         return Result.success();
     }
 
-    public List<ClothingListingDto> findByBrandAndClothingType(UUID brandId, UUID clothingTypeId) {
-        return clothingRepository.findByBrand_IdAndClothingType_Id(brandId, clothingTypeId)
-                .stream().map(listingMapper::toClothingDto).toList();
+    public Page<ClothingListingDto> findByBrandAndClothingType(UUID brandId, UUID clothingTypeId, Pageable pageable) {
+        return clothingRepository.findByBrand_IdAndClothingType_Id(brandId, clothingTypeId, pageable)
+                .map(listingMapper::toClothingDto);
     }
 
     public ClothingListingDto getClothingDetails(UUID id) {

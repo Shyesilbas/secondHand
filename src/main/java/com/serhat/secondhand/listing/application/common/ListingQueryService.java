@@ -1,12 +1,5 @@
 package com.serhat.secondhand.listing.application.common;
 
-import com.serhat.secondhand.dashboard.application.DashboardService;
-import com.serhat.secondhand.listing.application.books.BooksListingService;
-import com.serhat.secondhand.listing.application.clothing.ClothingListingService;
-import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
-import com.serhat.secondhand.listing.application.realestate.RealEstateListingService;
-import com.serhat.secondhand.listing.application.sports.SportsListingService;
-import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
@@ -15,26 +8,25 @@ import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.review.application.IReviewService;
-import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ListingQueryService {
 
     private final ListingRepository listingRepository;
@@ -42,59 +34,8 @@ public class ListingQueryService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    private final DashboardService dashboardService;
+    @Qualifier("taskExecutor")
     private final Executor taskExecutor;
-
-    private final BooksListingService booksListingService;
-    private final ClothingListingService clothingListingService;
-    private final ElectronicListingService electronicListingService;
-    private final RealEstateListingService realEstateListingService;
-    private final SportsListingService sportsListingService;
-    private final VehicleListingService vehicleListingService;
-
-    @Autowired
-    public ListingQueryService(
-            ListingRepository listingRepository,
-            ListingMapper listingMapper,
-            ListingEnrichmentService enrichmentService,
-            ListingViewService listingViewService,
-            IReviewService reviewService,
-            DashboardService dashboardService,
-            @Qualifier("taskExecutor") Executor taskExecutor,
-            @Lazy BooksListingService booksListingService,
-            @Lazy ClothingListingService clothingListingService,
-            @Lazy ElectronicListingService electronicListingService,
-            @Lazy RealEstateListingService realEstateListingService,
-            @Lazy SportsListingService sportsListingService,
-            @Lazy VehicleListingService vehicleListingService) {
-        this.listingRepository = listingRepository;
-        this.listingMapper = listingMapper;
-        this.enrichmentService = enrichmentService;
-        this.listingViewService = listingViewService;
-        this.reviewService = reviewService;
-        this.dashboardService = dashboardService;
-        this.taskExecutor = taskExecutor;
-        this.booksListingService = booksListingService;
-        this.clothingListingService = clothingListingService;
-        this.electronicListingService = electronicListingService;
-        this.realEstateListingService = realEstateListingService;
-        this.sportsListingService = sportsListingService;
-        this.vehicleListingService = vehicleListingService;
-    }
-
-    private Map<Class<?>, Function<ListingFilterDto, Page<ListingDto>>> filterStrategyMap;
-
-    @PostConstruct
-    void initFilterStrategyMap() {
-        this.filterStrategyMap = Map.of(
-                VehicleListingFilterDto.class, f -> vehicleListingService.filterVehicles((VehicleListingFilterDto) f),
-                ElectronicListingFilterDto.class, f -> electronicListingService.filterElectronics((ElectronicListingFilterDto) f),
-                BooksListingFilterDto.class, f -> booksListingService.filterBooks((BooksListingFilterDto) f),
-                ClothingListingFilterDto.class, f -> clothingListingService.filterClothing((ClothingListingFilterDto) f),
-                RealEstateFilterDto.class, f -> realEstateListingService.filterRealEstate((RealEstateFilterDto) f),
-                SportsListingFilterDto.class, f -> sportsListingService.filterSports((SportsListingFilterDto) f)
-        );
-    }
 
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -139,36 +80,11 @@ public class ListingQueryService {
 
     public List<ListingDto> findByIds(List<UUID> ids, Long userId) {
         if (ids == null || ids.isEmpty()) return List.of();
-        List<Listing> listings = listingRepository.findByIdsWithSeller(ids);
+        List<Listing> listings = listingRepository.findAllByIdIn(ids);
         List<ListingDto> dtos = listings.stream()
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
         return enrichList(dtos, userId);
-    }
-
-    public Page<ListingDto> filterByCategory(ListingFilterDto filters, Long userId) {
-        Function<ListingFilterDto, Page<ListingDto>> strategy = filterStrategyMap.get(filters.getClass());
-        if (strategy == null) return Page.empty();
-        Page<ListingDto> result = strategy.apply(filters);
-        return enrichPage(result, userId);
-    }
-
-    public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
-        if (query == null || query.trim().isEmpty()) return Page.empty();
-
-        String searchTerm = query.trim();
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-
-        Page<Listing> results = listingRepository.findBySearch(
-                searchTerm, searchTerm, ListingStatus.ACTIVE, pageable
-        );
-
-        List<ListingDto> dtos = results.getContent().stream()
-                .map(listingMapper::toDynamicDto)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, results.getTotalElements());
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size) {
@@ -198,10 +114,6 @@ public class ListingQueryService {
                         .stream().map(listingMapper::toDynamicDto).toList(),
                 null
         );
-    }
-
-    public ListingStatisticsDto getGlobalListingStatistics() {
-        return dashboardService.getGlobalListingStatistics();
     }
 
     private List<ListingDto> enrichList(List<ListingDto> dtos, Long userId) {

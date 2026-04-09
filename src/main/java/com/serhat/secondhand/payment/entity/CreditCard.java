@@ -23,9 +23,12 @@ public class CreditCard {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_holder_id", nullable = false)
     private User cardHolder;
+
+    @Column(name = "card_label", length = 50)
+    private String cardLabel;
 
     @Column(nullable = false)
     private String number;

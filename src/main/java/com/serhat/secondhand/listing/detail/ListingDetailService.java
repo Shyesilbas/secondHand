@@ -21,7 +21,7 @@ public class ListingDetailService {
     public String getCombinedSummary(UUID listingId) {
         Listing listing = listingRepository.findById(listingId).orElse(null);
         if (listing == null) {
-            return "İlan bulunamadı.";
+            return "Listing not found.";
         }
 
         ListingType type = listing.getListingType();
@@ -43,7 +43,7 @@ public class ListingDetailService {
     private String buildFallbackSummary(Listing listing) {
         String title = listing.getTitle();
         if (title == null || title.isBlank()) {
-            title = "İlan";
+            title = "Listing";
         }
 
         if (listing.getPrice() == null) {

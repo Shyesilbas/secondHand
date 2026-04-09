@@ -140,7 +140,7 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     @Transactional
     public void expireShowcases() {
-        List<Showcase> expiredShowcases = showcaseRepository.findByStatusAndEndDateAfter(
+        List<Showcase> expiredShowcases = showcaseRepository.findByStatusAndEndDateLessThanEqual(
                 ShowcaseStatus.ACTIVE, LocalDateTime.now());
 
         expiredShowcases.forEach(showcase -> {

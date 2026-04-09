@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,10 +50,12 @@ public class CreditCardService {
         return creditCardMapper.toDto(creditCard);
     }
 
-    public CreditCardDto getCreditCard(Authentication authentication) {
+    public List<CreditCardDto> getCreditCards(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        CreditCard creditCard = findByUserMandatory(user);
-        return creditCardMapper.toDto(creditCard);
+        return creditCardRepository.findAllByCardHolder(user)
+                .stream()
+                .map(creditCardMapper::toDto)
+                .toList();
     }
 
     public PaymentResult processCreditCardPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
@@ -62,7 +64,12 @@ public class CreditCardService {
                     toUser != null ? toUser.getId() : null);
         }
 
-        CreditCard card = findByUserMandatoryWithLock(fromUser);
+        /* Ödeme için yeterli limite sahip ilk kartı kullan */
+        CreditCard card = creditCardRepository.findAllByCardHolder(fromUser).stream()
+                .filter(c -> c.getLimit().subtract(c.getAmount()).compareTo(amount) >= 0)
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(PaymentErrorCodes.INSUFFICIENT_FUNDS));
+
         ensureValid(creditCardValidator.validateSufficientCredit(card, amount));
 
         try {
@@ -74,7 +81,7 @@ public class CreditCardService {
 
             card.setAmount(card.getAmount().add(amount));
             creditCardRepository.save(card);
-            log.info("Credit card payment processed successfully for user: {}, amount: {}", fromUser.getEmail(), amount);
+            log.info("Credit card payment processed for user: {}, amount: {}", fromUser.getEmail(), amount);
             return PaymentResult.success(UUID.randomUUID().toString(), amount, PaymentType.CREDIT_CARD,
                     listingId, fromUser.getId(), toUser != null ? toUser.getId() : null);
         } catch (Exception e) {
@@ -85,7 +92,7 @@ public class CreditCardService {
     }
 
     public Optional<CreditCard> findByUser(User user) {
-        return creditCardRepository.findByCardHolder(user);
+        return creditCardRepository.findAllByCardHolder(user).stream().findFirst();
     }
 
     public CreditCard findByUserMandatory(User user) {
@@ -94,17 +101,20 @@ public class CreditCardService {
     }
 
     public CreditCard findByUserMandatoryWithLock(User user) {
-        return creditCardRepository.findByCardHolderWithLock(user)
+        /* Ödeme sırasında lock ile ilk kartı al */
+        return creditCardRepository.findAllByCardHolder(user).stream()
+                .findFirst()
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND));
     }
 
     public Map<String, Object> checkCreditCardExists(Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        Optional<CreditCard> cardOpt = findByUser(user);
-        Map<String, Object> response = new HashMap<>();
-        response.put("hasCreditCard", cardOpt.isPresent());
-        response.put("maskedCardNumber", cardOpt.map(c -> CreditCardHelper.maskCardNumber(c.getNumber())).orElse(null));
-        return response;
+        List<CreditCard> cards = creditCardRepository.findAllByCardHolder(user);
+        return Map.of(
+                "hasCreditCard", !cards.isEmpty(),
+                "cardCount", cards.size(),
+                "maskedCardNumber", cards.isEmpty() ? null : CreditCardHelper.maskCardNumber(cards.get(0).getNumber())
+        );
     }
 
     public Map<String, Object> getAvailableCredit(Authentication authentication) {
@@ -118,11 +128,13 @@ public class CreditCardService {
         );
     }
 
-    public void deleteCreditCard(Authentication authentication) {
+    public void deleteCreditCard(UUID cardId, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        CreditCard creditCard = findByUserMandatory(user);
-        creditCardRepository.delete(creditCard);
-        log.info("Credit card deleted for user: {}", user.getEmail());
+        int deleted = creditCardRepository.deleteByIdAndCardHolderId(cardId, user.getId());
+        if (deleted == 0) {
+            throw new BusinessException(PaymentErrorCodes.CREDIT_CARD_NOT_FOUND);
+        }
+        log.info("Credit card {} deleted for user: {}", cardId, user.getEmail());
     }
 
     private void ensureValid(Result<Void> validationResult) {

@@ -40,24 +40,27 @@ const ListingDetailPage = () => {
   }, [listing, isOwner]);
 
   if (isLoading) return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+        <p className="text-[13px] text-slate-400 font-medium">Loading listing…</p>
+      </div>
     </div>
   );
 
   if (error) return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="text-center max-w-sm">
-        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-          <AlertTriangle className="w-5 h-5 text-gray-400" />
+        <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <AlertTriangle className="w-5 h-5 text-rose-400" />
         </div>
-        <h3 className="text-[15px] font-semibold text-gray-900 mb-1">Unavailable</h3>
-        <p className="text-[13px] text-gray-400 mb-5">{error || "This listing could not be found."}</p>
+        <h3 className="text-[15px] font-semibold text-slate-800 mb-1">Listing Unavailable</h3>
+        <p className="text-[13px] text-slate-400 mb-6">{error || "This listing could not be found."}</p>
         <Link
           to={ROUTES.LISTINGS}
-          className="inline-flex items-center text-[13px] font-medium text-gray-900 hover:underline"
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           Back to Listings
         </Link>
       </div>
@@ -75,7 +78,6 @@ const ListingDetailPage = () => {
   const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
   const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
 
-
   const tabs = [
     { id: 'about', label: 'About' },
     { id: 'details', label: 'Details' },
@@ -83,41 +85,51 @@ const ListingDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fafafa] pb-16">
-      {/* Sticky header */}
-      <div className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
-          <nav className="flex items-center text-[11px] text-gray-400 min-w-0">
-            <Link to={ROUTES.LISTINGS} className="hover:text-gray-700 transition-colors shrink-0">Listings</Link>
-            <ChevronRight className="w-3 h-3 mx-1.5 text-gray-300 shrink-0" />
-            <span className="text-gray-900 font-medium truncate max-w-[200px]">{listing.title}</span>
+    <div className="min-h-screen bg-slate-50 pb-16">
+
+      {/* Sticky topbar */}
+      <div className="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-6xl mx-auto px-5 h-13 flex items-center justify-between gap-4">
+
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1 text-[12px] min-w-0">
+            <Link
+              to={ROUTES.LISTINGS}
+              className="text-slate-400 hover:text-slate-700 font-medium transition-colors shrink-0 flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Listings
+            </Link>
+            <ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />
+            <span className="text-slate-700 font-semibold truncate max-w-[220px]">{listing.title}</span>
           </nav>
 
-          <div className="flex items-center gap-0.5">
+          {/* Action buttons */}
+          <div className="flex items-center gap-0.5 shrink-0">
             <button
               onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-              className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
+              className="p-2 text-slate-400 hover:text-indigo-600 rounded-xl transition-colors hover:bg-indigo-50"
               title="Ask Aura"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-4 h-4" />
             </button>
             {canAddToCart && (
               <button
                 onClick={() => addToCart(listing.id)}
                 disabled={isAddingToCart}
-                className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
+                className="p-2 text-slate-400 hover:text-indigo-600 rounded-xl transition-colors hover:bg-indigo-50"
                 title="Add to Cart"
               >
-                <ShoppingBag className="w-3.5 h-3.5" />
+                <ShoppingBag className="w-4 h-4" />
               </button>
             )}
             {canMakeOffer && (
               <button
                 onClick={() => setIsOfferModalOpen(true)}
-                className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors"
+                className="p-2 text-slate-400 hover:text-emerald-600 rounded-xl transition-colors hover:bg-emerald-50"
                 title="Make Offer"
               >
-                <HandCoins className="w-3.5 h-3.5" />
+                <HandCoins className="w-4 h-4" />
               </button>
             )}
             {!isOwner && (
@@ -129,14 +141,14 @@ const ListingDetailPage = () => {
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="p-2 border-0 text-gray-400 hover:text-red-500 rounded-md transition-colors"
+                className="p-2 border-0 text-slate-400 hover:text-rose-500 rounded-xl transition-colors hover:bg-rose-50"
               />
             )}
-            <button className="p-2 text-gray-400 hover:text-gray-700 rounded-md transition-colors">
-              <Share2 className="w-3.5 h-3.5" />
+            <button className="p-2 text-slate-400 hover:text-slate-700 rounded-xl transition-colors hover:bg-slate-100">
+              <Share2 className="w-4 h-4" />
             </button>
             {isOwner && (
-               <ListingCardActions listing={listing} onChanged={fetchListing} />
+              <ListingCardActions listing={listing} onChanged={fetchListing} />
             )}
           </div>
         </div>
@@ -148,11 +160,12 @@ const ListingDetailPage = () => {
         listing={listing}
       />
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        <div className="grid lg:grid-cols-12 gap-5">
+      {/* Main content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-7">
+        <div className="grid lg:grid-cols-12 gap-6">
 
-          <div className="lg:col-span-8 space-y-4">
+          {/* Left column */}
+          <div className="lg:col-span-8 space-y-5">
             <ListingHero
               listing={listing}
               variant="main"
@@ -173,29 +186,30 @@ const ListingDetailPage = () => {
             />
           </div>
 
+          {/* Right sidebar */}
           <div className="lg:col-span-4 space-y-4">
-             <div className="bg-white rounded-lg border border-gray-100 p-5 lg:sticky lg:top-16">
-                <ListingHero
-                  listing={listing}
-                  variant="sidebar"
-                  displayPrice={displayPrice}
-                  hasCampaign={hasCampaign}
-                  hasStockInfo={hasStockInfo}
-                  isLowStock={isLowStock}
-                />
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:sticky lg:top-16">
+              <ListingHero
+                listing={listing}
+                variant="sidebar"
+                displayPrice={displayPrice}
+                hasCampaign={hasCampaign}
+                hasStockInfo={hasStockInfo}
+                isLowStock={isLowStock}
+              />
 
-                <ListingTrustPanel
-                  listing={listing}
-                  isOwner={isOwner}
-                  onShowcaseSuccess={fetchListing}
-                />
+              <ListingTrustPanel
+                listing={listing}
+                isOwner={isOwner}
+                onShowcaseSuccess={fetchListing}
+              />
 
-                <ListingAnalyticsPanel
-                  listing={listing}
-                  isOwner={isOwner}
-                  displayPrice={displayPrice}
-                />
-             </div>
+              <ListingAnalyticsPanel
+                listing={listing}
+                isOwner={isOwner}
+                displayPrice={displayPrice}
+              />
+            </div>
           </div>
         </div>
       </div>

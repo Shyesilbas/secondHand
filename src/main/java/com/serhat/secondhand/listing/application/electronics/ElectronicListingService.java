@@ -2,8 +2,8 @@ package com.serhat.secondhand.listing.application.electronics;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.category.AbstractListingService;
-import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
 import com.serhat.secondhand.listing.application.common.ListingValidationService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
@@ -18,9 +18,11 @@ import com.serhat.secondhand.listing.validation.electronics.ElectronicSpecValida
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.List;
 import java.util.UUID;
 
@@ -129,9 +131,9 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         return Result.success();
     }
 
-    public List<ElectronicListingDto> findByElectronicType(UUID electronicTypeId) {
-        return repository.findByElectronicType_Id(electronicTypeId)
-                .stream().map(listingMapper::toElectronicDto).toList();
+    public Page<ElectronicListingDto> findByElectronicType(UUID electronicTypeId, Pageable pageable) {
+        return repository.findByElectronicType_Id(electronicTypeId, pageable)
+                .map(listingMapper::toElectronicDto);
     }
 
     public ElectronicListingDto getElectronicDetails(UUID id) {

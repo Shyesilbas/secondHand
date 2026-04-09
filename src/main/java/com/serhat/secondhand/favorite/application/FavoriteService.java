@@ -234,7 +234,7 @@ public class FavoriteService {
             return Result.success(List.of());
         }
 
-        List<Listing> listings = listingRepository.findByIdsWithSeller(topIds);
+        List<Listing> listings = listingRepository.findAllByIdIn(topIds);
 
         Map<UUID, Listing> listingMap = listings.stream()
                 .collect(Collectors.toMap(Listing::getId, l -> l, (a, b) -> a, LinkedHashMap::new));

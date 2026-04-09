@@ -14,12 +14,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -71,9 +71,10 @@ public class ElectronicListingController {
 
     @GetMapping("/electronicType/{electronicType}")
     @Operation(summary = "Find electronics by type")
-    public ResponseEntity<List<ElectronicListingDto>> findByElectronicType(
-            @PathVariable UUID electronicType) {
-        List<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType);
+    public ResponseEntity<Page<ElectronicListingDto>> findByElectronicType(
+            @PathVariable UUID electronicType,
+            Pageable pageable) {
+        Page<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType, pageable);
         return ResponseEntity.ok(electronicDto);
     }
 

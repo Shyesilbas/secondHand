@@ -74,13 +74,21 @@ public final class CreditCardHelper {
         if (cardNumber == null || cardNumber.length() < 4) {
             return "****";
         }
-        
-        String cleanedNumber = cardNumber.replaceAll("[\\s-]", "");
-        if (cleanedNumber.length() == 16) {
-            return "**** **** **** " + cleanedNumber.substring(12);
+        String cleaned = cardNumber.replaceAll("[\\s-]", "");
+        int len = cleaned.length();
+        if (len < 8) {
+            return cleaned.substring(0, 4) + " **** " + cleaned.substring(len - 4);
         }
-        
-        return "****";
+        // ilk 4 + maskeli orta + son 4
+        String first4 = cleaned.substring(0, 4);
+        String last4  = cleaned.substring(len - 4);
+        int middleGroups = (len - 8) / 4;
+        StringBuilder masked = new StringBuilder(first4);
+        for (int i = 0; i <= middleGroups; i++) {
+            masked.append(" ****");
+        }
+        masked.append(" ").append(last4);
+        return masked.toString();
     }
 
 }

@@ -17,6 +17,8 @@ public enum EmailType {
     PROMOTIONAL("Promotional"),
     PAYMENT_VERIFICATION("Payment Verification"),
     NEW_LISTING_NOTIFICATION("New Listing Notification"),
+    /** Yasal metin / sözleşme güncellemeleri — yalnızca gelen kutusu; in-app bildirim değil */
+    AGREEMENT_UPDATED("Agreement Updated"),
     SYSTEM("System");
 
     private final String label;

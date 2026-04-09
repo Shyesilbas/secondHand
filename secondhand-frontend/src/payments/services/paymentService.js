@@ -62,12 +62,20 @@ export const paymentService = {
         return get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
     },
 
-    createCreditCard: async (limit) => {
-        return post(API_ENDPOINTS.CREDIT_CARDS.CREATE, { limit });
+    createCreditCard: async (limit, cardData = null) => {
+        const body = { limit };
+        if (cardData) {
+            if (cardData.cardLabel)   body.cardLabel   = cardData.cardLabel;
+            if (cardData.cardNumber)  body.cardNumber  = cardData.cardNumber.replace(/\s/g, '');
+            if (cardData.cvv)         body.cvv         = cardData.cvv;
+            if (cardData.expiryMonth) body.expiryMonth = parseInt(cardData.expiryMonth, 10);
+            if (cardData.expiryYear)  body.expiryYear  = parseInt(cardData.expiryYear, 10);
+        }
+        return post(API_ENDPOINTS.CREDIT_CARDS.CREATE, body);
     },
 
-    deleteCreditCard: async () => {
-        return del(API_ENDPOINTS.CREDIT_CARDS.DELETE);
+    deleteCreditCard: async (cardId) => {
+        return del(API_ENDPOINTS.CREDIT_CARDS.DELETE(cardId));
     },
 
     createBankAccount: async () => {

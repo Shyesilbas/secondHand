@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
 
     @Bean
+    @Primary
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(
                 "notificationCount",
@@ -24,7 +26,14 @@ public class CacheConfig {
                 "cartItems",
                 "userBadges",
                 "favoriteStatsBatch",
-                "reviewStatsBatch"
+                "reviewStatsBatch",
+                // listing caches
+                "brands",
+                "vehicleTypes",
+                "bookGenres",
+                "electronicTypes",
+                "clothingTypes",
+                "listingStats"
         );
         
         cacheManager.setCaffeine(caffeineCacheBuilder());

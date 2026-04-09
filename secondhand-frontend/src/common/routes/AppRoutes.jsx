@@ -53,6 +53,7 @@ const ForumPage = lazy(() => import('../../forum/pages/ForumPage.jsx'));
 // Shopping & Orders - Lazy loaded
 const ShoppingCartPage = lazy(() => import('../../cart/pages/ShoppingCartPage.jsx'));
 const CheckoutPage = lazy(() => import('../../cart/pages/CheckoutPage.jsx'));
+const OrderSuccessPage = lazy(() => import('../../order/pages/OrderSuccessPage.jsx'));
 const MyOrdersPage = lazy(() => import('../../order/pages/MyOrdersPage.jsx'));
 const ISoldPage = lazy(() => import('../../order/pages/ISoldPage.jsx'));
 
@@ -452,6 +453,14 @@ const AppRoutes = () => {
                                 <CheckoutPage />
                             </Suspense>
                         } 
+                    />
+                    <Route
+                        path={ROUTES.ORDER_SUCCESS}
+                        element={
+                            <Suspense fallback={<PageLoader />}>
+                                <OrderSuccessPage />
+                            </Suspense>
+                        }
                     />
                     <Route 
                         path={ROUTES.MY_COUPONS} 
