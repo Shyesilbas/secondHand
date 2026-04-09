@@ -1,24 +1,17 @@
 package com.serhat.secondhand.listing.detail.strategy;
 
 import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@RequiredArgsConstructor
 public class RealEstateDetailStrategy implements ListingDetailStrategy {
 
-    private final RealEstateRepository realEstateRepository;
-
     @Override
-    public String getDetailSummary(UUID listingId) {
-        RealEstateListing realEstate = realEstateRepository.findById(listingId).orElse(null);
-        if (realEstate == null) {
+    public String getDetailSummary(Listing listing) {
+        if (!(listing instanceof RealEstateListing realEstate)) {
             return "";
         }
 

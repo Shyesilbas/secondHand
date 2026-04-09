@@ -122,14 +122,15 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         return Result.success();
     }
 
-    public List<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId) {
-        return vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId)
-                .stream().map(listingMapper::toVehicleDto).toList();
+    public Page<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId, org.springframework.data.domain.Pageable pageable) {
+        return vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId, pageable)
+                .map(listingMapper::toVehicleDto);
     }
 
     public VehicleListingDto getVehicleDetails(UUID id) {
         VehicleListing vehicle = vehicleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Vehicle listing not found"));
+                .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(
+                    com.serhat.secondhand.listing.util.ListingErrorCodes.LISTING_NOT_FOUND));
         return listingMapper.toVehicleDto(vehicle);
     }
 

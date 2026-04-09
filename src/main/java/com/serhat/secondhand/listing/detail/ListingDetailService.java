@@ -31,7 +31,7 @@ public class ListingDetailService {
                 .orElse(null);
 
         if (strategy != null) {
-            String detail = strategy.getDetailSummary(listingId);
+            String detail = strategy.getDetailSummary(listing);
             if (detail != null && !detail.isBlank()) {
                 return detail;
             }

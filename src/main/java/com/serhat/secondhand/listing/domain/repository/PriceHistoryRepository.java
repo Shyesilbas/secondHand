@@ -14,15 +14,10 @@ import java.util.UUID;
 @Repository
 public interface PriceHistoryRepository extends JpaRepository<PriceHistory, Long> {
     
-    List<PriceHistory> findByListingOrderByChangeDateDesc(Listing listing);
-    
     List<PriceHistory> findByListingIdOrderByChangeDateDesc(UUID listingId);
     
-    @Query("SELECT ph FROM PriceHistory ph WHERE ph.listing.id = :listingId ORDER BY ph.changeDate DESC")
-    List<PriceHistory> findPriceHistoryByListingId(@Param("listingId") UUID listingId);
-    
-    @Query("SELECT ph FROM PriceHistory ph WHERE ph.listing = :listing ORDER BY ph.changeDate DESC")
-    List<PriceHistory> findLatestPriceChanges(@Param("listing") Listing listing);
+    @Query("SELECT ph FROM PriceHistory ph WHERE ph.listing.id = :listingId ORDER BY ph.changeDate DESC LIMIT 1")
+    PriceHistory findFirstByListingIdOrderByChangeDateDesc(@Param("listingId") UUID listingId);
 
     @Query("SELECT ph FROM PriceHistory ph WHERE ph.changeDate >= :since")
     List<PriceHistory> findAllChangedSince(@Param("since") LocalDateTime since);

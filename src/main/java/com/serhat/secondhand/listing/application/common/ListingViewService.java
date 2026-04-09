@@ -31,7 +31,6 @@ public class ListingViewService {
     private final IUserService userService;
 
     @Async("viewTrackingExecutor")
-    @Transactional
     public void trackView(UUID listingId, Long userId, String sessionId, String ipAddress, String userAgent) {
         try {
             Listing listing = listingRepository.findById(listingId)
@@ -70,8 +69,10 @@ public class ListingViewService {
 
             listingViewRepository.save(view);
 
+        } catch (org.springframework.dao.DataAccessException e) {
+            log.error("Database error tracking view for listing {}: {}", listingId, e.getMessage());
         } catch (Exception e) {
-            log.error("Error tracking view for listing {}: {}", listingId, e.getMessage());
+            log.error("Unexpected error tracking view for listing {}: {}", listingId, e.getMessage());
         }
     }
 
@@ -119,22 +120,29 @@ public class ListingViewService {
     @Transactional(readOnly = true)
     public ListingViewStatsDto getViewStatistics(UUID listingId, LocalDateTime startDate, LocalDateTime endDate) {
         if (!listingRepository.existsById(listingId)) {
-            throw new IllegalArgumentException("Listing not found: " + listingId);
+            throw new com.serhat.secondhand.core.exception.BusinessException(
+                com.serhat.secondhand.listing.util.ListingErrorCodes.LISTING_NOT_FOUND);
         }
 
         int periodDays = (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
-
-        long totalViews = listingViewRepository.countByListingIdAndViewedAtBetween(listingId, startDate, endDate);
-
-        long uniqueViews = listingViewRepository.countDistinctUserOrSessionByListingAndViewedAtBetween(
-                listingId, startDate, endDate);
-
+        
+        List<Object[]> stats = listingViewRepository.getViewStatisticsWithDailyBreakdown(listingId, startDate, endDate);
+        
+        long totalViews = 0;
+        long uniqueViews = 0;
         Map<LocalDate, Long> viewsByDate = new HashMap<>();
-        listingViewRepository.countViewsByDate(listingId, startDate, endDate).forEach(row -> {
-            LocalDate date = row[0] instanceof Date ? ((java.sql.Date) row[0]).toLocalDate() : (LocalDate) row[0];
-            Long count = ((Number) row[1]).longValue();
-            viewsByDate.put(date, count);
-        });
+        
+        if (!stats.isEmpty()) {
+            Object[] firstRow = stats.get(0);
+            totalViews = ((Number) firstRow[0]).longValue();
+            uniqueViews = ((Number) firstRow[1]).longValue();
+            
+            for (Object[] row : stats) {
+                LocalDate date = row[2] instanceof Date ? ((java.sql.Date) row[2]).toLocalDate() : (LocalDate) row[2];
+                Long count = ((Number) row[3]).longValue();
+                viewsByDate.put(date, count);
+            }
+        }
 
         return ListingViewStatsDto.builder()
                 .totalViews(totalViews)

@@ -1,24 +1,17 @@
 package com.serhat.secondhand.listing.detail.strategy;
 
 import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@RequiredArgsConstructor
 public class CarDetailStrategy implements ListingDetailStrategy {
 
-    private final VehicleListingRepository vehicleListingRepository;
-
     @Override
-    public String getDetailSummary(UUID listingId) {
-        VehicleListing vehicle = vehicleListingRepository.findById(listingId).orElse(null);
-        if (vehicle == null) {
+    public String getDetailSummary(Listing listing) {
+        if (!(listing instanceof VehicleListing vehicle)) {
             return "";
         }
 

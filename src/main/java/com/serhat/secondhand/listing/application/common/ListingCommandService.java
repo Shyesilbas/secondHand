@@ -21,6 +21,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@org.springframework.transaction.annotation.Transactional
 public class ListingCommandService {
 
     private final ListingRepository listingRepository;
@@ -84,7 +85,10 @@ public class ListingCommandService {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_QUANTITY_AT_LEAST_ONE,
                     ListingErrorCodes.INVALID_QUANTITY.toString());
         }
-        listingRepository.updateQuantityBatch(listingIds, quantity, userId);
+        int updated = listingRepository.updateQuantityBatch(listingIds, quantity, userId);
+        if (updated != listingIds.size()) {
+            log.warn("Partial batch quantity update: {} of {} listings updated", updated, listingIds.size());
+        }
         return Result.success();
     }
 
@@ -103,7 +107,10 @@ public class ListingCommandService {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
                     ListingBusinessConstants.ERROR_CODE_INVALID_PRICE);
         }
-        listingRepository.updatePriceBatch(listingIds, price, userId);
+        int updated = listingRepository.updatePriceBatch(listingIds, price, userId);
+        if (updated != listingIds.size()) {
+            log.warn("Partial batch price update: {} of {} listings updated", updated, listingIds.size());
+        }
         return Result.success();
     }
 

@@ -32,28 +32,19 @@ public interface ListingViewRepository extends JpaRepository<ListingView, UUID> 
                                       @Param("startDate") LocalDateTime startDate,
                                       @Param("endDate") LocalDateTime endDate);
 
-
-
-    @Query(value = "SELECT COUNT(DISTINCT " +
-            "CASE " +
-            "  WHEN lv.user_id IS NOT NULL THEN CAST(lv.user_id AS VARCHAR) " +
-            "  ELSE lv.session_id " +
-            "END) " +
-            "FROM listing_views lv " +
-            "WHERE lv.listing_id = :listingId " +
-            "AND lv.viewed_at BETWEEN :startDate AND :endDate", nativeQuery = true)
-    long countDistinctUserOrSessionByListingAndViewedAtBetween(
-            @Param("listingId") UUID listingId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
-
-    @Query("SELECT CAST(lv.viewedAt AS DATE), COUNT(lv) " +
-            "FROM ListingView lv " +
-            "WHERE lv.listing.id = :listingId " +
-            "AND lv.viewedAt BETWEEN :startDate AND :endDate " +
-            "GROUP BY CAST(lv.viewedAt AS DATE) " +
-            "ORDER BY CAST(lv.viewedAt AS DATE)")
-    List<Object[]> countViewsByDate(
+    @Query(value = """
+            SELECT 
+                COUNT(*) as total_views,
+                COUNT(DISTINCT CASE WHEN lv.user_id IS NOT NULL THEN CAST(lv.user_id AS VARCHAR) ELSE lv.session_id END) as unique_views,
+                CAST(lv.viewed_at AS DATE) as view_date,
+                COUNT(*) as daily_count
+            FROM listing_views lv
+            WHERE lv.listing_id = :listingId
+            AND lv.viewed_at BETWEEN :startDate AND :endDate
+            GROUP BY CAST(lv.viewed_at AS DATE)
+            ORDER BY view_date
+            """, nativeQuery = true)
+    List<Object[]> getViewStatisticsWithDailyBreakdown(
             @Param("listingId") UUID listingId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
