@@ -59,18 +59,23 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
                                @Param("status") ListingStatus status,
                                Pageable pageable);
 
+    @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'totalCount'")
     @Query("SELECT COUNT(l) FROM Listing l")
     long getTotalListingCount();
 
+    @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'countByStatus:' + #status")
     @Query("SELECT COUNT(l) FROM Listing l WHERE l.status = :status")
     long getListingCountByStatus(ListingStatus status);
 
+    @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'activeSellerCount:' + #status")
     @Query("SELECT COUNT(DISTINCT l.seller.id) FROM Listing l WHERE l.status = :status")
     long getActiveSellerCount(ListingStatus status);
 
+    @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'activeCityCount:' + #status")
     @Query("SELECT COUNT(DISTINCT l.city) FROM Listing l WHERE l.status = :status AND l.city IS NOT NULL")
     long getActiveCityCount(ListingStatus status);
 
+    @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'countsByType:' + #status")
     @Query("SELECT l.listingType, COUNT(l) FROM Listing l WHERE l.status = :status GROUP BY l.listingType")
     List<Object[]> getActiveCountsByType(ListingStatus status);
 
@@ -97,12 +102,10 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
     List<Listing> findAllByIdIn(@Param("ids") Collection<UUID> ids);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
-    List<Listing> findByIdsWithSeller(@Param("ids") List<UUID> ids);
-
     long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
     long countBySellerId(Long sellerId);
 
+    @EntityGraph(attributePaths = {"seller"})
     List<Listing> findByStatus(ListingStatus status);
 }

@@ -2,23 +2,16 @@ package com.serhat.secondhand.listing.detail.strategy;
 
 import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingListingRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@RequiredArgsConstructor
 public class ClothingDetailStrategy implements ListingDetailStrategy {
 
-    private final ClothingListingRepository clothingListingRepository;
-
     @Override
-    public String getDetailSummary(UUID listingId) {
-        ClothingListing clothing = clothingListingRepository.findById(listingId).orElse(null);
-        if (clothing == null) {
+    public String getDetailSummary(Listing listing) {
+        if (!(listing instanceof ClothingListing clothing)) {
             return "";
         }
 

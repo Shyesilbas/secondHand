@@ -112,8 +112,8 @@ public class PriceHistoryService {
     }
 
     public PriceHistoryDto getLatestPriceChange(UUID listingId) {
-        List<PriceHistory> history = priceHistoryRepository.findByListingIdOrderByChangeDateDesc(listingId);
-        return history.isEmpty() ? null : priceHistoryMapper.toDto(history.get(0));
+        PriceHistory history = priceHistoryRepository.findFirstByListingIdOrderByChangeDateDesc(listingId);
+        return history != null ? priceHistoryMapper.toDto(history) : null;
     }
 
     public boolean hasPriceHistory(UUID listingId) {

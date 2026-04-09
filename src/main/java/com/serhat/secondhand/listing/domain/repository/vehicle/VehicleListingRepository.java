@@ -1,6 +1,9 @@
 package com.serhat.secondhand.listing.domain.repository.vehicle;
 
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,8 +16,8 @@ import java.util.UUID;
 @Repository
 public interface VehicleListingRepository extends JpaRepository<VehicleListing, UUID> {
     
-
-    List<VehicleListing> findByBrand_IdAndModel_Id(UUID brandId, UUID modelId);
+    @EntityGraph(attributePaths = {"seller", "brand", "model", "vehicleType"})
+    Page<VehicleListing> findByBrand_IdAndModel_Id(UUID brandId, UUID modelId, Pageable pageable);
 
     long countByModel_Id(UUID modelId);
 

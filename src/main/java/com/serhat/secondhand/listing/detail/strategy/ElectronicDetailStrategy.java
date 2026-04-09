@@ -2,23 +2,16 @@ package com.serhat.secondhand.listing.detail.strategy;
 
 import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicListingRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@RequiredArgsConstructor
 public class ElectronicDetailStrategy implements ListingDetailStrategy {
 
-    private final ElectronicListingRepository electronicListingRepository;
-
     @Override
-    public String getDetailSummary(UUID listingId) {
-        ElectronicListing electronic = electronicListingRepository.findById(listingId).orElse(null);
-        if (electronic == null) {
+    public String getDetailSummary(Listing listing) {
+        if (!(listing instanceof ElectronicListing electronic)) {
             return "";
         }
 

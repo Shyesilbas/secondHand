@@ -123,4 +123,52 @@ public abstract class AbstractListingService<T extends Listing, C> {
     protected Result<Void> preProcess(T entity, C request) {
         return Result.success();
     }
+    
+    @Transactional
+    protected <U, R> Result<Void> performUpdate(
+            UUID id,
+            U request,
+            Long currentUserId,
+            java.util.function.Function<UUID, Optional<T>> finder,
+            java.util.function.BiConsumer<T, U> updater,
+            java.util.function.Function<T, Result<Void>> resolver,
+            java.util.function.Function<T, Result<Void>> validator) {
+        
+        log.info("Updating {} listing: {} by user: {}", getListingType(), id, currentUserId);
+        
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) {
+            return ownershipResult;
+        }
+        
+        Optional<T> existingOpt = finder.apply(id);
+        if (existingOpt.isEmpty()) {
+            return Result.error(getListingType() + " listing not found", ListingErrorCodes.LISTING_NOT_FOUND);
+        }
+        
+        T existing = existingOpt.get();
+        
+        Result<Void> statusResult = validateEditableStatus(existing);
+        if (statusResult.isError()) {
+            return statusResult;
+        }
+        
+        if (resolver != null) {
+            Result<Void> resolveResult = resolver.apply(existing);
+            if (resolveResult.isError()) {
+                return resolveResult;
+            }
+        }
+        
+        updater.accept(existing, request);
+        
+        Result<Void> validationResult = validator.apply(existing);
+        if (validationResult.isError()) {
+            return validationResult;
+        }
+        
+        save(existing);
+        log.info("{} listing updated: {}", getListingType(), existing.getId());
+        return Result.success();
+    }
 }

@@ -37,10 +37,14 @@ public class GenericListingFilterService<T extends Listing, F extends ListingFil
 
         CriteriaQuery<T> query = cb.createQuery(entityClass);
         Root<T> root = query.from(entityClass);
+        
+        root.fetch("seller", JoinType.LEFT);
+        applyEntitySpecificFetches(root, entityClass);
 
         List<Predicate> predicates = buildAllPredicates(cb, root, filters, predicateBuilder);
 
         query.select(root)
+                .distinct(true)
                 .where(predicates.toArray(new Predicate[0]))
                 .orderBy(buildOrderBy(cb, root, filters, predicateBuilder));
 
@@ -56,6 +60,29 @@ public class GenericListingFilterService<T extends Listing, F extends ListingFil
                 .toList();
 
         return new PageImpl<>(dtos, pageable, total);
+    }
+    
+    private void applyEntitySpecificFetches(Root<T> root, Class<T> entityClass) {
+        String className = entityClass.getSimpleName();
+        try {
+            switch (className) {
+                case "VehicleListing":
+                    root.fetch("brand", JoinType.LEFT);
+                    root.fetch("model", JoinType.LEFT);
+                    root.fetch("vehicleType", JoinType.LEFT);
+                    break;
+                case "ClothingListing":
+                    root.fetch("brand", JoinType.LEFT);
+                    root.fetch("clothingType", JoinType.LEFT);
+                    break;
+                case "ElectronicListing":
+                    root.fetch("electronicType", JoinType.LEFT);
+                    root.fetch("electronicModel", JoinType.LEFT);
+                    break;
+            }
+        } catch (Exception e) {
+            log.debug("Could not apply entity-specific fetches for {}: {}", className, e.getMessage());
+        }
     }
 
     private List<Predicate> buildAllPredicates(CriteriaBuilder cb, Root<T> root, F filters,
