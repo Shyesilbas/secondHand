@@ -14,12 +14,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -71,10 +71,11 @@ public class ClothingListingController {
 
     @GetMapping("/brand/{brand}/type/{clothingType}")
     @Operation(summary = "Find clothing by brand and type")
-    public ResponseEntity<List<ClothingListingDto>> findByBrandAndClothingType(
+    public ResponseEntity<Page<ClothingListingDto>> findByBrandAndClothingType(
             @PathVariable UUID brand,
-            @PathVariable UUID clothingType) {
-        List<ClothingListingDto> clothing = clothingListingService.findByBrandAndClothingType(brand, clothingType);
+            @PathVariable UUID clothingType,
+            Pageable pageable) {
+        Page<ClothingListingDto> clothing = clothingListingService.findByBrandAndClothingType(brand, clothingType, pageable);
         return ResponseEntity.ok(clothing);
     }
 

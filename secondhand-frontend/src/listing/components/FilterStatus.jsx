@@ -1,3 +1,4 @@
+import { SlidersHorizontal, X, ArrowUpDown } from 'lucide-react';
 import { LISTING_DEFAULTS, LISTING_SORT_FIELDS } from '../types/index.js';
 
 const FilterStatus = ({ 
@@ -11,12 +12,12 @@ const FilterStatus = ({
 }) => {
     const getSortLabel = (sortBy) => {
         switch (sortBy) {
-            case LISTING_SORT_FIELDS.PRICE: return 'Sorted by price';
-            case LISTING_SORT_FIELDS.YEAR: return 'Sorted by year';
-            case LISTING_SORT_FIELDS.MILEAGE: return 'Sorted by mileage';
-            case LISTING_SORT_FIELDS.BRAND: return 'Sorted by brand';
-            case LISTING_SORT_FIELDS.TYPE: return 'Sorted by type';
-            default: return 'Sorted by date';
+            case LISTING_SORT_FIELDS.PRICE: return 'Price';
+            case LISTING_SORT_FIELDS.YEAR: return 'Year';
+            case LISTING_SORT_FIELDS.MILEAGE: return 'Mileage';
+            case LISTING_SORT_FIELDS.BRAND: return 'Brand';
+            case LISTING_SORT_FIELDS.TYPE: return 'Type';
+            default: return 'Date';
         }
     };
 
@@ -106,40 +107,42 @@ const FilterStatus = ({
 
     const hasResults = Number(totalElements) > 0;
 
+    const activeCount = countActiveFilters();
+    const hasActive = checkActiveFilters();
+    const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
+
+    const FilterBadge = () => (
+        hasActive && activeCount > 0 ? (
+            <div className="flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    <SlidersHorizontal className="w-3 h-3" />
+                    {activeCount} filter{activeCount !== 1 ? 's' : ''}
+                </span>
+                <button
+                    onClick={onResetFilters}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                >
+                    <X className="w-3 h-3" />
+                    Clear all
+                </button>
+            </div>
+        ) : null
+    );
+
     if (!hasResults) {
         return (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <p className="text-slate-600">
-                        <span className="font-medium">No listings found</span>
-                        {filters.listingType && (
-                            <span className="text-slate-500 ml-2">
-                                in {getListingTypeLabel(filters.listingType)} category
-                            </span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 py-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block" />
+                        <span className="text-[13px] font-semibold text-slate-700">No listings found</span>
+                        {categoryLabel && (
+                            <span className="text-[13px] text-slate-400">in <span className="font-medium text-slate-600">{categoryLabel}</span></span>
                         )}
-                    </p>
-                    {(() => {
-                        const activeCount = countActiveFilters();
-                        const hasActive = checkActiveFilters();
-                        if (hasActive && activeCount > 0) {
-                            return (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                        {activeCount} filter{activeCount !== 1 ? 's' : ''} active
-                                    </span>
-                                    <button
-                                        onClick={onResetFilters}
-                                        className="text-xs text-slate-500 hover:text-slate-700 underline transition-colors"
-                                    >
-                                        Clear all
-                                    </button>
-                                </div>
-                            );
-                        }
-                        return null;
-                    })()}
+                    </div>
+                    <FilterBadge />
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-[12px] text-slate-400">
                     Try changing filters or category to see more listings.
                 </p>
             </div>
@@ -147,70 +150,43 @@ const FilterStatus = ({
     }
 
     return (
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <p className="text-slate-600">
-                    <span className="font-medium">{totalElements}</span> listings found
-                    {filters.listingType && (
-                        <span className="text-slate-500 ml-2">
-                            • in {getListingTypeLabel(filters.listingType)} category
-                        </span>
+        <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                    <span className="text-[13px] font-semibold text-slate-700">
+                        {totalElements} listing{totalElements !== 1 ? 's' : ''}
+                    </span>
+                    {categoryLabel && (
+                        <span className="text-[13px] text-slate-400">in <span className="font-medium text-slate-600">{categoryLabel}</span></span>
                     )}
-                </p>
-                {(() => {
-                    const activeCount = countActiveFilters();
-                    const hasActive = checkActiveFilters();
-                    
-                    // Only show if there are actually active filters (count > 0)
-                    if (hasActive && activeCount > 0) {
-                        return (
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                    {activeCount} filter{activeCount !== 1 ? 's' : ''} active
-                                </span>
-                                <button
-                                    onClick={onResetFilters}
-                                    className="text-xs text-slate-500 hover:text-slate-700 underline transition-colors"
-                                >
-                                    Clear all
-                                </button>
-                            </div>
-                        );
-                    }
-                    return null;
-                })()}
+                </div>
+                <FilterBadge />
             </div>
-            <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-500">
-                    {getSortLabel(filters.sortBy)}
-                </span>
-                <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-                    <button
-                        onClick={() => updateFilters({ sortBy: LISTING_SORT_FIELDS.DATE, sortDirection: LISTING_DEFAULTS.SORT_DIRECTION })}
-                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
-                            filters.sortBy === LISTING_SORT_FIELDS.DATE 
-                                ? 'text-white bg-gray-900' 
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                        }`}
-                    >
-                        Date
-                        {filters.sortBy === LISTING_SORT_FIELDS.DATE && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
-                        )}
-                    </button>
-                    <button
-                        onClick={() => updateFilters({ sortBy: LISTING_SORT_FIELDS.PRICE, sortDirection: LISTING_DEFAULTS.SORT_DIRECTION })}
-                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 relative ${
-                            filters.sortBy === LISTING_SORT_FIELDS.PRICE 
-                                ? 'text-white bg-gray-900' 
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                        }`}
-                    >
-                        Price
-                        {filters.sortBy === LISTING_SORT_FIELDS.PRICE && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full"></div>
-                        )}
-                    </button>
+
+            {/* Sort toggle */}
+            <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                    <ArrowUpDown className="w-3 h-3" />
+                    <span>Sort:</span>
+                </div>
+                <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-0.5">
+                    {[
+                        { key: LISTING_SORT_FIELDS.DATE, label: 'Date' },
+                        { key: LISTING_SORT_FIELDS.PRICE, label: 'Price' },
+                    ].map(({ key, label }) => (
+                        <button
+                            key={key}
+                            onClick={() => updateFilters({ sortBy: key, sortDirection: LISTING_DEFAULTS.SORT_DIRECTION })}
+                            className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all duration-200 ${
+                                filters.sortBy === key
+                                    ? 'bg-white text-slate-900 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-700'
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>

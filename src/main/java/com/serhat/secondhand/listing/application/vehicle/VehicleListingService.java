@@ -18,6 +18,7 @@ import com.serhat.secondhand.listing.validation.vehicle.VehicleSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +123,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         return Result.success();
     }
 
-    public Page<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId, org.springframework.data.domain.Pageable pageable) {
+    public Page<VehicleListingDto> findByBrandAndModel(UUID brandId, UUID modelId, Pageable pageable) {
         return vehicleRepository.findByBrand_IdAndModel_Id(brandId, modelId, pageable)
                 .map(listingMapper::toVehicleDto);
     }

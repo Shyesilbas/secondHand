@@ -6,6 +6,14 @@ import { orderService } from '../../order/services/orderService.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
 import { showcaseService } from '../services/showcaseService.js';
 
+const getCardSelectValue = (card) => (
+  card?.id
+  || card?.cardId
+  || card?.number
+  || card?.cardNumber
+  || null
+);
+
 const ShowcasePayment = ({ 
   listingId, 
   listingTitle, 
@@ -25,7 +33,6 @@ const ShowcasePayment = ({
   const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   
   const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
@@ -39,7 +46,7 @@ const ShowcasePayment = ({
 
   useEffect(() => {
     if (paymentType === 'CREDIT_CARD' && paymentMethods.creditCards.length > 0) {
-      setSelectedCardNumber(paymentMethods.creditCards[0].number || paymentMethods.creditCards[0].cardNumber);
+      setSelectedCardNumber(getCardSelectValue(paymentMethods.creditCards[0]));
     }
     if (paymentType === 'TRANSFER' && paymentMethods.bankAccounts.length > 0) {
       setSelectedBankAccountIban(paymentMethods.bankAccounts[0].IBAN);
@@ -67,13 +74,8 @@ const ShowcasePayment = ({
         acceptedAgreements.size > 0, 
         acceptedAgreementIds
       );
-      setSuccess(true);
       try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
       onSuccess?.();
-      setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 1000);
     } catch (err) {
       setError(err.message || 'Payment failed');
     } finally {
@@ -210,7 +212,6 @@ const ShowcasePayment = ({
                 ))}
               </div>
             </div>
-            {success && <div className="mt-3 text-green-700 text-center font-semibold">Successfully added to showcase!</div>}
           </div>
         );
       default:

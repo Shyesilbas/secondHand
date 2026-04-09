@@ -31,35 +31,31 @@ public class ListingCommandService {
 
     public void publish(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listingValidationService.validateStatus(listing, ListingStatus.DRAFT);
-        if (!listing.isListingFeePaid()) {
-            throw new BusinessException(ListingErrorCodes.LISTING_FEE_NOT_PAID);
-        }
-        listing.setStatus(ListingStatus.ACTIVE);
+        listing.publish();
         listingRepository.save(listing);
         eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
+        log.info("Listing {} published", listingId);
     }
 
     public void reactivate(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listingValidationService.validateStatus(listing, ListingStatus.INACTIVE);
-        listing.setStatus(ListingStatus.ACTIVE);
+        listing.reactivate();
         listingRepository.save(listing);
+        log.info("Listing {} reactivated", listingId);
     }
 
     public void deactivate(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listingValidationService.validateStatus(listing, ListingStatus.ACTIVE);
-        listing.setStatus(ListingStatus.INACTIVE);
+        listing.deactivate();
         listingRepository.save(listing);
+        log.info("Listing {} deactivated", listingId);
     }
 
     public void markAsSold(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listingValidationService.validateStatus(listing, ListingStatus.ACTIVE, ListingStatus.RESERVED);
-        listing.setStatus(ListingStatus.SOLD);
+        listing.markAsSold();
         listingRepository.save(listing);
-        log.info("Listing with id {} has marked as sold.", listingId);
+        log.info("Listing {} marked as sold", listingId);
     }
 
     public Result<Void> deleteListing(UUID listingId, Long userId) {

@@ -11,8 +11,15 @@ export const useCreditCard = () => {
   const notification = useNotification();
 
   const queryFn = useCallback(async () => {
-    const data = await paymentService.getCreditCards();
-    return normalizeArrayResponse(data);
+    try {
+      const data = await paymentService.getCreditCards();
+      return normalizeArrayResponse(data);
+    } catch (err) {
+      if (err?.response?.status === 404) {
+        return [];
+      }
+      throw err;
+    }
   }, []);
 
   const {
@@ -31,7 +38,7 @@ export const useCreditCard = () => {
   });
 
   const createCreditCardMutation = useMutation({
-    mutationFn: (limit) => paymentService.createCreditCard(limit),
+    mutationFn: ({ limit, cardData }) => paymentService.createCreditCard(limit, cardData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.creditCards, user?.id] });
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.paymentMethods, user?.id] });
@@ -44,7 +51,7 @@ export const useCreditCard = () => {
   });
 
   const deleteCreditCardMutation = useMutation({
-    mutationFn: () => paymentService.deleteCreditCard(),
+    mutationFn: (cardId) => paymentService.deleteCreditCard(cardId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.creditCards, user?.id] });
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.paymentMethods, user?.id] });
@@ -56,19 +63,18 @@ export const useCreditCard = () => {
     },
   });
 
-  const createCreditCard = useCallback(async (limit) => {
-    const res = await createCreditCardMutation.mutateAsync(limit);
-    return res;
+  const createCreditCard = useCallback(async (limit, cardData = null) => {
+    return createCreditCardMutation.mutateAsync({ limit, cardData });
   }, [createCreditCardMutation]);
 
-  const deleteCreditCard = useCallback(async () => {
-    const res = await deleteCreditCardMutation.mutateAsync();
-    return res;
+  const deleteCreditCard = useCallback(async (cardId) => {
+    return deleteCreditCardMutation.mutateAsync(cardId);
   }, [deleteCreditCardMutation]);
 
   return {
     creditCards,
-    isLoading: isLoading || createCreditCardMutation.isPending || deleteCreditCardMutation.isPending,
+    isLoading: isLoading || createCreditCardMutation.isPending,
+    isDeleting: deleteCreditCardMutation.isPending,
     error: error?.response?.data?.message || error?.message || null,
     createCreditCard,
     deleteCreditCard,
@@ -108,13 +114,28 @@ export const usePaymentMethods = () => {
   const { user, isAuthenticated } = useAuthState();
 
   const queryFn = useCallback(async () => {
-    const [cardsData, banksData] = await Promise.all([
+    const [cardsResult, banksResult] = await Promise.allSettled([
       paymentService.getCreditCards(),
       paymentService.getBankAccounts(),
     ]);
+
+    const cardsData = cardsResult.status === 'fulfilled' ? cardsResult.value : [];
+    const banksData = banksResult.status === 'fulfilled' ? banksResult.value : [];
+
+    // If both requests fail with non-404 errors, surface the first error.
+    if (cardsResult.status === 'rejected' && banksResult.status === 'rejected') {
+      const cardsStatus = cardsResult.reason?.response?.status;
+      const banksStatus = banksResult.reason?.response?.status;
+      const cards404 = cardsStatus === 404;
+      const banks404 = banksStatus === 404;
+      if (!cards404 || !banks404) {
+        throw cardsResult.reason || banksResult.reason;
+      }
+    }
+
     return {
       creditCards: normalizeArrayResponse(cardsData),
-      bankAccounts: Array.isArray(banksData) ? banksData : [],
+      bankAccounts: normalizeArrayResponse(banksData),
     };
   }, []);
 

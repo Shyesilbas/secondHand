@@ -143,7 +143,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
         
         Optional<T> existingOpt = finder.apply(id);
         if (existingOpt.isEmpty()) {
-            return Result.error(getListingType() + " listing not found", ListingErrorCodes.LISTING_NOT_FOUND);
+            return Result.error(getListingType() + " listing not found", ListingErrorCodes.LISTING_NOT_FOUND.toString());
         }
         
         T existing = existingOpt.get();

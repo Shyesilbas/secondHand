@@ -1,16 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
-    AlertTriangle as ExclamationTriangleIcon,
-    CheckCircle as CheckCircleIcon,
-    Info as InformationCircleIcon,
-    X as XMarkIcon,
-    XCircle as XCircleIcon
+    AlertTriangle,
+    CheckCircle2,
+    Info,
+    X,
+    XCircle,
 } from 'lucide-react';
-// Lucide uses the same component for outline/solid — use fill="currentColor" for solid variants
-const CheckCircleIconSolid = (props) => <CheckCircleIcon {...props} fill="currentColor" />;
-const ExclamationTriangleIconSolid = (props) => <ExclamationTriangleIcon {...props} fill="currentColor" />;
-const InformationCircleIconSolid = (props) => <InformationCircleIcon {...props} fill="currentColor" />;
-const XCircleIconSolid = (props) => <XCircleIcon {...props} fill="currentColor" />;
 
 const NotificationModal = ({ 
     isOpen, 
@@ -26,17 +21,18 @@ const NotificationModal = ({
     size = 'md' }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isLeaving, setIsLeaving] = useState(false);
+    const [progressKey, setProgressKey] = useState(0);
 
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
             setIsLeaving(false);
-            
-                        if (autoClose && autoCloseDelay > 0) {
+            setProgressKey(prev => prev + 1);
+
+            if (autoClose && autoCloseDelay > 0) {
                 const timer = setTimeout(() => {
                     handleClose();
                 }, autoCloseDelay);
-                
                 return () => clearTimeout(timer);
             }
         }
@@ -62,48 +58,44 @@ const NotificationModal = ({
         switch (type) {
             case 'success':
                 return {
-                    icon: CheckCircleIconSolid,
-                    iconOutline: CheckCircleIcon,
-                    iconBg: 'bg-green-100',
-                    iconColor: 'text-green-600',
-                    titleColor: 'text-gray-900',
-                    messageColor: 'text-gray-600',
-                    buttonBg: 'bg-green-600 hover:bg-green-700',
-                    buttonColor: 'text-white'
+                    icon: CheckCircle2,
+                    iconWrap: 'bg-emerald-100 text-emerald-600',
+                    heading: 'text-slate-900',
+                    text: 'text-slate-500',
+                    primaryButton: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+                    secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
+                    progress: 'bg-emerald-500'
                 };
             case 'error':
                 return {
-                    icon: XCircleIconSolid,
-                    iconOutline: XCircleIcon,
-                    iconBg: 'bg-red-100',
-                    iconColor: 'text-red-600',
-                    titleColor: 'text-gray-900',
-                    messageColor: 'text-gray-600',
-                    buttonBg: 'bg-red-600 hover:bg-red-700',
-                    buttonColor: 'text-white'
+                    icon: XCircle,
+                    iconWrap: 'bg-rose-100 text-rose-600',
+                    heading: 'text-slate-900',
+                    text: 'text-slate-500',
+                    primaryButton: 'bg-rose-600 hover:bg-rose-700 text-white',
+                    secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
+                    progress: 'bg-rose-500'
                 };
             case 'warning':
                 return {
-                    icon: ExclamationTriangleIconSolid,
-                    iconOutline: ExclamationTriangleIcon,
-                    iconBg: 'bg-yellow-100',
-                    iconColor: 'text-yellow-600',
-                    titleColor: 'text-gray-900',
-                    messageColor: 'text-gray-600',
-                    buttonBg: 'bg-yellow-600 hover:bg-yellow-700',
-                    buttonColor: 'text-white'
+                    icon: AlertTriangle,
+                    iconWrap: 'bg-amber-100 text-amber-600',
+                    heading: 'text-slate-900',
+                    text: 'text-slate-500',
+                    primaryButton: 'bg-amber-600 hover:bg-amber-700 text-white',
+                    secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
+                    progress: 'bg-amber-500'
                 };
             case 'info':
             default:
                 return {
-                    icon: InformationCircleIconSolid,
-                    iconOutline: InformationCircleIcon,
-                    iconBg: 'bg-gray-100',
-                    iconColor: 'text-gray-600',
-                    titleColor: 'text-gray-900',
-                    messageColor: 'text-gray-600',
-                    buttonBg: 'bg-gray-900 hover:bg-gray-800',
-                    buttonColor: 'text-white'
+                    icon: Info,
+                    iconWrap: 'bg-indigo-100 text-indigo-600',
+                    heading: 'text-slate-900',
+                    text: 'text-slate-500',
+                    primaryButton: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+                    secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
+                    progress: 'bg-indigo-500'
                 };
         }
     };
@@ -122,57 +114,57 @@ const NotificationModal = ({
         }
     };
 
-    const config = getNotificationConfig();
+    const config = useMemo(() => getNotificationConfig(), [type]);
     const IconComponent = config.icon;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleBackdropClick}>
-            <div className={`bg-white rounded border border-gray-200 ${getSizeClasses()} w-full mx-4 transform transition-all duration-300 ${
+        <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center z-[80] p-4" onClick={handleBackdropClick}>
+            <div className={`relative bg-white rounded-3xl border border-slate-200 shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${
                 isLeaving 
                     ? 'opacity-0 scale-95' 
                     : 'opacity-100 scale-100'
             }`}>
                 {/* Close button */}
                 {showCloseButton && (
-                    <div className="absolute right-0 top-0 pr-4 pt-4">
+                    <div className="absolute right-4 top-4 z-10">
                         <button
                             type="button"
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                            className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center"
                             onClick={handleClose}
                         >
                             <span className="sr-only">Close</span>
-                            <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                            <X className="h-4 w-4" aria-hidden="true" />
                         </button>
                     </div>
                 )}
 
                 {/* Content */}
-                <div className="p-6">
-                    <div className="flex items-start space-x-4">
+                <div className="p-6 sm:p-7">
+                    <div className="flex items-start gap-4">
                         {/* Icon */}
-                        <div className={`p-2 ${config.iconBg} rounded-lg flex-shrink-0`}>
-                            <IconComponent className={`w-6 h-6 ${config.iconColor}`} />
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${config.iconWrap}`}>
+                            <IconComponent className="w-6 h-6" />
                         </div>
                         
                         {/* Text content */}
                         <div className="flex-1">
                             {title && (
-                                <h3 className={`text-lg font-semibold ${config.titleColor} mb-2`}>
+                                <h3 className={`text-lg font-bold ${config.heading} mb-1.5 pr-10`}>
                                     {title}
                                 </h3>
                             )}
                             {message && (
-                                <div className={`text-sm ${config.messageColor} mb-4`}>
+                                <div className={`text-sm leading-relaxed ${config.text} mb-4`}>
                                     <p>{message}</p>
                                 </div>
                             )}
                             {details && (
                                 <details className="mt-3">
-                                    <summary className={`cursor-pointer text-sm font-medium ${config.titleColor} hover:underline`}>
+                                    <summary className={`cursor-pointer text-sm font-semibold ${config.heading} hover:underline`}>
                                         Show Details
                                     </summary>
-                                    <div className="mt-2 p-3 bg-gray-50 rounded border border-gray-200">
-                                        <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
+                                    <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                        <pre className="text-xs text-slate-600 whitespace-pre-wrap font-mono">
                                             {typeof details === 'object' ? JSON.stringify(details, null, 2) : details}
                                         </pre>
                                     </div>
@@ -184,13 +176,13 @@ const NotificationModal = ({
 
                 {/* Actions */}
                 {(actions.length > 0 || !autoClose) && (
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-row-reverse gap-3">
+                    <div className="px-6 sm:px-7 py-4 bg-slate-50 border-t border-slate-100 flex flex-row-reverse gap-2.5">
                         {actions.map((action, index) => (
                             <button
                                 key={index}
                                 type="button"
-                                className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-                                    action.primary ? `${config.buttonBg} ${config.buttonColor}` : 'bg-gray-600 hover:bg-gray-700 text-white'
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                                    action.primary ? config.primaryButton : config.secondaryButton
                                 }`}
                                 onClick={() => {
                                     action.onClick?.();
@@ -205,7 +197,7 @@ const NotificationModal = ({
                         {!autoClose && actions.length === 0 && (
                             <button
                                 type="button"
-                                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-medium transition-colors"
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${config.primaryButton}`}
                                 onClick={handleClose}
                             >
                                 Okay
@@ -216,11 +208,12 @@ const NotificationModal = ({
 
                 {/* Auto-close progress bar */}
                 {autoClose && autoCloseDelay > 0 && (
-                    <div className="h-1 bg-gray-200">
-                        <div 
-                            className={`h-full ${config.buttonBg.replace('hover:bg-', 'bg-')} transition-all linear`}
+                    <div className="h-1.5 bg-slate-100">
+                        <div
+                            key={progressKey}
+                            className={`h-full ${config.progress}`}
                             style={{
-                                animation: `shrink ${autoCloseDelay}ms linear forwards`
+                                animation: `notification-shrink ${autoCloseDelay}ms linear forwards`
                             }}
                         />
                     </div>
@@ -232,7 +225,7 @@ const NotificationModal = ({
 
 const style = document.createElement('style');
 style.textContent = `
-    @keyframes shrink {
+    @keyframes notification-shrink {
         from { width: 100%; }
         to { width: 0%; }
     }

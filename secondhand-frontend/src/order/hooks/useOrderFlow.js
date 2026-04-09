@@ -9,6 +9,7 @@ import {
   ORDER_DEFAULTS,
   ORDER_MESSAGES,
   ORDER_STATUSES,
+  ORDER_STATUS_TAB_FILTER,
   ORDER_TIME,
   ORDER_VIEW_MODES,
 } from '../constants/orderUiConstants.js';
@@ -198,6 +199,16 @@ export const useOrderFlow = ({
   const ordersUnfiltered = useMemo(() => (searchResult ? [searchResult] : ordersRaw), [ordersRaw, searchResult]);
   const orders = useMemo(() => {
     if (!statusFilter) return ordersUnfiltered;
+    if (statusFilter === ORDER_STATUS_TAB_FILTER.PREPARING) {
+      return ordersUnfiltered.filter((o) =>
+        [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.PROCESSING].includes(o.status)
+      );
+    }
+    if (statusFilter === ORDER_STATUS_TAB_FILTER.DELIVERED_GROUP) {
+      return ordersUnfiltered.filter((o) =>
+        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(o.status)
+      );
+    }
     return ordersUnfiltered.filter((o) => o.status === statusFilter);
   }, [ordersUnfiltered, statusFilter]);
 

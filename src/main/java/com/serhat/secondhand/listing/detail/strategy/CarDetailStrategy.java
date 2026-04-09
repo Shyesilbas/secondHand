@@ -21,7 +21,7 @@ public class CarDetailStrategy implements ListingDetailStrategy {
         String mileage = vehicle.getMileage() != null ? vehicle.getMileage().toString() : null;
         String fuel = vehicle.getFuelType() != null ? vehicle.getFuelType().getLabel().toLowerCase() : null;
 
-        StringBuilder sb = new StringBuilder("Bu araç");
+        StringBuilder sb = new StringBuilder("This car");
         if (brand != null && !brand.isBlank()) {
             sb.append(" ").append(brand);
         }
@@ -32,12 +32,12 @@ public class CarDetailStrategy implements ListingDetailStrategy {
             sb.append(" ").append(year).append(" model");
         }
         if (mileage != null) {
-            sb.append(", ").append(mileage).append(" KM'de");
+            sb.append(", ").append(mileage).append(" KM");
         }
         if (fuel != null && !fuel.isBlank()) {
-            sb.append(", ").append(fuel).append(" bir araçtır");
+            sb.append(", ").append(fuel).append(" car");
         } else {
-            sb.append(" bir araçtır");
+            sb.append(" a car");
         }
         sb.append(".");
 

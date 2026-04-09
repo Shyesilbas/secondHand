@@ -14,12 +14,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -71,10 +71,11 @@ public class VehicleListingController {
 
     @GetMapping("/brand/{brandId}/model/{modelId}")
     @Operation(summary = "Find vehicles by brand and model")
-    public ResponseEntity<List<VehicleListingDto>> findByBrandAndModel(
+    public ResponseEntity<Page<VehicleListingDto>> findByBrandAndModel(
             @PathVariable UUID brandId,
-            @PathVariable UUID modelId) {
-        List<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brandId, modelId);
+            @PathVariable UUID modelId,
+            Pageable pageable) {
+        Page<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brandId, modelId, pageable);
         return ResponseEntity.ok(vehicles);
     }
 

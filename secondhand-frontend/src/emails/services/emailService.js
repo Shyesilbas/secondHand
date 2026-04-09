@@ -1,4 +1,4 @@
-import { get, del } from '../../common/services/api/request.js';
+import { get, del, patch } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { EmailDto } from '../emails.js';
 import logger from '../../common/utils/logger.js';
@@ -34,6 +34,15 @@ export const emailService = {
             };
         } catch (error) {
             logger.error('Error fetching emails:', error);
+            throw error;
+        }
+    },
+    markAsRead: async(emailId) => {
+        try {
+            const data = await patch(API_ENDPOINTS.EMAILS.MARK_READ(emailId));
+            return EmailDto(data);
+        } catch (error) {
+            logger.error('Error marking email as read:', error);
             throw error;
         }
     },

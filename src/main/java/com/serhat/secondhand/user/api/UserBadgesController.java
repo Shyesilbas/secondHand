@@ -1,6 +1,7 @@
 package com.serhat.secondhand.user.api;
 
 import com.serhat.secondhand.chat.application.ChatService;
+import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.notification.application.NotificationService;
 import com.serhat.secondhand.order.application.OrderQueryService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class UserBadgesController {
 
     private final NotificationService notificationService;
+    private final EmailService emailService;
     private final ChatService chatService;
     private final OrderQueryService orderQueryService;
 
@@ -44,11 +46,13 @@ public class UserBadgesController {
         log.debug("Fetching aggregated badges for user: {}", currentUser.getEmail());
         
         Long notificationCount = notificationService.getUnreadCount(currentUser.getId());
+        Long emailUnreadCount = emailService.getUnreadCount(currentUser.getId());
         Long chatUnreadCount = chatService.getTotalUnreadMessageCount(currentUser.getId());
         Map<String, Object> pendingOrders = orderQueryService.getPendingCompletionStatus(currentUser.getId());
         
         Map<String, Object> badges = Map.of(
             "notificationCount", notificationCount,
+            "emailUnreadCount", emailUnreadCount,
             "chatUnreadCount", chatUnreadCount,
             "hasPendingOrders", pendingOrders.get("hasPendingOrders"),
             "pendingOrderCount", pendingOrders.get("pendingCount")

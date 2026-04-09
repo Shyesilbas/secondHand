@@ -12,6 +12,7 @@ export const EMAIL_TYPES = {
     OFFER_COMPLETED: 'OFFER_COMPLETED',
     PROMOTIONAL: 'PROMOTIONAL',
     PAYMENT_VERIFICATION: 'PAYMENT_VERIFICATION',
+    AGREEMENT_UPDATED: 'AGREEMENT_UPDATED',
     SYSTEM: 'SYSTEM'
 };
 
@@ -23,7 +24,8 @@ export const EmailDto = (data) => ({
     content: data.content || '',
     emailType: data.emailType || EMAIL_TYPES.SYSTEM,
     sentAt: data.sentAt || null,
-    createdAt: data.createdAt || null
+    createdAt: data.createdAt || null,
+    isRead: data.isRead || false
 });
 
 
@@ -40,6 +42,7 @@ export const EMAIL_TYPE_LABELS = {
     [EMAIL_TYPES.OFFER_COMPLETED]: 'Offer Completed',
     [EMAIL_TYPES.PROMOTIONAL]: 'Promotional',
     [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'Payment Verification',
+    [EMAIL_TYPES.AGREEMENT_UPDATED]: 'Agreement Update',
     [EMAIL_TYPES.SYSTEM]: 'System Email'
 };
 
@@ -56,5 +59,6 @@ export const EMAIL_TYPE_BADGE_COLORS = {
     [EMAIL_TYPES.OFFER_COMPLETED]: 'bg-indigo-100 text-indigo-800',
     [EMAIL_TYPES.PROMOTIONAL]: 'bg-pink-100 text-pink-800',
     [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-red-100 text-red-800',
+    [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-amber-100 text-amber-900',
     [EMAIL_TYPES.SYSTEM]: 'bg-gray-100 text-gray-800'
 };

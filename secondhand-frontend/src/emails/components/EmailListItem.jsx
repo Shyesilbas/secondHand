@@ -16,7 +16,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
         return 'bg-slate-400';
     })();
 
-    const isUnread = !email.read;
+    const isUnread = !email.read && !email.isRead;
 
     return (
         <div

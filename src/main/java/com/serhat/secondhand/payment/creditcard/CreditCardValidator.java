@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -19,10 +19,52 @@ public class CreditCardValidator {
     private final CreditCardRepository creditCardRepository;
 
     public Result<Void> validateForCreate(User user, CreditCardRequest request) {
-        if (creditCardRepository.existsByCardHolder(user)) {
-            return Result.error(PaymentErrorCodes.CREDIT_CARD_EXISTS);
+        Result<Void> limitResult = validateCreditLimit(request.limit());
+        if (limitResult.isError()) return limitResult;
+
+        if (request.isManual()) {
+            return validateManualCardInput(request);
         }
-        return validateCreditLimit(request.limit());
+        return Result.success();
+    }
+
+    /** Kullanıcı manuel kart girişi yaptıysa format + expiry kontrolü */
+    private Result<Void> validateManualCardInput(CreditCardRequest request) {
+        String cleaned = request.cardNumber().replaceAll("[\\s-]", "");
+        if (cleaned.length() < 13 || cleaned.length() > 19 || !cleaned.matches("\\d+")) {
+            return Result.error(PaymentErrorCodes.INVALID_CARD_NUMBER);
+        }
+        if (!isLuhnValid(cleaned)) {
+            return Result.error(PaymentErrorCodes.INVALID_CARD_NUMBER);
+        }
+        if (request.cvv() == null || !request.cvv().matches("\\d{3,4}")) {
+            return Result.error(PaymentErrorCodes.INVALID_CVV);
+        }
+        int month = request.expiryMonth() != null ? request.expiryMonth() : 0;
+        int year  = request.expiryYear()  != null ? request.expiryYear()  : 0;
+        if (month < 1 || month > 12) {
+            return Result.error(PaymentErrorCodes.INVALID_EXPIRY);
+        }
+        LocalDate now = LocalDate.now();
+        if (year < now.getYear() || (year == now.getYear() && month < now.getMonthValue())) {
+            return Result.error(PaymentErrorCodes.CARD_EXPIRED);
+        }
+        return Result.success();
+    }
+
+    private boolean isLuhnValid(String number) {
+        int sum = 0;
+        boolean alternate = false;
+        for (int i = number.length() - 1; i >= 0; i--) {
+            int n = Character.getNumericValue(number.charAt(i));
+            if (alternate) {
+                n *= 2;
+                if (n > 9) n -= 9;
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return sum % 10 == 0;
     }
 
     public Result<Void> validateCreditLimit(BigDecimal limit) {
@@ -50,13 +92,9 @@ public class CreditCardValidator {
         if (user == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             return false;
         }
-        Optional<CreditCard> creditCard = creditCardRepository.findByCardHolder(user);
-        if (creditCard.isEmpty()) {
-            return false;
-        }
-        CreditCard card = creditCard.get();
-        BigDecimal availableCredit = card.getLimit().subtract(card.getAmount());
-        return availableCredit.compareTo(amount) >= 0;
+        /* Kullanıcının herhangi bir kartında yeterli limit var mı? */
+        return creditCardRepository.findAllByCardHolder(user).stream()
+                .anyMatch(card -> card.getLimit().subtract(card.getAmount()).compareTo(amount) >= 0);
     }
 }
 

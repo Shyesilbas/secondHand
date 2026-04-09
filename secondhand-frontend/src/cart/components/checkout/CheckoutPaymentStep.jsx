@@ -3,6 +3,14 @@ import PaymentAgreementsSection from '../../../payments/components/PaymentAgreem
 import {formatCurrency} from '../../../common/formatters.js';
 import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
 
+const getCardSelectValue = (card) => (
+    card?.id
+    || card?.cardId
+    || card?.number
+    || card?.cardNumber
+    || null
+);
+
 const CheckoutPaymentStep = ({
     selectedPaymentType,
     setSelectedPaymentType,
@@ -145,8 +153,8 @@ const CheckoutPaymentStep = ({
                             >
                                 <option value="">Choose a card</option>
                                 {cards?.map((card, index) => (
-                                    <option key={card.id || `card-${index}`} value={card.number || card.cardNumber}>
-                                        •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4)}
+                                    <option key={getCardSelectValue(card) || `card-${index}`} value={getCardSelectValue(card) || ''}>
+                                        •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4) || card.last4 || 'XXXX'}
                                     </option>
                                 ))}
                             </select>

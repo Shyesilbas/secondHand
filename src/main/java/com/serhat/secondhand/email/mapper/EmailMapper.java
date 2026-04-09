@@ -10,6 +10,7 @@ import org.mapstruct.ReportingPolicy;
 public interface EmailMapper {
 
     @Mapping(target = "sentAt", source = "createdAt")
+    @Mapping(target = "isRead", expression = "java(email.getReadAt() != null)")
     EmailDto toDto(Email email);
 }
 

@@ -40,6 +40,7 @@ export const ROUTES = {
     SECURITY: '/security',
     SHOPPING_CART: '/cart',
     CHECKOUT: '/checkout',
+    ORDER_SUCCESS: '/orders/success',
     OFFERS: '/offers',
     MY_ORDERS: '/profile/orders',
     I_SOLD: '/profile/i-sold',

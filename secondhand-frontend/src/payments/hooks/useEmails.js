@@ -43,6 +43,22 @@ export const useEmails = () => {
         }
     }, [notification, refetch]);
 
+    const markAsRead = useCallback(async (emailId) => {
+        try {
+            await emailService.markAsRead(emailId);
+            queryClient.setQueryData([...PAYMENT_QUERY_KEYS.emailsMy, user?.id], (oldData) => {
+                if (!Array.isArray(oldData)) return oldData;
+                return oldData.map((email) => 
+                    email.id === emailId ? { ...email, isRead: true, read: true } : email
+                );
+            });
+            // Update unread count by invalidating or refetching it if needed
+            // (We assume another query handles unread count, but for UI sync, manually updating cache is good)
+        } catch (error) {
+            notification.showError('Error', 'Could not mark email as read.');
+        }
+    }, [queryClient, user?.id, notification]);
+
     const clearEmails = useCallback(() => {
         queryClient.setQueryData([...PAYMENT_QUERY_KEYS.emailsMy, user?.id], []);
     }, [queryClient, user?.id]);
@@ -51,6 +67,7 @@ export const useEmails = () => {
         emails,
         isLoading,
         fetchEmails,
+        markAsRead,
         clearEmails
     };
 };

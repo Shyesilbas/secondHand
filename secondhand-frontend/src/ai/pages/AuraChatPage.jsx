@@ -3,7 +3,14 @@ import { useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
-import { RotateCcw, Send, Sparkles, Trash2 } from 'lucide-react';
+import {
+  Bot,
+  RotateCcw,
+  Send,
+  Sparkles,
+  Trash2,
+  UserRound,
+} from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 
@@ -158,48 +165,56 @@ const AuraChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col min-h-[calc(100vh-0px)]">
+        {/* Header — sayfa zemini slate-50; vurgular kart/ikon içinde */}
+        <header className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-2xl bg-indigo-400/25 blur-md" />
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/20 ring-1 ring-slate-900/5">
+                <Sparkles className="h-6 w-6 text-white" strokeWidth={2} />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Aura Assistant</h1>
-                <p className="text-sm text-slate-500 tracking-tight">
-                  Marketplace focused AI assistant. <br />
-                </p>
-              </div>
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Aura Assistant</h1>
+              <p className="text-sm text-slate-500 mt-0.5 max-w-md">
+                Your marketplace copilot — search, compare, and stay safe while you trade.
+              </p>
             </div>
           </div>
 
-          <div className="text-right">
-            <div className="text-xs text-slate-500 tracking-tight">User Id</div>
-            <div className="text-sm font-semibold text-slate-900 tracking-tight">
-              {userId ?? '—'}
-            </div>
+          <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+            {userId != null ? (
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 shadow-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Signed in
+              </span>
+            ) : (
+              <span className="text-xs text-amber-700">Sign in for full chat history</span>
+            )}
             {AI_AGENT_MODE_ENABLED ? (
-              <label className="mt-3 inline-flex items-center gap-2 text-xs text-slate-600 tracking-tight">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 shadow-sm hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/40"
                   checked={agentMode}
                   onChange={(e) => setAgentMode(e.target.checked)}
                 />
-                Agent Mode (Read-only)
+                Agent mode
               </label>
             ) : null}
           </div>
-        </div>
+        </header>
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Actions */}
+        <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={handleNewChat}
               disabled={isSending}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               New chat
@@ -208,83 +223,103 @@ const AuraChatPage = () => {
               type="button"
               onClick={handleDeleteHistory}
               disabled={isSending}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-100 text-slate-900 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
             >
-              <Trash2 className="w-4 h-4" />
-              Delete chat history
+              <Trash2 className="w-4 h-4 opacity-80" />
+              Clear history
             </button>
             <button
               type="button"
               onClick={handleDeleteMemory}
               disabled={isSending}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-50 text-red-700 px-4 py-2.5 text-sm font-semibold tracking-tight disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-100 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Delete memory and chat history
+              Reset memory
             </button>
           </div>
-          <div className="mt-2 text-xs text-slate-500 tracking-tight">
-            New chat: clears history,Keeps memory. Delete memory: memory + history will be deleted.
-          </div>
+          <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
+            <span className="text-slate-600 font-medium">New chat</span> clears the conversation but keeps memory.{' '}
+            <span className="text-slate-600 font-medium">Reset memory</span> removes memory and chat history.
+          </p>
         </div>
 
         {listingContext ? (
-          <div className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-1.5">
+          <div className="mb-4 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span className="text-xs font-semibold text-indigo-700 tracking-tight">Aura sees this listing</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-800">Listing context</span>
             </div>
-            <div className="text-sm text-slate-800 tracking-tight whitespace-pre-wrap">{listingContext}</div>
-            <p className="mt-2 text-xs text-slate-500 tracking-tight">Replies will be tailored to this item.</p>
+            <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{listingContext}</p>
+            <p className="mt-2 text-[11px] text-slate-500">Replies are tailored to this listing.</p>
           </div>
         ) : null}
 
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div ref={listRef} className="h-[520px] overflow-y-auto p-6 space-y-4">
-            {messages.map((m) => (
-              <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 tracking-tight whitespace-pre-wrap ${
-                    m.role === 'user'
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-900'
-                  }`}
-                >
-                  {m.content}
-                  {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {m.meta.dataSources.map((source) => (
-                        <span
-                          key={`${m.id}-${source.source}`}
-                          className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px] leading-4 text-slate-600"
-                        >
-                          {source.source}:{source.status}
-                        </span>
-                      ))}
+        {/* Chat shell */}
+        <div className="flex-1 flex flex-col min-h-0 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div
+            ref={listRef}
+            className="flex-1 min-h-[min(56vh,420px)] max-h-[min(60vh,560px)] overflow-y-auto px-4 py-5 sm:px-6 space-y-5"
+          >
+            {messages.map((m) => {
+              const isUser = m.role === 'user';
+              return (
+                <div key={m.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+                      isUser
+                        ? 'border-slate-200 bg-white text-slate-700 shadow-sm'
+                        : 'border-indigo-200 bg-gradient-to-br from-indigo-50 to-violet-50 text-indigo-700'
+                    }`}
+                  >
+                    {isUser ? <UserRound className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                  </div>
+                  <div className={`min-w-0 max-w-[min(100%,28rem)] ${isUser ? 'text-right' : ''}`}>
+                    <div
+                      className={`inline-block rounded-2xl px-4 py-3 text-sm leading-relaxed text-left whitespace-pre-wrap ${
+                        isUser
+                          ? 'bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20'
+                          : 'border border-slate-200 bg-slate-50 text-slate-900'
+                      }`}
+                    >
+                      {m.content}
+                      {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {m.meta.dataSources.map((source) => (
+                            <span
+                              key={`${m.id}-${source.source}`}
+                              className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] leading-4 text-slate-600"
+                            >
+                              {source.source}:{source.status}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="border-t border-slate-200 p-4">
-            <div className="flex items-end gap-3">
+          <div className="border-t border-slate-200 bg-slate-50/80 p-4 sm:p-5">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Type your message... (Enter sends, Shift+Enter for a new line)"
-                className="flex-1 resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300"
+                placeholder="Message Aura… (Enter to send, Shift+Enter for new line)"
+                className="flex-1 resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-400 min-h-[88px]"
                 rows={2}
               />
               <button
+                type="button"
                 onClick={() => sendMessage()}
                 disabled={isSending || !input.trim()}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 text-sm font-semibold tracking-tight cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+                className="inline-flex h-12 sm:h-[88px] sm:w-14 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-semibold shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-violet-600 transition-all sm:flex-col sm:py-0 px-5 sm:px-0"
               >
-                <Send className="w-4 h-4" />
-                Send
+                <Send className="w-5 h-5" />
+                <span className="sm:hidden">Send</span>
               </button>
             </div>
           </div>
@@ -295,4 +330,3 @@ const AuraChatPage = () => {
 };
 
 export default AuraChatPage;
-

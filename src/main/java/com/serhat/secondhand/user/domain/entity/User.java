@@ -100,8 +100,9 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "accountHolder", cascade = CascadeType.ALL, orphanRemoval = true)
     private Bank bank;
 
-    @OneToOne(mappedBy = "cardHolder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private CreditCard creditCard;
+    @OneToMany(mappedBy = "cardHolder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CreditCard> creditCards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

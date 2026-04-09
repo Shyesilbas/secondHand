@@ -32,4 +32,10 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
 
     @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND e.emailType = :emailType ORDER BY e.createdAt DESC")
     Page<Email> findByUserIdAndEmailType(Long userId, Pageable pageable, EmailType emailType);
+
+    boolean existsByUser_IdAndEmailTypeAndSubject(Long userId, EmailType emailType, String subject);
+
+    java.util.Optional<Email> findByIdAndRecipientEmail(UUID id, String recipientEmail);
+
+    Page<Email> findByRecipientEmail(String email, Pageable pageable);
 }

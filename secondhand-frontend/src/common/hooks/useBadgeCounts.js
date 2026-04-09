@@ -25,7 +25,7 @@ export const useBadgeCounts = ({ enabled = true, userId } = {}) => {
         cartService.getCartItems(),     // Separate as it returns items
       ]);
 
-      const emailCount = Number(badges.notificationCount) || 0;
+      const emailCount = Number(badges.emailUnreadCount) || 0;
       const chatCount = Number(badges.chatUnreadCount) || 0;
       const cartCount = countCartItems(normalizeCartItems(cartItemsRaw));
       const orderCount = Number(badges.pendingOrderCount) || 0;

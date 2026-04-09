@@ -14,7 +14,8 @@ import java.util.UUID;
 @Repository
 public interface ShowcaseRepository extends JpaRepository<Showcase, UUID> {
     
-    List<Showcase> findByStatusAndEndDateAfter(ShowcaseStatus status, LocalDateTime endDate);
+    /** Süresi dolmuş aktif vitrinler: endDate <= an */
+    List<Showcase> findByStatusAndEndDateLessThanEqual(ShowcaseStatus status, LocalDateTime now);
     
     List<Showcase> findByUserIdAndStatus(Long userId, ShowcaseStatus status);
     

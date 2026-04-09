@@ -49,9 +49,19 @@ public class EmailController {
         return ResponseEntity.ok(emails);
     }
 
+    @PatchMapping("/{id}/read")
+    public ResponseEntity<EmailDto> markEmailAsRead(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Marking email {} as read for user: {}", id, currentUser.getEmail());
+        EmailDto updatedEmail = emailService.markAsRead(id, currentUser.getEmail());
+        return ResponseEntity.ok(updatedEmail);
+    }
+
     @GetMapping("/unread-count")
-    public ResponseEntity<Map<String, Long>> unreadCount(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(Map.of("count", emailService.getUnreadCount(currentUser.getId())));
+    public ResponseEntity<Map<String, Long>> getUnreadCount(@AuthenticationPrincipal User currentUser) {
+        long count = emailService.getUnreadCount(currentUser.getId());
+        return ResponseEntity.ok(Map.of("unreadCount", count));
     }
 
     @DeleteMapping("/{emailId}")

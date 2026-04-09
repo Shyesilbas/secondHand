@@ -4,9 +4,6 @@ import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.entity.UserAgreement;
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.UserAgreementRepository;
-import com.serhat.secondhand.notification.repository.NotificationRepository;
-import com.serhat.secondhand.notification.application.NotificationEventPublisher;
-import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,9 +19,7 @@ public class AgreementUpdateNotificationService {
     private final AgreementRequirementService agreementRequirementService;
     private final AgreementService agreementService;
     private final UserAgreementRepository userAgreementRepository;
-    private final NotificationEventPublisher notificationEventPublisher;
-    private final NotificationRepository notificationRepository;
-    private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final AgreementEmailNotificationService agreementEmailNotificationService;
 
     @Transactional
     public void notifyOutdatedRequiredAgreements(Long userId) {
@@ -46,16 +41,7 @@ public class AgreementUpdateNotificationService {
                 continue;
             }
 
-            var request = notificationTemplateCatalog.agreementUpdatedForUser(userId, type.name(), currentVersion);
-            String metadata = request.getMetadata();
-
-            boolean alreadyExists = notificationRepository.existsByUser_IdAndTypeAndMetadataAndIsReadFalse(
-                    userId, request.getType(), metadata);
-            if (alreadyExists) {
-                continue;
-            }
-
-            notificationEventPublisher.publishDispatch(request, "agreements", "agreement-updated:" + userId + ":" + type.name() + ":" + currentVersion);
+            agreementEmailNotificationService.notifyUserOutdatedAgreement(userId, type, currentVersion);
         }
     }
 

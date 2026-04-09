@@ -3,7 +3,7 @@ import ListingGrid from './ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import FilterStatus from './FilterStatus.jsx';
 import ListingsSkeleton from './ListingsSkeleton.jsx';
-import {Image as PhotoIcon} from 'lucide-react';
+import { PackageSearch, SlidersHorizontal, RefreshCw } from 'lucide-react';
 
 const ListingsContent = React.memo(({
     isLoading,
@@ -41,19 +41,42 @@ const ListingsContent = React.memo(({
             {isLoading ? (
                 <ListingsSkeleton />
             ) : filteredListings && filteredListings.length === 0 ? (
-                <div className="flex items-center justify-center min-h-[320px]">
-                    <div className="max-w-xl w-full bg-white border border-slate-200 rounded-3xl shadow-sm px-8 py-10 text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                            <PhotoIcon className="w-8 h-8 text-slate-400" />
+                <div className="flex items-center justify-center min-h-[380px] py-8">
+                    <div className="max-w-sm w-full text-center">
+                        {/* Icon */}
+                        <div className="relative inline-flex mb-6">
+                            <div className="w-20 h-20 rounded-3xl bg-slate-100 flex items-center justify-center">
+                                <PackageSearch className="w-9 h-9 text-slate-400" />
+                            </div>
+                            {hasSearch && (
+                                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center">
+                                    <SlidersHorizontal className="w-3 h-3 text-white" />
+                                </div>
+                            )}
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                            {hasSearch ? 'No results for your search' : 'No listings found'}
+
+                        {/* Text */}
+                        <h3 className="text-[16px] font-bold text-slate-800 mb-2">
+                            {hasSearch ? 'No results found' : 'Nothing here yet'}
                         </h3>
-                        <p className="text-sm text-slate-500 mb-6">
+                        <p className="text-[13px] text-slate-400 leading-relaxed mb-6 max-w-[260px] mx-auto">
                             {hasSearch
-                                ? 'Try changing your keywords or adjusting filters to discover more listings.'
-                                : `There are no listings in ${categoryLabel} right now. Try a different category or check back soon.`}
+                                ? 'Try different keywords or remove some filters to see more results.'
+                                : `No listings in ${categoryLabel} right now. Try a different category or check back soon.`}
                         </p>
+
+                        {/* Actions */}
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                            {onResetFilters && (
+                                <button
+                                    onClick={onResetFilters}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-[12px] font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
+                                >
+                                    <RefreshCw className="w-3.5 h-3.5" />
+                                    Reset Filters
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
             ) : (
@@ -66,8 +89,8 @@ const ListingsContent = React.memo(({
             )}
             
             {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && (
-                <div className="mt-12 flex justify-center">
-                    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-2">
+                <div className="mt-10 flex justify-center">
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-1.5">
                         <Pagination
                             page={currentPage || 0}
                             totalPages={totalPages || 0}
