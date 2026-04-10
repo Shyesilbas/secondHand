@@ -85,6 +85,11 @@ app:
       fee: 50.00
     fee:
       tax: 18.00
+  favorite:
+    user-favorites-default-size: ${FAVORITE_USER_DEFAULT_SIZE:20}
+    top-default-size: ${FAVORITE_TOP_DEFAULT_SIZE:10}
+    top-listings-default-size: ${FAVORITE_TOP_LISTINGS_DEFAULT_SIZE:10}
+    top-listings-max-size: ${FAVORITE_TOP_LISTINGS_MAX_SIZE:100}
   showcase:
     daily:
       cost: 10.00

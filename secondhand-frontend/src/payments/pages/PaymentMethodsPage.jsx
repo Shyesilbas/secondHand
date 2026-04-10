@@ -26,7 +26,7 @@ const BankAccountsSection = () => {
     const { data: bankAccounts = [], isLoading, error } = useBankAccountsQuery();
     const { createBankAccount, deleteBankAccount, isCreating, isDeleting } = useBankAccountMutations();
     const { data: statsData } = usePaymentStatisticsQuery('TRANSFER');
-    const totalSpent = typeof statsData?.totalAmount !== 'undefined' ? statsData.totalAmount : null;
+    const totalAmount = typeof statsData?.totalAmount !== 'undefined' ? statsData.totalAmount : null;
 
     const handleCreateBankAccount = async () => {
         notification.showConfirmation(
@@ -69,10 +69,10 @@ const BankAccountsSection = () => {
                     <h2 className="text-xl font-semibold tracking-tight text-slate-900">
                         Bank Accounts ({bankAccounts.length})
                     </h2>
-                    {totalSpent != null && (
+                    {totalAmount != null && (
                         <div className="mt-2 text-sm text-slate-500">
-                            Total Spent (Bank Transfer):
-                            <span className="ml-2 font-semibold text-slate-900">{formatCurrency(totalSpent)}</span>
+                            Incoming + Outgoing Volume (Bank Transfer):
+                            <span className="ml-2 font-semibold text-slate-900">{formatCurrency(totalAmount)}</span>
                         </div>
                     )}
                 </div>
@@ -89,6 +89,27 @@ const BankAccountsSection = () => {
             {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                     <p className="text-red-600">{error?.response?.data?.message || error?.message || error}</p>
+                </div>
+            )}
+
+            {statsData && (
+                <div className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        <p className="text-xs text-slate-500">Incoming + Outgoing</p>
+                        <p className="mt-1 text-base font-semibold text-slate-900">{statsData.totalPayments ?? 0}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        <p className="text-xs text-slate-500">Successful</p>
+                        <p className="mt-1 text-base font-semibold text-emerald-600">{statsData.successfulPayments ?? 0}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        <p className="text-xs text-slate-500">Failed</p>
+                        <p className="mt-1 text-base font-semibold text-rose-600">{statsData.failedPayments ?? 0}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                        <p className="text-xs text-slate-500">Success Rate</p>
+                        <p className="mt-1 text-base font-semibold text-slate-900">%{(statsData.successRate ?? 0).toFixed(1)}</p>
+                    </div>
                 </div>
             )}
 
@@ -601,7 +622,7 @@ const EWalletSection = () => {
 
     const [statisticsLoaded, setStatisticsLoaded] = useState(false);
     const { data: statsData, refetch: refetchStats } = usePaymentStatisticsQuery('EWALLET', { enabled: false });
-    const totalSpent = typeof statsData?.totalAmount !== 'undefined' ? statsData.totalAmount : null;
+    const totalAmount = typeof statsData?.totalAmount !== 'undefined' ? statsData.totalAmount : null;
 
     const fetchStatistics = useCallback(async () => {
         if (statisticsLoaded) return;
@@ -653,7 +674,8 @@ const EWalletSection = () => {
             ) : (
                 <EWalletBalance
                     eWallet={eWallet}
-                    totalSpent={totalSpent}
+                    totalAmount={totalAmount}
+                    statsData={statsData}
                     statisticsLoaded={statisticsLoaded}
                     onLoadStatistics={fetchStatistics}
                 />

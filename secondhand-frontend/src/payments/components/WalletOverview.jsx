@@ -41,11 +41,11 @@ export const PaymentInfo = () => {
   );
 };
 
-export const EWalletBalance = ({ eWallet, totalSpent, statisticsLoaded, onLoadStatistics }) => {
+export const EWalletBalance = ({ eWallet, totalAmount, statsData, statisticsLoaded, onLoadStatistics }) => {
   if (!eWallet) return null;
 
-  const spentPercentage = (statisticsLoaded && totalSpent != null && eWallet.spendingWarningLimit)
-    ? Math.min(((totalSpent / eWallet.spendingWarningLimit) * 100), 100).toFixed(1)
+  const spentPercentage = (statisticsLoaded && totalAmount != null && eWallet.spendingWarningLimit)
+    ? Math.min(((totalAmount / eWallet.spendingWarningLimit) * 100), 100).toFixed(1)
     : 0;
 
   return (
@@ -134,19 +134,25 @@ export const EWalletBalance = ({ eWallet, totalSpent, statisticsLoaded, onLoadSt
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="flex justify-between items-end mb-2">
                      <span className="text-xs font-medium text-slate-500">Current Period Spend</span>
-                     {statisticsLoaded && totalSpent != null ? (
-                       <span className="text-xs font-bold text-slate-700">{formatCurrency(totalSpent)}</span>
+                     {statisticsLoaded && totalAmount != null ? (
+                       <span className="text-xs font-bold text-slate-700">{formatCurrency(totalAmount)}</span>
                      ) : (
                         <button onClick={onLoadStatistics} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">Reveal</button>
                      )}
                   </div>
-                  {statisticsLoaded && totalSpent != null && (
+                  {statisticsLoaded && totalAmount != null && (
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${spentPercentage > 90 ? 'bg-red-500' : spentPercentage > 75 ? 'bg-amber-400' : 'bg-emerald-400'}`} 
                         style={{ width: `${spentPercentage}%` }} 
                       />
                     </div>
+                  )}
+
+                  {statisticsLoaded && statsData && (
+                    <p className="mt-3 text-[11px] text-slate-500">
+                      Incoming + outgoing transactions: <span className="font-semibold text-slate-700">{statsData.totalPayments ?? 0}</span>
+                    </p>
                   )}
                 </div>
               )}

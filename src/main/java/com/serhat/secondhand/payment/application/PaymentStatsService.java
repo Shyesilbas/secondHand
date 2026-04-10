@@ -34,9 +34,10 @@ public class PaymentStatsService {
     public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
         log.info("Calculating payment statistics via DB for userId: {}", userId);
 
-        Object[] stats = paymentRepository.getPaymentStats(userId, filterType);
+        List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, filterType);
+        Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO} : statsRows.get(0);
 
-        long total = (long) stats[0];
+        long total = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
         long successful = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
         BigDecimal totalAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
 

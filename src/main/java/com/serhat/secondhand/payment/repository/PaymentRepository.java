@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             "SUM(CASE WHEN p.isSuccess = true THEN p.amount ELSE 0 END) " +
             "FROM Payment p WHERE (p.fromUser.id = :userId OR p.toUser.id = :userId) " +
             "AND (:type IS NULL OR p.paymentType = :type)")
-    Object[] getPaymentStats(@Param("userId") Long userId, @Param("type") PaymentType type);
+    List<Object[]> getPaymentStats(@Param("userId") Long userId, @Param("type") PaymentType type);
 
 
     Optional<Payment> findByIdempotencyKeyAndFromUserId(String idempotencyKey, Long fromUserId);

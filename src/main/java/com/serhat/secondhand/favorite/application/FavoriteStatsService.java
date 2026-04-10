@@ -38,24 +38,38 @@ public class FavoriteStatsService {
     public Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
         log.info("FavoriteStatsService#getFavoriteStatsForListings CACHE MISS for {} listings, userId={}", listingIds.size(), userId);
 
-        List<Object[]> countResults = favoriteRepository.countByListingIds(listingIds);
+        if (listingIds == null || listingIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<UUID> uniqueListingIds = listingIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (uniqueListingIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Object[]> countResults = favoriteRepository.countByListingIds(uniqueListingIds);
         Map<UUID, Long> favoriteCounts = countResults.stream()
             .collect(Collectors.toMap(
                 result -> (UUID) result[0],
-                result -> (Long) result[1]
+                result -> (Long) result[1],
+                Long::sum
             ));
 
-        Set<UUID> userFavoriteSet = userId != null ?
-                new HashSet<>(favoriteRepository.findListingIdsByUserId(userId)) : Set.of();
+        Set<UUID> userFavoriteSet = userId != null
+                ? new HashSet<>(favoriteRepository.findListingIdsByUserIdAndListingIdIn(userId, uniqueListingIds))
+                : Set.of();
 
-            return listingIds.stream()
-                    .collect(Collectors.toMap(
-                            listingId -> listingId,
-                            listingId -> FavoriteStatsDto.builder()
-                                    .listingId(listingId)
-                                    .favoriteCount(favoriteCounts.getOrDefault(listingId, 0L))
-                                    .isFavorited(userFavoriteSet.contains(listingId))
-                                    .build()
-                    ));
+        return uniqueListingIds.stream()
+                .collect(Collectors.toMap(
+                        listingId -> listingId,
+                        listingId -> FavoriteStatsDto.builder()
+                                .listingId(listingId)
+                                .favoriteCount(favoriteCounts.getOrDefault(listingId, 0L))
+                                .isFavorited(userFavoriteSet.contains(listingId))
+                                .build()
+                ));
     }
 }
