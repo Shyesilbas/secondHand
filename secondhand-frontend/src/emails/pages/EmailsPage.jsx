@@ -25,22 +25,14 @@ import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES } from '../emailConstants
 
 const EmailsPageLoader = () => (
     <div className="min-h-screen bg-slate-50">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-6">
-            <div className="animate-pulse space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="animate-pulse space-y-6">
                 <div className="space-y-4">
                     <div className="h-8 bg-secondary-200 rounded w-1/4"></div>
                     <div className="h-4 bg-secondary-200 rounded w-1/2"></div>
                 </div>
-                
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
-                    <div className="flex items-center space-x-4">
-                        <div className="h-10 bg-secondary-200 rounded w-1/3"></div>
-                        <div className="h-10 bg-secondary-200 rounded w-32"></div>
-                    </div>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-1 bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <div className="lg:col-span-4 xl:col-span-3 bg-white rounded-2xl border border-slate-200 overflow-hidden">
                         <div className="p-4 border-b border-border-light">
                             <div className="h-6 bg-secondary-200 rounded w-1/3"></div>
                         </div>
@@ -54,7 +46,7 @@ const EmailsPageLoader = () => (
                             ))}
                         </div>
                     </div>
-                    <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+                    <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-slate-200 p-6">
                         <div className="space-y-4">
                             <div className="h-6 bg-secondary-200 rounded w-1/2"></div>
                             {[...Array(8)].map((_, i) => (
@@ -183,7 +175,10 @@ const EmailsPage = () => {
             title: 'Email',
             deleteFunc: () => emailService.deleteEmail(emailId),
             onSuccess: () => {
-                if (selectedEmail?.id === emailId) setSelectedEmail(null);
+                if (selectedEmail?.id === emailId) {
+                    setSelectedEmail(null);
+                    setMobileDetailOpen(false);
+                }
             }
         });
     };
@@ -231,6 +226,11 @@ const EmailsPage = () => {
         () => folderItems.find((item) => item.id === filterType)?.label || 'Inbox',
         [folderItems, filterType]
     );
+    const handleFolderSelect = useCallback((folderId) => {
+        setFilterType(folderId);
+        setSelectedEmail(null);
+        setMobileDetailOpen(false);
+    }, []);
 
     const onSelectEmail = useCallback(async (email) => {
         setSelectedEmail(email);
@@ -255,21 +255,21 @@ const EmailsPage = () => {
 
     return (
         <div className="min-h-screen bg-slate-50">
-            <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3">
+            <div className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
                     <button
                         onClick={() => navigate(-1)}
-                        className="h-9 px-2.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-300 inline-flex items-center gap-2"
+                        className="h-10 px-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-300 inline-flex items-center gap-2"
                         type="button"
                     >
                         <ArrowLeftIcon className="w-5 h-5" />
-                        <span className="text-sm font-medium tracking-tight hidden sm:inline">Back</span>
+                        <span className="text-sm font-medium hidden sm:inline">Back</span>
                     </button>
 
-                    <div className="hidden xl:flex flex-col pr-2 border-r border-slate-200">
-                        <span className="text-sm font-semibold tracking-tight text-slate-900">Mailbox</span>
-                        <span className="text-[11px] text-slate-500">
-                            {unreadCount} unread • {pageInfo.totalElements} total
+                    <div className="hidden md:flex flex-col pr-3 border-r border-slate-200">
+                        <span className="text-sm font-semibold text-slate-900">Mailbox</span>
+                        <span className="text-xs text-slate-500">
+                            {pageInfo.totalElements} total - {unreadCount} unread
                         </span>
                     </div>
 
@@ -280,7 +280,7 @@ const EmailsPage = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search mail"
-                                className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 text-sm"
+                                className="w-full h-10 pl-10 pr-4 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 text-sm"
                             />
                             <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         </div>
@@ -290,7 +290,7 @@ const EmailsPage = () => {
                         <button
                             type="button"
                             onClick={() => queryClient.invalidateQueries({ queryKey: ['myEmails', user?.id] })}
-                            className="h-9 w-9 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300"
+                            className="h-10 w-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300"
                             title="Refresh"
                         >
                             <RefreshCw className="w-4 h-4" />
@@ -299,7 +299,7 @@ const EmailsPage = () => {
                             type="button"
                             onClick={handleDeleteAllEmails}
                             disabled={isDeleting || filteredEmails.length === 0}
-                            className="h-9 w-9 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="h-10 w-10 rounded-xl border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                             title="Delete all"
                         >
                             <Trash2 className="w-4 h-4" />
@@ -307,8 +307,8 @@ const EmailsPage = () => {
                     </div>
                 </div>
 
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-3">
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 lg:hidden">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
                         {folderItems.map((item) => {
                             const Icon = item.icon;
                             const active = filterType === item.id;
@@ -316,15 +316,11 @@ const EmailsPage = () => {
                                 <button
                                     key={item.id}
                                     type="button"
-                                    onClick={() => {
-                                        setFilterType(item.id);
-                                        setSelectedEmail(null);
-                                        setMobileDetailOpen(false);
-                                    }}
-                                    className={`shrink-0 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                    onClick={() => handleFolderSelect(item.id)}
+                                    className={`shrink-0 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
                                         active
                                             ? 'bg-slate-900 text-white'
-                                            : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                                            : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
                                     <Icon className="w-3.5 h-3.5" />
@@ -339,19 +335,20 @@ const EmailsPage = () => {
                 </div>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm">
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">Total</p>
-                        <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{pageInfo.totalElements}</p>
-                    </div>
-                    <div className="rounded-2xl border border-indigo-200 bg-indigo-50/60 px-4 py-3 shadow-sm">
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-indigo-700 font-medium">Unread</p>
-                        <p className="mt-1 text-2xl font-semibold text-indigo-900 tabular-nums">{unreadCount}</p>
-                    </div>
-                    <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm">
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">Visible</p>
-                        <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{filteredEmails.length}</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+                        <span className="text-slate-500">
+                            Folder: <span className="font-semibold text-slate-900">{selectedFolderLabel}</span>
+                        </span>
+                        <span className="text-slate-300 hidden sm:inline">|</span>
+                        <span className="text-slate-500">
+                            Visible: <span className="font-semibold text-slate-900 tabular-nums">{filteredEmails.length}</span>
+                        </span>
+                        <span className="text-slate-300 hidden sm:inline">|</span>
+                        <span className="text-slate-500">
+                            Unread: <span className="font-semibold text-indigo-700 tabular-nums">{unreadCount}</span>
+                        </span>
                     </div>
                 </div>
 
@@ -362,13 +359,13 @@ const EmailsPage = () => {
                 />
 
                 {filteredEmails.length > 0 && (
-                    <div className="hidden lg:grid grid-cols-12 gap-4">
-                        <aside className="col-span-2">
-                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                                <div className="px-3 py-3 border-b border-slate-100">
+                    <div className="hidden lg:grid grid-cols-12 gap-5">
+                        <aside className="col-span-4 xl:col-span-3">
+                            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100">
                                     <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Folders</p>
                                 </div>
-                                <div className="p-2">
+                                <div className="p-2.5">
                                     {folderItems.map((item) => {
                                         const Icon = item.icon;
                                         const active = filterType === item.id;
@@ -376,8 +373,8 @@ const EmailsPage = () => {
                                             <button
                                                 key={item.id}
                                                 type="button"
-                                                onClick={() => { setFilterType(item.id); setSelectedEmail(null); setMobileDetailOpen(false); }}
-                                                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-300 ${active ? 'bg-indigo-50 text-indigo-900' : 'text-slate-700 hover:bg-slate-50'}`}
+                                                onClick={() => handleFolderSelect(item.id)}
+                                                className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-300 ${active ? 'bg-indigo-50 text-indigo-900' : 'text-slate-700 hover:bg-slate-50'}`}
                                             >
                                                 <span className="flex items-center gap-2 min-w-0">
                                                     <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-600' : 'text-slate-500'}`} />
@@ -389,61 +386,87 @@ const EmailsPage = () => {
                                     })}
                                 </div>
                             </div>
+                            <div className="mt-4 rounded-2xl border border-slate-200 bg-white shadow-sm px-4 py-3">
+                                <p className="text-xs text-slate-500">Page</p>
+                                <div className="mt-2 flex items-center justify-between gap-2">
+                                    <button
+                                        disabled={pageInfo.page === 0}
+                                        onClick={() => setPage(pageInfo.page - 1)}
+                                        className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                        type="button"
+                                    >
+                                        Prev
+                                    </button>
+                                    <span className="text-xs text-slate-500 tabular-nums">
+                                        {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
+                                    </span>
+                                    <button
+                                        disabled={pageInfo.page + 1 >= pageInfo.totalPages}
+                                        onClick={() => setPage(pageInfo.page + 1)}
+                                        className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                        type="button"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
                         </aside>
 
-                        <section className="col-span-4">
-                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">{selectedFolderLabel}</p>
+                        <section className="col-span-8 xl:col-span-9">
+                            {!selectedEmail && (
+                                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden h-[calc(100vh-200px)]">
+                                    <div className="px-4 py-3 border-b border-slate-100 bg-white sticky top-0 z-10">
+                                        <p className="text-sm font-semibold text-slate-900">{selectedFolderLabel}</p>
                                         <p className="text-xs text-slate-500 mt-0.5">
-                                            {filteredEmails.length} shown • {unreadCount} unread
+                                            {filteredEmails.length} shown - {unreadCount} unread
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            disabled={pageInfo.page === 0}
-                                            onClick={() => setPage(pageInfo.page - 1)}
-                                            className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
-                                            type="button"
-                                        >
-                                            Prev
-                                        </button>
-                                        <span className="text-xs text-slate-500 tabular-nums">
-                                            {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
-                                        </span>
-                                        <button
-                                            disabled={pageInfo.page + 1 >= pageInfo.totalPages}
-                                            onClick={() => setPage(pageInfo.page + 1)}
-                                            className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
-                                            type="button"
-                                        >
-                                            Next
-                                        </button>
+                                    <div className="h-[calc(100%-56px)] overflow-y-auto">
+                                        {filteredEmails.map((email) => (
+                                            <EmailListItem
+                                                key={email.id}
+                                                email={email}
+                                                isSelected={false}
+                                                onSelect={onSelectEmail}
+                                                onDelete={handleDeleteEmail}
+                                                isDeleting={isDeleting}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
+                            )}
 
-                                <div className="h-[calc(100vh-190px)] overflow-y-auto">
-                                    {filteredEmails.map((email) => (
-                                        <EmailListItem
-                                            key={email.id}
-                                            email={email}
-                                            isSelected={selectedEmail?.id === email.id}
-                                            onSelect={onSelectEmail}
-                                            onDelete={handleDeleteEmail}
-                                            isDeleting={isDeleting}
-                                        />
-                                    ))}
+                            {selectedEmail && (
+                                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden h-[calc(100vh-200px)]">
+                                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedEmail(null);
+                                                setMobileDetailOpen(false);
+                                            }}
+                                            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors duration-200"
+                                        >
+                                            <ArrowLeftIcon className="w-4 h-4" />
+                                            Back to list
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id, selectedEmail.subject);
+                                            }}
+                                            disabled={isDeleting || !selectedEmail?.id}
+                                            className="h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <div className="h-[calc(100%-56px)] overflow-y-auto">
+                                        <EmailContent email={selectedEmail} />
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
-
-                        <section className="col-span-6">
-                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden h-[calc(100vh-190px)]">
-                                <div className="h-full overflow-y-auto">
-                                    <EmailContent email={selectedEmail} />
-                                </div>
-                            </div>
+                            )}
                         </section>
                     </div>
                 )}
@@ -451,10 +474,10 @@ const EmailsPage = () => {
                 {filteredEmails.length > 0 && (
                     <div className="lg:hidden">
                         {!mobileDetailOpen && (
-                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-900 tracking-tight">{selectedFolderLabel}</p>
+                                        <p className="text-sm font-semibold text-slate-900">{selectedFolderLabel}</p>
                                         <p className="text-xs text-slate-500">{filteredEmails.length} shown • {unreadCount} unread</p>
                                     </div>
                                     <span className="text-xs text-slate-500 tabular-nums">{filteredEmails.length}</span>
@@ -475,13 +498,14 @@ const EmailsPage = () => {
                         )}
 
                         {mobileDetailOpen && (
-                            <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                                     <button
                                         type="button"
                                         onClick={() => setMobileDetailOpen(false)}
-                                        className="text-sm font-medium text-slate-700 hover:text-slate-900"
+                                        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors duration-200"
                                     >
+                                        <ArrowLeftIcon className="w-4 h-4" />
                                         Back to list
                                     </button>
                                     <button

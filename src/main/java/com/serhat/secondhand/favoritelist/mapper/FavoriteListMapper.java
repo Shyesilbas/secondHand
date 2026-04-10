@@ -6,6 +6,7 @@ import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
 import com.serhat.secondhand.favoritelist.entity.FavoriteList;
 import com.serhat.secondhand.favoritelist.entity.FavoriteListItem;
 import com.serhat.secondhand.favoritelist.entity.FavoriteListLike;
+import com.serhat.secondhand.favoritelist.repository.projection.FavoriteListSummaryProjection;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.hibernate.Hibernate;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class FavoriteListMapper {
+    private static final String DEFAULT_CURRENCY = "TRY";
 
     public FavoriteListDto toDto(FavoriteList entity, User currentUser) {
         if (entity == null) return null;
@@ -60,36 +62,26 @@ public class FavoriteListMapper {
     public FavoriteListSummaryDto toSummaryDto(FavoriteList entity) {
         if (entity == null) return null;
 
-        // For summary, we don't need all items/likes - just counts
-        // Try to get counts without fully loading collections if possible
         int itemCount = 0;
         int likeCount = 0;
         BigDecimal totalPrice = BigDecimal.ZERO;
-        String currency = "TRY";
+        String currency = DEFAULT_CURRENCY;
         String previewImage = entity.getCoverImageUrl();
 
-        try {
-            Set<FavoriteListItem> items = entity.getItems();
-            if (items != null && Hibernate.isInitialized(items)) {
-                List<FavoriteListItem> itemsList = new ArrayList<>(items);
-                itemCount = itemsList.size();
-                totalPrice = calculateTotalPrice(itemsList);
-                currency = getFirstCurrency(itemsList);
-                if (previewImage == null || previewImage.isEmpty()) {
-                    previewImage = getPreviewImage(null, itemsList);
-                }
+        Set<FavoriteListItem> items = entity.getItems();
+        if (items != null && Hibernate.isInitialized(items)) {
+            List<FavoriteListItem> itemsList = new ArrayList<>(items);
+            itemCount = itemsList.size();
+            totalPrice = calculateTotalPrice(itemsList);
+            currency = getFirstCurrency(itemsList);
+            if (previewImage == null || previewImage.isEmpty()) {
+                previewImage = getPreviewImage(null, itemsList);
             }
-        } catch (Exception e) {
-            // Collection not initialized, use defaults
         }
 
-        try {
-            Set<FavoriteListLike> likes = entity.getLikes();
-            if (likes != null && Hibernate.isInitialized(likes)) {
-                likeCount = likes.size();
-            }
-        } catch (Exception e) {
-            // Collection not initialized, use default
+        Set<FavoriteListLike> likes = entity.getLikes();
+        if (likes != null && Hibernate.isInitialized(likes)) {
+            likeCount = likes.size();
         }
 
         return FavoriteListSummaryDto.builder()
@@ -109,28 +101,39 @@ public class FavoriteListMapper {
             .build();
     }
 
+    public FavoriteListSummaryDto toSummaryDto(FavoriteListSummaryProjection projection) {
+        if (projection == null) return null;
+        return FavoriteListSummaryDto.builder()
+            .id(projection.getId())
+            .name(projection.getName())
+            .description(projection.getDescription())
+            .isPublic(projection.getIsPublic())
+            .coverImageUrl(projection.getCoverImageUrl())
+            .ownerId(projection.getOwnerId())
+            .ownerName(projection.getOwnerName())
+            .itemCount((int) projection.getItemCount())
+            .likeCount((int) projection.getLikeCount())
+            .totalPrice(projection.getTotalPrice() != null ? projection.getTotalPrice() : BigDecimal.ZERO)
+            .currency(projection.getCurrency() != null ? projection.getCurrency() : DEFAULT_CURRENCY)
+            .previewImageUrl(projection.getPreviewImageUrl())
+            .createdAt(projection.getCreatedAt())
+            .build();
+    }
+
     private List<FavoriteListItem> safeGetItems(FavoriteList entity) {
-        try {
-            Set<FavoriteListItem> items = entity.getItems();
-            if (items == null) return Collections.emptyList();
-            // Force initialization and create copy
-            Hibernate.initialize(items);
-            return new ArrayList<>(items);
-        } catch (Exception e) {
+        Set<FavoriteListItem> items = entity.getItems();
+        if (items == null || !Hibernate.isInitialized(items)) {
             return Collections.emptyList();
         }
+        return new ArrayList<>(items);
     }
 
     private List<FavoriteListLike> safeGetLikes(FavoriteList entity) {
-        try {
-            Set<FavoriteListLike> likes = entity.getLikes();
-            if (likes == null) return Collections.emptyList();
-            // Force initialization and create copy
-            Hibernate.initialize(likes);
-            return new ArrayList<>(likes);
-        } catch (Exception e) {
+        Set<FavoriteListLike> likes = entity.getLikes();
+        if (likes == null || !Hibernate.isInitialized(likes)) {
             return Collections.emptyList();
         }
+        return new ArrayList<>(likes);
     }
 
     public FavoriteListItemDto toItemDto(FavoriteListItem item) {
@@ -143,7 +146,7 @@ public class FavoriteListMapper {
             .listingId(listing.getId())
             .listingTitle(listing.getTitle())
             .listingPrice(listing.getPrice())
-            .listingCurrency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
+            .listingCurrency(listing.getCurrency() != null ? listing.getCurrency().name() : DEFAULT_CURRENCY)
             .listingImageUrl(listing.getImageUrl())
             .listingStatus(listing.getStatus() != null ? listing.getStatus().name() : null)
             .note(item.getNote())
@@ -170,14 +173,14 @@ public class FavoriteListMapper {
 
     private String getFirstCurrency(List<FavoriteListItem> items) {
         if (items == null || items.isEmpty()) {
-            return "TRY";
+            return DEFAULT_CURRENCY;
         }
         return items.stream()
             .map(item -> item.getListing().getCurrency())
             .filter(currency -> currency != null)
             .map(Enum::name)
             .findFirst()
-            .orElse("TRY");
+            .orElse(DEFAULT_CURRENCY);
     }
 
     private String getPreviewImage(String coverImageUrl, List<FavoriteListItem> items) {

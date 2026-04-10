@@ -17,7 +17,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "offers")
+@Table(name = "offers", indexes = {
+        @Index(name = "idx_offers_status_expires_at", columnList = "status, expires_at"),
+        @Index(name = "idx_offers_buyer_id", columnList = "buyer_id"),
+        @Index(name = "idx_offers_seller_id", columnList = "seller_id"),
+        @Index(name = "idx_offers_listing_id", columnList = "listing_id")
+})
 public class Offer {
 
     @Id
@@ -68,9 +73,6 @@ public class Offer {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
-        if (expiresAt == null) {
-            expiresAt = now.plusHours(24);
-        }
         if (status == null) {
             status = OfferStatus.PENDING;
         }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,10 +25,9 @@ public class ShowcaseMapper {
     private final ListingCampaignPricingUtil listingCampaignPricingUtil;
     
     public ShowcaseDto toDto(Showcase showcase) {
-        // Convert listing to DTO with favorite stats
         var listingDto = listingMapper.toDynamicDto(showcase.getListing());
-        favoriteStatsUtil.enrichWithFavoriteStats(listingDto, null); // No user context for public showcases
-        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDto); // Enrich with campaign pricing
+        favoriteStatsUtil.enrichWithFavoriteStats(listingDto, null);
+        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDto);
         
         return ShowcaseDto.builder()
                 .id(showcase.getId())
@@ -42,6 +42,36 @@ public class ShowcaseMapper {
                 .updatedAt(showcase.getUpdatedAt())
                 .listing(listingDto)
                 .build();
+    }
+
+    public List<ShowcaseDto> toDtos(List<Showcase> showcases, Long userId) {
+        List<ShowcaseDto> dtos = showcases.stream()
+                .map(showcase -> {
+                    var listingDto = listingMapper.toDynamicDto(showcase.getListing());
+                    return ShowcaseDto.builder()
+                            .id(showcase.getId())
+                            .listingId(showcase.getListing().getId())
+                            .userId(showcase.getUser().getId())
+                            .startDate(showcase.getStartDate())
+                            .endDate(showcase.getEndDate())
+                            .totalCost(showcase.getTotalCost())
+                            .dailyCost(showcase.getDailyCost())
+                            .status(showcase.getStatus().name())
+                            .createdAt(showcase.getCreatedAt())
+                            .updatedAt(showcase.getUpdatedAt())
+                            .listing(listingDto)
+                            .build();
+                })
+                .toList();
+
+        List<com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto> listingDtos = dtos.stream()
+                .map(ShowcaseDto::listing)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+
+        favoriteStatsUtil.enrichWithFavoriteStats(listingDtos, userId);
+        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDtos);
+        return dtos;
     }
 
     public Showcase fromCreateRequest(ShowcasePaymentRequest request, User user, Listing listing, 

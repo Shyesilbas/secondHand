@@ -48,4 +48,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     @Query("SELECT c FROM Cart c WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")
     List<Cart> findExpiredReservations(@Param("now") LocalDateTime now);
+
+    @Query("SELECT c.id FROM Cart c WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")
+    List<Long> findExpiredReservationIds(@Param("now") LocalDateTime now);
 }

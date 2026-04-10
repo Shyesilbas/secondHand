@@ -49,21 +49,21 @@ public class OfferController {
     }
 
     @PostMapping("/{offerId}/accept")
-    @Operation(summary = "Accept offer", description = "Seller accepts an offer")
+    @Operation(summary = "Accept offer", description = "Receiver accepts a pending offer")
     public ResponseEntity<?> accept(@PathVariable UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.accept(currentUser.getId(), offerId));
     }
 
     @PostMapping("/{offerId}/reject")
-    @Operation(summary = "Reject offer", description = "Seller rejects an offer")
+    @Operation(summary = "Reject offer", description = "Receiver rejects a pending offer")
     public ResponseEntity<?> reject(@PathVariable UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.reject(currentUser.getId(), offerId));
     }
 
     @PostMapping("/{offerId}/counter")
-    @Operation(summary = "Counter offer", description = "Seller counters an offer (creates a new offer record)")
+    @Operation(summary = "Counter offer", description = "Receiver counters a pending offer (creates a new offer record)")
     public ResponseEntity<?> counter(@PathVariable UUID offerId,
                                            @Valid @RequestBody CounterOfferRequest request,
                                            @AuthenticationPrincipal User currentUser) {

@@ -8,19 +8,20 @@ export const useShowcase = () => {
     const queryClient = useQueryClient();
 
         const {
-        data: showcases = [],
+        data: showcasePage,
         isLoading: loading,
         error: queryError,
         refetch: fetchShowcases
     } = useQuery({
-        queryKey: SHOWCASE_QUERY_KEYS.active(),
-        queryFn: showcaseService.getActiveShowcases,
+        queryKey: SHOWCASE_QUERY_KEYS.active(0, 12),
+        queryFn: () => showcaseService.getActiveShowcases({ page: 0, size: 12 }),
         staleTime: 5 * 60 * 1000, 
         gcTime: 10 * 60 * 1000, 
         refetchOnWindowFocus: false,
         refetchOnMount: false, 
         onError: (err) => setError(err.message)
     });
+    const showcases = Array.isArray(showcasePage?.content) ? showcasePage.content : [];
 
         const createShowcaseMutation = useMutation({
         mutationFn: ({ listingId, days, paymentType }) => 

@@ -43,7 +43,7 @@ public class AgreementService {
         }
 
         String content = getContentForType(agreementType);
-        String version = getVersionForType(agreementType);
+        String version = getVersionForType(existingAgreement.orElse(null));
 
         Agreement agreement = Agreement.builder()
                 .agreementType(agreementType)
@@ -68,10 +68,9 @@ public class AgreementService {
         };
     }
 
-    private String getVersionForType(AgreementType agreementType) {
-        Optional<Agreement> existingAgreement = agreementRepository.findByAgreementType(agreementType);
-        if (existingAgreement.isPresent()) {
-            return agreementVersionHelper.incrementVersion(existingAgreement.get().getVersion());
+    private String getVersionForType(Agreement existingAgreement) {
+        if (existingAgreement != null) {
+            return agreementVersionHelper.incrementVersion(existingAgreement.getVersion());
         }
         return "1.0.0";
     }
@@ -79,6 +78,13 @@ public class AgreementService {
     public Agreement getAgreementByType(AgreementType agreementType) {
         return agreementRepository.findByAgreementType(agreementType)
                 .orElseThrow(() -> new BusinessException(AgreementErrorCodes.AGREEMENT_NOT_FOUND));
+    }
+
+    public List<Agreement> getAgreementsByTypes(List<AgreementType> agreementTypes) {
+        if (agreementTypes == null || agreementTypes.isEmpty()) {
+            return List.of();
+        }
+        return agreementRepository.findAllByAgreementTypeIn(agreementTypes);
     }
 
     public Agreement getAgreementById(UUID agreementId) {

@@ -1,146 +1,152 @@
-# Order Modülü
+# Order Paketi Teknik Rehber
 
-Sipariş yaşam döngüsü: sepetten sipariş oluşturma, ödeme, escrow, kargo durumu, otomatik ve manuel tamamlama, iptal ve iade. Ödeme cüzdan hareketleri `payment` modülündeki `PaymentOrchestrator` üzerinden yapılır; order tarafı sipariş/escrow kayıtlarını ve iş kurallarını yönetir.
+Bu dokumanin amaci:
+- `order` paketinin sinirlarini ve kritik akislarini tek yerde netlestirmek
+- Insan ve AI gelistiricilerin degisiklik yaparken etki alanini hizli kavramasini saglamak
+- Durum gecisi, escrow, iptal/iade ve event akislarinda regresyon riskini azaltmak
 
----
+## 1) Paketin Amaci ve Sinirlari
 
-## Paket Yapısı
+`order` paketi, siparis yasam dongusunu yonetir: olusturma, durum ilerletme, tamamlama, iptal, iade ve escrow ile iliskili domain kararlarini verir.
 
-```
-order/
-├── api/                    → OrderController (checkout, sorgu, iptal, iade, tamamlama)
-├── application/            → Servisler, event'ler, listener'lar
-│   ├── event/              → OrderCreatedEvent, OrderCompletedEvent, OrderCancelledEvent, …
-│   └── listener/           → OrderEmailListener, OrderNotificationListener
-├── dto/                    → CheckoutRequest, OrderDto, iptal/iade istekleri
-├── entity/                 → Order, OrderItem, Shipping, OrderItemEscrow, iptal/iade kayıtları
-├── entity/enums/           → ShippingStatus, CancelRefundReason
-├── mapper/                 → OrderMapper, ShippingMapper
-├── policy/                 → Durum geçişi, iptal, iade, tamamlama kuralları
-├── repository/             → JPA repository'ler
-├── util/                   → OrderErrorCodes, OrderBusinessConstants
-└── validator/              → OrderStatusConsistencyLogger (tutarsızlık loglama)
-```
+Kapsam:
+- Siparis olusturma ve siparis item modelleme
+- Durum gecisi kurallari (policy tabanli)
+- Scheduler ile otomatik ilerletme/tamamlama
+- Manuel tamamlama, iptal ve iade akislarinin domain orkestrasyonu
+- Siparis event yayini ve bildirim tetikleme noktasi
 
----
+Kapsam disi:
+- Odeme stratejisi ve para hareketi detay motoru (`payment`)
+- Sepet/fiyat hesaplama kararlarinin ana kaynagi (`cart`, `pricing`)
+- Kimlik dogrulama ve yetkilendirme altyapisi (`auth`, `security`)
 
-## Yaşam Döngüsü 
+## 2) Paket Yapisi (Nerede Ne Var)
 
-### 1. Checkout (giriş noktası)
+- `api/OrderController.java`
+  - HTTP giris noktasi.
+  - Checkout sonrasi siparis sorgu/aksiyon endpointleri.
 
-`OrderController` → `CheckoutOrchestrator` (checkout modülü):
+- `application/*`
+  - `OrderCreationService`, `OrderQueryService`, `OrderModificationService`, `OrderValidationService`.
+  - `OrderCompletionService`, `OrderCancellationService`, `OrderRefundService`.
+  - `OrderCompletionScheduler` (otomatik durum ilerletme).
+  - `event/*` ve `listener/*` (event publish/consume).
 
-1. Fiyatlandırma bağlamı ve stok rezervasyonu  
-2. `OrderCreationService.createOrder` — adres doğrulama, sipariş + kargo + kalemler, `OrderRepository.save`  
-3. `OrderPaymentService` — satıcı başına ödeme istekleri, `PaymentProcessor`  
-4. Başarılı ödemede `CheckoutOrchestrator` siparişi **PAID / CONFIRMED** yapar, `PaymentOrchestrator.createEscrowsForOrder` ile kalemler için escrow oluşturur  
-5. Başarısız ödemede sipariş **FAILED / CANCELLED**, stok rezervi iade  
-6. `OrderCreatedEvent` — ödeme başarılı/başarısız bilgisiyle yayınlanır  
+- `entity/*`
+  - `Order`, `OrderItem`, `Shipping`, escrow ve iptal/iade kayitlari.
+  - Durum setleri ve domain sabitlerinin bir kismi burada tanimli.
 
-Checkout, sipariş + ödeme + escrow’u tek transaction akışında birleştirir; detaylı ödeme motoru `payment` README’de.
+- `policy/*`
+  - Gecis/iptal/iade/tamamlama uygunluk kurallari.
+  - Is kurali degisikliginde ilk bakilacak yer.
 
-### 2. Sipariş durumları (`Order.OrderStatus`)
+- `repository/*`
+  - Siparis, item, shipping, escrow ve kompanzasyon sorgulari.
 
-Tipik akış (zamanlama sabitleri `OrderBusinessConstants`):
+- `mapper/*`
+  - Entity -> DTO donusumleri (`OrderMapper`, `ShippingMapper`).
 
-| Durum | Anlam |
-|-------|--------|
-| PENDING | Oluşturuldu, ödeme bekleniyor olabilir |
-| CONFIRMED | Ödeme alındı, hazırlık aşaması |
-| PROCESSING | İşleniyor (zamanlayıcı) |
-| SHIPPED | Kargoda |
-| DELIVERED | Teslim edildi |
-| COMPLETED | Tamamlandı; escrow satıcıya serbest bırakıldı |
-| CANCELLED | İptal |
-| REFUNDED | İade işlendi |
+- `util/*`
+  - `OrderErrorCodes`, `OrderBusinessConstants`.
 
-`CANCELLABLE_STATUSES`, `REFUNDABLE_STATUSES`, `MODIFIABLE_STATUSES`, `COMPLETABLE_STATUSES` entity üzerinde merkezi tanımlı.
+## 3) Katmanlar Arasi Standart Akis
 
-### 3. Otomatik ilerleme — `OrderCompletionScheduler`
+Standart akis:
+1. `Controller` istegi alir ve service'e delege eder.
+2. `Service` policy + validator + repository orkestrasyonunu yapar.
+3. `Policy` gecerlilik kurallarini netlestirir.
+4. `Repository` kalicilik/sorgu yapar.
+5. `Mapper` DTO donusumunu tamamlar.
+6. Gerekirse `event` yayinlanir, yan etkiler listener tarafinda ele alinir.
 
-Periyodik job (`@Scheduled`):
+Prensipler:
+- Durum gecisi kurali service icine dagitilmaz; policy merkezli kalir.
+- Para hareketi detaylari `payment` orchestrator/executor katmanina devredilir.
+- Event dinleyicileri ana transaction kararini bozmaz.
 
-- CONFIRMED → PROCESSING → SHIPPED → DELIVERED (zaman eşiklerine göre, `Shipping` tarihleri güncellenir)  
-- DELIVERED + teslimden belli süre sonra → **önce** `releaseEscrowsToSellers`, **başarılıysa** COMPLETED + `OrderCompletedEvent` + `OrderStatusChangedEvent`  
+## 4) Ana Is Akislari
 
-Escrow serbest bırakılamazsa sipariş COMPLETED yapılmaz; sonraki çalışmada tekrar denenir.
+### 4.1 Checkout Sonrasi Siparis Olusturma
+1. Checkout orkestrasyonu siparis olusturma adimini tetikler.
+2. `OrderCreationService` siparis + item + shipping olusturur.
+3. Odeme sonucu basariliysa siparis onaylanir ve escrow olusturma tetiklenir.
+4. Sonuc event ile dis aksiyonlara yayilir.
 
-### 4. Manuel tamamlama — `OrderCompletionService`
+### 4.2 Durum Gecisi ve Otomatik Ilerleme
+1. `OrderCompletionScheduler` periodik calisir.
+2. Durumlar zaman esiklerine gore ilerletilir.
+3. Tamamlama adiminda once escrow release denenir.
+4. Release basariliysa `COMPLETED` ve ilgili eventler yazilir.
 
-Alıcı “teslim aldım” benzeri akış: politika + validasyon → escrow release → durum COMPLETED → `OrderCompletedEvent` (manuel bayrakla).
+### 4.3 Manuel Tamamlama
+1. Kullanici aksiyonu policy kurallarindan gecer.
+2. Escrow release yapilir.
+3. Durum `COMPLETED` edilir ve event yayinlanir.
 
-### 5. İptal — `OrderCancellationService`
+### 4.4 Iptal
+1. Iptal uygunlugu policy/validation ile dogrulanir.
+2. Item bazli kompanzasyon plani cikarilir.
+3. Escrow iptal + alici iadesi payment orchestrator ile yapilir.
+4. Kalici kayitlar yazilir ve `OrderCancelledEvent` yayinlanir.
 
-Validasyon → `OrderItemCompensationPlanner` ile iptal planı → `PaymentOrchestrator.cancelEscrowsAndRefundBuyer` → kalıcı iptal kayıtları → `OrderCancelledEvent`.
+### 4.5 Iade
+1. Iade uygunlugu policy ile kontrol edilir.
+2. Satıcı ve escrow kaynakli iade akisi payment orchestrator ile isletilir.
+3. Kayitlar guncellenir ve `OrderRefundedEvent` yayinlanir.
 
-### 6. İade — `OrderRefundService`
+## 5) Kritik Is Kurallari
 
-Teslim sonrası iade kuralları → `PaymentOrchestrator.refundFromSellersAndEscrows` → `OrderRefundedEvent`.
+- Gecersiz durum gecisleri policy katmaninda engellenir.
+- Tamamlama, escrow release basarisizsa finalize edilmez.
+- Iptal ve iade kararinda item bazli plan zorunludur.
+- Event yayinlari domain karari tamamlandiktan sonra yapilir.
 
----
+## 6) Performans ve Davranissal Risk Notlari
 
-## Escrow ve Sorumluluk Ayrımı
+- Query tarafinda item/shipping/escrow baglantilari N+1 riski acisindan izlenmelidir.
+- Scheduler akisi buyuk veri setinde toplu isleme uygun kalmalidir.
+- Iptal/iade akislarinda kismi basari senaryolari idempotent ele alinmalidir.
+- Mapper tarafinda ek relation erisimi eklenirse liste endpoint maliyeti yeniden olculmelidir.
 
-| Katman | Rol |
-|--------|-----|
-| `EscrowCreateExecutor` (payment) | Checkout sonrası toplu escrow oluşturma (N+1’siz bulk) |
-| `OrderEscrowService` | Escrow entity sorgu/durum; cüzdan hareketi yok |
-| `PaymentOrchestrator` | Para: release, iptal+iade, refund |
+## 7) Bir Degisiklik Yapacaginda Ne Yapacaksin?
 
----
+### A) Durum kurali degistirmek
+1. Once `policy` siniflarini guncelle.
+2. Sonra ilgili service akisini policy sonucuna gore revize et.
+3. Event tetikleme kosullarini kontrol et.
+4. `OrderErrorCodes` semantigini bozmadan hata durumlarini hizala.
 
-## Domain Event’ler ve Yan Etkiler
+### B) Iptal/Iade davranisi degistirmek
+1. `OrderCancellationService` veya `OrderRefundService` akisini belirle.
+2. `OrderItemCompensationPlanner` ve kalicilik adimlarini birlikte ele al.
+3. Payment orchestrator cagri semantigini kontrol et.
+4. Event ve bildirim zincirini tekrar dogrula.
 
-Event’ler işlem commit’inden sonra dinlenir (`AFTER_COMMIT`), e-posta/bildirim ana transaction’ı bozmaz.
+### C) Yeni endpoint eklemek
+1. `OrderController` imzasini ekle.
+2. Is mantigini service'e tasi.
+3. Gerekirse DTO + mapper + repository metotlarini birlikte guncelle.
+4. Yetki/sahiplik kontrolunun servis katmaninda oldugundan emin ol.
 
-| Event | Tipik dinleyici |
-|-------|------------------|
-| `OrderCreatedEvent` | E-posta (başarılı ödeme), in-app |
-| `OrderCompletedEvent` | Tamamlama bildirimleri |
-| `OrderCancelledEvent` | İptal bildirimleri |
-| `OrderRefundedEvent` | İade bildirimleri |
-| `OrderStatusChangedEvent` | Durum değişikliği bildirimleri |
+## 8) Yeni Ozellik Eklerken Hizli Runbook
 
-`OrderEmailListener` / `OrderNotificationListener` — ayrı sorumluluk (SRP).
+1. Ozelligin hangi asamaya ait oldugunu netlestir: olusturma, gecis, tamamlama, iptal, iade.
+2. Etkilenen policy'leri tespit et; kurali once policy'de tanimla.
+3. Service orkestrasyonunu yeni kurala gore guncelle.
+4. Payment ile temas varsa order tarafinda sadece orkestrasyon karari al, para detayina girme.
+5. Event etkisini kontrol et:
+   - Hangi event cikmali/cikmamali
+   - Listener yan etkisi ana karari etkilememeli
+6. Davranissal risk testi ekle:
+   - Scheduler gecisi
+   - Escrow release basarisizlik senaryosu
+   - Iptal/iade kismi basari senaryosu
 
----
+## 9) AI Ajanlari Icin Kisa Protokol
 
-## Politikalar (`policy/`)
-
-- `OrderStateTransitionPolicy` — geçerli durum geçişleri  
-- `OrderCancellationPolicy` / `OrderCancellationValidationService` — iptal edilebilirlik  
-- `OrderRefundPolicy` — iade koşulları  
-- `OrderCompletionPolicy` — tamamlanabilirlik  
-
-İş kuralı değişince önce politika katmanına bakılır.
-
----
-
-## Önemli Servisler (Özet Tablo)
-
-| Servis | Görev |
-|--------|--------|
-| `OrderCreationService` | Sipariş + kalemler + shipping oluşturma |
-| `OrderQueryService` | Alıcı/satıcı listesi ve detay; iptal/iade miktarlarını toplayıp mapper’a verir (N+1 önleme) |
-| `OrderModificationService` | İsim, not, adres (modifiye edilebilir durumlarda) |
-| `OrderValidationService` | Ortak sahiplik / erişim kontrolleri |
-| `OrderItemCompensationPlanner` | İptal/iade için satır bazlı plan |
-| `OrderCompensationPersistenceService` | İptal/iade kayıtlarının kalıcılığı |
-| `OrderLogService` | Merkezi operasyon log’u |
-| `OrderMapper` | Entity → DTO; repository inject etmez |
-
----
-
-## Özet
-
-Sipariş checkout’ta oluşturuluyor: fiyat ve stok rezervi sonrası `OrderCreationService` siparişi ve kalemleri kaydediyor. Ödeme `PaymentProcessor` ile satıcı başına parçalanıyor. Ödeme başarılıysa sipariş onaylanıyor ve her kalem için escrow açılıyor — para satıcıya hemen gitmiyor. Sonra ya zamanlayıcıyla kargo hattı simüle edilip teslim, ya da kullanıcı manuel tamamlıyor; her iki durumda da önce escrow serbest bırakılıyor, sonra COMPLETED. İptalde escrow iptal + alıcı iadesi, iadede satıcıdan kesip alıcıya refund. Bildirimler domain event’lerle, commit sonrası async ayrı listener’larda.
-
----
-
-## İlişkili Modüller
-
-- **checkout** — `CheckoutOrchestrator` (sipariş + ödeme + escrow + kupon/teklif)  
-- **payment** — ödeme motoru ve escrow para akışı  
-- **cart / pricing / listing / user** — sepet, fiyat, ilan, adres  
-
-Daha fazla ödeme detayı için: `payment/README.md`.
+Bu pakette otomatik degisiklik yapan ajanlar:
+1. `Controller -> Service -> Policy -> Repository -> Mapper` zincirini sirayla izle.
+2. Durum gecisi kuralini service icine dagitma, policy merkezli tut.
+3. Payment ile ilgili degisiklikte order tarafinda sadece orkestrasyon kararini degistir.
+4. Event cikis noktalarini koru; commit sonrasi yan etki modelini bozma.

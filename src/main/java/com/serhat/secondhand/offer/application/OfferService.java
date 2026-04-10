@@ -41,9 +41,9 @@ public class OfferService implements IOfferService {
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
-        var userResult = userService.findById(buyerId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
-        User buyer = userResult.getData();
+        Result<User> buyerResult = findUser(buyerId);
+        if (buyerResult.isError()) return buyerResult.propagateError();
+        User buyer = buyerResult.getData();
 
         Result<Void> validationResult = offerValidator.validateCreateRequest(request);
         if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
@@ -63,20 +63,20 @@ public class OfferService implements IOfferService {
 
     @Transactional(readOnly = true)
     public Page<OfferDto> listMade(Long buyerId, Pageable pageable) {
-        return offerRepository.findByBuyerIdWithDetails(buyerId, pageable)
+        return offerRepository.findByBuyerId(buyerId, pageable)
                 .map(offerMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Page<OfferDto> listReceived(Long sellerId, Pageable pageable) {
-        return offerRepository.findBySellerIdWithDetails(sellerId, pageable)
+        return offerRepository.findBySellerId(sellerId, pageable)
                 .map(offerMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Result<OfferDto> getByIdForUser(Long userId, UUID offerId) {
-        var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        Result<User> userResult = findUser(userId);
+        if (userResult.isError()) return userResult.propagateError();
 
         Result<Offer> offerResult = findOffer(offerId);
         if (offerResult.isError()) return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
@@ -105,6 +105,10 @@ public class OfferService implements IOfferService {
 
         Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
         if (eligibilityResult.isError()) return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+
+        Listing lockedListing = listingService.findByIdWithLock(offer.getListing().getId()).orElse(null);
+        if (lockedListing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+        offer.setListing(lockedListing);
 
         if (offerRepository.existsByListingAndStatusAndIdNot(offer.getListing(), OfferStatus.ACCEPTED, offer.getId())) {
             return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
@@ -138,11 +142,12 @@ public class OfferService implements IOfferService {
 
     @Transactional
     public Result<OfferDto> counter(Long userId, UUID offerId, CounterOfferRequest request) {
-        var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        Result<User> userResult = findUser(userId);
+        if (userResult.isError()) return userResult.propagateError();
         User user = userResult.getData();
 
-        if (offerValidator.validateCounterRequest(request).isError()) return Result.error(OfferErrorCodes.INVALID_TOTAL_PRICE);
+        Result<Void> counterValidationResult = offerValidator.validateCounterRequest(request);
+        if (counterValidationResult.isError()) return counterValidationResult.propagateError();
 
         Result<Offer> previousResult = getOfferForAction(userId, offerId);
         if (previousResult.isError()) return Result.error(previousResult.getMessage(), previousResult.getErrorCode());
@@ -198,8 +203,8 @@ public class OfferService implements IOfferService {
 
 
     private Result<Offer> getOfferForAction(Long userId, UUID offerId) {
-        var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        Result<User> userResult = findUser(userId);
+        if (userResult.isError()) return userResult.propagateError();
 
         Result<Offer> offerResult = findOffer(offerId);
         if (offerResult.isError()) return offerResult;
@@ -217,6 +222,12 @@ public class OfferService implements IOfferService {
         return offerRepository.findById(offerId)
                 .map(Result::success)
                 .orElse(Result.error(OfferErrorCodes.OFFER_NOT_FOUND));
+    }
+
+    private Result<User> findUser(Long userId) {
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        return userResult;
     }
 
     private boolean isExpired(Offer offer) {

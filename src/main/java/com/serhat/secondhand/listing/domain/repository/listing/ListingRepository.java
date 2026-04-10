@@ -102,6 +102,12 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
     List<Listing> findAllByIdIn(@Param("ids") Collection<UUID> ids);
 
+    long countByIdIn(Collection<UUID> ids);
+
+    long countByIdInAndSellerId(Collection<UUID> ids, Long sellerId);
+
+    boolean existsByIdInAndListingTypeIn(Collection<UUID> ids, Collection<ListingType> listingTypes);
+
     long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
     long countBySellerId(Long sellerId);

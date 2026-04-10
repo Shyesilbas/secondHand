@@ -3,21 +3,21 @@ import { showcaseService } from '../services/showcaseService.js';
 
 export const SHOWCASE_QUERY_KEYS = {
   all: ['showcases'],
-  active: () => [...SHOWCASE_QUERY_KEYS.all, 'active'],
+  active: (page = 0, size = 12) => [...SHOWCASE_QUERY_KEYS.all, 'active', page, size],
   mine: (userId) => [...SHOWCASE_QUERY_KEYS.all, 'mine', userId || 'anonymous'],
 };
 
 export const useShowcaseQueries = (options = {}) => {
-  const { enabled = true } = options;
+  const { enabled = true, page = 0, size = 12 } = options;
 
   const {
-    data: showcases = [],
+    data: showcasePage,
     isLoading: loading,
     error,
     refetch,
   } = useQuery({
-    queryKey: SHOWCASE_QUERY_KEYS.active(),
-    queryFn: showcaseService.getActiveShowcases,
+    queryKey: SHOWCASE_QUERY_KEYS.active(page, size),
+    queryFn: () => showcaseService.getActiveShowcases({ page, size }),
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -27,6 +27,8 @@ export const useShowcaseQueries = (options = {}) => {
     retryDelay: 1000,
   });
 
+  const showcases = Array.isArray(showcasePage?.content) ? showcasePage.content : [];
+
   const isInShowcase = (listingId) => {
     if (!Array.isArray(showcases)) return false;
     return showcases.some((s) => (s?.listing?.id || s?.listingId) === listingId);
@@ -34,6 +36,7 @@ export const useShowcaseQueries = (options = {}) => {
 
   return {
     showcases,
+    showcasePage,
     loading,
     error: error?.message,
     refetch,

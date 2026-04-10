@@ -13,9 +13,10 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface TokenRepository extends JpaRepository<Token, Long> {
+ public interface TokenRepository extends JpaRepository<Token, UUID> {
 
     Optional<Token> findByToken(String token);
 
@@ -29,4 +30,39 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     Optional<Token> findByTokenAndTokenTypeAndTokenStatus(String token, TokenType tokenType, TokenStatus tokenStatus);
 
     List<Token> findByUserAndTokenTypeAndTokenStatus(User user, TokenType tokenType, TokenStatus tokenStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Token t
+            SET t.tokenStatus = :newStatus
+            WHERE t.user = :user
+              AND t.tokenType = :tokenType
+              AND t.tokenStatus = :currentStatus
+            """)
+    int bulkUpdateUserTokensByTypeAndStatus(@Param("user") User user,
+                                            @Param("tokenType") TokenType tokenType,
+                                            @Param("currentStatus") TokenStatus currentStatus,
+                                            @Param("newStatus") TokenStatus newStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Token t
+            SET t.tokenStatus = :newStatus
+            WHERE t.user = :user
+              AND t.tokenStatus = :currentStatus
+            """)
+    int bulkUpdateUserTokensByStatus(@Param("user") User user,
+                                     @Param("currentStatus") TokenStatus currentStatus,
+                                     @Param("newStatus") TokenStatus newStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Token t
+            SET t.tokenStatus = :newStatus
+            WHERE t.expiresAt <= :now
+              AND t.tokenStatus = :currentStatus
+            """)
+    int bulkExpireTokens(@Param("now") LocalDateTime now,
+                         @Param("currentStatus") TokenStatus currentStatus,
+                         @Param("newStatus") TokenStatus newStatus);
 }

@@ -41,6 +41,11 @@ public class ListingQueryService {
         return listingRepository.findById(id);
     }
 
+    @Transactional
+    public Optional<Listing> findByIdWithLock(UUID id) {
+        return listingRepository.findByIdWithLock(id);
+    }
+
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
         return listingRepository.findByIdWithSeller(id).map(listing -> {
             ListingDto dto = listingMapper.toDynamicDto(listing);

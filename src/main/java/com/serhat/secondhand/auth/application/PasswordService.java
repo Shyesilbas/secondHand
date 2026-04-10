@@ -133,6 +133,10 @@ public class PasswordService {
                     UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
         }
 
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return Result.error(AuthErrorCodes.PASSWORD_CONFIRMATION_MISMATCH);
+        }
+
         Result<Void> validationResult = validateNewPassword(request.getNewPassword(), user.getPassword());
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());

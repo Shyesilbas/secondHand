@@ -9,6 +9,7 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisti
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,7 +71,7 @@ public class DashboardService implements IDashboardService {
         CompletableFuture<List<Object[]>> categoryRevenueFuture = CompletableFuture.supplyAsync(() ->
                 salesStatisticsPort.sumRevenueBySellerAndCategory(sellerId, startDate, endDate), taskExecutor);
 
-        CompletableFuture<List<Object[]>> reviewStatsFuture = CompletableFuture.supplyAsync(() ->
+        CompletableFuture<ReviewStatsDto> reviewStatsFuture = CompletableFuture.supplyAsync(() ->
                 reviewStatisticsPort.getUserReviewStats(sellerId), taskExecutor);
 
         CompletableFuture<List<Object[]>> topListingsRawFuture = CompletableFuture.supplyAsync(() ->
@@ -93,11 +94,9 @@ public class DashboardService implements IDashboardService {
         long totalOrders = ordersByStatusMap.values().stream().mapToLong(Long::longValue).sum();
         long completed = ordersByStatusMap.getOrDefault("COMPLETED", 0L) + ordersByStatusMap.getOrDefault("DELIVERED", 0L);
 
-        List<Object[]> reviewStatsRaw = reviewStatsFuture.join();
-        long totalReviews = (reviewStatsRaw != null && !reviewStatsRaw.isEmpty())
-                ? ((Number) reviewStatsRaw.get(0)[0]).longValue() : 0L;
-        double averageRating = (reviewStatsRaw != null && !reviewStatsRaw.isEmpty() && reviewStatsRaw.get(0).length >= 2 && reviewStatsRaw.get(0)[1] != null)
-                ? ((Number) reviewStatsRaw.get(0)[1]).doubleValue() : 0.0;
+        ReviewStatsDto reviewStats = Optional.ofNullable(reviewStatsFuture.join()).orElse(ReviewStatsDto.empty());
+        long totalReviews = reviewStats.getTotalReviews() != null ? reviewStats.getTotalReviews() : 0L;
+        double averageRating = reviewStats.getAverageRating() != null ? reviewStats.getAverageRating() : 0.0;
 
         return SellerDashboardDto.builder()
                 .totalRevenue(revenueFuture.join())
@@ -118,7 +117,7 @@ public class DashboardService implements IDashboardService {
                 .topListings(processTopListings(topListingsRawFuture.join(), sellerId))
                 .averageRating(averageRating)
                 .totalReviews(totalReviews)
-                .ratingDistribution(dashboardMapper.mapRatingDistribution(reviewStatsRaw))
+                .ratingDistribution(dashboardMapper.mapRatingDistribution(reviewStats))
                 .soldListings(salesStatisticsPort.countDistinctListingsSoldBySellerAndDateRange(sellerId, startDate, endDate))
                 .categoryOrderCount(dashboardMapper.mapCategoryOrderCount(categoryOrderCountRawFuture.join()))
                 .startDate(startDate)

@@ -1,17 +1,19 @@
 package com.serhat.secondhand.campaign.validator;
 
 import com.serhat.secondhand.campaign.entity.Campaign;
+import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +45,13 @@ public class CampaignValidator {
             return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
         }
         if (campaign.getDiscountKind() == null || campaign.getValue() == null) {
+            return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
+        }
+        if (campaign.getValue().compareTo(BigDecimal.ZERO) <= 0) {
+            return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
+        }
+        if (campaign.getDiscountKind() == CampaignDiscountKind.PERCENT
+                && campaign.getValue().compareTo(BigDecimal.valueOf(100)) > 0) {
             return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
         }
         return Result.success();
@@ -79,20 +88,19 @@ public class CampaignValidator {
         if (campaign.getEligibleListingIds() == null || campaign.getEligibleListingIds().isEmpty()) {
             return Result.success();
         }
-
-        List<Listing> listings = listingRepository.findAllById(campaign.getEligibleListingIds());
-        if (listings.size() != campaign.getEligibleListingIds().size()) {
+        Set<java.util.UUID> eligibleIds = campaign.getEligibleListingIds();
+        long totalCount = listingRepository.countByIdIn(eligibleIds);
+        if (totalCount != eligibleIds.size()) {
             return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
         }
-
-        for (Listing listing : listings) {
-            if (!listing.getSeller().getId().equals(seller.getId())) {
-                return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_OWNED);
-            }
-            if (listing.getListingType() == ListingType.REAL_ESTATE
-                    || listing.getListingType() == ListingType.VEHICLE) {
-                return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_ALLOWED_FOR_TYPE);
-            }
+        long ownedCount = listingRepository.countByIdInAndSellerId(eligibleIds, seller.getId());
+        if (ownedCount != eligibleIds.size()) {
+            return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_OWNED);
+        }
+        if (listingRepository.existsByIdInAndListingTypeIn(
+                eligibleIds,
+                List.of(ListingType.REAL_ESTATE, ListingType.VEHICLE))) {
+            return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_ALLOWED_FOR_TYPE);
         }
         
         return Result.success();

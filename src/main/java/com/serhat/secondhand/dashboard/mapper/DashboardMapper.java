@@ -3,6 +3,7 @@ package com.serhat.secondhand.dashboard.mapper;
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -72,18 +73,15 @@ public class DashboardMapper {
         return result;
     }
 
-    public Map<Integer, Long> mapRatingDistribution(List<Object[]> reviewStats) {
+    public Map<Integer, Long> mapRatingDistribution(ReviewStatsDto reviewStats) {
         Map<Integer, Long> distribution = new HashMap<>();
-        if (reviewStats != null && !reviewStats.isEmpty()) {
-            Object[] stats = reviewStats.get(0);
-            if (stats.length >= 8) {
-                distribution.put(5, stats[2] != null ? ((Number) stats[2]).longValue() : 0L);
-                distribution.put(4, stats[3] != null ? ((Number) stats[3]).longValue() : 0L);
-                distribution.put(3, stats[4] != null ? ((Number) stats[4]).longValue() : 0L);
-                distribution.put(2, stats[5] != null ? ((Number) stats[5]).longValue() : 0L);
-                distribution.put(1, stats[6] != null ? ((Number) stats[6]).longValue() : 0L);
-                distribution.put(0, stats[7] != null ? ((Number) stats[7]).longValue() : 0L);
-            }
+        if (reviewStats != null) {
+            distribution.put(5, reviewStats.getFiveStarReviews() != null ? reviewStats.getFiveStarReviews() : 0L);
+            distribution.put(4, reviewStats.getFourStarReviews() != null ? reviewStats.getFourStarReviews() : 0L);
+            distribution.put(3, reviewStats.getThreeStarReviews() != null ? reviewStats.getThreeStarReviews() : 0L);
+            distribution.put(2, reviewStats.getTwoStarReviews() != null ? reviewStats.getTwoStarReviews() : 0L);
+            distribution.put(1, reviewStats.getOneStarReviews() != null ? reviewStats.getOneStarReviews() : 0L);
+            distribution.put(0, reviewStats.getZeroStarReviews() != null ? reviewStats.getZeroStarReviews() : 0L);
         }
         return distribution;
     }

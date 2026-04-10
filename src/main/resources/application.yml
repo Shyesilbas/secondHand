@@ -77,9 +77,14 @@ app:
     allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
     max-age: ${CORS_MAX_AGE:3600}
   cart:
+    zone-id: ${CART_ZONE_ID:Europe/Istanbul}
     reservation:
       enabled: ${CART_RESERVATION_ENABLED:true}
       timeout-minutes: ${CART_RESERVATION_TIMEOUT_MINUTES:15}
+    defaults:
+      quantity: ${CART_DEFAULT_QUANTITY:1}
+    scheduler:
+      cleanup-fixed-rate-ms: ${CART_SCHEDULER_CLEANUP_FIXED_RATE_MS:60000}
   listing:
     creation:
       fee: 50.00
@@ -90,11 +95,27 @@ app:
     top-default-size: ${FAVORITE_TOP_DEFAULT_SIZE:10}
     top-listings-default-size: ${FAVORITE_TOP_LISTINGS_DEFAULT_SIZE:10}
     top-listings-max-size: ${FAVORITE_TOP_LISTINGS_MAX_SIZE:100}
+  favorite-list:
+    my-lists-default-size: ${FAVORITE_LIST_MY_DEFAULT_SIZE:5}
+    user-public-lists-default-size: ${FAVORITE_LIST_USER_PUBLIC_DEFAULT_SIZE:5}
+    popular-default-size: ${FAVORITE_LIST_POPULAR_DEFAULT_SIZE:10}
+    max-lists-per-user: ${FAVORITE_LIST_MAX_PER_USER:20}
+    max-items-per-list: ${FAVORITE_LIST_MAX_ITEMS_PER_LIST:100}
+  campaign:
+    list-default-size: ${CAMPAIGN_LIST_DEFAULT_SIZE:5}
+    scheduler-deactivate-fixed-delay-ms: ${CAMPAIGN_DEACTIVATE_FIXED_DELAY_MS:600000}
+  offer:
+    expiration-hours: ${OFFER_EXPIRATION_HOURS:24}
+    scheduler-cron: ${OFFER_SCHEDULER_CRON:0 * * * * *}
   showcase:
     daily:
       cost: 10.00
     fee:
       tax: 18.00
+    max-days: ${SHOWCASE_MAX_DAYS:30}
+    active-list-default-size: ${SHOWCASE_ACTIVE_LIST_DEFAULT_SIZE:12}
+    scheduler:
+      expire-cron: ${SHOWCASE_EXPIRE_CRON:0 0 * * * ?}
   seed:
     startup-enabled: ${SEED_STARTUP_ENABLED:true}
 

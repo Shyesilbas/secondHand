@@ -3,18 +3,16 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRight,
   ChevronDown,
-  Package,
   ShoppingBag,
-  TrendingUp,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { USER_DEFAULTS } from '../userConstants.js';
 import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
-import { dashboardService } from '../../dashboard/services/dashboardService.js';
 import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency } from '../../common/formatters.js';
+import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
 
 const getInitials = (name) => {
   const value = (name || '').trim();
@@ -26,20 +24,6 @@ const getInitials = (name) => {
 };
 
 const isRouteActive = (pathname, route) => pathname === route;
-
-const StatCard = ({ label, value, icon: Icon, iconBg, loading }) => (
-  <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between min-h-[132px]">
-    <div className="flex justify-between items-start mb-4">
-      <span className="text-[12px] font-semibold text-gray-500 leading-tight max-w-[110px]">{label}</span>
-      <div className={`w-9 h-9 rounded-lg ${iconBg} flex items-center justify-center text-white shrink-0`}>
-        <Icon className="w-4.5 h-4.5" />
-      </div>
-    </div>
-    <div className="text-[28px] font-bold text-gray-900 leading-none tracking-tight">
-      {loading ? <span className="inline-block w-14 h-7 bg-gray-200 rounded animate-pulse" /> : value}
-    </div>
-  </div>
-);
 
 const AccountHubPage = () => {
   const { user } = useAuthState();
@@ -62,24 +46,6 @@ const AccountHubPage = () => {
     });
   };
 
-  const { data: buyerData, isLoading: buyerLoading } = useQuery({
-    queryKey: ['buyerDashboard', user?.id],
-    queryFn: () => dashboardService.getBuyerDashboard(),
-    enabled: !!user?.id,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: sellerData, isLoading: sellerLoading } = useQuery({
-    queryKey: ['sellerDashboard', user?.id],
-    queryFn: () => dashboardService.getSellerDashboard(),
-    enabled: !!user?.id,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-
   const { data: ordersData, isLoading: ordersLoading } = useQuery({
     queryKey: ['myOrders', user?.id, 0, 5],
     queryFn: () => orderService.myOrders(0, 5),
@@ -90,13 +56,6 @@ const AccountHubPage = () => {
   });
 
   const recentOrders = useMemo(() => ordersData?.content || [], [ordersData]);
-
-  const totalOrders = buyerData?.totalOrders ?? buyerData?.orderCount ?? null;
-  const totalSpent = buyerData?.totalSpent ?? buyerData?.totalAmount ?? null;
-  const activeOrders = buyerData?.activeOrders ?? buyerData?.pendingOrders ?? null;
-  const activeListings = sellerData?.activeListings ?? sellerData?.listingCount ?? null;
-
-  const statsLoading = buyerLoading || sellerLoading;
 
   if (!user) {
     return (
@@ -188,37 +147,6 @@ const AccountHubPage = () => {
             <p className="mt-1.5 text-sm text-gray-500">Here&apos;s what&apos;s happening with your account today.</p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
-            <StatCard
-              label="Total Orders"
-              value={totalOrders ?? '—'}
-              icon={ShoppingBag}
-              iconBg="bg-blue-500"
-              loading={statsLoading && totalOrders === null}
-            />
-            <StatCard
-              label="Active Orders"
-              value={activeOrders ?? '—'}
-              icon={Package}
-              iconBg="bg-purple-500"
-              loading={statsLoading && activeOrders === null}
-            />
-            <StatCard
-              label="Total Spent"
-              value={totalSpent != null ? formatCurrency(totalSpent) : '—'}
-              icon={TrendingUp}
-              iconBg="bg-emerald-500"
-              loading={statsLoading && totalSpent === null}
-            />
-            <StatCard
-              label="Active Listings"
-              value={activeListings ?? '—'}
-              icon={Package}
-              iconBg="bg-pink-500"
-              loading={sellerLoading && activeListings === null}
-            />
-          </div>
-
           <div className="bg-white rounded-[24px] border border-gray-200 p-6 lg:p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
@@ -296,6 +224,8 @@ const AccountHubPage = () => {
               </div>
             )}
           </div>
+
+          <MyShowcasesPanel userId={user?.id} />
         </div>
       </main>
     </div>

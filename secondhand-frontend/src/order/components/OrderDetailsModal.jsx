@@ -39,7 +39,10 @@ import {
 import CancelRefundModal from './CancelRefundModal.jsx';
 
 const StatusBadge = ({ label, type = 'rose' }) => {
-  const styles = { rose: 'bg-rose-50/80 border-rose-200/60 text-rose-600', amber: 'bg-amber-50/80 border-amber-200/60 text-amber-600' };
+  const styles = {
+    rose: 'bg-rose-50 border-rose-200 text-rose-700',
+    amber: 'bg-amber-50 border-amber-200 text-amber-700',
+  };
   return (
     <span className={`px-2 py-0.5 text-[10px] font-medium rounded-md border ${styles[type]}`}>{label}</span>
   );
@@ -49,8 +52,8 @@ const GlassCard = ({ children, className = '', critical = false }) => (
   <div
     className={`rounded-2xl border backdrop-blur-sm transition-all ${
       critical
-        ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10'
-        : 'bg-white/80 border-slate-200/60 shadow-sm'
+        ? 'bg-slate-900 text-white border-slate-800 shadow-sm'
+        : 'bg-white border-slate-200 shadow-sm'
     } ${className}`}
   >
     {children}
@@ -167,25 +170,25 @@ const OrderDetailsModal = React.memo(
     return (
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
-          isSellerView ? 'bg-slate-900/40 backdrop-blur-md' : 'bg-gray-900/40 backdrop-blur-sm'
+          isSellerView ? 'bg-slate-900/35 backdrop-blur-sm' : 'bg-slate-900/30 backdrop-blur-sm'
         } animate-in fade-in duration-300`}
         style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
       >
         <div
-          className={`w-full ${isSellerView ? 'max-w-5xl rounded-3xl border border-white/20 shadow-2xl shadow-slate-900/20' : 'max-w-6xl rounded-xl border border-gray-200/60 shadow-xl shadow-gray-900/20'} max-h-[92vh] bg-white overflow-hidden flex flex-col`}
+          className={`w-full ${isSellerView ? 'max-w-5xl rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10' : 'max-w-6xl rounded-2xl border border-slate-200 shadow-lg shadow-slate-900/10'} max-h-[92vh] bg-slate-50 overflow-hidden flex flex-col`}
         >
           <div
             className={`${
-              isSellerView ? 'px-8 py-6 bg-slate-50/50 border-b border-slate-100' : 'px-6 py-5 bg-white border-b border-gray-200/60'
+              isSellerView ? 'px-8 py-6 bg-white border-b border-slate-200' : 'px-6 py-5 bg-white border-b border-slate-200'
             } flex items-center justify-between group`}
           >
             <div className="flex items-center gap-3">
               <div
                 className={`${
-                  isSellerView ? 'w-12 h-12 rounded-2xl shadow-sm border border-slate-200 bg-white' : 'w-10 h-10 rounded-lg border border-gray-200/60 bg-gray-50'
+                  isSellerView ? 'w-12 h-12 rounded-2xl border border-slate-200 bg-slate-50' : 'w-10 h-10 rounded-lg border border-slate-200 bg-slate-50'
                 } flex items-center justify-center`}
               >
-                <Package className={`${isSellerView ? 'text-slate-700 w-6 h-6' : 'text-gray-700 w-5 h-5'}`} />
+                <Package className={`${isSellerView ? 'text-slate-600 w-6 h-6' : 'text-slate-600 w-5 h-5'}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -224,7 +227,7 @@ const OrderDetailsModal = React.memo(
                         <>
                           <button
                             onClick={() => setIsEditingName(true)}
-                            className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100"
+                            className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100"
                             title="Edit order name"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -243,27 +246,27 @@ const OrderDetailsModal = React.memo(
                     </>
                   )}
                 </div>
-                <p className={`${isSellerView ? 'text-sm text-slate-500 font-normal' : 'text-xs text-gray-500 font-medium mt-0.5'}`}>
+                <p className={`${isSellerView ? 'text-sm text-slate-500 font-normal' : 'text-xs text-slate-500 font-medium mt-0.5'}`}>
                   {formatDateTime(selectedOrder.createdAt)}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className={`${isSellerView ? 'p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all border border-transparent hover:border-slate-200' : 'p-1.5 hover:bg-gray-100 rounded-md transition-colors'} text-gray-400 hover:text-gray-600`}
+              className={`${isSellerView ? 'p-2 hover:bg-slate-100 rounded-xl transition-all border border-transparent hover:border-slate-200' : 'p-1.5 hover:bg-slate-100 rounded-md transition-colors'} text-slate-400 hover:text-slate-600`}
             >
-              <X className={`${isSellerView ? 'w-6 h-6 text-slate-400' : 'w-5 h-5'}`} />
+              <X className={`${isSellerView ? 'w-6 h-6 text-slate-500' : 'w-5 h-5'}`} />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             <div className={`${isSellerView ? 'p-8' : 'p-6'}`}>
               <GlassCard className={`p-6 mb-8`}>
-                <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4' : 'text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-5'}`}>
+                <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4' : 'text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-5'}`}>
                   Tracking Progress
                 </h3>
                 <OrderProgressStepper currentStatus={selectedOrder.status} variant={stepperVariant} />
-                <div className={`${isSellerView ? 'text-xs text-slate-500' : 'text-xs text-gray-500 font-medium'} mt-2`}>
+                <div className={`${isSellerView ? 'text-xs text-slate-500' : 'text-xs text-slate-500 font-medium'} mt-2`}>
                   Last update: {resolveEnumLabel(enums, 'orderStatuses', lastUpdate.status) || lastUpdate.status}
                   {lastUpdate.updatedAt ? ` • ${formatDateTime(lastUpdate.updatedAt)}` : ''}
                 </div>

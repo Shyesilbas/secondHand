@@ -1,7 +1,6 @@
 package com.serhat.secondhand.cart.application;
 
 import com.serhat.secondhand.cart.config.CartConfig;
-import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,20 +21,20 @@ public class CartReservationScheduler {
     private final CartRepository cartRepository;
     private final CartConfig cartConfig;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRateString = "${app.cart.scheduler.cleanup-fixed-rate-ms:60000}")
     @Transactional
     public void cleanupExpiredReservations() {
         if (!cartConfig.getReservation().isEnabled()) {
             return;
         }
 
-        List<Cart> expired = cartRepository.findExpiredReservations(LocalDateTime.now(ZoneId.of("Europe/Istanbul")));
-        if (expired.isEmpty()) return;
+        ZoneId zoneId = ZoneId.of(Optional.ofNullable(cartConfig.getZoneId()).orElse("Europe/Istanbul"));
+        LocalDateTime now = LocalDateTime.now(zoneId);
+        List<Long> expiredIds = cartRepository.findExpiredReservationIds(now);
+        if (expiredIds.isEmpty()) return;
 
-        log.info("Removing {} expired cart reservations", expired.size());
-        for (Cart cart : expired) {
-            cartRepository.delete(cart);
-            log.debug("Removed expired reservation: cart {} listing {}", cart.getId(), cart.getListing().getId());
-        }
+        log.info("Removing {} expired cart reservations", expiredIds.size());
+        cartRepository.deleteAllByIdInBatch(expiredIds);
+        log.debug("Expired reservations removed in batch");
     }
 }
