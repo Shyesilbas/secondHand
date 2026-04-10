@@ -24,15 +24,15 @@ export const FAVORITE_LIST_MODAL_LIMITS = Object.freeze({
 });
 
 export const FAVORITE_LIST_MESSAGES = Object.freeze({
-  DELETE_LIST_TITLE: 'Listeyi Sil',
-  DELETE_LIST_CONFIRM: 'Bu listeyi silmek istediğinize emin misiniz?',
-  REMOVE_ITEM_TITLE: 'Ürünü Çıkar',
-  REMOVE_ITEM_CONFIRM: 'Bu ürünü listeden çıkarmak istediğinize emin misiniz?',
-  LINK_COPIED_TITLE: 'Başarılı',
-  LINK_COPIED: 'Link kopyalandı!',
-  NOT_FOUND_TITLE: 'Liste Bulunamadı',
-  NOT_FOUND_BODY: 'Bu liste silinmiş veya size özel olabilir.',
-  BACK: 'Geri Dön',
-  SOLD_LABEL: 'Satıldı',
-  INACTIVE_LABEL: 'Pasif',
+  DELETE_LIST_TITLE: 'Delete list',
+  DELETE_LIST_CONFIRM: 'Are you sure you want to delete this list? This cannot be undone.',
+  REMOVE_ITEM_TITLE: 'Remove listing',
+  REMOVE_ITEM_CONFIRM: 'Remove this listing from the list?',
+  LINK_COPIED_TITLE: 'Success',
+  LINK_COPIED: 'Link copied to clipboard.',
+  NOT_FOUND_TITLE: 'List not found',
+  NOT_FOUND_BODY: 'This list may have been deleted or you may not have access.',
+  BACK: 'Go back',
+  SOLD_LABEL: 'Sold',
+  INACTIVE_LABEL: 'Inactive',
 });

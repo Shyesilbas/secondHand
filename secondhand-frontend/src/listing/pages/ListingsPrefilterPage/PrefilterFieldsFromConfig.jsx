@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import EnumDropdown from '../../../common/components/ui/EnumDropdown.jsx';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getPrefilterSelectors } from '../../config/listingConfig.js';
+import PrefilterOptionField from './PrefilterOptionField.jsx';
 
 const PrefilterFieldsFromConfig = ({ listingType, value, onChange }) => {
   const { enums } = useEnums();
@@ -15,28 +15,37 @@ const PrefilterFieldsFromConfig = ({ listingType, value, onChange }) => {
     onChange(patch);
   };
 
+  const dependencyLabel = (dependsOnKey) => {
+    const parent = selectors.find((s) => s.initialDataKey === dependsOnKey);
+    return parent?.label || dependsOnKey;
+  };
+
   if (!selectors.length) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div className="flex flex-col gap-4">
       {selectors.map((sel) => {
         const fieldValue = value[sel.initialDataKey] ?? '';
-        const disabled = (sel.dependsOn || []).some((key) => !value[key]);
+        const missingDeps = (sel.dependsOn || []).filter((key) => !value[key]);
+        const disabled = missingDeps.length > 0;
         const options = sel.getOptions
           ? sel.getOptions({ enums, selection: value })
           : (enums?.[sel.enumKey] || []);
 
+        const hint =
+          missingDeps.length > 0
+            ? `Select ${missingDeps.map((k) => `"${dependencyLabel(k)}"`).join(' and ')} first.`
+            : null;
+
         return (
-          <EnumDropdown
+          <PrefilterOptionField
             key={sel.initialDataKey}
-            label={sel.label}
-            enumKey={sel.enumKey}
-            value={fieldValue}
-            onChange={(v) => handleFieldChange(sel, v)}
-            multiple={false}
-            className="w-full"
-            options={Array.isArray(options) && options.length > 0 ? options : undefined}
+            selector={sel}
+            fieldValue={fieldValue}
             disabled={disabled}
+            options={options}
+            dependencyHint={hint}
+            onSelect={(v) => handleFieldChange(sel, v)}
           />
         );
       })}

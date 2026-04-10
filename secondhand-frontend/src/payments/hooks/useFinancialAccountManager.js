@@ -95,7 +95,7 @@ export const useBankAccountMutations = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => paymentService.deleteBankAccount(),
+    mutationFn: (accountId) => paymentService.deleteBankAccount(accountId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.bankAccounts, user?.id] });
       queryClient.invalidateQueries({ queryKey: [...PAYMENT_QUERY_KEYS.paymentMethods, user?.id] });
@@ -119,19 +119,18 @@ export const usePaymentMethods = () => {
       paymentService.getBankAccounts(),
     ]);
 
+    const cardsStatus = cardsResult.status === 'fulfilled' ? null : cardsResult.reason?.response?.status;
+    const banksStatus = banksResult.status === 'fulfilled' ? null : banksResult.reason?.response?.status;
+
+    if (cardsResult.status === 'rejected' && cardsStatus !== 404) {
+      throw cardsResult.reason;
+    }
+    if (banksResult.status === 'rejected' && banksStatus !== 404) {
+      throw banksResult.reason;
+    }
+
     const cardsData = cardsResult.status === 'fulfilled' ? cardsResult.value : [];
     const banksData = banksResult.status === 'fulfilled' ? banksResult.value : [];
-
-    // If both requests fail with non-404 errors, surface the first error.
-    if (cardsResult.status === 'rejected' && banksResult.status === 'rejected') {
-      const cardsStatus = cardsResult.reason?.response?.status;
-      const banksStatus = banksResult.reason?.response?.status;
-      const cards404 = cardsStatus === 404;
-      const banks404 = banksStatus === 404;
-      if (!cards404 || !banks404) {
-        throw cardsResult.reason || banksResult.reason;
-      }
-    }
 
     return {
       creditCards: normalizeArrayResponse(cardsData),

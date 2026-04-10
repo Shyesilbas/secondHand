@@ -192,12 +192,21 @@ const PaymentMethodDetails = ({
 const canProceedWithPaymentMethod = ({ paymentType, paymentMethods, isLoadingPaymentMethods, eWallet, feeConfig }) => {
   if (isLoadingPaymentMethods) return false;
 
+  const fee = toNumber(feeConfig?.totalCreationFee);
   const creditCards = paymentMethods?.creditCards ?? [];
   const bankAccounts = paymentMethods?.bankAccounts ?? [];
 
-  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) return creditCards.length > 0;
-  if (paymentType === PAYMENT_TYPES.TRANSFER) return bankAccounts.length > 0;
-  if (paymentType === PAYMENT_TYPES.EWALLET) return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
+  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) {
+    if (creditCards.length === 0) return false;
+    return creditCards.some((card) => toNumber(card?.limit) - toNumber(card?.amount) >= fee);
+  }
+  if (paymentType === PAYMENT_TYPES.TRANSFER) {
+    if (bankAccounts.length === 0) return false;
+    return bankAccounts.some((acc) => toNumber(acc?.balance) >= fee);
+  }
+  if (paymentType === PAYMENT_TYPES.EWALLET) {
+    return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
+  }
   return false;
 };
 

@@ -1,10 +1,26 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-    ArrowLeft, Heart, Globe, Lock, MoreVertical, Pencil, Trash2, 
-    Share2, Package, X, ExternalLink
+import {
+  ArrowLeft,
+  Heart,
+  Globe,
+  Lock,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Share2,
+  Package,
+  X,
+  ExternalLink,
+  StickyNote,
 } from 'lucide-react';
-import { useFavoriteListById, useLikeFavoriteList, useUnlikeFavoriteList, useDeleteFavoriteList, useRemoveItemFromList } from '../hooks/useFavoriteLists.js';
+import {
+  useFavoriteListById,
+  useLikeFavoriteList,
+  useUnlikeFavoriteList,
+  useDeleteFavoriteList,
+  useRemoveItemFromList,
+} from '../hooks/useFavoriteLists.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency } from '../../common/formatters.js';
@@ -14,343 +30,349 @@ import logger from '../../common/utils/logger.js';
 import { FAVORITE_LIST_LISTING_STATUS, FAVORITE_LIST_MESSAGES } from '../favoriteListConstants.js';
 
 const FavoriteListDetailPage = () => {
-    const { listId } = useParams();
-    const navigate = useNavigate();
-    const { user } = useAuthState();
-    const notification = useNotification();
-    
-    const [showMenu, setShowMenu] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
+  const { listId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuthState();
+  const notification = useNotification();
 
-    const { data: list, isLoading, error } = useFavoriteListById(listId);
-    const likeMutation = useLikeFavoriteList();
-    const unlikeMutation = useUnlikeFavoriteList();
-    const deleteMutation = useDeleteFavoriteList();
-    const removeItemMutation = useRemoveItemFromList();
+  const [showMenu, setShowMenu] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-    const isOwner = user && list?.ownerId === user.id;
-    const isLiked = list?.isLikedByCurrentUser;
+  const { data: list, isLoading, error } = useFavoriteListById(listId);
+  const likeMutation = useLikeFavoriteList();
+  const unlikeMutation = useUnlikeFavoriteList();
+  const deleteMutation = useDeleteFavoriteList();
+  const removeItemMutation = useRemoveItemFromList();
 
-    const handleLikeToggle = async () => {
-        if (!user) return;
-        
+  const isOwner = user && list?.ownerId === user.id;
+  const isLiked = list?.isLikedByCurrentUser;
+
+  const handleLikeToggle = async () => {
+    if (!user) return;
+    try {
+      if (isLiked) {
+        await unlikeMutation.mutateAsync(list.id);
+      } else {
+        await likeMutation.mutateAsync(list.id);
+      }
+    } catch (err) {
+      logger.error('Error toggling like:', err);
+    }
+  };
+
+  const handleDelete = () => {
+    notification.showConfirmation(
+      FAVORITE_LIST_MESSAGES.DELETE_LIST_TITLE,
+      FAVORITE_LIST_MESSAGES.DELETE_LIST_CONFIRM,
+      async () => {
         try {
-            if (isLiked) {
-                await unlikeMutation.mutateAsync(list.id);
-            } else {
-                await likeMutation.mutateAsync(list.id);
-            }
-        } catch (error) {
-            logger.error('Error toggling like:', error);
+          await deleteMutation.mutateAsync(list.id);
+          navigate(-1);
+        } catch (err) {
+          logger.error('Error deleting list:', err);
         }
-    };
-
-    const handleDelete = () => {
-        notification.showConfirmation(
-            FAVORITE_LIST_MESSAGES.DELETE_LIST_TITLE,
-            FAVORITE_LIST_MESSAGES.DELETE_LIST_CONFIRM,
-            async () => {
-                try {
-                    await deleteMutation.mutateAsync(list.id);
-                    navigate(-1);
-                } catch (error) {
-                    logger.error('Error deleting list:', error);
-                }
-            }
-        );
-        setShowMenu(false);
-    };
-
-    const handleRemoveItem = (listingId) => {
-        notification.showConfirmation(
-            FAVORITE_LIST_MESSAGES.REMOVE_ITEM_TITLE,
-            FAVORITE_LIST_MESSAGES.REMOVE_ITEM_CONFIRM,
-            async () => {
-                try {
-                    await removeItemMutation.mutateAsync({ listId: list.id, listingId });
-                } catch (error) {
-                    logger.error('Error removing item:', error);
-                }
-            }
-        );
-    };
-
-    const handleShare = async () => {
-        const url = window.location.href;
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: list.name,
-                    text: list.description || `${list.ownerName} tarafından oluşturuldu`,
-                    url: url,
-                });
-            } catch (error) {
-                logger.error('Error sharing:', error);
-            }
-        } else {
-            navigator.clipboard.writeText(url);
-            notification.showSuccess(FAVORITE_LIST_MESSAGES.LINK_COPIED_TITLE, FAVORITE_LIST_MESSAGES.LINK_COPIED);
-        }
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50">
-                <div className="max-w-6xl mx-auto p-6">
-                    <div className="animate-pulse space-y-6">
-                        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                        <div className="bg-white rounded-xl p-6 space-y-4">
-                            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {[...Array(4)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-xl overflow-hidden">
-                                    <div className="aspect-square bg-gray-200"></div>
-                                    <div className="p-4 space-y-2">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
-                                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error || !list) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Package className="w-10 h-10 text-gray-400" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
-                    <p className="text-gray-500 mb-6">{FAVORITE_LIST_MESSAGES.NOT_FOUND_BODY}</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                    >
-                        {FAVORITE_LIST_MESSAGES.BACK}
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-6xl mx-auto p-6 space-y-6">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                    <span>Geri</span>
-                </button>
-
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                    <div className="p-6">
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-2xl font-bold text-gray-900">{list.name}</h1>
-                                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                                        list.isPublic 
-                                            ? 'bg-green-100 text-green-700' 
-                                            : 'bg-gray-100 text-gray-700'
-                                    }`}>
-                                        {list.isPublic ? (
-                                            <>
-                                                <Globe className="w-3 h-3" />
-                                                Herkese Açık
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Lock className="w-3 h-3" />
-                                                Gizli
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                                
-                                {list.description && (
-                                    <p className="text-gray-600 mb-4">{list.description}</p>
-                                )}
-
-                                <div className="flex items-center gap-6 text-sm text-gray-500">
-                                    <Link 
-                                        to={ROUTES.USER_PROFILE(list.ownerId)}
-                                        className="hover:text-indigo-600 transition-colors"
-                                    >
-                                        {list.ownerName} tarafından
-                                    </Link>
-                                    <span>{list.itemCount} ürün</span>
-                                    {list.isPublic && (
-                                        <span className="flex items-center gap-1">
-                                            <Heart className="w-4 h-4" />
-                                            {list.likeCount} beğeni
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <div className="text-right">
-                                    <p className="text-sm text-gray-500">Toplam Değer</p>
-                                    <p className="text-2xl font-bold text-gray-900">
-                                        {formatCurrency(list.totalPrice, list.currency)}
-                                    </p>
-                                </div>
-
-                                {list.isPublic && !isOwner && user && (
-                                    <button
-                                        onClick={handleLikeToggle}
-                                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                                            isLiked 
-                                                ? 'bg-rose-500 text-white' 
-                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                    >
-                                        <Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} />
-                                    </button>
-                                )}
-
-                                {list.isPublic && (
-                                    <button
-                                        onClick={handleShare}
-                                        className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                                    >
-                                        <Share2 className="w-5 h-5" />
-                                    </button>
-                                )}
-
-                                {isOwner && (
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setShowMenu(!showMenu)}
-                                            className="w-12 h-12 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                                        >
-                                            <MoreVertical className="w-5 h-5" />
-                                        </button>
-                                        
-                                        {showMenu && (
-                                            <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[160px] z-10">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowEditModal(true);
-                                                        setShowMenu(false);
-                                                    }}
-                                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                    Düzenle
-                                                </button>
-                                                <button
-                                                    onClick={handleDelete}
-                                                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                    Sil
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {list.items && list.items.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {list.items.map((item) => (
-                            <div 
-                                key={item.id}
-                                className="bg-white rounded-xl border border-gray-200 overflow-hidden group hover:shadow-lg transition-all"
-                            >
-                                <div className="relative aspect-square bg-gray-100">
-                                    {item.listingImageUrl ? (
-                                        <img
-                                            src={item.listingImageUrl}
-                                            alt={item.listingTitle}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <Package className="w-12 h-12 text-gray-300" />
-                                        </div>
-                                    )}
-                                    
-                                    {item.listingStatus !== FAVORITE_LIST_LISTING_STATUS.ACTIVE && (
-                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                            <span className="px-3 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
-                                                {item.listingStatus === FAVORITE_LIST_LISTING_STATUS.SOLD
-                                                    ? FAVORITE_LIST_MESSAGES.SOLD_LABEL
-                                                    : FAVORITE_LIST_MESSAGES.INACTIVE_LABEL}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Link
-                                            to={ROUTES.LISTING_DETAIL(item.listingId)}
-                                            className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100 transition-colors"
-                                        >
-                                            <ExternalLink className="w-4 h-4 text-gray-600" />
-                                        </Link>
-                                        {isOwner && (
-                                            <button
-                                                onClick={() => handleRemoveItem(item.listingId)}
-                                                className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 transition-colors"
-                                            >
-                                                <X className="w-4 h-4 text-red-500" />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="block p-3">
-                                    <h3 className="font-medium text-gray-900 text-sm truncate hover:text-indigo-600 transition-colors">
-                                        {item.listingTitle}
-                                    </h3>
-                                    <p className="font-semibold text-gray-900 mt-1">
-                                        {formatCurrency(item.listingPrice, item.listingCurrency)}
-                                    </p>
-                                    {item.note && (
-                                        <p className="text-xs text-gray-500 mt-1 truncate">
-                                            📝 {item.note}
-                                        </p>
-                                    )}
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-xl border border-gray-200 py-16 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Package className="w-10 h-10 text-gray-400" />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">Liste Boş</h3>
-                        <p className="text-gray-500">
-                            {isOwner 
-                                ? 'Favori ürünlerinizi bu listeye ekleyin' 
-                                : 'Bu listede henüz ürün yok'}
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            <FavoriteListModal
-                isOpen={showEditModal}
-                onClose={() => setShowEditModal(false)}
-                editList={list}
-            />
-        </div>
+      }
     );
+    setShowMenu(false);
+  };
+
+  const handleRemoveItem = (listingId) => {
+    notification.showConfirmation(
+      FAVORITE_LIST_MESSAGES.REMOVE_ITEM_TITLE,
+      FAVORITE_LIST_MESSAGES.REMOVE_ITEM_CONFIRM,
+      async () => {
+        try {
+          await removeItemMutation.mutateAsync({ listId: list.id, listingId });
+        } catch (err) {
+          logger.error('Error removing item:', err);
+        }
+      }
+    );
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: list.name,
+          text: list.description || `A list by ${list.ownerName}`,
+          url,
+        });
+      } catch (err) {
+        logger.error('Error sharing:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      notification.showSuccess(FAVORITE_LIST_MESSAGES.LINK_COPIED_TITLE, FAVORITE_LIST_MESSAGES.LINK_COPIED);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50/90">
+        <div className="mx-auto max-w-6xl p-4 sm:p-6">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 w-40 rounded-lg bg-slate-200" />
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="h-6 w-1/2 rounded bg-slate-200" />
+              <div className="h-4 w-3/4 rounded bg-slate-200" />
+            </div>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="aspect-square bg-slate-200" />
+                  <div className="space-y-2 p-4">
+                    <div className="h-4 rounded bg-slate-200" />
+                    <div className="h-4 w-1/2 rounded bg-slate-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !list) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50/90 px-4">
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+            <Package className="h-8 w-8 text-slate-400" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
+          <p className="mt-2 text-sm text-slate-500">{FAVORITE_LIST_MESSAGES.NOT_FOUND_BODY}</p>
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="mt-6 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            {FAVORITE_LIST_MESSAGES.BACK}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50/90">
+      <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
+        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
+          <div className="border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-5 sm:px-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0 flex-1">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{list.name}</h1>
+                  <div
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      list.isPublic ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80' : 'bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {list.isPublic ? (
+                      <>
+                        <Globe className="h-3 w-3" />
+                        Public
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-3 w-3" />
+                        Private
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {list.description ? <p className="max-w-2xl text-sm leading-relaxed text-slate-600">{list.description}</p> : null}
+
+                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
+                  <Link
+                    to={ROUTES.USER_PROFILE(list.ownerId)}
+                    className="font-medium text-teal-800 transition hover:text-teal-950"
+                  >
+                    By {list.ownerName}
+                  </Link>
+                  <span>
+                    {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
+                  </span>
+                  {list.isPublic ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Heart className="h-4 w-4 text-rose-500" />
+                      {list.likeCount} {list.likeCount === 1 ? 'like' : 'likes'}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                <div className="text-right">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Total value</p>
+                  <p className="font-mono text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
+                    {formatCurrency(list.totalPrice, list.currency)}
+                  </p>
+                </div>
+
+                {list.isPublic && !isOwner && user ? (
+                  <button
+                    type="button"
+                    onClick={handleLikeToggle}
+                    className={`flex h-11 w-11 items-center justify-center rounded-full transition-all ${
+                      isLiked ? 'bg-rose-500 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                    aria-label={isLiked ? 'Unlike list' : 'Like list'}
+                  >
+                    <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+                  </button>
+                ) : null}
+
+                {list.isPublic ? (
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+                    aria-label="Share list"
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </button>
+                ) : null}
+
+                {isOwner ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowMenu(!showMenu)}
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+                      aria-label="List actions"
+                    >
+                      <MoreVertical className="h-5 w-5" />
+                    </button>
+
+                    {showMenu ? (
+                      <div className="absolute right-0 top-full z-10 mt-2 min-w-[168px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowEditModal(true);
+                            setShowMenu(false);
+                          }}
+                          className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDelete}
+                          className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {list.items && list.items.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-4">
+            {list.items.map((item) => (
+              <div
+                key={item.id}
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+              >
+                <div className="relative aspect-square bg-slate-100">
+                  {item.listingImageUrl ? (
+                    <img
+                      src={item.listingImageUrl}
+                      alt={item.listingTitle}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Package className="h-12 w-12 text-slate-300" />
+                    </div>
+                  )}
+
+                  {item.listingStatus !== FAVORITE_LIST_LISTING_STATUS.ACTIVE ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">
+                        {item.listingStatus === FAVORITE_LIST_LISTING_STATUS.SOLD
+                          ? FAVORITE_LIST_MESSAGES.SOLD_LABEL
+                          : FAVORITE_LIST_MESSAGES.INACTIVE_LABEL}
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Link
+                      to={ROUTES.LISTING_DETAIL(item.listingId)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition hover:bg-slate-50"
+                      aria-label="Open listing"
+                    >
+                      <ExternalLink className="h-4 w-4 text-slate-600" />
+                    </Link>
+                    {isOwner ? (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItem(item.listingId)}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition hover:bg-red-50"
+                        aria-label="Remove from list"
+                      >
+                        <X className="h-4 w-4 text-red-500" />
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+
+                <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="block p-3">
+                  <h3 className="truncate text-sm font-medium text-slate-900 transition hover:text-teal-800">
+                    {item.listingTitle}
+                  </h3>
+                  <p className="mt-1 font-semibold tabular-nums text-slate-900">
+                    {formatCurrency(item.listingPrice, item.listingCurrency)}
+                  </p>
+                  {item.note ? (
+                    <p className="mt-1 flex items-start gap-1 truncate text-xs text-slate-500">
+                      <StickyNote className="mt-0.5 h-3 w-3 shrink-0 text-slate-400" />
+                      <span className="truncate">{item.note}</span>
+                    </p>
+                  ) : null}
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-14 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+              <Package className="h-7 w-7 text-slate-400" />
+            </div>
+            <h3 className="text-base font-semibold text-slate-900">This list is empty</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              {isOwner
+                ? 'Add listings from search or listing pages with “Add to list”.'
+                : 'There are no listings in this list yet.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <FavoriteListModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} editList={list} />
+    </div>
+  );
 };
 
 export default FavoriteListDetailPage;
-

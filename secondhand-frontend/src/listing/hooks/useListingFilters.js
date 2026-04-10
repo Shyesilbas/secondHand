@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cleanObject } from '../../common/formatters.js';
 import { getDefaultFiltersForType } from './utils/filterDefaults.js';
 import { LISTING_DEFAULTS, LISTING_TYPES } from '../types/index.js';
@@ -35,6 +35,7 @@ export const useListingFilters = ({
   });
 
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+  const previousUserIdRef = useRef(user?.id ?? null);
 
   // Sync category from navigation state
   useEffect(() => {
@@ -109,9 +110,12 @@ export const useListingFilters = ({
 
   // Reset filters when user changes
   useEffect(() => {
+    const currentUserId = user?.id ?? null;
+    if (previousUserIdRef.current === currentUserId) return;
+    previousUserIdRef.current = currentUserId;
     setFilters((prev) => ({ ...prev, page: 0 }));
     onFiltersChange?.();
-  }, [user?.id]);
+  }, [onFiltersChange, user?.id]);
 
   const cleanedFilters = useMemo(() => cleanObject(filters), [filters]);
 

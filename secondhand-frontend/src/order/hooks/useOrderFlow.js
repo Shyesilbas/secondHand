@@ -32,7 +32,7 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
     return await orderService.myOrders(page, size, sort, direction);
   }, [mode, page, size, sort, direction]);
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey,
     queryFn,
     enabled: !!user?.id,
@@ -46,8 +46,7 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
     queryClient.invalidateQueries({
       queryKey: mode === ORDER_VIEW_MODES.SELLER ? ORDER_QUERY_KEYS.sellerOrders : ORDER_QUERY_KEYS.orders,
     });
-    refetch();
-  }, [queryClient, refetch, mode]);
+  }, [queryClient, mode]);
 
   return {
     data,
@@ -146,6 +145,8 @@ export const useOrderFlow = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQ = searchParams.get('q') || '';
 
+  const orderDetailRequestRef = useRef(0);
+
   const [searchTerm, setSearchTerm] = useState(urlQ);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState(null);
@@ -167,9 +168,18 @@ export const useOrderFlow = ({
           setSearchOrder(order);
           setIsSearchMode(true);
           setSearchTerm('');
+          setSearchError(null);
+        } else {
+          setSearchResult(null);
+          setIsSearchMode(false);
+          setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
         }
       })
-      .catch(() => setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND))
+      .catch(() => {
+        setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
+        setSearchResult(null);
+        setIsSearchMode(false);
+      })
       .finally(() => setSearchLoading(false));
   }, [urlQ]);
 
@@ -334,9 +344,15 @@ export const useOrderFlow = ({
             next.set('q', term);
             return next;
           });
+        } else {
+          setSearchResult(null);
+          setIsSearchMode(false);
+          setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
         }
       } catch (err) {
         setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
+        setSearchResult(null);
+        setIsSearchMode(false);
       } finally {
         setSearchLoading(false);
       }
@@ -378,19 +394,26 @@ export const useOrderFlow = ({
     setReceiptPayment(null);
   }, []);
 
-  const fetchReviewsData = useCallback(async (order) => {
-    if (!order?.orderItems || order.orderItems.length === 0) return;
+  const fetchReviewsData = useCallback(async (order, detailRequestId) => {
+    const stillCurrent = () => detailRequestId === undefined || orderDetailRequestRef.current === detailRequestId;
+
+    if (!order?.orderItems || order.orderItems.length === 0) {
+      if (stillCurrent()) setOrderReviews({});
+      return;
+    }
 
     setReviewsLoading(true);
     try {
       if (order.status !== ORDER_STATUSES.DELIVERED && order.status !== ORDER_STATUSES.COMPLETED) {
-        setOrderReviews({});
+        if (stillCurrent()) setOrderReviews({});
         return;
       }
 
       const orderItemIds = order.orderItems.map((item) => item.id);
       const { reviewService } = await import('../../reviews/services/reviewService.js');
       const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);
+
+      if (!stillCurrent()) return;
 
       const reviewsMap = {};
       if (reviewsResponse && Array.isArray(reviewsResponse)) {
@@ -403,7 +426,7 @@ export const useOrderFlow = ({
 
       setOrderReviews(reviewsMap);
     } finally {
-      setReviewsLoading(false);
+      if (stillCurrent()) setReviewsLoading(false);
     }
   }, []);
 
@@ -413,16 +436,19 @@ export const useOrderFlow = ({
 
   const openOrderModal = useCallback(
     async (order) => {
+      const requestId = ++orderDetailRequestRef.current;
       try {
         const freshOrder = mode === ORDER_VIEW_MODES.SELLER
           ? await orderService.getSellerOrderById(order.id)
           : await orderService.getById(order.id);
+        if (orderDetailRequestRef.current !== requestId) return;
         setSelectedOrder(freshOrder);
         setOrderModalOpen(true);
         if (mode !== ORDER_VIEW_MODES.SELLER) {
-          await fetchReviewsData(freshOrder);
+          await fetchReviewsData(freshOrder, requestId);
         }
       } catch (e) {
+        if (orderDetailRequestRef.current !== requestId) return;
         setSelectedOrder(order);
         setOrderModalOpen(true);
       }
@@ -437,12 +463,14 @@ export const useOrderFlow = ({
 
   const refreshSelectedOrder = useCallback(async () => {
     if (!selectedOrder?.id) return;
+    const requestId = ++orderDetailRequestRef.current;
     const updatedOrder = mode === ORDER_VIEW_MODES.SELLER
       ? await orderService.getSellerOrderById(selectedOrder.id)
       : await orderService.getById(selectedOrder.id);
+    if (orderDetailRequestRef.current !== requestId) return;
     setSelectedOrder(updatedOrder);
     if (mode !== ORDER_VIEW_MODES.SELLER) {
-      await fetchReviewsData(updatedOrder);
+      await fetchReviewsData(updatedOrder, requestId);
     }
   }, [selectedOrder?.id, mode, fetchReviewsData]);
 

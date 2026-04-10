@@ -21,10 +21,10 @@ export const usePaymentsQuery = ({ userId, currentPage, pageSize, filters }) => 
       };
     },
     enabled: !!userId,
-    staleTime: 0,
+    staleTime: 30 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: 'always',
+    refetchOnMount: true,
   });
 };
 

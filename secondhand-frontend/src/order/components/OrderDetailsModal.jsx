@@ -200,7 +200,7 @@ const OrderDetailsModal = React.memo(
                         onChange={(e) => setOrderName(e.target.value)}
                         className="flex-1 px-2.5 py-1.5 text-sm font-semibold text-gray-900 border border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200"
                         placeholder="Order name"
-                        maxLength={100}
+                        maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
                         autoFocus
                       />
                       <button

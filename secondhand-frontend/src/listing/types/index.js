@@ -42,6 +42,12 @@ export const LISTING_DEFAULTS = Object.freeze({
   CURRENCY: '',
   // Mine-mode: "low stock" alert threshold (exclusive upper bound).
   LOW_STOCK_MAX_QUANTITY: 10,
+  // Title search: page size for loading all pages in my listings mode.
+  SEARCH_MY_PAGE_SIZE: 50,
+  // Title search: page size for loading all pages in browse mode.
+  SEARCH_FILTER_PAGE_SIZE: 24,
+  // Safety cap to avoid excessive sequential requests.
+  TITLE_SEARCH_MAX_PAGES: 30,
 });
 
 export const LISTING_SORT_FIELDS = Object.freeze({

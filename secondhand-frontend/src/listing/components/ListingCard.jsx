@@ -6,7 +6,6 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
@@ -14,10 +13,9 @@ import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 
-const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, currentUserId }) => {
+const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false }) => {
     const [showInfo, setShowInfo] = useState(false);
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
-    const { showcases } = useShowcase();
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
     const { isInComparison } = useComparison();
 
@@ -37,9 +35,10 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
         }
     };
 
-    const isInShowcase = Array.isArray(showcases) && showcases.some(s => (s.listing?.id || s.listingId) === listing.id);
-    const reviewCount = listing.reviewStats?.totalReviews || 0;
-    const averageRating = listing.reviewStats?.averageRating || 0;
+    const reviewCount = Number(listing.reviewStats?.totalReviews) || 0;
+    const avgRaw = Number(listing.reviewStats?.averageRating);
+    const averageRating = Number.isFinite(avgRaw) ? avgRaw : 0;
+    const roundedForStars = reviewCount > 0 ? Math.round(averageRating) : 0;
     const favoriteCount = listing.favoriteStats?.favoriteCount || 0;
     const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
     const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
@@ -55,7 +54,7 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
         <div className={`
             group relative flex flex-col h-full
             bg-white rounded-2xl
-            border transition-all duration-300
+            border transition-[transform,box-shadow,border-color] duration-200 ease-out
             hover:shadow-xl hover:-translate-y-1
             ${isOutOfStock ? 'opacity-55' : ''}
             ${isInCompare
@@ -105,7 +104,9 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
                     <img
                         src={listing.imageUrl}
                         alt={listing.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fetchPriority={priorityImage ? 'high' : 'auto'}
+                        decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-200 ease-out motion-reduce:transition-none motion-reduce:group-hover:scale-100 group-hover:scale-105"
                         onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';
@@ -158,20 +159,27 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
                     {listing.title}
                 </h3>
 
-                {/* Stars */}
-                {reviewCount > 0 && (
-                    <div className="flex items-center gap-1 mb-1.5">
-                        <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                    key={star}
-                                    className={`w-3 h-3 ${star <= Math.round(averageRating) ? 'text-amber-400 fill-current' : 'text-slate-200'}`}
-                                />
-                            ))}
-                        </div>
-                        <span className="text-[11px] text-slate-400">({reviewCount})</span>
+                {/* Reviews: her zaman göster (API’de reviewStats yoksa 0 kabul) */}
+                <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
+                    <div className="flex shrink-0" aria-hidden>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                                key={star}
+                                className={`w-3 h-3 ${reviewCount > 0 && star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`}
+                            />
+                        ))}
                     </div>
-                )}
+                    <span className="text-[11px] text-slate-500 tabular-nums leading-none">
+                        {reviewCount > 0 ? (
+                            <>
+                                <span className="font-medium text-slate-600">{averageRating.toFixed(1)}</span>
+                                <span className="text-slate-400"> ({reviewCount})</span>
+                            </>
+                        ) : (
+                            <span className="text-slate-400">0 reviews</span>
+                        )}
+                    </span>
+                </div>
 
                 {/* Price row */}
                 <div className="flex items-end gap-2 flex-wrap mb-1">
@@ -242,12 +250,10 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
             <ListingInfoModal
                 isOpen={showInfo}
                 onClose={() => setShowInfo(false)}
-                listingId={listing.id}
-                listingTitle={listing.title}
-                price={displayPrice}
-                currency={listing.currency}
+                listing={listing}
+                displayPrice={displayPrice}
                 isOwner={isOwner}
-                viewStats={listing.viewStats || null}
+                isInShowcase={isInShowcase}
             />
 
             <MakeOfferModal
@@ -257,13 +263,15 @@ const ListingCard = memo(({ listing, onDeleted, showActions = true, isOwner, cur
             />
         </div>
     );
-});
+};
 
 ListingCard.displayName = 'ListingCard';
 
 export default memo(ListingCard, (prevProps, nextProps) =>
-    prevProps.listing.id === nextProps.listing.id &&
+    prevProps.listing === nextProps.listing &&
     prevProps.isOwner === nextProps.isOwner &&
     prevProps.currentUserId === nextProps.currentUserId &&
-    prevProps.showActions === nextProps.showActions
+    prevProps.showActions === nextProps.showActions &&
+    prevProps.isInShowcase === nextProps.isInShowcase &&
+    prevProps.priorityImage === nextProps.priorityImage
 );

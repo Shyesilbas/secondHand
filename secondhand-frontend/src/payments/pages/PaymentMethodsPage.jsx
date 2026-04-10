@@ -23,6 +23,7 @@ import {EWalletActions, EWalletBalance} from '../components/WalletOverview.jsx';
 
 const BankAccountsSection = () => {
     const notification = useNotification();
+    const [deletingBankAccountId, setDeletingBankAccountId] = useState(null);
     const { data: bankAccounts = [], isLoading, error } = useBankAccountsQuery();
     const { createBankAccount, deleteBankAccount, isCreating, isDeleting } = useBankAccountMutations();
     const { data: statsData } = usePaymentStatisticsQuery('TRANSFER');
@@ -45,18 +46,28 @@ const BankAccountsSection = () => {
         );
     };
 
-    const handleDeleteBankAccount = async () => {
+    const handleDeleteBankAccount = (account) => {
+        const id = account?.id;
+        if (id == null) {
+            notification.showError('Error', 'Invalid bank account.');
+            return;
+        }
+        const label = account?.IBAN ? String(account.IBAN).slice(-4) : '';
         notification.showConfirmation(
             'Delete Bank Account',
-            'Are you sure you want to delete this bank account?',
+            label
+                ? `Are you sure you want to delete the bank account ending in ${label}?`
+                : 'Are you sure you want to delete this bank account?',
             async () => {
                 try {
-                    await deleteBankAccount();
+                    setDeletingBankAccountId(id);
+                    await deleteBankAccount(id);
                     notification.showSuccess('Success', 'Bank account deleted successfully!');
                 } catch (err) {
                     const errorMessage = err.response?.data?.message || 'Error occurred while deleting bank account';
                     notification.showError('Error', errorMessage);
                 } finally {
+                    setDeletingBankAccountId(null);
                 }
             }
         );
@@ -142,12 +153,12 @@ const BankAccountsSection = () => {
                 />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {bankAccounts.map((account, index) => (
+                    {bankAccounts.map((account) => (
                         <FinancialCards
-                            key={index}
+                            key={account.id ?? account.IBAN}
                             account={account}
-                            onDelete={handleDeleteBankAccount}
-                            isDeleting={isDeleting}
+                            onDelete={() => handleDeleteBankAccount(account)}
+                            isDeleting={isDeleting && deletingBankAccountId === account.id}
                         />
                     ))}
                 </div>
@@ -205,7 +216,7 @@ const BrandMark = ({ brand }) => {
     );
 };
 
-const CreditCardVisual = ({ card, index, isDefault, onDeleteClick, isDeleting }) => {
+const CreditCardVisual = ({ card, isDefault, onDeleteClick, isDeleting }) => {
     const brand = getCardBrand(card);
     const { gradient, chip } = BRAND_STYLES[brand] ?? BRAND_STYLES.CARD;
     const displayNumber = formatMaskedNumber(card.number || card.cardNumber || '');
@@ -380,7 +391,6 @@ const CreditCardsSection = () => {
                         <CreditCardVisual
                             key={card.id || card.number || index}
                             card={card}
-                            index={index}
                             isDefault={index === 0}
                             onDeleteClick={() => setDeletingCardId(card.id)}
                             isDeleting={isDeleting && deletingCardId === card.id}

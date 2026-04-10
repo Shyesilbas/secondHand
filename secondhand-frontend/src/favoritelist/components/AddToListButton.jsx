@@ -36,7 +36,7 @@ const AddToListButton = ({ listingId, listingTitle, size = 'sm', className = '' 
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
                 className={buttonClassName}
-                title="Listeye Ekle"
+                title="Add to list"
             >
                 <List className={iconSizes[size]} />
             </button>

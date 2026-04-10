@@ -89,4 +89,6 @@ export const ORDER_MESSAGES = Object.freeze({
   UPDATE_ADDRESS_FAILED: 'Failed to update address',
   UPDATE_NOTES_FAILED: 'Failed to update notes',
   UNKNOWN_ERROR: 'An error occurred',
+  ORDER_NAME_TOO_LONG: (max) => `Order name must be ${max} characters or less`,
+  ORDER_NOTES_TOO_LONG: (max) => `Notes must be ${max} characters or less`,
 });

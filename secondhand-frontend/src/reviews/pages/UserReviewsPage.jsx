@@ -10,7 +10,7 @@ const UserReviewsPage = () => {
     const isGivenReviews = location.pathname.includes('/reviews/given/');
     
         const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
-    const { reviews, loading, error, hasMore, loadMore } = reviewsData;
+    const { reviews, loading, error, hasMore, loadMore, refetch } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 
     const givenStats = React.useMemo(() => {
@@ -65,6 +65,7 @@ const UserReviewsPage = () => {
                         error={error}
                         hasMore={hasMore}
                         onLoadMore={loadMore}
+                        onRetry={refetch}
                     />
                 </div>
             </div>

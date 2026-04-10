@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { listingService } from '../services/listingService.js';
+import { LISTING_DEFAULTS } from '../types/index.js';
 
 /**
  * Handles title-based search (client-side) and listingNo search (API call)
@@ -13,6 +14,7 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory }) 
   const [listingNoError, setListingNoError] = useState('');
   const [listingNoResult, setListingNoResult] = useState(null);
   const listingNoRequestRef = useRef(0);
+  const titleSearchRequestRef = useRef(0);
 
   const searchTrimmed = useMemo(() => String(searchTerm || '').trim(), [searchTerm]);
   const searchUpper = useMemo(() => searchTrimmed.toUpperCase(), [searchTrimmed]);
@@ -80,9 +82,11 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory }) 
   }, [allListings, allPagesLoaded, listingNoResult, listings, searchMode, searchTrimmed]);
 
   const clearSearch = useCallback(() => {
+    titleSearchRequestRef.current += 1;
     setSearchTerm('');
     setAllPagesLoaded(false);
     setAllListings([]);
+    setLoadingAllPages(false);
     setListingNoLoading(false);
     setListingNoError('');
     setListingNoResult(null);
@@ -90,38 +94,51 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory }) 
 
   const loadAllPages = useCallback(async () => {
     if (searchMode !== 'title' || !searchTrimmed) return;
+    const requestId = titleSearchRequestRef.current + 1;
+    titleSearchRequestRef.current = requestId;
     setLoadingAllPages(true);
     try {
       const allListingsData = [];
       let page = 0;
       let total = 1;
+      let loadedPageCount = 0;
 
-      while (page < total) {
+      while (page < total && loadedPageCount < LISTING_DEFAULTS.TITLE_SEARCH_MAX_PAGES) {
+        if (titleSearchRequestRef.current !== requestId) return;
         const response =
           mode === 'mine'
-            ? await listingService.getMyListings(page, 50, selectedCategory || filters.listingType || null)
+            ? await listingService.getMyListings(
+                page,
+                LISTING_DEFAULTS.SEARCH_MY_PAGE_SIZE,
+                selectedCategory || filters.listingType || null
+              )
             : await listingService.filterListings({
                 ...filters,
                 listingType: selectedCategory || filters.listingType,
                 type: selectedCategory || filters.type,
                 page,
-                size: 24,
+                size: LISTING_DEFAULTS.SEARCH_FILTER_PAGE_SIZE,
               });
 
+        if (titleSearchRequestRef.current !== requestId) return;
         const content = response.content || [];
         total = response.totalPages || 0;
         if (content.length) {
           allListingsData.push(...content);
         }
         page += 1;
+        loadedPageCount += 1;
 
         if (!content.length) break;
       }
 
+      if (titleSearchRequestRef.current !== requestId) return;
       setAllListings(allListingsData);
       setAllPagesLoaded(true);
     } finally {
-      setLoadingAllPages(false);
+      if (titleSearchRequestRef.current === requestId) {
+        setLoadingAllPages(false);
+      }
     }
   }, [filters, mode, searchMode, searchTrimmed, selectedCategory]);
 

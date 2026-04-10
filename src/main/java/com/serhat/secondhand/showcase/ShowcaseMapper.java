@@ -1,7 +1,6 @@
 package com.serhat.secondhand.showcase;
 
-import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
-import com.serhat.secondhand.listing.util.ListingFavoriteStatsUtil;
+import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
@@ -21,13 +20,11 @@ import java.util.List;
 public class ShowcaseMapper {
     
     private final ListingMapper listingMapper;
-    private final ListingFavoriteStatsUtil favoriteStatsUtil;
-    private final ListingCampaignPricingUtil listingCampaignPricingUtil;
+    private final ListingEnrichmentService listingEnrichmentService;
     
     public ShowcaseDto toDto(Showcase showcase) {
         var listingDto = listingMapper.toDynamicDto(showcase.getListing());
-        favoriteStatsUtil.enrichWithFavoriteStats(listingDto, null);
-        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDto);
+        listingEnrichmentService.enrichInPlace(listingDto, null);
         
         return ShowcaseDto.builder()
                 .id(showcase.getId())
@@ -69,8 +66,7 @@ public class ShowcaseMapper {
                 .filter(java.util.Objects::nonNull)
                 .toList();
 
-        favoriteStatsUtil.enrichWithFavoriteStats(listingDtos, userId);
-        listingCampaignPricingUtil.enrichWithCampaignPricing(listingDtos);
+        listingEnrichmentService.enrich(listingDtos, userId);
         return dtos;
     }
 

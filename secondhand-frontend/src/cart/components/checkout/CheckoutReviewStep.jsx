@@ -5,31 +5,33 @@ import {Star as StarIcon} from 'lucide-react';
 
 const SellerRating = ({ sellerId }) => {
     const { stats, loading } = useSellerReviewStatsCache(sellerId);
-    
-    if (loading || !stats || stats.totalReviews === 0) {
+
+    const total = Number(stats?.totalReviews);
+    const avgRaw = Number(stats?.averageRating);
+    const safeAvg = Number.isFinite(avgRaw) ? avgRaw : 0;
+
+    if (loading || !stats || !Number.isFinite(total) || total <= 0) {
         return null;
     }
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
-        
-        return Array.from({ length: 5 }, (_, index) => {
-            return (
-                <StarIcon 
-                    key={index} 
-                    className={`w-3 h-3 ${index < fullStars ? 'text-yellow-400' : 'text-gray-300'}`} 
-                />
-            );
-        });
+
+        return Array.from({ length: 5 }, (_, index) => (
+            <StarIcon
+                key={index}
+                className={`w-3 h-3 ${index < fullStars ? 'text-yellow-400' : 'text-gray-300'}`}
+            />
+        ));
     };
 
     return (
         <div className="flex items-center space-x-1">
             <div className="flex items-center">
-                {renderStars(stats.averageRating)}
+                {renderStars(safeAvg)}
             </div>
             <span className="text-xs text-gray-600">
-                {stats.averageRating.toFixed(1)} ({stats.totalReviews})
+                {safeAvg.toFixed(1)} ({total})
             </span>
         </div>
     );

@@ -32,12 +32,9 @@ const ListingAnalyticsPanel = ({ listing, isOwner, displayPrice }) => {
       <ListingInfoModal
         isOpen={isInfoOpen}
         onClose={closeInfo}
-        listingId={listing.id}
-        listingTitle={listing.title}
-        price={displayPrice}
-        currency={listing.currency}
+        listing={listing}
+        displayPrice={displayPrice}
         isOwner={isOwner}
-        viewStats={listing.viewStats || null}
       />
     </div>
   );

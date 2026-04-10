@@ -34,13 +34,13 @@ export const useEmails = () => {
     const emails = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
     const fetchEmails = useCallback(async () => {
-        try {
-            const res = await refetch();
-            return Array.isArray(res.data) ? res.data : [];
-        } catch {
-            notification.showError('Error', 'Emails could not be loaded.');
+        const res = await refetch();
+        if (res.isError) {
+            const msg = res.error?.message || res.error?.response?.data?.message || 'Emails could not be loaded.';
+            notification.showError('Error', msg);
             return [];
         }
+        return Array.isArray(res.data) ? res.data : [];
     }, [notification, refetch]);
 
     const markAsRead = useCallback(async (emailId) => {

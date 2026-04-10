@@ -6,7 +6,7 @@ import {filterConfigs} from '../filters/filterConfigs.js';
 import {getMinKey, getMaxKey} from '../filters/filterRangeKeys.js';
 
 const toInt = (value) => {
-  if (value === null || value === undefined || value === '' || value === 0 || value === '0') return null;
+  if (value === null || value === undefined || value === '') return null;
   const n = Number.parseInt(value, 10);
   return Number.isFinite(n) ? n : null;
 };

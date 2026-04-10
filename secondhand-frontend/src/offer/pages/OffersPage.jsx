@@ -1,31 +1,43 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {offerService} from '../services/offerService.js';
-import {formatCurrency, formatDateTime} from '../../common/formatters.js';
-import {ROUTES} from '../../common/constants/routes.js';
-import {useNotification} from '../../notification/NotificationContext.jsx';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { offerService } from '../services/offerService.js';
+import { ROUTES } from '../../common/constants/routes.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
-import {RefreshCw, CheckCircle2, XCircle, Clock, ShoppingCart, Handshake} from 'lucide-react';
+import OfferTrackingCard from '../components/OfferTrackingCard.jsx';
+import {
+  AlertCircle,
+  Handshake,
+  LayoutGrid,
+  RefreshCw,
+  Search,
+  SlidersHorizontal,
+} from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import { OFFER_DEFAULTS, OFFER_MESSAGES, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
 import { getOfferErrorMessage } from '../utils/offerError.js';
 
-const statusBadge = (status) => {
-  switch (status) {
-    case OFFER_STATUSES.PENDING:
-      return 'bg-amber-50/60 text-amber-700 border-amber-200/60';
-    case OFFER_STATUSES.ACCEPTED:
-      return 'bg-emerald-50/60 text-emerald-700 border-emerald-200/60';
-    case OFFER_STATUSES.REJECTED:
-      return 'bg-red-50/60 text-red-700 border-red-200/60';
-    case OFFER_STATUSES.EXPIRED:
-      return 'bg-slate-50/70 text-slate-600 border-slate-200/70';
-    case OFFER_STATUSES.COMPLETED:
-      return 'bg-indigo-50/60 text-indigo-700 border-indigo-200/60';
-    default:
-      return 'bg-slate-50/60 text-slate-600 border-slate-200/60';
-  }
+const STATUS_FILTER = Object.freeze({
+  ALL: 'ALL',
+});
+
+const SORT = Object.freeze({
+  NEWEST: 'newest',
+  EXPIRING: 'expiring',
+});
+
+const needsAttention = (o, activeTab) => {
+  const expired = o.status === OFFER_STATUSES.EXPIRED;
+  if (expired) return false;
+  if (activeTab === OFFER_TABS.RECEIVED && o.status === OFFER_STATUSES.PENDING) return true;
+  if (activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.ACCEPTED) return true;
+  return false;
 };
+
+const personLabel = (o, activeTab) =>
+  activeTab === OFFER_TABS.MADE
+    ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim()
+    : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim();
 
 const OffersPage = () => {
   const notification = useNotification();
@@ -43,6 +55,9 @@ const OffersPage = () => {
   const [receivedTotalElements, setReceivedTotalElements] = useState(0);
   const size = OFFER_DEFAULTS.PAGE_SIZE;
   const [counterTarget, setCounterTarget] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(STATUS_FILTER.ALL);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState(SORT.NEWEST);
 
   const refresh = async (opts = {}) => {
     setIsLoading(true);
@@ -94,6 +109,44 @@ const OffersPage = () => {
   const page = activeTab === OFFER_TABS.RECEIVED ? receivedPage : madePage;
   const totalElements = activeTab === OFFER_TABS.RECEIVED ? receivedTotalElements : madeTotalElements;
 
+  const statusCounts = useMemo(() => {
+    const c = { [STATUS_FILTER.ALL]: items.length };
+    Object.values(OFFER_STATUSES).forEach((s) => {
+      c[s] = 0;
+    });
+    items.forEach((o) => {
+      if (c[o.status] !== undefined) c[o.status] += 1;
+    });
+    return c;
+  }, [items]);
+
+  const attentionCount = useMemo(
+    () => items.filter((o) => needsAttention(o, activeTab)).length,
+    [items, activeTab]
+  );
+
+  const processedItems = useMemo(() => {
+    let list = [...items];
+    if (statusFilter !== STATUS_FILTER.ALL) {
+      list = list.filter((o) => o.status === statusFilter);
+    }
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter((o) => {
+        const title = (o.listingTitle || '').toLowerCase();
+        const person = personLabel(o, activeTab).toLowerCase();
+        return title.includes(q) || person.includes(q);
+      });
+    }
+    list.sort((a, b) => {
+      if (sortBy === SORT.EXPIRING) {
+        return new Date(a.expiresAt || 0) - new Date(b.expiresAt || 0);
+      }
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+    return list;
+  }, [items, statusFilter, searchQuery, sortBy, activeTab]);
+
   const handleAccept = async (offerId) => {
     try {
       await offerService.accept(offerId);
@@ -118,218 +171,230 @@ const OffersPage = () => {
     navigate(`${ROUTES.CHECKOUT}?offerId=${offerId}`);
   };
 
+  const openListing = useCallback(
+    (listingId) => {
+      navigate(ROUTES.LISTING_DETAIL(listingId));
+    },
+    [navigate]
+  );
+
+  const statusChips = useMemo(
+    () => [
+      { key: STATUS_FILTER.ALL, label: 'All' },
+      { key: OFFER_STATUSES.PENDING, label: 'Pending' },
+      { key: OFFER_STATUSES.ACCEPTED, label: 'Accepted' },
+      { key: OFFER_STATUSES.REJECTED, label: 'Rejected' },
+      { key: OFFER_STATUSES.EXPIRED, label: 'Expired' },
+      { key: OFFER_STATUSES.COMPLETED, label: 'Completed' },
+    ],
+    []
+  );
+
+  const pageFrom = totalElements === 0 ? 0 : page * size + 1;
+  const pageTo = Math.min(totalElements, page * size + items.length);
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">Offers</h1>
-            {items.length > 0 && (
-              <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                {activeTab === OFFER_TABS.MADE ? 'Offers you made' : 'Offers you received'} • {totalElements} total
+    <div className="min-h-screen bg-slate-50/90">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-7">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
+          <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+            <div className="min-w-0 border-l-2 border-teal-700 pl-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Negotiations</p>
+              <h1 className="mt-0.5 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">Offer center</h1>
+              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500">
+                Incoming offers and your bids in one place — filter, search, checkout when accepted.
               </p>
-            )}
+            </div>
+            <button
+              type="button"
+              onClick={() => refresh()}
+              disabled={isLoading}
+              className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => refresh()}
-            disabled={isLoading}
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-60"
-          >
-            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
+
+          <div className="grid grid-cols-2 gap-2 px-3 py-3 sm:grid-cols-4 sm:gap-3 sm:px-4 sm:py-3">
+            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Needs you</div>
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <span className="text-lg font-bold tabular-nums text-slate-900">{attentionCount}</span>
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-teal-700" aria-hidden />
+              </div>
+              <p className="text-[10px] text-slate-400">This page</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Pending</div>
+              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
+                {statusCounts[OFFER_STATUSES.PENDING] ?? 0}
+              </div>
+              <p className="text-[10px] text-slate-400">This page</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Accepted</div>
+              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
+                {statusCounts[OFFER_STATUSES.ACCEPTED] ?? 0}
+              </div>
+              <p className="text-[10px] text-slate-400">This page</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">In tab</div>
+              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">{totalElements}</div>
+              <p className="text-[10px] text-slate-400">Total offers</p>
+            </div>
+          </div>
         </div>
 
-        <div className="mb-5 rounded-3xl bg-white/80 p-3 shadow-[0_18px_45px_rgba(15,23,42,0.05)] border border-slate-100">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="inline-flex items-center rounded-2xl bg-slate-100 p-1">
+        <div className="mt-6 rounded-3xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="inline-flex rounded-2xl bg-slate-100 p-1">
               <button
                 type="button"
-                onClick={() => setActiveTab(OFFER_TABS.MADE)}
-                className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
-                  activeTab === OFFER_TABS.MADE
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                onClick={() => {
+                  setActiveTab(OFFER_TABS.MADE);
+                  setStatusFilter(STATUS_FILTER.ALL);
+                }}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  activeTab === OFFER_TABS.MADE ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
+                <LayoutGrid className="h-4 w-4 opacity-70" />
                 Made
-                <span className="ml-1.5 text-[11px] text-slate-400">{madeTotalElements}</span>
+                <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
+                  {madeTotalElements}
+                </span>
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab(OFFER_TABS.RECEIVED)}
-                className={`relative inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-medium tracking-tight transition-all ${
-                  activeTab === OFFER_TABS.RECEIVED
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                onClick={() => {
+                  setActiveTab(OFFER_TABS.RECEIVED);
+                  setStatusFilter(STATUS_FILTER.ALL);
+                }}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  activeTab === OFFER_TABS.RECEIVED ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-slate-400" />
+                <Handshake className="h-4 w-4 opacity-70" />
                 Received
-                <span className="ml-1.5 text-[11px] text-slate-400">{receivedTotalElements}</span>
+                <span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
+                  {receivedTotalElements}
+                </span>
               </button>
             </div>
-            <div className="text-[11px] text-slate-500 tracking-tight">
-              {activeTab === OFFER_TABS.MADE
-                ? 'Track offers you send to other sellers.'
-                : 'Review and respond to incoming offers.'}
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative min-w-[200px] flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search listing or name…"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" aria-hidden />
+                <label className="sr-only" htmlFor="offer-sort">
+                  Sort
+                </label>
+                <select
+                  id="offer-sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:w-auto"
+                >
+                  <option value={SORT.NEWEST}>Newest first</option>
+                  <option value={SORT.EXPIRING}>Expiring soon</option>
+                </select>
+              </div>
             </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+            {statusChips.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setStatusFilter(key)}
+                className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                  statusFilter === key
+                    ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                {label}
+                <span className="ml-1.5 tabular-nums text-slate-400">({statusCounts[key] ?? 0})</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="rounded-[2rem] bg-white/90 p-4 sm:p-6 border border-slate-100 shadow-[0_22px_60px_rgba(15,23,42,0.05)]">
+        <div className="mt-6 rounded-[1.75rem] border border-slate-200/80 bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.06)] sm:p-6">
+          {totalElements > 0 ? (
+            <p className="mb-4 text-xs text-slate-500">
+              Showing {pageFrom}–{pageTo} of {totalElements} offers
+            </p>
+          ) : null}
+
           {isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-24 rounded-2xl bg-slate-100/60 border border-slate-100 animate-pulse"
-                />
+                <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-100" />
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-red-200/80 bg-red-50/70 px-4 py-3">
-              <p className="text-xs font-medium text-red-700 tracking-tight">{error}</p>
+            <div className="rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3">
+              <p className="text-sm font-medium text-red-800">{error}</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500/10 via-sky-500/10 to-emerald-500/10">
-                <Handshake className="h-7 w-7 text-indigo-500" />
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-16 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15">
+                <Handshake className="h-8 w-8 text-indigo-600" />
               </div>
-              <h2 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
+              <h2 className="text-lg font-semibold text-slate-900">
                 No {activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'} yet
               </h2>
-              <p className="mt-2 max-w-sm text-xs sm:text-sm text-slate-500 tracking-tight">
-                Start negotiating prices to unlock better deals on high quality items.
+              <p className="mt-2 max-w-md text-sm text-slate-500">
+                When you send or receive offers, they will appear here with status, timeline, and quick actions.
               </p>
+            </div>
+          ) : processedItems.length === 0 ? (
+            <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 px-4 py-8 text-center">
+              <p className="text-sm font-medium text-amber-900">No offers match your filters.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusFilter(STATUS_FILTER.ALL);
+                  setSearchQuery('');
+                }}
+                className="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+              >
+                Clear filters
+              </button>
             </div>
           ) : (
             <>
-              <div className="space-y-3">
-                {items.map((o) => {
-                  const currency = OFFER_DEFAULTS.FALLBACK_CURRENCY;
-                  const isExpired = o.status === OFFER_STATUSES.EXPIRED;
-                  const canActAsSeller = !isExpired && activeTab === OFFER_TABS.RECEIVED && o.status === OFFER_STATUSES.PENDING;
-                  const canCheckout = !isExpired && activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.ACCEPTED;
-                  const personName = activeTab === OFFER_TABS.MADE
-                    ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() || '—'
-                    : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim() || '—';
+              <ul className="space-y-4">
+                {processedItems.map((o) => (
+                  <li key={o.id}>
+                    <OfferTrackingCard
+                      offer={o}
+                      activeTab={activeTab}
+                      currency={OFFER_DEFAULTS.FALLBACK_CURRENCY}
+                      onAccept={handleAccept}
+                      onReject={handleReject}
+                      onCounter={setCounterTarget}
+                      onCheckout={handleCheckout}
+                      onOpenListing={openListing}
+                    />
+                  </li>
+                ))}
+              </ul>
 
-                  return (
-                    <div
-                      key={o.id}
-                      className={`rounded-3xl border border-slate-200/60 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm transition-all hover:shadow-[0_24px_70px_rgba(15,23,42,0.07)] ${
-                        isExpired ? 'opacity-60 grayscale' : ''
-                      }`}
-                    >
-                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-semibold tracking-tight text-slate-900">
-                                {o.listingTitle || 'Listing'}
-                              </p>
-                              <p className="mt-0.5 text-[11px] text-slate-500 tracking-tight">
-                                {activeTab === OFFER_TABS.MADE ? 'To' : 'From'} {personName}
-                              </p>
-                            </div>
-                            <span
-                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium tracking-tight ${statusBadge(
-                                o.status
-                              )}`}
-                            >
-                              <Clock className="h-3 w-3" />
-                              {o.status}
-                            </span>
-                          </div>
-
-                          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                                Total offer
-                              </div>
-                              <div className="mt-1 flex items-baseline gap-1.5">
-                                <span className="font-mono text-2xl font-black tracking-tighter text-indigo-600">
-                                  {formatCurrency(o.totalPrice, currency)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                                Quantity and unit
-                              </div>
-                              <div className="mt-1 text-xs text-slate-600">
-                                {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
-                              </div>
-                            </div>
-                            <div className="rounded-2xl bg-slate-50 px-3 py-2.5">
-                              <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">
-                                Timeline
-                              </div>
-                              <div className="mt-1 text-xs text-slate-600">
-                                <span>
-                                  {o.createdAt ? formatDateTime(o.createdAt) : '—'}
-                                </span>
-                                <span className="mx-1 text-slate-400">→</span>
-                                <span className={isExpired ? 'text-red-600 font-medium' : ''}>
-                                  {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-end gap-1.5 md:flex-col md:items-end md:gap-2">
-                          {isExpired ? (
-                            <span className="text-[11px] font-medium text-slate-500 tracking-tight">
-                              Offer expired
-                            </span>
-                          ) : canCheckout ? (
-                            <button
-                              type="button"
-                              onClick={() => handleCheckout(o.id)}
-                              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold tracking-tight text-white shadow-sm hover:bg-indigo-700"
-                            >
-                              <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
-                              Checkout
-                            </button>
-                          ) : canActAsSeller ? (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => handleAccept(o.id)}
-                                className="inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold tracking-tight text-emerald-700 hover:bg-emerald-500/15"
-                              >
-                                <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-                                Accept
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setCounterTarget(o)}
-                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-700 hover:border-slate-300"
-                              >
-                                Counter
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleReject(o.id)}
-                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium tracking-tight text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                              >
-                                <XCircle className="mr-1.5 h-3.5 w-3.5" />
-                                Reject
-                              </button>
-                            </>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-4 rounded-3xl bg-white border border-slate-100 shadow-sm/50 shadow-[0_22px_60px_rgba(15,23,42,0.04)] overflow-hidden">
+              <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/50">
                 <Pagination
                   page={page}
                   totalPages={totalPages}
@@ -361,4 +426,3 @@ const OffersPage = () => {
 };
 
 export default OffersPage;
-

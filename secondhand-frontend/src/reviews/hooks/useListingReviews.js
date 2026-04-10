@@ -20,7 +20,7 @@ export const useListingReviews = (listingId, options = {}) => {
     },
     enabled: !!listingId && (options.enabled !== undefined ? options.enabled : true),
     staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
-    cacheTime: REVIEW_DEFAULTS.LISTING_CACHE_TIME_MS,
+    gcTime: REVIEW_DEFAULTS.LISTING_CACHE_TIME_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     retry: REVIEW_DEFAULTS.RETRY_COUNT,

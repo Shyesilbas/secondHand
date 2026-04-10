@@ -22,6 +22,33 @@ export const PAYMENT_QUERY_KEYS = Object.freeze({
   draftListings: ['draftListings'],
 });
 
+/** Taslak ilan çekimi ve benzeri akış sabitleri */
+export const PAYMENT_FLOW_DEFAULTS = Object.freeze({
+  DRAFT_LISTINGS_PAGE_SIZE: 100,
+  DRAFT_LISTINGS_MAX_PAGES: 10,
+});
+
+/**
+ * İstatistik API alan adı sapmalarına karşı tek yerden okuma (PaymentsPage vb.)
+ */
+export const PAYMENT_STATISTICS_FIELD_KEYS = Object.freeze({
+  totalVolume: ['totalAmount', 'totalVolume', 'total'],
+  incomingVolume: ['incomingAmount', 'totalIncomingAmount', 'incomingTotal'],
+  outgoingVolume: ['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'],
+  successfulCount: ['successfulCount', 'successfulPayments', 'successCount', 'successfulTransactions'],
+});
+
+export const pickPaymentStatistic = (stats, keyGroup) => {
+  if (!stats || !keyGroup) return 0;
+  const keys = PAYMENT_STATISTICS_FIELD_KEYS[keyGroup];
+  if (!keys) return 0;
+  for (const key of keys) {
+    const value = stats[key];
+    if (typeof value === 'number') return value;
+  }
+  return 0;
+};
+
 export { normalizeArrayResponse };
 
 export const PAYMENT_TYPES = {
@@ -133,7 +160,8 @@ export const createListingFeePaymentRequest = (data) => {
     paymentDirection: PAYMENT_DIRECTIONS.OUTGOING,
     verificationCode: data.verificationCode || null,
     agreementsAccepted: data.agreementsAccepted || false,
-    acceptedAgreementIds: data.acceptedAgreementIds || []
+    acceptedAgreementIds: data.acceptedAgreementIds || [],
+    idempotencyKey: data.idempotencyKey,
   };
 };
 

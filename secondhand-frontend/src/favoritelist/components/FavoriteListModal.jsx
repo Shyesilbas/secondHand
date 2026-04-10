@@ -61,12 +61,12 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                 onClick={onClose}
             />
             
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scaleIn">
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
+            <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl ring-1 ring-slate-950/5 animate-scaleIn">
+                <div className="bg-gradient-to-r from-teal-700 via-teal-800 to-slate-800 px-6 py-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                <List className="w-6 h-6 text-white" />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm">
+                                <List className="h-6 w-6 text-white" />
                             </div>
                             <h2 className="text-xl font-bold text-white">
                                 {editList ? 'Edit List' : 'Create New List'}
@@ -84,7 +84,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
                             List Name
                         </label>
                         <input
@@ -92,7 +92,7 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="e.g. Home Decoration"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
+                            className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition-all focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
                             maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX}
                             required
                             autoFocus
@@ -100,31 +100,31 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-slate-700">
                             Description (Optional)
                         </label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="A short description about the list..."
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none outline-none"
+                            className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 outline-none transition-all focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20"
                             rows={3}
                             maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                        <label className="mb-3 block text-sm font-medium text-slate-700">
                             Privacy
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, isPublic: false })}
-                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+                                className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${
                                     !formData.isPublic
-                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                        ? 'border-teal-600 bg-teal-50 text-teal-900'
+                                        : 'border-slate-200 text-slate-600 hover:border-slate-300'
                                 }`}
                             >
                                 <Lock className="w-4 h-4" />
@@ -133,17 +133,17 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, isPublic: true })}
-                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+                                className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${
                                     formData.isPublic
-                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                        ? 'border-teal-600 bg-teal-50 text-teal-900'
+                                        : 'border-slate-200 text-slate-600 hover:border-slate-300'
                                 }`}
                             >
                                 <Globe className="w-4 h-4" />
                                 <span className="font-medium">Public</span>
                             </button>
                         </div>
-                        <p className="mt-2 text-xs text-gray-500">
+                        <p className="mt-2 text-xs text-slate-500">
                             {formData.isPublic 
                                 ? 'Everyone can view and like this list'
                                 : 'Only you can view this list'}
@@ -154,14 +154,14 @@ const FavoriteListModal = ({ isOpen, onClose, editList = null, onSuccess }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                            className="flex-1 rounded-xl border border-slate-200 px-4 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-50"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading || !formData.name.trim()}
-                            className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 rounded-xl bg-teal-700 px-4 py-3 font-medium text-white shadow-sm transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {isLoading ? 'Saving...' : (editList ? 'Update' : 'Create')}
                         </button>
