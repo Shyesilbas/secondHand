@@ -9,6 +9,7 @@ import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.showcase.Showcase;
+import com.serhat.secondhand.showcase.ShowcaseErrorCodes;
 import com.serhat.secondhand.showcase.ShowcaseMapper;
 import com.serhat.secondhand.showcase.ShowcaseStatus;
 import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
@@ -20,6 +21,8 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +80,7 @@ public class ShowcaseService implements IShowcaseService {
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
         if (paymentResult.isError()) {
-            return Result.error("Payment failed for showcase creation", "SHOWCASE_PAYMENT_FAILED");
+            return Result.error(ShowcaseErrorCodes.PAYMENT_FAILED);
         }
 
         // Success - Save Showcase
@@ -90,26 +93,35 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShowcaseDto> getActiveShowcases() {
-        List<Showcase> activeShowcases = showcaseRepository.findActiveShowcases(ShowcaseStatus.ACTIVE, LocalDateTime.now());
-        return activeShowcases.stream().map(showcaseMapper::toDto).toList();
+    public Page<ShowcaseDto> getActiveShowcases(Pageable pageable) {
+        Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE, LocalDateTime.now(), pageable);
+        List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
+        return new org.springframework.data.domain.PageImpl<>(dtoList, pageable, activeShowcases.getTotalElements());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ShowcaseDto> getUserShowcases(Long userId) {
-        List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatus(userId, ShowcaseStatus.ACTIVE);
-        return activeShowcases.stream().map(showcaseMapper::toDto).toList();
+        List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatusWithListing(userId, ShowcaseStatus.ACTIVE);
+        return showcaseMapper.toDtos(activeShowcases, userId);
     }
 
     @Override
-    public Result<Void> extendShowcase(UUID showcaseId, int additionalDays) {
+    public Result<Void> extendShowcase(Long userId, UUID showcaseId, int additionalDays) {
+        Result<Void> daysValidation = showcaseValidator.validateDaysCount(additionalDays);
+        if (daysValidation.isError()) {
+            return Result.error(daysValidation.getMessage(), daysValidation.getErrorCode());
+        }
         return showcaseRepository.findById(showcaseId)
-                .map(showcase -> performExtension(showcase, additionalDays))
-                .orElseGet(() -> Result.error("Showcase not found", "SHOWCASE_NOT_FOUND"));
+                .map(showcase -> performExtension(showcase, userId, additionalDays))
+                .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
     }
     
-    private Result<Void> performExtension(Showcase showcase, int additionalDays) {
+    private Result<Void> performExtension(Showcase showcase, Long userId, int additionalDays) {
+        if (!showcase.getUser().getId().equals(userId)) {
+            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+
         Result<Void> validationResult = showcaseValidator.validateIsActive(showcase);
         if (validationResult.isError()) {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
@@ -127,14 +139,17 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
-    public Result<Void> cancelShowcase(UUID showcaseId) {
+    public Result<Void> cancelShowcase(Long userId, UUID showcaseId) {
         return showcaseRepository.findById(showcaseId)
                 .map(showcase -> {
+                    if (!showcase.getUser().getId().equals(userId)) {
+                        return Result.<Void>error(ListingErrorCodes.NOT_LISTING_OWNER);
+                    }
                     showcase.setStatus(ShowcaseStatus.CANCELLED);
                     showcaseRepository.save(showcase);
                     return Result.<Void>success();
                 })
-                .orElseGet(() -> Result.error("Showcase not found", "SHOWCASE_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
     }
 
     @Override
@@ -143,10 +158,8 @@ public class ShowcaseService implements IShowcaseService {
         List<Showcase> expiredShowcases = showcaseRepository.findByStatusAndEndDateLessThanEqual(
                 ShowcaseStatus.ACTIVE, LocalDateTime.now());
 
-        expiredShowcases.forEach(showcase -> {
-            showcase.setStatus(ShowcaseStatus.EXPIRED);
-            showcaseRepository.save(showcase);
-        });
+        expiredShowcases.forEach(showcase -> showcase.setStatus(ShowcaseStatus.EXPIRED));
+        showcaseRepository.saveAll(expiredShowcases);
     }
 
     @Override

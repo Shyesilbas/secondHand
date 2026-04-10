@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -34,6 +36,13 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
     Page<Email> findByUserIdAndEmailType(Long userId, Pageable pageable, EmailType emailType);
 
     boolean existsByUser_IdAndEmailTypeAndSubject(Long userId, EmailType emailType, String subject);
+
+    @Query("select e.user.id from Email e where e.user.id in :userIds and e.emailType = :emailType and e.subject = :subject")
+    Set<Long> findUserIdsBySubjectAndEmailType(
+            @Param("userIds") Collection<Long> userIds,
+            @Param("emailType") EmailType emailType,
+            @Param("subject") String subject
+    );
 
     java.util.Optional<Email> findByIdAndRecipientEmail(UUID id, String recipientEmail);
 

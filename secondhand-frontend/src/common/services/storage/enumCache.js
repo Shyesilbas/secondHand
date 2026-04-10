@@ -2,53 +2,68 @@ import logger from '../../utils/logger.js';
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
 const ENUM_CACHE_VERSION = '4.2';
-const REQUIRED_ENUM_KEYS = [
-  'listingTypes',
-  'listingStatuses',
-  'orderStatuses',
-  'carBrands',
-  'vehicleModels',
-  'fuelTypes',
-  'colors',
-  'doors',
-  'currencies',
-  'gearTypes',
-  'seatCounts',
-  'electronicTypes',
-  'electronicBrands',
-  'electronicModels',
-  'processors',
-  'drivetrains',
-  'bodyTypes',
-  'realEstateTypes',
-  'realEstateAdTypes',
-  'heatingTypes',
-  'ownerTypes',
-  'clothingBrands',
-  'clothingTypes',
-  'clothingConditions',
-  'clothingGenders',
-  'clothingCategories',
-  'bookTypes',
-  'bookGenres',
-  'bookLanguages',
-  'bookFormats',
-  'bookConditions',
-  'sportDisciplines',
-  'sportEquipmentTypes',
-  'sportConditions',
-  'genders',
-  'paymentTypes',
-  'shippingStatuses',
-  'emailTypes',
-  'auditEventTypes',
-  'auditEventStatuses',
-  'listingFeeConfig',
-  'showcasePricingConfig',
-  'agreementGroups',
-  'agreementTypes',
+const REQUIRED_ENUM_PATHS = [
+  ['general', 'listingTypes'],
+  ['general', 'listingStatuses'],
+  ['general', 'orderStatuses'],
+  ['general', 'currencies'],
+  ['general', 'paymentTypes'],
+  ['general', 'shippingStatuses'],
+  ['general', 'emailTypes'],
+  ['general', 'genders'],
+  ['general', 'auditEventTypes'],
+  ['general', 'auditEventStatuses'],
+  ['general', 'listingFeeConfig'],
+  ['general', 'showcasePricingConfig'],
+  ['general', 'agreementGroups'],
+  ['general', 'agreementTypes'],
+  ['vehicle', 'carBrands'],
+  ['vehicle', 'vehicleTypes'],
+  ['vehicle', 'vehicleModels'],
+  ['vehicle', 'fuelTypes'],
+  ['vehicle', 'colors'],
+  ['vehicle', 'doors'],
+  ['vehicle', 'gearTypes'],
+  ['vehicle', 'seatCounts'],
+  ['vehicle', 'drivetrains'],
+  ['vehicle', 'bodyTypes'],
+  ['electronics', 'electronicTypes'],
+  ['electronics', 'electronicBrands'],
+  ['electronics', 'electronicModels'],
+  ['electronics', 'processors'],
+  ['electronics', 'storageTypes'],
+  ['electronics', 'electronicConnectionTypes'],
+  ['realEstate', 'realEstateTypes'],
+  ['realEstate', 'realEstateAdTypes'],
+  ['realEstate', 'heatingTypes'],
+  ['realEstate', 'ownerTypes'],
+  ['clothing', 'clothingBrands'],
+  ['clothing', 'clothingTypes'],
+  ['clothing', 'clothingConditions'],
+  ['clothing', 'clothingGenders'],
+  ['clothing', 'clothingCategories'],
+  ['clothing', 'clothingSizes'],
+  ['book', 'bookTypes'],
+  ['book', 'bookGenres'],
+  ['book', 'bookLanguages'],
+  ['book', 'bookFormats'],
+  ['book', 'bookConditions'],
+  ['sport', 'sportDisciplines'],
+  ['sport', 'sportEquipmentTypes'],
+  ['sport', 'sportConditions'],
 ];
 const CACHE_EXPIRY_HOURS = 24;
+const hasNestedKey = (obj, path) => {
+    let current = obj;
+    for (const segment of path) {
+        if (current == null || !(segment in current)) {
+            return false;
+        }
+        current = current[segment];
+    }
+    return true;
+};
+
 export const getCachedEnums = () => {
     try {
         const cached = localStorage.getItem(ENUM_CACHE_KEY);
@@ -61,8 +76,8 @@ export const getCachedEnums = () => {
             return null;
         }
 
-        const missingKeys = REQUIRED_ENUM_KEYS.filter((key) => !(key in (data || {})));
-        if (missingKeys.length > 0) {
+        const missingPaths = REQUIRED_ENUM_PATHS.filter((path) => !hasNestedKey(data, path));
+        if (missingPaths.length > 0) {
             clearEnumCache();
             return null;
         }
@@ -77,8 +92,8 @@ export const getCachedEnums = () => {
 
         // Check if pricing config cache versions have changed
         if (pricingCacheVersions) {
-            const currentListingFeeVersion = data.listingFeeConfig?.cacheVersion;
-            const currentShowcaseVersion = data.showcasePricingConfig?.cacheVersion;
+            const currentListingFeeVersion = data.general?.listingFeeConfig?.cacheVersion;
+            const currentShowcaseVersion = data.general?.showcasePricingConfig?.cacheVersion;
             
             if (currentListingFeeVersion && pricingCacheVersions.listingFeeConfig && 
                 currentListingFeeVersion !== pricingCacheVersions.listingFeeConfig) {
@@ -106,8 +121,8 @@ export const setCachedEnums = (enums) => {
     try {
         // Extract pricing cache versions for future comparison
         const pricingCacheVersions = {
-            listingFeeConfig: enums.listingFeeConfig?.cacheVersion,
-            showcasePricingConfig: enums.showcasePricingConfig?.cacheVersion
+            listingFeeConfig: enums.general?.listingFeeConfig?.cacheVersion,
+            showcasePricingConfig: enums.general?.showcasePricingConfig?.cacheVersion
         };
         
         const cacheData = {

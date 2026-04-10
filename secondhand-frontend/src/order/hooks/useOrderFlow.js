@@ -140,6 +140,8 @@ export const useOrderFlow = ({
 
   const [orderReviews, setOrderReviews] = useState({});
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewedOrderIds, setReviewedOrderIds] = useState({});
+  const [reviewedOrderSummaries, setReviewedOrderSummaries] = useState({});
 
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQ = searchParams.get('q') || '';
@@ -211,6 +213,75 @@ export const useOrderFlow = ({
     }
     return ordersUnfiltered.filter((o) => o.status === statusFilter);
   }, [ordersUnfiltered, statusFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchListReviewState = async () => {
+      if (mode === ORDER_VIEW_MODES.SELLER || !orders?.length) {
+        setReviewedOrderIds({});
+        setReviewedOrderSummaries({});
+        return;
+      }
+
+      const reviewEligibleOrders = orders.filter((order) =>
+        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(order?.status)
+      );
+      const orderItemIds = reviewEligibleOrders.flatMap((order) =>
+        (order?.orderItems || []).map((item) => item?.id).filter(Boolean)
+      );
+
+      if (!orderItemIds.length) {
+        setReviewedOrderIds({});
+        setReviewedOrderSummaries({});
+        return;
+      }
+
+      try {
+        const { reviewService } = await import('../../reviews/services/reviewService.js');
+        const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);
+        if (cancelled) return;
+
+        const reviewedItems = new Set(
+          Array.isArray(reviewsResponse)
+            ? reviewsResponse.map((review) => review?.orderItemId).filter(Boolean)
+            : []
+        );
+
+        const orderReviewMap = {};
+        const orderReviewSummaryMap = {};
+        reviewEligibleOrders.forEach((order) => {
+          const firstReviewedItem = (order?.orderItems || []).find((item) => reviewedItems.has(item?.id));
+          const hasReviewedItem = Boolean(firstReviewedItem);
+          if (hasReviewedItem) {
+            orderReviewMap[order.id] = true;
+            const reviewDetails = Array.isArray(reviewsResponse)
+              ? reviewsResponse.find((review) => review?.orderItemId === firstReviewedItem?.id)
+              : null;
+            if (reviewDetails) {
+              orderReviewSummaryMap[order.id] = {
+                rating: reviewDetails.rating,
+                comment: reviewDetails.comment,
+              };
+            }
+          }
+        });
+
+        setReviewedOrderIds(orderReviewMap);
+        setReviewedOrderSummaries(orderReviewSummaryMap);
+      } catch {
+        if (!cancelled) {
+          setReviewedOrderIds({});
+          setReviewedOrderSummaries({});
+        }
+      }
+    };
+
+    fetchListReviewState();
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, orders]);
 
   const pagination = useMemo(
     () => ({
@@ -471,6 +542,8 @@ export const useOrderFlow = ({
       reviewsLoading,
       fetchReviewsData,
       clearReviews,
+      reviewedOrderIds,
+      reviewedOrderSummaries,
     },
     ui: {
       editingOrderId,

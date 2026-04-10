@@ -20,6 +20,7 @@ public class AgreementUpdateNotificationService {
     private final AgreementService agreementService;
     private final UserAgreementRepository userAgreementRepository;
     private final AgreementEmailNotificationService agreementEmailNotificationService;
+    private final AgreementAcceptanceBackfillHelper agreementAcceptanceBackfillHelper;
 
     @Transactional
     public void notifyOutdatedRequiredAgreements(Long userId) {
@@ -30,7 +31,8 @@ public class AgreementUpdateNotificationService {
                     .orElse(null);
 
             String currentVersion = agreement.getVersion();
-            if (userAgreement != null && userAgreement.getAcceptedVersion() == null && shouldBackfillAcceptedVersion(userAgreement)) {
+            if (userAgreement != null && userAgreement.getAcceptedVersion() == null
+                    && agreementAcceptanceBackfillHelper.shouldBackfillAcceptedVersion(userAgreement)) {
                 userAgreement.setAcceptedVersion(currentVersion);
                 userAgreement.setAcceptedTheLastVersion(true);
                 userAgreementRepository.save(userAgreement);
@@ -43,16 +45,6 @@ public class AgreementUpdateNotificationService {
 
             agreementEmailNotificationService.notifyUserOutdatedAgreement(userId, type, currentVersion);
         }
-    }
-
-    private boolean shouldBackfillAcceptedVersion(UserAgreement userAgreement) {
-        if (userAgreement == null) return false;
-        if (!userAgreement.isAcceptedTheLastVersion()) return false;
-        if (userAgreement.getAgreement() == null) return false;
-        if (userAgreement.getAgreement().getVersion() == null) return false;
-        if (userAgreement.getAgreement().getUpdatedDate() == null) return false;
-        if (userAgreement.getAcceptedDate() == null) return false;
-        return !userAgreement.getAcceptedDate().isBefore(userAgreement.getAgreement().getUpdatedDate());
     }
 
 }

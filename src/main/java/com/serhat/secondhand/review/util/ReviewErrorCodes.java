@@ -9,7 +9,9 @@ public enum ReviewErrorCodes implements ErrorCode {
     ORDER_ITEM_NOT_FOUND("ORDER_ITEM_NOT_FOUND", "Order item not found", HttpStatus.NOT_FOUND),
     ORDER_ITEM_NOT_BELONG_TO_USER("ORDER_ITEM_NOT_BELONG_TO_USER", "Order item does not belong to user", HttpStatus.FORBIDDEN),
     ORDER_NOT_DELIVERED("ORDER_NOT_DELIVERED", "Can only review delivered orders", HttpStatus.BAD_REQUEST),
-    REVIEW_ALREADY_EXISTS("REVIEW_ALREADY_EXISTS", "Review already exists for this order item", HttpStatus.CONFLICT);
+    REVIEW_ALREADY_EXISTS("REVIEW_ALREADY_EXISTS", "Review already exists for this order item", HttpStatus.CONFLICT),
+    INVALID_ORDER_ITEM_IDS("INVALID_ORDER_ITEM_IDS", "Invalid orderItemIds format", HttpStatus.BAD_REQUEST),
+    TOO_MANY_ORDER_ITEM_IDS("TOO_MANY_ORDER_ITEM_IDS", "orderItemIds exceeds maximum allowed size", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

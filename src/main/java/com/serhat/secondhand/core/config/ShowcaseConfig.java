@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 public class ShowcaseConfig {
     private Daily daily;
     private Fee fee;
+    private Scheduler scheduler = new Scheduler();
+    private Integer maxDays = 30;
+    private Integer activeListDefaultSize = 12;
 
     @Getter
     @Setter
@@ -25,6 +28,12 @@ public class ShowcaseConfig {
     @Setter
     public static class Fee {
         private BigDecimal tax;
+    }
+
+    @Getter
+    @Setter
+    public static class Scheduler {
+        private String expireCron = "0 0 * * * ?";
     }
 }
 

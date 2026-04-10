@@ -6,6 +6,7 @@ import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
+import com.serhat.secondhand.review.repository.projection.ReviewStatsProjection;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -45,18 +46,19 @@ public class ReviewMapper {
                 .build();
     }
 
-    public ReviewStatsDto mapToReviewStatsDto(Object[] stats, int startIndex) {
-        int len = stats.length;
-
+    public ReviewStatsDto mapToReviewStatsDto(ReviewStatsProjection stats) {
+        if (stats == null) {
+            return ReviewStatsDto.empty();
+        }
         return new ReviewStatsDto(
-                (Long) stats[startIndex],
-                (len > startIndex + 1 && stats[startIndex + 1] != null) ? (Double) stats[startIndex + 1] : 0.0, // averageRating
-                (len > startIndex + 2) ? (Long) stats[startIndex + 2] : 0L, // 5 star
-                (len > startIndex + 3) ? (Long) stats[startIndex + 3] : 0L, // 4 star
-                (len > startIndex + 4) ? (Long) stats[startIndex + 4] : 0L, // 3 star
-                (len > startIndex + 5) ? (Long) stats[startIndex + 5] : 0L, // 2 star
-                (len > startIndex + 6) ? (Long) stats[startIndex + 6] : 0L, // 1 star
-                (len > startIndex + 7) ? (Long) stats[startIndex + 7] : 0L  // 0 star
+                stats.getTotalReviews(),
+                stats.getAverageRating() != null ? stats.getAverageRating() : 0.0,
+                stats.getFiveStarReviews(),
+                stats.getFourStarReviews(),
+                stats.getThreeStarReviews(),
+                stats.getTwoStarReviews(),
+                stats.getOneStarReviews(),
+                stats.getZeroStarReviews()
         );
     }
 

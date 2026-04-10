@@ -4,11 +4,14 @@ import com.serhat.secondhand.campaign.dto.CampaignDto;
 import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.entity.Campaign;
+import com.serhat.secondhand.campaign.repository.projection.CampaignListProjection;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class CampaignMapper {
@@ -34,6 +37,21 @@ public class CampaignMapper {
                 .value(campaign.getValue())
                 .eligibleTypes(campaign.getEligibleTypes())
                 .eligibleListingIds(campaign.getEligibleListingIds())
+                .applyToFutureListings(campaign.isApplyToFutureListings())
+                .build();
+    }
+
+    public CampaignDto toDto(CampaignListProjection campaign) {
+        return CampaignDto.builder()
+                .id(campaign.getId())
+                .name(campaign.getName())
+                .active(campaign.isActive())
+                .startsAt(campaign.getStartsAt())
+                .endsAt(campaign.getEndsAt())
+                .discountKind(campaign.getDiscountKind())
+                .value(campaign.getValue())
+                .eligibleTypes(new HashSet<>())
+                .eligibleListingIds(new HashSet<>())
                 .applyToFutureListings(campaign.isApplyToFutureListings())
                 .build();
     }

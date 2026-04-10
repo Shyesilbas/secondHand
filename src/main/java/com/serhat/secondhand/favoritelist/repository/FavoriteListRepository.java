@@ -1,6 +1,7 @@
 package com.serhat.secondhand.favoritelist.repository;
 
 import com.serhat.secondhand.favoritelist.entity.FavoriteList;
+import com.serhat.secondhand.favoritelist.repository.projection.FavoriteListSummaryProjection;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,24 +23,85 @@ public interface FavoriteListRepository extends JpaRepository<FavoriteList, Long
     @Query("SELECT COUNT(fl) FROM FavoriteList fl WHERE fl.owner = :owner")
     long countByOwner(@Param("owner") User owner);
 
-    @Query("SELECT fl FROM FavoriteList fl WHERE fl.isPublic = true ORDER BY SIZE(fl.likes) DESC")
-    Page<FavoriteList> findPopularPublicLists(Pageable pageable);
+    @Query(value = """
+            SELECT
+              fl.id AS id,
+              fl.name AS name,
+              fl.description AS description,
+              fl.isPublic AS isPublic,
+              fl.coverImageUrl AS coverImageUrl,
+              fl.owner.id AS ownerId,
+              CONCAT(fl.owner.name, ' ', fl.owner.surname) AS ownerName,
+              COUNT(DISTINCT i.id) AS itemCount,
+              COUNT(DISTINCT l.id) AS likeCount,
+              COALESCE(SUM(li.price), 0) AS totalPrice,
+              MAX(li.currency) AS currency,
+              COALESCE(fl.coverImageUrl, MAX(li.imageUrl)) AS previewImageUrl,
+              fl.createdAt AS createdAt
+            FROM FavoriteList fl
+            LEFT JOIN fl.items i
+            LEFT JOIN i.listing li
+            LEFT JOIN fl.likes l
+            WHERE fl.isPublic = true
+            GROUP BY fl.id, fl.name, fl.description, fl.isPublic, fl.coverImageUrl, fl.owner.id, fl.owner.name, fl.owner.surname, fl.createdAt
+            ORDER BY COUNT(DISTINCT l.id) DESC, fl.createdAt DESC
+            """,
+            countQuery = "SELECT COUNT(fl) FROM FavoriteList fl WHERE fl.isPublic = true")
+    Page<FavoriteListSummaryProjection> findPopularPublicListSummaries(Pageable pageable);
 
     boolean existsByOwnerAndName(User owner, String name);
 
-    @Query(value = "SELECT DISTINCT fl FROM FavoriteList fl " +
-            "LEFT JOIN FETCH fl.items " +
-            "LEFT JOIN FETCH fl.likes " +
-            "WHERE fl.owner = :owner",
+    @Query(value = """
+            SELECT
+              fl.id AS id,
+              fl.name AS name,
+              fl.description AS description,
+              fl.isPublic AS isPublic,
+              fl.coverImageUrl AS coverImageUrl,
+              fl.owner.id AS ownerId,
+              CONCAT(fl.owner.name, ' ', fl.owner.surname) AS ownerName,
+              COUNT(DISTINCT i.id) AS itemCount,
+              COUNT(DISTINCT l.id) AS likeCount,
+              COALESCE(SUM(li.price), 0) AS totalPrice,
+              MAX(li.currency) AS currency,
+              COALESCE(fl.coverImageUrl, MAX(li.imageUrl)) AS previewImageUrl,
+              fl.createdAt AS createdAt
+            FROM FavoriteList fl
+            LEFT JOIN fl.items i
+            LEFT JOIN i.listing li
+            LEFT JOIN fl.likes l
+            WHERE fl.owner = :owner
+            GROUP BY fl.id, fl.name, fl.description, fl.isPublic, fl.coverImageUrl, fl.owner.id, fl.owner.name, fl.owner.surname, fl.createdAt
+            ORDER BY fl.createdAt DESC
+            """,
             countQuery = "SELECT COUNT(fl) FROM FavoriteList fl WHERE fl.owner = :owner")
-    Page<FavoriteList> findByOwnerWithDetails(@Param("owner") User owner, Pageable pageable);
+    Page<FavoriteListSummaryProjection> findMyListSummaries(@Param("owner") User owner, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT fl FROM FavoriteList fl " +
-            "LEFT JOIN FETCH fl.items " +
-            "LEFT JOIN FETCH fl.likes " +
-            "WHERE fl.owner.id = :ownerId AND fl.isPublic = true",
+    @Query(value = """
+            SELECT
+              fl.id AS id,
+              fl.name AS name,
+              fl.description AS description,
+              fl.isPublic AS isPublic,
+              fl.coverImageUrl AS coverImageUrl,
+              fl.owner.id AS ownerId,
+              CONCAT(fl.owner.name, ' ', fl.owner.surname) AS ownerName,
+              COUNT(DISTINCT i.id) AS itemCount,
+              COUNT(DISTINCT l.id) AS likeCount,
+              COALESCE(SUM(li.price), 0) AS totalPrice,
+              MAX(li.currency) AS currency,
+              COALESCE(fl.coverImageUrl, MAX(li.imageUrl)) AS previewImageUrl,
+              fl.createdAt AS createdAt
+            FROM FavoriteList fl
+            LEFT JOIN fl.items i
+            LEFT JOIN i.listing li
+            LEFT JOIN fl.likes l
+            WHERE fl.owner.id = :ownerId AND fl.isPublic = true
+            GROUP BY fl.id, fl.name, fl.description, fl.isPublic, fl.coverImageUrl, fl.owner.id, fl.owner.name, fl.owner.surname, fl.createdAt
+            ORDER BY fl.createdAt DESC
+            """,
             countQuery = "SELECT COUNT(fl) FROM FavoriteList fl WHERE fl.owner.id = :ownerId AND fl.isPublic = true")
-    Page<FavoriteList> findPublicByOwnerIdWithDetails(@Param("ownerId") Long ownerId, Pageable pageable);
+    Page<FavoriteListSummaryProjection> findPublicListSummaries(@Param("ownerId") Long ownerId, Pageable pageable);
 
     @Query("SELECT fl FROM FavoriteList fl " +
             "LEFT JOIN FETCH fl.items " +

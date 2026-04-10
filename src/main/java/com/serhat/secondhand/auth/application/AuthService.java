@@ -74,18 +74,17 @@ public class AuthService implements IAuthService {
             return Result.error(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
         }
 
-        User user = userMapper.toEntity(request, passwordEncoder);
-        Result<Void> saveResult = userService.save(user);
-        if (saveResult.isError()) {
-            return Result.error(saveResult.getMessage(), saveResult.getErrorCode());
-        }
-
         var requiredAgreements = agreementRequirementService.getRequiredAgreements("REGISTER");
-
         Set<UUID> requiredIds = requiredAgreements.stream().map(Agreement::getAgreementId).collect(Collectors.toSet());
         Set<UUID> acceptedIds = new HashSet<>(request.getAcceptedAgreementIds());
         if (!acceptedIds.containsAll(requiredIds)) {
             return Result.error(AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED);
+        }
+
+        User user = userMapper.toEntity(request, passwordEncoder);
+        Result<Void> saveResult = userService.save(user);
+        if (saveResult.isError()) {
+            return Result.error(saveResult.getMessage(), saveResult.getErrorCode());
         }
 
         for (UUID agreementId : acceptedIds) {
@@ -122,10 +121,6 @@ public class AuthService implements IAuthService {
         }
 
         User user = userResult.getData();
-
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password.");
-        }
 
         if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
@@ -294,7 +289,10 @@ public class AuthService implements IAuthService {
                 .lastLoginDate(LocalDateTime.now())
                 .build();
 
-        userService.save(user);
+        Result<Void> saveResult = userService.save(user);
+        if (saveResult.isError()) {
+            throw new BadCredentialsException(saveResult.getMessage());
+        }
         eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
         String accessToken = jwtUtils.generateAccessToken(user);

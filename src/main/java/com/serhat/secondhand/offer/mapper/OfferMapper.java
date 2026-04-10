@@ -1,6 +1,7 @@
 package com.serhat.secondhand.offer.mapper;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.offer.config.OfferConfigProperties;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
 import com.serhat.secondhand.offer.dto.OfferDto;
@@ -8,13 +9,16 @@ import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;
 import com.serhat.secondhand.offer.entity.OfferStatus;
 import com.serhat.secondhand.user.domain.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class OfferMapper {
+
+    private final OfferConfigProperties offerConfigProperties;
 
     public OfferDto toDto(Offer offer) {
         Listing listing = offer.getListing();
@@ -52,7 +56,7 @@ public class OfferMapper {
                 .totalPrice(request.getTotalPrice())
                 .status(OfferStatus.PENDING)
                 .createdBy(OfferActor.BUYER)
-                .expiresAt(LocalDateTime.now().plusHours(24))
+                .expiresAt(offerConfigProperties.calculateExpiresAt())
                 .build();
     }
 
@@ -66,7 +70,7 @@ public class OfferMapper {
                 .status(OfferStatus.PENDING)
                 .createdBy(actor)
                 .parentOffer(previous)
-                .expiresAt(LocalDateTime.now().plusHours(24))
+                .expiresAt(offerConfigProperties.calculateExpiresAt())
                 .build();
     }
 

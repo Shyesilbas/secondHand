@@ -15,6 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Agreement güncellemeleri yalnızca gelen kutusu (Email) üzerinden iletilir; in-app bildirim oluşturulmaz.
  */
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 public class AgreementEmailNotificationService {
 
     private static final String BODY_FOOTER = "\n\nOpen Agreements in your account: Profile → Agreements (or /agreements/all).";
+    private static final int BROADCAST_BATCH_SIZE = 150;
 
     private final EmailService emailService;
     private final EmailRepository emailRepository;
@@ -52,12 +56,20 @@ public class AgreementEmailNotificationService {
         String body = template.getMessage() + BODY_FOOTER;
 
         int page = 0;
-        Pageable pageable = PageRequest.of(page, 150);
+        Pageable pageable = PageRequest.of(page, BROADCAST_BATCH_SIZE);
         Page<User> batch;
         do {
             batch = userRepository.findAll(pageable);
-            for (User u : batch.getContent()) {
-                if (emailRepository.existsByUser_IdAndEmailTypeAndSubject(u.getId(), EmailType.AGREEMENT_UPDATED, subject)) {
+            List<User> users = batch.getContent();
+            List<Long> userIds = users.stream().map(User::getId).toList();
+            if (userIds.isEmpty()) {
+                pageable = batch.nextPageable();
+                continue;
+            }
+            Set<Long> alreadySentUserIds = emailRepository.findUserIdsBySubjectAndEmailType(
+                    userIds, EmailType.AGREEMENT_UPDATED, subject);
+            for (User u : users) {
+                if (alreadySentUserIds.contains(u.getId())) {
                     continue;
                 }
                 emailService.sendEmail(u, subject, body, EmailType.AGREEMENT_UPDATED);

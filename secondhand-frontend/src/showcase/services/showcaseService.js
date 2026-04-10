@@ -2,7 +2,8 @@ import { get, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
 export const showcaseService = {
-  getActiveShowcases: () => get(API_ENDPOINTS.SHOWCASES.ACTIVE),
+  getActiveShowcases: ({ page = 0, size = 12 } = {}) =>
+    get(API_ENDPOINTS.SHOWCASES.ACTIVE, { params: { page, size } }),
 
   getUserShowcases: () => get(API_ENDPOINTS.SHOWCASES.MY_SHOWCASES),
 

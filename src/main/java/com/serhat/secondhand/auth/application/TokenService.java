@@ -60,12 +60,14 @@ public class TokenService {
 
     @Transactional
     public void revokeUserRefreshTokens(User user) {
-        List<Token> activeRefreshTokens = tokenRepository.findByUserAndTokenTypeAndTokenStatus(
-                user, TokenType.REFRESH_TOKEN, TokenStatus.ACTIVE);
-        if (!activeRefreshTokens.isEmpty()) {
-            activeRefreshTokens.forEach(token -> token.setTokenStatus(TokenStatus.REVOKED));
-            tokenRepository.saveAll(activeRefreshTokens);
-            log.info("Revoked {} active refresh tokens for user: {}", activeRefreshTokens.size(), user.getUsername());
+        int revokedCount = tokenRepository.bulkUpdateUserTokensByTypeAndStatus(
+                user,
+                TokenType.REFRESH_TOKEN,
+                TokenStatus.ACTIVE,
+                TokenStatus.REVOKED
+        );
+        if (revokedCount > 0) {
+            log.info("Revoked {} active refresh tokens for user: {}", revokedCount, user.getUsername());
         }
     }
 
@@ -81,23 +83,26 @@ public class TokenService {
 
     @Transactional
     public void revokeAllUserTokens(User user) {
-        List<Token> activeTokens = findActiveTokensByUser(user);
-        if (!activeTokens.isEmpty()) {
-            activeTokens.forEach(token -> token.setTokenStatus(TokenStatus.REVOKED));
-            tokenRepository.saveAll(activeTokens);
-            log.info("Revoked {} active tokens for user: {}", activeTokens.size(), user.getUsername());
+        int revokedCount = tokenRepository.bulkUpdateUserTokensByStatus(
+                user,
+                TokenStatus.ACTIVE,
+                TokenStatus.REVOKED
+        );
+        if (revokedCount > 0) {
+            log.info("Revoked {} active tokens for user: {}", revokedCount, user.getUsername());
         }
     }
 
     @Transactional
     public void cleanupExpiredTokens() {
         LocalDateTime now = LocalDateTime.now();
-        List<Token> expiredTokens = tokenRepository.findExpiredTokens(now);
-
-        if (!expiredTokens.isEmpty()) {
-            expiredTokens.forEach(token -> token.setTokenStatus(TokenStatus.EXPIRED));
-            tokenRepository.saveAll(expiredTokens);
-            log.info("Cleaned up {} expired tokens", expiredTokens.size());
+        int expiredCount = tokenRepository.bulkExpireTokens(
+                now,
+                TokenStatus.ACTIVE,
+                TokenStatus.EXPIRED
+        );
+        if (expiredCount > 0) {
+            log.info("Cleaned up {} expired tokens", expiredCount);
         } else {
             log.debug("No expired tokens found to cleanup");
         }

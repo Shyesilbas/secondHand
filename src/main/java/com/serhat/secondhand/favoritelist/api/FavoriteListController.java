@@ -1,6 +1,7 @@
 package com.serhat.secondhand.favoritelist.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.favoritelist.config.FavoriteListConfig;
 import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
 import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
 import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
@@ -32,6 +33,7 @@ import java.util.UUID;
 public class FavoriteListController {
 
     private final FavoriteListService favoriteListService;
+    private final FavoriteListConfig favoriteListConfig;
 
     @PostMapping
     @Operation(summary = "Create a new favorite list")
@@ -45,9 +47,10 @@ public class FavoriteListController {
     @Operation(summary = "Get current user's favorite lists")
     public ResponseEntity<Page<FavoriteListSummaryDto>> getMyLists(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) Integer size,
             @AuthenticationPrincipal User currentUser) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        int resolvedSize = resolveSize(size, favoriteListConfig.getMyListsDefaultSize());
+        Pageable pageable = PageRequest.of(page, resolvedSize, Sort.by("createdAt").descending());
         Page<FavoriteListSummaryDto> lists = favoriteListService.getMyLists(currentUser.getId(), pageable);
         return ResponseEntity.ok(lists);
     }
@@ -57,8 +60,9 @@ public class FavoriteListController {
     public ResponseEntity<Page<FavoriteListSummaryDto>> getUserPublicLists(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            @RequestParam(required = false) Integer size) {
+        int resolvedSize = resolveSize(size, favoriteListConfig.getUserPublicListsDefaultSize());
+        Pageable pageable = PageRequest.of(page, resolvedSize, Sort.by("createdAt").descending());
         Page<FavoriteListSummaryDto> lists = favoriteListService.getUserPublicLists(userId, pageable);
         return ResponseEntity.ok(lists);
     }
@@ -67,8 +71,9 @@ public class FavoriteListController {
     @Operation(summary = "Get popular public favorite lists")
     public ResponseEntity<Page<FavoriteListSummaryDto>> getPopularLists(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+            @RequestParam(required = false) Integer size) {
+        int resolvedSize = resolveSize(size, favoriteListConfig.getPopularDefaultSize());
+        Pageable pageable = PageRequest.of(page, resolvedSize);
         Page<FavoriteListSummaryDto> lists = favoriteListService.getPopularLists(pageable);
         return ResponseEntity.ok(lists);
     }
@@ -139,5 +144,12 @@ public class FavoriteListController {
             @AuthenticationPrincipal User currentUser) {
         List<Long> listIds = favoriteListService.getListIdsContainingListing(currentUser.getId(), listingId);
         return ResponseEntity.ok(Map.of("listIds", listIds));
+    }
+
+    private int resolveSize(Integer requestedSize, int defaultSize) {
+        if (requestedSize == null || requestedSize < 1) {
+            return defaultSize;
+        }
+        return requestedSize;
     }
 }

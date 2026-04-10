@@ -1,29 +1,30 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { formatCurrency, formatDate, resolveEnumLabel } from '../../../common/formatters.js';
-import { ROUTES } from '../../../common/constants/routes.js';
+import React, {useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {formatCurrency, resolveEnumLabel} from '../../../common/formatters.js';
+import {ROUTES} from '../../../common/constants/routes.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
-import { getStatusColor } from '../../orderConstants.js';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
+import {OrderProgressStepper} from '../orderDetails/OrderTimeline.jsx';
 import {
-  ORDER_DEFAULTS,
-  ORDER_STATUSES,
-  ORDER_STATUS_TAB_FILTER,
-  ORDER_VIEW_MODES,
+    ORDER_DEFAULTS,
+    ORDER_STATUS_TAB_FILTER,
+    ORDER_STATUSES,
+    ORDER_VIEW_MODES,
 } from '../../constants/orderUiConstants.js';
 import {
-  BarChart3,
-  CheckCircle,
-  Package,
-  Pencil,
-  Receipt,
-  RefreshCw,
-  Search,
-  SlidersHorizontal,
-  Sparkles,
-  Wallet,
-  X,
-  Info,
+    BarChart3,
+    CheckCircle,
+    CircleCheck,
+    Info,
+    Package,
+    Pencil,
+    Receipt,
+    RefreshCw,
+    Search,
+    SlidersHorizontal,
+    Sparkles,
+    Wallet,
+    X,
 } from 'lucide-react';
 
 const mergeUiCopy = (partial) => ({ ...DEFAULT_UI_COPY, ...partial });
@@ -43,13 +44,14 @@ const DEFAULT_UI_COPY = {
   totalLabel: 'Total',
   orderLabel: 'Order',
   orderNumberPrefix: '#',
-  trackingLabel: 'Tracking no.',
-  etaLabel: 'Est. delivery',
-  trackingEmpty: '—',
+  reviewDone: 'Review completed',
+  reviewLabel: 'Your review',
+  reviewNow: 'Review now',
+  progressLabel: 'Order progress',
   detail: 'Order details',
   trackShipment: 'Track shipment',
   reorder: 'Buy again',
-  confirmReceipt: 'Confirm delivery',
+  confirmReceipt: 'Confirm Order',
   qtyLabel: 'Qty',
   itemsSummary: (n) => (n === 1 ? '1 item' : `${n} items`),
   nameBannerTitle: 'Name your orders',
@@ -96,20 +98,20 @@ const orderStatusBadgeClass = (status) => {
 const Header = React.memo(
   ({ title, subtitle, showIndicator, onAnalytics, analyticsLabel = 'Analytics', onRefresh, loading, sticky, uiCopy: _u }) => {
     const headerContent = (
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">{title}</h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight">{title}</h1>
             {showIndicator ? <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0" /> : null}
           </div>
-          {subtitle ? <p className="text-sm text-slate-500 mt-1.5 max-w-xl leading-relaxed">{subtitle}</p> : null}
+          {subtitle ? <p className="text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">{subtitle}</p> : null}
         </div>
         <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
           {onAnalytics ? (
             <button
               type="button"
               onClick={onAnalytics}
-              className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold text-slate-700 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 transition-colors"
             >
               <BarChart3 className="w-4 h-4" />
               {analyticsLabel}
@@ -120,7 +122,7 @@ const Header = React.memo(
               type="button"
               onClick={onRefresh}
               disabled={loading}
-              className="p-2 text-slate-500 hover:text-slate-800 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors disabled:opacity-40"
+              className="p-2.5 text-slate-500 hover:text-slate-800 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 transition-colors disabled:opacity-40"
               title="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -131,12 +133,12 @@ const Header = React.memo(
     );
 
     if (!sticky) {
-      return <div className="mb-8">{headerContent}</div>;
+      return <div className="mb-6">{headerContent}</div>;
     }
 
     return (
-      <div className="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">{headerContent}</div>
+      <div className="bg-white/90 backdrop-blur border-b border-slate-200/90 sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5">{headerContent}</div>
       </div>
     );
   }
@@ -357,6 +359,8 @@ const UnifiedOrderItem = React.memo(
     onCancelEditName,
     onSaveOrderName,
     uiCopy,
+    isReviewed,
+    reviewSummary,
   }) => {
     const items = order.orderItems || [];
     const isBuyer = viewMode === ORDER_VIEW_MODES.BUYER;
@@ -374,18 +378,10 @@ const UnifiedOrderItem = React.memo(
     const currency = order.currency || 'TRY';
 
     const statusLabel = resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status;
-    const trackingNo = order.shipping?.trackingNumber || order.trackingNumber || null;
-    const etaText = (() => {
-      if (order.shipping?.deliveredAt) return formatLongDate(order.shipping.deliveredAt, uiCopy.locale);
-      if (order.shipping?.inTransitAt) return formatLongDate(order.shipping.inTransitAt, uiCopy.locale);
-      return uiCopy.trackingEmpty;
-    })();
-
     const firstListingId = items[0]?.listing?.id;
-
     return (
       <article className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-5 pb-4">
+        <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/40">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="min-w-0 flex-1">
               {isBuyer && editingOrderId === order.id ? (
@@ -428,9 +424,7 @@ const UnifiedOrderItem = React.memo(
                         </button>
                       ) : null}
                     </div>
-                    {order.createdAt ? (
-                      <p className="text-xs text-slate-500 mt-1.5">{formatLongDate(order.createdAt, uiCopy.locale)}</p>
-                    ) : null}
+                    {order.createdAt ? <p className="text-xs text-slate-500 mt-1.5">{formatLongDate(order.createdAt, uiCopy.locale)}</p> : null}
                   </div>
                 </div>
               )}
@@ -444,28 +438,42 @@ const UnifiedOrderItem = React.memo(
           </div>
         </div>
 
-        <div className="px-5 border-t border-slate-100">
+        <div className="px-5 sm:px-6">
           {items.length ? items.map((item) => <OrderLine key={item.id ?? `${item.listing?.id}-${item.quantity}`} item={item} currency={currency} uiCopy={uiCopy} />) : null}
         </div>
 
-        <div className="px-5 py-3 bg-slate-50/80 border-t border-slate-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <div className="flex justify-between gap-2 text-slate-600">
-              <span className="font-medium text-slate-500">{uiCopy.trackingLabel}</span>
-              <span className="font-mono text-slate-800 tabular-nums">{trackingNo || uiCopy.trackingEmpty}</span>
+        {isCompleted && isReviewed ? (
+          <div className="px-5 sm:px-6 py-3 bg-emerald-50/70 border-t border-emerald-100">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 mb-1">
+              <CircleCheck className="w-4 h-4" />
+              {uiCopy.reviewDone}
             </div>
-            <div className="flex justify-between gap-2 text-slate-600">
-              <span className="font-medium text-slate-500">{uiCopy.etaLabel}</span>
-              <span className="text-slate-800">{etaText}</span>
+            <div className="text-xs text-emerald-900">
+              <span className="font-semibold">{uiCopy.reviewLabel}: </span>
+              <span className="font-semibold">{reviewSummary?.rating ?? '-'} / 5</span>
+              {reviewSummary?.comment ? <span className="ml-1">- {reviewSummary.comment}</span> : null}
             </div>
           </div>
-        </div>
+        ) : null}
+        {isBuyer &&
+        order.status !== ORDER_STATUSES.COMPLETED &&
+        order.status !== ORDER_STATUSES.CANCELLED &&
+        order.status !== ORDER_STATUSES.REFUNDED ? (
+          <div className="px-5 sm:px-6 py-3 border-t border-slate-100 bg-white">
+            <div className="mb-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{uiCopy.progressLabel}</span>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50/60 px-3">
+              <OrderProgressStepper currentStatus={order.status} variant="compact" />
+            </div>
+          </div>
+        ) : null}
 
-        <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
+        <div className="p-4 sm:px-6 border-t border-slate-100 bg-white flex flex-col sm:flex-row gap-2">
           <button
             type="button"
             onClick={() => onOpenOrder(order)}
-            className="flex-1 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
+            className="flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
           >
             {uiCopy.detail}
           </button>
@@ -473,7 +481,7 @@ const UnifiedOrderItem = React.memo(
             <button
               type="button"
               onClick={() => onOpenOrder(order)}
-              className="flex-1 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+              className="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
             >
               {uiCopy.trackShipment}
             </button>
@@ -482,7 +490,7 @@ const UnifiedOrderItem = React.memo(
             <button
               type="button"
               onClick={(e) => onCompleteOrder(order.id, e)}
-              className="flex-1 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+              className="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
             >
               {uiCopy.confirmReceipt}
             </button>
@@ -491,7 +499,7 @@ const UnifiedOrderItem = React.memo(
             <button
               type="button"
               onClick={() => onReorder?.(firstListingId)}
-              className="flex-1 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
+              className="flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
             >
               {uiCopy.reorder}
             </button>
@@ -500,9 +508,18 @@ const UnifiedOrderItem = React.memo(
             <button
               type="button"
               onClick={() => onReorder?.(firstListingId)}
-              className="flex-1 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
+              className="flex-1 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-900 hover:bg-slate-50"
             >
               {uiCopy.reorder}
+            </button>
+          ) : null}
+          {isBuyer && isCompleted && !isReviewed ? (
+            <button
+              type="button"
+              onClick={() => onOpenOrder(order)}
+              className="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800"
+            >
+              {uiCopy.reviewNow}
             </button>
           ) : null}
           {order.paymentReference ? (
@@ -512,7 +529,7 @@ const UnifiedOrderItem = React.memo(
                 e.stopPropagation();
                 onOpenReceipt(order.paymentReference);
               }}
-              className="sm:w-auto py-3 px-4 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2 text-sm font-medium"
+              className="sm:w-auto py-2.5 px-4 rounded-xl border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2 text-sm font-medium"
             >
               <Receipt className="w-4 h-4" />
             </button>
@@ -646,7 +663,7 @@ const OrdersListLayout = ({
     ) : null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-100/70">
       <Header
         title={title}
         subtitle={subtitle}
@@ -659,34 +676,38 @@ const OrdersListLayout = ({
         uiCopy={uiCopy}
       />
 
-      <div className={containerClassName || 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
+      <div className={containerClassName || 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}>
         {banner ? <div className="mb-6">{banner}</div> : null}
         {topSlot ? <div className="mb-6">{topSlot}</div> : null}
 
         {flow.search ? (
-          <div className="mb-5 space-y-4">
-            <SearchToolbar
-              search={flow.search}
-              onSearch={flow.search.handleSearch}
-              onClearSearch={flow.search.clearSearch}
-              filtersOpen={filtersOpen}
-              setFiltersOpen={setFiltersOpen}
-              uiCopy={uiCopy}
-              pagination={flow.pagination}
-              onPageSizeChange={onPageSizeChange}
-            />
-            <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
+          <div className="mb-6 space-y-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
+              <SearchToolbar
+                search={flow.search}
+                onSearch={flow.search.handleSearch}
+                onClearSearch={flow.search.clearSearch}
+                filtersOpen={filtersOpen}
+                setFiltersOpen={setFiltersOpen}
+                uiCopy={uiCopy}
+                pagination={flow.pagination}
+                onPageSizeChange={onPageSizeChange}
+              />
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+              <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
+            </div>
           </div>
         ) : null}
 
         {flow.loading ? (
-          <div>
+          <div className="space-y-4">
             {[...Array(isSellerView ? 2 : 3)].map((_, i) => (
               <OrderItemSkeleton key={i} />
             ))}
           </div>
         ) : !flow.orders?.length && !flow.search?.isSearchMode ? (
-          <div className="py-16 text-center">
+          <div className="py-16 text-center rounded-2xl border border-dashed border-slate-300 bg-white">
             <Package className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-sm text-slate-500 mb-4">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</p>
             {isBuyerView && emptyAction ? (
@@ -696,25 +717,28 @@ const OrdersListLayout = ({
             ) : null}
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {(flow.orders || []).map((order) => (
-              <UnifiedOrderItem
-                key={order.id}
-                viewMode={viewMode || flow.viewMode}
-                order={order}
-                enums={enums}
-                onOpenOrder={flow.modal.openOrderModal}
-                onOpenReceipt={flow.receipt.openReceipt}
-                onCompleteOrder={flow.actions.completeOrder}
-                onReorder={onReorderListing}
-                editingOrderId={flow.ui.editingOrderId}
-                editingOrderName={flow.ui.editingOrderName}
-                setEditingOrderName={flow.ui.setEditingOrderName}
-                onStartEditName={flow.actions.startEditOrderName}
-                onCancelEditName={flow.actions.cancelEditOrderName}
-                onSaveOrderName={flow.actions.saveOrderName}
-                uiCopy={uiCopy}
-              />
+              <div key={order.id}>
+                <UnifiedOrderItem
+                  viewMode={viewMode || flow.viewMode}
+                  order={order}
+                  enums={enums}
+                  onOpenOrder={flow.modal.openOrderModal}
+                  onOpenReceipt={flow.receipt.openReceipt}
+                  onCompleteOrder={flow.actions.completeOrder}
+                  onReorder={onReorderListing}
+                  editingOrderId={flow.ui.editingOrderId}
+                  editingOrderName={flow.ui.editingOrderName}
+                  setEditingOrderName={flow.ui.setEditingOrderName}
+                  onStartEditName={flow.actions.startEditOrderName}
+                  onCancelEditName={flow.actions.cancelEditOrderName}
+                  onSaveOrderName={flow.actions.saveOrderName}
+                  uiCopy={uiCopy}
+                  isReviewed={Boolean(flow.reviews?.reviewedOrderIds?.[order.id])}
+                  reviewSummary={flow.reviews?.reviewedOrderSummaries?.[order.id]}
+                />
+              </div>
             ))}
           </div>
         )}

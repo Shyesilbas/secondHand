@@ -5,9 +5,8 @@ import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -24,18 +23,10 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
 
     boolean existsByListingAndStatusAndIdNot(Listing listing, OfferStatus status, UUID id);
 
-    @Query("SELECT o FROM Offer o " +
-            "JOIN FETCH o.listing " +
-            "JOIN FETCH o.buyer " +
-            "JOIN FETCH o.listing.seller " +
-            "WHERE o.buyer.id = :buyerId")
-    Page<Offer> findByBuyerIdWithDetails(@Param("buyerId") Long buyerId, Pageable pageable);
+    @EntityGraph(attributePaths = {"listing", "buyer", "seller"})
+    Page<Offer> findByBuyerId(Long buyerId, Pageable pageable);
 
-    @Query("SELECT o FROM Offer o " +
-            "JOIN FETCH o.listing " +
-            "JOIN FETCH o.buyer " +
-            "JOIN FETCH o.listing.seller " +
-            "WHERE o.listing.seller.id = :sellerId")
-    Page<Offer> findBySellerIdWithDetails(@Param("sellerId") Long sellerId, Pageable pageable);
+    @EntityGraph(attributePaths = {"listing", "buyer", "seller"})
+    Page<Offer> findBySellerId(Long sellerId, Pageable pageable);
 
 }

@@ -15,8 +15,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "reviews", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"reviewer_id", "order_item_id"}))
+@Table(
+        name = "reviews",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"reviewer_id", "order_item_id"}),
+        indexes = {
+                @Index(name = "idx_reviews_reviewed_user_created_at", columnList = "reviewed_user_id, created_at"),
+                @Index(name = "idx_reviews_reviewer_created_at", columnList = "reviewer_id, created_at")
+        }
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Review {
 

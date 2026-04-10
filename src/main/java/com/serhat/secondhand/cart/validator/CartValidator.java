@@ -44,14 +44,21 @@ public class CartValidator {
         return Result.success();
     }
 
-    public Result<Void> validateReservationPossible(Listing listing, int requestedTotalQty, int currentInCartQty) {
+    public Result<Void> validateReservationPossible(
+            Listing listing,
+            int requestedTotalQty,
+            int currentInCartQty,
+            int activeReservationQty
+    ) {
         int actualStock = Optional.ofNullable(listing.getQuantity()).orElse(0);
+        int effectiveReservedQty = Math.max(activeReservationQty - currentInCartQty, 0);
+        int availableStock = Math.max(actualStock - effectiveReservedQty, 0);
 
-        if (actualStock <= 0) {
+        if (availableStock <= 0) {
             return Result.error(CartErrorCodes.INSUFFICIENT_STOCK);
         }
 
-        if (requestedTotalQty > actualStock) {
+        if (requestedTotalQty > availableStock) {
             if (actualStock <= 3) {
                 return Result.error(ListingErrorCodes.LISTING_IS_RESERVED);
             }

@@ -21,7 +21,7 @@ public class OfferScheduler {
     private final OfferRepository offerRepository;
     private final OfferEmailNotificationService notificationService;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "${app.offer.scheduler-cron:0 * * * * *}")
     @Transactional
     public void checkExpiredOffers() {
         log.debug("Checking for expired offers...");

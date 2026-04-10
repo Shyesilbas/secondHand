@@ -19,6 +19,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,10 +45,6 @@ public class CartService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingRepository listingRepository;
     private final CartConfig cartConfig;
-
-    private static final ZoneId ZONE = ZoneId.of("Europe/Istanbul");
-    private static final int DEFAULT_CART_QUANTITY = 1;
-
 
     @Transactional(readOnly = true)
     public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
@@ -76,7 +73,7 @@ public class CartService {
     private void applyReservationIfLowStock(Listing listing, Cart cartItem) {
         Integer qty = listing.getQuantity();
         if (qty != null && qty <= 3) {
-            LocalDateTime now = LocalDateTime.now(ZONE);
+            LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
             cartItem.setReservedAt(now);
             cartItem.setReservationEndTime(now.plusMinutes(cartConfig.getReservation().getTimeoutDuration().toMinutes()));
             cartItem.setIsReserved(true);
@@ -112,7 +109,8 @@ public class CartService {
             return Result.error(listingValidation.getErrorCode());
         }
 
-        int targetQty = Optional.ofNullable(requestedQty).orElse(DEFAULT_CART_QUANTITY);
+        int targetQty = Optional.ofNullable(requestedQty)
+                .orElse(Optional.ofNullable(cartConfig.getDefaults().getQuantity()).orElse(1));
         Optional<Cart> existingCartItemOpt = cartRepository
                 .findByUserIdAndListingId(userId, listing.getId());
 
@@ -123,10 +121,15 @@ public class CartService {
 
         boolean reservationEnabled = cartConfig.getReservation().isEnabled();
         if (reservationEnabled) {
+            LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
+            LocalDateTime cutoff = now.minus(cartConfig.getReservation().getTimeoutDuration());
+            int activeReservationQty = cartRepository.countActiveReservationsByListing(listing.getId(), now, cutoff);
+
             Result<Void> reservationValidation = cartValidator.validateReservationPossible(
                     listing,
                     finalTotalQty,
-                    currentInCartQty
+                    currentInCartQty,
+                    activeReservationQty
             );
             if (reservationValidation.isError()) {
                 return Result.error(reservationValidation.getErrorCode());
@@ -141,7 +144,8 @@ public class CartService {
         );
 
         cartItem.setQuantity(finalTotalQty);
-        if (notes != null) {
+        // Update senaryosunda not alanının temizlenebilmesi için null da yazılır.
+        if (isUpdate || notes != null) {
             cartItem.setNotes(notes);
         }
 
@@ -149,11 +153,22 @@ public class CartService {
             applyReservationIfLowStock(listing, cartItem);
         }
 
-        Cart savedCart = cartRepository.save(cartItem);
+        Cart savedCart;
+        try {
+            savedCart = cartRepository.save(cartItem);
+        } catch (DataIntegrityViolationException ex) {
+            log.warn("Concurrent cart write conflict for user {} and listing {}", userId, listingId, ex);
+            return Result.error(CartErrorCodes.RESERVATION_FAILED);
+        }
         CartDto dto = cartMapper.toDto(savedCart);
 
         enrichmentService.enrichInPlace(dto.getListing(), userId);
         return Result.success(dto);
+    }
+
+    private ZoneId getConfiguredZoneId() {
+        String configuredZone = Optional.ofNullable(cartConfig.getZoneId()).orElse("Europe/Istanbul");
+        return ZoneId.of(configuredZone);
     }
 
 

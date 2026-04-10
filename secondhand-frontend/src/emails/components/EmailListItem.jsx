@@ -20,10 +20,10 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
 
     return (
         <div
-            className={`relative px-4 py-3.5 transition-all duration-300 ease-in-out cursor-pointer group ${
+            className={`relative px-4 py-4 transition-all duration-200 ease-out cursor-pointer group border-b border-slate-100/80 last:border-b-0 ${
                 isSelected 
-                    ? 'bg-indigo-50 border-l-4 border-indigo-600' 
-                    : 'hover:bg-slate-100/50'
+                    ? 'bg-indigo-50/70 border-l-4 border-indigo-600' 
+                    : 'hover:bg-slate-50'
             }`}
             onClick={() => onSelect(email)}
             onMouseEnter={() => setIsHovered(true)}
@@ -37,23 +37,23 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                            <h4 className={`text-sm truncate mb-1.5 tracking-tight ${
-                                isUnread ? 'font-bold text-slate-900' : 'font-normal text-slate-500'
+                            <h4 className={`text-sm truncate mb-2 ${
+                                isUnread ? 'font-extrabold text-slate-900' : 'font-bold text-slate-800'
                             }`}>
                                 {email.subject}
                             </h4>
-                            <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
                                     {email.emailType || 'EMAIL'}
                                 </span>
                                 <span className="text-xs text-slate-300">•</span>
-                                <span className="text-xs text-slate-500 tracking-tight">
+                                <span className="text-xs text-slate-500">
                                     {formatDate(email.sentAt)}
                                 </span>
                                 {isUnread && (
                                     <>
                                         <span className="text-xs text-slate-300">•</span>
-                                        <span className="inline-flex items-center rounded-full bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-600">
+                                        <span className="inline-flex items-center rounded-full bg-indigo-100/70 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
                                             New
                                         </span>
                                     </>
@@ -63,7 +63,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                                 <span className="truncate">{email.senderEmail}</span>
                             </div>
                             {previewText && (
-                                <p className="mt-1 text-xs text-slate-500 line-clamp-2 pr-2">
+                                <p className="mt-1 text-xs leading-5 text-slate-500 line-clamp-2 pr-2">
                                     {previewText}
                                 </p>
                             )}
@@ -75,7 +75,7 @@ const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) =>
                                 onDelete(email.id, email.subject);
                             }}
                             disabled={isDeleting}
-                            className={`opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed ${
+                            className={`opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed ${
                                 isHovered ? 'opacity-100' : ''
                             }`}
                             title="Delete email"

@@ -13,6 +13,7 @@ import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.mapper.ReviewMapper;
 import com.serhat.secondhand.review.repository.ReviewRepository;
+import com.serhat.secondhand.review.repository.projection.ListingReviewStatsProjection;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.review.validator.ReviewValidator;
 import com.serhat.secondhand.notification.application.INotificationService;
@@ -23,12 +24,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +66,12 @@ public class ReviewService implements IReviewService {
         User reviewedUser = orderItem.getListing().getSeller();
         Review review = reviewMapper.fromCreateRequest(request, reviewer, reviewedUser, orderItem);
 
-        Review savedReview = reviewRepository.save(review);
+        Review savedReview;
+        try {
+            savedReview = reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            return Result.error(ReviewErrorCodes.REVIEW_ALREADY_EXISTS);
+        }
         try {
             var listing = orderItem.getListing();
             String listingTitle = listing != null ? listing.getTitle() : null;
@@ -81,7 +89,7 @@ public class ReviewService implements IReviewService {
             if (notificationResult.isError()) {
                 log.error("Failed to create review notification: {}", notificationResult.getMessage());
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to create in-app notification for review received: {}", e.getMessage());
         }
         return Result.success(reviewMapper.toDto(savedReview));
@@ -109,10 +117,7 @@ public class ReviewService implements IReviewService {
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
         User user = userResult.getData();
 
-        List<Object[]> statsList = reviewRepository.getUserReviewStats(userId);
-        ReviewStatsDto stats = (statsList == null || statsList.isEmpty())
-                ? ReviewStatsDto.empty()
-                : reviewMapper.mapToReviewStatsDto(statsList.get(0), 0);
+        ReviewStatsDto stats = reviewMapper.mapToReviewStatsDto(reviewRepository.getUserReviewStats(userId));
 
         return Result.success(reviewMapper.mapToUserReviewStatsDto(userId, user.getName(), user.getSurname(), stats));
     }
@@ -149,23 +154,36 @@ public class ReviewService implements IReviewService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "reviewStatsBatch",
-            key = "T(java.util.Objects).hash(#listingIds)",
+            key = "#root.target.createStableListingStatsKey(#listingIds)",
             unless = "#result == null || #result.isEmpty()"
     )
     public Map<UUID, ReviewStatsDto> getListingReviewStatsDto(List<UUID> listingIds) {
         if (listingIds == null || listingIds.isEmpty()) return new HashMap<>();
         log.info("ReviewService#getListingReviewStatsDto CACHE MISS for {} listings", listingIds.size());
-        List<Object[]> rows = reviewRepository.getListingReviewStats(listingIds);
+        List<ListingReviewStatsProjection> rows = reviewRepository.getListingReviewStats(listingIds);
         Map<UUID, ReviewStatsDto> statsMap = new HashMap<>();
         for (UUID id : listingIds) {
             statsMap.put(id, ReviewStatsDto.empty());
         }
-        for (Object[] row : rows) {
-            UUID listingId = (UUID) row[0];
-            ReviewStatsDto stats = reviewMapper.mapToReviewStatsDto(row, 1);
+        for (ListingReviewStatsProjection row : rows) {
+            UUID listingId = row.getListingId();
+            ReviewStatsDto stats = reviewMapper.mapToReviewStatsDto(row);
             statsMap.put(listingId, stats);
         }
         return statsMap;
+    }
+
+    public String createStableListingStatsKey(List<UUID> listingIds) {
+        if (listingIds == null || listingIds.isEmpty()) {
+            return "empty";
+        }
+        String stableKey = listingIds.stream()
+                .filter(Objects::nonNull)
+                .map(UUID::toString)
+                .sorted()
+                .distinct()
+                .collect(Collectors.joining(","));
+        return stableKey.isEmpty() ? "empty" : stableKey;
     }
 
     @Transactional(readOnly = true)

@@ -1,12 +1,12 @@
 package com.serhat.secondhand.dashboard.application.port;
 
-import java.util.List;
+import com.serhat.secondhand.review.dto.ReviewStatsDto;
 
 public interface ReviewStatisticsPort {
 
     Double getUserAverageRating(Long userId);
 
-    List<Object[]> getUserReviewStats(Long userId);
+    ReviewStatsDto getUserReviewStats(Long userId);
 
     long countByReviewerId(Long reviewerId);
 }
