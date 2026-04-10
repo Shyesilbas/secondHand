@@ -45,7 +45,7 @@ public class Favorite {
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    @JsonFormat(pattern = "dd/mm/YYYY")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDateTime createdAt;
     
         public Favorite(User user, Listing listing) {

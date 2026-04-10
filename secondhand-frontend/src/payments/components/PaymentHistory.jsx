@@ -55,7 +55,7 @@ const PaymentListSkeleton = () => {
   );
 };
 
-const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
+const PaymentItem = React.memo(({ payment, onShowReceipt, layout = 'default' }) => {
   const orderItems = payment.orderItems || [];
 
   const getPaymentTypeIcon = (type) => {
@@ -97,8 +97,25 @@ const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
     );
   };
 
+  const isModern = layout === 'modern';
+
   return (
-    <div className="group bg-white border border-gray-200/60 rounded-lg p-5 transition-all hover:border-gray-300 hover:shadow-sm">
+    <div
+      onClick={isModern ? () => onShowReceipt(payment) : undefined}
+      role={isModern ? 'button' : undefined}
+      tabIndex={isModern ? 0 : undefined}
+      onKeyDown={isModern ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onShowReceipt(payment);
+        }
+      } : undefined}
+      className={`group bg-white border rounded-lg p-5 transition-all ${
+        isModern
+          ? 'border-slate-200/80 hover:border-indigo-200 hover:shadow-sm cursor-pointer'
+          : 'border-gray-200/60 hover:border-gray-300 hover:shadow-sm'
+      }`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className={`p-2 rounded-md flex-shrink-0 ${payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'bg-green-50' : 'bg-gray-50'}`}>
@@ -157,22 +174,28 @@ const PaymentItem = React.memo(({ payment, onShowReceipt }) => {
             </span>
           </div>
 
-          <button
-            onClick={() => onShowReceipt(payment)}
-            className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-            title="Show Receipt"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </button>
+          {isModern ? (
+            <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
+              View receipt
+            </span>
+          ) : (
+            <button
+              onClick={() => onShowReceipt(payment)}
+              className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+              title="Show Receipt"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 });
 
-const PaymentHistory = React.memo(({ payments, onShowReceipt, hasActiveFilters, onClearFilters, isLoading }) => {
+const PaymentHistory = React.memo(({ payments, onShowReceipt, hasActiveFilters, onClearFilters, isLoading, layout = 'default' }) => {
   if (isLoading) {
     return <PaymentListSkeleton />;
   }
@@ -182,10 +205,10 @@ const PaymentHistory = React.memo(({ payments, onShowReceipt, hasActiveFilters, 
       <div className="bg-white border border-gray-200/60 rounded-lg p-12 text-center">
         <BanknotesIcon className="w-8 h-8 text-gray-400 mx-auto mb-3" />
         <p className="text-xs font-medium text-gray-500 mb-1">
-          {hasActiveFilters ? 'No Payments Match Your Filters' : 'No Payment Found'}
+          {hasActiveFilters ? 'No payments match your filters' : 'No payments found'}
         </p>
         <p className="text-[11px] text-gray-400">
-          {hasActiveFilters ? 'Try adjusting your filters to see more results.' : "You haven't made any payments yet."}
+          {hasActiveFilters ? 'Try adjusting your filters to see more results.' : "You do not have any payments yet."}
         </p>
         {hasActiveFilters ? (
           <button
@@ -206,6 +229,7 @@ const PaymentHistory = React.memo(({ payments, onShowReceipt, hasActiveFilters, 
           key={payment.paymentId || index}
           payment={payment}
           onShowReceipt={onShowReceipt}
+          layout={layout}
         />
       ))}
     </div>

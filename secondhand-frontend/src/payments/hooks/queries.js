@@ -54,7 +54,7 @@ export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
   return useQuery({
     queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, paymentType],
     queryFn: () => paymentService.getStatistics(paymentType),
-    enabled: enabled && !!paymentType && !!(isAuthenticated && user?.id),
+    enabled: enabled && !!(isAuthenticated && user?.id),
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

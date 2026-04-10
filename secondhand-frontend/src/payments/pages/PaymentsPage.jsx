@@ -1,16 +1,24 @@
-import React, {useCallback} from 'react';
-import {Menu, X as XMarkIcon} from 'lucide-react';
+import React, {useCallback, useMemo, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {Download, Menu, Search, X as XMarkIcon} from 'lucide-react';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
 import PaymentHistory from '../components/PaymentHistory.jsx';
 import PaymentNavigation, {PaymentPagination} from '../components/PaymentNavigation.jsx';
 import {PaymentInfo} from '../components/WalletOverview.jsx';
 import {usePayments} from '../hooks/usePayments.js';
-import {PAYMENT_DIRECTIONS} from '../paymentSchema.js';
+import {usePaymentStatisticsQuery} from '../hooks/queries.js';
+import {
+    PAYMENT_DIRECTIONS,
+    PAYMENT_DIRECTION_LABELS,
+    PAYMENT_TRANSACTION_TYPES,
+    TRANSACTION_TYPE_LABELS
+} from '../paymentSchema.js';
+import {formatCurrency} from '../../common/formatters.js';
+import {ROUTES} from '../../common/constants/routes.js';
 
 const PaymentsPage = () => {
     const {
         payments,
-        filteredPayments,
         isLoading,
         error,
         currentPage,
@@ -31,6 +39,10 @@ const PaymentsPage = () => {
         handlePageSizeChange,
         setShowFilters
     } = usePayments();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [directionFilter, setDirectionFilter] = useState('');
+
+    const {data: paymentStats} = usePaymentStatisticsQuery(undefined, {enabled: true});
 
     const toggleFilterSidebar = useCallback(() => {
         setShowFilters(!showFilters);
@@ -40,8 +52,100 @@ const PaymentsPage = () => {
         setShowFilters(false);
     }, [setShowFilters]);
 
-    const incomingCount = payments.filter((p) => p.paymentDirection === PAYMENT_DIRECTIONS.INCOMING).length;
-    const outgoingCount = payments.filter((p) => p.paymentDirection === PAYMENT_DIRECTIONS.OUTGOING).length;
+    const directionOptions = useMemo(() => ([
+        {value: '', label: 'All directions'},
+        {value: PAYMENT_DIRECTIONS.INCOMING, label: PAYMENT_DIRECTION_LABELS[PAYMENT_DIRECTIONS.INCOMING]},
+        {value: PAYMENT_DIRECTIONS.OUTGOING, label: PAYMENT_DIRECTION_LABELS[PAYMENT_DIRECTIONS.OUTGOING]},
+    ]), []);
+
+    const categoryTabs = useMemo(() => ([
+        {value: '', label: 'All'},
+        ...Object.values(PAYMENT_TRANSACTION_TYPES).map((type) => ({
+            value: type,
+            label: TRANSACTION_TYPE_LABELS[type] || type
+        }))
+    ]), []);
+
+    const visiblePayments = useMemo(() => {
+        const normalizedSearch = searchTerm.trim().toLowerCase();
+        return payments.filter((payment) => {
+            const matchesDirection = !directionFilter || payment.paymentDirection === directionFilter;
+            if (!matchesDirection) return false;
+
+            if (!normalizedSearch) return true;
+
+            const searchableValues = [
+                payment.transactionType,
+                TRANSACTION_TYPE_LABELS[payment.transactionType],
+                payment.paymentType,
+                payment.listingTitle,
+                ...(payment.orderItems || []),
+                payment.senderName,
+                payment.senderSurname,
+                payment.receiverName,
+                payment.receiverSurname,
+            ];
+
+            return searchableValues.some((value) => String(value || '').toLowerCase().includes(normalizedSearch));
+        });
+    }, [payments, directionFilter, searchTerm]);
+
+    const getStatValue = useCallback((candidates) => {
+        for (const key of candidates) {
+            const value = paymentStats?.[key];
+            if (typeof value === 'number') return value;
+        }
+        return 0;
+    }, [paymentStats]);
+
+    const statCards = useMemo(() => ([
+        {
+            title: 'Total volume',
+            value: formatCurrency(getStatValue(['totalAmount', 'totalVolume', 'total'])),
+            tone: 'slate'
+        },
+        {
+            title: 'Incoming volume',
+            value: formatCurrency(getStatValue(['incomingAmount', 'totalIncomingAmount', 'incomingTotal'])),
+            tone: 'emerald'
+        },
+        {
+            title: 'Outgoing volume',
+            value: formatCurrency(getStatValue(['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'])),
+            tone: 'indigo'
+        },
+        {
+            title: 'Successful transactions',
+            value: getStatValue(['successfulCount', 'successfulPayments', 'successCount', 'successfulTransactions']).toString(),
+            tone: 'amber'
+        },
+    ]), [getStatValue]);
+
+    const exportCurrentPageAsCsv = useCallback(() => {
+        const headers = ['Date', 'Transaction Type', 'Direction', 'Method', 'Amount', 'Status', 'Listing Title'];
+        const rows = visiblePayments.map((payment) => ([
+            payment.createdAt || '',
+            TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType || '',
+            PAYMENT_DIRECTION_LABELS[payment.paymentDirection] || payment.paymentDirection || '',
+            payment.paymentType || '',
+            payment.amount ?? 0,
+            payment.isSuccess ? 'Success' : 'Failed',
+            payment.listingTitle || ''
+        ]));
+        const csv = [headers, ...rows]
+            .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `payments-page-${currentPage + 1}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, [visiblePayments, currentPage]);
 
     if (isLoading) {
         return (
@@ -49,8 +153,8 @@ const PaymentsPage = () => {
                 <div className="max-w-7xl mx-auto px-6 py-6">
                     <div className="animate-pulse space-y-6">
                         <div className="h-24 rounded-3xl bg-white border border-slate-200/70" />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {[...Array(3)].map((_, i) => (
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {[...Array(4)].map((_, i) => (
                                 <div key={i} className="bg-white border border-slate-200/70 rounded-2xl p-4">
                                     <div className="h-3 bg-slate-200 rounded w-1/3 mb-2"></div>
                                     <div className="h-6 bg-slate-200 rounded w-1/2"></div>
@@ -106,6 +210,12 @@ const PaymentsPage = () => {
                                     <p className="text-xs text-slate-500 font-medium">Track and manage your payment transactions</p>
                                 </div>
                             </div>
+                            <Link
+                                to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`}
+                                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                            >
+                                View balance
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -118,19 +228,21 @@ const PaymentsPage = () => {
                             <p className="text-sm text-slate-500 mt-1">Monitor cash flow and inspect transactions quickly.</p>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-                            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">Total</p>
-                            <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{totalElements}</p>
-                        </div>
-                        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 px-4 py-3">
-                            <p className="text-[11px] uppercase tracking-[0.16em] text-emerald-700 font-medium">Incoming</p>
-                            <p className="mt-1 text-2xl font-semibold text-emerald-900 tabular-nums">{incomingCount}</p>
-                        </div>
-                        <div className="rounded-2xl border border-indigo-200 bg-indigo-50/60 px-4 py-3">
-                            <p className="text-[11px] uppercase tracking-[0.16em] text-indigo-700 font-medium">Outgoing</p>
-                            <p className="mt-1 text-2xl font-semibold text-indigo-900 tabular-nums">{outgoingCount}</p>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                        {statCards.map((card) => (
+                            <div
+                                key={card.title}
+                                className={`rounded-2xl px-4 py-3 border ${
+                                    card.tone === 'emerald' ? 'border-emerald-200 bg-emerald-50/60' :
+                                        card.tone === 'indigo' ? 'border-indigo-200 bg-indigo-50/60' :
+                                            card.tone === 'amber' ? 'border-amber-200 bg-amber-50/60' :
+                                                'border-slate-200 bg-slate-50/70'
+                                }`}
+                            >
+                                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">{card.title}</p>
+                                <p className="mt-1 text-2xl font-semibold text-slate-900 tabular-nums">{card.value}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
@@ -155,7 +267,7 @@ const PaymentsPage = () => {
                         <div className="flex items-center gap-2">
                             <h2 className="text-sm font-semibold text-slate-900">Transaction History</h2>
                             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-700">
-                                {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'}
+                                {visiblePayments.length} {visiblePayments.length === 1 ? 'payment' : 'payments'}
                             </span>
                         </div>
                         {hasActiveFilters && (
@@ -168,12 +280,64 @@ const PaymentsPage = () => {
                             </button>
                         )}
                     </div>
+                    <div className="mb-4 flex flex-col gap-3">
+                        <div className="flex flex-wrap gap-2">
+                            {categoryTabs.map((tab) => {
+                                const isActive = (filters.transactionType || '') === tab.value;
+                                return (
+                                    <button
+                                        key={tab.value || 'all'}
+                                        onClick={() => handleFilterChange('transactionType', tab.value)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                                            isActive
+                                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+                            <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 bg-white">
+                                <Search className="w-4 h-4 text-slate-400" />
+                                <input
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search transaction, listing, person"
+                                    className="w-full text-sm bg-transparent outline-none text-slate-700 placeholder:text-slate-400"
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <select
+                                    value={directionFilter}
+                                    onChange={(e) => setDirectionFilter(e.target.value)}
+                                    className="px-3 py-2 text-sm border border-slate-200 rounded-xl bg-white text-slate-700"
+                                >
+                                    {directionOptions.map((option) => (
+                                        <option key={option.value || 'all'} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    onClick={exportCurrentPageAsCsv}
+                                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Export CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <PaymentHistory
-                        payments={payments}
+                        payments={visiblePayments}
                         onShowReceipt={showReceipt}
                         hasActiveFilters={hasActiveFilters}
                         onClearFilters={clearFilters}
                         isLoading={isLoading}
+                        layout="modern"
                     />
                     {shouldShowPagination && (
                         <PaymentPagination

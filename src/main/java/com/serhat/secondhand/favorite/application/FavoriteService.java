@@ -9,6 +9,7 @@ import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
@@ -18,6 +19,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,17 +56,14 @@ public class FavoriteService {
     @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
     public Result<FavoriteDto> addToFavorites(Long userId, UUID listingId) {
         log.info("Adding listing {} to favorites for userId {}", listingId, userId);
-
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
-        User user = userResult.getData();
-        
-        if (favoriteRepository.existsByUserAndListingId(user, listingId)) {
-            return Result.error(FavoriteErrorCodes.ALREADY_FAVORITED);
-        }
-        
+        return addToFavorites(userResult.getData(), userId, listingId);
+    }
+
+    private Result<FavoriteDto> addToFavorites(User user, Long userId, UUID listingId) {
         Listing listing = listingAccessService.findById(listingId)
             .orElse(null);
 
@@ -88,7 +87,11 @@ public class FavoriteService {
             return Result.error(FavoriteErrorCodes.OWN_LISTING);
         }
         
-        favorite = favoriteRepository.save(favorite);
+        try {
+            favorite = favoriteRepository.save(favorite);
+        } catch (DataIntegrityViolationException e) {
+            return Result.error(FavoriteErrorCodes.ALREADY_FAVORITED);
+        }
 
         try {
             Long sellerId = listing.getSeller() != null ? listing.getSeller().getId() : null;
@@ -108,8 +111,15 @@ public class FavoriteService {
                         "listing-favorited:" + sellerId + ":" + listing.getId() + ":" + userId
                 );
             }
-        } catch (Exception e) {
-            log.error("Failed to create in-app notification for listing favorited: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.warn(
+                    "Favorite notification publish failed. listingId={}, sellerId={}, actorUserId={}, reason={}",
+                    listing.getId(),
+                    listing.getSeller() != null ? listing.getSeller().getId() : null,
+                    userId,
+                    e.getMessage(),
+                    e
+            );
         }
         
         log.info("Successfully added listing {} to favorites for user {}", listingId, user.getEmail());
@@ -121,19 +131,19 @@ public class FavoriteService {
     @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
     public Result<Void> removeFromFavorites(Long userId, UUID listingId) {
         log.info("Removing listing {} from favorites for userId {}", listingId, userId);
-
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
-        User user = userResult.getData();
-        
-        if (!favoriteRepository.existsByUserAndListingId(user, listingId)) {
+        return removeFromFavorites(userResult.getData(), listingId);
+    }
+
+    private Result<Void> removeFromFavorites(User user, UUID listingId) {
+        int deletedRows = favoriteRepository.deleteByUserAndListingIdIfExists(user, listingId);
+        if (deletedRows == 0) {
             return Result.error(FavoriteErrorCodes.NOT_FAVORITED);
         }
-        
-        favoriteRepository.deleteByUserAndListingId(user, listingId);
-        
+
         log.info("Successfully removed listing {} from favorites for user {}", listingId, user.getEmail());
         return Result.success();
     }
@@ -144,7 +154,7 @@ public class FavoriteService {
     public Result<FavoriteStatsDto> toggleFavorite(Long userId, UUID listingId) {
         log.info("Toggling favorite status for listing {} and userId {}", listingId, userId);
 
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
@@ -153,18 +163,18 @@ public class FavoriteService {
         boolean isFavorited = favoriteRepository.existsByUserAndListingId(user, listingId);
 
         if (isFavorited) {
-            Result<Void> removeResult = removeFromFavorites(userId, listingId);
+            Result<Void> removeResult = removeFromFavorites(user, listingId);
             if (removeResult.isError()) {
                 return Result.error(removeResult.getMessage(), removeResult.getErrorCode());
             }
         } else {
-            Result<FavoriteDto> addResult = addToFavorites(userId, listingId);
+            Result<FavoriteDto> addResult = addToFavorites(user, userId, listingId);
             if (addResult.isError()) {
                 return Result.error(addResult.getMessage(), addResult.getErrorCode());
             }
         }
         
-        Result<FavoriteStatsDto> statsResult = getFavoriteStats(listingId, user.getId());
+        Result<FavoriteStatsDto> statsResult = getFavoriteStats(listingId, userId);
         if (statsResult.isError()) {
             return Result.error(statsResult.getMessage(), statsResult.getErrorCode());
         }
@@ -173,11 +183,11 @@ public class FavoriteService {
 
     @Transactional(readOnly = true)
     public Result<Page<FavoriteDto>> getUserFavorites(Long userId, Pageable pageable) {
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
         User user = userResult.getData();
 
-        Page<Favorite> favorites = favoriteRepository.findByUserWithListing(user, pageable);
+        Page<Favorite> favorites = favoriteRepository.findByUserWithListingAndSeller(user, pageable);
         Page<FavoriteDto> favoriteDtos = favorites.map(favoriteMapper::toDto);
 
         List<ListingDto> listings = favoriteDtos.getContent().stream()
@@ -202,7 +212,7 @@ public class FavoriteService {
 
     @Transactional(readOnly = true)
     public Result<Boolean> isFavorited(Long userId, UUID listingId) {
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
@@ -222,13 +232,13 @@ public class FavoriteService {
 
     @Transactional(readOnly = true)
     public Result<Page<Object[]>> getTopFavoritedListings(Pageable pageable) {
-        return Result.success(favoriteRepository.findTopFavoritedListings(pageable));
+        return Result.success(favoriteRepository.findTopFavoritedListings(ListingStatus.ACTIVE, pageable));
     }
 
     @Transactional(readOnly = true)
     public Result<List<ListingDto>> getTopFavoritedListingsWithDetails(int size, Long userId) {
         Pageable pageable = PageRequest.of(0, size);
-        List<UUID> topIds = favoriteRepository.findTopFavoritedListingIds(pageable);
+        List<UUID> topIds = favoriteRepository.findTopFavoritedListingIds(ListingStatus.ACTIVE, pageable);
 
         if (topIds.isEmpty()) {
             return Result.success(List.of());
@@ -251,11 +261,19 @@ public class FavoriteService {
 
     @Transactional(readOnly = true)
     public Result<List<UUID>> getUserFavoriteIds(Long userId) {
-        var userResult = userService.findById(userId);
+        Result<User> userResult = resolveUser(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         User user = userResult.getData();
         return Result.success(favoriteRepository.findListingIdsByUser(user));
+    }
+
+    private Result<User> resolveUser(Long userId) {
+        Result<User> userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        return Result.success(userResult.getData());
     }
 }
