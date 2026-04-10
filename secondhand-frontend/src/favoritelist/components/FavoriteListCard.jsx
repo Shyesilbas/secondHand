@@ -84,12 +84,12 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                                 {list.isPublic ? (
                                     <>
                                         <Globe className="w-3 h-3" />
-                                        Herkese Açık
+                                        Public
                                     </>
                                 ) : (
                                     <>
                                         <Lock className="w-3 h-3" />
-                                        Gizli
+                                        Private
                                     </>
                                 )}
                             </div>
@@ -122,7 +122,7 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                         >
                                             <Pencil className="w-4 h-4" />
-                                            Düzenle
+                                            Edit
                                         </button>
                                         <button
                                             onClick={(e) => {
@@ -132,7 +132,7 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                         >
                                             <Trash2 className="w-4 h-4" />
-                                            Sil
+                                            Delete
                                         </button>
                                     </div>
                                 )}
@@ -166,7 +166,9 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
 
                         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                             <div className="flex items-center gap-4 text-sm text-gray-500">
-                                <span>{list.itemCount} ürün</span>
+                                <span>
+                                    {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
+                                </span>
                                 {list.isPublic && (
                                     <span className="flex items-center gap-1">
                                         <Heart className="w-4 h-4" />
@@ -181,7 +183,7 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
 
                         {showOwner && (
                             <div className="mt-3 text-xs text-gray-500">
-                                {list.ownerName} tarafından
+                                By {list.ownerName}
                             </div>
                         )}
                     </div>

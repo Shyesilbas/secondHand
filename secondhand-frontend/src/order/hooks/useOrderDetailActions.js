@@ -24,7 +24,7 @@ export const useOrderDetailActions = ({
   const handleSaveName = useCallback(async () => {
     if (isSellerView) return;
     if (orderName.length > ORDER_LIMITS.ORDER_NAME_MAX_LENGTH) {
-      notification.showError('Error', 'Order name must be 100 characters or less');
+      notification.showError('Error', ORDER_MESSAGES.ORDER_NAME_TOO_LONG(ORDER_LIMITS.ORDER_NAME_MAX_LENGTH));
       return;
     }
     setIsSavingName(true);
@@ -116,7 +116,7 @@ export const useOrderDetailActions = ({
 
   const handleSaveNotes = useCallback(async () => {
     if (orderNotes.length > ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH) {
-      notification.showError('Error', 'Notes must be 1000 characters or less');
+      notification.showError('Error', ORDER_MESSAGES.ORDER_NOTES_TOO_LONG(ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH));
       return;
     }
     setIsSavingNotes(true);

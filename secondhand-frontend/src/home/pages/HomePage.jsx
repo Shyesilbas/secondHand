@@ -2,19 +2,17 @@ import React, { Suspense, lazy } from 'react';
 import {usePageTheme} from '../../common/theme/usePageTheme.js';
 import {HomePageTheme} from '../themes/index.js';
 
+const HeroSection = lazy(() => import('../components/HeroSection.jsx'));
 const ShowcaseSection = lazy(() => import('../components/ShowcaseSection.jsx'));
-const CategoriesSection = lazy(() => import('../components/CategoriesSection.jsx'));
-const MostFavoritedSection = lazy(() => import('../components/MostFavoritedSection.jsx'));
 
 const HomePage = () => {
   usePageTheme(HomePageTheme);
 
   return (
     <div className="min-h-screen bg-white pb-10">
-      <Suspense fallback={<div className="flex items-center justify-center p-10"><span className="text-gray-500">Bölümler Yükleniyor...</span></div>}>
+      <Suspense fallback={<div className="py-10 text-center text-sm text-slate-500">Loading homepage sections...</div>}>
+        <HeroSection />
         <ShowcaseSection />
-        <CategoriesSection />
-        <MostFavoritedSection />
       </Suspense>
     </div>
   );

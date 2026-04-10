@@ -16,8 +16,8 @@ const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searc
       options={enumOptions}
       selectedValues={selectedValues}
       onSelectionChange={handleChange}
-      placeholder={placeholder || `${label} seçin...`}
-      searchPlaceholder={searchPlaceholder || `${label} ara...`}
+      placeholder={placeholder || 'Select…'}
+      searchPlaceholder={searchPlaceholder || 'Search…'}
       multiple={multiple}
       className={className}
       disabled={disabled}

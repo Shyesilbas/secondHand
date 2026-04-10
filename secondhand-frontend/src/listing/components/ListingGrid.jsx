@@ -1,11 +1,17 @@
-import React, {memo} from 'react';
+import React, {memo, useMemo} from 'react';
 import ListingCard from './ListingCard.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import {AlertCircle as ExclamationCircleIcon, Image as PhotoIcon} from 'lucide-react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
+import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
 const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
     const { user } = useAuthState();
+    const { showcases } = useShowcase();
+    const showcaseListingIds = useMemo(() => {
+        if (!Array.isArray(showcases) || showcases.length === 0) return new Set();
+        return new Set(showcases.map((s) => s?.listing?.id || s?.listingId).filter(Boolean));
+    }, [showcases]);
     if (isLoading) {
         return (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
@@ -68,13 +74,15 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-            {listings.map((listing) => (
+            {listings.map((listing, index) => (
                 <ListingCard
                     key={listing.id}
                     listing={listing}
                     onDeleted={onDeleted}
                     isOwner={user?.id === listing.sellerId}
                     currentUserId={user?.id}
+                    isInShowcase={showcaseListingIds.has(listing.id)}
+                    priorityImage={index === 0}
                 />
             ))}
         </div>

@@ -21,7 +21,10 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
   const location = useLocation();
   const { user, isAuthenticated } = useAuthState();
 
-  const navState = useMemo(() => window.history.state && window.history.state.usr, []);
+  const navState = useMemo(() => {
+    if (location?.state) return location.state;
+    return window.history.state?.usr || null;
+  }, [location?.state]);
   const engineModeFromNav = navState?.mode || null;
   const [mode] = useState(engineModeFromNav || initialMode || 'browse');
 

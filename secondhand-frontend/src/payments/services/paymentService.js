@@ -8,7 +8,7 @@ export const paymentService = {
         const paymentRequestData = createPaymentRequest(paymentData);
         const idempotencyKey =
             paymentData.idempotencyKey
-            || `payment-${paymentRequestData.listingId || 'general'}-${Date.now()}`;
+            || `pay-${paymentRequestData.listingId || 'general'}-${paymentRequestData.paymentType || 'x'}-${paymentRequestData.amount}`;
         const config = {
             headers: {
                 'Idempotency-Key': idempotencyKey
@@ -18,13 +18,16 @@ export const paymentService = {
     },
 
     createListingFeePayment: async (paymentData) => {
-        const idempotencyKey = `listing-fee-${paymentData.listingId}-${Date.now()}`;
+        const { idempotencyKey: explicitKey, ...body } = paymentData;
+        const idempotencyKey =
+            explicitKey
+            || `listing-fee-${body.listingId || 'unknown'}`;
         const config = {
             headers: {
                 'Idempotency-Key': idempotencyKey
             }
         };
-        return await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, paymentData, config);
+        return await post(API_ENDPOINTS.PAYMENTS.LISTING_FEE_PAYMENT, body, config);
     },
 
     getMyPayments: async (page = 0, size = 5, filters = {}) => {
@@ -44,11 +47,6 @@ export const paymentService = {
             data.content = data.content.map(PaymentDto);
         }
         return data;
-    },
-
-    getListingFeeConfig: async () => {
-        const response = await get(API_ENDPOINTS.PAYMENTS.LISTING_FEE_CONFIG);
-        return response;
     },
 
     getStatistics: async (paymentType) => {
@@ -89,6 +87,12 @@ export const paymentService = {
         return rawData.map(BankDto);
     },
 
-    deleteBankAccount: async () => del(API_ENDPOINTS.BANK_ACCOUNTS.DELETE),
+    /** Backend şu an kullanıcı başına tek hesap siliyor; id tıklanan satırla eşleşmeli (çoklu UI için). */
+    deleteBankAccount: async (accountId) => {
+        if (accountId == null || accountId === '') {
+            throw new Error('Bank account id is required');
+        }
+        return del(API_ENDPOINTS.BANK_ACCOUNTS.DELETE);
+    },
 
 };

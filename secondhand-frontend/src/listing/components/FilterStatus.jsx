@@ -1,6 +1,58 @@
 import { SlidersHorizontal, X, ArrowUpDown } from 'lucide-react';
 import { LISTING_DEFAULTS, LISTING_SORT_FIELDS } from '../types/index.js';
 
+const GROUPED_FILTERS = [
+    ['minPrice', 'maxPrice'],
+    ['city', 'district'],
+    ['vehicleTypeIds'],
+    ['brandIds'],
+    ['vehicleModelIds'],
+    ['brands'],
+    ['electronicBrandIds'],
+    ['fuelTypes'],
+    ['colors'],
+    ['gearTypes'],
+    ['seatCounts'],
+    ['electronicTypeIds'],
+    ['types'],
+    ['conditions'],
+    ['clothingGenders'],
+    ['clothingCategories'],
+    ['genres'],
+    ['languages'],
+    ['formats'],
+    ['bookTypeIds'],
+    ['genreIds'],
+    ['languageIds'],
+    ['formatIds'],
+    ['conditionIds'],
+    ['disciplineIds'],
+    ['equipmentTypeIds'],
+    ['realEstateTypeIds'],
+    ['heatingTypeIds'],
+    ['adTypeId'],
+    ['ownerTypeId'],
+    ['minYear', 'maxYear'],
+    ['maxMileage'],
+    ['minSquareMeters', 'maxSquareMeters'],
+    ['minRoomCount', 'maxRoomCount'],
+    ['minBuildingAge', 'maxBuildingAge'],
+    ['minFloor', 'maxFloor'],
+    ['minPageCount', 'maxPageCount'],
+    ['purchaseDateFrom', 'purchaseDateTo'],
+];
+
+const hasMeaningfulValue = (value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    return value !== null && value !== undefined && value !== '' && value !== false;
+};
+
+const computeActiveFilterCount = (filters = {}) =>
+    GROUPED_FILTERS.reduce((count, group) => {
+        const hasGroupValue = group.some((key) => hasMeaningfulValue(filters[key]));
+        return hasGroupValue ? count + 1 : count;
+    }, 0);
+
 const FilterStatus = ({ 
   totalElements, 
   filters, 
@@ -10,105 +62,14 @@ const FilterStatus = ({
   getActiveFilterCount,
   updateFilters
 }) => {
-    const getSortLabel = (sortBy) => {
-        switch (sortBy) {
-            case LISTING_SORT_FIELDS.PRICE: return 'Price';
-            case LISTING_SORT_FIELDS.YEAR: return 'Year';
-            case LISTING_SORT_FIELDS.MILEAGE: return 'Mileage';
-            case LISTING_SORT_FIELDS.BRAND: return 'Brand';
-            case LISTING_SORT_FIELDS.TYPE: return 'Type';
-            default: return 'Date';
-        }
-    };
-
-        const checkActiveFilters = hasActiveFilters || (() => {
-        return filters.minPrice || filters.maxPrice || filters.city || filters.district ||
-            (filters.vehicleTypeIds && filters.vehicleTypeIds.length > 0) ||
-            (filters.brandIds && filters.brandIds.length > 0) ||
-            (filters.vehicleModelIds && filters.vehicleModelIds.length > 0) ||
-            (filters.brands && filters.brands.length > 0) ||
-            (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) ||
-            (filters.fuelTypes && filters.fuelTypes.length > 0) ||
-            (filters.colors && filters.colors.length > 0) ||
-            (filters.gearTypes && filters.gearTypes.length > 0) ||
-            (filters.seatCounts && filters.seatCounts.length > 0) ||
-            (filters.electronicTypeIds && filters.electronicTypeIds.length > 0) ||
-            (filters.types && filters.types.length > 0) ||
-            (filters.conditions && filters.conditions.length > 0) ||
-            (filters.clothingGenders && filters.clothingGenders.length > 0) ||
-            (filters.clothingCategories && filters.clothingCategories.length > 0) ||
-            (filters.genres && filters.genres.length > 0) ||
-            (filters.languages && filters.languages.length > 0) ||
-            (filters.formats && filters.formats.length > 0) ||
-            (filters.bookTypeIds && filters.bookTypeIds.length > 0) ||
-            (filters.genreIds && filters.genreIds.length > 0) ||
-            (filters.languageIds && filters.languageIds.length > 0) ||
-            (filters.formatIds && filters.formatIds.length > 0) ||
-            (filters.conditionIds && filters.conditionIds.length > 0) ||
-            (filters.disciplineIds && filters.disciplineIds.length > 0) ||
-            (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) ||
-            (filters.conditionIds && filters.conditionIds.length > 0) ||
-            (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) ||
-            (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) ||
-            filters.adTypeId || filters.ownerTypeId ||
-            filters.minYear || filters.maxYear || filters.maxMileage ||
-            filters.minSquareMeters || filters.maxSquareMeters ||
-            filters.minRoomCount || filters.maxRoomCount ||
-            filters.minBuildingAge || filters.maxBuildingAge ||
-            filters.minFloor || filters.maxFloor ||
-            filters.minPageCount || filters.maxPageCount ||
-            filters.purchaseDateFrom || filters.purchaseDateTo;
-    });
-
-    const countActiveFilters = getActiveFilterCount || (() => {
-        let count = 0;
-        if (filters.minPrice || filters.maxPrice) count++;
-        if (filters.city || filters.district) count++;
-        if (filters.vehicleTypeIds && filters.vehicleTypeIds.length > 0) count++;
-        if (filters.brandIds && filters.brandIds.length > 0) count++;
-        if (filters.vehicleModelIds && filters.vehicleModelIds.length > 0) count++;
-        if (filters.brands && filters.brands.length > 0) count++;
-        if (filters.electronicBrandIds && filters.electronicBrandIds.length > 0) count++;
-        if (filters.fuelTypes && filters.fuelTypes.length > 0) count++;
-        if (filters.colors && filters.colors.length > 0) count++;
-        if (filters.gearTypes && filters.gearTypes.length > 0) count++;
-        if (filters.seatCounts && filters.seatCounts.length > 0) count++;
-        if (filters.electronicTypeIds && filters.electronicTypeIds.length > 0) count++;
-        if (filters.types && filters.types.length > 0) count++;
-        if (filters.conditions && filters.conditions.length > 0) count++;
-        if (filters.clothingGenders && filters.clothingGenders.length > 0) count++;
-        if (filters.clothingCategories && filters.clothingCategories.length > 0) count++;
-        if (filters.genres && filters.genres.length > 0) count++;
-        if (filters.languages && filters.languages.length > 0) count++;
-        if (filters.formats && filters.formats.length > 0) count++;
-        if (filters.bookTypeIds && filters.bookTypeIds.length > 0) count++;
-        if (filters.genreIds && filters.genreIds.length > 0) count++;
-        if (filters.languageIds && filters.languageIds.length > 0) count++;
-        if (filters.formatIds && filters.formatIds.length > 0) count++;
-        if (filters.conditionIds && filters.conditionIds.length > 0) count++;
-        if (filters.disciplineIds && filters.disciplineIds.length > 0) count++;
-        if (filters.equipmentTypeIds && filters.equipmentTypeIds.length > 0) count++;
-        if (filters.conditionIds && filters.conditionIds.length > 0) count++;
-        if (filters.realEstateTypeIds && filters.realEstateTypeIds.length > 0) count++;
-        if (filters.heatingTypeIds && filters.heatingTypeIds.length > 0) count++;
-        if (filters.adTypeId) count++;
-        if (filters.ownerTypeId) count++;
-        if (filters.minYear || filters.maxYear) count++;
-        if (filters.maxMileage) count++;
-        if (filters.minSquareMeters || filters.maxSquareMeters) count++;
-        if (filters.minRoomCount || filters.maxRoomCount) count++;
-        if (filters.minBuildingAge || filters.maxBuildingAge) count++;
-        if (filters.minFloor || filters.maxFloor) count++;
-        if (filters.minPageCount || filters.maxPageCount) count++;
-        if (filters.purchaseDateFrom || filters.purchaseDateTo) count++;
-        
-        return count;
-    });
+    const resolvedCount = typeof getActiveFilterCount === 'function'
+        ? getActiveFilterCount(filters)
+        : computeActiveFilterCount(filters);
 
     const hasResults = Number(totalElements) > 0;
 
-    const activeCount = countActiveFilters();
-    const hasActive = checkActiveFilters();
+    const activeCount = resolvedCount;
+    const hasActive = typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0;
     const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
 
     const FilterBadge = () => (

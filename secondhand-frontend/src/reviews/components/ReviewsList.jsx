@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import ReviewCard from './ReviewCard.jsx';
 import { REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
 
-const ReviewsList = memo(({ reviews, loading, error, hasMore, onLoadMore, showLoadMore = true }) => {
+const ReviewsList = memo(({ reviews, loading, error, hasMore, onLoadMore, onRetry, showLoadMore = true }) => {
     if (loading && reviews.length === 0) {
         return (
             <div className="space-y-4">
@@ -43,7 +43,8 @@ const ReviewsList = memo(({ reviews, loading, error, hasMore, onLoadMore, showLo
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{REVIEW_MESSAGES.ERROR_OCCURRED_TITLE}</h3>
                 <p className="text-gray-600 mb-4">{error}</p>
                 <button
-                    onClick={onLoadMore}
+                    type="button"
+                    onClick={() => (onRetry ?? onLoadMore)?.()}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                 >
                     {REVIEW_MESSAGES.TRY_AGAIN}

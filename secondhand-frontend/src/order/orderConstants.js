@@ -1,5 +1,7 @@
 import { ORDER_STATUSES } from './constants/orderUiConstants.js';
 
+export { getOrderStatusTextClass as getStatusColor } from './utils/statusPresentation.js';
+
 export const ORDER_QUERY_KEYS = Object.freeze({
   orders: ['orders'],
   myOrders: (userId, page, size, sort, direction) => [
@@ -22,25 +24,6 @@ export const ORDER_QUERY_KEYS = Object.freeze({
   pendingCompletionOrders: ['pendingCompletionOrders'],
   pendingCompletion: (userId) => ['pendingCompletionOrders', userId],
 });
-
-export const getStatusColor = (status) => {
-  const value = String(status || '').toUpperCase();
-
-  if (value === ORDER_STATUSES.COMPLETED) return 'text-emerald-600';
-  if (value === ORDER_STATUSES.DELIVERED) return 'text-blue-600';
-  if (value === ORDER_STATUSES.SHIPPED) return 'text-indigo-600';
-  if (value === ORDER_STATUSES.PROCESSING) return 'text-amber-600';
-  if (value === ORDER_STATUSES.CONFIRMED) return 'text-green-600';
-  if (value === ORDER_STATUSES.PENDING) return 'text-slate-600';
-
-  if (value === ORDER_STATUSES.PAID) return 'text-emerald-600';
-  if (value === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-600';
-  if (value === ORDER_STATUSES.REFUNDED) return 'text-rose-600';
-  if (value === ORDER_STATUSES.FAILED) return 'text-rose-600';
-  if (value === ORDER_STATUSES.CANCELLED) return 'text-rose-600';
-
-  return 'text-slate-600';
-};
 
 export const getLastUpdateInfo = (order) => {
   const status = order?.status;

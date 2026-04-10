@@ -1,75 +1,121 @@
-import { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useCallback, useMemo } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
 import { REVIEW_DEFAULTS } from '../reviewConstants.js';
 
 const REVIEW_KEYS = {
-    received: (userId, page, size) => ['reviews', 'received', userId, page, size],
-    written: (userId) => ['reviews', 'written', userId],
+    received: (userId, size) => ['reviews', 'received', userId, size],
+    written: (userId, size) => ['reviews', 'written', userId, size],
     stats: (userId) => ['reviewStats', userId],
+};
+
+const nextPageParamFromSpring = (lastPage) => {
+    if (!lastPage) return undefined;
+    const number = lastPage.number ?? 0;
+    const totalPages = lastPage.totalPages ?? 0;
+    if (totalPages === 0 || number >= totalPages - 1) return undefined;
+    return number + 1;
 };
 
 export const useReviews = (userId, options = {}) => {
     const enabled = options.enabled ?? true;
-    const initialPage = options.page ?? REVIEW_DEFAULTS.RECEIVED_PAGE;
     const initialSize = options.size ?? REVIEW_DEFAULTS.RECEIVED_SIZE;
-    const [currentPage, setCurrentPage] = useState(initialPage);
     const [currentSize, setCurrentSize] = useState(initialSize);
 
-    const { data, isLoading, error, refetch } = useQuery({
-        queryKey: REVIEW_KEYS.received(userId, currentPage, currentSize),
-        queryFn: () => reviewService.getReviewsReceivedByUser(userId, currentPage, currentSize),
+    const {
+        data,
+        isLoading,
+        isFetchingNextPage,
+        error,
+        refetch,
+        fetchNextPage,
+        hasNextPage,
+    } = useInfiniteQuery({
+        queryKey: REVIEW_KEYS.received(userId, currentSize),
+        queryFn: ({ pageParam }) => reviewService.getReviewsReceivedByUser(userId, pageParam, currentSize),
+        initialPageParam: REVIEW_DEFAULTS.RECEIVED_PAGE,
+        getNextPageParam: (lastPage) => nextPageParamFromSpring(lastPage),
         enabled: !!(userId && enabled),
         staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
         gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
-        placeholderData: (prev) => prev,
     });
 
-    const reviews = data?.content ?? (Array.isArray(data) ? data : []);
+    const reviews = useMemo(
+        () => data?.pages?.flatMap((p) => p?.content ?? []) ?? [],
+        [data?.pages]
+    );
+
+    const lastPage = data?.pages?.length ? data.pages[data.pages.length - 1] : null;
     const pagination = {
-        number: data?.number ?? currentPage,
-        size: data?.size ?? currentSize,
-        totalPages: data?.totalPages ?? 0,
-        totalElements: data?.totalElements ?? 0,
-        first: data?.first ?? (currentPage === REVIEW_DEFAULTS.RECEIVED_PAGE),
-        last: data?.last ?? false,
+        number: lastPage?.number ?? REVIEW_DEFAULTS.RECEIVED_PAGE,
+        size: lastPage?.size ?? currentSize,
+        totalPages: lastPage?.totalPages ?? 0,
+        totalElements: lastPage?.totalElements ?? 0,
+        first: lastPage?.first ?? true,
+        last: lastPage?.last ?? true,
     };
 
-    const loadPage = useCallback((page) => setCurrentPage(page), []);
+    const loadMore = useCallback(() => {
+        if (hasNextPage) fetchNextPage();
+    }, [fetchNextPage, hasNextPage]);
+
     const handlePageSizeChange = useCallback((size) => {
         setCurrentSize(size);
-        setCurrentPage(REVIEW_DEFAULTS.RECEIVED_PAGE);
     }, []);
 
     return {
         reviews,
-        loading: isLoading,
+        loading: isLoading || isFetchingNextPage,
         error: error?.message || null,
         pagination,
         refetch,
-        loadPage,
+        hasMore: Boolean(hasNextPage),
+        loadMore,
         handlePageSizeChange,
     };
 };
 
 export const useReviewsByUser = (userId, options = {}) => {
     const enabled = options.enabled ?? true;
+    const pageSize = options.size ?? REVIEW_DEFAULTS.WRITTEN_SIZE;
 
-    const { data, isLoading, error, refetch } = useQuery({
-        queryKey: REVIEW_KEYS.written(userId),
-        queryFn: () => reviewService.getReviewsByUser(userId, REVIEW_DEFAULTS.WRITTEN_PAGE, REVIEW_DEFAULTS.WRITTEN_SIZE),
+    const {
+        data,
+        isLoading,
+        isFetchingNextPage,
+        error,
+        refetch,
+        fetchNextPage,
+        hasNextPage,
+    } = useInfiniteQuery({
+        queryKey: REVIEW_KEYS.written(userId, pageSize),
+        queryFn: ({ pageParam }) => reviewService.getReviewsByUser(userId, pageParam, pageSize),
+        initialPageParam: REVIEW_DEFAULTS.WRITTEN_PAGE,
+        getNextPageParam: (lastPage) => nextPageParamFromSpring(lastPage),
         enabled: !!(userId && enabled),
         staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
         gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
         refetchOnWindowFocus: false,
     });
 
+    const reviews = useMemo(
+        () => data?.pages?.flatMap((p) => p?.content ?? []) ?? [],
+        [data?.pages]
+    );
+
+    const loadMore = useCallback(() => {
+        if (hasNextPage) fetchNextPage();
+    }, [fetchNextPage, hasNextPage]);
+
     return {
-        reviews: data?.content ?? [],
-        loading: isLoading,
+        reviews,
+        loading: isLoading || isFetchingNextPage,
         error: error?.message || null,
         refresh: refetch,
+        refetch,
+        hasMore: Boolean(hasNextPage),
+        loadMore,
     };
 };
 

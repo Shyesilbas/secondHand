@@ -11,6 +11,7 @@ import {
     PAYMENT_DIRECTIONS,
     PAYMENT_DIRECTION_LABELS,
     PAYMENT_TRANSACTION_TYPES,
+    pickPaymentStatistic,
     TRANSACTION_TYPE_LABELS
 } from '../paymentSchema.js';
 import {formatCurrency} from '../../common/formatters.js';
@@ -90,36 +91,28 @@ const PaymentsPage = () => {
         });
     }, [payments, directionFilter, searchTerm]);
 
-    const getStatValue = useCallback((candidates) => {
-        for (const key of candidates) {
-            const value = paymentStats?.[key];
-            if (typeof value === 'number') return value;
-        }
-        return 0;
-    }, [paymentStats]);
-
     const statCards = useMemo(() => ([
         {
             title: 'Total volume',
-            value: formatCurrency(getStatValue(['totalAmount', 'totalVolume', 'total'])),
+            value: formatCurrency(pickPaymentStatistic(paymentStats, 'totalVolume')),
             tone: 'slate'
         },
         {
             title: 'Incoming volume',
-            value: formatCurrency(getStatValue(['incomingAmount', 'totalIncomingAmount', 'incomingTotal'])),
+            value: formatCurrency(pickPaymentStatistic(paymentStats, 'incomingVolume')),
             tone: 'emerald'
         },
         {
             title: 'Outgoing volume',
-            value: formatCurrency(getStatValue(['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'])),
+            value: formatCurrency(pickPaymentStatistic(paymentStats, 'outgoingVolume')),
             tone: 'indigo'
         },
         {
             title: 'Successful transactions',
-            value: getStatValue(['successfulCount', 'successfulPayments', 'successCount', 'successfulTransactions']).toString(),
+            value: pickPaymentStatistic(paymentStats, 'successfulCount').toString(),
             tone: 'amber'
         },
-    ]), [getStatValue]);
+    ]), [paymentStats]);
 
     const exportCurrentPageAsCsv = useCallback(() => {
         const headers = ['Date', 'Transaction Type', 'Direction', 'Method', 'Amount', 'Status', 'Listing Title'];

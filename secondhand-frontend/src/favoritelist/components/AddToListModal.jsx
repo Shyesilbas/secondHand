@@ -67,7 +67,7 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h2 className="text-xl font-bold text-white mb-1">
-                                        Listeye Ekle
+                                        Add to list
                                     </h2>
                                     <p className="text-white/90 text-sm line-clamp-2 leading-snug">
                                         {listingTitle}
@@ -78,7 +78,7 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                 type="button"
                                 onClick={onClose}
                                 className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
-                                aria-label="Kapat"
+                                aria-label="Close"
                             >
                                 <X className="w-5 h-5 text-white" />
                             </button>
@@ -89,7 +89,7 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                         {listsLoading ? (
                             <div className="flex flex-col items-center justify-center py-12">
                                 <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-                                <p className="text-sm text-gray-500">Listeler yükleniyor...</p>
+                                <p className="text-sm text-gray-500">Loading lists…</p>
                             </div>
                         ) : myLists.length === 0 ? (
                             <div className="text-center py-12">
@@ -97,10 +97,10 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                     <List className="w-10 h-10 text-indigo-500" />
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                    Henüz listen yok
+                                    No lists yet
                                 </h3>
                                 <p className="text-sm text-gray-500 mb-6">
-                                    Ürünleri kategorize etmek için ilk listeni oluştur
+                                    Create your first list to organize saved listings.
                                 </p>
                                 <button
                                     type="button"
@@ -108,13 +108,13 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
                                 >
                                     <Plus className="w-5 h-5" />
-                                    İlk Listeni Oluştur
+                                    Create your first list
                                 </button>
                             </div>
                         ) : (
                             <div className="space-y-3">
                                 <p className="text-sm font-medium text-gray-700 mb-4">
-                                    Listelerim ({myLists.length})
+                                    Your lists ({myLists.length})
                                 </p>
                                 {myLists.map((list) => {
                                     const isInList = containingListIds.includes(list.id);
@@ -160,10 +160,11 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                                 <div className="flex items-center gap-3 text-xs text-gray-500">
                                                     <span className="flex items-center gap-1">
                                                         <Package className="w-3.5 h-3.5" />
-                                                        {list.itemCount || 0} ürün
+                                                        {list.itemCount || 0}{' '}
+                                                        {(list.itemCount || 0) === 1 ? 'item' : 'items'}
                                                     </span>
                                                     <span className="text-gray-300">•</span>
-                                                    <span>{list.isPublic ? 'Herkese Açık' : 'Gizli'}</span>
+                                                    <span>{list.isPublic ? 'Public' : 'Private'}</span>
                                                 </div>
                                             </div>
                                         </button>
@@ -181,7 +182,7 @@ const AddToListModal = ({ isOpen, onClose, listingId, listingTitle }) => {
                                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-black transition-all shadow-lg hover:shadow-xl"
                             >
                                 <Plus className="w-5 h-5" />
-                                Yeni Liste Oluştur
+                                Create new list
                             </button>
                         </div>
                     )}

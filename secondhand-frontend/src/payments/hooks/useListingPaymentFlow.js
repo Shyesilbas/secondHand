@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
@@ -6,6 +6,7 @@ import { orderService } from '../../order/services/orderService.js';
 import {
   createListingFeePaymentRequest,
   OTP_TTL_MINUTES,
+  PAYMENT_FLOW_DEFAULTS,
   PAYMENT_TRANSACTION_TYPES,
   PAYMENT_TYPES,
   PAYMENT_QUERY_KEYS,
@@ -67,9 +68,17 @@ export const useDraftListings = () => {
   const { user, isAuthenticated } = useAuthState();
 
   const queryFn = useCallback(async () => {
-    // İlk sayfadan (page=0) makul bir limit ile taslak ilanları çek
-    const data = await listingService.getMyListingsByStatus('DRAFT', 0, 50);
-    return normalizeArrayResponse(data);
+    const pageSize = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_PAGE_SIZE;
+    const maxPages = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_MAX_PAGES;
+    const merged = [];
+    for (let page = 0; page < maxPages; page += 1) {
+      const data = await listingService.getMyListingsByStatus('DRAFT', page, pageSize);
+      const chunk = normalizeArrayResponse(data);
+      merged.push(...chunk);
+      const totalPages = data?.totalPages ?? 1;
+      if (page >= totalPages - 1 || chunk.length < pageSize) break;
+    }
+    return merged;
   }, []);
 
   const {
@@ -98,6 +107,7 @@ export const useDraftListings = () => {
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess }) => {
   const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
+  const listingFeeIdempotencyKeyRef = useRef(null);
   const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.CREDIT_CARD);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -115,6 +125,10 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     areAllAgreementsAccepted,
     getAcceptedAgreementIds,
   } = useAgreementsState();
+
+  useEffect(() => {
+    listingFeeIdempotencyKeyRef.current = null;
+  }, [selectedListing?.id]);
 
   useEffect(() => {
     if (!codeExpiryTime) {
@@ -187,17 +201,25 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     setIsProcessingPayment(true);
 
     try {
+      if (!listingFeeIdempotencyKeyRef.current) {
+        listingFeeIdempotencyKeyRef.current =
+          typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.randomUUID === 'function'
+            ? `listing-fee-${globalThis.crypto.randomUUID()}`
+            : `listing-fee-${selectedListing.id}-${feeConfig.totalCreationFee}`;
+      }
       const paymentData = createListingFeePaymentRequest({
         listingId: selectedListing.id,
         paymentType: paymentType,
         verificationCode: verificationCode,
         agreementsAccepted: true,
-        acceptedAgreementIds: getAcceptedAgreementIds()
+        acceptedAgreementIds: getAcceptedAgreementIds(),
+        idempotencyKey: listingFeeIdempotencyKeyRef.current,
       });
       await paymentService.createListingFeePayment(paymentData);
 
       showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
 
+      listingFeeIdempotencyKeyRef.current = null;
       setSelectedListing(null);
       setVerificationCode('');
       setCodeExpiryTime(null);

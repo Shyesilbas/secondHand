@@ -7,10 +7,12 @@ import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import {OrderProgressStepper} from '../orderDetails/OrderTimeline.jsx';
 import {
     ORDER_DEFAULTS,
+    ORDER_LIMITS,
     ORDER_STATUS_TAB_FILTER,
     ORDER_STATUSES,
     ORDER_VIEW_MODES,
 } from '../../constants/orderUiConstants.js';
+import { getOrderStatusBadgeClass } from '../../utils/statusPresentation.js';
 import {
     BarChart3,
     CheckCircle,
@@ -81,18 +83,6 @@ const formatLongDate = (iso, locale) => {
   } catch {
     return '';
   }
-};
-
-const orderStatusBadgeClass = (status) => {
-  const s = String(status || '').toUpperCase();
-  if (s === ORDER_STATUSES.COMPLETED) return 'bg-emerald-50 text-emerald-800 border-emerald-200';
-  if (s === ORDER_STATUSES.DELIVERED) return 'bg-blue-50 text-blue-800 border-blue-200';
-  if (s === ORDER_STATUSES.SHIPPED) return 'bg-indigo-50 text-indigo-800 border-indigo-200';
-  if (s === ORDER_STATUSES.PROCESSING) return 'bg-amber-50 text-amber-900 border-amber-200';
-  if (s === ORDER_STATUSES.CONFIRMED) return 'bg-green-50 text-green-800 border-green-200';
-  if (s === ORDER_STATUSES.PENDING) return 'bg-slate-100 text-slate-700 border-slate-200';
-  if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
-  return 'bg-slate-50 text-slate-700 border-slate-200';
 };
 
 const Header = React.memo(
@@ -392,7 +382,7 @@ const UnifiedOrderItem = React.memo(
                     onChange={(e) => setEditingOrderName(e.target.value)}
                     className="flex-1 min-w-[8rem] max-w-md px-3 py-2 text-sm font-medium border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/15"
                     placeholder="…"
-                    maxLength={100}
+                    maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
                     autoFocus
                   />
                   <button type="button" onClick={(e) => onSaveOrderName(order.id, e)} className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
@@ -410,7 +400,7 @@ const UnifiedOrderItem = React.memo(
                         {uiCopy.orderLabel} {uiCopy.orderNumberPrefix}
                         {order.orderNumber}
                       </span>
-                      <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-[11px] font-bold border ${orderStatusBadgeClass(order.status)}`}>
+                      <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-[11px] font-bold border ${getOrderStatusBadgeClass(order.status)}`}>
                         {statusLabel}
                       </span>
                       {isBuyer ? (

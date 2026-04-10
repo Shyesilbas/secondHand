@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle2, Package, Receipt, ShoppingBag } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -34,9 +34,18 @@ const OrderSuccessPage = () => {
     return items.map(getOrderItemTitle).filter(Boolean);
   }, [order]);
 
+  const detailFetchDoneRef = useRef(false);
+
+  useEffect(() => {
+    detailFetchDoneRef.current = false;
+  }, [orderId, orderNumber]);
+
   useEffect(() => {
     let isMounted = true;
-    if (order || (!orderId && !orderNumber)) return undefined;
+    if (!orderId && !orderNumber) return undefined;
+    if (order && Array.isArray(order.orderItems)) return undefined;
+    if (detailFetchDoneRef.current) return undefined;
+    detailFetchDoneRef.current = true;
 
     const loadOrder = async () => {
       setLoading(true);
@@ -56,7 +65,7 @@ const OrderSuccessPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [order, orderId, orderNumber]);
+  }, [orderId, orderNumber, order]);
 
   return (
     <div className="min-h-screen bg-slate-50 relative overflow-hidden">
