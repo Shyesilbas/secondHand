@@ -68,7 +68,7 @@ const Header = () => {
                     {isAuthenticated && (
                         <nav className="hidden lg:flex items-center gap-1">
                             <HeaderNavLink to={ROUTES.FORUM}>Forum</HeaderNavLink>
-                            <HeaderNavLink to={ROUTES.CREATE_LISTING}>Sell</HeaderNavLink>
+                            <HeaderNavLink to={ROUTES.LISTINGS_PREFILTER_CREATE}>Sell</HeaderNavLink>
                             <HeaderNavLink to={ROUTES.LISTINGS_PREFILTER}>Categories</HeaderNavLink>
                         </nav>
                     )}

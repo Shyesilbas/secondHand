@@ -15,6 +15,8 @@ export const ROUTES = {
     PROFILE: '/profile',
     LISTINGS: '/listings',
     LISTINGS_PREFILTER: '/listings/prefilter',
+    /** İlan oluşturma akışı: kategori + filtreler bu sayfada */
+    LISTINGS_PREFILTER_CREATE: '/listings/prefilter?flow=create',
     FORUM: '/forum',
     MY_LISTINGS: '/my-listings',
     COMPLAINTS: '/complaints',

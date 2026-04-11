@@ -5,8 +5,8 @@ import { LISTING_DEFAULTS } from '../types/index.js';
 /**
  * Handles title-based search (client-side) and listingNo search (API call)
  */
-export const useListingSearch = ({ listings, mode, filters, selectedCategory }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+export const useListingSearch = ({ listings, mode, filters, selectedCategory, urlSearchQuery = '' }) => {
+  const [searchTerm, setSearchTerm] = useState(() => String(urlSearchQuery || '').trim());
   const [allPagesLoaded, setAllPagesLoaded] = useState(false);
   const [allListings, setAllListings] = useState([]);
   const [loadingAllPages, setLoadingAllPages] = useState(false);
@@ -15,6 +15,11 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory }) 
   const [listingNoResult, setListingNoResult] = useState(null);
   const listingNoRequestRef = useRef(0);
   const titleSearchRequestRef = useRef(0);
+
+  useEffect(() => {
+    const q = String(urlSearchQuery || '').trim();
+    if (q) setSearchTerm(q);
+  }, [urlSearchQuery]);
 
   const searchTrimmed = useMemo(() => String(searchTerm || '').trim(), [searchTerm]);
   const searchUpper = useMemo(() => searchTrimmed.toUpperCase(), [searchTrimmed]);

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +29,7 @@ public class ListingCommandService {
     private final ApplicationEventPublisher eventPublisher;
     private final ListingValidationService listingValidationService;
     private final ListingConfig listingConfig;
+    private final PriceHistoryService priceHistoryService;
 
     public void publish(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
@@ -93,8 +95,29 @@ public class ListingCommandService {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
                     ListingBusinessConstants.ERROR_CODE_INVALID_PRICE);
         }
+        Optional<Listing> listingOpt = listingRepository.findById(listingId);
+        if (listingOpt.isEmpty()) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+        }
+        Listing listing = listingOpt.get();
+        if (!userId.equals(listing.getSeller().getId())) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+        }
+        BigDecimal oldPrice = listing.getPrice();
         int updated = listingRepository.updatePrice(listingId, price, userId);
-        return updated > 0 ? Result.success() : Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+        if (updated <= 0) {
+            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
+        }
+        if (priceChanged(oldPrice, price)) {
+            priceHistoryService.recordPriceChange(
+                    listingId,
+                    listing.getTitle(),
+                    oldPrice,
+                    price,
+                    listing.getCurrency(),
+                    "Price updated via quick action");
+        }
+        return Result.success();
     }
 
     public Result<Void> updateBatchPrice(List<UUID> listingIds, BigDecimal price, Long userId) {
@@ -103,11 +126,35 @@ public class ListingCommandService {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
                     ListingBusinessConstants.ERROR_CODE_INVALID_PRICE);
         }
+        List<Listing> ownedBefore = listingRepository.findAllByIdIn(listingIds).stream()
+                .filter(l -> userId.equals(l.getSeller().getId()))
+                .toList();
         int updated = listingRepository.updatePriceBatch(listingIds, price, userId);
         if (updated != listingIds.size()) {
             log.warn("Partial batch price update: {} of {} listings updated", updated, listingIds.size());
         }
+        for (Listing l : ownedBefore) {
+            if (priceChanged(l.getPrice(), price)) {
+                priceHistoryService.recordPriceChange(
+                        l.getId(),
+                        l.getTitle(),
+                        l.getPrice(),
+                        price,
+                        l.getCurrency(),
+                        "Price updated via bulk quick action");
+            }
+        }
         return Result.success();
+    }
+
+    private static boolean priceChanged(BigDecimal oldPrice, BigDecimal newPrice) {
+        if (oldPrice == null && newPrice == null) {
+            return false;
+        }
+        if (oldPrice == null || newPrice == null) {
+            return true;
+        }
+        return oldPrice.compareTo(newPrice) != 0;
     }
 
     public BigDecimal calculateTotalListingFee() {

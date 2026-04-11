@@ -91,11 +91,20 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
   });
 
   // Initialize search sub-hook
+  const urlSearchQuery = useMemo(() => {
+    try {
+      return new URLSearchParams(location.search).get('q') || '';
+    } catch {
+      return '';
+    }
+  }, [location.search]);
+
   const searchHook = useListingSearch({
     listings,
     mode,
     filters: filterHook.filters,
     selectedCategory: filterHook.selectedCategory,
+    urlSearchQuery,
   });
 
   // Wire up filter changes to clear search

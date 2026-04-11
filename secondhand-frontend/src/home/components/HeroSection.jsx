@@ -25,7 +25,7 @@ const HeroSection = () => {
               Explore Listings
             </Link>
             <Link
-              to={ROUTES.CREATE_LISTING}
+              to={ROUTES.LISTINGS_PREFILTER_CREATE}
               className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
             >
               Start Selling

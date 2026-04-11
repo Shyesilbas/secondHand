@@ -1,40 +1,50 @@
-import React, {useEffect} from 'react';
-import {createPortal} from 'react-dom';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ArrowDownLeft as ArrowDownLeftIcon,
   ArrowUpRight as ArrowUpRightIcon,
   BadgeCheck as CheckBadgeIcon,
   Printer as PrinterIcon,
-  X as XMarkIcon
+  X as XMarkIcon,
 } from 'lucide-react';
-import {formatCurrency, formatDateTime, replaceEnumCodesInHtml, resolveEnumLabel} from '../../formatters.js';
-import {useEnums} from '../../hooks/useEnums.js';
-import {useNotification} from '../../../notification/NotificationContext.jsx';
+import {
+  formatCurrency,
+  formatDateTime,
+  replaceEnumCodesInHtml,
+  resolveEnumLabel,
+} from '../../formatters.js';
+import { useEnums } from '../../hooks/useEnums.js';
+import { PAYMENT_DIRECTIONS } from '../../../payments/paymentSchema.js';
+
+const DIRECTION_LABEL_TR = {
+  [PAYMENT_DIRECTIONS.INCOMING]: 'Gelen',
+  [PAYMENT_DIRECTIONS.OUTGOING]: 'Giden',
+};
 
 const useModalBodyOverflow = (isOpen) => {
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 };
 
-// --- Modern Aksiyon Butonu ---
-const ActionButton = ({ onClick, children, variant = 'primary', icon: Icon }) => {
-  const base = "flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-2xl transition-all duration-200 shadow-md";
-  const styles = variant === 'primary'
-      ? 'text-button-primary-text bg-button-primary-bg hover:bg-button-primary-hover shadow-lg shadow-secondary-200 active:scale-[0.98]'
-      : 'text-text-secondary bg-secondary-50 hover:bg-secondary-100 active:scale-[0.98]';
+const fullName = (first, last) => [first, last].filter(Boolean).join(' ').trim();
 
-  return (
-      <button onClick={onClick} className={`${base} ${styles}`}>
-        {Icon && <Icon className="w-4 h-4" />}
-        {children}
-      </button>
-  );
-};
+// Özet satır: dekont detayı
+const ReceiptRow = ({ label, value, mono }) => (
+  <div className="flex items-start justify-between gap-4 py-3 border-b border-header-border/80 last:border-0">
+    <span className="text-xs font-medium text-text-muted shrink-0 pt-0.5">{label}</span>
+    <span
+      className={`text-sm font-semibold text-text-primary text-right ${mono ? 'font-mono text-[13px] tracking-tight' : ''}`}
+    >
+      {value}
+    </span>
+  </div>
+);
 
 const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
-  const notification = useNotification();
   const { enums } = useEnums();
   useModalBodyOverflow(isOpen);
 
@@ -45,126 +55,174 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
 
   const handlePrint = () => window.print();
 
-
   const isIncoming = payment.paymentDirection === 'INCOMING';
+  const directionLabel =
+    DIRECTION_LABEL_TR[payment.paymentDirection] || payment.paymentDirection;
 
-  const details = [
-    { label: 'Payment Date', value: formatDate(payment.createdAt) },
-    { label: 'Payment Method', value: resolveEnumLabel(enums, 'paymentTypes', payment.paymentType) },
-    { label: 'Transaction', value: replaceEnumCodesInHtml(payment.transactionType, enums, ['paymentTypes']) },
-  ].filter(Boolean);
+  const transactionDisplay = replaceEnumCodesInHtml(
+    payment.transactionType,
+    enums,
+    ['paymentTypes']
+  );
+
+  const senderFull = fullName(payment.senderName, payment.senderSurname);
+  const receiverFull = fullName(payment.receiverName, payment.receiverSurname);
 
   return createPortal(
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md transition-opacity print:hidden" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto print:static print:inset-auto print:p-0 print:overflow-visible">
+      <div
+        className="absolute inset-0 bg-secondary-900/45 backdrop-blur-sm transition-opacity print:hidden"
+        onClick={onClose}
+        aria-hidden
+      />
 
-        {/* Modal Container */}
-        <div className="relative w-full max-w-[440px] max-h-[90vh] bg-white rounded-[2.5rem] sm:rounded-[2.5rem] rounded-2xl shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2),inset_0_1px_2px_rgba(0,0,0,0.03)] print:shadow-none print:rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-
-          {/* Header Controls */}
-          <div className="flex items-center justify-between p-4 sm:p-8 pb-0 print:hidden flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Verified Receipt</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button onClick={handlePrint} className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors" title="Print">
-                <PrinterIcon className="w-5 h-5" />
-              </button>
-              <button onClick={onClose} className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors">
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
+      <div
+        className="relative w-full max-w-[420px] max-h-[min(90vh,720px)] flex flex-col bg-card-bg rounded-card-2xl shadow-2xl ring-1 ring-card-border print:shadow-none print:ring-0 print:max-w-none print:max-h-none overflow-hidden animate-in zoom-in-95 duration-200"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="payment-receipt-title"
+      >
+        {/* Üst çubuk */}
+        <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-3 print:hidden flex-shrink-0 border-b border-header-border/60 bg-main-bg/80">
+          <div className="min-w-0">
+            <h2 id="payment-receipt-title" className="text-base font-bold text-text-primary truncate">
+              Ödeme dekontu
+            </h2>
+            <p className="text-[11px] text-text-muted mt-0.5">Dijital işlem özeti</p>
           </div>
-
-          {/* Receipt Content */}
-          <div className="p-4 sm:p-8 pt-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1">
-
-            {/* Main Visual: Amount & Status */}
-            <div className="relative flex flex-col items-center py-6">
-              <div className={`mb-4 w-16 h-16 rounded-3xl flex items-center justify-center shadow-inner ${isIncoming ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-900'}`}>
-                {isIncoming ? <ArrowDownLeftIcon className="w-8 h-8" /> : <ArrowUpRightIcon className="w-8 h-8" />}
-              </div>
-
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
-              <h2 className={`text-5xl font-black font-mono tracking-tighter ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
-                {isIncoming ? '+' : ''}{formatAmount(payment.amount)}
-              </h2>
-
-              {payment.isSuccess ? (
-                  <div className="mt-4 px-3 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-full border border-emerald-100 flex items-center gap-1.5">
-                    <CheckBadgeIcon className="w-4 h-4" /> Transaction Successful
-                  </div>
-              ) : (
-                  <div className="mt-4 px-3 py-1 bg-rose-50 text-rose-700 text-[11px] font-bold rounded-full border border-rose-100">
-                    Transaction Failed
-                  </div>
-              )}
-            </div>
-
-            {/* Info Sections */}
-            <div className="space-y-6">
-              {/* Field Grid */}
-              <div className="grid grid-cols-2 gap-y-6 gap-x-6 px-1">
-                {details.map((field) => (
-                    <div key={field.label} className="space-y-1.5">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.05em] mb-1">{field.label}</p>
-                      <p className="text-sm font-semibold text-slate-900 leading-relaxed tracking-tight">{field.value}</p>
-                    </div>
-                ))}
-              </div>
-
-              {/* Created For */}
-              {payment.senderName && (
-                  <div className="pt-4 border-t border-slate-100">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">Created For</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {payment.senderName}{payment.senderSurname ? ` ${payment.senderSurname}` : ''}
-                      </p>
-                    </div>
-                  </div>
-              )}
-            </div>
-
-            {/* Receipt Divider */}
-            <div className="relative py-6">
-              <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
-              <div className="relative flex items-center justify-center">
-                <div className="flex gap-0.5">
-                  {[...Array(24)].map((_, i) => (
-                    <div key={i} className="w-0.5 h-0.5 rounded-full bg-slate-300/60"></div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Branding */}
-            <div className="pt-2 flex flex-col items-center gap-2">
-              <div className="flex items-center gap-2 mt-4 opacity-30">
-                <div className="w-6 h-6 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-[10px] font-black">S</span>
-                </div>
-                <span className="text-xs font-black tracking-tighter text-slate-900">SecondHand Inc.</span>
-              </div>
-              <p className="text-[9px] text-slate-400 font-medium">© 2026 Digital Document • No Physical Signature Required</p>
-            </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="p-2.5 rounded-xl text-text-muted hover:text-text-primary hover:bg-secondary-100 transition-colors"
+              title="Yazdır"
+            >
+              <PrinterIcon className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2.5 rounded-xl text-text-muted hover:text-status-error-DEFAULT hover:bg-status-error-bg transition-colors"
+              title="Kapat"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
           </div>
-
-          {/* Footer Actions */}
-          <div className="p-4 sm:p-8 pt-0 flex gap-3 print:hidden flex-shrink-0 border-t border-slate-100">
-            <ActionButton variant="secondary" onClick={onClose}>
-              Close
-            </ActionButton>
-            <ActionButton variant="primary" onClick={handlePrint} icon={PrinterIcon}>
-              Print Document
-            </ActionButton>
-          </div>
-
         </div>
-      </div>,
-      document.body
+
+        <div className="overflow-y-auto flex-1 px-5 sm:px-6">
+          {/* Tutar bloğu */}
+          <div
+            className={`mt-5 mb-2 rounded-2xl px-5 py-6 text-center ${
+              isIncoming
+                ? 'bg-accent-emerald-50 ring-1 ring-accent-emerald-100'
+                : 'bg-secondary-50 ring-1 ring-secondary-200/80'
+            }`}
+          >
+            <div
+              className={`mx-auto mb-3 w-14 h-14 rounded-2xl flex items-center justify-center ${
+                isIncoming ? 'bg-white text-accent-emerald-600 shadow-sm' : 'bg-white text-secondary-700 shadow-sm'
+              }`}
+            >
+              {isIncoming ? (
+                <ArrowDownLeftIcon className="w-7 h-7" />
+              ) : (
+                <ArrowUpRightIcon className="w-7 h-7" />
+              )}
+            </div>
+            <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1">
+              İşlem tutarı
+            </p>
+            <p
+              className={`text-4xl sm:text-[2.5rem] font-black font-mono tracking-tight ${
+                isIncoming ? 'text-accent-emerald-600' : 'text-text-primary'
+              }`}
+            >
+              {isIncoming ? '+' : '-'}
+              {formatAmount(payment.amount)}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                  payment.isSuccess
+                    ? 'bg-status-success-bg text-status-success-text border-status-success-border'
+                    : 'bg-status-error-bg text-status-error-text border-status-error-border'
+                }`}
+              >
+                {payment.isSuccess && <CheckBadgeIcon className="w-3.5 h-3.5" />}
+                {payment.isSuccess ? 'Başarılı' : 'Başarısız'}
+              </span>
+              <span className="inline-flex px-2.5 py-1 rounded-full text-[11px] font-semibold bg-secondary-100 text-text-secondary border border-header-border">
+                {directionLabel}
+              </span>
+            </div>
+          </div>
+
+          {/* Detay listesi */}
+          <div className="rounded-xl bg-main-bg/50 ring-1 ring-header-border px-4 mb-5">
+            {payment.paymentId != null && payment.paymentId !== '' && (
+              <ReceiptRow label="İşlem no" value={String(payment.paymentId)} mono />
+            )}
+            <ReceiptRow label="Tarih" value={formatDate(payment.createdAt)} />
+            <ReceiptRow
+              label="Ödeme yöntemi"
+              value={resolveEnumLabel(enums, 'paymentTypes', payment.paymentType)}
+            />
+            <ReceiptRow label="İşlem türü" value={transactionDisplay} />
+            {payment.listingTitle && (
+              <ReceiptRow label="İlan" value={payment.listingTitle} />
+            )}
+            {payment.listingNo != null && payment.listingNo !== '' && (
+              <ReceiptRow label="İlan no" value={String(payment.listingNo)} mono />
+            )}
+            {senderFull && <ReceiptRow label="Gönderen" value={senderFull} />}
+            {receiverFull && <ReceiptRow label="Alıcı" value={receiverFull} />}
+          </div>
+
+          {/* Dekont kesik çizgisi */}
+          <div className="relative h-6 flex items-center justify-center mb-5 print:mb-4">
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-header-border to-transparent" />
+            <div className="relative flex gap-1 px-2 bg-card-bg">
+              {[...Array(14)].map((_, i) => (
+                <span key={i} className="w-1 h-1 rounded-full bg-secondary-300/70" />
+              ))}
+            </div>
+          </div>
+
+          <div className="pb-6 flex flex-col items-center gap-1.5 text-center">
+            <div className="flex items-center gap-2 text-text-primary">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-400 text-white text-xs font-black">
+                S
+              </span>
+              <span className="text-sm font-bold tracking-tight">SecondHand</span>
+            </div>
+            <p className="text-[10px] text-text-muted max-w-[260px] leading-relaxed">
+              Bu belge bilgilendirme amaçlıdır; fiziksel imza gerektirmez.
+            </p>
+          </div>
+        </div>
+
+        {/* Alt aksiyonlar */}
+        <div className="p-4 sm:px-6 sm:pb-5 flex gap-3 print:hidden flex-shrink-0 border-t border-header-border bg-card-bg">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-3 px-4 text-sm font-semibold rounded-xl bg-secondary-100 text-text-secondary hover:bg-secondary-200 transition-colors"
+          >
+            Kapat
+          </button>
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold rounded-xl bg-btn-primary text-white hover:bg-btn-primary-hover transition-colors shadow-md"
+          >
+            <PrinterIcon className="w-4 h-4" />
+            Yazdır
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };
 
