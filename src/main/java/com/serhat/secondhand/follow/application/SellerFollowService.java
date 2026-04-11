@@ -2,6 +2,7 @@ package com.serhat.secondhand.follow.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
@@ -34,6 +35,7 @@ public class SellerFollowService {
     private final UserRepository userRepository;
     private final SellerFollowMapper sellerFollowMapper;
     private final EmailService emailService;
+    private final EmailConfig emailConfig;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
 
@@ -182,7 +184,11 @@ public class SellerFollowService {
         log.info("Notifying {} followers about new listing {} by user {}", 
             followers.size(), listing.getId(), seller.getId());
 
-        String subject = seller.getName() + " " + seller.getSurname() + " yeni bir ilan ekledi!";
+        String subject = String.format(
+                emailConfig.getFollow().getNewListingSubjectFormat(),
+                seller.getName(),
+                seller.getSurname()
+        );
         
         for (SellerFollow follow : followers) {
             try {
@@ -209,16 +215,16 @@ public class SellerFollowService {
     }
 
     private String buildNewListingEmailContent(User follower, User seller, Listing listing) {
+        EmailConfig.Follow cfg = emailConfig.getFollow();
         StringBuilder sb = new StringBuilder();
-        sb.append("Merhaba ").append(follower.getName()).append(",\n\n");
-        sb.append("Takip ettiğiniz satıcı ").append(seller.getName()).append(" ").append(seller.getSurname());
-        sb.append(" yeni bir ilan ekledi:\n\n");
-        sb.append("📦 ").append(listing.getTitle()).append("\n");
-        sb.append("💰 ").append(listing.getPrice()).append(" ").append(listing.getCurrency()).append("\n");
-        sb.append("📍 ").append(listing.getCity()).append("\n\n");
-        sb.append("İlanı görüntülemek için uygulamayı ziyaret edin.\n\n");
-        sb.append("---\n");
-        sb.append("Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.");
+        sb.append(String.format(cfg.getGreetingFormat(), follower.getName())).append("\n\n");
+        sb.append(String.format(cfg.getSellerIntroFormat(), seller.getName(), seller.getSurname())).append("\n\n");
+        sb.append(cfg.getTitlePrefix()).append(": ").append(listing.getTitle()).append("\n");
+        sb.append(cfg.getPricePrefix()).append(": ").append(listing.getPrice()).append(" ").append(listing.getCurrency()).append("\n");
+        sb.append(cfg.getCityPrefix()).append(": ").append(listing.getCity()).append("\n\n");
+        sb.append(cfg.getVisitLine()).append("\n\n");
+        sb.append(cfg.getFooterSeparator()).append("\n");
+        sb.append(cfg.getManageNotificationLine());
         return sb.toString();
     }
 }

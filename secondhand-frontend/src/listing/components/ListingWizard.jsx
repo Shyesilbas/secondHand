@@ -13,6 +13,8 @@ const ListingWizard = ({
     isLoading = false,
     canSubmit = true,
     renderStep,
+    footerExtra = null,
+    lastStepAction = null,
 }) => {
   const isLastStep = currentStep >= steps.length;
   const currentStepInfo = steps.find(s => s.id === currentStep) || steps[0];
@@ -114,6 +116,7 @@ const ListingWizard = ({
       {/* Bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 z-40">
         <div className="max-w-4xl mx-auto px-6 py-3">
+          {footerExtra ? <div className="mb-3 w-full">{footerExtra}</div> : null}
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
@@ -140,9 +143,23 @@ const ListingWizard = ({
                 <button
                   type="button"
                   onClick={(e) => { e.preventDefault(); onNext(); }}
-                  className="flex items-center gap-1.5 px-5 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 transition-colors focus:outline-none"
+                  disabled={!canSubmit}
+                  className="flex items-center gap-1.5 px-5 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors focus:outline-none"
                 >
                   Continue
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : lastStepAction ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    lastStepAction.onClick?.();
+                  }}
+                  disabled={Boolean(lastStepAction.disabled)}
+                  className="flex items-center gap-1.5 px-5 py-2 bg-gray-900 text-white text-[13px] font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors focus:outline-none"
+                >
+                  {lastStepAction.label}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (

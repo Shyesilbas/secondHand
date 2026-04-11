@@ -29,6 +29,21 @@ export const getPrefilterSelectors = (listingType) => {
   return [...subtype, ...prefilterPreForm.map((s) => ({ ...s, label: s.title }))];
 };
 
+/** Create-listing wizard steps (all preFormSelectors; independent of browse prefilter subset) */
+export const getCreateFlowSelectorSteps = (listingType) => {
+  const config = listingTypeConfig[listingType];
+  if (!config?.createFlow) return [];
+  const { subtypeSelector, preFormSelectors = [] } = config.createFlow;
+  const list = [];
+  if (subtypeSelector?.enumKey && subtypeSelector?.initialDataKey) {
+    list.push({ ...subtypeSelector, kind: 'grid' });
+  }
+  preFormSelectors.forEach((s) => {
+    if (s?.enumKey && s?.initialDataKey) list.push(s);
+  });
+  return list;
+};
+
 export const getAllListingTypes = () => {
   return Object.keys(listingTypeConfig);
 };
@@ -63,5 +78,12 @@ export const createFormRegistry = Object.fromEntries(
     config.createComponent
   ])
 );
+
+export const isCreateSelectionComplete = (listingType, selection) => {
+  if (!listingType || !createFormRegistry[listingType]) return false;
+  const steps = getCreateFlowSelectorSteps(listingType);
+  if (!steps.length) return true;
+  return steps.every((s) => Boolean(selection?.[s.initialDataKey]));
+};
 
 export default listingTypeConfig;

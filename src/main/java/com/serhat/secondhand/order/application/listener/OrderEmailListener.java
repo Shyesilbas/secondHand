@@ -12,7 +12,6 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +59,7 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String content = buildCancellationContent(event.requester(), order);
-            emailService.sendEmail(event.requester(), OrderBusinessConstants.EMAIL_SUBJECT_ORDER_CANCELLED, content, EmailType.NOTIFICATION);
+            emailService.sendEmail(event.requester(), emailConfig.getOrder().getCancelledSubject(), content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCancelledEmail", event.order().getOrderNumber(), e.getMessage());
@@ -73,7 +72,7 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String content = buildCompletionContent(event.buyer(), order, event.isAutomatic());
-            emailService.sendEmail(event.buyer(), OrderBusinessConstants.EMAIL_SUBJECT_ORDER_COMPLETED, content, EmailType.NOTIFICATION);
+            emailService.sendEmail(event.buyer(), emailConfig.getOrder().getCompletedSubject(), content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("orderCompletedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCompletedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -86,7 +85,7 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String content = buildRefundContent(event.buyer(), order);
-            emailService.sendEmail(event.buyer(), OrderBusinessConstants.EMAIL_SUBJECT_ORDER_REFUNDED, content, EmailType.NOTIFICATION);
+            emailService.sendEmail(event.buyer(), emailConfig.getOrder().getRefundedSubject(), content, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("orderRefundedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderRefundedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -139,16 +138,17 @@ public class OrderEmailListener {
     }
 
     private String buildOrderConfirmationContent(User user, OrderDto order) {
+        EmailConfig.Order cfg = emailConfig.getOrder();
         StringBuilder sb = new StringBuilder();
-        sb.append("Hello ").append(user.getName()).append(",\n\n");
-        sb.append("Thank you for your purchase! Your order has been confirmed.\n\n");
-        sb.append("Order Number: ").append(order.getOrderNumber()).append('\n');
-        sb.append("Status: ").append(order.getStatus()).append('\n');
-        sb.append("Payment Status: ").append(order.getPaymentStatus()).append('\n');
-        sb.append("Total: ").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("\n");
+        sb.append(String.format(cfg.getCustomerGreetingFormat(), user.getName())).append("\n\n");
+        sb.append(cfg.getCustomerIntroLine()).append("\n\n");
+        sb.append(cfg.getCustomerOrderNumberLabel()).append(": ").append(order.getOrderNumber()).append('\n');
+        sb.append(cfg.getCustomerStatusLabel()).append(": ").append(order.getStatus()).append('\n');
+        sb.append(cfg.getCustomerPaymentStatusLabel()).append(": ").append(order.getPaymentStatus()).append('\n');
+        sb.append(cfg.getCustomerTotalLabel()).append(": ").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("\n");
 
         if (order.getShippingAddress() != null) {
-            sb.append("\nShipping Address:\n");
+            sb.append("\n").append(cfg.getCustomerShippingAddressLabel()).append(":\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')
               .append(order.getShippingAddress().getState()).append(' ')
@@ -157,48 +157,55 @@ public class OrderEmailListener {
         }
 
         if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-            sb.append("\nItems:\n");
+            sb.append("\n").append(cfg.getCustomerItemsLabel()).append(":\n");
             order.getOrderItems().forEach(it -> {
-                String title = it.getListing() != null ? it.getListing().getTitle() : "Item";
-                sb.append("- ").append(title)
-                  .append(" x").append(it.getQuantity())
-                  .append(" — ").append(it.getTotalPrice()).append(' ').append(order.getCurrency())
-                  .append('\n');
+                String title = it.getListing() != null ? it.getListing().getTitle() : cfg.getCustomerItemFallbackTitle();
+                sb.append(String.format(
+                        cfg.getCustomerItemLineFormat(),
+                        title,
+                        it.getQuantity(),
+                        it.getTotalPrice(),
+                        order.getCurrency()
+                )).append('\n');
             });
         }
 
         if (order.getNotes() != null && !order.getNotes().isBlank()) {
-            sb.append("\nNotes: ").append(order.getNotes()).append('\n');
+            sb.append("\n").append(cfg.getCustomerNotesLabel()).append(": ").append(order.getNotes()).append('\n');
         }
         if (order.getPaymentReference() != null) {
-            sb.append("Payment Reference: ").append(order.getPaymentReference()).append('\n');
+            sb.append(cfg.getCustomerPaymentReferenceLabel()).append(": ").append(order.getPaymentReference()).append('\n');
         }
-        sb.append("\nBest regards,\nSecondHand Team\n");
+        sb.append("\n").append(cfg.getCustomerClosing()).append('\n');
         return sb.toString();
     }
 
     private String buildSaleNotificationContent(User seller, OrderDto order, List<OrderItemDto> sellerItems) {
+        EmailConfig.Order cfg = emailConfig.getOrder();
         StringBuilder sb = new StringBuilder();
-        sb.append("Hello ").append(seller.getName()).append(",\n\n");
-        sb.append("Great news! Your item(s) have been sold!\n\n");
-        sb.append("Order Number: ").append(order.getOrderNumber()).append('\n');
+        sb.append(String.format(cfg.getSellerGreetingFormat(), seller.getName())).append("\n\n");
+        sb.append(cfg.getSellerIntroLine()).append("\n\n");
+        sb.append(cfg.getSellerOrderNumberLabel()).append(": ").append(order.getOrderNumber()).append('\n');
 
         BigDecimal total = sellerItems.stream()
                 .map(OrderItemDto::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        sb.append("Total Amount: ").append(total).append(' ').append(order.getCurrency()).append("\n\n");
+        sb.append(cfg.getSellerTotalAmountLabel()).append(": ").append(total).append(' ').append(order.getCurrency()).append("\n\n");
 
-        sb.append("Sold Items:\n");
+        sb.append(cfg.getSellerSoldItemsLabel()).append(":\n");
         sellerItems.forEach(item -> {
-            String title = item.getListing() != null ? item.getListing().getTitle() : "Item";
-            sb.append("- ").append(title)
-              .append(" x").append(item.getQuantity())
-              .append(" — ").append(item.getTotalPrice()).append(' ').append(order.getCurrency())
-              .append('\n');
+            String title = item.getListing() != null ? item.getListing().getTitle() : cfg.getSellerItemFallbackTitle();
+            sb.append(String.format(
+                    cfg.getSellerItemLineFormat(),
+                    title,
+                    item.getQuantity(),
+                    item.getTotalPrice(),
+                    order.getCurrency()
+            )).append('\n');
         });
 
         if (order.getShippingAddress() != null) {
-            sb.append("\nShipping Address:\n");
+            sb.append("\n").append(cfg.getSellerShippingAddressLabel()).append(":\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')
               .append(order.getShippingAddress().getState()).append(' ')
@@ -206,22 +213,23 @@ public class OrderEmailListener {
             sb.append(order.getShippingAddress().getCountry()).append('\n');
         }
 
-        sb.append("\nPlease prepare the item(s) for shipping and contact the buyer if needed.\n");
-        sb.append("Thank you for using SecondHand!\n\nBest regards,\nSecondHand Team\n");
+        sb.append("\n").append(cfg.getSellerPrepLine()).append("\n");
+        sb.append(cfg.getSellerClosing()).append('\n');
         return sb.toString();
     }
 
     private String buildCancellationContent(User user, Order order) {
-        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been cancelled.\n";
+        return String.format(emailConfig.getOrder().getCancellationContentFormat(), user.getName(), order.getOrderNumber());
     }
 
     private String buildRefundContent(User user, Order order) {
-        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber()
-                + " has been refunded. The refund amount has been credited to your eWallet.\n";
+        return String.format(emailConfig.getOrder().getRefundContentFormat(), user.getName(), order.getOrderNumber());
     }
 
     private String buildCompletionContent(User user, Order order, boolean isAutomatic) {
-        return "Hello " + user.getName() + ",\n\nYour order " + order.getOrderNumber() + " has been "
-                + (isAutomatic ? "automatically completed" : "completed") + ".\n";
+        String completionWord = isAutomatic
+                ? emailConfig.getOrder().getCompletionAutomaticWord()
+                : emailConfig.getOrder().getCompletionManualWord();
+        return String.format(emailConfig.getOrder().getCompletionContentFormat(), user.getName(), order.getOrderNumber(), completionWord);
     }
 }

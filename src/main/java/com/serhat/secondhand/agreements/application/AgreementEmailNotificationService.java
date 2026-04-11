@@ -2,6 +2,7 @@ package com.serhat.secondhand.agreements.application;
 
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.notification.dto.NotificationRequest;
@@ -26,10 +27,10 @@ import java.util.Set;
 @Slf4j
 public class AgreementEmailNotificationService {
 
-    private static final String BODY_FOOTER = "\n\nOpen Agreements in your account: Profile → Agreements (or /agreements/all).";
     private static final int BROADCAST_BATCH_SIZE = 150;
 
     private final EmailService emailService;
+    private final EmailConfig emailConfig;
     private final EmailRepository emailRepository;
     private final UserRepository userRepository;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
@@ -45,7 +46,7 @@ public class AgreementEmailNotificationService {
         if (emailRepository.existsByUser_IdAndEmailTypeAndSubject(user.getId(), EmailType.AGREEMENT_UPDATED, subject)) {
             return;
         }
-        String body = template.getMessage() + BODY_FOOTER;
+        String body = template.getMessage() + emailConfig.getAgreement().getBodyFooter();
         emailService.sendEmail(user, subject, body, EmailType.AGREEMENT_UPDATED);
         log.debug("Agreement outdated email queued for userId={} type={}", userId, agreementType);
     }
@@ -53,7 +54,7 @@ public class AgreementEmailNotificationService {
     public void notifyAllUsersAgreementPublished(AgreementType agreementType, String version) {
         NotificationRequest template = notificationTemplateCatalog.agreementUpdatedBroadcast(agreementType.name(), version);
         String subject = buildSubject(template);
-        String body = template.getMessage() + BODY_FOOTER;
+        String body = template.getMessage() + emailConfig.getAgreement().getBodyFooter();
 
         int page = 0;
         Pageable pageable = PageRequest.of(page, BROADCAST_BATCH_SIZE);
@@ -81,6 +82,6 @@ public class AgreementEmailNotificationService {
     }
 
     private String buildSubject(NotificationRequest template) {
-        return "SecondHand: " + template.getTitle();
+        return emailConfig.getAgreement().getSubjectPrefix() + template.getTitle();
     }
 }

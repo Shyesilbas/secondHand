@@ -1,68 +1,129 @@
 package com.serhat.secondhand.email.config;
 
 import lombok.Getter;
-import org.springframework.stereotype.Component;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Getter
-@Component
+@Setter
+@Configuration
+@ConfigurationProperties(prefix = "app.email")
 public class EmailConfig {
 
-    private final String sender;
+    private String sender;
 
-    private final String verificationSubject;
-    private final String verificationContent;
+    private String verificationSubject;
+    private String verificationContent;
 
-    private final String paymentTermContent;
+    private String welcomeSubject;
+    private String welcomeContent;
 
-    private final String termsOfServiceContent;
-    private final String termsOfServiceSubject;
+    private String phoneUpdateSubject;
+    private String phoneUpdateContent;
 
-    private final String welcomeSubject;
-    private final String welcomeContent;
+    private String paymentSuccessSubject;
+    private String paymentSuccessContent;
 
-    private final String phoneUpdateSubject;
-    private final String phoneUpdateContent;
+    private String priceChangeSubject;
+    private String priceChangeContent;
 
-    private final String paymentSuccessSubject;
-    private final String paymentSuccessContent;
+    private String orderConfirmationSubject;
+    private String saleNotificationSubject;
 
-    private final String priceChangeSubject;
-    private final String priceChangeContent;
+    private String paymentVerificationSubject;
+    private String paymentVerificationContent;
 
-    private final String orderConfirmationSubject;
-    private final String saleNotificationSubject;
+    private Agreement agreement = new Agreement();
+    private Order order = new Order();
+    private Offer offer = new Offer();
+    private Follow follow = new Follow();
 
-    private final String paymentVerificationSubject;
-    private final String paymentVerificationContent;
+    @Getter
+    @Setter
+    public static class Agreement {
+        private String subjectPrefix;
+        private String bodyFooter;
+    }
 
-    public EmailConfig() {
-        this.sender = "secondhand@noreply.com";
+    @Getter
+    @Setter
+    public static class Order {
+        private String cancelledSubject;
+        private String completedSubject;
+        private String refundedSubject;
 
-        this.verificationSubject = "SecondHand - Account Verification Code";
-        this.verificationContent = "Hello %s,Please use the following code to verify your SecondHand account: Verification Code: %s This code is valid for 15 minutes.If you did not request this verification, please ignore this email. Best regards, SecondHand Team";
+        private String customerGreetingFormat;
+        private String customerIntroLine;
+        private String customerOrderNumberLabel;
+        private String customerStatusLabel;
+        private String customerPaymentStatusLabel;
+        private String customerTotalLabel;
+        private String customerShippingAddressLabel;
+        private String customerItemsLabel;
+        private String customerItemFallbackTitle;
+        private String customerItemLineFormat;
+        private String customerNotesLabel;
+        private String customerPaymentReferenceLabel;
+        private String customerClosing;
 
-        this.termsOfServiceContent = "Welcome to SecondHand! By using our platform, you agree to the following terms of service: \\n\\n1. You must be at least 18 years old to create an account.\\n2. You are responsible for maintaining the confidentiality of your account credentials.\\n3. All items listed must comply with our prohibited items policy.\\n4. Payments and transactions are subject to our platform rules.\\n5. SecondHand is not liable for any disputes between users.\\n6. We may update these terms at any time; continued use of the platform constitutes acceptance of the updated terms.\\n\\nThank you for using SecondHand!";
-        this.termsOfServiceSubject = "Hello %s,Please use the following code to verify your SecondHand account: Verification Code: %s This code is valid for 15 minutes.If you did not request this verification, please ignore this email. Best regards, SecondHand Team";
+        private String sellerGreetingFormat;
+        private String sellerIntroLine;
+        private String sellerOrderNumberLabel;
+        private String sellerTotalAmountLabel;
+        private String sellerSoldItemsLabel;
+        private String sellerShippingAddressLabel;
+        private String sellerItemFallbackTitle;
+        private String sellerItemLineFormat;
+        private String sellerPrepLine;
+        private String sellerClosing;
 
-        this.welcomeSubject = "Welcome to SecondHand!";
-        this.welcomeContent = "Hello %s,Welcome to SecondHand! Your account has been successfully created. You can now: Sell your second-hand items Purchase items you like Communicate safely with other users Happy shopping! SecondHand Team";
+        private String cancellationContentFormat;
+        private String refundContentFormat;
+        private String completionContentFormat;
+        private String completionManualWord;
+        private String completionAutomaticWord;
+    }
 
-        this.phoneUpdateSubject = "SecondHand - Phone Number updated";
-        this.phoneUpdateContent = "Hello %s,your phone number has been updated. If you did not make this change, please contact us immediately.";
+    @Getter
+    @Setter
+    public static class Offer {
+        private String receivedSubject;
+        private String counterReceivedSubject;
+        private String acceptedSubject;
+        private String rejectedSubject;
+        private String expiredSubject;
+        private String completedSubject;
 
+        private String receivedHeadline;
+        private String counterReceivedHeadline;
+        private String acceptedHeadline;
+        private String rejectedHeadline;
+        private String expiredHeadline;
+        private String completedHeadline;
+        private String acceptedNextStepLine;
 
-        this.paymentTermContent = "\n1. All payment transactions are secured with SSL encryption.\\n2. Your credit card details are stored in an encrypted format and never shared with third parties.\\n3. Additional security measures (such as 3D Secure) may be required during the payment process.\\n4. If a payment fails, the transaction will be canceled and no charges will be applied.\\n5. Refunds are processed within 5?7 business days.\\n6. The platform is not liable for any technical issues that may occur during payment processing.\\n7. By proceeding with the payment, you acknowledge and agree to these terms.\n";
+        private String greeting;
+        private String listingLabel;
+        private String quantityLabel;
+        private String totalPriceLabel;
+        private String unitPriceLabel;
+        private String expiresAtLabel;
+        private String listingFallback;
+        private String closing;
+    }
 
-        this.paymentSuccessSubject = "SecondHand - Payment Successful";
-        this.paymentSuccessContent = "Hello %s,\nYour payment for the listing titled \"%s\" has been successfully processed.\nPayment Details:\nAmount: %s\nTransaction Type: %s\nThank you for using SecondHand!\nBest regards,\nSecondHand Team";
-
-        this.priceChangeSubject = "SecondHand - Price changed on a favorite listing";
-        this.priceChangeContent = "Hello %s,\nThe listing \"%s\" at your favorites has changed price from %s to %s.\nCheck it out on SecondHand.";
-
-        this.orderConfirmationSubject = "SecondHand - Order Confirmation";
-        this.saleNotificationSubject = "SecondHand - Your Item Has Been Sold!";
-
-        this.paymentVerificationSubject = "SecondHand - Payment Verification";
-        this.paymentVerificationContent = "Hello %s, your payment verification code is %s. This code is valid for %d minutes.";
+    @Getter
+    @Setter
+    public static class Follow {
+        private String newListingSubjectFormat;
+        private String greetingFormat;
+        private String sellerIntroFormat;
+        private String titlePrefix;
+        private String pricePrefix;
+        private String cityPrefix;
+        private String visitLine;
+        private String footerSeparator;
+        private String manageNotificationLine;
     }
 }
