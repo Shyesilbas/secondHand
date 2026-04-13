@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
@@ -123,6 +124,7 @@ export const useOrderFlow = ({
   initialSortDirection = ORDER_DEFAULTS.SORT_DIRECTION,
 }) => {
   const mode = viewMode === ORDER_VIEW_MODES.SELLER ? ORDER_VIEW_MODES.SELLER : ORDER_VIEW_MODES.BUYER;
+  const notification = useNotification();
 
   const [page, setPage] = useState(initialPage);
   const [size, setSize] = useState(initialSize);
@@ -501,14 +503,29 @@ export const useOrderFlow = ({
   );
 
   const completeOrder = useCallback(
-    async (orderId, e) => {
+    (orderId, e) => {
       if (e?.stopPropagation) e.stopPropagation();
-      const ok = window.confirm(ORDER_MESSAGES.CONFIRM_COMPLETE_ORDER);
-      if (!ok) return;
-      await orderService.completeOrder(orderId);
-      refresh();
+      notification.showConfirmation(
+        ORDER_MESSAGES.CONFIRM_ORDER_MODAL_TITLE,
+        ORDER_MESSAGES.CONFIRM_ORDER_MODAL_BODY,
+        async () => {
+          try {
+            await orderService.completeOrder(orderId);
+            refresh();
+          } catch (err) {
+            notification.showError(
+              'Error',
+              err?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED
+            );
+          }
+        },
+        {
+          confirmLabel: ORDER_MESSAGES.CONFIRM_ORDER_BUTTON,
+          cancelLabel: ORDER_MESSAGES.CANCEL_ORDER_BUTTON,
+        }
+      );
     },
-    [refresh]
+    [notification, refresh]
   );
 
   const dismissNameBanner = useCallback(() => {

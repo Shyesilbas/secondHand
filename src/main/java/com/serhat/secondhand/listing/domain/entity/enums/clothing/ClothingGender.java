@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ClothingGender {
     MALE("Male"),
-    FEMALE("Female");
+    FEMALE("Female"),
+    UNISEX("Unisex");
 
     private final String label;
 

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import {Navigate, Route, Routes} from 'react-router-dom';
+import {Navigate, Route, Routes, useSearchParams} from 'react-router-dom';
 import {useAuth} from '../../auth/AuthContext.jsx';
 import {ROUTES} from '../constants/routes.js';
 import LoadingIndicator from '../components/ui/LoadingIndicator.jsx';
@@ -43,9 +43,19 @@ const SellerDashboardPage = lazy(() => import('../../dashboard/pages/SellerDashb
 const BuyerDashboardPage = lazy(() => import('../../dashboard/pages/BuyerDashboardPage.jsx'));
 
 // Chat & Communication - Lazy loaded
-const ChatPage = lazy(() => import('../../chat/pages/ChatPage.jsx'));
 const AuraChatPage = lazy(() => import('../../ai/pages/AuraChatPage.jsx'));
-const EmailsPage = lazy(() => import('../../emails/pages/EmailsPage'));
+const InboxPage = lazy(() => import('../../inbox/pages/InboxPage.jsx'));
+
+const LegacyChatInboxRedirect = () => {
+    const [sp] = useSearchParams();
+    const room = sp.get('room');
+    const q = new URLSearchParams();
+    q.set('tab', 'chat');
+    if (room) {
+        q.set('room', room);
+    }
+    return <Navigate to={`${ROUTES.INBOX}?${q.toString()}`} replace />;
+};
 
 // Forum - Lazy loaded
 const ForumPage = lazy(() => import('../../forum/pages/ForumPage.jsx'));
@@ -334,22 +344,16 @@ const AppRoutes = () => {
                             </Suspense>
                         } 
                     />
-                    <Route 
-                        path={ROUTES.EMAILS} 
+                    <Route
+                        path={ROUTES.INBOX}
                         element={
                             <Suspense fallback={<PageLoader />}>
-                                <EmailsPage />
+                                <InboxPage />
                             </Suspense>
-                        } 
+                        }
                     />
-                    <Route 
-                        path={ROUTES.CHAT} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
-                                <ChatPage />
-                            </Suspense>
-                        } 
-                    />
+                    <Route path={ROUTES.EMAILS} element={<Navigate to={`${ROUTES.INBOX}?tab=emails`} replace />} />
+                    <Route path={ROUTES.CHAT} element={<LegacyChatInboxRedirect />} />
                     <Route 
                         path={ROUTES.AURA_CHAT} 
                         element={

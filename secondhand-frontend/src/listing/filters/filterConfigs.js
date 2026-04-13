@@ -41,7 +41,7 @@ export const createClothingFilterConfig = () => {
     .addEnumField('sizes', 'Size', 'clothingSizes')
     .addEnumField('colors', 'Color', 'colors')
     .addEnumField('conditions', 'Condition', 'clothingConditions', { displayAs: 'chips' })
-    .addEnumField('clothingGenders', 'Clothing Gender', 'clothingGenders', { displayAs: 'chips' })
+    .addEnumField('clothingGenders', 'Gender (male, female, unisex)', 'clothingGenders', { displayAs: 'chips' })
     .addEnumField('clothingCategories', 'Clothing Category', 'clothingCategories', { displayAs: 'chips' })
     .addNumericRangeField('shoeSizeEu', 'Shoe Size (EU)', { min: 20, max: 55, step: 1, placeholder: '42' })
     .addTextField('material', 'Material', { placeholder: 'e.g. cotton, leather' })

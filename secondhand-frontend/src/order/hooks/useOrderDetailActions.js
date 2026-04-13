@@ -75,18 +75,28 @@ export const useOrderDetailActions = ({
     }
   }, [isProcessing, isSellerView, notification, onReviewSuccess, selectedOrder?.id]);
 
-  const handleCompleteOrder = useCallback(async () => {
+  const handleCompleteOrder = useCallback(() => {
     if (isSellerView || isProcessing) return;
-    setIsProcessing(true);
-    try {
-      await orderService.completeOrder(selectedOrder.id);
-      notification.showSuccess('Success', 'Order completed successfully');
-      if (onReviewSuccess) onReviewSuccess();
-    } catch (error) {
-      notification.showError('Error', error?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED);
-    } finally {
-      setIsProcessing(false);
-    }
+    notification.showConfirmation(
+      ORDER_MESSAGES.CONFIRM_ORDER_MODAL_TITLE,
+      ORDER_MESSAGES.CONFIRM_ORDER_MODAL_BODY,
+      async () => {
+        setIsProcessing(true);
+        try {
+          await orderService.completeOrder(selectedOrder.id);
+          notification.showSuccess('Success', 'Order completed successfully');
+          if (onReviewSuccess) onReviewSuccess();
+        } catch (error) {
+          notification.showError('Error', error?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED);
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      {
+        confirmLabel: ORDER_MESSAGES.CONFIRM_ORDER_BUTTON,
+        cancelLabel: ORDER_MESSAGES.CANCEL_ORDER_BUTTON,
+      }
+    );
   }, [isProcessing, isSellerView, notification, onReviewSuccess, selectedOrder?.id]);
 
   const handleSaveAddress = useCallback(async () => {

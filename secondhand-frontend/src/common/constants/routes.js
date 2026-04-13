@@ -34,6 +34,8 @@ export const ROUTES = {
     PAY_LISTING_FEE: '/payments/listing-fee',
     PAYMENT_METHODS: '/payment-methods',
     EWALLET: '/ewallet',
+    /** Mail + bildirim + sohbet sekmeli hub */
+    INBOX: '/inbox',
     EMAILS: '/emails',
     CHAT: '/chat',
     AURA_CHAT: '/aura',

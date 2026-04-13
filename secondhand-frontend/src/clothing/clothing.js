@@ -1,4 +1,10 @@
-
+const normalizeClothingGendersForFilter = (clothingGenders) => {
+    const selected = Array.isArray(clothingGenders) ? clothingGenders.filter(Boolean) : [];
+    if (selected.includes('MALE') || selected.includes('FEMALE')) {
+        return Array.from(new Set([...selected, 'UNISEX']));
+    }
+    return selected;
+};
 
 export const createClothingCreateRequest = (data) => ({
     base: {
@@ -120,7 +126,7 @@ export const createClothingFilterRequest = (data) => ({
     types: Array.isArray(data.types) ? data.types : [],
     colors: Array.isArray(data.colors) ? data.colors : [],
     conditions: Array.isArray(data.conditions) ? data.conditions : [],
-    clothingGenders: Array.isArray(data.clothingGenders) ? data.clothingGenders : [],
+    clothingGenders: normalizeClothingGendersForFilter(data.clothingGenders),
     clothingCategories: Array.isArray(data.clothingCategories) ? data.clothingCategories : [],
     minPurchaseDate: data.minPurchaseDate || null,
     maxPurchaseDate: data.maxPurchaseDate || null,

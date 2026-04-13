@@ -103,7 +103,7 @@ const getEmailMatchesFilter = (email, filterType) => {
     return email?.emailType === filterType;
 };
 
-const EmailsPage = () => {
+const EmailsPage = ({ embedded = false }) => {
     const navigate = useNavigate();
     const notification = useNotification();
     const queryClient = useQueryClient();
@@ -147,7 +147,7 @@ const EmailsPage = () => {
         totalElements: emailPage?.totalElements ?? emails.length
     };
 
-    const handleDelete = async ({ id, title, deleteFunc, onSuccess }) => {
+    const handleDelete = async ({ title, deleteFunc, onSuccess }) => {
         notification.showConfirmation(`Delete ${title}`, `Are you sure you want to delete "${title}"?`, async () => {
             try {
                 setIsDeleting(true);
@@ -165,13 +165,12 @@ const EmailsPage = () => {
         });
     };
 
-    const handleDeleteEmail = (emailId, emailSubject) => {
+    const handleDeleteEmail = (emailId) => {
         if (!emailId) {
             notification.showError(EMAIL_MESSAGES.EMAIL_ID_MISSING);
             return;
         }
         handleDelete({
-            id: emailId,
             title: 'Email',
             deleteFunc: () => emailService.deleteEmail(emailId),
             onSuccess: () => {
@@ -251,22 +250,32 @@ const EmailsPage = () => {
         }
     }, [queryClient, user?.id, page]);
 
-    if (isLoading) return <EmailsPageLoader />;
+    if (isLoading) {
+        return embedded ? (
+            <div className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500 shadow-sm">
+                Loading mail…
+            </div>
+        ) : (
+            <EmailsPageLoader />
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            <div className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+        <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-slate-50'}>
+            <div className={`sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md ${embedded ? 'rounded-t-2xl' : ''}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="h-10 px-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-300 inline-flex items-center gap-2"
-                        type="button"
-                    >
-                        <ArrowLeftIcon className="w-5 h-5" />
-                        <span className="text-sm font-medium hidden sm:inline">Back</span>
-                    </button>
+                    {!embedded && (
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="h-10 px-3 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-300 inline-flex items-center gap-2"
+                            type="button"
+                        >
+                            <ArrowLeftIcon className="w-5 h-5" />
+                            <span className="text-sm font-medium hidden sm:inline">Back</span>
+                        </button>
+                    )}
 
-                    <div className="hidden md:flex flex-col pr-3 border-r border-slate-200">
+                    <div className="hidden md:flex flex-col border-r border-slate-200 pr-3">
                         <span className="text-sm font-semibold text-slate-900">Mailbox</span>
                         <span className="text-xs text-slate-500">
                             {pageInfo.totalElements} total - {unreadCount} unread
@@ -453,7 +462,7 @@ const EmailsPage = () => {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id, selectedEmail.subject);
+                                                if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id);
                                             }}
                                             disabled={isDeleting || !selectedEmail?.id}
                                             className="h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -511,7 +520,7 @@ const EmailsPage = () => {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id, selectedEmail.subject);
+                                            if (selectedEmail?.id) handleDeleteEmail(selectedEmail.id);
                                         }}
                                         disabled={isDeleting || !selectedEmail?.id}
                                         className="h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 inline-flex items-center justify-center transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"

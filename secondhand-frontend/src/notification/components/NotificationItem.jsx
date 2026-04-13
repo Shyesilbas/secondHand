@@ -89,9 +89,9 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
 
             case 'CHAT_MESSAGE_RECEIVED':
                 if (metadataObj.chatRoomId) {
-                    return `${ROUTES.CHAT}?room=${metadataObj.chatRoomId}`;
+                    return `${ROUTES.INBOX}?tab=chat&room=${metadataObj.chatRoomId}`;
                 }
-                return ROUTES.CHAT;
+                return `${ROUTES.INBOX}?tab=chat`;
 
             case 'LISTING_PRICE_DROPPED':
             case 'LISTING_NEW_FROM_FOLLOWED':

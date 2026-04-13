@@ -159,27 +159,23 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
                     {listing.title}
                 </h3>
 
-                {/* Reviews: her zaman göster (API’de reviewStats yoksa 0 kabul) */}
-                <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
-                    <div className="flex shrink-0" aria-hidden>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                                key={star}
-                                className={`w-3 h-3 ${reviewCount > 0 && star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`}
-                            />
-                        ))}
+                {/* Reviews: yalnızca en az bir değerlendirme varsa */}
+                {reviewCount > 0 && (
+                    <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
+                        <div className="flex shrink-0" aria-hidden>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                    key={star}
+                                    className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`}
+                                />
+                            ))}
+                        </div>
+                        <span className="text-[11px] text-slate-500 tabular-nums leading-none">
+                            <span className="font-medium text-slate-600">{averageRating.toFixed(1)}</span>
+                            <span className="text-slate-400"> ({reviewCount})</span>
+                        </span>
                     </div>
-                    <span className="text-[11px] text-slate-500 tabular-nums leading-none">
-                        {reviewCount > 0 ? (
-                            <>
-                                <span className="font-medium text-slate-600">{averageRating.toFixed(1)}</span>
-                                <span className="text-slate-400"> ({reviewCount})</span>
-                            </>
-                        ) : (
-                            <span className="text-slate-400">0 reviews</span>
-                        )}
-                    </span>
-                </div>
+                )}
 
                 {/* Price row */}
                 <div className="flex items-end gap-2 flex-wrap mb-1">

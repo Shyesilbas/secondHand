@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.clothing;
 import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
@@ -12,6 +13,7 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
@@ -44,7 +46,7 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
         }
         
         if (filters.getClothingGenders() != null && !filters.getClothingGenders().isEmpty()) {
-            predicates.add(root.get("clothingGender").in(filters.getClothingGenders()));
+            predicates.add(root.get("clothingGender").in(expandGenderFilters(filters.getClothingGenders())));
         }
         
         if (filters.getClothingCategories() != null && !filters.getClothingCategories().isEmpty()) {
@@ -92,5 +94,13 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
             case "purchasedate", "purchase_date" -> Optional.of(root.get("purchaseDate"));
             default -> Optional.empty();
         };
+    }
+
+    private EnumSet<ClothingGender> expandGenderFilters(List<ClothingGender> selectedGenders) {
+        EnumSet<ClothingGender> effective = EnumSet.copyOf(selectedGenders);
+        if (effective.contains(ClothingGender.MALE) || effective.contains(ClothingGender.FEMALE)) {
+            effective.add(ClothingGender.UNISEX);
+        }
+        return effective;
     }
 }

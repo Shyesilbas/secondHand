@@ -81,7 +81,13 @@ export const ORDER_TIME = Object.freeze({
 
 export const ORDER_MESSAGES = Object.freeze({
   ORDER_NOT_FOUND: 'Order not found. Please check the order number.',
+  /** @deprecated use CONFIRM_ORDER_MODAL_TITLE / BODY; kept for any stray references */
   CONFIRM_COMPLETE_ORDER: 'Are you sure you want to complete this order? This action cannot be undone.',
+  CONFIRM_ORDER_MODAL_TITLE: 'Confirm order?',
+  CONFIRM_ORDER_MODAL_BODY:
+    'You are about to confirm that you have received this order. After you confirm, you will not be able to cancel this order or request a refund from this screen. Make sure you are satisfied with your purchase before continuing.',
+  CONFIRM_ORDER_BUTTON: 'Confirm order',
+  CANCEL_ORDER_BUTTON: 'Cancel',
   UPDATE_NAME_FAILED: 'Failed to update order name',
   CANCEL_ORDER_FAILED: 'Failed to cancel order',
   REQUEST_REFUND_FAILED: 'Failed to request refund',

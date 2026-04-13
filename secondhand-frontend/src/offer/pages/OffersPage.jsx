@@ -6,10 +6,8 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import CounterOfferModal from '../components/CounterOfferModal.jsx';
 import OfferTrackingCard from '../components/OfferTrackingCard.jsx';
 import {
-  AlertCircle,
   Handshake,
   LayoutGrid,
-  RefreshCw,
   Search,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -25,14 +23,6 @@ const SORT = Object.freeze({
   NEWEST: 'newest',
   EXPIRING: 'expiring',
 });
-
-const needsAttention = (o, activeTab) => {
-  const expired = o.status === OFFER_STATUSES.EXPIRED;
-  if (expired) return false;
-  if (activeTab === OFFER_TABS.RECEIVED && o.status === OFFER_STATUSES.PENDING) return true;
-  if (activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.ACCEPTED) return true;
-  return false;
-};
 
 const personLabel = (o, activeTab) =>
   activeTab === OFFER_TABS.MADE
@@ -120,11 +110,6 @@ const OffersPage = () => {
     return c;
   }, [items]);
 
-  const attentionCount = useMemo(
-    () => items.filter((o) => needsAttention(o, activeTab)).length,
-    [items, activeTab]
-  );
-
   const processedItems = useMemo(() => {
     let list = [...items];
     if (statusFilter !== STATUS_FILTER.ALL) {
@@ -196,58 +181,7 @@ const OffersPage = () => {
   return (
     <div className="min-h-screen bg-slate-50/90">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:py-7">
-        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
-          <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between sm:px-5">
-            <div className="min-w-0 border-l-2 border-teal-700 pl-3">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Negotiations</p>
-              <h1 className="mt-0.5 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">Offer center</h1>
-              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500">
-                Incoming offers and your bids in one place — filter, search, checkout when accepted.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => refresh()}
-              disabled={isLoading}
-              className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 px-3 py-3 sm:grid-cols-4 sm:gap-3 sm:px-4 sm:py-3">
-            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Needs you</div>
-              <div className="mt-0.5 flex items-center gap-1.5">
-                <span className="text-lg font-bold tabular-nums text-slate-900">{attentionCount}</span>
-                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-teal-700" aria-hidden />
-              </div>
-              <p className="text-[10px] text-slate-400">This page</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Pending</div>
-              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
-                {statusCounts[OFFER_STATUSES.PENDING] ?? 0}
-              </div>
-              <p className="text-[10px] text-slate-400">This page</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Accepted</div>
-              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">
-                {statusCounts[OFFER_STATUSES.ACCEPTED] ?? 0}
-              </div>
-              <p className="text-[10px] text-slate-400">This page</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">In tab</div>
-              <div className="mt-0.5 text-lg font-bold tabular-nums text-slate-900">{totalElements}</div>
-              <p className="text-[10px] text-slate-400">Total offers</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
+        <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="inline-flex rounded-2xl bg-slate-100 p-1">
               <button
