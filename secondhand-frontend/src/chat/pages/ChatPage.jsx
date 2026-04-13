@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useChat} from '../hooks/useChat.js';
 import ChatWindow from '../components/ChatWindow.jsx';
 import ChatList from '../components/ChatList.jsx';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {EllipsisVertical as EllipsisVerticalIcon, MessageCircle} from 'lucide-react';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CHAT_MESSAGES } from '../chatConstants.js';
 
-const ChatPage = () => {
+const ChatPage = ({ embedded = false }) => {
   const { user } = useAuthState();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const notification = useNotification();
   const {
     chatRooms,
@@ -26,8 +28,42 @@ const ChatPage = () => {
     deleteConversation
   } = useChat(user?.id, { enableChatRoomsFetch: true });
 
+  const syncRoomToUrl = useCallback(
+    (room) => {
+      if (!location.pathname.startsWith(ROUTES.INBOX)) {
+        return;
+      }
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('tab', 'chat');
+          if (room?.id) {
+            next.set('room', String(room.id));
+          } else {
+            next.delete('room');
+          }
+          return next;
+        },
+        { replace: true }
+      );
+    },
+    [location.pathname, setSearchParams]
+  );
+
+  useEffect(() => {
+    const roomId = searchParams.get('room');
+    if (!roomId || !chatRooms?.length) {
+      return;
+    }
+    const found = chatRooms.find((r) => String(r.id) === String(roomId));
+    if (found && selectedChatRoom?.id !== found.id) {
+      selectChatRoom(found);
+    }
+  }, [searchParams, chatRooms, selectedChatRoom?.id, selectChatRoom]);
+
   const handleChatRoomSelect = (chatRoom) => {
     selectChatRoom(chatRoom);
+    syncRoomToUrl(chatRoom);
   };
 
   const handleListingClick = (listingId, event) => {
@@ -48,6 +84,7 @@ const ChatPage = () => {
       () => {
         if (selectedChatRoom?.id === roomId) {
           selectChatRoom(null);
+          syncRoomToUrl(null);
         }
         deleteConversation(roomId);
         notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.CONVERSATION_DELETED);
@@ -66,27 +103,42 @@ const ChatPage = () => {
     );
   }
 
+  const gridHeightClass = embedded ? 'h-[min(72vh,calc(100vh-260px))]' : 'h-[calc(100vh-200px)]';
+
   return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
-                Messages
-              </h1>
-              <p className="text-slate-500 mt-2 tracking-tight">Connect with buyers and sellers</p>
+      <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-slate-50'}>
+        <div className={`max-w-[1600px] mx-auto ${embedded ? 'px-0 py-0' : 'px-6 lg:px-8 py-8'}`}>
+          {!embedded && (
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+                  Messages
+                </h1>
+                <p className="text-slate-500 mt-2 tracking-tight">Connect with buyers and sellers</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 bg-white px-5 py-2.5 rounded-xl border border-slate-200/60 shadow-sm">
+                  <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`}></div>
+                  <span className="text-sm font-semibold text-slate-700 tracking-tight">
+                    {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-white px-5 py-2.5 rounded-xl border border-slate-200/60 shadow-sm">
-                <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`}></div>
-                <span className="text-sm font-semibold text-slate-700 tracking-tight">
+          )}
+
+          {embedded && (
+            <div className="mb-3 flex justify-end">
+              <div className="flex items-center space-x-2 rounded-xl border border-slate-200/60 bg-white px-4 py-2 shadow-sm">
+                <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`} />
+                <span className="text-xs font-semibold text-slate-700">
                   {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                 </span>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 h-[calc(100vh-200px)] bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-3xl border border-slate-200/60 bg-white shadow-sm`}>
             {/* Chat Rooms List */}
             <div className="lg:col-span-4 border-r border-slate-200/60 h-full flex flex-col overflow-hidden">
               <ChatList
@@ -113,6 +165,7 @@ const ChatPage = () => {
                         <button
                           onClick={() => {
                             selectChatRoom(null);
+                            syncRoomToUrl(null);
                           }}
                           className="lg:hidden p-2 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out"
                         >
@@ -159,6 +212,7 @@ const ChatPage = () => {
                           isConnected={isConnected}
                           onConversationDeleted={() => {
                             selectChatRoom(null);
+                            syncRoomToUrl(null);
                           }}
                           isEmbedded={true}
                       />

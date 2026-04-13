@@ -106,7 +106,8 @@ export const NotificationProvider = ({ children }) => {
         }
     }, [showSuccess, showError, showWarning, showInfo]);
 
-    const showConfirmation = useCallback((title, message, onConfirm) => {
+    const showConfirmation = useCallback((title, message, onConfirm, options = {}) => {
+        const { confirmLabel = 'Confirm', cancelLabel = 'Cancel' } = options;
         const id = addNotification({
             type: 'info',
             title,
@@ -114,19 +115,21 @@ export const NotificationProvider = ({ children }) => {
             autoClose: false,
             actions: [
                 {
-                    label: 'Cancel',
+                    label: cancelLabel,
                     primary: false,
                 },
                 {
-                    label: 'Confirm',
+                    label: confirmLabel,
                     primary: true,
                     onClick: () => {
-                        onConfirm?.();
-                        removeNotification(id);
-                    }
-                }
-            ]
+                        void Promise.resolve(onConfirm?.()).finally(() => {
+                            removeNotification(id);
+                        });
+                    },
+                },
+            ],
         });
+        return id;
     }, [addNotification, removeNotification]);
 
 

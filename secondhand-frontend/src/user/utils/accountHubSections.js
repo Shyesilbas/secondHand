@@ -9,7 +9,6 @@ import {
   LineChart,
   List,
   Mail,
-  MessageCircle,
   Banknote,
   Package,
   Receipt,
@@ -96,8 +95,7 @@ export const getAccountHubNavGroups = (userId) => [
     label: 'Messages & notifications',
     icon: Mail,
     items: [
-      { name: 'Emails & codes', description: 'Verification mail', route: ROUTES.EMAILS, icon: Mail },
-      { name: 'Chat', description: 'Conversations', route: ROUTES.CHAT, icon: MessageCircle },
+      { name: 'Inbox', description: 'Mail, notifications & chat', route: ROUTES.INBOX, icon: Mail },
       { name: 'Aura assistant', description: 'AI help', route: ROUTES.AURA_CHAT, icon: Sparkles },
     ],
   },

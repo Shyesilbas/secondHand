@@ -20,6 +20,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const [allAgreementsAccepted, setAllAgreementsAccepted] = useState(false);
     const [requiredAgreements, setRequiredAgreements] = useState([]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+    const [successSummary, setSuccessSummary] = useState(null);
     const { enums, isLoading: isPricingLoading } = useEnums();
     const {
         acceptedAgreements,
@@ -48,6 +49,12 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     }, [showcasePricing, days]);
 
     const totalCost = useMemo(() => calculateTotal(), [calculateTotal]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setShowSuccessNotification(false);
+        setSuccessSummary(null);
+    }, [isOpen]);
 
     useEffect(() => {
         setAllAgreementsAccepted(areAllAgreementsAccepted());
@@ -168,6 +175,10 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                 calculateSubtotal={calculateSubtotal}
                 calculateTax={calculateTax}
                 onSuccess={() => {
+                    setSuccessSummary({
+                        title: listing?.title || listingTitle,
+                        days,
+                    });
                     setShowSuccessNotification(true);
                     onSuccess?.();
                 }}
@@ -178,7 +189,10 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
         );
     }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, getAcceptedAgreementIds, handleDaysChange, onRequiredAgreementsChange]);
 
-    if (!isOpen) return null;
+    if (!isOpen && !showSuccessNotification) return null;
+
+    const successTitle = successSummary?.title ?? listing?.title ?? listingTitle;
+    const successDays = successSummary?.days ?? days;
 
     const renderModalContent = () => {
         if (isListingLoading) {
@@ -295,25 +309,31 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                     </div>
                 </div>
 
-                <NotificationModal
-                    isOpen={showSuccessNotification}
-                    onClose={() => {
-                        setShowSuccessNotification(false);
-                        onClose?.();
-                    }}
-                    type="success"
-                    title="Showcase activated!"
-                    message={`"${listing.title || listingTitle}" will be featured for ${days} day${days !== 1 ? 's' : ''}.`}
-                    autoClose={true}
-                    autoCloseDelay={5000}
-                    size="md"
-                />
             </>
         );
     };
 
-    const modalContent = renderModalContent();
-    if (!modalContent) return null;
+    const modalContent = (
+        <>
+            {isOpen ? renderModalContent() : null}
+            {showSuccessNotification && (
+                <NotificationModal
+                    isOpen={showSuccessNotification}
+                    onClose={() => {
+                        setShowSuccessNotification(false);
+                        setSuccessSummary(null);
+                        onClose?.();
+                    }}
+                    type="success"
+                    title="Showcase activated!"
+                    message={`"${successTitle}" will be featured for ${successDays} day${successDays !== 1 ? 's' : ''}.`}
+                    autoClose={true}
+                    autoCloseDelay={5000}
+                    size="md"
+                />
+            )}
+        </>
+    );
     return ReactDOM.createPortal(modalContent, document.body);
 };
 

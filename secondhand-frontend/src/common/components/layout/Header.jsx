@@ -20,7 +20,6 @@ const Header = () => {
     const scrolled = useHeaderScroll();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [inAppNotificationCenterOpen, setInAppNotificationCenterOpen] = useState(false);
 
     const dropdowns = useDropdownManager();
     const listingsMenuOpen = dropdowns.isOpen('listings');
@@ -89,9 +88,6 @@ const Header = () => {
                                 orderCount={orderCount}
                                 mobileMenuOpen={mobileMenuOpen}
                                 onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                inAppNotificationCenterOpen={inAppNotificationCenterOpen}
-                                onToggleNotificationCenter={() => setInAppNotificationCenterOpen(!inAppNotificationCenterOpen)}
-                                onCloseNotificationCenter={() => setInAppNotificationCenterOpen(false)}
                                 paymentsMenuOpen={paymentsMenuOpen}
                                 listingsMenuOpen={listingsMenuOpen}
                                 profileMenuOpen={profileMenuOpen}

@@ -1,10 +1,9 @@
-import NotificationBadge from '../../../../notification/components/NotificationBadge.jsx';
-import NotificationCenter from '../../../../notification/components/NotificationCenter.jsx';
+import HeaderInboxLink from './HeaderInboxLink.jsx';
 import HeaderIconButton from './HeaderIconButton.jsx';
 import HeaderPaymentsMenu from './HeaderPaymentsMenu.jsx';
 import HeaderListingsMenu from './HeaderListingsMenu.jsx';
 import HeaderProfileMenu from './HeaderProfileMenu.jsx';
-import { Heart, Mail, Menu, MessageSquare, ShoppingBag, X } from 'lucide-react';
+import { Heart, Menu, ShoppingBag, X } from 'lucide-react';
 import { ROUTES } from '../../../constants/routes.js';
 
 const HeaderAuthActions = ({
@@ -15,9 +14,6 @@ const HeaderAuthActions = ({
     orderCount,
     mobileMenuOpen,
     onToggleMobileMenu,
-    inAppNotificationCenterOpen,
-    onToggleNotificationCenter,
-    onCloseNotificationCenter,
     paymentsMenuOpen,
     listingsMenuOpen,
     profileMenuOpen,
@@ -32,15 +28,8 @@ const HeaderAuthActions = ({
 }) => (
     <>
         <div className="flex items-center gap-1 mr-2">
-            <div className="relative">
-                <NotificationBadge onClick={onToggleNotificationCenter} />
-                <NotificationCenter isOpen={inAppNotificationCenterOpen} onClose={onCloseNotificationCenter} />
-            </div>
+            <HeaderInboxLink emailCount={emailCount} chatCount={chatCount} />
 
-            <div className="h-6 w-[1px] bg-gray-300 mx-1" />
-
-            <HeaderIconButton to={ROUTES.EMAILS} icon={Mail} badge={emailCount} title="Mails" />
-            <HeaderIconButton to={ROUTES.CHAT} icon={MessageSquare} badge={chatCount} title="Chats" />
             <HeaderIconButton to={ROUTES.FAVORITES} icon={Heart} title="Favorites" />
             <HeaderIconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />
 

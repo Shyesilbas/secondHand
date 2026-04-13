@@ -204,6 +204,9 @@ const GenericListingForm = ({
             options={options}
             disabled={disabled}
           />
+          {field.description ? (
+            <p className="mt-1.5 text-xs text-gray-500">{field.description}</p>
+          ) : null}
           <FieldError error={error} />
         </div>
       );
