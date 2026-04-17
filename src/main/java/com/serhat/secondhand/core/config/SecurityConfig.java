@@ -147,6 +147,12 @@ public class SecurityConfig {
             "/api/favorites/top-listings"
     );
 
+    private static final List<String> ACTUATOR_PUBLIC_ENDPOINTS = Arrays.asList(
+            "/actuator/health",
+            "/actuator/health/**",
+            "/actuator/info"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
@@ -225,6 +231,9 @@ public class SecurityConfig {
                         
                         // Favorite public endpoints (top favorites can be viewed by anyone)
                         .requestMatchers(FAVORITE_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
+
+                        // Actuator public probes
+                        .requestMatchers(ACTUATOR_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -342,3 +351,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(10);
     }
 }
+

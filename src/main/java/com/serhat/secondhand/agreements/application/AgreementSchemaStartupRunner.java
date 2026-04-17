@@ -29,7 +29,6 @@ public class AgreementSchemaStartupRunner implements ApplicationRunner {
 
         try {
             jdbcTemplate.execute("ALTER TABLE agreements ALTER COLUMN content TYPE TEXT");
-            log.info("Ensured agreements.content column uses TEXT type.");
         } catch (Exception ex) {
             // Do not block startup if schema is already compatible or table not created yet.
             log.warn("Could not ensure agreements.content TEXT type: {}", ex.getMessage());

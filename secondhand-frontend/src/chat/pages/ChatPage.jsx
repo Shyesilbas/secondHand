@@ -175,13 +175,12 @@ const ChatPage = ({ embedded = false }) => {
                         </button>
                         <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center shadow-sm">
                           <span className="text-base font-bold text-white tracking-tight">
-                            {selectedChatRoom.otherParticipantName?.charAt(0).toUpperCase() || 
-                             selectedChatRoom.roomName?.charAt(0).toUpperCase() || 'U'}
+                            {(selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'U').charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
                           <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                            {selectedChatRoom.otherParticipantName || selectedChatRoom.roomName || 'Unknown User'}
+                            {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
                           </h3>
                           <div className="flex items-center space-x-2 mt-1">
                             <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>

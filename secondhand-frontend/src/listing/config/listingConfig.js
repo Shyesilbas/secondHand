@@ -1,4 +1,5 @@
 import {LISTING_TYPES} from '../types/index.js';
+import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 
 import {vehicleConfig} from './vehicleConfig.js';
 import {electronicsConfig} from './electronicsConfig.js';
@@ -83,7 +84,7 @@ export const isCreateSelectionComplete = (listingType, selection) => {
   if (!listingType || !createFormRegistry[listingType]) return false;
   const steps = getCreateFlowSelectorSteps(listingType);
   if (!steps.length) return true;
-  return steps.every((s) => Boolean(selection?.[s.initialDataKey]));
+  return steps.every((s) => isPrefilterValueFilled(selection?.[s.initialDataKey]));
 };
 
 export default listingTypeConfig;

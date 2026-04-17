@@ -6,6 +6,7 @@ import {useChat} from '../hooks/useChat.js';
 import ChatWindow from './ChatWindow.jsx';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useLocation, useNavigate} from 'react-router-dom';
+import { sameChatId } from '../chatIdUtils.js';
 
 const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) => {
     const { authState: { user, isAuthenticated } } = useAuth();
@@ -19,6 +20,8 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
         createDirectChat,
         selectChatRoom,
         sendMessage,
+        deleteMessage,
+        deleteConversation,
         messages,
         isLoadingMessages,
         isConnected,
@@ -26,7 +29,7 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
     } = useChat(user?.id, { enableChatRoomsFetch: false });
 
     const targetUserId = listing.userId || listing.sellerId;
-    if (targetUserId === user?.id) {
+    if (sameChatId(targetUserId, user?.id)) {
         return null;
     }
 
@@ -100,6 +103,9 @@ const ContactSellerButton = ({ listing, className = '', isDirectChat = false }) 
                     selectedChatRoom={selectedChatRoom}
                     messages={messages}
                     onSendMessage={sendMessage}
+                    onDeleteMessage={deleteMessage}
+                    onDeleteConversation={deleteConversation}
+                    onConversationDeleted={() => setIsChatOpen(false)}
                     isLoadingMessages={isLoadingMessages}
                     isConnected={isConnected}
                 />

@@ -22,6 +22,7 @@ const ChatList = ({
     return (
       room.otherParticipantName?.toLowerCase().includes(searchLower) ||
       room.listingTitle?.toLowerCase().includes(searchLower) ||
+      room.title?.toLowerCase().includes(searchLower) ||
       room.roomName?.toLowerCase().includes(searchLower) ||
       room.lastMessage?.toLowerCase().includes(searchLower)
     );

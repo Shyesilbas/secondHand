@@ -59,7 +59,8 @@ const ChatWindow = ({
     }, [messages, selectedChatRoom, scrollToBottom, isLoadingMessages]);
 
     const handleDeleteMessage = (messageId) => {
-        onDeleteMessage?.(messageId);
+        if (!onDeleteMessage) return;
+        onDeleteMessage(messageId);
         notification.showSuccess(CHAT_MESSAGES.SUCCESS_TITLE, CHAT_MESSAGES.MESSAGE_DELETED);
     };
 
@@ -74,7 +75,7 @@ const ChatWindow = ({
                     messagesEndRef={messagesEndRef}
                     messagesContainerRef={messagesContainerRef}
                     user={user}
-                    onDeleteMessage={handleDeleteMessage}
+                    onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
                 />
                 <ChatInput
                     messageText={messageText}
@@ -103,7 +104,7 @@ const ChatWindow = ({
                 messagesEndRef={messagesEndRef}
                 messagesContainerRef={messagesContainerRef}
                 user={user}
-                onDeleteMessage={handleDeleteMessage}
+                onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
             />
             <ChatInput
                 messageText={messageText}

@@ -37,13 +37,21 @@ const useWebSocket = (userId) => {
         
         stompClient.current.connect(
             headers,
-            (frame) => {
+            () => {
                 setIsConnected(true);
-                reconnectAttempt.current = 0; // Reset on successful connection
+                reconnectAttempt.current = 0;
 
-                // Kullanıcıya özel mesajları dinle
-                if (userId) {
-                    subscribeToUserMessages(userId);
+                // Stomp bağlandıktan sonra (React state gecikmesi yok); queue backend'de şu an boş olabilir
+                if (userId && stompClient.current?.connected) {
+                    const userSub = stompClient.current.subscribe(
+                        `/user/${userId}/queue/messages`,
+                        (message) => {
+                            const messageData = JSON.parse(message.body);
+                            setMessages((prev) => [...prev, messageData]);
+                            setUnreadCount((prev) => prev + 1);
+                        }
+                    );
+                    subscriptions.current.set(`user-${userId}`, userSub);
                 }
             },
             (error) => {
@@ -93,7 +101,7 @@ const useWebSocket = (userId) => {
     // ==================== SUBSCRIPTION MANAGEMENT ====================
     
     const subscribeToUserMessages = useCallback((userId) => {
-        if (!stompClient.current || !isConnected) return;
+        if (!stompClient.current?.connected || !userId) return;
 
         const subscription = stompClient.current.subscribe(
             `/user/${userId}/queue/messages`,
@@ -105,10 +113,10 @@ const useWebSocket = (userId) => {
         );
         
         subscriptions.current.set(`user-${userId}`, subscription);
-    }, [isConnected]);
+    }, []);
 
     const subscribeToChatRoom = useCallback((chatRoomId) => {
-        if (!stompClient.current || !isConnected) {
+        if (!stompClient.current?.connected || !chatRoomId) {
             return;
         }
 
@@ -126,7 +134,7 @@ const useWebSocket = (userId) => {
         );
         
         subscriptions.current.set(`room-${chatRoomId}`, subscription);
-    }, [isConnected]);
+    }, []);
 
     const unsubscribeFromChatRoom = useCallback((chatRoomId) => {
         const subscription = subscriptions.current.get(`room-${chatRoomId}`);
@@ -149,39 +157,39 @@ const useWebSocket = (userId) => {
     // ==================== MESSAGE ACTIONS ====================
     
     const sendMessage = useCallback((message) => {
-        if (stompClient.current && isConnected) {
+        if (stompClient.current?.connected) {
             stompClient.current.send('/app/chat.sendMessage', {}, JSON.stringify(message));
         }
-    }, [isConnected]);
+    }, []);
 
     const joinRoom = useCallback((chatRoomId, senderId) => {
-        if (stompClient.current && isConnected) {
+        if (stompClient.current?.connected) {
             stompClient.current.send('/app/chat.joinRoom', {}, JSON.stringify({
                 chatRoomId,
                 senderId
             }));
         }
-    }, [isConnected]);
+    }, []);
 
     const leaveRoom = useCallback((chatRoomId, senderId) => {
-        if (stompClient.current && isConnected) {
+        if (stompClient.current?.connected) {
             stompClient.current.send('/app/chat.leaveRoom', {}, JSON.stringify({
                 chatRoomId,
                 senderId
             }));
         }
         unsubscribeFromChatRoom(chatRoomId);
-    }, [isConnected, unsubscribeFromChatRoom]);
+    }, [unsubscribeFromChatRoom]);
 
     const markAsRead = useCallback((chatRoomId, senderId) => {
-        if (stompClient.current && isConnected) {
+        if (stompClient.current?.connected) {
             stompClient.current.send('/app/chat.markAsRead', {}, JSON.stringify({
                 chatRoomId,
                 senderId
             }));
             setUnreadCount(0);
         }
-    }, [isConnected]);
+    }, []);
 
     // ==================== EFFECTS ====================
     

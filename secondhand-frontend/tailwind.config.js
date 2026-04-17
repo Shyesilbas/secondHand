@@ -79,6 +79,8 @@ export default {
         slower: theme.transitions.slower,
       },
       zIndex: theme.zIndex,
+      fontFamily: theme.typography.fontFamily,
+      fontSize: theme.typography.fontSize,
     },
   },
   plugins: [],
