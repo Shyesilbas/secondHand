@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     List<ChatMessage> findTop30ByUserIdOrderByTimestampDesc(Long userId);
+
+    List<ChatMessage> findTop12ByUserIdOrderByTimestampDesc(Long userId);
     void deleteByUserId(Long userId);
     long countByUserIdAndRole(Long userId, ChatRole role);
 }

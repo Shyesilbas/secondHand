@@ -13,13 +13,23 @@ public record AgentQueryResponse(
         String error,
         LocalDateTime timestamp,
         String model,
-        List<AgentDataSourceDto> dataSources
+        List<AgentDataSourceDto> dataSources,
+        List<SuggestedListingDto> suggestedListings
 ) {
     public static AgentQueryResponse success(String answer, String model, List<AgentDataSourceDto> dataSources) {
-        return new AgentQueryResponse(true, true, answer, null, LocalDateTime.now(), model, dataSources);
+        return success(answer, model, dataSources, null);
+    }
+
+    public static AgentQueryResponse success(
+            String answer,
+            String model,
+            List<AgentDataSourceDto> dataSources,
+            List<SuggestedListingDto> suggestedListings
+    ) {
+        return new AgentQueryResponse(true, true, answer, null, LocalDateTime.now(), model, dataSources, suggestedListings);
     }
 
     public static AgentQueryResponse error(String error, List<AgentDataSourceDto> dataSources) {
-        return new AgentQueryResponse(false, true, null, error, LocalDateTime.now(), null, dataSources);
+        return new AgentQueryResponse(false, true, null, error, LocalDateTime.now(), null, dataSources, null);
     }
 }

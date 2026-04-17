@@ -222,3 +222,11 @@ gemini:
     key: ${GEMINI_API_KEY}
     model: ${GEMINI_API_MODEL}
     base-url: ${GEMINI_API_BASE_URL}
+
+# Aura agent: canlı ilan araması (ListingSearchService) — kullanıcı başına dakika başına sınır
+aura:
+  agent:
+    search:
+      enabled: ${AURA_AGENT_SEARCH_ENABLED:true}
+      rate-limit-per-minute: ${AURA_AGENT_SEARCH_PER_MINUTE:12}
+      rate-limit-window-ms: ${AURA_AGENT_SEARCH_WINDOW_MS:60000}

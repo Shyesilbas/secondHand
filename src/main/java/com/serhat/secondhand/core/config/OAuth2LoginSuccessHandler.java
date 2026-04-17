@@ -1,8 +1,8 @@
 package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.auth.application.TokenService;
-import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.entity.Token;
+import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.user.application.IUserService;
@@ -32,6 +32,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
+    private final AuditLogService auditLogService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -61,14 +62,17 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 String accessToken = jwtUtils.generateAccessToken(user);
                 String refreshToken = jwtUtils.generateRefreshToken(user, false);
 
-                tokenService.revokeAllUserTokens(user);
-
-                tokenService.saveToken(accessToken, TokenType.ACCESS_TOKEN, user,
-                        LocalDateTime.now().plusSeconds(jwtUtils.getAccessTokenExpiration() / 1000), null, false);
+                tokenService.revokeUserRefreshTokens(user);
 
                 tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
                         LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
                         oldRefreshToken.orElse(null), false);
+
+                auditLogService.logLoginViaGoogle(
+                        user.getEmail(),
+                        user.getId(),
+                        auditLogService.getClientIpAddress(request),
+                        auditLogService.getClientUserAgent(request));
 
                 handleSuccessResponse(request, response, accessToken, refreshToken);
             } else {

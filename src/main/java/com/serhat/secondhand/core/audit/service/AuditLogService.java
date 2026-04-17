@@ -46,6 +46,27 @@ public class AuditLogService {
 
     @Async("taskExecutor")
     @Transactional
+    public void logLoginViaGoogle(String userEmail, Long userId, String ipAddress, String userAgent) {
+        try {
+            AuditLog auditLog = AuditLog.builder()
+                    .userEmail(userEmail)
+                    .userId(userId)
+                    .eventType(AuditLog.AuditEventType.LOGIN_SUCCESS)
+                    .eventStatus(AuditLog.AuditEventStatus.SUCCESS)
+                    .ipAddress(ipAddress)
+                    .userAgent(userAgent)
+                    .details("Login Via Google")
+                    .build();
+
+            auditLogRepository.save(auditLog);
+            log.info("Audit log saved for Google OAuth login: {}", userEmail);
+        } catch (Exception e) {
+            log.error("Failed to save audit log for Google OAuth login: {}", e.getMessage());
+        }
+    }
+
+    @Async("taskExecutor")
+    @Transactional
     public void logLogout(String userEmail, Long userId, String ipAddress, String userAgent) {
         try {
             AuditLog auditLog = AuditLog.builder()

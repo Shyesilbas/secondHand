@@ -131,9 +131,10 @@ public class AuthController {
     @PostMapping("/oauth2/complete")
     public ResponseEntity<Map<String, Object>> completeOAuth(
             @Valid @RequestBody OAuthCompleteRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
         log.info("Completing OAuth registration for email: {}", request.getEmail());
-        LoginResponse response = authService.completeOAuthRegistration(request);
+        LoginResponse response = authService.completeOAuthRegistration(request, httpRequest);
         
                 cookieUtils.setAccessTokenCookie(httpResponse, response.getAccessToken());
         cookieUtils.setRefreshTokenCookie(httpResponse, response.getRefreshToken());

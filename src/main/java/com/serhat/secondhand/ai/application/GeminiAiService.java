@@ -2,7 +2,7 @@ package com.serhat.secondhand.ai.application;
 
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
 import com.serhat.secondhand.ai.agent.prompt.AgentPromptBuilder;
-import com.serhat.secondhand.ai.config.AuraProductKnowledge;
+import com.serhat.secondhand.ai.config.AuraSystemInstructions;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserMemory;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
@@ -53,7 +53,8 @@ public class GeminiAiService {
 
         try {
             UserMemory memory = memoryService.getOrCreate(userId);
-            String prompt = buildMemoryAwarePrompt(memory, request);
+            String recent = memoryService.buildRecentConversationBlock(userId);
+            String prompt = buildMemoryAwarePrompt(memory, request, recent);
             String answer = geminiClient.generateText(prompt);
 
             memoryService.storeMessage(userId, ChatRole.USER, request.question());
@@ -74,7 +75,8 @@ public class GeminiAiService {
             UserQuestionRequest request,
             String memoryData,
             String domainContext,
-            AgentUiContextRequest uiContext
+            AgentUiContextRequest uiContext,
+            String liveSearchResults
     ) {
         if (userId == null) {
             return AiResponse.error("userId is required");
@@ -84,7 +86,9 @@ public class GeminiAiService {
         }
 
         try {
-            String prompt = agentPromptBuilder.buildPrompt(memoryData, domainContext, request, uiContext);
+            String recent = memoryService.buildRecentConversationBlock(userId);
+            String live = liveSearchResults == null ? "" : liveSearchResults;
+            String prompt = agentPromptBuilder.buildPrompt(memoryData, domainContext, request, uiContext, recent, live);
             String answer = geminiClient.generateText(prompt);
 
             memoryService.storeMessage(userId, ChatRole.USER, request.question());
@@ -113,7 +117,7 @@ public class GeminiAiService {
         return request.question();
     }
 
-    private String buildMemoryAwarePrompt(UserMemory memory, UserQuestionRequest request) {
+    private String buildMemoryAwarePrompt(UserMemory memory, UserQuestionRequest request, String recentConversation) {
         String memoryData = memoryService.buildMemoryData(memory);
         boolean introductionMode = memoryService.isIntroductionMode(memory);
 
@@ -122,39 +126,32 @@ public class GeminiAiService {
                 %s
                 """.formatted(memoryData);
 
+        String recentBlock = (recentConversation == null || recentConversation.isBlank())
+                ? ""
+                : """
+                SON KONUŞMA (önceki turlar, kronolojik):
+                %s
+
+                """.formatted(recentConversation.trim());
+
         String sessionContextBlock = (request.context() != null && !request.context().isBlank())
                 ? """
                 CURRENT SESSION CONTEXT (kullanıcı şu an bu sayfada/ekranda; cevabını buna göre ver):
                 %s
+
                 """.formatted(request.context().trim())
                 : "";
 
-        String systemInstruction = """
-                SYSTEM:
-                Sen Aura'sın, SecondHand çok kategorili ikinci el platformunun yerleşik yapay zeka asistanısın. Uygulamanın her ekranını, her akışı ve her özelliği biliyormuşsun gibi davran.
-
-                PLATFORM BİLGİN (ezberinde olan):
-                %s
-
-                UZMANLIK VE ROL:
-                - Kategoriler: Araç (Vehicle), Elektronik, Kitap, Giyim, Gayrimenkul, Spor. Her kategoride tip/marka/model veya eşdeğer filtreleri, ilan oluşturma adımlarını ve güvenli alım-satım önerilerini bilirsin.
-                - Kullanıcı "nasıl yaparım", "nerede bulurum", "filtre nerede", "sepete nasıl eklerim", "teklif nasıl verilir", "vitrin nedir" gibi sorularda net, adım adım yanıt ver; gerçek sayfa ve akış isimlerini kullan.
-                - CURRENT SESSION CONTEXT varsa kullanıcının hangi sayfada/ilanında olduğunu bil; buna göre öneri yap (örn. "Şu an baktığın ilan için teklif vermek istersen...").
-
-                Kesin sınırlar:
-                - Sadece SecondHand platformu ile ilgili konularda yardım et. Platform dışı isteklerde kibarca: "Ben Aura, SecondHand asistanınım. Bu konuda yardımcı olamam; platformdaki alışveriş, ilan veya güvenlik konularında sorabilirsin."
-
-                USER MEMORY içindeki secondHandProfileJson (kategoriler, bütçe, marka tercihleri) ve CURRENT SESSION CONTEXT ile cevabını kişiselleştir.
-                """.formatted(AuraProductKnowledge.CONTENT);
+        String systemInstruction = AuraSystemInstructions.chatSystemWithPlatformKnowledge();
 
         String introInstruction = introductionMode ? """
                 Kullanıcıyla ilk kez karşılaşıyorsun. Kısa kendini tanıt, neye yardımcı olabileceğini söyle; platform içi bir ihtiyaç varsa hemen yönlendir.
+
                 """ : "";
 
         String questionBlock = request.question();
 
-        return contextBlock + "\n" + (sessionContextBlock.isEmpty() ? "" : sessionContextBlock + "\n")
-                + systemInstruction + "\n" + introInstruction + "\nUSER:\n" + questionBlock;
+        return contextBlock + "\n" + recentBlock + sessionContextBlock + systemInstruction + "\n" + introInstruction + "USER:\n" + questionBlock;
     }
 
 }

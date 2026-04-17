@@ -47,35 +47,47 @@ public class ListingQueryService {
     }
 
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
-        return listingRepository.findByIdWithSeller(id).map(listing -> {
-            ListingDto dto = listingMapper.toDynamicDto(listing);
+        return listingRepository.findByIdWithSeller(id).map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
+    }
 
-            CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
-                    enrichmentService.enrichInPlace(dto, userId), taskExecutor);
+    /** İlan numarası (ör. Z4ZW3EQZ) ile; listing_no tekil. */
+    public Optional<ListingDto> findByListingNoAsDto(String listingNo, Long currentUserId, Long userId) {
+        if (listingNo == null || listingNo.isBlank()) {
+            return Optional.empty();
+        }
+        return listingRepository.findByListingNoWithSeller(listingNo.trim())
+                .map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
+    }
 
-            if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
-                CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
-                        listingViewService.getViewStatistics(id,
-                                LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
-                                LocalDateTime.now()), taskExecutor);
+    private ListingDto toDtoWithEnrichment(Listing listing, Long currentUserId, Long userId) {
+        UUID id = listing.getId();
+        ListingDto dto = listingMapper.toDynamicDto(listing);
 
-                CompletableFuture.allOf(enrichTask, statsTask).join();
-                dto.setViewStats(statsTask.join());
-            } else {
-                enrichTask.join();
+        CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
+                enrichmentService.enrichInPlace(dto, userId), taskExecutor);
+
+        if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
+            CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
+                    listingViewService.getViewStatistics(id,
+                            LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
+                            LocalDateTime.now()), taskExecutor);
+
+            CompletableFuture.allOf(enrichTask, statsTask).join();
+            dto.setViewStats(statsTask.join());
+        } else {
+            enrichTask.join();
+        }
+
+        if (dto.getType() != null
+                && !ListingBusinessConstants.LISTING_TYPES_EXCLUDED_FROM_INLINE_REVIEWS.contains(dto.getType())) {
+            var reviewsResult = reviewService.getReviewsForListing(id.toString(),
+                    PageRequest.of(ListingBusinessConstants.DEFAULT_PAGE_INDEX, ListingBusinessConstants.REVIEWS_PAGE_SIZE));
+            if (reviewsResult.isSuccess() && reviewsResult.getData() != null) {
+                dto.setReviews(reviewsResult.getData().getContent());
             }
+        }
 
-            if (dto.getType() != null
-                    && !ListingBusinessConstants.LISTING_TYPES_EXCLUDED_FROM_INLINE_REVIEWS.contains(dto.getType())) {
-                var reviewsResult = reviewService.getReviewsForListing(id.toString(),
-                        PageRequest.of(ListingBusinessConstants.DEFAULT_PAGE_INDEX, ListingBusinessConstants.REVIEWS_PAGE_SIZE));
-                if (reviewsResult.isSuccess() && reviewsResult.getData() != null) {
-                    dto.setReviews(reviewsResult.getData().getContent());
-                }
-            }
-
-            return dto;
-        });
+        return dto;
     }
 
     public List<Listing> findAllByIds(List<UUID> ids) {

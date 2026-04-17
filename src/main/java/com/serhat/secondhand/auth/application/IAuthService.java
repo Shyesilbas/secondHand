@@ -25,7 +25,7 @@ public interface IAuthService {
     
     Map<String, Object> validateToken(Authentication authentication);
     
-    LoginResponse completeOAuthRegistration(OAuthCompleteRequest request);
+    LoginResponse completeOAuthRegistration(OAuthCompleteRequest request, HttpServletRequest httpRequest);
     
     Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request);
 }
