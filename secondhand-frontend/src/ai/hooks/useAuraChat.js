@@ -1,6 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { aiChatService } from '../services/aiChatService.js';
-import { createAuraChatId, createChatMessage, getApiErrorMessage, getAuraChatStorageKey } from '../utils/auraChatUtils.js';
+import {
+  createAuraChatId,
+  createChatMessage,
+  getApiErrorMessage,
+  getAuraChatMessagesStorageKey,
+  getAuraChatStorageKey,
+} from '../utils/auraChatUtils.js';
+
+const MAX_PERSISTED_MESSAGES = 80;
+
+function loadPersistedMessages(persistSurface, userId) {
+  if (!persistSurface || userId == null) return null;
+  try {
+    const raw = localStorage.getItem(getAuraChatMessagesStorageKey(userId, persistSurface));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    return parsed.filter((m) => m && !m.typing).slice(-MAX_PERSISTED_MESSAGES);
+  } catch {
+    return null;
+  }
+}
 
 export const useAuraChat = ({
   userId,
@@ -10,6 +31,8 @@ export const useAuraChat = ({
   buildPayload = (text) => text,
   sendApi = null,
   echoUserMessageWhenUnauthed = false,
+  /** 'widget' | 'page' — bu cihazda son konuşmayı saklar */
+  persistMessagesSurface = null,
 }) => {
   const [messages, setMessages] = useState(() => initialMessages);
   const [input, setInput] = useState('');
@@ -23,6 +46,33 @@ export const useAuraChat = ({
   }, [messages]);
 
   const storageKey = useMemo(() => getAuraChatStorageKey(userId), [userId]);
+
+  const persistFlushRef = useRef(0);
+
+  useEffect(() => {
+    persistFlushRef.current = 0;
+  }, [userId]);
+
+  useEffect(() => {
+    if (!persistMessagesSurface || userId == null) return;
+    const loaded = loadPersistedMessages(persistMessagesSurface, userId);
+    if (loaded?.length) setMessages(loaded);
+  }, [userId, persistMessagesSurface]);
+
+  useEffect(() => {
+    if (!persistMessagesSurface || userId == null) return;
+    persistFlushRef.current += 1;
+    if (persistFlushRef.current === 1) return;
+    const toSave = messages.filter((m) => !m.typing).slice(-MAX_PERSISTED_MESSAGES);
+    try {
+      localStorage.setItem(
+        getAuraChatMessagesStorageKey(userId, persistMessagesSurface),
+        JSON.stringify(toSave)
+      );
+    } catch {
+      /* quota */
+    }
+  }, [messages, persistMessagesSurface, userId]);
 
   const scrollToBottom = useCallback(() => {
     const el = listRef.current;
@@ -104,12 +154,16 @@ export const useAuraChat = ({
             );
         const answer = response?.answer || response?.message || 'No response.';
         const dataSources = Array.isArray(response?.dataSources) ? response.dataSources : undefined;
-        const meta = dataSources?.length ? { dataSources } : undefined;
+        const suggestedListings = Array.isArray(response?.suggestedListings) ? response.suggestedListings : undefined;
+        const meta = {};
+        if (dataSources?.length) meta.dataSources = dataSources;
+        if (suggestedListings?.length) meta.suggestedListings = suggestedListings;
+        const hasMeta = Object.keys(meta).length > 0;
 
         if (typingId) {
-          replaceTypingWith(typingId, answer, meta);
+          replaceTypingWith(typingId, answer, hasMeta ? meta : undefined);
         } else {
-          appendAssistant(answer, meta);
+          appendAssistant(answer, hasMeta ? meta : undefined);
         }
       } catch (e) {
         if (typingId) {

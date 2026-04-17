@@ -2,6 +2,8 @@ package com.serhat.secondhand.ai.dto;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +28,15 @@ public class UserMemory {
     @Column(name = "interest", nullable = false, length = 200)
     private List<String> permanentInterests = new ArrayList<>();
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column
     private String summaryOfPastConversations;
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column
     private String userNotes;
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column
     private String secondHandProfileJson;
 

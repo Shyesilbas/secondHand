@@ -248,7 +248,7 @@ public class AuthService implements IAuthService {
         return null;
     }
 
-    public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request) {
+    public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request, HttpServletRequest httpRequest) {
         User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
 
         if (existing != null) {
@@ -271,6 +271,8 @@ public class AuthService implements IAuthService {
             );
 
             agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(existing.getId());
+
+            auditOAuthGoogleLogin(existing, httpRequest);
 
             return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
         }
@@ -307,7 +309,20 @@ public class AuthService implements IAuthService {
                 false
         );
 
+        auditOAuthGoogleLogin(user, httpRequest);
+
         return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);
+    }
+
+    private void auditOAuthGoogleLogin(User user, HttpServletRequest httpRequest) {
+        if (httpRequest == null || user == null) {
+            return;
+        }
+        auditLogService.logLoginViaGoogle(
+                user.getEmail(),
+                user.getId(),
+                auditLogService.getClientIpAddress(httpRequest),
+                auditLogService.getClientUserAgent(httpRequest));
     }
 
     public Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request) {
@@ -324,7 +339,6 @@ public class AuthService implements IAuthService {
         
         log.info("Revoking all sessions for user: {}", username);
         
-        // Only revoke refresh tokens - access tokens are stateless
         tokenService.revokeUserRefreshTokens(user);
         
         String ipAddress = getClientIpAddress(request);

@@ -199,14 +199,15 @@ public class GlobalExceptionHandler {
     }
 
     private ErrorResponse createErrorResponse(HttpStatus httpStatus, String error, String message, String path, Map<String, String> validationErrors) {
-        return ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(httpStatus.value())
-                .error(error)
-                .message(message)
-                .path(path)
-                .validationErrors(validationErrors)
-                .build();
+        return new ErrorResponse(
+                LocalDateTime.now(),
+                httpStatus.value(),
+                error,
+                message,
+                path,
+                validationErrors,
+                null,
+                null);
     }
 
     private String sanitizeMessage(String message) {
