@@ -468,6 +468,14 @@ const GenericListingForm = ({
     }
   };
 
+  const canGoForward = useMemo(() => {
+    const step = wizardSteps?.find((s) => Number(s.id) === Number(currentStep)) || null;
+    if (step?.kind === 'mediaLocation') {
+      return Boolean(String(formData?.city ?? '').trim() && String(formData?.district ?? '').trim());
+    }
+    return true;
+  }, [wizardSteps, currentStep, formData?.city, formData?.district]);
+
   if (!formSchema) return null;
 
   return (
@@ -481,7 +489,7 @@ const GenericListingForm = ({
       onPrev={prevStep}
       onSubmit={handleSubmit}
       isLoading={Boolean(isLoading)}
-      canSubmit={Boolean(formData?.city?.trim?.() && formData?.district?.trim?.())}
+      canSubmit={canGoForward}
       renderStep={renderStep}
     />
   );

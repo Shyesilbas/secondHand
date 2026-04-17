@@ -72,17 +72,18 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         if (!rateLimitConfig.isEnabled()) {
             return true;
         }
-        
+
         String method = request.getMethod();
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
-        
+
         String uri = request.getRequestURI();
-        if (uri.startsWith("/swagger-ui") || 
-            uri.startsWith("/api-docs") || 
+        if (uri.startsWith("/swagger-ui") ||
+            uri.startsWith("/api-docs") ||
             uri.startsWith("/v3/api-docs") ||
-            uri.startsWith("/ws/")) {
+            uri.startsWith("/ws/") ||
+            uri.startsWith("/actuator/")) {
             return true;
         }
         

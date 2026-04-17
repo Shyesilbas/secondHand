@@ -2,6 +2,7 @@ import React, {memo, useState} from 'react';
 import {Trash2 as TrashIcon} from 'lucide-react';
 import {formatDistanceToNow} from 'date-fns';
 import {enUS} from 'date-fns/locale';
+import { sameChatId } from '../chatIdUtils.js';
 
 const MessageBubble = memo(({ message, isOwnMessage, onDeleteMessage }) => {
   const [showDeleteButton, setShowDeleteButton] = useState(false);
@@ -37,8 +38,9 @@ const MessageBubble = memo(({ message, isOwnMessage, onDeleteMessage }) => {
             <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-slate-300' : 'bg-slate-400'}`}></div>
           )}
         </div>
-        {isOwnMessage && showDeleteButton && (
+        {isOwnMessage && showDeleteButton && onDeleteMessage && (
           <button
+            type="button"
             onClick={handleDeleteClick}
             className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-110"
             title="Delete message"
@@ -82,7 +84,7 @@ const MessageList = memo(({
           <MessageBubble
             key={message.id}
             message={message}
-            isOwnMessage={message.senderId === user?.id}
+            isOwnMessage={sameChatId(message.senderId, user?.id)}
             onDeleteMessage={onDeleteMessage}
           />
         ))

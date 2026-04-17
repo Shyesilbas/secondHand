@@ -40,8 +40,6 @@ public class SeedStartupRunner implements ApplicationRunner {
         boolean agreementsMissing = agreementRepository.count() == 0 || agreementRequirementRepository.count() == 0;
         if (agreementsMissing) {
             runSeed("agreements");
-        } else {
-            log.info("Skipping seed '{}' because agreement repositories are already populated.", "agreements");
         }
     }
 
@@ -49,9 +47,7 @@ public class SeedStartupRunner implements ApplicationRunner {
         Result<Void> result = seedRunnerService.run(key);
         if (result.isError()) {
             log.error("Startup seed failed for key '{}': {}", key, result.getMessage());
-            return;
         }
-        log.info("Startup seed completed for key '{}'.", key);
     }
 }
 

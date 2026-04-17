@@ -9,6 +9,7 @@ import {
   getPrefilterSelectors,
 } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 import ListingWizard from './ListingWizard.jsx';
 import { Check, ChevronRight } from 'lucide-react';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
@@ -104,7 +105,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
     if (mode !== 'browse' || !selectedType) return false;
     if (!selectorSteps.length) return true;
     const firstKey = selectorSteps[0]?.initialDataKey;
-    return Boolean(firstKey && selection?.[firstKey]);
+    return Boolean(firstKey && isPrefilterValueFilled(selection?.[firstKey]));
   }, [mode, selectedType, selectorSteps, selection]);
 
   const triggerBrowseSearch = useCallback(() => {
@@ -117,7 +118,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
     const idx = selectionStep - 2;
     const selector = selectorSteps[idx];
     if (!selector) return false;
-    return Boolean(selection?.[selector.initialDataKey]);
+    return isPrefilterValueFilled(selection?.[selector.initialDataKey]);
   }, [selectedType, selection, selectionStep, selectorSteps]);
 
   const onSelectionPrev = useCallback(() => {
@@ -219,7 +220,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
       const valueKey = selector.initialDataKey;
       const selectedValue = selection?.[valueKey] ?? null;
       const dependsOn = Array.isArray(selector.dependsOn) ? selector.dependsOn : [];
-      const isEnabled = dependsOn.every((k) => Boolean(selection?.[k]));
+      const isEnabled = dependsOn.every((k) => isPrefilterValueFilled(selection?.[k]));
 
       const optionsRaw = resolveStepOptions(selector, selection);
 
@@ -323,7 +324,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
     if (mode === 'create') {
       if (!SelectedForm) return false;
       if (!selectorSteps.length) return true;
-      return selectorSteps.every((s) => Boolean(selection?.[s.initialDataKey]));
+      return selectorSteps.every((s) => isPrefilterValueFilled(selection?.[s.initialDataKey]));
     }
     return false;
   }, [SelectedForm, mode, selectedType, selection, selectorSteps]);

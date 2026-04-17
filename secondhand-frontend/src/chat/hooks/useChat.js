@@ -5,6 +5,7 @@ import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { UNREAD_COUNT_KEYS } from './useUnreadCount.js';
 import { CHAT_DEFAULTS, CHAT_MESSAGE_TYPES } from '../chatConstants.js';
+import { sameChatId } from '../chatIdUtils.js';
 
 export const useChat = (userId, options = {}) => {
     const { user } = useAuthState();
@@ -64,7 +65,7 @@ export const useChat = (userId, options = {}) => {
         mutationFn: (messageData) => chatService.sendMessage(messageData),
         onSuccess: (data) => {
             setMessages(prev => {
-                if (prev.some(msg => msg.id === data.id)) return prev;
+                if (prev.some(msg => sameChatId(msg.id, data.id))) return prev;
                 return [...prev, data];
             });
             // Only update specific queries, don't invalidate everything
@@ -93,13 +94,13 @@ export const useChat = (userId, options = {}) => {
     const deleteMessageMutation = useMutation({
         mutationFn: ({ messageId }) => chatService.deleteMessage(messageId),
         onSuccess: (_, { messageId }) => {
-            setMessages(prev => prev.filter(msg => msg.id !== messageId));
+            setMessages((prev) => prev.filter((msg) => !sameChatId(msg.id, messageId)));
             // Only update the specific message cache, don't refetch everything
             queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
                 if (!oldData) return oldData;
                 return {
                     ...oldData,
-                    content: oldData.content.filter(msg => msg.id !== messageId)
+                    content: oldData.content.filter(msg => !sameChatId(msg.id, messageId))
                 };
             });
         }
@@ -138,7 +139,9 @@ export const useChat = (userId, options = {}) => {
     const sendMessage = useCallback((content) => {
         if (!selectedChatRoom?.id || !user?.id) return;
 
-        const otherParticipant = selectedChatRoom.participantIds.find(id => id !== user.id);
+        const otherParticipant = [...(selectedChatRoom.participantIds || [])].find(
+            (id) => !sameChatId(id, user.id)
+        );
         if (!otherParticipant) return;
 
         const messageData = {
@@ -175,9 +178,9 @@ export const useChat = (userId, options = {}) => {
     useEffect(() => {
         if (isConnected && selectedChatRoom?.id) {
             const handleNewMessage = (messageData) => {
-                if (messageData.senderId === user?.id) return;
+                if (sameChatId(messageData.senderId, user?.id)) return;
                 setMessages(prev => {
-                    if (prev.some(msg => msg.id === messageData.id)) return prev;
+                    if (prev.some(msg => sameChatId(msg.id, messageData.id))) return prev;
                     return [...prev, messageData];
                 });
             };
@@ -186,6 +189,10 @@ export const useChat = (userId, options = {}) => {
             return () => removeMessageCallback(handleNewMessage);
         }
     }, [isConnected, selectedChatRoom?.id, user?.id, addMessageCallback, removeMessageCallback]);
+
+    useEffect(() => {
+        setMessages([]);
+    }, [selectedChatRoom?.id]);
 
     useEffect(() => {
         if (chatMessages?.content) {

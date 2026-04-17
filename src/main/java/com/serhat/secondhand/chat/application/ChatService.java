@@ -98,6 +98,34 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    /** Tek oda için liste endpoint'i ile aynı enrich (isim, listing başlığı, unread). */
+    private ChatRoomDto mapAndEnrich(ChatRoom room, Long viewerUserId) {
+        ChatRoomDto dto = chatRoomMapper.toDto(room);
+
+        List<Long> participantIds = new ArrayList<>(room.getParticipantIds());
+        Map<Long, User> userMap =
+                userService.findAllByIds(participantIds).stream()
+                        .collect(Collectors.toMap(User::getId, u -> u));
+
+        Map<Long, Long> unreadCountMap =
+                messageRepository.countUnreadMessagesByRoomIdsAndUserId(
+                        List.of(room.getId()), viewerUserId);
+
+        Map<UUID, Listing> listingMap = Map.of();
+        if (room.getListingId() != null) {
+            Listing listingEntity =
+                    listingRepository.findById(UUID.fromString(room.getListingId())).orElse(null);
+            if (listingEntity != null) {
+                listingMap = Map.of(listingEntity.getId(), listingEntity);
+                dto.setListingTitle(listingEntity.getTitle());
+            }
+        }
+
+        ChatEnrichmentContext context =
+                new ChatEnrichmentContext(userMap, unreadCountMap, listingMap);
+
+        return chatRoomEnricher.enrich(room, viewerUserId, context, dto);
+    }
 
     @Transactional
     public ChatRoomDto createOrGetDirectChat(Long user1, Long user2) {
@@ -108,7 +136,7 @@ public class ChatService {
 
         return chatRoomRepository
                 .findDirectChatRoom(user1, user2)
-                .map(chatRoomMapper::toDto)
+                .map(room -> mapAndEnrich(room, user1))
                 .orElseGet(() -> {
                     ChatRoom room =
                             chatRoomMapper.toEntity(
@@ -117,7 +145,8 @@ public class ChatService {
                                     null
                             );
                     room.setParticipantIds(Set.of(user1, user2));
-                    return chatRoomMapper.toDto(chatRoomRepository.save(room));
+                    ChatRoom saved = chatRoomRepository.save(room);
+                    return mapAndEnrich(saved, user1);
                 });
     }
 
@@ -130,7 +159,7 @@ public class ChatService {
         if (!existingRooms.isEmpty()) {
             ChatRoom existingRoom = existingRooms.get(0);
             if (existingRoom.getParticipantIds().contains(listing.getSeller().getId())) {
-                return chatRoomMapper.toDto(existingRoom);
+                return mapAndEnrich(existingRoom, userId);
             }
         }
 
@@ -142,7 +171,8 @@ public class ChatService {
                 );
 
         room.setParticipantIds(Set.of(userId, listing.getSeller().getId()));
-        return chatRoomMapper.toDto(chatRoomRepository.save(room));
+        ChatRoom saved = chatRoomRepository.save(room);
+        return mapAndEnrich(saved, userId);
     }
 
 

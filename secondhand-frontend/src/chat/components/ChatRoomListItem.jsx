@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon} from 'lucide-react';
 import { CHAT_ROOM_TYPES } from '../chatConstants.js';
+import { sameChatId } from '../chatIdUtils.js';
 
 const ChatRoomListItem = ({
                             room,
@@ -35,7 +36,7 @@ const ChatRoomListItem = ({
 
   const getLastMessageSenderName = () => {
     if (!room.lastMessageSenderId) return '';
-    return room.lastMessageSenderId === userId
+    return sameChatId(room.lastMessageSenderId, userId)
         ? 'You'
         : room.lastMessageSenderName || `User ${room.lastMessageSenderId}`;
   };
