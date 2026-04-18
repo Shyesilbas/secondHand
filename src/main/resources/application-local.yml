@@ -1,4 +1,3 @@
-# Yerel geliştirme (spring.profiles.default=local veya SPRING_PROFILES_ACTIVE=local)
 spring:
   jpa:
     hibernate:

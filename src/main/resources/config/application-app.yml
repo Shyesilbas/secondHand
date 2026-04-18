@@ -1,0 +1,72 @@
+# İş kuralları: app.* (e-posta hariç — application-email.yml)
+app:
+  auth:
+    cookie:
+      domain: ${COOKIE_DOMAIN:localhost}
+      secure: ${COOKIE_SECURE:false}
+      same-site: ${COOKIE_SAME_SITE:Lax}
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    auth:
+      requests-per-second: ${RATE_LIMIT_AUTH:3}
+    payment:
+      requests-per-second: ${RATE_LIMIT_PAYMENT:3}
+    general:
+      requests-per-second: ${RATE_LIMIT_GENERAL:10}
+    ai:
+      requests-per-second: ${RATE_LIMIT_AI:6}
+    window-size-seconds: ${RATE_LIMIT_WINDOW:60}
+  async:
+    core-pool-size: ${ASYNC_CORE_POOL_SIZE:4}
+    max-pool-size: ${ASYNC_MAX_POOL_SIZE:10}
+    queue-capacity: ${ASYNC_QUEUE_CAPACITY:100}
+    thread-name-prefix: async-
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://localhost:5173,http://127.0.0.1:5173}
+    allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS,PATCH}
+    allowed-headers: ${CORS_ALLOWED_HEADERS:Authorization,Content-Type,X-Requested-With,Accept,Origin,Cache-Control,X-File-Name,Idempotency-Key,X-XSRF-TOKEN}
+    exposed-headers: ${CORS_EXPOSED_HEADERS:Authorization,X-Total-Count,X-RateLimit-Limit,X-RateLimit-Remaining,X-RateLimit-Reset,Retry-After,Idempotency-Key,X-CSRF-TOKEN}
+    allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+    max-age: ${CORS_MAX_AGE:3600}
+  cart:
+    zone-id: ${CART_ZONE_ID:Europe/Istanbul}
+    reservation:
+      enabled: ${CART_RESERVATION_ENABLED:true}
+      timeout-minutes: ${CART_RESERVATION_TIMEOUT_MINUTES:15}
+    defaults:
+      quantity: ${CART_DEFAULT_QUANTITY:1}
+    scheduler:
+      cleanup-fixed-rate-ms: ${CART_SCHEDULER_CLEANUP_FIXED_RATE_MS:60000}
+  listing:
+    creation:
+      fee: 50.00
+    fee:
+      tax: 18.00
+  favorite:
+    user-favorites-default-size: ${FAVORITE_USER_DEFAULT_SIZE:20}
+    top-default-size: ${FAVORITE_TOP_DEFAULT_SIZE:10}
+    top-listings-default-size: ${FAVORITE_TOP_LISTINGS_DEFAULT_SIZE:10}
+    top-listings-max-size: ${FAVORITE_TOP_LISTINGS_MAX_SIZE:100}
+  favorite-list:
+    my-lists-default-size: ${FAVORITE_LIST_MY_DEFAULT_SIZE:5}
+    user-public-lists-default-size: ${FAVORITE_LIST_USER_PUBLIC_DEFAULT_SIZE:5}
+    popular-default-size: ${FAVORITE_LIST_POPULAR_DEFAULT_SIZE:10}
+    max-lists-per-user: ${FAVORITE_LIST_MAX_PER_USER:20}
+    max-items-per-list: ${FAVORITE_LIST_MAX_ITEMS_PER_LIST:100}
+  campaign:
+    list-default-size: ${CAMPAIGN_LIST_DEFAULT_SIZE:5}
+    scheduler-deactivate-fixed-delay-ms: ${CAMPAIGN_DEACTIVATE_FIXED_DELAY_MS:600000}
+  offer:
+    expiration-hours: ${OFFER_EXPIRATION_HOURS:24}
+    scheduler-cron: ${OFFER_SCHEDULER_CRON:0 * * * * *}
+  showcase:
+    daily:
+      cost: 10.00
+    fee:
+      tax: 18.00
+    max-days: ${SHOWCASE_MAX_DAYS:30}
+    active-list-default-size: ${SHOWCASE_ACTIVE_LIST_DEFAULT_SIZE:12}
+    scheduler:
+      expire-cron: ${SHOWCASE_EXPIRE_CRON:0 0 * * * ?}
+  seed:
+    startup-enabled: ${SEED_STARTUP_ENABLED:true}

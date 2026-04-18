@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Yerel sırlar (spring.config.import optional)
+config/application-local-secret.yml
