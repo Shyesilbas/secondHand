@@ -1,0 +1,74 @@
+# Spring, veri kaynağı, güvenlik, dış servisler. Sırlar yalnızca ortam değişkenleriyle (aşağıdaki ${...}).
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jackson:
+    date-format: dd/MM/yyyy HH:mm
+    time-zone: GMT+3
+    locale: tr_TR
+    serialization:
+      fail-on-empty-beans: false
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: ${GOOGLE_SCOPE}
+            redirect-uri: ${REDIRECT_URI}
+        provider:
+          google:
+            issuer-uri: ${ISSUER_URI}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+jwt:
+  # Öncelik: JWT_SECRET_KEY; yoksa eski jwt_secretKey (migration)
+  secretKey: ${JWT_SECRET_KEY:${jwt_secretKey:}}
+  accessToken:
+    expiration: 900000
+  refreshToken:
+    expiration: 604800000
+    rememberMeExpiration: 2592000000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+exchange:
+  api:
+    key: ${EXCHANGE_API_KEY:${exchangeApiKey:}}
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:${cloudinaryCloudName:}}
+  api-key: ${CLOUDINARY_API_KEY:${cloudinaryApiKey:}}
+  api-secret: ${CLOUDINARY_API_SECRET:${cloudinarySecretKey:}}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+    model: ${GEMINI_API_MODEL:gemini-2.5-flash}
+    base-url: ${GEMINI_API_BASE_URL}
+    fallback-memory-model: ${GEMINI_API_FALLBACK_MEMORY_MODEL:gemini-2.0-flash-lite}
+
+aura:
+  agent:
+    search:
+      enabled: ${AURA_AGENT_SEARCH_ENABLED:true}
+      rate-limit-per-minute: ${AURA_AGENT_SEARCH_PER_MINUTE:12}
+      rate-limit-window-ms: ${AURA_AGENT_SEARCH_WINDOW_MS:60000}
