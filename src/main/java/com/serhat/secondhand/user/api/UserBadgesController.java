@@ -41,7 +41,6 @@ public class UserBadgesController {
         @ApiResponse(responseCode = "200", description = "Badges retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    @Cacheable(value = "userBadges", key = "#currentUser.id")
     public ResponseEntity<Map<String, Object>> getUserBadges(@AuthenticationPrincipal User currentUser) {
         log.debug("Fetching aggregated badges for user: {}", currentUser.getEmail());
         

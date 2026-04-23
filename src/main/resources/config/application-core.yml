@@ -1,5 +1,7 @@
 # Spring, veri kaynağı, güvenlik, dış servisler. Sırlar yalnızca ortam değişkenleriyle (aşağıdaki ${...}).
 spring:
+  cache:
+    type: redis
   data:
     redis:
       host: ${REDIS_HOST:localhost}

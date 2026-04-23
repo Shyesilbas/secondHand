@@ -17,8 +17,7 @@ import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -177,7 +176,7 @@ public class ChatService {
 
 
     @Transactional
-    @CacheEvict(value = "chatUnreadCount", key = "#dto.recipientId")
+
     public ChatMessageDto sendMessage(ChatMessageDto dto) {
 
         Result<Void> contentResult = chatAuthorizationService.validateMessageContent(dto.getContent());
@@ -242,7 +241,7 @@ public class ChatService {
     }
 
     @Transactional
-    @CacheEvict(value = "chatUnreadCount", key = "#userId")
+
     public void markMessagesAsRead(Long chatRoomId, Long userId) {
         Result<Void> validationResult = chatAuthorizationService.validateRoomParticipant(chatRoomId, userId);
         if (validationResult.isError()) {
@@ -277,7 +276,7 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "chatUnreadCount", key = "#userId")
+
     public Long getTotalUnreadMessageCount(Long userId) {
         return messageRepository.countUnreadMessagesByRecipientId(userId);
     }

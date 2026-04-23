@@ -13,6 +13,10 @@ import com.serhat.secondhand.user.domain.repository.UserRepository;
 import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,10 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserNotificationService userNotificationService;
     private final UserMapper userMapper;
+
+    @Lazy
+    @Autowired
+    private UserService self;
 
     public User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -51,6 +59,7 @@ public class UserService implements IUserService {
         return Result.success();
     }
 
+    @CacheEvict(value = "userProfile", key = "#user.id")
     public void update(User user) {
         userRepository.save(user);
     }
@@ -126,9 +135,19 @@ public class UserService implements IUserService {
     }
 
     public Result<UserDto> getById(Long id){
+        UserDto userDto = self.getCachedUserDto(id);
+        if (userDto == null) {
+            return Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID);
+        }
+        return Result.success(userDto);
+    }
+
+    @Cacheable(value = "userProfile", key = "#id")
+    public UserDto getCachedUserDto(Long id) {
+        log.info("[CACHE MISS] userProfile::{}", id);
         return userRepository.findById(id)
-                .map(user -> Result.success(userMapper.toDto(user)))
-                .orElse(Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID));
+                .map(userMapper::toDto)
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)

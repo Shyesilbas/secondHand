@@ -10,6 +10,7 @@ import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,9 @@ public class PaymentStatsService {
     private final ListingQueryService listingService;
     private final PaymentContextResolver paymentContextResolver;
 
+    @Cacheable(value = "paymentStats", key = "#userId + '_' + #filterType")
     public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
-        log.info("Calculating payment statistics via DB for userId: {}", userId);
+        log.info("[CACHE MISS] paymentStats for userId: {}", userId);
 
         List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, filterType);
         Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO} : statsRows.get(0);
@@ -41,13 +43,13 @@ public class PaymentStatsService {
         long successful = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
         BigDecimal totalAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
 
-        return Map.of(
-                "totalPayments", total,
-                "successfulPayments", successful,
-                "failedPayments", total - successful,
-                "successRate", total > 0 ? (double) successful / total * 100 : 0,
-                "totalAmount", totalAmount
-        );
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("totalPayments", total);
+        result.put("successfulPayments", successful);
+        result.put("failedPayments", total - successful);
+        result.put("successRate", total > 0 ? (double) successful / total * 100 : 0.0);
+        result.put("totalAmount", totalAmount);
+        return result;
     }
 
     public Page<PaymentDto> getMyPayments(Long userId, Pageable pageable, PaymentFilter filter) {
