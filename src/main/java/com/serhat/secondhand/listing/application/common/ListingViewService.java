@@ -10,6 +10,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,6 +78,7 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "sellerViewStats", key = "#sellerId")
     public ListingViewStatsDto getAggregatedViewStatisticsForSeller(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Object[]> stats = listingViewRepository.getAggregatedStats(sellerId, startDate, endDate);
 
@@ -118,6 +120,7 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "listingViewStats", key = "#listingId")
     public ListingViewStatsDto getViewStatistics(UUID listingId, LocalDateTime startDate, LocalDateTime endDate) {
         if (!listingRepository.existsById(listingId)) {
             throw new com.serhat.secondhand.core.exception.BusinessException(

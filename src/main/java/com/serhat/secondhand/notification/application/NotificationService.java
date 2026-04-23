@@ -18,8 +18,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -104,7 +103,7 @@ public class NotificationService implements INotificationService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "notificationCount", key = "#userId")
+
     public Long getUnreadCount(Long userId) {
         long personal = notificationRepository.countByUser_IdAndIsReadFalseAndTypeNot(userId, NotificationType.AGREEMENT_UPDATED);
         long totalEvents = notificationEventRepository.countByTypeNot(NotificationType.AGREEMENT_UPDATED);
@@ -113,7 +112,7 @@ public class NotificationService implements INotificationService {
         return personal + broadcastUnread;
     }
 
-    @CacheEvict(value = "notificationCount", key = "#userId")
+
     public Result<Void> markAsRead(UUID notificationId, Long userId) {
         log.info("Marking notification {} as read for user: {}", notificationId, userId);
 
@@ -150,7 +149,7 @@ public class NotificationService implements INotificationService {
         return Result.success();
     }
 
-    @CacheEvict(value = "notificationCount", key = "#userId")
+
     public void markAllAsRead(Long userId) {
         log.info("Marking all notifications as read for user: {}", userId);
 

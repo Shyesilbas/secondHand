@@ -6,7 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
+})
 @ConfigurationPropertiesScan
 @EnableScheduling
 @EnableAsync

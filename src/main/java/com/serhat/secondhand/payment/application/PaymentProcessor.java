@@ -16,6 +16,7 @@ import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,7 @@ public class PaymentProcessor {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @CacheEvict(value = "paymentStats", allEntries = true)
     public Result<PaymentDto> executePaymentWithTransaction(Long userId, PaymentRequest paymentRequest) {
         String idempotencyKey = paymentRequest.idempotencyKey();
 

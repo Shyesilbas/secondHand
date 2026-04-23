@@ -13,7 +13,10 @@ import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class OrderQueryService {
 
@@ -39,6 +43,10 @@ public class OrderQueryService {
     private final OrderItemCancelRepository orderItemCancelRepository;
     private final OrderItemRefundRepository orderItemRefundRepository;
 
+    @Lazy
+    @Autowired
+    private OrderQueryService self;
+
     public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
@@ -49,8 +57,30 @@ public class OrderQueryService {
         Result<Order> orderResult = orderValidationService.validateOwnership(orderId, userId);
         if (orderResult.isError()) return orderResult.propagateError();
         Order order = orderResult.getData();
+
+        // Tamamlanmış siparişler cache'den döner (statüsü artık değişmez)
+        if (TERMINAL_STATUSES.contains(order.getStatus())) {
+            return Result.success(self.getCachedCompletedOrder(orderId, order));
+        }
+
         return Result.success(orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order)));
     }
+
+    /**
+     * Statüsü artık değişmeyecek siparişleri cache'ler.
+     * COMPLETED, CANCELLED, REFUNDED → 2 saat TTL
+     */
+    @Cacheable(value = "completedOrder", key = "#orderId")
+    public OrderDto getCachedCompletedOrder(Long orderId, Order order) {
+        log.info("[CACHE MISS] completedOrder::{}", orderId);
+        return orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order));
+    }
+
+    private static final java.util.Set<Order.OrderStatus> TERMINAL_STATUSES = java.util.EnumSet.of(
+            Order.OrderStatus.COMPLETED,
+            Order.OrderStatus.CANCELLED,
+            Order.OrderStatus.REFUNDED
+    );
 
     public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
         return orderRepository.findByIdForSeller(orderId, sellerId)
@@ -122,10 +152,10 @@ public class OrderQueryService {
         boolean hasPending = orderRepository.existsByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
         long count = hasPending ? orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED) : 0;
 
-        return Map.of(
-                "hasPendingOrders", hasPending,
-                "pendingCount", count
-        );
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("hasPendingOrders", hasPending);
+        result.put("pendingCount", count);
+        return result;
     }
 
 
