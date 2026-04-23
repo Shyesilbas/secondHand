@@ -12,6 +12,18 @@ logging:
     org.springframework.security.oauth2.client: INFO
     org.springframework.security.oauth2.core: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 springdoc:
   api-docs:
     enabled: false

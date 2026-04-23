@@ -9,3 +9,15 @@ logging:
     org.springframework.security.oauth2: DEBUG
     org.springframework.security.oauth2.client: DEBUG
     org.springframework.security.oauth2.core: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

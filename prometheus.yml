@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'secondhand-app-local'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      # Docker içindeki Prometheus'un, kendi bilgisayarımızda (IntelliJ'de vs) 
+      # localhost:8080'de çalışan Spring Boot'a erişebilmesi için:
+      - targets: ['host.docker.internal:8080']
