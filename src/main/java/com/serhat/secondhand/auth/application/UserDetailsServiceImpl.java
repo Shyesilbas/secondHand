@@ -1,6 +1,5 @@
 package com.serhat.secondhand.auth.application;
 
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

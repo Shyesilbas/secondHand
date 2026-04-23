@@ -150,7 +150,8 @@ public class SecurityConfig {
     private static final List<String> ACTUATOR_PUBLIC_ENDPOINTS = Arrays.asList(
             "/actuator/health",
             "/actuator/health/**",
-            "/actuator/info"
+            "/actuator/info",
+            "/actuator/prometheus"
     );
 
     @Bean

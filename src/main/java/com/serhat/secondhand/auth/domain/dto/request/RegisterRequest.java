@@ -2,8 +2,6 @@ package com.serhat.secondhand.auth.domain.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
-import com.serhat.secondhand.user.domain.entity.enums.UserType;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,10 +39,8 @@ public class RegisterRequest {
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 128, message = "Password must be between 8 and 128 characters")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.])[A-Za-z\\d@$!%*?&.]+$",
-             message = "Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.])[A-Za-z\\d@$!%*?&.]+$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character")
     private String password;
-
 
     @NotNull(message = "Gender is required")
     private Gender gender;
@@ -58,5 +54,5 @@ public class RegisterRequest {
 
     @NotNull(message = "Accepted agreement IDs are required")
     private List<UUID> acceptedAgreementIds;
-    
-} 
+
+}

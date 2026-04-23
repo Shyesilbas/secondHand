@@ -1,0 +1,47 @@
+version: '3.8'
+
+# Ekipteki her geliştirici projeyi clone'layıp sadece `docker-compose up -d` yazarak 
+# kendi lokal veritabanını, redis'ini ve log mekanizmasını ayağa kaldırabilir.
+# Uygulamanın (Spring Boot) kendisi IntelliJ'den çalıştırılır.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: secondhand_postgres_dev
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: secondhand
+    ports:
+      # Kendi bilgisayarımızdaki postgres ile çakışmasın diye dışarıya 5433'ten açıyoruz
+      - "5433:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: secondhand_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata_dev:/data
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: secondhand_prometheus_dev
+    extra_hosts:
+      # Prometheus'un bilgisayarımıza erişebilmesi için gerekli (host.docker.internal)
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - promdata_dev:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+volumes:
+  pgdata_dev:
+  redisdata_dev:
+  promdata_dev:
