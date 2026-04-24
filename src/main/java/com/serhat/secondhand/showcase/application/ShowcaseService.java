@@ -1,31 +1,34 @@
 package com.serhat.secondhand.showcase.application;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
+import com.serhat.secondhand.core.dto.CachedPage;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
-import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.application.PaymentRequestFactory;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
+import com.serhat.secondhand.payment.application.PaymentRequestFactory;
+import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.showcase.Showcase;
 import com.serhat.secondhand.showcase.ShowcaseErrorCodes;
 import com.serhat.secondhand.showcase.ShowcaseMapper;
 import com.serhat.secondhand.showcase.ShowcaseStatus;
-import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
+import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
 import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,21 +105,18 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ShowcaseDto> getActiveShowcases(Pageable pageable) {
-        CachedPage<ShowcaseDto> cached = self.getCachedActiveShowcases(pageable.getPageNumber(), pageable.getPageSize());
-        return new org.springframework.data.domain.PageImpl<>(cached.content(), pageable, cached.totalElements());
+    public Page<ShowcaseDto> getActiveShowcases(int page, int size) {
+        return self.getCachedActiveShowcases(page, size).toPage();
     }
 
     @Cacheable(value = "activeShowcases", key = "#page + '_' + #size")
     public CachedPage<ShowcaseDto> getCachedActiveShowcases(int page, int size) {
         log.info("[CACHE MISS] activeShowcases::page={}, size={}", page, size);
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE, LocalDateTime.now(), pageable);
         List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
-        return new CachedPage<>(dtoList, activeShowcases.getTotalElements());
+        return CachedPage.from(new PageImpl<>(dtoList, pageable, activeShowcases.getTotalElements()));
     }
-
-    private record CachedPage<T>(List<T> content, long totalElements) implements java.io.Serializable {}
 
     @Override
     @Transactional(readOnly = true)

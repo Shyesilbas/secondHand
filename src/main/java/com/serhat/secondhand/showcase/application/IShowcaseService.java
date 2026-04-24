@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IShowcaseService {
-    Page<ShowcaseDto> getActiveShowcases(Pageable pageable);
+    Page<ShowcaseDto> getActiveShowcases(int page, int size);
     List<ShowcaseDto> getUserShowcases(Long userId);
     Result<Void> extendShowcase(Long userId, UUID showcaseId, int additionalDays);
     Result<Void> cancelShowcase(Long userId, UUID showcaseId);

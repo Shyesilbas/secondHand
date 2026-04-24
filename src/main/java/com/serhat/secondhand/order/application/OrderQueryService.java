@@ -50,7 +50,12 @@ public class OrderQueryService {
         Pageable finalPageable = ensureSort(pageable);
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
         
-        Set<Long> itemIds = orders.getContent().stream()
+        List<Order> orderList = orders.getContent();
+        if (orderList.isEmpty()) {
+            return orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of()));
+        }
+
+        Set<Long> itemIds = orderList.stream()
                 .flatMap(o -> o.getOrderItems().stream())
                 .map(OrderItem::getId)
                 .filter(Objects::nonNull)
@@ -64,17 +69,7 @@ public class OrderQueryService {
             orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(itemIds).stream()
                 .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
 
-        return orders.map(order -> {
-            Map<Long, Integer> cancelledMap = order.getOrderItems().stream()
-                .filter(i -> allCancelled.containsKey(i.getId()))
-                .collect(Collectors.toMap(OrderItem::getId, i -> allCancelled.get(i.getId())));
-            
-            Map<Long, Integer> refundedMap = order.getOrderItems().stream()
-                .filter(i -> allRefunded.containsKey(i.getId()))
-                .collect(Collectors.toMap(OrderItem::getId, i -> allRefunded.get(i.getId())));
-                
-            return orderMapper.toDto(order, cancelledMap, refundedMap);
-        });
+        return orders.map(order -> orderMapper.toDto(order, allCancelled, allRefunded));
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
