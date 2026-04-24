@@ -23,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @org.springframework.transaction.annotation.Transactional
+@org.springframework.cache.annotation.CacheConfig(cacheNames = "userProfile")
 public class ListingCommandService {
 
     private final ListingRepository listingRepository;
@@ -31,6 +32,7 @@ public class ListingCommandService {
     private final ListingConfig listingConfig;
     private final PriceHistoryService priceHistoryService;
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public void publish(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         listing.publish();
@@ -39,6 +41,7 @@ public class ListingCommandService {
         log.info("Listing {} published", listingId);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public void reactivate(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         listing.reactivate();
@@ -46,6 +49,7 @@ public class ListingCommandService {
         log.info("Listing {} reactivated", listingId);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public void deactivate(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         listing.deactivate();
@@ -53,6 +57,7 @@ public class ListingCommandService {
         log.info("Listing {} deactivated", listingId);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public void markAsSold(UUID listingId, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         listing.markAsSold();
@@ -60,6 +65,7 @@ public class ListingCommandService {
         log.info("Listing {} marked as sold", listingId);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> deleteListing(UUID listingId, Long userId) {
         Result<Void> ownershipResult = listingValidationService.validateOwnership(listingId, userId);
         if (ownershipResult.isError()) return ownershipResult;
@@ -68,6 +74,7 @@ public class ListingCommandService {
         return Result.success();
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
         if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_QUANTITY_AT_LEAST_ONE,
@@ -77,6 +84,7 @@ public class ListingCommandService {
         return updated > 0 ? Result.success() : Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchQuantity(List<UUID> listingIds, int quantity, Long userId) {
         if (listingIds == null || listingIds.isEmpty()) return Result.success();
         if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
@@ -90,6 +98,7 @@ public class ListingCommandService {
         return Result.success();
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateSinglePrice(UUID listingId, BigDecimal price, Long userId) {
         if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {
             return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
@@ -120,6 +129,7 @@ public class ListingCommandService {
         return Result.success();
     }
 
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchPrice(List<UUID> listingIds, BigDecimal price, Long userId) {
         if (listingIds == null || listingIds.isEmpty()) return Result.success();
         if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {

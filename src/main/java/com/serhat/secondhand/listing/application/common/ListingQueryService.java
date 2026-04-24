@@ -1,16 +1,21 @@
 package com.serhat.secondhand.listing.application.common;
 
-import com.serhat.secondhand.listing.domain.dto.response.listing.*;
+import com.serhat.secondhand.core.dto.CachedPage;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
-import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.review.application.IReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,10 @@ public class ListingQueryService {
     private final IReviewService reviewService;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
+
+    @Lazy
+    @Autowired
+    private ListingQueryService self;
 
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -105,10 +114,16 @@ public class ListingQueryService {
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size) {
+        return self.getCachedUserListings(userId, page, size).toPage();
+    }
+
+    @Cacheable(value = "userProfile", key = "'listings:' + #userId + ':' + #page + ':' + #size")
+    public CachedPage<ListingDto> getCachedUserListings(Long userId, int page, int size) {
+        log.info("[CACHE MISS] userListings::{} page={}", userId, page);
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+        return CachedPage.from(enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId));
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {
