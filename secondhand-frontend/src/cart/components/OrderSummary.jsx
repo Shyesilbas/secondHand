@@ -22,15 +22,15 @@ const OrderSummary = ({
     const hasCampaign = campaignDiscount > 0;
 
     return (
-        <div className="bg-white rounded-lg border border-gray-100 sticky top-16">
-            <div className="px-5 py-3 border-b border-gray-50">
-                <h3 className="text-[13px] font-semibold text-gray-900">Summary</h3>
-                <p className="text-[11px] text-gray-400 mt-0.5 tabular-nums">{cartCount} {cartCount === 1 ? 'item' : 'items'}</p>
+        <div className="bg-white/80 backdrop-blur-2xl rounded-3xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-[5.5rem] overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100/50 bg-slate-50/30">
+                <h3 className="text-base font-extrabold text-slate-900 tracking-tight">Order Summary</h3>
+                <p className="text-xs font-medium text-slate-500 mt-1 tabular-nums">{cartCount} {cartCount === 1 ? 'item' : 'items'}</p>
             </div>
             
             {/* Item list */}
-            <div className="px-5 py-3 max-h-52 overflow-y-auto">
-                <div className="space-y-2.5">
+            <div className="px-6 py-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+                <div className="space-y-4">
                     {cartItems.map((item) => {
                         const itemPrice = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
                         const itemTotal = itemPrice * item.quantity;
@@ -53,12 +53,12 @@ const OrderSummary = ({
                                     </span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-[12px] text-gray-700 truncate">{item.listing.title}</p>
-                                    <p className="text-[10px] text-gray-400 tabular-nums">
+                                    <p className="text-sm font-semibold text-slate-800 line-clamp-1 leading-snug">{item.listing.title}</p>
+                                    <p className="text-xs font-medium text-slate-500 tabular-nums mt-0.5">
                                         {item.quantity} × {formatCurrency(itemPrice, item.listing.currency)}
                                     </p>
                                 </div>
-                                <span className="text-[12px] font-medium text-gray-900 tabular-nums shrink-0">
+                                <span className="text-sm font-bold text-slate-900 tabular-nums shrink-0">
                                     {formatCurrency(itemTotal, item.listing.currency)}
                                 </span>
                             </div>
@@ -68,51 +68,51 @@ const OrderSummary = ({
             </div>
             
             {/* Totals */}
-            <div className="px-5 py-4 border-t border-gray-50">
-                <div className="space-y-1.5 text-[12px]">
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Subtotal</span>
-                        <span className="text-gray-900 tabular-nums font-medium">{formatCurrency(total, currency)}</span>
+            <div className="px-6 py-5 border-t border-slate-100/80 bg-slate-50/30">
+                <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center">
+                        <span className="text-slate-500 font-medium">Subtotal</span>
+                        <span className="text-slate-900 tabular-nums font-semibold">{formatCurrency(total, currency)}</span>
                     </div>
 
                     {hasCampaign && (
-                        <div className="flex justify-between">
-                            <span className="text-gray-400">Discount</span>
-                            <span className="text-emerald-600 tabular-nums font-medium">-{formatCurrency(campaignDiscount, currency)}</span>
+                        <div className="flex justify-between items-center">
+                            <span className="text-slate-500 font-medium">Discount</span>
+                            <span className="text-emerald-600 tabular-nums font-bold">-{formatCurrency(campaignDiscount, currency)}</span>
                         </div>
                     )}
                     
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Shipping</span>
-                        <span className="text-gray-900">Free</span>
+                    <div className="flex justify-between items-center">
+                        <span className="text-slate-500 font-medium">Shipping</span>
+                        <span className="text-slate-900 font-semibold">Free</span>
                     </div>
                     
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Tax</span>
-                        <span className="text-gray-900 tabular-nums">{formatCurrency(tax, currency)}</span>
+                    <div className="flex justify-between items-center">
+                        <span className="text-slate-500 font-medium">Tax</span>
+                        <span className="text-slate-900 tabular-nums font-semibold">{formatCurrency(tax, currency)}</span>
                     </div>
                     
-                    <div className="border-t border-gray-50 pt-2.5 mt-2.5">
-                        <div className="flex justify-between">
-                            <span className="text-[13px] font-semibold text-gray-900">Total</span>
-                            <span className="text-[13px] font-semibold text-gray-900 tabular-nums">{formatCurrency(finalTotal, currency)}</span>
+                    <div className="border-t border-slate-200/60 pt-4 mt-4">
+                        <div className="flex justify-between items-end">
+                            <span className="text-base font-bold text-slate-900">Total</span>
+                            <span className="text-2xl font-extrabold text-slate-900 tabular-nums tracking-tight leading-none">{formatCurrency(finalTotal, currency)}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="px-5 pb-5 pt-1">
+            <div className="px-6 pb-6 pt-2 bg-slate-50/30">
                 <button
-                    className="w-full bg-gray-900 text-white py-2.5 px-4 rounded-lg hover:bg-gray-800 transition-colors text-[13px] font-medium disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg shadow-indigo-500/25 text-sm font-bold disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0"
                     onClick={onCheckout}
                     disabled={disabled}
                 >
                     Proceed to Checkout
                 </button>
                 
-                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-gray-400">
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
+                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span>Secure checkout · SSL encrypted</span>
                 </div>

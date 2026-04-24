@@ -1,4 +1,4 @@
-import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon} from 'lucide-react';
+import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon, Check} from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import {formatCurrency} from '../../../common/formatters.js';
 import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
@@ -32,6 +32,7 @@ const CheckoutPaymentStep = ({
     areAllAgreementsAccepted
 }) => {
     const totalAmount = calculateTotal();
+    const cur = currency || 'TRY';
 
     const canProceed = () => {
         return isPaymentMethodValid() && areAllAgreementsAccepted();
@@ -40,21 +41,21 @@ const CheckoutPaymentStep = ({
     const paymentMethods = [
         {
             id: CART_PAYMENT_TYPES.CREDIT_CARD,
-            name: 'Credit/Debit Card',
+            name: 'Card',
             icon: CreditCardIcon,
-            description: 'Pay with your credit or debit card'
+            sub: 'Credit / Debit'
         },
         {
             id: CART_PAYMENT_TYPES.TRANSFER,
-            name: 'Bank Transfer',
+            name: 'Transfer',
             icon: BanknotesIcon,
-            description: 'Transfer from your bank account'
+            sub: 'Bank account'
         },
         {
             id: CART_PAYMENT_TYPES.EWALLET,
-            name: 'E-Wallet',
+            name: 'Wallet',
             icon: WalletIcon,
-            description: `Pay with e-wallet (Balance: ${formatCurrency(eWallet?.balance || 0, currency || 'TRY')})`,
+            sub: formatCurrency(eWallet?.balance || 0, cur),
         }
     ];
 
@@ -71,195 +72,193 @@ const CheckoutPaymentStep = ({
 
     const handleNext = async () => {
         if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && calculateTotal() > eWallet.balance) {
-            return; // Show error
+            return;
         }
         await sendVerificationCode();
         onNext();
     };
 
+    const isEWalletDisabled = !eWallet || totalAmount > (eWallet?.balance || 0);
+
+    // Inline detail panel content
+    const renderDetail = () => {
+        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD) {
+            return (
+                <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Select Card</label>
+                    <select
+                        value={selectedCardNumber || ''}
+                        onChange={(e) => setSelectedCardNumber(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm font-semibold border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white transition-all"
+                    >
+                        <option value="">Choose a card</option>
+                        {cards?.map((card, index) => (
+                            <option key={getCardSelectValue(card) || `card-${index}`} value={getCardSelectValue(card) || ''}>
+                                •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4) || card.last4 || 'XXXX'}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            );
+        }
+        if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER) {
+            return (
+                <div>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Select Account</label>
+                    <select
+                        value={selectedBankAccountIban || ''}
+                        onChange={(e) => setSelectedBankAccountIban(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm font-semibold border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white transition-all"
+                    >
+                        <option value="">Choose an account</option>
+                        {bankAccounts?.map((account, index) => (
+                            <option key={account.id || `account-${index}`} value={account.IBAN}>
+                                •••• {account.IBAN?.slice(-4)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            );
+        }
+        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET) {
+            return (
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-500 font-medium">Available</span>
+                        <span className="font-bold text-slate-900 tabular-nums">{formatCurrency(eWallet?.balance || 0, cur)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-500 font-medium">Order Total</span>
+                        <span className="font-bold text-slate-900 tabular-nums">{formatCurrency(totalAmount, cur)}</span>
+                    </div>
+                    {totalAmount > (eWallet?.balance || 0) && (
+                        <div className="mt-2 px-3 py-2 bg-red-50 border border-red-100 rounded-xl">
+                            <p className="text-[11px] text-red-600 font-bold">Insufficient balance. Add funds or choose another method.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
-        <div className="p-5 sm:p-6 lg:p-7">
-            <div className="mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-1">Payment</h2>
-                <p className="text-sm text-slate-500">Choose how you would like to pay for this order.</p>
+        <div className="p-4 sm:p-5">
+            {/* Top row: title + amount badge */}
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Payment</h2>
+                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100">
+                    <span className="text-sm font-extrabold text-indigo-900 tabular-nums">{formatCurrency(totalAmount, cur)}</span>
+                </div>
             </div>
 
-            <div className="space-y-6">
-                <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100">
-                    <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700">Amount to authorize</span>
-                        <span className="text-xl font-bold text-indigo-900 tabular-nums">
-                            {formatCurrency(totalAmount, currency || 'TRY')}
-                        </span>
-                    </div>
+            {/* Method selector + detail — 2 column layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4 mb-4">
+                {/* Left: method cards */}
+                <div className="flex gap-2.5">
+                    {paymentMethods.map((method) => {
+                        const Icon = method.icon;
+                        const isSelected = selectedPaymentType === method.id;
+                        const isDisabled = method.id === CART_PAYMENT_TYPES.EWALLET && isEWalletDisabled;
+
+                        return (
+                            <label
+                                key={method.id}
+                                className={`relative flex-1 p-3.5 rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden group flex flex-col items-center justify-center text-center gap-2 ${
+                                    isSelected
+                                        ? 'bg-gradient-to-br from-indigo-600 to-violet-600 shadow-lg shadow-indigo-500/25 scale-[1.02] border-transparent'
+                                        : isDisabled
+                                            ? 'bg-slate-50 border-2 border-slate-100 cursor-not-allowed opacity-50'
+                                            : 'bg-white border-2 border-slate-100 hover:border-indigo-200 hover:shadow-md'
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value={method.id}
+                                    checked={isSelected}
+                                    onChange={(e) => setSelectedPaymentType(e.target.value)}
+                                    disabled={isDisabled}
+                                    className="sr-only"
+                                />
+                                {isSelected && (
+                                    <div className="absolute -top-8 -left-8 w-20 h-20 bg-white/15 rounded-full blur-xl z-0 pointer-events-none" />
+                                )}
+                                <div className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                                    isSelected ? 'bg-white text-indigo-600 shadow-sm' : 'bg-slate-100 text-slate-500 group-hover:text-indigo-500 group-hover:bg-indigo-50'
+                                }`}>
+                                    <Icon className="w-5 h-5" />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className={`text-xs font-extrabold tracking-tight ${isSelected ? 'text-white' : 'text-slate-900'}`}>{method.name}</div>
+                                    <div className={`text-[10px] font-medium mt-0.5 ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>{method.sub}</div>
+                                </div>
+                            </label>
+                        );
+                    })}
                 </div>
 
-                {/* Payment methods */}
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900 mb-2.5">Method</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {paymentMethods.map((method) => {
-                            const Icon = method.icon;
-                            const isSelected = selectedPaymentType === method.id;
-                            const isDisabled = method.id === CART_PAYMENT_TYPES.EWALLET && (!eWallet || totalAmount > eWallet.balance);
-
-                            return (
-                                <label
-                                    key={method.id}
-                                    className={`relative flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-all duration-150 ${
-                                        isSelected
-                                            ? 'border border-indigo-400 bg-indigo-50/60 ring-2 ring-indigo-100'
-                                            : isDisabled
-                                                ? 'border border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'
-                                                : 'border border-slate-200 bg-white hover:border-slate-300'
-                                    }`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value={method.id}
-                                        checked={isSelected}
-                                        onChange={(e) => setSelectedPaymentType(e.target.value)}
-                                        disabled={isDisabled}
-                                        className="sr-only"
-                                    />
-                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                                        isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'
-                                    }`}>
-                                        <Icon className="w-4 h-4" />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-slate-900">{method.name}</div>
-                                        <div className="text-xs text-slate-500 truncate">{method.description}</div>
-                                        {isDisabled && (
-                                            <span className="text-xs font-semibold text-red-500 mt-0.5 inline-block">Insufficient balance</span>
-                                        )}
-                                    </div>
-                                </label>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && (
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <h4 className="text-sm font-semibold text-slate-800 mb-3">Card Details</h4>
-                        <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Select Card</label>
-                            <select
-                                value={selectedCardNumber || ''}
-                                onChange={(e) => setSelectedCardNumber(e.target.value)}
-                                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
-                            >
-                                <option value="">Choose a card</option>
-                                {cards?.map((card, index) => (
-                                    <option key={getCardSelectValue(card) || `card-${index}`} value={getCardSelectValue(card) || ''}>
-                                        •••• •••• •••• {card.number?.slice(-4) || card.cardNumber?.slice(-4) || card.last4 || 'XXXX'}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                )}
-
-                {selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && (
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <h4 className="text-sm font-semibold text-slate-800 mb-3">Bank Account</h4>
-                        <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Select Account</label>
-                            <select
-                                value={selectedBankAccountIban || ''}
-                                onChange={(e) => setSelectedBankAccountIban(e.target.value)}
-                                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
-                            >
-                                <option value="">Choose an account</option>
-                                {bankAccounts?.map((account, index) => (
-                                    <option key={account.id || `account-${index}`} value={account.IBAN}>
-                                        •••• {account.IBAN?.slice(-4)}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                )}
-
-                {selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && (
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                        <h4 className="text-sm font-semibold text-slate-800 mb-3">E-Wallet</h4>
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-slate-500">Available</span>
-                                <span className="font-semibold text-slate-900 tabular-nums">
-                                    {formatCurrency(eWallet?.balance || 0, currency || 'TRY')}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-slate-500">Order Total</span>
-                                <span className="font-semibold text-slate-900 tabular-nums">
-                                    {formatCurrency(totalAmount, currency || 'TRY')}
-                                </span>
-                            </div>
-                        </div>
-                        {totalAmount > eWallet?.balance && (
-                            <div className="mt-3 px-3 py-2 bg-red-50 border border-red-100 rounded-xl">
-                                <p className="text-xs text-red-600 font-semibold">
-                                    Insufficient balance. Add funds or choose another method.
-                                </p>
-                            </div>
+                {/* Right: inline detail */}
+                <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-center">
+                    <div className="w-full">
+                        {renderDetail() || (
+                            <p className="text-xs text-slate-400 text-center font-medium py-2">Select a payment method</p>
                         )}
                     </div>
-                )}
-
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                    <PaymentAgreementsSection
-                        acceptedAgreements={acceptedAgreements}
-                        onToggle={onAgreementToggle}
-                        onRequiredAgreementsChange={onRequiredAgreementsChange}
-                    />
                 </div>
             </div>
 
-            <div className="hidden sm:flex items-center justify-between pt-5 mt-6 border-t border-slate-100">
+            {/* Agreements — compact */}
+            <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 mb-1">
+                <PaymentAgreementsSection
+                    acceptedAgreements={acceptedAgreements}
+                    onToggle={onAgreementToggle}
+                    onRequiredAgreementsChange={onRequiredAgreementsChange}
+                />
+            </div>
+
+            {/* Actions */}
+            <div className="hidden sm:flex items-center justify-between pt-4 mt-3 border-t border-slate-200/60">
                 <button
                     onClick={onBack}
-                    className="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
                 >
                     Back
                 </button>
                 <div className="flex items-center gap-3">
                     {!canProceed() && (
-                        <p className="text-xs text-slate-500 max-w-[220px] text-right">
+                        <p className="text-xs text-slate-500 max-w-[220px] text-right font-medium">
                             {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
                         </p>
                     )}
                     <button
                         onClick={handleNext}
                         disabled={!canProceed()}
-                        className="px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-semibold transition-colors disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 text-sm font-bold shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
                     >
                         Send Verification Code
                     </button>
                 </div>
             </div>
 
-            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-3 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-                <div className="grid grid-cols-2 gap-2">
+            <div className="sm:hidden sticky bottom-0 -mx-4 mt-4 px-4 py-3.5 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl">
+                <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={onBack}
-                        className="px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 bg-white"
+                        className="px-4 py-3 rounded-2xl border-2 border-slate-200/80 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
                     >
                         Back
                     </button>
                     <button
                         onClick={handleNext}
                         disabled={!canProceed()}
-                        className="px-4 py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                        className="px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl text-sm font-bold shadow-lg shadow-indigo-500/25 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
                     >
                         Send Code
                     </button>
                 </div>
                 {!canProceed() && (
-                    <p className="mt-2 text-xs text-slate-500 text-center">
+                    <p className="mt-2 text-xs font-medium text-slate-500 text-center">
                         {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
                     </p>
                 )}

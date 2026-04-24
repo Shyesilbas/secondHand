@@ -103,10 +103,8 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
 
   const partialBrowseSearchEnabled = useMemo(() => {
     if (mode !== 'browse' || !selectedType) return false;
-    if (!selectorSteps.length) return true;
-    const firstKey = selectorSteps[0]?.initialDataKey;
-    return Boolean(firstKey && isPrefilterValueFilled(selection?.[firstKey]));
-  }, [mode, selectedType, selectorSteps, selection]);
+    return true;
+  }, [mode, selectedType]);
 
   const triggerBrowseSearch = useCallback(() => {
     if (mode !== 'browse' || !selectedType) return;
@@ -349,8 +347,7 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
   const showBrowseMidSearch =
     mode === 'browse' &&
     partialBrowseSearchEnabled &&
-    selectionSteps.length > 1 &&
-    selectionStep < selectionSteps.length;
+    selectionStep > 1;
 
   const browseFooterExtra = showBrowseMidSearch ? (
     <div className="flex justify-end">

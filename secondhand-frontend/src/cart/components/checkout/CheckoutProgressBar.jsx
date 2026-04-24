@@ -3,9 +3,8 @@ import {Check as CheckIcon} from 'lucide-react';
 
 const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
     return (
-        <div className="bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-200/60">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                <div className="flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto pb-1">
+        <div className="w-full px-1">
+            <div className="flex items-center justify-between gap-1 sm:gap-4 flex-wrap sm:flex-nowrap overflow-hidden">
                     {steps.map((step, index) => {
                         const isCompleted = currentStep > step.id;
                         const isCurrent = currentStep === step.id;
@@ -59,7 +58,6 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                         );
                     })}
                 </div>
-            </div>
         </div>
     );
 };

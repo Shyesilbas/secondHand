@@ -102,57 +102,64 @@ const ShoppingCartPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#fafafa]">
+        <div className="min-h-screen bg-slate-50/50 relative">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-indigo-50/60 via-violet-50/20 to-transparent pointer-events-none -z-10" />
+            
             {/* Sticky header */}
-            <div className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
-                <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
+            <div className="bg-white/70 backdrop-blur-2xl border-b border-slate-200/60 sticky top-0 z-30 shadow-sm">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => navigate(-1)}
-                            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-md transition-colors -ml-1.5"
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 -ml-2"
                         >
-                            <ArrowLeftIcon className="w-4 h-4" />
+                            <ArrowLeftIcon className="w-5 h-5" />
                         </button>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-[15px] font-semibold text-gray-900 tracking-[-0.01em]">Cart</h1>
-                            <span className="text-[11px] text-gray-400 tabular-nums">
-                                · {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Shopping Cart</h1>
+                            <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold tracking-wide">
+                                {cartCount} {cartCount === 1 ? 'item' : 'items'}
                             </span>
                         </div>
                     </div>
                     {cartCount > 0 && (
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-[15px] font-semibold text-gray-900 tabular-nums tracking-tight">{formatCurrency(discountedTotal, currency)}</span>
+                        <div className="flex flex-col items-end justify-center">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-base sm:text-lg font-extrabold text-slate-900 tabular-nums tracking-tight">{formatCurrency(discountedTotal, currency)}</span>
+                            </div>
                             {campaignDiscount > 0 && (
-                                <>
-                                    <span className="text-[11px] text-gray-400 line-through tabular-nums">{formatCurrency(originalTotal, currency)}</span>
-                                    <span className="text-[10px] font-medium text-emerald-600">-{formatCurrency(campaignDiscount, currency)}</span>
-                                </>
+                                <div className="flex items-center gap-1.5 -mt-0.5">
+                                    <span className="text-[11px] text-slate-400 line-through tabular-nums">{formatCurrency(originalTotal, currency)}</span>
+                                    <span className="text-[10px] font-bold text-emerald-500">-{formatCurrency(campaignDiscount, currency)}</span>
+                                </div>
                             )}
                         </div>
                     )}
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-6 py-6">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
             {cartCount === 0 ? (
-                <div className="py-24 sm:py-32 text-center rounded-2xl bg-white border border-gray-100 shadow-sm mt-8">
-                    <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
+                <div className="py-24 sm:py-32 text-center rounded-[2rem] bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-8 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-violet-50/30 pointer-events-none" />
+                    <div className="relative z-10">
+                        <div className="w-28 h-28 bg-white rounded-3xl shadow-xl shadow-indigo-500/10 flex items-center justify-center mx-auto mb-8 border border-slate-100">
+                            <svg className="w-12 h-12 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                        </div>
+                        <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">{CART_MESSAGES.EMPTY_CART_TITLE}</p>
+                        <p className="text-base text-slate-500 mb-10 max-w-sm mx-auto font-medium">
+                            Browse listings and add items to get started.
+                        </p>
+                        <button
+                            onClick={() => navigate(ROUTES.LISTINGS)}
+                            className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-base font-bold rounded-2xl hover:from-indigo-700 hover:to-violet-700 hover:-translate-y-0.5 active:translate-y-0 shadow-xl shadow-indigo-500/25 transition-all duration-300"
+                        >
+                            Browse Listings
+                        </button>
                     </div>
-                    <p className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">{CART_MESSAGES.EMPTY_CART_TITLE}</p>
-                    <p className="text-sm sm:text-base text-gray-500 mb-8 max-w-sm mx-auto">
-                        Browse listings and add items to get started.
-                    </p>
-                    <button
-                        onClick={() => navigate(ROUTES.LISTINGS)}
-                        className="inline-flex items-center justify-center px-8 py-3.5 bg-gray-900 text-white text-base font-semibold rounded-xl hover:bg-gray-800 hover:scale-105 active:scale-95 shadow-md shadow-gray-200 transition-all duration-200"
-                    >
-                        Browse Listings
-                    </button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -185,18 +192,18 @@ const ShoppingCartPage = () => {
 
                     {/* Cart items */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
-                            <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
-                                <h2 className="text-[13px] font-semibold text-gray-900">Items</h2>
+                        <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+                            <div className="px-6 py-5 border-b border-slate-100/50 bg-slate-50/30 flex items-center justify-between">
+                                <h2 className="text-base font-extrabold text-slate-900 tracking-tight">Your Items</h2>
                                 <button
                                     onClick={() => setShowClearModal(true)}
-                                    className="text-[11px] text-gray-400 hover:text-red-500 transition-colors font-medium"
+                                    className="text-xs text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors font-bold"
                                 >
                                     Clear all
                                 </button>
                             </div>
 
-                            <div className="divide-y divide-gray-50">
+                            <div className="divide-y divide-slate-100/60 bg-white/40">
                                 {cartItems.map((item, index) => (
                                     <CartItemCard
                                         key={item.id}

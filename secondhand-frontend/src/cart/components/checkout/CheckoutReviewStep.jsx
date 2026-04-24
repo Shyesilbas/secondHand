@@ -41,14 +41,14 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
     const totalAmount = calculateTotal();
 
     return (
-        <div className="p-5 sm:p-6 lg:p-7">
-            <div className="mb-6">
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-1">Review Your Order</h2>
+        <div className="p-4 sm:p-5">
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-0.5">Review Your Order</h2>
                 <p className="text-sm text-slate-500">Verify items and quantities before continuing.</p>
             </div>
 
             {/* Items */}
-            <div className="space-y-3 mb-6">
+            <div className="space-y-2.5 mb-5">
                 {cartItems.map((item) => {
                     const isOffer = !!item.isOffer;
                     const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
@@ -59,9 +59,9 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                         ? (parseFloat(item.offerTotalPrice) || 0)
                         : (parseFloat(unitPrice) * item.quantity);
                     return (
-                        <div key={item.id} className="flex items-center gap-3 px-4 py-3.5 bg-slate-50/70 rounded-2xl border border-slate-100">
+                        <div key={item.id} className="flex items-center gap-3 px-4 py-3 bg-slate-50/70 rounded-2xl border border-slate-100">
                             {/* Image */}
-                            <div className="w-14 h-14 bg-slate-100 rounded-xl shrink-0 overflow-hidden flex items-center justify-center">
+                            <div className="w-12 h-12 bg-slate-100 rounded-xl shrink-0 overflow-hidden flex items-center justify-center">
                                 {item.listing.imageUrl ? (
                                     <img src={item.listing.imageUrl} alt={item.listing.title} className="w-full h-full object-cover" />
                                 ) : (
@@ -123,25 +123,25 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
             </div>
 
             {/* Actions */}
-            <div className="hidden sm:flex items-center justify-between pt-5 border-t border-slate-100">
+            <div className="hidden sm:flex items-center justify-between pt-6 border-t border-slate-200/60">
                 <button
                     onClick={onBack}
-                    className="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
                 >
                     Back to Cart
                 </button>
                 <button
                     onClick={onNext}
-                    className="px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-semibold transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 text-sm font-bold shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all"
                 >
                     Continue to Address
                 </button>
             </div>
 
-            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-3 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
                 <button
                     onClick={onNext}
-                    className="w-full px-5 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-semibold transition-colors"
+                    className="w-full px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl hover:from-indigo-700 hover:to-violet-700 text-base font-bold shadow-lg shadow-indigo-500/25 transition-all"
                 >
                     Continue to Address
                 </button>

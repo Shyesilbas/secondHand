@@ -104,6 +104,7 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
                     <img
                         src={listing.imageUrl}
                         alt={listing.title}
+                        loading={priorityImage ? 'eager' : 'lazy'}
                         fetchPriority={priorityImage ? 'high' : 'auto'}
                         decoding="async"
                         className="w-full h-full object-cover transition-transform duration-200 ease-out motion-reduce:transition-none motion-reduce:group-hover:scale-100 group-hover:scale-105"
@@ -264,7 +265,7 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
 ListingCard.displayName = 'ListingCard';
 
 export default memo(ListingCard, (prevProps, nextProps) =>
-    prevProps.listing === nextProps.listing &&
+    prevProps.listing?.id === nextProps.listing?.id &&
     prevProps.isOwner === nextProps.isOwner &&
     prevProps.currentUserId === nextProps.currentUserId &&
     prevProps.showActions === nextProps.showActions &&

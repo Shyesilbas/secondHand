@@ -113,7 +113,7 @@ const CheckoutStep = ({
     };
 
     return (
-        <div className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_12px_40px_-24px_rgba(15,23,42,0.45)] overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/80 shadow-[0_8px_40px_rgb(0,0,0,0.06)] overflow-hidden">
             {renderStepContent()}
         </div>
     );
