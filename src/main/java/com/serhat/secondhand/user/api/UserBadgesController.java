@@ -41,22 +41,40 @@ public class UserBadgesController {
         @ApiResponse(responseCode = "200", description = "Badges retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+    @Cacheable(value = "userBadges", key = "#currentUser.id")
     public ResponseEntity<Map<String, Object>> getUserBadges(@AuthenticationPrincipal User currentUser) {
+        Long userId = currentUser.getId();
         log.debug("Fetching aggregated badges for user: {}", currentUser.getEmail());
-        
-        Long notificationCount = notificationService.getUnreadCount(currentUser.getId());
-        Long emailUnreadCount = emailService.getUnreadCount(currentUser.getId());
-        Long chatUnreadCount = chatService.getTotalUnreadMessageCount(currentUser.getId());
-        Map<String, Object> pendingOrders = orderQueryService.getPendingCompletionStatus(currentUser.getId());
-        
-        Map<String, Object> badges = Map.of(
-            "notificationCount", notificationCount,
-            "emailUnreadCount", emailUnreadCount,
-            "chatUnreadCount", chatUnreadCount,
-            "hasPendingOrders", pendingOrders.get("hasPendingOrders"),
-            "pendingOrderCount", pendingOrders.get("pendingCount")
-        );
-        
-        return ResponseEntity.ok(badges);
+
+        // Run all count queries in parallel
+        var notificationFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> 
+            notificationService.getUnreadCount(userId));
+            
+        var emailFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> 
+            emailService.getUnreadCount(userId));
+            
+        var chatFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> 
+            chatService.getTotalUnreadMessageCount(userId));
+            
+        var ordersFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> 
+            orderQueryService.getPendingCompletionStatus(userId));
+
+        // Wait for all to complete
+        java.util.concurrent.CompletableFuture.allOf(notificationFuture, emailFuture, chatFuture, ordersFuture).join();
+
+        try {
+            Map<String, Object> pendingOrders = ordersFuture.get();
+            Map<String, Object> badges = Map.of(
+                "notificationCount", notificationFuture.get(),
+                "emailUnreadCount", emailFuture.get(),
+                "chatUnreadCount", chatFuture.get(),
+                "hasPendingOrders", pendingOrders.get("hasPendingOrders"),
+                "pendingOrderCount", pendingOrders.get("pendingCount")
+            );
+            return ResponseEntity.ok(badges);
+        } catch (Exception e) {
+            log.error("Error calculating aggregated badges", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

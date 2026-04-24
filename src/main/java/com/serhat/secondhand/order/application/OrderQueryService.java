@@ -25,8 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +49,32 @@ public class OrderQueryService {
     public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
-        return orders.map(order -> orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order)));
+        
+        Set<Long> itemIds = orders.getContent().stream()
+                .flatMap(o -> o.getOrderItems().stream())
+                .map(OrderItem::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<Long, Integer> allCancelled = itemIds.isEmpty() ? Map.of() : 
+            orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(itemIds).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
+        Map<Long, Integer> allRefunded = itemIds.isEmpty() ? Map.of() : 
+            orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(itemIds).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
+        return orders.map(order -> {
+            Map<Long, Integer> cancelledMap = order.getOrderItems().stream()
+                .filter(i -> allCancelled.containsKey(i.getId()))
+                .collect(Collectors.toMap(OrderItem::getId, i -> allCancelled.get(i.getId())));
+            
+            Map<Long, Integer> refundedMap = order.getOrderItems().stream()
+                .filter(i -> allRefunded.containsKey(i.getId()))
+                .collect(Collectors.toMap(OrderItem::getId, i -> allRefunded.get(i.getId())));
+                
+            return orderMapper.toDto(order, cancelledMap, refundedMap);
+        });
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
@@ -76,7 +100,7 @@ public class OrderQueryService {
         return orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order));
     }
 
-    private static final java.util.Set<Order.OrderStatus> TERMINAL_STATUSES = java.util.EnumSet.of(
+    private static final Set<Order.OrderStatus> TERMINAL_STATUSES = EnumSet.of(
             Order.OrderStatus.COMPLETED,
             Order.OrderStatus.CANCELLED,
             Order.OrderStatus.REFUNDED
@@ -149,11 +173,10 @@ public class OrderQueryService {
 
     @Cacheable(value = "pendingOrders", key = "#userId")
     public Map<String, Object> getPendingCompletionStatus(Long userId) {
-        boolean hasPending = orderRepository.existsByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
-        long count = hasPending ? orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED) : 0;
+        long count = orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
 
         Map<String, Object> result = new java.util.HashMap<>();
-        result.put("hasPendingOrders", hasPending);
+        result.put("hasPendingOrders", count > 0);
         result.put("pendingCount", count);
         return result;
     }

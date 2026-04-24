@@ -64,6 +64,10 @@ public class CacheConfig {
         // Sık değişen ama yine de cache'lenebilir veriler
         RedisCacheConfiguration shortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
+        // ── Tier 4: Ultra Kısa — 30 saniye ────────────────────────────
+        // Polling yapan badge'ler için DB yükünü azaltmak amacıyla
+        RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofSeconds(30));
+
         // ── Tier 2b: Kullanıcı profili — 15 dakika ────────────────────
         // Kullanıcı bilgileri nadiren değişir ama güncel kalması önemli
         RedisCacheConfiguration profileConfig = defaultConfig.entryTtl(Duration.ofMinutes(15));
@@ -97,6 +101,9 @@ public class CacheConfig {
                 .withCacheConfiguration("pendingOrders", shortConfig)
                 .withCacheConfiguration("listingViewStats", shortConfig)
                 .withCacheConfiguration("activeShowcases", shortConfig)
+
+                // Tier 4 — Ultra Kısa (30 saniye)
+                .withCacheConfiguration("userBadges", ultraShortConfig)
 
                 .build();
     }
