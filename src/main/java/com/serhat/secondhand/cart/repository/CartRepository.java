@@ -20,7 +20,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     List<Cart> findByUserId(Long userId);
 
-    @Query(value = "SELECT c FROM Cart c JOIN FETCH c.listing l JOIN FETCH l.seller s WHERE c.user.id = :userId",
+    @Query(value = "SELECT c FROM Cart c JOIN FETCH c.listing l WHERE c.user.id = :userId",
             countQuery = "SELECT COUNT(c) FROM Cart c WHERE c.user.id = :userId")
     Page<Cart> findByUserIdWithListing(@Param("userId") Long userId, Pageable pageable);
 

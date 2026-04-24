@@ -17,9 +17,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o " +
-           "LEFT JOIN FETCH o.orderItems oi " +
-           "LEFT JOIN FETCH oi.listing l " +
-           "LEFT JOIN FETCH l.seller " +
+           "JOIN FETCH o.user u " +
            "WHERE o.user.id = :userId")
     Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
@@ -47,10 +45,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     BigDecimal sumTotalAmountByUserIdAndDateRange(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT DISTINCT o FROM Order o " +
-           "JOIN FETCH o.orderItems oi " +
-           "JOIN FETCH oi.listing l " +
-           "JOIN FETCH l.seller " +
-           "WHERE l.seller.id = :sellerId " +
+           "JOIN o.orderItems oi " +
+           "JOIN FETCH o.user u " +
+           "WHERE oi.listing.seller.id = :sellerId " +
            "ORDER BY o.createdAt DESC")
     Page<Order> findOrdersBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 

@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "notification_events")
+@Table(name = "notification_events", indexes = {
+    @Index(name = "idx_notification_event_created", columnList = "created_at")
+})
 @Data
 @Builder
 @NoArgsConstructor

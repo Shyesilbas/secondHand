@@ -18,7 +18,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "carts", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "listing_id"}))
+@Table(name = "carts", 
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "listing_id"}),
+    indexes = {
+        @Index(name = "idx_cart_user", columnList = "user_id"),
+        @Index(name = "idx_cart_reservation_end", columnList = "reservation_end_time"),
+        @Index(name = "idx_cart_reserved", columnList = "is_reserved")
+    }
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Cart {
 
