@@ -50,10 +50,10 @@ const StatusBadge = ({ label, type = 'rose' }) => {
 
 const GlassCard = ({ children, className = '', critical = false }) => (
   <div
-    className={`rounded-2xl border backdrop-blur-sm transition-all ${
+    className={`rounded-3xl border transition-all duration-300 ${
       critical
-        ? 'bg-slate-900 text-white border-slate-800 shadow-sm'
-        : 'bg-white border-slate-200 shadow-sm'
+        ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg'
+        : 'bg-white/60 backdrop-blur-xl border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'
     } ${className}`}
   >
     {children}
@@ -169,18 +169,20 @@ const OrderDetailsModal = React.memo(
 
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
-          isSellerView ? 'bg-slate-900/35 backdrop-blur-sm' : 'bg-slate-900/30 backdrop-blur-sm'
-        } animate-in fade-in duration-300`}
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300`}
         style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
       >
         <div
-          className={`w-full ${isSellerView ? 'max-w-5xl rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10' : 'max-w-6xl rounded-2xl border border-slate-200 shadow-lg shadow-slate-900/10'} max-h-[92vh] bg-slate-50 overflow-hidden flex flex-col`}
+          className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-[2rem] border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-3xl overflow-hidden flex flex-col relative`}
         >
+          {/* Decorative glows inside the modal */}
+          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-400/10 blur-[100px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-violet-400/10 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
+
           <div
-            className={`${
-              isSellerView ? 'px-8 py-6 bg-white border-b border-slate-200' : 'px-6 py-5 bg-white border-b border-slate-200'
-            } flex items-center justify-between group`}
+            className={`relative z-10 ${
+              isSellerView ? 'px-8 py-6' : 'px-6 py-5'
+            } bg-white/50 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between group`}
           >
             <div className="flex items-center gap-3">
               <div
@@ -259,8 +261,8 @@ const OrderDetailsModal = React.memo(
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <div className={`${isSellerView ? 'p-8' : 'p-6'}`}>
+          <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
+            <div className={`${isSellerView ? 'p-8' : 'p-6 sm:p-8'}`}>
               <GlassCard className={`p-6 mb-8`}>
                 <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4' : 'text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-5'}`}>
                   Tracking Progress

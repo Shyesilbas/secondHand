@@ -28,76 +28,73 @@ const ListingsNavigation = ({
 
   return (
       <>
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <button
                     onClick={onToggleFilterSidebar}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900 relative"
+                    className="p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-500 hover:text-gray-900 relative"
                 >
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-5 h-5" />
                   {hasActiveFilters ? <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-900" /> : null}
                 </button>
-                <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
-                  {icon}
-                </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight leading-none">{title}</h1>
-                  <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-sm font-medium text-indigo-600">
+                  <h1 className="text-lg font-semibold text-gray-900 tracking-tight leading-none">{title}</h1>
+                  <div className="flex items-center gap-1.5 mt-1">
+                  <span className="text-[13px] font-medium text-gray-600">
                     {getListingTypeLabel(selectedCategory || filters?.listingType) || 'All Categories'}
                   </span>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-gray-500 text-sm">{totalElements?.toLocaleString()} results</span>
+                    <span className="text-gray-300">·</span>
+                    <span className="text-gray-400 text-[13px]">{totalElements?.toLocaleString()} results</span>
                   </div>
                 </div>
               </div>
               {extraActions ? <div className="flex items-center gap-3">{extraActions}</div> : null}
             </div>
 
-            {topSlot ? <div className="mt-6">{topSlot}</div> : null}
+            {topSlot ? <div className="mt-5">{topSlot}</div> : null}
 
-            <div className={topSlot ? 'mt-4' : 'mt-6'}>
+            <div className={topSlot ? 'mt-3' : 'mt-5'}>
               <div className="relative max-w-2xl">
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors" />
                   </div>
                   <input
                       type="text"
                       value={term}
                       onChange={(e) => engineSearch?.setTerm?.(e.target.value)}
-                      placeholder="Search listings by title or listing number..."
-                      className="block w-full pl-11 pr-4 py-3 bg-gray-50 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:bg-white rounded-xl transition-all font-medium"
+                      placeholder="Search by title or listing number…"
+                      className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-200 focus:border-gray-300 focus:bg-white rounded-xl transition-all text-[13px] font-medium"
                   />
                   {term ? (
                       <button
                           onClick={() => clear?.()}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
                       >
-                        <span className="text-xs font-semibold px-2 py-1 bg-gray-200 rounded-md">ESC</span>
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-gray-200 rounded-md">ESC</span>
                       </button>
                   ) : null}
                 </div>
               </div>
 
               {term ? (
-                  <div className="mt-4 flex items-center justify-between bg-indigo-50/50 rounded-xl p-4 border border-indigo-100">
+                  <div className="mt-3 flex items-center justify-between bg-gray-50 rounded-xl p-3.5 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-indigo-900">
+                        <p className="text-[13px] font-medium text-gray-700">
                           {isListingNo && listingNoLoading ? (
                               <span className="flex items-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Searching listing number...
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Searching listing number…
                         </span>
                           ) : isListingNo && listingNoError ? (
                               listingNoError
                           ) : loadingAllPages ? (
                               <span className="flex items-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Searching everywhere...
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Searching everywhere…
                         </span>
                           ) : (
                               <>
@@ -113,7 +110,7 @@ const ListingsNavigation = ({
                     {isTitle && !allPagesLoaded && !loadingAllPages ? (
                         <button
                             onClick={() => loadAllPages?.()}
-                            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-indigo-100 hover:border-indigo-200 transition-all"
+                            className="text-[11px] font-semibold text-gray-700 hover:text-gray-900 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 transition-all"
                         >
                           Search All Pages
                         </button>

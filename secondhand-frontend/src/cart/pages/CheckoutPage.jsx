@@ -169,13 +169,19 @@ const CheckoutPage = () => {
 
     if (!offerId && cartCount === 0) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-2xl font-medium text-gray-900 mb-4">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
-                    <p className="text-gray-600 mb-8">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
+            <div className="min-h-screen bg-slate-50/50 flex items-center justify-center relative">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-indigo-50/60 via-violet-50/20 to-transparent pointer-events-none -z-10" />
+                <div className="text-center bg-white/80 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-12 rounded-[2rem] max-w-lg mx-auto">
+                    <div className="w-24 h-24 bg-white rounded-3xl shadow-xl shadow-indigo-500/10 flex items-center justify-center mx-auto mb-8 border border-slate-100">
+                        <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-2xl font-extrabold text-slate-900 mb-4 tracking-tight">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
+                    <p className="text-slate-500 mb-8 font-medium">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
                     <button
                         onClick={() => navigate(ROUTES.LISTINGS)}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-base font-bold rounded-2xl hover:from-indigo-700 hover:to-violet-700 hover:-translate-y-0.5 active:translate-y-0 shadow-xl shadow-indigo-500/25 transition-all duration-300"
                     >
                         Browse Listings
                     </button>
@@ -185,31 +191,30 @@ const CheckoutPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
-            <div className="bg-white border-b border-slate-200/60">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex items-center space-x-4">
+        <div className="min-h-screen bg-slate-50/50 relative tracking-tight">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-indigo-50/60 via-violet-50/20 to-transparent pointer-events-none -z-10" />
+            
+            <div className="bg-white/70 backdrop-blur-2xl border-b border-slate-200/60 sticky top-0 z-30 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => navigate(ROUTES.SHOPPING_CART)}
-                            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 -ml-2 shrink-0"
                         >
                             <ArrowLeftIcon className="w-5 h-5" />
                         </button>
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tighter">Checkout</h1>
-                            <p className="text-slate-500 mt-1 tracking-tight">Complete your purchase securely</p>
+                        <div className="flex-1 min-w-0">
+                            <CheckoutProgressBar 
+                                currentStep={currentStep} 
+                                steps={steps}
+                                onStepChange={handleStepChange}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <CheckoutProgressBar 
-                currentStep={currentStep} 
-                steps={steps}
-                onStepChange={handleStepChange}
-            />
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
                         <CheckoutStep

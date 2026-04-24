@@ -67,6 +67,7 @@ const FavoriteListCard = ({ list, showOwner = false }) => {
                             <img
                                 src={list.previewImageUrl || list.coverImageUrl}
                                 alt={list.name}
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                             />
                         ) : (

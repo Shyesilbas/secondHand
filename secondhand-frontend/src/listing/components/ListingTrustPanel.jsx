@@ -11,11 +11,11 @@ const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
   return (
     <>
       {/* Seller */}
-      <div className="border-t border-gray-50 py-5 mb-5">
+      <div className="border-t border-gray-100 py-5 mb-4">
         <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-3">Seller</h3>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-[13px] font-semibold text-white shrink-0">
+            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center text-[13px] font-semibold text-white shrink-0">
               {listing.sellerName?.[0]?.toUpperCase() || 'U'}
             </div>
             <div>
@@ -40,7 +40,7 @@ const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
         {!isOwner ? (
           <ContactSellerButton
             listing={listing}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-[13px] font-medium transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-[13px] font-medium transition-colors"
           >
             Contact Seller
           </ContactSellerButton>
@@ -50,7 +50,7 @@ const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
       </div>
 
       {/* Safety */}
-      <div className="bg-gray-50 rounded-lg p-4">
+      <div className="bg-gray-50 rounded-xl p-4">
         <h3 className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-2.5 flex items-center gap-1.5">
           <ShieldCheck className="w-3 h-3" />
           Safety
@@ -75,4 +75,3 @@ const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
 };
 
 export default ListingTrustPanel;
-

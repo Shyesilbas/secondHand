@@ -6,23 +6,27 @@ const ListingSocialPanel = ({ listing, isOwner, tabs, activeTab, onTabChange, De
   if (!listing) return null;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
-      {/* Tab bar */}
-      <div className="flex items-center border-b border-gray-50 px-5">
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Pill tab bar */}
+      <div className="flex items-center gap-0.5 px-4 pt-3 pb-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={`
-              relative py-3 px-3 text-[13px] font-medium transition-colors duration-150
-              ${activeTab === tab.id ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'}
+              relative py-2 px-3.5 text-[13px] font-medium rounded-lg transition-colors duration-150
+              ${activeTab === tab.id
+                ? 'text-gray-900 bg-gray-100'
+                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+              }
             `}
           >
             {tab.label}
-            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 rounded-full" />}
           </button>
         ))}
       </div>
+
+      <div className="border-t border-gray-50 mt-2.5" />
 
       {/* Content */}
       <div className="p-5">
@@ -67,4 +71,3 @@ const ListingSocialPanel = ({ listing, isOwner, tabs, activeTab, onTabChange, De
 };
 
 export default ListingSocialPanel;
-

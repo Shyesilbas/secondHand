@@ -1,27 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useEnums } from "../../common/hooks/useEnums.js";
-import { X, ChevronDown, ChevronRight } from "lucide-react";
+import { X, RotateCcw, SlidersHorizontal } from "lucide-react";
 import PriceLocationFields from "./filters/shared/PriceLocationFields.jsx";
 import FilterRenderer from "./filters/FilterRenderer.jsx";
 import { getListingConfig } from "../config/listingConfig.js";
 import { LISTING_STATUSES } from "../types/index.js";
-
-const FilterSectionAccordion = ({ title, defaultOpen = false, children }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50/50 hover:bg-slate-50 transition-colors text-left"
-      >
-        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{title}</span>
-        {isOpen ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
-      </button>
-      {isOpen && <div className="p-4 border-t border-slate-100">{children}</div>}
-    </div>
-  );
-};
 
 /**
  * browse mode: local draft filters applied on "Apply Filters" click.
@@ -41,11 +24,9 @@ const FilterSidebar = ({
 }) => {
   const { enums, isLoading: enumsLoading } = useEnums();
 
-  // browse mode: draft state for multi-field editing before "Apply"
   const [localFilters, setLocalFilters] = useState(filters);
   const [mineActiveTab, setMineActiveTab] = useState('category');
 
-  // keep draft in sync when external filters change (e.g. category switch resets defaults)
   useEffect(() => {
     setLocalFilters(filters);
   }, [filters]);
@@ -76,13 +57,17 @@ const FilterSidebar = ({
   const listingConfig = getListingConfig(selectedCategory);
   const filterConfig = listingConfig?.filterConfig;
 
+  // In browse mode, hide category selector if a category is already active
+  const showCategorySelector = mode === 'browse' && !selectedCategory;
+
   if (enumsLoading) {
     return (
       <div className="fixed inset-0 z-50 lg:relative lg:z-auto">
-        <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-        <div className="fixed left-0 top-0 h-full w-80 bg-white shadow-xl lg:relative lg:shadow-none border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-gray-500">Loading...</div>
+        <div className="fixed inset-0 bg-black/40 lg:hidden" onClick={onClose} />
+        <div className="fixed left-0 top-0 h-full w-80 bg-white border-r border-gray-100 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-6 h-6 rounded-full border-2 border-gray-900 border-t-transparent animate-spin" />
+            <p className="text-[13px] text-gray-400">Loading filters…</p>
           </div>
         </div>
       </div>
@@ -93,92 +78,96 @@ const FilterSidebar = ({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
       <div className={`
-        fixed left-0 top-0 h-screen w-80 bg-white shadow-xl z-50 border-r border-slate-200 flex flex-col
+        fixed left-0 top-0 h-screen w-80 bg-white z-50 border-r border-gray-100 flex flex-col
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="border-b border-slate-200 bg-white px-4 py-3.5 flex-shrink-0">
+        {/* Header */}
+        <div className="border-b border-gray-100 px-4 py-3.5 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">Filters</h2>
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-gray-500" />
+              <h2 className="text-[15px] font-semibold text-gray-900">Filters</h2>
+            </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
               aria-label="Close filters"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-slate-50/80 overscroll-contain">
-          <div className="p-4 space-y-3">
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="p-4 space-y-4">
             {mode === 'mine' ? (
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="flex border-b border-gray-200">
+              /* Mine mode: tabs for category/status */
+              <div>
+                <div className="flex gap-1 p-1 bg-gray-50 rounded-lg mb-3">
                   {['category', 'status'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setMineActiveTab(tab)}
-                      className={`flex-1 px-4 py-3 text-sm font-medium transition-colors capitalize ${
+                      className={`flex-1 px-3 py-2 text-[13px] font-medium rounded-md transition-all capitalize ${
                         mineActiveTab === tab
-                          ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-500'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-500 hover:text-gray-700'
                       }`}
                     >
                       {tab}
                     </button>
                   ))}
                 </div>
-                <div className="p-4">
+                <div className="space-y-1">
                   {mineActiveTab === 'category' && (
-                    <div className="space-y-2">
-                      <MineOptionButton
+                    <>
+                      <OptionRow
                         label="All Categories"
                         active={selectedCategory === null}
                         onClick={() => handleCategoryChange(null)}
                       />
                       {(enums?.listingTypes || []).map((type) => (
-                        <MineOptionButton
+                        <OptionRow
                           key={type.value}
                           label={type.label}
                           active={selectedCategory === type.value}
                           onClick={() => handleCategoryChange(type.value)}
                         />
                       ))}
-                    </div>
+                    </>
                   )}
                   {mineActiveTab === 'status' && (
-                    <div className="space-y-2">
-                      <MineOptionButton
+                    <>
+                      <OptionRow
                         label="All Statuses"
                         active={selectedStatus === null}
                         onClick={() => handleStatusChange(null)}
                       />
                       {LISTING_STATUSES.map((s) => (
-                        <MineOptionButton
+                        <OptionRow
                           key={s.value}
                           label={s.label}
                           active={selectedStatus === s.value}
                           onClick={() => handleStatusChange(s.value)}
                         />
                       ))}
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
             ) : (
               <>
-                <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-                  <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Category</h3>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex flex-wrap gap-2">
+                {/* Category — only when no category is pre-selected */}
+                {showCategorySelector && (
+                  <FilterSection title="Category">
+                    <div className="flex flex-wrap gap-1.5">
                       <CategoryChip
                         label="All"
                         active={!selectedCategory}
@@ -198,61 +187,72 @@ const FilterSidebar = ({
                         );
                       })}
                     </div>
-                  </div>
-                </div>
+                  </FilterSection>
+                )}
 
-                <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-                  <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Price & Location</h3>
-                  </div>
-                  <div className="p-4">
-                    <PriceLocationFields
-                      filters={localFilters}
-                      onPriceChange={handleInputChange}
-                      onInputChange={handleInputChange}
-                      compact={true}
-                    />
-                  </div>
-                </div>
-
+                {/* Active category label (when category is locked) */}
                 {selectedCategory && (
-                  <FilterSectionAccordion
-                    title={`${listingConfig?.label || selectedCategory} Filters`}
-                    defaultOpen={true}
-                  >
-                    {filterConfig ? (
-                      <FilterRenderer
-                        config={filterConfig}
-                        filters={localFilters}
-                        onChange={handleInputChange}
-                        title=""
-                      />
-                    ) : (
-                      <div className="py-6 text-center">
-                        <p className="text-sm text-slate-500">No additional filters for this category.</p>
-                      </div>
-                    )}
-                  </FilterSectionAccordion>
+                  <div className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                    <span className="text-[13px] font-semibold text-gray-700">
+                      {listingConfig?.label || selectedCategory}
+                    </span>
+                    <button
+                      onClick={() => onCategoryChange(null)}
+                      className="text-[11px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      Change
+                    </button>
+                  </div>
+                )}
+
+                {/* Price & Location */}
+                <FilterSection title="Price & Location">
+                  <PriceLocationFields
+                    filters={localFilters}
+                    onPriceChange={handleInputChange}
+                    onInputChange={handleInputChange}
+                    compact={true}
+                  />
+                </FilterSection>
+
+                {/* Category-specific filters */}
+                {selectedCategory && filterConfig && (
+                  <FilterSection title={`${listingConfig?.label || ''} Filters`}>
+                    <FilterRenderer
+                      config={filterConfig}
+                      filters={localFilters}
+                      onChange={handleInputChange}
+                      title=""
+                    />
+                  </FilterSection>
+                )}
+
+                {selectedCategory && !filterConfig && (
+                  <div className="py-4 text-center">
+                    <p className="text-[13px] text-gray-400">No additional filters for this category.</p>
+                  </div>
                 )}
               </>
             )}
           </div>
         </div>
 
-        <div className="border-t border-slate-200 bg-white px-4 py-3 flex-shrink-0">
-          <div className="flex flex-col gap-2">
+        {/* Footer actions */}
+        <div className="border-t border-gray-100 px-4 py-3 flex-shrink-0">
+          <div className="flex gap-2">
             {mode !== 'mine' && (
               <button
                 onClick={handleApplyFilters}
-                className="w-full px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 active:scale-[0.98] transition-all"
+                className="flex-1 px-4 py-2.5 bg-gray-900 text-white text-[13px] font-semibold rounded-xl hover:bg-gray-800 transition-colors"
               >
-                Apply Filters
+                Apply
               </button>
             )}
             <button
               onClick={handleReset}
-              className="w-full px-4 py-2 text-slate-600 text-sm font-medium hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-gray-500 text-[13px] font-medium hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors"
             >
+              <RotateCcw className="w-3.5 h-3.5" />
               Reset
             </button>
           </div>
@@ -262,30 +262,36 @@ const FilterSidebar = ({
   );
 };
 
-const MineOptionButton = ({ label, active, onClick }) => (
+/* ── Sub-components ── */
+
+const FilterSection = ({ title, children }) => (
+  <div>
+    <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5 px-0.5">{title}</h3>
+    {children}
+  </div>
+);
+
+const OptionRow = ({ label, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left ${
+    className={`w-full px-3 py-2.5 rounded-lg text-left transition-colors text-[13px] font-medium ${
       active
-        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+        ? 'bg-gray-900 text-white'
+        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
     }`}
   >
-    <div className="flex items-center justify-between">
-      <span className="text-sm font-medium">{label}</span>
-      {active && <div className="w-2 h-2 rounded-full bg-indigo-500" />}
-    </div>
+    {label}
   </button>
 );
 
 const CategoryChip = ({ label, icon, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-      active ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
+      active ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
     }`}
   >
-    {icon && <span>{icon}</span>}
+    {icon && <span className="text-[11px]">{icon}</span>}
     <span>{label}</span>
   </button>
 );

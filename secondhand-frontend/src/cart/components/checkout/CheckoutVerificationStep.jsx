@@ -77,9 +77,9 @@ const CheckoutVerificationStep = ({
     const filledCount = codeValue.replace(/\s/g, '').length;
 
     return (
-        <div className="p-5 sm:p-6 lg:p-7">
+        <div className="p-4 sm:p-5">
             {/* Security banner */}
-            <div className="flex items-center gap-3 mb-6 px-4 py-3.5 bg-gradient-to-r from-slate-50 to-indigo-50 rounded-2xl border border-slate-200">
+            <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gradient-to-r from-slate-50 to-indigo-50 rounded-2xl border border-slate-200">
                 <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
                     <Lock className="w-3.5 h-3.5 text-white" />
                 </div>
@@ -189,50 +189,61 @@ const CheckoutVerificationStep = ({
                 </div>
             </div>
 
-            <div className="hidden sm:flex items-center justify-between pt-5 mt-6 border-t border-slate-100">
+            <div className="hidden sm:flex items-center justify-between pt-6 mt-8 border-t border-slate-200/60">
                 <button
                     onClick={onBack}
-                    className="px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                    className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
                 >
                     Back
                 </button>
                 <button
                     onClick={onCheckout}
                     disabled={proceedDisabled || isCheckingOut || !isCodeComplete}
-                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                    className={`px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 transition-all ${
                         isCodeComplete && !proceedDisabled && !isCheckingOut
-                            ? 'bg-slate-900 text-white hover:bg-slate-800'
-                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-500/25 hover:from-indigo-700 hover:to-violet-700 hover:-translate-y-0.5 active:translate-y-0'
+                            : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed transform-none'
                     }`}
                 >
                     {isCheckingOut ? (
                         <>
-                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white" />
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                             <span>Processing…</span>
                         </>
                     ) : (
                         <>
-                            <ShieldCheckIcon className="w-3.5 h-3.5" />
+                            <ShieldCheckIcon className="w-4 h-4" />
                             <span>Complete Purchase</span>
                         </>
                     )}
                 </button>
             </div>
 
-            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-3 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-                <div className="grid grid-cols-2 gap-2">
+            <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
+                <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={onBack}
-                        className="px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 bg-white"
+                        className="px-4 py-3.5 rounded-2xl border-2 border-slate-200/80 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
                     >
                         Back
                     </button>
                     <button
                         onClick={onCheckout}
                         disabled={proceedDisabled || isCheckingOut || !isCodeComplete}
-                        className="px-4 py-3 rounded-xl text-sm font-semibold bg-slate-900 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+                        className={`px-4 py-3.5 rounded-2xl text-sm font-bold shadow-lg flex justify-center items-center gap-1.5 transition-all ${
+                            isCodeComplete && !proceedDisabled && !isCheckingOut
+                                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-500/25'
+                                : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
+                        }`}
                     >
-                        {isCheckingOut ? 'Processing…' : 'Complete'}
+                        {isCheckingOut ? (
+                            <>
+                                <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-slate-400" />
+                                <span>Processing…</span>
+                            </>
+                        ) : (
+                            'Complete'
+                        )}
                     </button>
                 </div>
             </div>
