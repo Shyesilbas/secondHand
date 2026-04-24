@@ -38,7 +38,11 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_email", columnList = "email"),
+    @Index(name = "idx_user_phone", columnList = "phone"),
+    @Index(name = "idx_user_status", columnList = "acc_status")
+})
 public class User implements UserDetails {
 
     @Id
@@ -91,6 +95,7 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @org.hibernate.annotations.BatchSize(size = 20)
     private List<Listing> listings = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

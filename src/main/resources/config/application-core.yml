@@ -20,6 +20,10 @@ spring:
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
+        default_batch_fetch_size: 20
+        jdbc.batch_size: 20
+        order_inserts: true
+        order_updates: true
   security:
     oauth2:
       client:

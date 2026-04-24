@@ -21,6 +21,10 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,7 +50,12 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestFactory paymentRequestFactory;
 
+    @Lazy
+    @Autowired
+    private ShowcaseService self;
+
     @Override
+    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
         log.info("Creating showcase for user ID: {} and listing ID: {}", userId, request.listingId());
 
@@ -94,10 +103,20 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     @Transactional(readOnly = true)
     public Page<ShowcaseDto> getActiveShowcases(Pageable pageable) {
+        CachedPage<ShowcaseDto> cached = self.getCachedActiveShowcases(pageable.getPageNumber(), pageable.getPageSize());
+        return new org.springframework.data.domain.PageImpl<>(cached.content(), pageable, cached.totalElements());
+    }
+
+    @Cacheable(value = "activeShowcases", key = "#page + '_' + #size")
+    public CachedPage<ShowcaseDto> getCachedActiveShowcases(int page, int size) {
+        log.info("[CACHE MISS] activeShowcases::page={}, size={}", page, size);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
         Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE, LocalDateTime.now(), pageable);
         List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
-        return new org.springframework.data.domain.PageImpl<>(dtoList, pageable, activeShowcases.getTotalElements());
+        return new CachedPage<>(dtoList, activeShowcases.getTotalElements());
     }
+
+    private record CachedPage<T>(List<T> content, long totalElements) implements java.io.Serializable {}
 
     @Override
     @Transactional(readOnly = true)
@@ -107,6 +126,7 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Void> extendShowcase(Long userId, UUID showcaseId, int additionalDays) {
         Result<Void> daysValidation = showcaseValidator.validateDaysCount(additionalDays);
         if (daysValidation.isError()) {
@@ -139,6 +159,7 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
+    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Void> cancelShowcase(Long userId, UUID showcaseId) {
         return showcaseRepository.findById(showcaseId)
                 .map(showcase -> {
