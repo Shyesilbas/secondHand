@@ -3,42 +3,53 @@ import {useEnums} from '../../common/hooks/useEnums.js';
 
 const EmailContent = ({ email }) => {
     const formatDate = (dateString) => formatDateTime(dateString);
-
     const { enums } = useEnums();
 
     if (!email) return null;
 
     return (
         <div className="h-full bg-white flex flex-col">
-            <div className="px-5 sm:px-8 lg:px-12 pt-6 sm:pt-8 pb-5 border-b border-slate-200/60 bg-white">
+            <div className="px-6 py-8 border-b border-gray-200">
                 <div className="max-w-3xl">
-                    <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4">
+                    <h2 className="text-xl font-bold text-gray-900 mb-6 tracking-tight">
                         {email.subject}
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-slate-600">
-                        <span><span className="font-medium text-slate-400">From:</span> {email.senderEmail}</span>
-                        <span><span className="font-medium text-slate-400">To:</span> {email.recipientEmail}</span>
-                        <span><span className="font-medium text-slate-400">Date:</span> {formatDate(email.sentAt)}</span>
-                        <span className="inline-flex w-fit items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                            {email.emailType || 'EMAIL'}
-                        </span>
+                    <div className="flex flex-col gap-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                            <span className="w-12 font-bold text-gray-400 uppercase text-[10px] tracking-wider">From</span> 
+                            <span className="font-medium text-gray-900">{email.senderEmail}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-12 font-bold text-gray-400 uppercase text-[10px] tracking-wider">To</span> 
+                            <span>{email.recipientEmail}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-12 font-bold text-gray-400 uppercase text-[10px] tracking-wider">Date</span> 
+                            <span>{formatDate(email.sentAt)}</span>
+                        </div>
+                        <div className="mt-2">
+                            <span className="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider">
+                                {email.emailType || 'EMAIL'}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 sm:px-8 lg:px-12 py-6 sm:py-9 bg-slate-50/60">
+            <div className="flex-1 overflow-y-auto px-6 py-8">
                 <div className="max-w-3xl">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm">
-                        <div 
-                        className="prose prose-slate prose-sm sm:prose-base lg:prose-base max-w-none prose-headings:font-semibold prose-headings:text-slate-900 prose-p:text-slate-800 prose-p:leading-7 prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-ul:text-slate-700 prose-ol:text-slate-700 prose-li:text-slate-700"
+                    <div 
+                        className="prose prose-gray prose-sm sm:prose-base max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-800 prose-p:leading-relaxed prose-a:text-gray-900 prose-a:underline hover:prose-a:text-gray-600 prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700"
                         dangerouslySetInnerHTML={{ 
                             __html: formatPricesInHtml(
-                                replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes']).replace(/\n/g, '<br/>'),
+                                replaceEnumCodesInHtml(email.content, enums, ['shippingStatuses', 'paymentTypes', 'emailTypes'])
+                                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                    .replace(/\n/g, '<br/>'),
                                 'TRY'
                             )
                         }}
-                        />
-                    </div>
+                    />
                 </div>
             </div>
         </div>

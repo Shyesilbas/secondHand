@@ -5,11 +5,11 @@ const HeaderIconButton = ({ to, icon: Icon, badge = 0, onClick, title }) => (
         to={to}
         onClick={onClick}
         title={title}
-        className="group relative p-2.5 text-slate-600 hover:text-slate-900 transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50"
+        className="group relative p-2 text-gray-500 hover:text-gray-900 transition-all duration-200 rounded-lg hover:bg-gray-100"
     >
-        <Icon className="w-[20px] h-[20px] stroke-[1.5px]" />
+        <Icon className="w-[18px] h-[18px] stroke-[1.8px]" />
         {badge > 0 && (
-            <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1.5 text-[10px] font-semibold text-white bg-red-500 rounded-full border-2 border-white shadow-sm shadow-red-500/30">
+            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] font-bold text-white bg-red-500 rounded-full border-[1.5px] border-white shadow-sm">
                 {badge > 99 ? '99+' : badge}
             </span>
         )}

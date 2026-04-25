@@ -1,61 +1,70 @@
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../common/constants/routes.js';
+import {useNavigate} from 'react-router-dom';
+import {ROUTES} from '../../common/constants/routes.js';
+import {AlertTriangle, Mail, Calendar, CheckCircle2} from 'lucide-react';
 
-const ProfileHeader = ({ user }) => {
+const ProfileHeader = ({user}) => {
   const navigate = useNavigate();
-  const userInitials = user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
+  const name = user?.name || '';
+  const surname = user?.surname || '';
+  const fullName = `${name} ${surname}`.trim();
+  const userInitials = (name?.[0] || user?.email?.[0] || 'U').toUpperCase() + (surname?.[0] || '').toUpperCase();
+  const isVerified = user?.accountVerified;
 
   return (
     <>
-      <div className="flex items-center space-x-6 mb-8">
+      <div className="flex items-center gap-5">
+        {/* Avatar */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center ring-4 ring-white shadow-lg">
-            <span className="text-2xl font-bold text-indigo-700 tracking-tight">
+          <div className="w-[72px] h-[72px] rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shadow-lg shadow-gray-900/10">
+            <span className="text-xl font-bold text-white tracking-tight">
               {userInitials}
             </span>
           </div>
+          {isVerified && (
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+              <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+            </div>
+          )}
         </div>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tighter mb-2">
-            {user?.name && user?.surname ? `${user.name} ${user.surname}` : 'Profile Settings'}
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            {fullName || 'Profile Settings'}
           </h1>
-          <p className="text-slate-500 tracking-tight">
-            {user?.email || 'Manage your account information and preferences'}
-          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+            {user?.email && (
+              <span className="inline-flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-gray-400" />
+                {user.email}
+              </span>
+            )}
+            {user?.accountCreationDate && (
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                Member since {new Date(user.accountCreationDate).getFullYear()}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {!user?.accountVerified && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
-          <div className="flex items-start">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 mr-4">
-              <svg
-                className="w-5 h-5 text-amber-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold text-amber-800 tracking-tight mb-1">
-                Account verification required
-              </h3>
-              <p className="text-sm text-amber-700 tracking-tight mb-4">
-                Please verify your email address to access all features and improve account security.
-              </p>
-              <button
-                onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
-                className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md tracking-tight"
-              >
-                Verify Account
-              </button>
-            </div>
+      {/* Verification banner */}
+      {!isVerified && (
+        <div className="mt-6 flex items-center gap-4 px-5 py-4 rounded-xl bg-amber-50 border border-amber-200/80">
+          <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-4.5 h-4.5 text-amber-600" />
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-amber-900">Account verification required</p>
+            <p className="text-xs text-amber-700 mt-0.5">Verify your email to access all features.</p>
+          </div>
+          <button
+            onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
+            className="shrink-0 px-4 py-2 text-sm font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 rounded-lg transition-colors duration-200"
+          >
+            Verify
+          </button>
         </div>
       )}
     </>

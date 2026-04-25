@@ -296,6 +296,7 @@ export const API_ENDPOINTS = {
         WITHDRAW: '/ewallet/withdraw',
         TRANSACTIONS: '/ewallet/transactions',
         CHECK_BALANCE: '/ewallet/balance/check',
+        SPENDING_WARNING_CHECK: '/ewallet/spending-warning/check',
     },
     SHOWCASES: {
         CREATE: '/showcases',

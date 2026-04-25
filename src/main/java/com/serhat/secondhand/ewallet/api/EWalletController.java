@@ -74,4 +74,12 @@ public class EWalletController {
         boolean hasBalance = eWalletService.hasSufficientBalance(amount);
         return ResponseEntity.ok(hasBalance);
     }
+
+    @GetMapping("/spending-warning/check")
+    public ResponseEntity<SpendingWarningCheckResponse> checkSpendingWarning(
+            @RequestParam BigDecimal amount) {
+        log.debug("Checking spending warning threshold for authenticated user");
+        SpendingWarningCheckResponse response = eWalletService.checkSpendingWarning(amount);
+        return ResponseEntity.ok(response);
+    }
 }

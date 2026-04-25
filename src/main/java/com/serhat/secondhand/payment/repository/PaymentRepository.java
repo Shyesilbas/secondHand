@@ -63,4 +63,12 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             @Param("amountMax") BigDecimal amountMax,
             @Param("sellerName") String sellerName,
             Pageable pageable);
+
+    @Query("SELECT SUM(p.amount) FROM Payment p " +
+           "WHERE p.fromUser.id = :userId " +
+           "AND p.paymentType = com.serhat.secondhand.payment.entity.PaymentType.EWALLET " +
+           "AND p.paymentDirection = com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING " +
+           "AND p.processedAt >= :startOfMonth " +
+           "AND p.isSuccess = true")
+    BigDecimal sumMonthlyEwalletSpending(@Param("userId") Long userId, @Param("startOfMonth") LocalDateTime startOfMonth);
 }

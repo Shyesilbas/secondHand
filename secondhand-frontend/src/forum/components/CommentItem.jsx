@@ -1,16 +1,16 @@
-import React, { useMemo } from 'react';
-import { CornerDownRight, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { FORUM_REACTIONS } from '../forumConstants.js';
-import { formatForumDateTime } from '../utils/forumDateFormat.js';
+import React, {useMemo} from 'react';
+import {ChevronUp, ChevronDown, CornerDownRight, Send} from 'lucide-react';
+import {FORUM_REACTIONS} from '../forumConstants.js';
+import {formatForumDateTime} from '../utils/forumDateFormat.js';
 
-export const CommentSkeleton = ({ depth = 0 }) => (
-  <div className="px-4 py-3">
-    <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-lg bg-slate-200 animate-pulse" style={{ marginLeft: depth ? `${depth * 12}px` : undefined }} />
+export const CommentSkeleton = ({depth = 0}) => (
+  <div className="px-5 py-4" style={{marginLeft: depth ? `${depth * 20}px` : undefined}}>
+    <div className="flex items-start gap-3 animate-pulse">
+      <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="h-4 w-1/4 bg-slate-200 rounded animate-pulse" />
-        <div className="mt-2 h-4 w-full bg-slate-200 rounded animate-pulse" />
-        <div className="mt-2 h-4 w-5/6 bg-slate-200 rounded animate-pulse" />
+        <div className="h-3 w-24 bg-gray-200 rounded mb-2" />
+        <div className="h-4 w-full bg-gray-100 rounded mb-1" />
+        <div className="h-4 w-4/5 bg-gray-100 rounded" />
       </div>
     </div>
   </div>
@@ -34,121 +34,129 @@ export const CommentItem = ({
     return childrenMap?.get(comment.id) || [];
   }, [childrenMap, comment?.id]);
 
-  const indent = Math.min(6, Math.max(0, Number(depth) || 0));
+  const indent = Math.min(4, Math.max(0, Number(depth) || 0));
   const isNested = indent > 0;
-  const marginLeft = indent ? `${indent * 12}px` : undefined;
   const hasChildren = children.length > 0;
   const isReplyTarget = !!activeReplyId && Number(activeReplyId) === Number(comment?.id);
+  const authorName = String(comment?.authorDisplayName || 'Anonymous');
+  const authorInitial = authorName.charAt(0).toUpperCase();
+  const netVotes = (Number(comment?.totalLikes) || 0) - (Number(comment?.totalDislikes) || 0);
 
   return (
-    <div className="relative" style={{ marginLeft }}>
-      <div
-        className={`rounded-2xl border shadow-sm ${
-          isNested ? 'border-slate-200 bg-slate-50/70' : 'border-slate-200 bg-white'
-        } ${hasChildren ? 'pb-2' : ''}`}
-      >
-        <div className="px-4 py-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span className="font-semibold text-slate-800">{String(comment?.authorDisplayName || 'Anonymous')}</span>
-                <span className="tabular-nums">{formatForumDateTime(comment?.createdAt)}</span>
-                {isNested ? (
-                  <span className="inline-flex items-center rounded-full bg-slate-200/70 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                    Reply
-                  </span>
-                ) : null}
+    <div style={{marginLeft: indent > 0 ? `${indent * 20}px` : undefined}}>
+      <div className={`rounded-xl transition-colors duration-200 ${
+        isNested ? 'border-l-2 border-gray-200 pl-4' : ''
+      }`}>
+        <div className="py-3">
+          {/* Author row */}
+          <div className="flex items-start gap-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+              isNested
+                ? 'bg-gray-100 text-gray-500'
+                : 'bg-gradient-to-br from-violet-100 to-indigo-100 text-violet-700'
+            }`}>
+              {authorInitial}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                <span className="font-semibold text-gray-800">{authorName}</span>
+                <span className="text-gray-400 tabular-nums">{formatForumDateTime(comment?.createdAt)}</span>
               </div>
-              <div className="mt-1 text-sm text-slate-800 whitespace-pre-wrap break-words">
+
+              <div className="mt-1.5 text-sm text-gray-700 whitespace-pre-wrap break-words leading-relaxed">
                 {comment?.content || ''}
               </div>
-              <div className="mt-3 flex items-center gap-3 text-xs text-slate-600">
+
+              {/* Action row */}
+              <div className="mt-2.5 flex items-center gap-1">
+                {/* Compact vote */}
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 hover:text-slate-900 transition-colors"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-all duration-200"
                   onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.LIKE)}
                 >
-                  <ThumbsUp className="w-3.5 h-3.5" />
-                  <span className="font-semibold tabular-nums">{Number(comment?.totalLikes) || 0}</span>
+                  <ChevronUp className="w-4 h-4" />
                 </button>
+                <span className={`text-xs font-bold tabular-nums min-w-[16px] text-center ${
+                  netVotes > 0 ? 'text-violet-600' : netVotes < 0 ? 'text-red-500' : 'text-gray-400'
+                }`}>
+                  {netVotes}
+                </span>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 hover:text-slate-900 transition-colors"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
                   onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.DISLIKE)}
                 >
-                  <ThumbsDown className="w-3.5 h-3.5" />
-                  <span className="font-semibold tabular-nums">{Number(comment?.totalDislikes) || 0}</span>
+                  <ChevronDown className="w-4 h-4" />
                 </button>
+
+                <div className="w-px h-4 bg-gray-200 mx-1.5" />
+
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 transition-colors"
+                  className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-violet-600 font-medium px-2 py-1.5 rounded-md hover:bg-violet-50 transition-all duration-200"
                   onClick={() => onReply?.(comment?.id)}
                 >
-                  <CornerDownRight className="w-3.5 h-3.5" />
+                  <CornerDownRight className="w-3 h-3" />
                   Reply
                 </button>
               </div>
 
-              {isReplyTarget ? (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
+              {/* Reply composer (inline) */}
+              {isReplyTarget && (
+                <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50/60 overflow-hidden focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-500/10 transition-all duration-200">
                   <textarea
                     value={replyDraft?.content || ''}
                     onChange={(e) => onReplyDraftChange?.(e.target.value)}
                     placeholder="Write a reply..."
                     autoFocus
-                    className="w-full min-h-[80px] rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full min-h-[80px] bg-transparent p-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none resize-none"
                   />
-                  <div className="mt-2 flex items-center justify-end gap-2">
+                  <div className="px-3 py-2.5 border-t border-gray-200/60 bg-white flex items-center justify-end gap-2">
                     <button
                       type="button"
                       onClick={onCancelReply}
-                      className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors duration-200"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={onSubmitReply}
-                      className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors duration-200"
                     >
+                      <Send className="w-3 h-3" />
                       Reply
                     </button>
                   </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
 
-      {children.length > 0 && (
-        <div className="px-4 pb-4">
-          <div className="rounded-xl border border-slate-200 bg-white">
-            <div className="px-3 py-2 text-[11px] font-semibold text-slate-600 uppercase tracking-wider border-b border-slate-100">
-              Replies
-            </div>
-            <div className="p-3 space-y-2 border-l-2 border-slate-200">
-              {children.map((child) => (
-                <CommentItem
-                  key={child?.id}
-                  comment={child}
-                  depth={indent + 1}
-                  childrenMap={childrenMap}
-                  activeReplyId={activeReplyId}
-                  replyDraft={replyDraft}
-                  onReplyDraftChange={onReplyDraftChange}
-                  onSubmitReply={onSubmitReply}
-                  onCancelReply={onCancelReply}
-                  onReply={onReply}
-                  onReact={onReact}
-                  threadId={threadId}
-                />
-              ))}
-            </div>
+        {/* Nested children */}
+        {hasChildren && (
+          <div className="mt-1 space-y-0.5">
+            {children.map((child) => (
+              <CommentItem
+                key={child?.id}
+                comment={child}
+                depth={indent + 1}
+                childrenMap={childrenMap}
+                activeReplyId={activeReplyId}
+                replyDraft={replyDraft}
+                onReplyDraftChange={onReplyDraftChange}
+                onSubmitReply={onSubmitReply}
+                onCancelReply={onCancelReply}
+                onReply={onReply}
+                onReact={onReact}
+                threadId={threadId}
+              />
+            ))}
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );
 };
-

@@ -1,7 +1,9 @@
-import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon, Check} from 'lucide-react';
+import React, { useState } from 'react';
+import {Banknote as BanknotesIcon, CreditCard as CreditCardIcon, Wallet as WalletIcon, Check, AlertCircle, Loader2} from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import {formatCurrency} from '../../../common/formatters.js';
 import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
+import { ewalletService } from '../../../ewallet/services/ewalletService.js';
 
 const getCardSelectValue = (card) => (
     card?.id
@@ -33,6 +35,9 @@ const CheckoutPaymentStep = ({
 }) => {
     const totalAmount = calculateTotal();
     const cur = currency || 'TRY';
+
+    const [warningData, setWarningData] = useState(null);
+    const [isCheckingWarning, setIsCheckingWarning] = useState(false);
 
     const canProceed = () => {
         return isPaymentMethodValid() && areAllAgreementsAccepted();
@@ -71,11 +76,30 @@ const CheckoutPaymentStep = ({
     };
 
     const handleNext = async () => {
-        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && calculateTotal() > eWallet.balance) {
-            return;
+        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET) {
+            if (calculateTotal() > eWallet.balance) return;
+
+            if (!warningData) {
+                try {
+                    setIsCheckingWarning(true);
+                    const res = await ewalletService.checkSpendingWarning(totalAmount);
+                    if (res && res.warningTriggered) {
+                        setWarningData(res);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Failed to check spending warning", e);
+                } finally {
+                    setIsCheckingWarning(false);
+                }
+            }
         }
         await sendVerificationCode();
         onNext();
+    };
+
+    const handleCancelWarning = () => {
+        setWarningData(null);
     };
 
     const isEWalletDisabled = !eWallet || totalAmount > (eWallet?.balance || 0);
@@ -177,7 +201,10 @@ const CheckoutPaymentStep = ({
                                     name="payment"
                                     value={method.id}
                                     checked={isSelected}
-                                    onChange={(e) => setSelectedPaymentType(e.target.value)}
+                                    onChange={(e) => {
+                                        setSelectedPaymentType(e.target.value);
+                                        setWarningData(null);
+                                    }}
                                     disabled={isDisabled}
                                     className="sr-only"
                                 />
@@ -218,51 +245,92 @@ const CheckoutPaymentStep = ({
             </div>
 
             {/* Actions */}
-            <div className="hidden sm:flex items-center justify-between pt-4 mt-3 border-t border-slate-200/60">
-                <button
-                    onClick={onBack}
-                    className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
-                >
-                    Back
-                </button>
-                <div className="flex items-center gap-3">
-                    {!canProceed() && (
-                        <p className="text-xs text-slate-500 max-w-[220px] text-right font-medium">
-                            {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
-                        </p>
-                    )}
-                    <button
-                        onClick={handleNext}
-                        disabled={!canProceed()}
-                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 text-sm font-bold shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                        Send Verification Code
-                    </button>
+            {warningData ? (
+                <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                            <h3 className="text-sm font-bold text-amber-900 mb-1">Spending Limit Warning</h3>
+                            <p className="text-xs text-amber-700 leading-relaxed mb-4">
+                                With this order, your total monthly spending will reach <strong>{formatCurrency(warningData.projectedSpending, cur)}</strong>. This is <strong>{warningData.usagePercentage.toFixed(1)}%</strong> of your <strong>{formatCurrency(warningData.warningLimit, cur)}</strong> security threshold limit. Do you still want to proceed?
+                            </p>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={handleCancelWarning}
+                                    className="px-4 py-2 text-xs font-bold text-amber-700 bg-amber-100 hover:bg-amber-200 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleNext}
+                                    className="px-4 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors shadow-sm"
+                                >
+                                    Yes, Proceed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <>
+                    <div className="hidden sm:flex items-center justify-between pt-4 mt-3 border-t border-slate-200/60">
+                        <button
+                            onClick={onBack}
+                            className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
+                        >
+                            Back
+                        </button>
+                        <div className="flex items-center gap-3">
+                            {!canProceed() && (
+                                <p className="text-xs text-slate-500 max-w-[220px] text-right font-medium">
+                                    {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
+                                </p>
+                            )}
+                            <button
+                                onClick={handleNext}
+                                disabled={!canProceed() || isCheckingWarning}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 text-sm font-bold shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none min-w-[210px]"
+                            >
+                                {isCheckingWarning ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Checking limits...
+                                    </>
+                                ) : (
+                                    'Send Verification Code'
+                                )}
+                            </button>
+                        </div>
+                    </div>
 
-            <div className="sm:hidden sticky bottom-0 -mx-4 mt-4 px-4 py-3.5 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl">
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={onBack}
-                        className="px-4 py-3 rounded-2xl border-2 border-slate-200/80 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
-                    >
-                        Back
-                    </button>
-                    <button
-                        onClick={handleNext}
-                        disabled={!canProceed()}
-                        className="px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl text-sm font-bold shadow-lg shadow-indigo-500/25 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
-                    >
-                        Send Code
-                    </button>
-                </div>
-                {!canProceed() && (
-                    <p className="mt-2 text-xs font-medium text-slate-500 text-center">
-                        {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
-                    </p>
-                )}
-            </div>
+                    <div className="sm:hidden sticky bottom-0 -mx-4 mt-4 px-4 py-3.5 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={onBack}
+                                className="px-4 py-3 rounded-2xl border-2 border-slate-200/80 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                disabled={!canProceed() || isCheckingWarning}
+                                className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl text-sm font-bold shadow-lg shadow-indigo-500/25 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+                            >
+                                {isCheckingWarning ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    'Send Code'
+                                )}
+                            </button>
+                        </div>
+                        {!canProceed() && (
+                            <p className="mt-2 text-xs font-medium text-slate-500 text-center">
+                                {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
+                            </p>
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 };
