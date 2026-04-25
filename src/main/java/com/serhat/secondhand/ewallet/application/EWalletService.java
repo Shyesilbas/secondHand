@@ -31,6 +31,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import java.math.RoundingMode;
+import java.time.YearMonth;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -144,6 +147,44 @@ public class EWalletService implements IEWalletService {
     public boolean hasSufficientBalance(BigDecimal amount) {
         User user = getAuthenticatedUser();
         return eWalletValidator.hasSufficientBalance(user, amount);
+    }
+
+    @Transactional(readOnly = true)
+    public SpendingWarningCheckResponse checkSpendingWarning(BigDecimal amount) {
+        User user = getAuthenticatedUser();
+        EWallet eWallet = getEWalletOrThrow(user);
+
+        if (eWallet.getSpendingWarningLimit() == null) {
+            return new SpendingWarningCheckResponse(false, BigDecimal.ZERO, null, amount, 0.0);
+        }
+
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        BigDecimal currentSpending = paymentRepository.sumMonthlyEwalletSpending(user.getId(), startOfMonth);
+        if (currentSpending == null) {
+            currentSpending = BigDecimal.ZERO;
+        }
+        BigDecimal projectedSpending = currentSpending.add(amount);
+        BigDecimal warningLimit = eWallet.getSpendingWarningLimit();
+
+        BigDecimal ninetyPercentLimit = warningLimit.multiply(new BigDecimal("0.90"));
+        
+        boolean currentNearLimit = currentSpending.compareTo(ninetyPercentLimit) >= 0;
+        boolean willExceedLimit = projectedSpending.compareTo(warningLimit) >= 0;
+        
+        boolean warningTriggered = currentNearLimit || willExceedLimit;
+
+        double usagePercentage = 0.0;
+        if (warningLimit.compareTo(BigDecimal.ZERO) > 0) {
+            usagePercentage = projectedSpending.divide(warningLimit, 4, RoundingMode.HALF_UP).doubleValue() * 100;
+        }
+
+        return new SpendingWarningCheckResponse(
+            warningTriggered,
+            currentSpending,
+            warningLimit,
+            projectedSpending,
+            usagePercentage
+        );
     }
 
     @Transactional(readOnly = true)

@@ -46,5 +46,9 @@ export const ewalletService = {
 
         checkBalance: async (amount) => {
         return get(`${API_ENDPOINTS.EWALLET.CHECK_BALANCE}?amount=${amount}`);
+    },
+
+    checkSpendingWarning: async (amount) => {
+        return get(`${API_ENDPOINTS.EWALLET.SPENDING_WARNING_CHECK}?amount=${amount}`);
     }
 };

@@ -5,7 +5,8 @@ import {
     MapPin as MapPinIcon,
     Settings as Cog6ToothIcon,
     ShieldCheck as ShieldCheckIcon,
-    User as UserIcon
+    User as UserIcon,
+    ChevronRight,
 } from 'lucide-react';
 import ProfileHeader from '../components/ProfileHeader.jsx';
 import ProfilePersonalInfo from '../components/ProfilePersonalInfo.jsx';
@@ -15,29 +16,29 @@ import AddressList from '../components/AddressList.jsx';
 import {useQueryClient} from '@tanstack/react-query';
 
 const TABS = [
-    { 
-        key: 'personal', 
-        label: 'Personal Info', 
+    {
+        key: 'personal',
+        label: 'Personal Info',
         icon: UserIcon,
-        description: 'Manage your personal information'
+        description: 'Your name, email and phone',
     },
-    { 
-        key: 'status', 
-        label: 'Account Status', 
+    {
+        key: 'status',
+        label: 'Account Status',
         icon: ShieldCheckIcon,
-        description: 'View account verification status'
+        description: 'Verification & security',
     },
-    { 
-        key: 'addresses', 
-        label: 'Addresses', 
+    {
+        key: 'addresses',
+        label: 'Addresses',
         icon: MapPinIcon,
-        description: 'Manage delivery addresses'
+        description: 'Delivery & billing',
     },
-    { 
-        key: 'actions', 
-        label: 'Quick Actions', 
+    {
+        key: 'actions',
+        label: 'Quick Actions',
         icon: Cog6ToothIcon,
-        description: 'Account management tools'
+        description: 'Orders, reviews & more',
     },
 ];
 
@@ -53,134 +54,117 @@ const ProfilePage = () => {
 
     const handleTabChange = (key) => {
         setActiveTab(key);
-        // Invalidate or prefetch queries if needed when switching tabs
         if (key === 'addresses') {
             queryClient.invalidateQueries(['addresses']);
         }
     };
 
+    const activeTabData = TABS.find(t => t.key === activeTab);
+    const ActiveIcon = activeTabData?.icon || UserIcon;
+
     return (
-        <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="mb-10">
+        <div className="min-h-screen bg-gray-50/80">
+            {/* ── Profile Hero ────────────────────────────────── */}
+            <div className="bg-white border-b border-gray-200/80">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <ProfileHeader user={user} />
                 </div>
+            </div>
 
-                <div className="mb-8">
-                    <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                        <div className="p-6">
-                            <div className="relative flex bg-slate-100 rounded-2xl p-1.5">
+            {/* ── Main Content: Sidebar + Panel ───────────────── */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="flex flex-col lg:flex-row gap-6">
+
+                    {/* ── Left Sidebar Nav ─────────────────────── */}
+                    <div className="lg:w-72 shrink-0">
+                        <nav className="bg-white rounded-2xl border border-gray-200 overflow-hidden lg:sticky lg:top-6">
+                            <div className="p-2">
                                 {TABS.map((tab) => {
-                                    const IconComponent = tab.icon;
+                                    const Icon = tab.icon;
                                     const isActive = activeTab === tab.key;
-                                    
                                     return (
                                         <button
                                             key={tab.key}
                                             onClick={() => handleTabChange(tab.key)}
-                                            className={`relative flex-1 flex items-center justify-center py-3 px-4 text-sm font-semibold rounded-xl transition-all duration-300 tracking-tight ${
+                                            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 group ${
                                                 isActive
-                                                    ? 'text-indigo-600 bg-white shadow-sm'
-                                                    : 'text-slate-500 hover:text-slate-700'
+                                                    ? 'bg-gray-900 text-white shadow-sm'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                         >
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-2 transition-all ${
-                                                isActive 
-                                                    ? 'bg-indigo-50 text-indigo-600' 
-                                                    : 'bg-slate-200 text-slate-500'
+                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
+                                                isActive
+                                                    ? 'bg-white/15'
+                                                    : 'bg-gray-100 group-hover:bg-gray-200'
                                             }`}>
-                                                <IconComponent className="w-4 h-4" />
+                                                <Icon className="w-4.5 h-4.5" />
                                             </div>
-                                            <span>{tab.label}</span>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                                                    {tab.label}
+                                                </div>
+                                                <div className={`text-[11px] truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
+                                                    {tab.description}
+                                                </div>
+                                            </div>
+                                            <ChevronRight className={`w-4 h-4 shrink-0 transition-all duration-200 ${
+                                                isActive ? 'text-white/40' : 'text-gray-300 group-hover:text-gray-400 group-hover:translate-x-0.5'
+                                            }`} />
                                         </button>
                                     );
                                 })}
                             </div>
+                        </nav>
+                    </div>
+
+                    {/* ── Right Content Panel ─────────────────── */}
+                    <div className="flex-1 min-w-0">
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                            {/* Panel Header */}
+                            <div className="px-8 py-6 border-b border-gray-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                                        <ActiveIcon className="w-5 h-5 text-gray-700" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                                            {activeTabData?.label}
+                                        </h2>
+                                        <p className="text-sm text-gray-500 mt-0.5">
+                                            {activeTabData?.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Panel Body */}
+                            <div className="p-8">
+                                <div key={activeTab} className="animate-fadeIn">
+                                    {activeTab === 'personal' && (
+                                        <ProfilePersonalInfo user={user} onPhoneUpdate={handlePhoneUpdate} />
+                                    )}
+                                    {activeTab === 'status' && (
+                                        <ProfileAccountStatus user={user} />
+                                    )}
+                                    {activeTab === 'addresses' && (
+                                        <AddressList isActive={activeTab === 'addresses'} />
+                                    )}
+                                    {activeTab === 'actions' && (
+                                        <ProfileQuickActions user={user} />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div className="space-y-6">
-                    <div key={activeTab} className="opacity-0 animate-[fadeIn_0.3s_ease-in-out_forwards]">
-                        {activeTab === 'personal' && (
-                            <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-10">
-                                    <div className="flex items-center space-x-3 mb-8">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                                            <UserIcon className="w-5 h-5 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-bold text-slate-900 tracking-tighter">Personal Information</h2>
-                                            <p className="text-sm text-slate-500 tracking-tight mt-1">Update your personal details and contact information</p>
-                                        </div>
-                                    </div>
-                                    <ProfilePersonalInfo user={user} onPhoneUpdate={handlePhoneUpdate} />
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'status' && (
-                            <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-10">
-                                    <div className="flex items-center space-x-3 mb-8">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                                            <ShieldCheckIcon className="w-5 h-5 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-bold text-slate-900 tracking-tighter">Account Status</h2>
-                                            <p className="text-sm text-slate-500 tracking-tight mt-1">View your account verification and security status</p>
-                                        </div>
-                                    </div>
-                                    <ProfileAccountStatus user={user} />
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'addresses' && (
-                            <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-10">
-                                    <div className="flex items-center space-x-3 mb-8">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                                            <MapPinIcon className="w-5 h-5 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-bold text-slate-900 tracking-tighter">Delivery Addresses</h2>
-                                            <p className="text-sm text-slate-500 tracking-tight mt-1">Manage your saved delivery addresses</p>
-                                        </div>
-                                    </div>
-                                    <AddressList isActive={activeTab === 'addresses'} />
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'actions' && (
-                            <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-10">
-                                    <div className="flex items-center space-x-3 mb-8">
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                                            <Cog6ToothIcon className="w-5 h-5 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-bold text-slate-900 tracking-tighter">Quick Actions</h2>
-                                            <p className="text-sm text-slate-500 tracking-tight mt-1">Account management and security tools</p>
-                                        </div>
-                                    </div>
-                                    <ProfileQuickActions user={user} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
             </div>
+
             <style>{`
                 @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
+                    from { opacity: 0; transform: translateY(6px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
+                .animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
             `}</style>
         </div>
     );

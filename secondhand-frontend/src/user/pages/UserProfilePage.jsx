@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, List } from 'lucide-react';
-import { useAuthState } from '../../auth/AuthContext.jsx';
-import { userService } from '../services/userService.js';
-import { useUserListings } from '../hooks/useUserListings.js';
-import { useReviews, useUserReviewStats } from '../../reviews/index.js';
-import { useUserFavoriteLists, FavoriteListCard, FavoriteListModal } from '../../favoritelist/index.js';
+import React, {useState} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import {Plus, List, Package, Heart, Star, MessageSquare, ChevronRight, AlertCircle} from 'lucide-react';
+import {useAuthState} from '../../auth/AuthContext.jsx';
+import {userService} from '../services/userService.js';
+import {useUserListings} from '../hooks/useUserListings.js';
+import {useReviews, useUserReviewStats} from '../../reviews/index.js';
+import {useUserFavoriteLists, FavoriteListCard, FavoriteListModal} from '../../favoritelist/index.js';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 import UserProfileHeader from '../components/UserProfileHeader.jsx';
 import UserReviews from '../components/UserReviews.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
-import { ROUTES } from '../../common/constants/routes.js';
+import {ROUTES} from '../../common/constants/routes.js';
 
 const TABS = [
-    { key: 'listings', label: 'Listings' },
-    { key: 'lists', label: 'Lists' },
-    { key: 'reviews', label: 'Reviews' },
+    {key: 'listings', label: 'Listings', icon: Package},
+    {key: 'lists', label: 'Lists', icon: Heart},
+    {key: 'reviews', label: 'Reviews', icon: Star},
 ];
 
 const useUserProfile = (userId) => {
@@ -41,51 +41,62 @@ const useUserProfile = (userId) => {
         else setIsLoading(false);
     }, [userId]);
 
-    return { user, isLoading, error };
+    return {user, isLoading, error};
 };
 
 const UserProfilePage = () => {
-    const { userId } = useParams();
+    const {userId} = useParams();
     const navigate = useNavigate();
-    const { user: currentUser } = useAuthState();
+    const {user: currentUser} = useAuthState();
     const [activeTab, setActiveTab] = useState('listings');
     const [showCreateListModal, setShowCreateListModal] = useState(false);
 
-    const { user, isLoading: userLoading, error: userError } = useUserProfile(userId);
-    const { listings, isLoading: listingsLoading, error: listingsError, pagination, loadPage, handlePageSizeChange } = useUserListings(userId, {
+    const {user, isLoading: userLoading, error: userError} = useUserProfile(userId);
+    const {listings, isLoading: listingsLoading, error: listingsError, pagination, loadPage, handlePageSizeChange} = useUserListings(userId, {
         enabled: activeTab === 'listings',
         page: 0,
-        size: 10
+        size: 12,
     });
-    const { reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, pagination: reviewsPagination, loadPage: loadReviewsPage, handlePageSizeChange: handleReviewsPageSizeChange } = useReviews(userId, {
+    const {reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, pagination: reviewsPagination, loadPage: loadReviewsPage, handlePageSizeChange: handleReviewsPageSizeChange} = useReviews(userId, {
         enabled: activeTab === 'reviews',
         page: 0,
-        size: 10
+        size: 10,
     });
-    const { stats: reviewStats } = useUserReviewStats(userId, { 
-        enabled: true
-    });
+    const {stats: reviewStats} = useUserReviewStats(userId, {enabled: true});
 
     const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
-    
-    const { data: favoriteLists = [], isLoading: listsLoading, refetch: refetchLists } = useUserFavoriteLists(userId, isOwnProfile, {
-        enabled: activeTab === 'lists'
+
+    const {data: favoriteLists = [], isLoading: listsLoading, refetch: refetchLists} = useUserFavoriteLists(userId, isOwnProfile, {
+        enabled: activeTab === 'lists',
     });
 
-    const handlePageChange = (page) => {
-        loadPage(page);
-    };
+    const handlePageChange = (page) => loadPage(page);
 
-    if (userLoading || !user) return <div className="text-center py-16 text-text-muted">Loading...</div>;
+    // Loading state
+    if (userLoading || !user) {
+        return (
+            <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-10 h-10 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-sm text-gray-500 font-medium">Loading profile...</p>
+                </div>
+            </div>
+        );
+    }
 
+    // Error state
     if (userError || !user) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="text-center">
-                    <p className="text-red-500 text-xl mb-4">{userError || 'User not found'}</p>
+            <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+                <div className="text-center max-w-sm">
+                    <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="w-6 h-6 text-red-500" />
+                    </div>
+                    <p className="text-lg font-semibold text-gray-900 mb-1">User not found</p>
+                    <p className="text-sm text-gray-500 mb-6">{userError || 'The profile you\'re looking for doesn\'t exist.'}</p>
                     <button
                         onClick={() => navigate(-1)}
-                        className="bg-btn-primary text-white px-6 py-2 rounded-lg hover:bg-btn-primary-hover transition-colors"
+                        className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors"
                     >
                         Go Back
                     </button>
@@ -95,222 +106,202 @@ const UserProfilePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] tracking-tight">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <UserProfileHeader
-                  user={user}
-                  isOwnProfile={isOwnProfile}
-                  reviewStats={reviewStats}
-                />
+        <div className="min-h-screen bg-gray-50/80">
+            {/* ── Profile Header (full-width banner) ──────────── */}
+            <UserProfileHeader
+                user={user}
+                isOwnProfile={isOwnProfile}
+                reviewStats={reviewStats}
+            />
 
-                <div className="mb-8 mt-10">
-                    <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-                        <div className="p-4">
-                            <div className="relative flex bg-slate-100 rounded-2xl p-1.5">
-                                {TABS.map((tab) => {
-                                    const isActive = activeTab === tab.key;
-                                    
-                                    return (
-                                        <button
-                                            key={tab.key}
-                                            onClick={() => setActiveTab(tab.key)}
-                                            className={`relative flex-1 flex items-center justify-center py-3 px-4 text-sm font-semibold rounded-xl transition-all duration-300 tracking-tight ${
-                                                isActive
-                                                    ? 'text-indigo-600 bg-white shadow-sm'
-                                                    : 'text-slate-500 hover:text-slate-700'
-                                            }`}
-                                        >
-                                            <span>{tab.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
+            {/* ── Tab Bar ─────────────────────────────────────── */}
+            <div className="bg-white border-b border-gray-200/80 sticky top-0 z-10">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center gap-1 -mb-px">
+                        {TABS.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.key;
+                            let count = null;
+                            if (tab.key === 'listings' && pagination.totalElements > 0) count = pagination.totalElements;
+                            if (tab.key === 'lists' && favoriteLists.length > 0) count = favoriteLists.length;
+                            if (tab.key === 'reviews' && reviewStats?.totalReviews > 0) count = reviewStats.totalReviews;
+
+                            return (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                                        isActive
+                                            ? 'border-gray-900 text-gray-900'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {tab.label}
+                                    {count !== null && (
+                                        <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-[11px] font-bold tabular-nums ${
+                                            isActive ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'
+                                        }`}>
+                                            {count}
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
+            </div>
 
-                <div key={activeTab} className="opacity-0 animate-[fadeIn_0.3s_ease-in-out_forwards]">
+            {/* ── Tab Content ─────────────────────────────────── */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div key={activeTab} className="animate-fadeIn">
+
+                    {/* ── Listings Tab ─────────────────────────── */}
                     {activeTab === 'listings' && (
-                        <div className="space-y-8">
-                            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-8">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tighter">
-                                                Listings {pagination.totalElements > 0 && <span className="text-slate-500 font-normal">({pagination.totalElements})</span>}
-                                            </h2>
-                                            <p className="text-sm text-slate-500 mt-2 tracking-tight">All active listings by this user</p>
-                                        </div>
-                                        {!listingsLoading && pagination.totalElements > 0 && (
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-slate-600 tracking-tight">Show:</span>
-                                                <select 
-                                                    value={pagination.size} 
-                                                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                                                    className="border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white tracking-tight"
-                                                >
-                                                    <option value={10}>10</option>
-                                                    <option value={15}>15</option>
-                                                    <option value={20}>20</option>
-                                                </select>
-                                                <span className="text-sm text-slate-600 tracking-tight">per page</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {listingsLoading ? (
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                                            {[...Array(8)].map((_, i) => (
-                                                <div key={i} className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden animate-pulse">
-                                                    <div className="aspect-video bg-slate-200"></div>
-                                                    <div className="p-4 space-y-3">
-                                                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                                                        <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                                                        <div className="h-4 bg-slate-200 rounded w-1/4"></div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : listingsError ? (
-                                        <div className="text-center py-16">
-                                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                                <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <p className="text-lg font-semibold text-slate-900 mb-2 tracking-tight">Failed to load listings</p>
-                                            <p className="text-sm text-slate-500 tracking-tight">Please try again later</p>
-                                        </div>
-                                    ) : listings.length === 0 ? (
-                                        <div className="text-center py-16">
-                                            <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                                                <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                                </svg>
-                                            </div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tighter">No listings available</h3>
-                                            <p className="text-sm text-slate-500 tracking-tight">
-                                                {isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"}
-                                            </p>
-                                            {isOwnProfile && (
-                                                <button
-                                                        onClick={() => navigate(ROUTES.CREATE_LISTING)}
-                                                    className="mt-6 px-6 py-3 bg-slate-900 text-white font-semibold rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-md hover:shadow-lg tracking-tight"
-                                                >
-                                                    Create Your First Listing
-                                                </button>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                                                {listings.map((listing, index) => (
-                                                    <ListingCard
-                                                        key={listing.id}
-                                                        listing={listing}
-                                                        showActions={false}
-                                                        isOwner={currentUser?.id === listing.sellerId}
-                                                        currentUserId={currentUser?.id}
-                                                        priorityImage={index === 0}
-                                                    />
-                                                ))}
-                                            </div>
-                                            {!listingsLoading && pagination.totalPages > 1 && (
-                                                <div className="mt-8 bg-white rounded-3xl border border-slate-200/60 shadow-sm">
-                                                    <Pagination
-                                                        page={pagination.number}
-                                                        totalPages={pagination.totalPages}
-                                                        onPageChange={handlePageChange}
-                                                    />
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
+                        <div>
+                            {/* Controls row */}
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                                        Listings
+                                    </h2>
+                                    <p className="text-sm text-gray-500 mt-0.5">
+                                        {isOwnProfile ? 'Your active listings' : 'All active listings by this user'}
+                                    </p>
                                 </div>
+                                {!listingsLoading && pagination.totalElements > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            value={pagination.size}
+                                            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                                            className="h-9 border border-gray-200 rounded-lg px-3 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 cursor-pointer"
+                                        >
+                                            <option value={10}>10</option>
+                                            <option value={15}>15</option>
+                                            <option value={20}>20</option>
+                                        </select>
+                                        <span className="text-xs text-gray-400 font-medium">per page</span>
+                                    </div>
+                                )}
                             </div>
+
+                            {listingsLoading ? (
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    {[...Array(8)].map((_, i) => (
+                                        <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
+                                            <div className="aspect-square bg-gray-100" />
+                                            <div className="p-3.5 space-y-2">
+                                                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                                                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : listingsError ? (
+                                <EmptyState
+                                    icon={AlertCircle}
+                                    iconColor="text-red-500"
+                                    iconBg="bg-red-50"
+                                    title="Failed to load listings"
+                                    description="Please try again later"
+                                />
+                            ) : listings.length === 0 ? (
+                                <EmptyState
+                                    icon={Package}
+                                    title="No listings yet"
+                                    description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"}
+                                    action={isOwnProfile ? {label: 'Create Listing', onClick: () => navigate(ROUTES.CREATE_LISTING)} : null}
+                                />
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                        {listings.map((listing, index) => (
+                                            <ListingCard
+                                                key={listing.id}
+                                                listing={listing}
+                                                showActions={false}
+                                                isOwner={currentUser?.id === listing.sellerId}
+                                                currentUserId={currentUser?.id}
+                                                priorityImage={index === 0}
+                                            />
+                                        ))}
+                                    </div>
+                                    {!listingsLoading && pagination.totalPages > 1 && (
+                                        <div className="mt-6">
+                                            <Pagination
+                                                page={pagination.number}
+                                                totalPages={pagination.totalPages}
+                                                onPageChange={handlePageChange}
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </div>
                     )}
 
+                    {/* ── Lists Tab ────────────────────────────── */}
                     {activeTab === 'lists' && (
-                        <div className="space-y-8">
-                            <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
-                                <div className="p-8">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-slate-900 tracking-tighter">
-                                                Lists {favoriteLists.length > 0 && <span className="text-slate-500 font-normal">({favoriteLists.length})</span>}
-                                            </h2>
-                                            <p className="text-sm text-slate-500 mt-2 tracking-tight">
-                                                {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
-                                            </p>
-                                        </div>
-                                        {isOwnProfile && (
-                                            <button
-                                                onClick={() => setShowCreateListModal(true)}
-                                                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-md hover:shadow-lg text-sm font-semibold tracking-tight"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                                New List
-                                            </button>
-                                        )}
-                                    </div>
+                        <div>
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">Lists</h2>
+                                    <p className="text-sm text-gray-500 mt-0.5">
+                                        {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
+                                    </p>
+                                </div>
+                                {isOwnProfile && (
+                                    <button
+                                        onClick={() => setShowCreateListModal(true)}
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 text-sm font-semibold transition-all duration-200 shadow-sm"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        New List
+                                    </button>
+                                )}
+                            </div>
 
-                                    {listsLoading ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {[...Array(3)].map((_, i) => (
-                                                <div key={i} className="bg-slate-50 border border-slate-200 rounded-3xl overflow-hidden animate-pulse">
-                                                    <div className="aspect-square bg-slate-200"></div>
-                                                    <div className="p-5 space-y-3">
-                                                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                                                        <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : favoriteLists.length === 0 ? (
-                                        <div className="text-center py-16">
-                                            <div className="w-24 h-24 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                                                <List className="w-12 h-12 text-indigo-600" />
+                            {listsLoading ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {[...Array(3)].map((_, i) => (
+                                        <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
+                                            <div className="aspect-[4/3] bg-gray-100" />
+                                            <div className="p-4 space-y-2">
+                                                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                                                <div className="h-3 bg-gray-100 rounded w-1/2" />
                                             </div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tighter">No lists yet</h3>
-                                            <p className="text-sm text-slate-500 mb-6 tracking-tight">
-                                                {isOwnProfile 
-                                                    ? "You haven't created any lists yet" 
-                                                    : "This user hasn't shared any public lists yet"}
-                                            </p>
-                                            {isOwnProfile && (
-                                                <button
-                                                    onClick={() => setShowCreateListModal(true)}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-md hover:shadow-lg font-semibold tracking-tight"
-                                                >
-                                                    <Plus className="w-5 h-5" />
-                                                    Create Your First List
-                                                </button>
-                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {favoriteLists.map(list => (
-                                                <FavoriteListCard key={list.id} list={list} />
-                                            ))}
-                                            {isOwnProfile && (
-                                                <button
-                                                    onClick={() => setShowCreateListModal(true)}
-                                                    className="aspect-square bg-slate-50 border-2 border-dashed border-slate-300 rounded-3xl flex flex-col items-center justify-center hover:border-indigo-400 hover:bg-indigo-50 transition-all duration-200 group"
-                                                >
-                                                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
-                                                        <Plus className="w-6 h-6 text-indigo-600" />
-                                                    </div>
-                                                    <span className="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 tracking-tight">New List</span>
-                                                </button>
-                                            )}
-                                        </div>
+                                    ))}
+                                </div>
+                            ) : favoriteLists.length === 0 ? (
+                                <EmptyState
+                                    icon={Heart}
+                                    title="No lists yet"
+                                    description={isOwnProfile ? "You haven't created any lists yet" : "This user hasn't shared any public lists yet"}
+                                    action={isOwnProfile ? {label: 'Create List', onClick: () => setShowCreateListModal(true)} : null}
+                                />
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {favoriteLists.map(list => (
+                                        <FavoriteListCard key={list.id} list={list} />
+                                    ))}
+                                    {isOwnProfile && (
+                                        <button
+                                            onClick={() => setShowCreateListModal(true)}
+                                            className="aspect-[4/3] bg-white border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group"
+                                        >
+                                            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-gray-200 transition-colors">
+                                                <Plus className="w-5 h-5 text-gray-500" />
+                                            </div>
+                                            <span className="text-sm font-semibold text-gray-500 group-hover:text-gray-700">New List</span>
+                                        </button>
                                     )}
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
 
+                    {/* ── Reviews Tab ──────────────────────────── */}
                     {activeTab === 'reviews' && (
                         <UserReviews
                             receivedReviews={receivedReviews}
@@ -324,7 +315,7 @@ const UserProfilePage = () => {
                     )}
                 </div>
             </div>
-            
+
             <FavoriteListModal
                 isOpen={showCreateListModal}
                 onClose={() => setShowCreateListModal(false)}
@@ -333,18 +324,35 @@ const UserProfilePage = () => {
                     setShowCreateListModal(false);
                 }}
             />
+
             <style>{`
                 @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
+                    from { opacity: 0; transform: translateY(6px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
+                .animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
             `}</style>
         </div>
     );
 };
+
+/* ── Reusable Empty State ──────────────────────────────── */
+const EmptyState = ({icon: Icon, iconColor = 'text-gray-400', iconBg = 'bg-gray-100', title, description, action}) => (
+    <div className="rounded-2xl border border-gray-200 bg-white py-16 px-8 text-center">
+        <div className={`w-14 h-14 rounded-2xl ${iconBg} flex items-center justify-center mx-auto mb-4`}>
+            <Icon className={`w-6 h-6 ${iconColor}`} />
+        </div>
+        <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
+        <p className="text-sm text-gray-500 max-w-xs mx-auto">{description}</p>
+        {action && (
+            <button
+                onClick={action.onClick}
+                className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm"
+            >
+                {action.label}
+            </button>
+        )}
+    </div>
+);
 
 export default UserProfilePage;

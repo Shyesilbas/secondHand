@@ -142,13 +142,13 @@ public class OrderEmailListener {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format(cfg.getCustomerGreetingFormat(), user.getName())).append("\n\n");
         sb.append(cfg.getCustomerIntroLine()).append("\n\n");
-        sb.append(cfg.getCustomerOrderNumberLabel()).append(": ").append(order.getOrderNumber()).append('\n');
-        sb.append(cfg.getCustomerStatusLabel()).append(": ").append(order.getStatus()).append('\n');
-        sb.append(cfg.getCustomerPaymentStatusLabel()).append(": ").append(order.getPaymentStatus()).append('\n');
-        sb.append(cfg.getCustomerTotalLabel()).append(": ").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("\n");
+        sb.append(cfg.getCustomerOrderNumberLabel()).append(": **").append(getOrderDisplayName(order.getName(), order.getOrderNumber())).append("**\n");
+        sb.append(cfg.getCustomerStatusLabel()).append(": **").append(order.getStatus()).append("**\n");
+        sb.append(cfg.getCustomerPaymentStatusLabel()).append(": **").append(order.getPaymentStatus()).append("**\n");
+        sb.append(cfg.getCustomerTotalLabel()).append(": **").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("**\n");
 
         if (order.getShippingAddress() != null) {
-            sb.append("\n").append(cfg.getCustomerShippingAddressLabel()).append(":\n");
+            sb.append("\n**").append(cfg.getCustomerShippingAddressLabel()).append("**:\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')
               .append(order.getShippingAddress().getState()).append(' ')
@@ -157,7 +157,7 @@ public class OrderEmailListener {
         }
 
         if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-            sb.append("\n").append(cfg.getCustomerItemsLabel()).append(":\n");
+            sb.append("\n**").append(cfg.getCustomerItemsLabel()).append("**:\n");
             order.getOrderItems().forEach(it -> {
                 String title = it.getListing() != null ? it.getListing().getTitle() : cfg.getCustomerItemFallbackTitle();
                 sb.append(String.format(
@@ -171,10 +171,10 @@ public class OrderEmailListener {
         }
 
         if (order.getNotes() != null && !order.getNotes().isBlank()) {
-            sb.append("\n").append(cfg.getCustomerNotesLabel()).append(": ").append(order.getNotes()).append('\n');
+            sb.append("\n**").append(cfg.getCustomerNotesLabel()).append("**: ").append(order.getNotes()).append('\n');
         }
         if (order.getPaymentReference() != null) {
-            sb.append(cfg.getCustomerPaymentReferenceLabel()).append(": ").append(order.getPaymentReference()).append('\n');
+            sb.append("**").append(cfg.getCustomerPaymentReferenceLabel()).append("**: ").append(order.getPaymentReference()).append('\n');
         }
         sb.append("\n").append(cfg.getCustomerClosing()).append('\n');
         return sb.toString();
@@ -185,14 +185,14 @@ public class OrderEmailListener {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format(cfg.getSellerGreetingFormat(), seller.getName())).append("\n\n");
         sb.append(cfg.getSellerIntroLine()).append("\n\n");
-        sb.append(cfg.getSellerOrderNumberLabel()).append(": ").append(order.getOrderNumber()).append('\n');
+        sb.append(cfg.getSellerOrderNumberLabel()).append(": **").append(getOrderDisplayName(order.getName(), order.getOrderNumber())).append("**\n");
 
         BigDecimal total = sellerItems.stream()
                 .map(OrderItemDto::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        sb.append(cfg.getSellerTotalAmountLabel()).append(": ").append(total).append(' ').append(order.getCurrency()).append("\n\n");
+        sb.append(cfg.getSellerTotalAmountLabel()).append(": **").append(total).append(' ').append(order.getCurrency()).append("**\n\n");
 
-        sb.append(cfg.getSellerSoldItemsLabel()).append(":\n");
+        sb.append("**").append(cfg.getSellerSoldItemsLabel()).append("**:\n");
         sellerItems.forEach(item -> {
             String title = item.getListing() != null ? item.getListing().getTitle() : cfg.getSellerItemFallbackTitle();
             sb.append(String.format(
@@ -205,7 +205,7 @@ public class OrderEmailListener {
         });
 
         if (order.getShippingAddress() != null) {
-            sb.append("\n").append(cfg.getSellerShippingAddressLabel()).append(":\n");
+            sb.append("\n**").append(cfg.getSellerShippingAddressLabel()).append("**:\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')
               .append(order.getShippingAddress().getState()).append(' ')
@@ -213,23 +213,34 @@ public class OrderEmailListener {
             sb.append(order.getShippingAddress().getCountry()).append('\n');
         }
 
-        sb.append("\n").append(cfg.getSellerPrepLine()).append("\n");
+        sb.append("\n*").append(cfg.getSellerPrepLine()).append("*\n\n");
         sb.append(cfg.getSellerClosing()).append('\n');
         return sb.toString();
     }
 
     private String buildCancellationContent(User user, Order order) {
-        return String.format(emailConfig.getOrder().getCancellationContentFormat(), user.getName(), order.getOrderNumber());
+        return String.format(emailConfig.getOrder().getCancellationContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
     }
 
     private String buildRefundContent(User user, Order order) {
-        return String.format(emailConfig.getOrder().getRefundContentFormat(), user.getName(), order.getOrderNumber());
+        return String.format(emailConfig.getOrder().getRefundContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
     }
 
     private String buildCompletionContent(User user, Order order, boolean isAutomatic) {
         String completionWord = isAutomatic
                 ? emailConfig.getOrder().getCompletionAutomaticWord()
                 : emailConfig.getOrder().getCompletionManualWord();
-        return String.format(emailConfig.getOrder().getCompletionContentFormat(), user.getName(), order.getOrderNumber(), completionWord);
+        return String.format(emailConfig.getOrder().getCompletionContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**", completionWord);
+    }
+
+    private String getOrderDisplayName(String orderName, String orderNumber) {
+        if (orderName != null && !orderName.trim().isEmpty()) {
+            return orderName;
+        }
+        if (orderNumber != null) {
+            String cleanNumber = orderNumber.replace("-", "").toUpperCase();
+            return "#ORD-" + cleanNumber.substring(0, Math.min(8, cleanNumber.length()));
+        }
+        return "Unknown";
     }
 }

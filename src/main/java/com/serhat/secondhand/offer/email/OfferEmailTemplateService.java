@@ -65,16 +65,16 @@ public class OfferEmailTemplateService {
         StringBuilder sb = new StringBuilder();
         sb.append(emailConfig.getOffer().getGreeting()).append("\n\n");
         sb.append(headline).append("\n\n");
-        sb.append(emailConfig.getOffer().getListingLabel()).append(": ").append(listingTitle);
+        sb.append("**").append(emailConfig.getOffer().getListingLabel()).append("** : ").append(listingTitle);
         if (listingNo != null && !listingNo.isBlank()) {
             sb.append(" (").append(listingNo).append(")");
         }
         sb.append("\n");
-        sb.append(emailConfig.getOffer().getQuantityLabel()).append(": ").append(qty != null ? qty : 0).append("\n");
-        sb.append(emailConfig.getOffer().getTotalPriceLabel()).append(": ").append(total != null ? total : BigDecimal.ZERO).append("\n");
-        sb.append(emailConfig.getOffer().getUnitPriceLabel()).append(": ").append(unit != null ? unit : BigDecimal.ZERO).append("\n");
+        sb.append("**").append(emailConfig.getOffer().getQuantityLabel()).append("** : ").append(qty != null ? qty : 0).append("\n");
+        sb.append("**").append(emailConfig.getOffer().getTotalPriceLabel()).append("** : ").append(total != null ? total : BigDecimal.ZERO).append("\n");
+        sb.append("**").append(emailConfig.getOffer().getUnitPriceLabel()).append("** : ").append(unit != null ? unit : BigDecimal.ZERO).append("\n");
         if (expiresAt != null) {
-            sb.append(emailConfig.getOffer().getExpiresAtLabel()).append(": ").append(expiresAt).append("\n");
+            sb.append("**").append(emailConfig.getOffer().getExpiresAtLabel()).append("** : ").append(expiresAt).append("\n");
         }
         sb.append("\n").append(emailConfig.getOffer().getClosing()).append("\n");
         return sb.toString();

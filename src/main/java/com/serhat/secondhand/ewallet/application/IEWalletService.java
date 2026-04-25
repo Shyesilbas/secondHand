@@ -35,4 +35,6 @@ public interface IEWalletService {
     void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType);
     
     void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType);
+    
+    SpendingWarningCheckResponse checkSpendingWarning(BigDecimal amount);
 }

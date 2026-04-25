@@ -8,7 +8,7 @@ const EWALLET_KEYS = {
 };
 
 export const useEWallet = (options = {}) => {
-    const { showNotification } = useNotification();
+    const { showSuccess, showError } = useNotification();
     const queryClient = useQueryClient();
     const enabled = options.enabled ?? true;
 
@@ -39,11 +39,11 @@ export const useEWallet = (options = {}) => {
             mutationFn,
             onSuccess: () => {
                 invalidateWallet();
-                if (successMsg) showNotification(successMsg, 'success');
+                if (successMsg) showSuccess('Success', successMsg);
             },
             onError: (err) => {
                 const msg = err.response?.data?.message || err.message || errorMsg;
-                showNotification(msg, 'error');
+                showError('Error', msg);
             },
         });
 
