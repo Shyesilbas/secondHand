@@ -12,57 +12,80 @@ import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 import {getListingConfig} from '../config/listingConfig.js';
 import {resolveEnumLabel, toDisplayText} from '../utils/listingDisplayFormat.js';
+import {AlertCircle, ImageIcon, MapPin, Package, FileText} from 'lucide-react';
 
-const FieldError = ({ error }) => {
+/* ── Small UI Primitives ───────────────────────────────────── */
+
+const FieldError = ({error}) => {
   if (!error) return null;
-  return <p className="mt-1.5 text-[11px] text-red-500">{error}</p>;
-};
-
-const SectionCard = ({ title, description, children }) => {
   return (
-    <div className="bg-white rounded-lg border border-gray-100 p-5">
-      <div className="pb-3 border-b border-gray-50 mb-5">
-        <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">{title}</h3>
-        {description ? <p className="text-[11px] text-gray-400 mt-0.5">{description}</p> : null}
-      </div>
-      {children}
-    </div>
+    <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
+      <AlertCircle className="w-3 h-3 shrink-0" />
+      {error}
+    </p>
   );
 };
 
-const ToggleCardField = ({ name, label, description, value, onToggle }) => {
-  return (
-    <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-150 cursor-pointer focus:outline-none ${
-        value ? 'border-gray-900 bg-gray-50' : 'border-gray-100 bg-white hover:border-gray-200'
-      }`}
-      onClick={onToggle}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onToggle();
-        }
-      }}
-    >
-      <input
-        id={name}
-        type="checkbox"
-        name={name}
-        checked={Boolean(value)}
-        onChange={() => onToggle()}
-        className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-1 focus:ring-gray-300"
-      />
+const SectionCard = ({title, description, icon: Icon, children}) => (
+  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+      {Icon && (
+        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 text-gray-500" />
+        </div>
+      )}
       <div>
-        <label htmlFor={name} className="block text-[13px] font-medium text-gray-900 cursor-pointer">
-          {label}
-        </label>
-        {description ? <p className="text-[11px] text-gray-400 mt-0.5">{description}</p> : null}
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
       </div>
     </div>
-  );
-};
+    <div className="p-6">{children}</div>
+  </div>
+);
+
+const ToggleCardField = ({name, label, description, value, onToggle}) => (
+  <div
+    className={`flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-200 cursor-pointer select-none ${
+      value ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'
+    }`}
+    onClick={onToggle}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
+    }}
+  >
+    <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
+      value ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-white'
+    }`}>
+      {value && (
+        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+    </div>
+    <input
+      id={name}
+      type="checkbox"
+      name={name}
+      checked={Boolean(value)}
+      onChange={() => onToggle()}
+      className="sr-only"
+    />
+    <div>
+      <label htmlFor={name} className="block text-sm font-medium text-gray-900 cursor-pointer">{label}</label>
+      {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+    </div>
+  </div>
+);
+
+/* ── Input Classes ─────────────────────────────────────────── */
+
+const inputBase = 'w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none transition-all duration-200';
+const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-900/10`;
+const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+
+/* ── Main Form ─────────────────────────────────────────────── */
 
 const GenericListingForm = ({
   listingType,
@@ -78,7 +101,7 @@ const GenericListingForm = ({
 }) => {
   const navigate = useNavigate();
   const notification = useNotification();
-  const { enums } = useEnums();
+  const {enums} = useEnums();
 
   const listingConfig = useMemo(() => getListingConfig(listingType), [listingType]);
   const formSchema = listingConfig?.formSchema || null;
@@ -92,7 +115,7 @@ const GenericListingForm = ({
       ...steps,
       {
         id: summaryId,
-        title: 'Summary',
+        title: 'Review & Publish',
         description: 'Review your listing before publishing',
         kind: 'summary',
       },
@@ -107,7 +130,7 @@ const GenericListingForm = ({
 
   const mergedInitialData = useMemo(() => {
     const base = (formSchema?.initialData && typeof formSchema.initialData === 'object') ? formSchema.initialData : {};
-    return { ...base, ...(normalizedInitialData || {}) };
+    return {...base, ...(normalizedInitialData || {})};
   }, [formSchema?.initialData, normalizedInitialData]);
 
   const totalSteps = wizardSteps?.length || 3;
@@ -118,7 +141,7 @@ const GenericListingForm = ({
     listingType,
   });
 
-  const { handleSubmit } = useFormSubmission({
+  const {handleSubmit} = useFormSubmission({
     submitFunction: (isEdit && onUpdate) ? onUpdate : submitFunction,
     formState,
     successMessage: successMessage || (isEdit ? 'Listing updated successfully!' : 'Listing created successfully!'),
@@ -139,28 +162,20 @@ const GenericListingForm = ({
 
   const ctx = useMemo(() => {
     const setValue = (field, value) => handleDropdownChange(field, value);
-    const setChecked = (field, checked) => handleInputChange({ target: { name: field, checked, type: 'checkbox' } });
-    const getName = (enumKey, idOrValue, { upper = false } = {}) => {
+    const setChecked = (field, checked) => handleInputChange({target: {name: field, checked, type: 'checkbox'}});
+    const getName = (enumKey, idOrValue, {upper = false} = {}) => {
       const n = resolveEnumLabel(enums, enumKey, idOrValue);
       return upper ? n.toUpperCase() : n;
     };
 
-    return {
-      enums,
-      formData,
-      errors,
-      setValue,
-      setChecked,
-      getName,
-      isEdit,
-    };
+    return {enums, formData, errors, setValue, setChecked, getName, isEdit};
   }, [enums, errors, formData, handleDropdownChange, handleInputChange, isEdit]);
 
   useEffect(() => {
     if (!formSchema?.derivedFields?.length) return;
     formSchema.derivedFields.forEach((d) => {
       const sourceValue = formData?.[d.sourceField];
-      const computed = ctx.getName(d.enumKey, sourceValue, { upper: Boolean(d.uppercase) });
+      const computed = ctx.getName(d.enumKey, sourceValue, {upper: Boolean(d.uppercase)});
       const nextValue = typeof d.transform === 'function' ? d.transform(computed, ctx) : computed;
       const currentValue = String(formData?.[d.targetField] ?? '');
       if (String(nextValue ?? '') !== currentValue) {
@@ -175,6 +190,8 @@ const GenericListingForm = ({
       if (typeof fn === 'function') fn(ctx);
     });
   }, [ctx, formSchema]);
+
+  /* ── Field Renderer ────────────────────────────────────── */
 
   const renderField = (field) => {
     const isVisible = typeof field.visibleWhen === 'function' ? field.visibleWhen(ctx) : true;
@@ -196,7 +213,7 @@ const GenericListingForm = ({
             value={value}
             onChange={(v) => {
               if (typeof field.onChange === 'function') {
-                field.onChange({ value: v, ctx });
+                field.onChange({value: v, ctx});
               } else {
                 handleDropdownChange(field.name, v);
               }
@@ -204,9 +221,7 @@ const GenericListingForm = ({
             options={options}
             disabled={disabled}
           />
-          {field.description ? (
-            <p className="mt-1.5 text-xs text-gray-500">{field.description}</p>
-          ) : null}
+          {field.description && <p className="mt-1.5 text-xs text-gray-400">{field.description}</p>}
           <FieldError error={error} />
         </div>
       );
@@ -225,7 +240,7 @@ const GenericListingForm = ({
             onSelectionChange={(values) => {
               const v = values?.[0] ?? '';
               if (typeof field.onChange === 'function') {
-                field.onChange({ value: v, ctx });
+                field.onChange({value: v, ctx});
               } else {
                 handleDropdownChange(field.name, v);
               }
@@ -250,7 +265,7 @@ const GenericListingForm = ({
             onToggle={() => {
               const next = !Boolean(value);
               if (typeof field.onChange === 'function') {
-                field.onChange({ value: next, ctx });
+                field.onChange({value: next, ctx});
               } else {
                 ctx.setChecked(field.name, next);
               }
@@ -264,16 +279,15 @@ const GenericListingForm = ({
     if (field.type === 'textarea') {
       return (
         <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
-          <label className="block text-[13px] font-medium text-gray-900 mb-2">{label}</label>
+          <label className="block text-sm font-medium text-gray-900 mb-2">{label}</label>
           <textarea
             name={field.name}
             value={value || ''}
             onChange={handleInputChange}
             rows={field.rows || 3}
             placeholder={field.placeholder || ''}
-            className={`w-full px-3 py-2.5 text-[13px] border rounded-lg focus:outline-none focus:ring-1 transition-colors resize-none ${
-              error ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'
-            }`}
+            className={error ? inputError : inputNormal}
+            style={{resize: 'none'}}
           />
           <FieldError error={error} />
         </div>
@@ -283,7 +297,7 @@ const GenericListingForm = ({
     const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
     return (
       <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
-        <label className="block text-[13px] font-medium text-gray-900 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-gray-900 mb-2">{label}</label>
         <input
           type={inputType}
           name={field.name}
@@ -293,14 +307,14 @@ const GenericListingForm = ({
           max={field.max}
           step={field.step}
           placeholder={field.placeholder || ''}
-          className={`w-full px-3 py-2.5 text-[13px] border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
-            error ? 'border-red-300 focus:ring-red-200' : 'border-gray-200 focus:ring-gray-200 focus:border-gray-300'
-          }`}
+          className={error ? inputError : inputNormal}
         />
         <FieldError error={error} />
       </div>
     );
   };
+
+  /* ── Step Renderers ────────────────────────────────────── */
 
   const renderDetailsStep = (step) => {
     const sections = step?.sections || [];
@@ -311,7 +325,7 @@ const GenericListingForm = ({
           if (!isVisible) return null;
           return (
             <SectionCard key={section.id || section.title} title={section.title} description={section.description}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {(section.fields || []).map(renderField)}
               </div>
             </SectionCard>
@@ -321,19 +335,21 @@ const GenericListingForm = ({
     );
   };
 
-  const renderMediaLocationStep = () => {
-    return (
-      <div className="space-y-6">
+  const renderMediaLocationStep = () => (
+    <div className="space-y-6">
+      <SectionCard title="Photos" description="Upload images of your item" icon={ImageIcon}>
         <ImageUpload
           onImageUpload={(imageUrl) => ctx.setValue('imageUrl', imageUrl)}
           onImageRemove={() => ctx.setValue('imageUrl', '')}
           imageUrl={formData?.imageUrl}
           disabled={false}
         />
+      </SectionCard>
+      <SectionCard title="Location" description="Where is the item located?" icon={MapPin}>
         <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
-      </div>
-    );
-  };
+      </SectionCard>
+    </div>
+  );
 
   const formatSummaryValue = (field, rawValue) => {
     const text = toDisplayText(rawValue, enums, field?.enumKey);
@@ -342,14 +358,14 @@ const GenericListingForm = ({
 
   const renderSummaryStep = () => {
     const basics = [
-      { label: 'Title', value: String(formData?.title ?? '') },
-      { label: 'Price', value: formData?.price != null && String(formData.price).trim() ? `${formData.price} ${formData?.currency || ''}`.trim() : '' },
-      { label: 'Quantity', value: formData?.quantity != null && String(formData.quantity).trim() ? String(formData.quantity) : '' },
+      {label: 'Title', value: String(formData?.title ?? '')},
+      {label: 'Price', value: formData?.price != null && String(formData.price).trim() ? `${formData.price} ${formData?.currency || ''}`.trim() : ''},
+      {label: 'Quantity', value: formData?.quantity != null && String(formData.quantity).trim() ? String(formData.quantity) : ''},
     ].filter((x) => String(x.value || '').trim());
 
     const location = [
-      { label: 'City', value: String(formData?.city ?? '') },
-      { label: 'District', value: String(formData?.district ?? '') },
+      {label: 'City', value: String(formData?.city ?? '')},
+      {label: 'District', value: String(formData?.district ?? '')},
     ].filter((x) => String(x.value || '').trim());
 
     const detailFields = [];
@@ -363,66 +379,47 @@ const GenericListingForm = ({
           if (!visible) return;
           const value = formatSummaryValue(field, formData?.[field.name]);
           if (!value) return;
-          detailFields.push({ label: field.label || field.name, value });
+          detailFields.push({label: field.label || field.name, value});
         });
       });
     });
 
     const typeLabel = listingConfig?.label || listingType;
 
-    const SummaryRow = ({ label, value }) => (
-      <div className="flex items-baseline justify-between py-2 border-b border-gray-50 last:border-0">
-        <span className="text-[11px] text-gray-400">{label}</span>
-        <span className="text-[13px] font-medium text-gray-900 text-right ml-4 tabular-nums">{value}</span>
-      </div>
-    );
-
     return (
       <div className="space-y-4">
         {/* Header card */}
-        <div className="bg-white rounded-lg border border-gray-100 p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{typeLabel}</span>
-              <h3 className="mt-0.5 text-[15px] font-semibold text-gray-900 tracking-[-0.01em]">{formData?.title || 'Untitled'}</h3>
-              {formData?.description ? (
-                <p className="mt-2 text-[12px] text-gray-500 line-clamp-3 whitespace-pre-wrap">{formData.description}</p>
-              ) : null}
-            </div>
-            {formData?.imageUrl ? (
-              <div className="w-20 h-20 rounded-lg border border-gray-100 overflow-hidden bg-gray-50 shrink-0">
-                <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+                  {typeLabel}
+                </span>
+                <h3 className="mt-2 text-lg font-bold text-gray-900 tracking-tight">{formData?.title || 'Untitled'}</h3>
+                {formData?.description && (
+                  <p className="mt-2 text-sm text-gray-500 line-clamp-3 whitespace-pre-wrap leading-relaxed">{formData.description}</p>
+                )}
               </div>
-            ) : null}
+              {formData?.imageUrl && (
+                <div className="w-24 h-24 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 shrink-0 shadow-sm">
+                  <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {basics.length ? (
-          <div className="bg-white rounded-lg border border-gray-100 p-5">
-            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Basics</h4>
-            {basics.map((row) => (
-              <SummaryRow key={row.label} label={row.label} value={row.value} />
-            ))}
-          </div>
-        ) : null}
-
-        {location.length ? (
-          <div className="bg-white rounded-lg border border-gray-100 p-5">
-            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Location</h4>
-            {location.map((row) => (
-              <SummaryRow key={row.label} label={row.label} value={row.value} />
-            ))}
-          </div>
-        ) : null}
-
-        {detailFields.length ? (
-          <div className="bg-white rounded-lg border border-gray-100 p-5">
-            <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-2">Details</h4>
-            {detailFields.map((row) => (
-              <SummaryRow key={`${row.label}:${row.value}`} label={row.label} value={row.value} />
-            ))}
-          </div>
-        ) : null}
+        {/* Summary sections */}
+        {basics.length > 0 && (
+          <SummarySection title="Basics" icon={Package} rows={basics} />
+        )}
+        {location.length > 0 && (
+          <SummarySection title="Location" icon={MapPin} rows={location} />
+        )}
+        {detailFields.length > 0 && (
+          <SummarySection title="Details" icon={FileText} rows={detailFields} />
+        )}
       </div>
     );
   };
@@ -435,19 +432,9 @@ const GenericListingForm = ({
       const showQuantity = Boolean(step?.showQuantity);
       return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} showQuantity={showQuantity} />;
     }
-
-    if (kind === 'mediaLocation') {
-      return renderMediaLocationStep();
-    }
-
-    if (kind === 'details') {
-      return renderDetailsStep(step);
-    }
-
-    if (kind === 'summary') {
-      return renderSummaryStep();
-    }
-
+    if (kind === 'mediaLocation') return renderMediaLocationStep();
+    if (kind === 'details') return renderDetailsStep(step);
+    if (kind === 'summary') return renderSummaryStep();
     return null;
   };
 
@@ -457,13 +444,12 @@ const GenericListingForm = ({
       nextStep();
       return;
     }
-
     notification.showError('Missing Information', 'Please check the highlighted fields and try again.');
     const firstErrorKey = Object.keys(errors || {})[0];
     if (firstErrorKey) {
       const el = document.querySelector(`[data-field="${CSS.escape(firstErrorKey)}"]`);
       if (el && typeof el.scrollIntoView === 'function') {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({behavior: 'smooth', block: 'center'});
       }
     }
   };
@@ -480,8 +466,8 @@ const GenericListingForm = ({
 
   return (
     <ListingWizard
-      title={typeof formSchema.getTitle === 'function' ? formSchema.getTitle({ isEdit, listingType }) : (isEdit ? 'Edit Listing' : 'Create Listing')}
-      subtitle={typeof formSchema.getSubtitle === 'function' ? formSchema.getSubtitle({ isEdit, listingType }) : (isEdit ? 'Update your listing details' : 'Create your listing step by step')}
+      title={typeof formSchema.getTitle === 'function' ? formSchema.getTitle({isEdit, listingType}) : (isEdit ? 'Edit Listing' : 'Create Listing')}
+      subtitle={typeof formSchema.getSubtitle === 'function' ? formSchema.getSubtitle({isEdit, listingType}) : (isEdit ? 'Update your listing details' : 'Create your listing step by step')}
       steps={wizardSteps}
       currentStep={currentStep}
       onBack={onBack || (() => navigate(-1))}
@@ -495,5 +481,27 @@ const GenericListingForm = ({
   );
 };
 
-export default GenericListingForm;
+/* ── Summary Section ────────────────────────────────────────── */
 
+const SummarySection = ({title, icon: Icon, rows}) => (
+  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="px-6 py-3.5 border-b border-gray-100 flex items-center gap-2.5">
+      {Icon && (
+        <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center">
+          <Icon className="w-3.5 h-3.5 text-gray-500" />
+        </div>
+      )}
+      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</h4>
+    </div>
+    <div className="divide-y divide-gray-100">
+      {rows.map((row) => (
+        <div key={`${row.label}-${row.value}`} className="flex items-center justify-between px-6 py-3">
+          <span className="text-xs text-gray-400">{row.label}</span>
+          <span className="text-sm font-medium text-gray-900 text-right ml-4 tabular-nums">{row.value}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+export default GenericListingForm;
