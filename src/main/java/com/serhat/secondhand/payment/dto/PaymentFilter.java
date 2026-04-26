@@ -15,5 +15,5 @@ public record PaymentFilter(
         LocalDateTime dateTo,
         BigDecimal amountMin,
         BigDecimal amountMax,
-        String sellerName
+        String searchTerm
 ) {}

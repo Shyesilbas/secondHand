@@ -93,18 +93,17 @@ export const WALLET_OPERATION_MODES = Object.freeze({
 
 export const PaymentDto = (data) => ({
   paymentId: data.paymentId || null,
-  senderName: data.senderName || '',
-  senderSurname: data.senderSurname || '',
-  receiverName: data.receiverName || '',
-  receiverSurname: data.receiverSurname || '',
+  senderDisplayName: data.senderDisplayName || '',
+  receiverDisplayName: data.receiverDisplayName || '',
   amount: data.amount || 0,
+  currency: data.currency || 'TRY',
   paymentType: data.paymentType || PAYMENT_TYPES.CREDIT_CARD,
   transactionType: data.transactionType || PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
   paymentDirection: data.paymentDirection || PAYMENT_DIRECTIONS.OUTGOING,
   listingId: data.listingId || null,
   listingTitle: data.listingTitle || null,
   listingNo: data.listingNo || null,
-  createdAt: data.createdAt || null,
+  processedAt: data.processedAt || null,
   isSuccess: data.isSuccess || false
 });
 

@@ -29,7 +29,6 @@ public class PaymentStatsService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-    private final ListingQueryService listingService;
     private final PaymentContextResolver paymentContextResolver;
 
     @Cacheable(value = "paymentStats", key = "#userId + '_' + #filterType")
@@ -54,26 +53,10 @@ public class PaymentStatsService {
 
     public Page<PaymentDto> getMyPayments(Long userId, Pageable pageable, PaymentFilter filter) {
         Page<Payment> paymentsPage = isFilterPresent(filter)
-                ? paymentRepository.findByFilters(userId, filter.transactionType(), filter.paymentType(), filter.paymentDirection(), filter.dateFrom(), filter.dateTo(), filter.amountMin(), filter.amountMax(), (filter.sellerName() != null && !filter.sellerName().isBlank()) ? filter.sellerName().trim() : null, pageable)
+                ? paymentRepository.findByFilters(userId, filter.transactionType(), filter.paymentType(), filter.paymentDirection(), filter.dateFrom(), filter.dateTo(), filter.amountMin(), filter.amountMax(), (filter.searchTerm() != null && !filter.searchTerm().isBlank()) ? filter.searchTerm().trim() : null, pageable)
                 : paymentRepository.findByUserId(userId, pageable);
 
-        List<UUID> listingIds = paymentsPage.getContent().stream()
-                .map(Payment::getListingId)
-                .filter(java.util.Objects::nonNull)
-                .distinct()
-                .toList();
-
-        Map<UUID, ListingInfo> listingMap = new java.util.HashMap<>();
-        if (!listingIds.isEmpty()) {
-            listingMap = listingService.findAllByIds(listingIds).stream()
-                    .collect(java.util.stream.Collectors.toMap(
-                            Listing::getId,
-                            l -> new ListingInfo(l.getTitle(), l.getListingNo())
-                    ));
-        }
-
-        final Map<UUID, ListingInfo> finalMap = listingMap;
-        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId, finalMap));
+        return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId));
     }
 
     private boolean isFilterPresent(PaymentFilter filter) {
@@ -85,32 +68,27 @@ public class PaymentStatsService {
                 filter.dateTo() != null ||
                 filter.amountMin() != null ||
                 filter.amountMax() != null ||
-                (filter.sellerName() != null && !filter.sellerName().isBlank());
+                (filter.searchTerm() != null && !filter.searchTerm().isBlank());
     }
 
-    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId, Map<UUID, ListingInfo> listingMap) {
+    private PaymentDto mapPaymentToDtoOptimized(Payment payment, Long currentUserId) {
         PaymentDto baseDto = paymentMapper.toDto(payment);
-
-        ListingInfo listingInfo = listingMap.getOrDefault(payment.getListingId(), new ListingInfo(null, null));
         var inferredData = paymentContextResolver.resolve(payment, currentUserId);
 
         return new PaymentDto(
                 baseDto.paymentId(),
-                baseDto.senderName(),
-                baseDto.senderSurname(),
-                baseDto.receiverName(),
-                baseDto.receiverSurname(),
+                baseDto.senderDisplayName(),
+                baseDto.receiverDisplayName(),
                 baseDto.amount(),
+                baseDto.currency(),
                 baseDto.paymentType(),
                 inferredData.transactionType(),
                 inferredData.direction(),
                 baseDto.listingId(),
-                listingInfo.title(),
-                listingInfo.no(),
-                baseDto.createdAt(),
+                payment.getListingTitle(), // Direct snapshot
+                payment.getListingNo(),    // Direct snapshot
+                baseDto.processedAt(),
                 baseDto.isSuccess()
         );
     }
-
-    private record ListingInfo(String title, String no) {}
 }

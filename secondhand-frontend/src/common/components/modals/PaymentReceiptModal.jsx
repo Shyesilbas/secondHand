@@ -77,8 +77,8 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
     ['paymentTypes']
   );
 
-  const senderFull = fullName(payment.senderName, payment.senderSurname);
-  const receiverFull = fullName(payment.receiverName, payment.receiverSurname);
+  const senderFull = payment.senderDisplayName || 'N/A';
+  const receiverFull = payment.receiverDisplayName || 'N/A';
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-[2px] transition-all print:static print:inset-auto print:p-0 print:overflow-visible">
@@ -155,7 +155,7 @@ const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
              <div className="bg-secondary-50/50 rounded-2xl ring-1 ring-secondary-200/40 divide-y divide-secondary-200/40 px-4">
                 <ReceiptRow 
                   label="İşlem Tarihi" 
-                  value={formatDate(payment.createdAt)} 
+                  value={formatDate(payment.processedAt)} 
                   icon={Calendar}
                 />
                 <ReceiptRow 

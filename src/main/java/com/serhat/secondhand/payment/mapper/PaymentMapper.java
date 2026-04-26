@@ -16,25 +16,31 @@ import org.mapstruct.ReportingPolicy;
 public interface PaymentMapper {
 
     @Mapping(target = "paymentId", source = "id")
-    @Mapping(target = "senderName", expression = "java(payment.getFromUser() != null ? payment.getFromUser().getName() : \"SYSTEM\")")
-    @Mapping(target = "senderSurname", expression = "java(payment.getFromUser() != null ? payment.getFromUser().getSurname() : \"\")")
-    @Mapping(target = "receiverName", expression = "java(payment.getToUser() != null ? payment.getToUser().getName() : \"SYSTEM\")")
-    @Mapping(target = "receiverSurname", expression = "java(payment.getToUser() != null ? payment.getToUser().getSurname() : \"\")")
-    @Mapping(target = "listingTitle", ignore = true)
-    @Mapping(target = "listingNo", ignore = true)
-    @Mapping(target = "createdAt", source = "processedAt")
+    @Mapping(target = "senderDisplayName", expression = "java(getDisplayName(payment.getFromUser()))")
+    @Mapping(target = "receiverDisplayName", expression = "java(getDisplayName(payment.getToUser()))")
     @Mapping(target = "isSuccess", source = "success")
     PaymentDto toDto(Payment payment);
+
+    default String getDisplayName(User user) {
+        if (user == null) return "SYSTEM";
+        String name = user.getName() != null ? user.getName() : "";
+        String surname = user.getSurname() != null ? user.getSurname() : "";
+        if (name.isEmpty() && surname.isEmpty()) return "UNKNOWN";
+        return (name + " " + surname).trim();
+    }
 
     default Payment fromPaymentRequest(PaymentRequest paymentRequest, User fromUser, User toUser, PaymentResult result) {
         return Payment.builder()
                 .fromUser(fromUser)
                 .toUser(toUser)
                 .amount(paymentRequest.amount())
+                .currency(paymentRequest.currency() != null ? paymentRequest.currency() : "TRY")
+                .listingId(paymentRequest.listingId())
+                .listingTitle(paymentRequest.listingTitle())
+                .listingNo(paymentRequest.listingNo())
                 .paymentType(paymentRequest.paymentType())
                 .transactionType(paymentRequest.transactionType())
                 .paymentDirection(paymentRequest.paymentDirection())
-                .listingId(paymentRequest.listingId())
                 .processedAt(result.processedAt())
                 .isSuccess(result.success())
                 .idempotencyKey(paymentRequest.idempotencyKey())

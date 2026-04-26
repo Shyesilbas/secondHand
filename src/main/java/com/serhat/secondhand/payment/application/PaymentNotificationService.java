@@ -22,9 +22,10 @@ public class PaymentNotificationService {
     private final EmailConfig emailConfig;
 
     @Async("notificationExecutor")
-    public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto, String listingTitle) {
+    public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto) {
         try {
             String subject = emailConfig.getPaymentSuccessSubject();
+            String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Payment";
             String content = String.format(emailConfig.getPaymentSuccessContent(), 
                     user.getName(), listingTitle, paymentDto.amount(), paymentDto.transactionType());
             

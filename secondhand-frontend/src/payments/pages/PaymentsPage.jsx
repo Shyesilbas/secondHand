@@ -81,10 +81,8 @@ const PaymentsPage = () => {
                 payment.paymentType,
                 payment.listingTitle,
                 ...(payment.orderItems || []),
-                payment.senderName,
-                payment.senderSurname,
-                payment.receiverName,
-                payment.receiverSurname,
+                payment.senderDisplayName,
+                payment.receiverDisplayName,
             ];
 
             return searchableValues.some((value) => String(value || '').toLowerCase().includes(normalizedSearch));
@@ -117,7 +115,7 @@ const PaymentsPage = () => {
     const exportCurrentPageAsCsv = useCallback(() => {
         const headers = ['Date', 'Transaction Type', 'Direction', 'Method', 'Amount', 'Status', 'Listing Title'];
         const rows = visiblePayments.map((payment) => ([
-            payment.createdAt || '',
+            payment.processedAt || '',
             TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType || '',
             PAYMENT_DIRECTION_LABELS[payment.paymentDirection] || payment.paymentDirection || '',
             payment.paymentType || '',
