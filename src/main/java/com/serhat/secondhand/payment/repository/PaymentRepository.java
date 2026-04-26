@@ -51,7 +51,8 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             "(:dateTo IS NULL OR p.processedAt <= :dateTo) AND " +
             "(:amountMin IS NULL OR p.amount >= :amountMin) AND " +
             "(:amountMax IS NULL OR p.amount <= :amountMax) AND " +
-            "(:sellerName IS NULL OR LOWER(tu.name) LIKE LOWER(CONCAT('%', :sellerName, '%')) OR LOWER(tu.surname) LIKE LOWER(CONCAT('%', :sellerName, '%')))")
+            "(:searchTerm IS NULL OR LOWER(tu.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(tu.surname) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+            "OR LOWER(p.listingTitle) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(p.listingNo) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Payment> findByFilters(
             @Param("userId") Long userId,
             @Param("transactionType") PaymentTransactionType transactionType,
@@ -61,7 +62,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             @Param("dateTo") LocalDateTime dateTo,
             @Param("amountMin") BigDecimal amountMin,
             @Param("amountMax") BigDecimal amountMax,
-            @Param("sellerName") String sellerName,
+            @Param("searchTerm") String searchTerm,
             Pageable pageable);
 
     @Query("SELECT SUM(p.amount) FROM Payment p " +

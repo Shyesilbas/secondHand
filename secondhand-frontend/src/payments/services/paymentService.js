@@ -40,7 +40,7 @@ export const paymentService = {
         if (filters.dateTo) params.dateTo = new Date(filters.dateTo).toISOString();
         if (filters.amountMin) params.amountMin = parseFloat(filters.amountMin);
         if (filters.amountMax) params.amountMax = parseFloat(filters.amountMax);
-        if (filters.seller && filters.seller.trim()) params.sellerName = filters.seller.trim();
+        if (filters.seller && filters.seller.trim()) params.searchTerm = filters.seller.trim();
         
         const data = await get(API_ENDPOINTS.PAYMENTS.MY_PAYMENTS, { params });
         if (data.content && Array.isArray(data.content)) {

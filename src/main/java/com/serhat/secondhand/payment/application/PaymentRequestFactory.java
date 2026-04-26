@@ -40,13 +40,17 @@ public class PaymentRequestFactory {
                                                              BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey) {
         PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
 
+        Listing firstListing = sellerItems.get(0).getListing();
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
                 .toUserId(null)
                 .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname(PaymentProcessingConstants.ESCROW_RECEIVER_SURNAME)
-                .listingId(sellerItems.get(0).getListing().getId())
+                .listingId(firstListing.getId())
+                .listingTitle(firstListing.getTitle())
+                .listingNo(firstListing.getListingNo())
                 .amount(sellerTotal)
+                .currency(firstListing.getCurrency() != null ? firstListing.getCurrency().name() : "TRY")
                 .paymentType(paymentType)
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
                 .paymentDirection(PaymentDirection.OUTGOING)
@@ -65,7 +69,10 @@ public class PaymentRequestFactory {
                 .receiverName(user.getName())
                 .receiverSurname(user.getSurname())
                 .listingId(listing.getId())
+                .listingTitle(listing.getTitle())
+                .listingNo(listing.getListingNo())
                 .amount(totalCost)
+                .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
                 .paymentType(request.paymentType())
                 .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
                 .paymentDirection(PaymentDirection.OUTGOING)

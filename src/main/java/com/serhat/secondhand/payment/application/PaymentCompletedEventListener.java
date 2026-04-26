@@ -35,8 +35,7 @@ public class PaymentCompletedEventListener {
         }
 
         PaymentDto paymentDto = paymentMapper.toDto(payment);
-        String listingTitle = handleResult.listingTitle() != null ? handleResult.listingTitle() : "Payment";
-        paymentNotificationService.sendPaymentSuccessNotification(user, paymentDto, listingTitle);
+        paymentNotificationService.sendPaymentSuccessNotification(user, paymentDto);
         log.info("Payment success email sent for payment ID: {}", payment.getId());
     }
 }

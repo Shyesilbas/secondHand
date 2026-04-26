@@ -10,18 +10,17 @@ import java.util.UUID;
 
 public record PaymentDto(
         UUID paymentId,
-        String senderName,
-        String senderSurname,
-        String receiverName,
-        String receiverSurname,
+        String senderDisplayName,
+        String receiverDisplayName,
         BigDecimal amount,
+        String currency,
         PaymentType paymentType,
         PaymentTransactionType transactionType,
         PaymentDirection paymentDirection,
         UUID listingId,
         String listingTitle,
         String listingNo,
-        LocalDateTime createdAt,
+        LocalDateTime processedAt,
         boolean isSuccess
 ) {
 }

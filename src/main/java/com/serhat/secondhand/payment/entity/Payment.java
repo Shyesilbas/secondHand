@@ -30,8 +30,15 @@ public class Payment {
     private Long version = 0L;
 
     private BigDecimal amount;
+    
+    @Builder.Default
+    private String currency = "TRY";
 
     private UUID listingId;
+    
+    private String listingTitle;
+    
+    private String listingNo;
 
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
