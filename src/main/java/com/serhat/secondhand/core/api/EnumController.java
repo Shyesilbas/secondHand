@@ -60,10 +60,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
+
 @RestController
 @RequestMapping("/api/v1/enums")
 @RequiredArgsConstructor
 @Tag(name = "Enum Values", description = "Endpoints for getting enum values from backend")
+@PublicEndpoint
 public class EnumController {
 
     private final ListingFeePaymentService listingFeePaymentService;

@@ -82,3 +82,9 @@ aura:
       enabled: ${AURA_AGENT_SEARCH_ENABLED:true}
       rate-limit-per-minute: ${AURA_AGENT_SEARCH_PER_MINUTE:12}
       rate-limit-window-ms: ${AURA_AGENT_SEARCH_WINDOW_MS:60000}
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  e-wallet:
+    default-balance: 10000.00
+    spending-warning-threshold: 0.90

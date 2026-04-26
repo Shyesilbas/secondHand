@@ -1,5 +1,6 @@
 package com.serhat.secondhand.showcase.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.showcase.application.IShowcaseService;
@@ -50,6 +51,7 @@ public class ShowcaseController {
                 .body(showcaseMapper.toDto(result.getData()));
     }
 
+    @PublicEndpoint
     @GetMapping("/active")
     public ResponseEntity<Page<ShowcaseDto>> getActiveShowcases(
             @RequestParam(defaultValue = "0") int page,
@@ -81,6 +83,7 @@ public class ShowcaseController {
         return ResultResponses.noContent(showcaseService.cancelShowcase(user.getId(), id));
     }
 
+    @PublicEndpoint
     @GetMapping("/pricing-config")
     public ResponseEntity<ShowcasePricingDto> getShowcasePricingConfig() {
         return ResponseEntity.ok(showcaseService.getShowcasePricingConfig());

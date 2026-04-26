@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = createErrorResponse(
                 HttpStatus.CONFLICT,
                 "CONCURRENT_MODIFICATION",
-                "Ürün şu an başka bir işlem görüyor, lütfen tekrar deneyin",
+                "The resource is currently being modified by another process. Please try again.",
                 request.getRequestURI()
         );
         log.warn("Optimistic lock failure: {}", ex.getMessage());

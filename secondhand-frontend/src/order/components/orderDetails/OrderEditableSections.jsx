@@ -2,7 +2,7 @@ import React from 'react';
 import { FileText, MapPin, Receipt, Save } from 'lucide-react';
 import { ORDER_LIMITS } from '../../constants/orderUiConstants.js';
 
-export const AddressSection = ({
+export const AddressSection = React.memo(({
   CardComponent,
   isEditingAddress,
   addressesLoading,
@@ -110,9 +110,10 @@ export const AddressSection = ({
       ) : null}
     </>
   );
-};
+});
+AddressSection.displayName = 'AddressSection';
 
-export const NotesSection = ({
+export const NotesSection = React.memo(({
   CardComponent,
   isEditingNotes,
   orderNotes,
@@ -183,4 +184,5 @@ export const NotesSection = ({
       ) : null}
     </CardComponent>
   );
-};
+});
+NotesSection.displayName = 'NotesSection';

@@ -48,17 +48,18 @@ const StatusBadge = ({ label, type = 'rose' }) => {
   );
 };
 
-const GlassCard = ({ children, className = '', critical = false }) => (
+const GlassCard = React.memo(({ children, className = '', critical = false }) => (
   <div
     className={`rounded-3xl border transition-all duration-300 ${
       critical
         ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg'
-        : 'bg-white/60 backdrop-blur-xl border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'
+        : 'bg-white/60 backdrop-blur-lg border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'
     } ${className}`}
   >
     {children}
   </div>
-);
+));
+GlassCard.displayName = 'GlassCard';
 
 const OrderDetailsModal = React.memo(
   ({
@@ -169,15 +170,15 @@ const OrderDetailsModal = React.memo(
 
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300`}
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300`}
         style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
       >
         <div
-          className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-[2rem] border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-3xl overflow-hidden flex flex-col relative`}
+          className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-[2rem] border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-xl overflow-hidden flex flex-col relative`}
         >
           {/* Decorative glows inside the modal */}
-          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-400/10 blur-[100px] rounded-full pointer-events-none mix-blend-multiply" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-violet-400/10 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-indigo-400/5 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-violet-400/5 blur-[60px] rounded-full pointer-events-none mix-blend-multiply" />
 
           <div
             className={`relative z-10 ${

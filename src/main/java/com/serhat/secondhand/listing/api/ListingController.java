@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.common.ListingCommandService;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
@@ -53,6 +54,7 @@ public class ListingController {
     private final IReviewService reviewService;
     private final ListingFeePaymentService listingFeePaymentService;
 
+    @PublicEndpoint
     @GetMapping("/{id}")
     public ResponseEntity<ListingDto> getListingById(
             @PathVariable UUID id,
@@ -63,6 +65,7 @@ public class ListingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PublicEndpoint
     @GetMapping("/{listingId}/reviews")
     public ResponseEntity<?> getReviewsForListing(
             @PathVariable String listingId,
@@ -70,11 +73,13 @@ public class ListingController {
         return ResultResponses.ok(reviewService.getReviewsForListing(listingId, pageable));
     }
 
+    @PublicEndpoint
     @GetMapping("/{listingId}/review-stats")
     public ResponseEntity<?> getListingReviewStats(@PathVariable String listingId) {
         return ResultResponses.ok(reviewService.getListingReviewStats(listingId));
     }
 
+    @PublicEndpoint
     @PostMapping("/bulk")
     @Operation(summary = "Get listings by IDs")
     public ResponseEntity<List<ListingDto>> getListingsByIds(
@@ -84,6 +89,7 @@ public class ListingController {
         return ResponseEntity.ok(listingQueryService.findByIds(ids, userId));
     }
 
+    @PublicEndpoint
     @PostMapping("/filter")
     public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
             @Valid @RequestBody ListingFilterDto filters,
@@ -96,6 +102,7 @@ public class ListingController {
         return ResponseEntity.ok(listingSearchService.filterByCategory(filters, userId));
     }
 
+    @PublicEndpoint
     @GetMapping("/search")
     public ResponseEntity<Page<ListingDto>> globalSearch(
             @RequestParam String query,
@@ -168,6 +175,7 @@ public class ListingController {
         return ResponseEntity.ok(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate));
     }
 
+    @PublicEndpoint
     @GetMapping("/statistics")
     public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
         return ResponseEntity.ok(listingStatisticsService.getGlobalListingStatistics());
@@ -211,6 +219,7 @@ public class ListingController {
         return ResultResponses.noContent(listingCommandService.updateBatchPrice(request.listingIds(), request.price(), currentUser.getId()));
     }
 
+    @PublicEndpoint
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
         return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status));
@@ -225,6 +234,7 @@ public class ListingController {
         return ResultResponses.created(listingFeePaymentService.payListingCreationFee(currentUser.getId(), request));
     }
 
+    @PublicEndpoint
     @GetMapping("/fee-config")
     @Operation(summary = "Get listing fee configuration")
     public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
@@ -49,6 +50,7 @@ public class RealEstateController {
         return ResponseEntity.created(location).body(Map.of("id", result.getData()));
     }
 
+    @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter Real Estate listings")
     public ResponseEntity<Page<ListingDto>> filterRealEstates(@RequestBody RealEstateFilterDto filters) {
@@ -69,6 +71,7 @@ public class RealEstateController {
         return ResultResponses.ok(realEstateListingService.updateRealEstateListing(id, request, currentUser.getId()));
     }
 
+    @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get real estate listing details")
     public ResponseEntity<RealEstateListingDto> getRealEstateDetails(@PathVariable UUID id) {

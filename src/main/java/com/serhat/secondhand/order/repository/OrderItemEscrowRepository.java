@@ -36,6 +36,11 @@ public interface OrderItemEscrowRepository extends JpaRepository<OrderItemEscrow
 
     @Query("SELECT oie FROM OrderItemEscrow oie WHERE oie.orderItem.id IN :ids")
     List<OrderItemEscrow> findByOrderItemIdIn(@Param("ids") List<Long> ids);
+
+    @Query("SELECT oie.order.id, SUM(oie.amount) FROM OrderItemEscrow oie " +
+           "WHERE oie.order.id IN :orderIds AND oie.seller.id = :sellerId AND oie.status = 'PENDING' " +
+           "GROUP BY oie.order.id")
+    List<Object[]> sumPendingAmountByOrderIdsAndSellerId(@Param("orderIds") List<Long> orderIds, @Param("sellerId") Long sellerId);
 }
 
 

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
@@ -62,6 +63,7 @@ public class ElectronicListingController {
         return ResultResponses.ok(electronicListingService.updateElectronicListings(id, request, currentUser.getId()));
     }
 
+    @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get electronic listing details")
     public ResponseEntity<ElectronicListingDto> getElectronicDetails(@PathVariable UUID id) {
@@ -69,6 +71,7 @@ public class ElectronicListingController {
         return ResponseEntity.ok(electronic);
     }
 
+    @PublicEndpoint
     @GetMapping("/electronicType/{electronicType}")
     @Operation(summary = "Find electronics by type")
     public ResponseEntity<Page<ElectronicListingDto>> findByElectronicType(
@@ -78,6 +81,7 @@ public class ElectronicListingController {
         return ResponseEntity.ok(electronicDto);
     }
 
+    @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter electronics listings with advanced criteria")
     public ResponseEntity<Page<ListingDto>> filterElectronics(@RequestBody ElectronicListingFilterDto filters) {

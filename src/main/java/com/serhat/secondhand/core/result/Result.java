@@ -4,6 +4,7 @@ import com.serhat.secondhand.core.exception.ErrorCode;
 import lombok.Getter;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Getter
 public class Result<T> {
@@ -64,13 +65,19 @@ public class Result<T> {
         return mapper.apply(this.data);
     }
 
-    /**
-     * Propagates an error from one Result type to another without data.
-     * Eliminates the repetitive pattern:
-     *   if (result.isError()) return Result.error(result.getMessage(), result.getErrorCode());
-     */
     public <R> Result<R> propagateError() {
         return Result.error(this.message, this.errorCode);
+    }
+
+    public T orElse(T other) {
+        return isError() ? other : data;
+    }
+
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+        if (isError()) {
+            throw exceptionSupplier.get();
+        }
+        return data;
     }
 
 }

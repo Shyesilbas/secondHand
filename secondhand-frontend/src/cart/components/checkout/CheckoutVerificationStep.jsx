@@ -17,7 +17,17 @@ const CheckoutVerificationStep = ({
     const [resendTimer, setResendTimer] = useState(0);
     const [canResend, setCanResend] = useState(true);
     const [isResending, setIsResending] = useState(false);
-    const codeValue = paymentVerificationCode || '';
+
+    const [codeArray, setCodeArray] = useState(() => {
+        const initial = Array(OTP_CODE_LENGTH).fill('');
+        if (paymentVerificationCode) {
+            const chars = paymentVerificationCode.split('');
+            for (let i = 0; i < OTP_CODE_LENGTH; i++) {
+                initial[i] = chars[i] || '';
+            }
+        }
+        return initial;
+    });
 
     useEffect(() => {
         if (resendTimer > 0) {
@@ -27,6 +37,10 @@ const CheckoutVerificationStep = ({
             setCanResend(true);
         }
     }, [resendTimer]);
+
+    useEffect(() => {
+        setPaymentVerificationCode(codeArray.join(''));
+    }, [codeArray, setPaymentVerificationCode]);
 
     const handleResendCode = async () => {
         setCanResend(false);
@@ -42,9 +56,9 @@ const CheckoutVerificationStep = ({
 
     const handleCodeChange = (index, value) => {
         if (value.length <= 1 && /^\d*$/.test(value)) {
-            const newCode = codeValue.split('');
-            newCode[index] = value;
-            setPaymentVerificationCode(newCode.join(''));
+            const nextArray = [...codeArray];
+            nextArray[index] = value;
+            setCodeArray(nextArray);
             
             if (value && index < OTP_CODE_LENGTH - 1) {
                 const nextInput = document.querySelector(`input[data-index="${index + 1}"]`);
@@ -54,7 +68,7 @@ const CheckoutVerificationStep = ({
     };
 
     const handleKeyDown = (index, e) => {
-        if (e.key === 'Backspace' && !codeValue[index] && index > 0) {
+        if (e.key === 'Backspace' && !codeArray[index] && index > 0) {
             const prevInput = document.querySelector(`input[data-index="${index - 1}"]`);
             prevInput?.focus();
         }
@@ -62,19 +76,23 @@ const CheckoutVerificationStep = ({
 
     const handleCodePaste = (e) => {
         const pasted = sanitizeOtpInput(e.clipboardData.getData('text'), OTP_CODE_LENGTH);
-        if (!pasted) {
-            return;
-        }
+        if (!pasted) return;
+        
         e.preventDefault();
-        setPaymentVerificationCode(pasted);
-        if (pasted.length === OTP_CODE_LENGTH) {
-            const lastInput = document.querySelector(`input[data-index="${OTP_CODE_LENGTH - 1}"]`);
-            lastInput?.focus();
+        const chars = pasted.split('');
+        const nextArray = Array(OTP_CODE_LENGTH).fill('');
+        for (let i = 0; i < OTP_CODE_LENGTH; i++) {
+            nextArray[i] = chars[i] || '';
         }
+        setCodeArray(nextArray);
+
+        const focusIndex = Math.min(pasted.length, OTP_CODE_LENGTH - 1);
+        const focusInput = document.querySelector(`input[data-index="${focusIndex}"]`);
+        focusInput?.focus();
     };
 
-    const isCodeComplete = codeValue.length === OTP_CODE_LENGTH;
-    const filledCount = codeValue.replace(/\s/g, '').length;
+    const isCodeComplete = codeArray.every(char => char !== '') && codeArray.length === OTP_CODE_LENGTH;
+    const filledCount = codeArray.filter(char => char !== '').length;
 
     return (
         <div className="p-4 sm:p-5">
@@ -94,13 +112,13 @@ const CheckoutVerificationStep = ({
                 <div className="text-center">
                     <div className="flex justify-center gap-2.5">
                         {Array.from({ length: OTP_CODE_LENGTH }, (_, index) => index).map((index) => {
-                            const hasValue = Boolean(codeValue[index]);
+                            const hasValue = Boolean(codeArray[index]);
                             return (
                                 <input
                                     key={index}
                                     type="text"
                                     inputMode="numeric"
-                                    value={codeValue[index] || ''}
+                                    value={codeArray[index] || ''}
                                     onChange={(e) => handleCodeChange(index, e.target.value)}
                                     onKeyDown={(e) => handleKeyDown(index, e)}
                                     onPaste={handleCodePaste}

@@ -21,6 +21,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
+
 @RestController
 @RequestMapping("/api/agreements")
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class AgreementController {
     private final UserAgreementService userAgreementService;
     private final AgreementMapper agreementMapper;
 
+    @PublicEndpoint
     @GetMapping
     @Operation(summary = "Get all agreements", description = "Retrieves all available agreements")
     public ResponseEntity<List<AgreementDto>> getAllAgreements() {
@@ -41,6 +44,7 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
+    @PublicEndpoint
     @PostMapping("/initialize")
     @Operation(summary = "Initialize agreements", description = "Creates default agreements and required agreement-group mappings")
     public ResponseEntity<List<AgreementDto>> initializeAgreements() {
@@ -50,6 +54,7 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
+    @PublicEndpoint
     @GetMapping("/required")
     @Operation(summary = "Get required agreements for a group", description = "Retrieves agreements required for a specific group (e.g. registration, payment, etc.)")
     public ResponseEntity<List<AgreementDto>> getRequiredAgreements(
@@ -62,6 +67,7 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
+    @PublicEndpoint
     @GetMapping("/{agreementType}")
     @Operation(summary = "Get agreement by type", description = "Retrieves agreement by its type")
     public ResponseEntity<AgreementDto> getAgreementByType(@PathVariable AgreementType agreementType) {

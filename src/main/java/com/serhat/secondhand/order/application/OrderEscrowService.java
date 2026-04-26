@@ -77,4 +77,14 @@ public class OrderEscrowService {
                 .map(OrderItemEscrow::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    @Transactional(readOnly = true)
+    public java.util.Map<Long, BigDecimal> sumPendingAmountsByOrderIds(List<Long> orderIds, Long sellerId) {
+        if (orderIds == null || orderIds.isEmpty()) return java.util.Map.of();
+        return orderItemEscrowRepository.sumPendingAmountByOrderIdsAndSellerId(orderIds, sellerId).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (BigDecimal) row[1]
+                ));
+    }
 }

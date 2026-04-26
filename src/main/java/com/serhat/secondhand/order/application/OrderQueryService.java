@@ -55,21 +55,9 @@ public class OrderQueryService {
             return orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of()));
         }
 
-        Set<Long> itemIds = orderList.stream()
-                .flatMap(o -> o.getOrderItems().stream())
-                .map(OrderItem::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        MetadataContext metadata = fetchBulkMetadata(orderList);
 
-        Map<Long, Integer> allCancelled = itemIds.isEmpty() ? Map.of() : 
-            orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(itemIds).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
-
-        Map<Long, Integer> allRefunded = itemIds.isEmpty() ? Map.of() : 
-            orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(itemIds).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
-
-        return orders.map(order -> orderMapper.toDto(order, allCancelled, allRefunded));
+        return orders.map(order -> orderMapper.toDto(order, metadata.cancelled(), metadata.refunded()));
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
@@ -103,13 +91,59 @@ public class OrderQueryService {
 
     public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
         return orderRepository.findByIdForSeller(orderId, sellerId)
-                .map(order -> buildSellerOrderDto(order, sellerId))
+                .map(order -> buildSellerOrderDto(order, sellerId, buildCancelledMap(order), buildRefundedMap(order)))
                 .map(Result::success)
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
 
-    private OrderDto buildSellerOrderDto(Order order, Long sellerId) {
-        OrderDto orderDto = orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order));
+    public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
+        var userResult = userService.findById(sellerId);
+        if (userResult.isError()) return Page.empty();
+
+        Pageable finalPageable = ensureSort(pageable);
+        Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
+        
+        List<Order> orderList = orders.getContent();
+        if (orderList.isEmpty()) {
+            return orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of()));
+        }
+
+        List<Long> orderIds = orderList.stream().map(Order::getId).toList();
+        Map<Long, BigDecimal> escrowAmounts = orderEscrowService.sumPendingAmountsByOrderIds(orderIds, sellerId);
+        
+        MetadataContext metadata = fetchBulkMetadata(orderList);
+
+        return orders.map(order -> {
+            OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata.cancelled(), metadata.refunded());
+            orderDto.setEscrowAmount(escrowAmounts.getOrDefault(order.getId(), BigDecimal.ZERO));
+            return orderDto;
+        });
+    }
+
+    private record MetadataContext(Map<Long, Integer> cancelled, Map<Long, Integer> refunded) {}
+
+    private MetadataContext fetchBulkMetadata(List<Order> orders) {
+        Set<Long> itemIds = orders.stream()
+                .flatMap(o -> o.getOrderItems().stream())
+                .map(OrderItem::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        if (itemIds.isEmpty()) {
+            return new MetadataContext(Map.of(), Map.of());
+        }
+
+        Map<Long, Integer> cancelled = orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(itemIds).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
+        Map<Long, Integer> refunded = orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(itemIds).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
+        return new MetadataContext(cancelled, refunded);
+    }
+
+    private OrderDto buildSellerOrderDto(Order order, Long sellerId, Map<Long, Integer> cancelled, Map<Long, Integer> refunded) {
+        OrderDto orderDto = orderMapper.toDto(order, cancelled, refunded);
         if (orderDto.getOrderItems() != null) {
             List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
                     .filter(item -> item.getListing() != null &&
@@ -120,22 +154,6 @@ public class OrderQueryService {
         }
         orderDto.setEscrowAmount(null);
         return orderDto;
-    }
-
-    public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
-        var userResult = userService.findById(sellerId);
-        if (userResult.isError()) return Page.empty();
-        User seller = userResult.getData();
-
-        Pageable finalPageable = ensureSort(pageable);
-        Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
-
-        return orders.map(order -> {
-            OrderDto orderDto = buildSellerOrderDto(order, sellerId);
-            BigDecimal escrowAmount = orderEscrowService.getPendingEscrowAmountByOrder(order, seller);
-            orderDto.setEscrowAmount(escrowAmount);
-            return orderDto;
-        });
     }
 
     /** Builds a map of orderItemId → cancelledQuantity for all items in the order. */
