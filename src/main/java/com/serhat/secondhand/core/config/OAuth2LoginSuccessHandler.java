@@ -33,6 +33,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
     private final AuditLogService auditLogService;
+    private final AppConfigProperties appConfigProperties;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -78,7 +79,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             } else {
                 // New user: do NOT create yet. Redirect to frontend to complete required fields.
                 String redirectUrl = String.format(
-                        "http://localhost:5173/auth/complete?email=%s&name=%s&surname=%s&picture=%s",
+                        "%s/auth/complete?email=%s&name=%s&surname=%s&picture=%s",
+                        appConfigProperties.getFrontendUrl(),
                         urlEncode(email), urlEncode(name), urlEncode(surname), urlEncode(picture)
                 );
                 response.sendRedirect(redirectUrl);
@@ -102,10 +104,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private void handleSuccessResponse(HttpServletRequest request, HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
         cookieUtils.setAccessTokenCookie(response, accessToken);
         cookieUtils.setRefreshTokenCookie(response, refreshToken);
-        response.sendRedirect("http://localhost:5173/");
+        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/");
     }
 
     private void handleErrorResponse(HttpServletResponse response, String message) throws IOException {
-        response.sendRedirect("http://localhost:5173/auth/error?message=" + message);
+        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/auth/error?message=" + message);
     }
 }

@@ -4,8 +4,8 @@ import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.notification.application.NotificationService;
 import com.serhat.secondhand.order.application.OrderQueryService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserBadgeService {
 
@@ -23,6 +22,19 @@ public class UserBadgeService {
     private final ChatService chatService;
     private final OrderQueryService orderQueryService;
     private final Executor taskExecutor;
+
+    public UserBadgeService(
+            NotificationService notificationService,
+            EmailService emailService,
+            ChatService chatService,
+            OrderQueryService orderQueryService,
+            @Qualifier("taskExecutor") Executor taskExecutor) {
+        this.notificationService = notificationService;
+        this.emailService = emailService;
+        this.chatService = chatService;
+        this.orderQueryService = orderQueryService;
+        this.taskExecutor = taskExecutor;
+    }
 
     @Cacheable(value = "userBadges", key = "#userId")
     public Map<String, Object> getUserBadges(Long userId) {

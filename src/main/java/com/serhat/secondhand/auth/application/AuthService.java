@@ -1,10 +1,10 @@
 package com.serhat.secondhand.auth.application;
 
-import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
-import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.agreements.application.AgreementRequirementService;
 import com.serhat.secondhand.agreements.application.AgreementUpdateNotificationService;
 import com.serhat.secondhand.agreements.application.UserAgreementService;
+import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
+import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
@@ -108,32 +108,12 @@ public class AuthService implements IAuthService {
                 user.getSurname()));
     }
 
-    public LoginResponse login(LoginRequest request) {
-        log.info("Login attempt: {}", request.email());
+    private record TokenRotationResult(String accessToken, String refreshToken) {}
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
-
-        Result<User> userResult = userService.findByEmail(request.email());
-        if (userResult.isError()) {
-            throw new BadCredentialsException("Invalid username or password.");
-        }
-
-        User user = userResult.getData();
-
-        if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
-            throw AccountNotActiveException.withStatus(user.getAccountStatus());
-        }
-
-        user.setLastLoginDate(LocalDateTime.now());
-        userService.update(user);
-
+    private TokenRotationResult issueTokens(User user, boolean rememberMe) {
         Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(user).orElse(null);
-
         tokenService.revokeUserRefreshTokens(user);
 
-        boolean rememberMe = request.rememberMe();
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
 
@@ -146,23 +126,40 @@ public class AuthService implements IAuthService {
                 oldRefreshToken,
                 rememberMe
         );
+        return new TokenRotationResult(accessToken, refreshToken);
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        log.info("Login attempt: {}", request.email());
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        );
+
+        User user = userService.findByEmail(request.email())
+                .orElseThrow(() -> new BadCredentialsException("Invalid username or password."));
+
+        if (!user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            throw AccountNotActiveException.withStatus(user.getAccountStatus());
+        }
+
+        user.setLastLoginDate(LocalDateTime.now());
+        userService.update(user);
+
+        TokenRotationResult tokens = issueTokens(user, request.rememberMe());
 
         agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(user.getId());
 
         log.info("User logged in successfully: {}", user.getEmail());
-        return new LoginResponse("Login success", user.getId(), user.getEmail(), accessToken, refreshToken, rememberMe);
+        return new LoginResponse("Login success", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), request.rememberMe());
     }
 
 
     public String logout(String username, String accessToken) {
         log.info("Logout request: {}", username);
 
-        Result<User> userResult = userService.findByEmail(username);
-        if (userResult.isError()) {
-            throw UserAlreadyLoggedOutException.defaultMessage();
-        }
-
-        User user = userResult.getData();
+        User user = userService.findByEmail(username)
+                .orElseThrow(UserAlreadyLoggedOutException::defaultMessage);
 
         if (tokenService.findActiveRefreshTokenByUser(user).isEmpty()) {
             throw UserAlreadyLoggedOutException.defaultMessage();
@@ -182,12 +179,8 @@ public class AuthService implements IAuthService {
         }
 
         String username = jwtUtils.extractUsername(refreshTokenValue);
-        Result<User> userResult = userService.findByEmail(username);
-        if (userResult.isError()) {
-            throw InvalidRefreshTokenException.invalid();
-        }
-
-        User user = userResult.getData();
+        User user = userService.findByEmail(username)
+                .orElseThrow(InvalidRefreshTokenException::invalid);
 
         if (!jwtUtils.isTokenValid(refreshTokenValue, user)) {
             throw InvalidRefreshTokenException.invalid();
@@ -200,24 +193,10 @@ public class AuthService implements IAuthService {
         Token oldRefreshToken = tokenService.findByToken(refreshTokenValue)
                 .orElseThrow(InvalidRefreshTokenException::invalid);
 
-        boolean rememberMe = oldRefreshToken.isRememberMe();
-        String newAccessToken = jwtUtils.generateAccessToken(user);
-        String newRefreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
-
-        tokenService.revokeToken(refreshTokenValue);
-
-        long refreshExpirationMs = rememberMe ? jwtUtils.getRememberMeExpiration() : jwtUtils.getRefreshTokenExpiration();
-        tokenService.saveToken(
-                newRefreshToken,
-                TokenType.REFRESH_TOKEN,
-                user,
-                LocalDateTime.now().plusSeconds(refreshExpirationMs / 1000),
-                oldRefreshToken,
-                rememberMe
-        );
+        TokenRotationResult tokens = issueTokens(user, oldRefreshToken.isRememberMe());
 
         log.info("Tokens rotated successfully for user: {}", username);
-        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), newAccessToken, newRefreshToken, rememberMe);
+        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe());
     }
 
     public Map<String, String> logout(Authentication authentication, HttpServletRequest request) {
@@ -255,26 +234,13 @@ public class AuthService implements IAuthService {
             existing.setLastLoginDate(LocalDateTime.now());
             userService.update(existing);
 
-            Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(existing).orElse(null);
-            tokenService.revokeUserRefreshTokens(existing);
-
-            String accessToken = jwtUtils.generateAccessToken(existing);
-            String refreshToken = jwtUtils.generateRefreshToken(existing, false);
-
-            tokenService.saveToken(
-                    refreshToken,
-                    TokenType.REFRESH_TOKEN,
-                    existing,
-                    LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                    oldRefreshToken,
-                    false
-            );
+            TokenRotationResult tokens = issueTokens(existing, false);
 
             agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(existing.getId());
 
             auditOAuthGoogleLogin(existing, httpRequest);
 
-            return new LoginResponse("Login success", existing.getId(), existing.getEmail(), accessToken, refreshToken);
+            return new LoginResponse("Login success", existing.getId(), existing.getEmail(), tokens.accessToken(), tokens.refreshToken());
         }
 
         User user = User.builder()
@@ -297,21 +263,11 @@ public class AuthService implements IAuthService {
         }
         eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
-        String accessToken = jwtUtils.generateAccessToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user, false);
-
-        tokenService.saveToken(
-                refreshToken,
-                TokenType.REFRESH_TOKEN,
-                user,
-                LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                null,
-                false
-        );
+        TokenRotationResult tokens = issueTokens(user, false);
 
         auditOAuthGoogleLogin(user, httpRequest);
 
-        return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), accessToken, refreshToken);
+        return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken());
     }
 
     private void auditOAuthGoogleLogin(User user, HttpServletRequest httpRequest) {
@@ -327,22 +283,15 @@ public class AuthService implements IAuthService {
 
     public Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request) {
         String username = authentication.getName();
-        Result<User> userResult = userService.findByEmail(username);
-        if (userResult.isError()) {
-            return Map.of(
-                "message", "User not found",
-                "status", "error"
-            );
-        }
-        
-        User user = userResult.getData();
+        User user = userService.findByEmail(username)
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
         
         log.info("Revoking all sessions for user: {}", username);
         
         tokenService.revokeUserRefreshTokens(user);
         
-        String ipAddress = getClientIpAddress(request);
-        String userAgent = getClientUserAgent(request);
+        String ipAddress = auditLogService.getClientIpAddress(request);
+        String userAgent = auditLogService.getClientUserAgent(request);
         auditLogService.logLogout(username, user.getId(), ipAddress, userAgent);
         
         log.info("All sessions revoked successfully for user: {}", username);
@@ -353,23 +302,4 @@ public class AuthService implements IAuthService {
             "revokedSessions", "all"
         );
     }
-
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-            return xRealIp;
-        }
-        
-        return request.getRemoteAddr();
-    }
-
-    private String getClientUserAgent(HttpServletRequest request) {
-        return request.getHeader("User-Agent");
-    }
-
 }

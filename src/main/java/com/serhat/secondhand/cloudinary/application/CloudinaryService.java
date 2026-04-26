@@ -76,13 +76,26 @@ public class CloudinaryService {
 
     private boolean isValidImageFile(MultipartFile file) {
         String contentType = file.getContentType();
-        return contentType != null && (
-                contentType.equals("image/jpeg") ||
+        String originalFilename = file.getOriginalFilename();
+        
+        if (contentType == null || originalFilename == null) {
+            return false;
+        }
+
+        boolean validContentType = contentType.equals("image/jpeg") ||
                 contentType.equals("image/jpg") ||
                 contentType.equals("image/png") ||
                 contentType.equals("image/gif") ||
-                contentType.equals("image/webp")
-        );
+                contentType.equals("image/webp");
+
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+        boolean validExtension = extension.equals("jpg") ||
+                extension.equals("jpeg") ||
+                extension.equals("png") ||
+                extension.equals("gif") ||
+                extension.equals("webp");
+
+        return validContentType && validExtension;
     }
 
     private String extractPublicIdFromUrl(String imageUrl) {

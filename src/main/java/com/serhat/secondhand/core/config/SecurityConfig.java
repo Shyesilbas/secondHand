@@ -2,6 +2,7 @@ package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
 import com.serhat.secondhand.core.security.CsrfCookieFilter;
+import com.serhat.secondhand.core.security.PublicEndpointRegistry;
 import com.serhat.secondhand.core.security.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -48,194 +49,47 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CorsConfigProperties corsConfigProperties;
-
-    // Public API endpoint groups
-    private static final List<String> AUTH_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/refresh",
-            "/api/auth/oauth2/google",
-            "/api/auth/oauth2/complete",
-            "/oauth2/**",
-            "/login/oauth2/**",
-            "/api/auth/password/forgot",
-            "/api/auth/password/reset"
-    );
-
-    private static final List<String> LISTING_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/v1/listings/status/{status}",
-            "/api/v1/listings/{id}",
-            "/api/v1/listings/allListings",
-            "/api/v1/listings/filter",
-            "/api/v1/listings/search/listing-no/{listingNo}",
-            "/api/v1/listings/byUser/{id}",
-            "/api/v1/listings/type/{listingType}",
-            "/api/v1/listings/type/{listingType}/active",
-            "/api/v1/listings/type/{listingType}/ordered",
-            "/api/v1/listings/{id}/view"
-    );
-
-    private static final List<String> SEED_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/v1/admin/seeds/**",
-            "/api/agreements/initialize"
-    );
-
-    private static final List<String> CATEGORY_LISTING_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/v1/books/{id}",
-            "/api/v1/books/filter",
-            "/api/v1/realEstates/{id}",
-            "/api/v1/realEstates/filter",
-            "/api/v1/vehicles/{id}",
-            "/api/v1/vehicles/filter",
-            "/api/v1/clothing/{id}",
-            "/api/v1/clothing/filter",
-            "/api/v1/electronics/{id}",
-            "/api/v1/electronics/filter",
-            "/api/v1/sports/{id}",
-            "/api/v1/sports/filter"
-    );
-
-    private static final List<String> SHOWCASE_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/showcases/active",
-            "/api/showcases/pricing-config"
-    );
-
-    private static final List<String> AGREEMENT_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/agreements/**"
-    );
-
-    private static final List<String> PAYMENT_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/v1/payments/listing-fee-config"
-    );
-
-    private static final List<String> ENUM_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/v1/enums/**"
-    );
-
-    private static final List<String> DOCUMENTATION_ENDPOINTS = Arrays.asList(
-            "/swagger-ui/**",
-            "/api-docs/**",
-            "/swagger-ui.html",
-            "/v3/api-docs/**"
-    );
-
-    private static final List<String> IMAGE_ENDPOINTS = Arrays.asList(
-            "/api/images/upload"
-    );
-
-    private static final List<String> WEBSOCKET_ENDPOINTS = Arrays.asList(
-            "/ws/**"
-    );
-
-    private static final List<String> FOLLOW_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/follow/stats/*",
-            "/api/follow/user/*/followers",
-            "/api/follow/user/*/following"
-    );
-
-    private static final List<String> RATE_LIMIT_TEST_ENDPOINTS = Arrays.asList(
-            "/api/test/rate-limit/**"
-    );
-
-    private static final List<String> FAVORITE_LIST_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/favorite-lists/user/*",
-            "/api/favorite-lists/popular"
-    );
-
-    private static final List<String> FAVORITE_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/favorites/top",
-            "/api/favorites/top-listings"
-    );
-
-    private static final List<String> ACTUATOR_PUBLIC_ENDPOINTS = Arrays.asList(
-            "/actuator/health",
-            "/actuator/health/**",
-            "/actuator/info",
-            "/actuator/prometheus"
-    );
+    private final PublicEndpointRegistry publicEndpointRegistry;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName(null);
 
+        Set<String> dynamicPublicEndpoints = publicEndpointRegistry.getPublicEndpoints();
+        log.info("Applying security to {} dynamically discovered public endpoints", dynamicPublicEndpoints.size());
+        
+        // Add additional non-controller public paths (wildcards)
+        Set<String> additionalPublicPaths = new java.util.HashSet<>(Arrays.asList(
+                "/oauth2/**",
+                "/login/oauth2/**",
+                "/swagger-ui/**",
+                "/api-docs/**",
+                "/swagger-ui.html",
+                "/v3/api-docs/**",
+                "/ws/**",
+                "/actuator/health/**",
+                "/actuator/info",
+                "/actuator/prometheus",
+                "/api/agreements/**" // Many agreements are public
+        ));
+        
+        Set<String> allPublicEndpoints = new java.util.HashSet<>(dynamicPublicEndpoints);
+        allPublicEndpoints.addAll(additionalPublicPaths);
+
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers(
-                                "/ws/**",
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/refresh",
-                                "/api/auth/oauth2/**",
-                                "/oauth2/**",
-                                "/login/oauth2/**",
-                                "/api/v1/listings/filter",
-                                "/api/v1/listings/bulk",
-                                "/api/v1/books/filter",
-                                "/api/v1/realEstates/filter",
-                                "/api/v1/vehicles/filter",
-                                "/api/v1/clothing/filter",
-                                "/api/v1/electronics/filter",
-                                "/api/v1/sports/filter",
-                                "/api/v1/listings/{id}/view",
-                                "/api/v1/admin/seeds/**",
-                                "/api/agreements/initialize"
-                        )
+                        .ignoringRequestMatchers(allPublicEndpoints.toArray(new String[0]))
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Authentication & Authorization endpoints
-                        .requestMatchers(AUTH_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-
-                        .requestMatchers(LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-
-                        // Public seed endpoints
-                        .requestMatchers(SEED_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public category-specific listing endpoints
-                        .requestMatchers(CATEGORY_LISTING_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public showcase endpoints
-                        .requestMatchers(SHOWCASE_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public agreement endpoints
-                        .requestMatchers(AGREEMENT_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public payment configuration endpoints
-                        .requestMatchers(PAYMENT_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Public enum endpoints
-                        .requestMatchers(ENUM_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Documentation endpoints
-                        .requestMatchers(DOCUMENTATION_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Image endpoints
-                        .requestMatchers(IMAGE_ENDPOINTS.toArray(new String[0])).authenticated()
-                        
-                        // WebSocket endpoints (HTTP handshake public, message-level auth in WebSocketSecurityConfig)
-                        .requestMatchers(WEBSOCKET_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Follow public endpoints (stats can be viewed by anyone)
-                        .requestMatchers(FOLLOW_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Rate limit test endpoints (for testing rate limiting)
-                        .requestMatchers(RATE_LIMIT_TEST_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Favorite list public endpoints
-                        .requestMatchers(FAVORITE_LIST_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-                        
-                        // Favorite public endpoints (top favorites can be viewed by anyone)
-                        .requestMatchers(FAVORITE_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-
-                        // Actuator public probes
-                        .requestMatchers(ACTUATOR_PUBLIC_ENDPOINTS.toArray(new String[0])).permitAll()
-
+                        .requestMatchers(allPublicEndpoints.toArray(new String[0])).permitAll()
+                        .requestMatchers("/api/images/upload").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

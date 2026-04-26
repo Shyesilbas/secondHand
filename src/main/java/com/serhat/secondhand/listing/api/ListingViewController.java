@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.TrackViewRequest;
@@ -29,6 +30,7 @@ public class ListingViewController {
     private final ListingViewService listingViewService;
     private final AuditLogService auditLogService;
 
+    @PublicEndpoint
     @PostMapping("/{id}/view")
     @Operation(summary = "Track a listing view", description = "Public endpoint to track when a listing is viewed. Supports both authenticated and anonymous users.")
     public ResponseEntity<Void> trackView(

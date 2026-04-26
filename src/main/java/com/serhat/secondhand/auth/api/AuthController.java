@@ -8,6 +8,7 @@ import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.CookieUtils;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,12 +36,14 @@ public class AuthController {
     private final IAuthService authService;
     private final CookieUtils cookieUtils;
 
+    @PublicEndpoint
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request for email: {}", request.getEmail());
         return ResultResponses.ok(authService.register(request));
     }
 
+    @PublicEndpoint
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
             @Valid @RequestBody LoginRequest request,
@@ -62,6 +65,7 @@ public class AuthController {
         return ResponseEntity.ok(responseMap);
     }
 
+    @PublicEndpoint
     @GetMapping("/oauth2/google")
     public ResponseEntity<Void> redirectToGoogle() {
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -84,6 +88,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PublicEndpoint
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, Object>> refreshToken(
             HttpServletRequest request,
@@ -128,6 +133,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PublicEndpoint
     @PostMapping("/oauth2/complete")
     public ResponseEntity<Map<String, Object>> completeOAuth(
             @Valid @RequestBody OAuthCompleteRequest request,

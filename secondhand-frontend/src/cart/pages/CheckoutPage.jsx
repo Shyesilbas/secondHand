@@ -12,6 +12,7 @@ import {offerService} from '../../offer/services/offerService.js';
 import {listingService} from '../../listing/services/listingService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
+import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendingWarningModal.jsx';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -285,6 +286,15 @@ const CheckoutPage = () => {
                     await refreshPreview(code);
                     setIsCouponsModalOpen(false);
                 }}
+            />
+
+            <EWalletSpendingWarningModal
+                isOpen={checkout.showEWalletWarning}
+                onClose={() => checkout.setShowEWalletWarning(false)}
+                onConfirm={checkout.confirmEWalletWarningAndCheckout}
+                projectedSpent={calculateTotal()}
+                warningLimit={checkout.eWallet?.spendingWarningLimit || 0}
+                currency={displayCartItems[0]?.listing?.currency || 'TRY'}
             />
         </div>
     );

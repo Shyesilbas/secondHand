@@ -132,20 +132,31 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     }, [selectedPaymentType, bankAccounts, selectedBankAccountIban, cards, selectedCardNumber]);
 
     const proceedDisabled = useMemo(() => {
-        if (cartCount === 0) return true;
+        // If we have an offer, we don't strictly need cartCount > 0
+        if (!offerId && cartCount === 0) return true;
+        
+        // Basic requirement: address
         if (!selectedShippingAddressId) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && (!Array.isArray(cards) || cards.length === 0)) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && !selectedCardNumber) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && (!Array.isArray(bankAccounts) || bankAccounts.length === 0)) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && !selectedBankAccountIban) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && !eWallet) return true;
-        if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && eWallet && eWallet.balance < calculateTotal()) return true;
+        
+        // Payment method specific requirements
+        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD) {
+            if (!selectedCardNumber && (!Array.isArray(cards) || cards.length === 0)) return true;
+        } else if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER) {
+            if (!selectedBankAccountIban && (!Array.isArray(bankAccounts) || bankAccounts.length === 0)) return true;
+        } else if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET) {
+            if (!eWallet || (eWallet.balance < calculateTotal())) return true;
+        }
+        
         return false;
-    }, [cartCount, selectedShippingAddressId, selectedPaymentType, cards, selectedCardNumber, bankAccounts, selectedBankAccountIban, eWallet, calculateTotal]);
+    }, [cartCount, offerId, selectedShippingAddressId, selectedPaymentType, cards, selectedCardNumber, bankAccounts, selectedBankAccountIban, eWallet, calculateTotal]);
 
     const handleCheckout = async () => {
+        if (isCheckingOut) return;
+        
         setIsCheckingOut(true);
         try {
+            logger.info('Initiating checkout process...', { paymentType: selectedPaymentType, offerId });
+
             if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && eWallet && eWallet.spendingWarningLimit) {
                 const projectedSpent = calculateTotal();
                 if (projectedSpent >= eWallet.spendingWarningLimit) {
@@ -154,23 +165,31 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                     return;
                 }
             }
+
             const payload = {
                 shippingAddressId: selectedShippingAddressId,
-                billingAddressId: selectedBillingAddressId,
-                notes: notes?.trim() || null,
-                name: orderName?.trim() || null,
+                billingAddressId: selectedBillingAddressId || selectedShippingAddressId,
+                notes: String(notes || '').trim() || null,
+                name: String(orderName || '').trim() || null,
                 paymentType: selectedPaymentType,
-                paymentVerificationCode: paymentVerificationCode?.trim() || null,
+                paymentVerificationCode: String(paymentVerificationCode || '').trim() || null,
                 agreementsAccepted: true,
                 acceptedAgreementIds: getAcceptedAgreementIds(),
-                couponCode: couponCode?.trim() || null,
+                couponCode: String(couponCode || '').trim() || null,
                 offerId: offerId || null
             };
+
+            logger.debug('Checkout payload prepared:', payload);
+
             const checkoutResult = await orderService.checkout(payload);
+            
+            logger.info('Checkout successful', { orderId: checkoutResult?.id });
+            
             await clearCart();
             showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
             navigateToOrderSuccess(checkoutResult);
         } catch (e) {
+            logger.error('Checkout failed:', e);
             showError(
                 CART_MESSAGES.CHECKOUT_FAILED_TITLE,
                 getCheckoutErrorMessage(e, CART_MESSAGES.CHECKOUT_FAILED)
@@ -227,14 +246,14 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         try {
             const payload = {
                 shippingAddressId: selectedShippingAddressId,
-                billingAddressId: selectedBillingAddressId,
-                notes: notes?.trim() || null,
-                name: orderName?.trim() || null,
+                billingAddressId: selectedBillingAddressId || selectedShippingAddressId,
+                notes: String(notes || '').trim() || null,
+                name: String(orderName || '').trim() || null,
                 paymentType: selectedPaymentType,
-                paymentVerificationCode: paymentVerificationCode?.trim() || null,
+                paymentVerificationCode: String(paymentVerificationCode || '').trim() || null,
                 agreementsAccepted: true,
                 acceptedAgreementIds: getAcceptedAgreementIds(),
-                couponCode: couponCode?.trim() || null,
+                couponCode: String(couponCode || '').trim() || null,
                 offerId: offerId || null
             };
             const checkoutResult = await orderService.checkout(payload);

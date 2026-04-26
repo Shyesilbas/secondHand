@@ -93,12 +93,19 @@ public class CheckoutOrchestrator {
             applyPaymentResultToOrder(order, paymentResults, allSuccessful, request.getPaymentType());
 
             if (allSuccessful) {
-                Result<Void> escrowResult = paymentOrchestrator.createEscrowsForOrder(order);
-                if (escrowResult.isError()) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    log.error("Escrow creation failed for order {}: {}", order.getOrderNumber(), escrowResult.getMessage());
-                    return Result.error("CHECKOUT_ESCROW_FAILED", "Checkout payment succeeded but escrow creation failed. Please contact support.");
+                try {
+                    Result<Void> escrowResult = paymentOrchestrator.createEscrowsForOrder(order);
+                    if (escrowResult.isError()) {
+                        log.error("ESCROW_CREATION_FAILED for order {}: {}. Manual intervention required to create escrows.", 
+                                order.getOrderNumber(), escrowResult.getMessage());
+                        // We don't rollback because payment was successful. 
+                        // The order is CONFIRMED but escrows are missing.
+                    }
+                } catch (Exception e) {
+                    log.error("CRITICAL_ERROR during escrow creation for order {}. Manual intervention required.", 
+                            order.getOrderNumber(), e);
                 }
+                
                 handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());

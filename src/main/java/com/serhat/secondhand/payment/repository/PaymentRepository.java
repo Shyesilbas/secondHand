@@ -51,7 +51,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             "(:dateTo IS NULL OR p.processedAt <= :dateTo) AND " +
             "(:amountMin IS NULL OR p.amount >= :amountMin) AND " +
             "(:amountMax IS NULL OR p.amount <= :amountMax) AND " +
-            "(:sellerName IS NULL OR LOWER(CONCAT(COALESCE(tu.name, ''), ' ', COALESCE(tu.surname, ''))) LIKE LOWER(CONCAT('%', :sellerName, '%')))")
+            "(:sellerName IS NULL OR LOWER(tu.name) LIKE LOWER(CONCAT('%', :sellerName, '%')) OR LOWER(tu.surname) LIKE LOWER(CONCAT('%', :sellerName, '%')))")
     Page<Payment> findByFilters(
             @Param("userId") Long userId,
             @Param("transactionType") PaymentTransactionType transactionType,

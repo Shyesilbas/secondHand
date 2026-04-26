@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ewallet.application;
 
+import com.serhat.secondhand.core.config.AppConfigProperties;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.dto.*;
@@ -8,14 +9,9 @@ import com.serhat.secondhand.ewallet.mapper.EWalletMapper;
 import com.serhat.secondhand.ewallet.repository.EWalletRepository;
 import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
-import com.serhat.secondhand.payment.entity.Bank;
-import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
-import com.serhat.secondhand.payment.entity.PaymentResult;
-import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.bank.BankService;
+import com.serhat.secondhand.payment.entity.*;
+import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -28,11 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +40,7 @@ public class EWalletService implements IEWalletService {
     private final EWalletMapper eWalletMapper;
     private final EWalletValidator eWalletValidator;
     private final IUserService userService;
+    private final AppConfigProperties appConfigProperties;
 
     @Transactional
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
@@ -166,7 +162,7 @@ public class EWalletService implements IEWalletService {
         BigDecimal projectedSpending = currentSpending.add(amount);
         BigDecimal warningLimit = eWallet.getSpendingWarningLimit();
 
-        BigDecimal ninetyPercentLimit = warningLimit.multiply(new BigDecimal("0.90"));
+        BigDecimal ninetyPercentLimit = warningLimit.multiply(appConfigProperties.getEWallet().getSpendingWarningThreshold());
         
         boolean currentNearLimit = currentSpending.compareTo(ninetyPercentLimit) >= 0;
         boolean willExceedLimit = projectedSpending.compareTo(warningLimit) >= 0;
@@ -244,7 +240,7 @@ public class EWalletService implements IEWalletService {
         EWallet eWallet = eWalletRepository.findByUserWithLock(user)
                 .orElseGet(() -> {
                     log.info("Creating new e-wallet for user: {}", user.getEmail());
-                    EWallet newWallet = eWalletMapper.createDefaultEWallet(user, new BigDecimal("10000.00"));
+                    EWallet newWallet = eWalletMapper.createDefaultEWallet(user, appConfigProperties.getEWallet().getDefaultBalance());
                     return eWalletRepository.save(newWallet);
                 });
 

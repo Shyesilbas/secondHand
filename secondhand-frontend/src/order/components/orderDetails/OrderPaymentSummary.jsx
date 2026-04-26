@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText, Tag } from 'lucide-react';
 
-export const OrderPaymentSummary = ({
+export const OrderPaymentSummary = React.memo(({
   CardComponent,
   isSellerView,
   selectedOrder,
@@ -85,4 +85,5 @@ export const OrderPaymentSummary = ({
       ) : null}
     </CardComponent>
   );
-};
+});
+OrderPaymentSummary.displayName = 'OrderPaymentSummary';

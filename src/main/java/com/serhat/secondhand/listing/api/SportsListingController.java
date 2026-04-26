@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
@@ -61,6 +62,7 @@ public class SportsListingController {
         return ResultResponses.ok(sportsListingService.updateSportsListing(id, request, currentUser.getId()));
     }
 
+    @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get sports listing details")
     public ResponseEntity<SportsListingDto> getSportsDetails(@PathVariable UUID id) {
@@ -68,6 +70,7 @@ public class SportsListingController {
         return ResponseEntity.ok(dto);
     }
 
+    @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter sports listings")
     public ResponseEntity<Page<ListingDto>> filterSports(@RequestBody SportsListingFilterDto filters) {

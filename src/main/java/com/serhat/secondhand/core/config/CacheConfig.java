@@ -32,7 +32,12 @@ public class CacheConfig {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.activateDefaultTyping(
                 BasicPolymorphicTypeValidator.builder()
-                        .allowIfBaseType(Object.class)
+                        .allowIfSubType("com.serhat.secondhand")
+                        .allowIfSubType("java.util")
+                        .allowIfSubType("java.time")
+                        .allowIfSubType("java.lang")
+                        .allowIfSubType("java.math")
+                        .allowIfSubType("org.springframework.data.domain")
                         .build(),
                 ObjectMapper.DefaultTyping.EVERYTHING
         );
