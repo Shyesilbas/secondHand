@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.domain.entity;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import jakarta.persistence.*;
 import lombok.*;
 

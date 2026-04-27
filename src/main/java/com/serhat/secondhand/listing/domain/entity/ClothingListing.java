@@ -8,21 +8,19 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCatego
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "clothing_listings")
-@AllArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
-@Data
+ @org.hibernate.annotations.BatchSize(size = 20)
 public class ClothingListing extends Listing {
 
     @ManyToOne(fetch = FetchType.LAZY)

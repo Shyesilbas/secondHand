@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.domain.dto.request.common;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

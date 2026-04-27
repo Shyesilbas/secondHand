@@ -4,8 +4,8 @@ import com.serhat.secondhand.core.dto.CachedPage;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
@@ -75,7 +75,7 @@ public class ListingQueryService {
         CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
                 enrichmentService.enrichInPlace(dto, userId), taskExecutor);
 
-        if (currentUserId != null && listing.getSeller().getId().equals(currentUserId)) {
+        if (currentUserId != null && listing.isOwnedBy(currentUserId)) {
             CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
                     listingViewService.getViewStatistics(id,
                             LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
@@ -140,12 +140,9 @@ public class ListingQueryService {
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 
-    public List<ListingDto> findByStatusAsDto(ListingStatus status) {
-        return enrichList(
-                listingRepository.findByStatus(status)
-                        .stream().map(listingMapper::toDynamicDto).toList(),
-                null
-        );
+    public Page<ListingDto> findByStatusAsDto(ListingStatus status, Pageable pageable) {
+        Page<Listing> listingsPage = listingRepository.findByStatus(status, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), null);
     }
 
     private List<ListingDto> enrichList(List<ListingDto> dtos, Long userId) {

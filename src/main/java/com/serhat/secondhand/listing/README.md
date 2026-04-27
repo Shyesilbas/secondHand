@@ -53,7 +53,7 @@
 **`ListingValidationService`**
 - Sahiplik doğrulama (`findAndValidateOwner`)
 - Durum doğrulama (`validateStatus`, `validateEditableStatus`)
-- Miktar doğrulama ve güncelleme (`applyQuantityUpdate`)
+- Miktar doğrulama (`validateQuantity`) ✨ (Mutation'lar temizlendi)
 
 **`ListingEnrichmentService`**
 - Favori bilgisi ekleme
@@ -189,6 +189,7 @@
 - **Validation methods:** Private, entity içinde iş kuralları
 - **JPA callbacks:** `@PrePersist`, `@PreUpdate`
 - **Inheritance:** `JOINED` stratejisi
+- **Performance:** `@BatchSize(size = 20)` (Kalıtım kaynaklı N+1 çözümü) ✨
 
 **Kategori Entity'leri** (Listing'den türer)
 - `VehicleListing`: Araç özel alanlar (brand, model, year, mileage, fuel)
@@ -212,7 +213,7 @@
 
 #### `domain/entity/enums/` - Enum'lar (Kategorilere göre)
 
-**Common Enums:**
+**Temel Enum'lar (com.serhat.secondhand.listing.domain.entity.enums.base):** ✨
 - `ListingStatus`: DRAFT, ACTIVE, INACTIVE, SOLD, RESERVED
 - `ListingType`: VEHICLE, BOOKS, CLOTHING, ELECTRONICS, REAL_ESTATE, SPORTS
 - `Currency`: TRY, USD, EUR
@@ -368,6 +369,7 @@
 - `@TrackPriceChange` annotation'ını dinler
 - Method execution sonrası fiyat geçmişi kaydeder
 - **Exception handling:** Hata durumunda ana akışı etkilemez
+- **Merkezi Kayıt:** Manuel kayıt işlemleri temizlendi, aspect üzerinden otomatikleşti ✨
 
 **`TrackPriceChange`** (Annotation)
 - `reason`: Değişiklik nedeni
@@ -782,6 +784,8 @@ ListingFeePaymentService.processListingFee()
 - **Command:** `ListingCommandService` (write)
 - **Query:** `ListingQueryService`, `ListingSearchService` (read) 
 - Ayrı optimizasyon stratejileri
+- **Consistency:** Kontrolcü yanıtlarında `ResultResponses` standardı ✨
+- **Type Safety:** `@Data` yerine `@Getter/@Setter` ile güvenli JPA modelleri ✨
 
 
 

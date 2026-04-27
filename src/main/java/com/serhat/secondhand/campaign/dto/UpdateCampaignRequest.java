@@ -1,7 +1,7 @@
 package com.serhat.secondhand.campaign.dto;
 
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Pattern;

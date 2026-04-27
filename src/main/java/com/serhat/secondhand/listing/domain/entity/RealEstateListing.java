@@ -5,19 +5,17 @@ import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwner
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "real_estate_listings")
-@AllArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
-@Data
+ @org.hibernate.annotations.BatchSize(size = 20)
 public class RealEstateListing extends Listing {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -3,7 +3,7 @@ package com.serhat.secondhand.listing.application.vehicle;
 import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;

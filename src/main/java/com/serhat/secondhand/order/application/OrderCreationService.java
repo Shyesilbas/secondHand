@@ -5,7 +5,7 @@ import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;

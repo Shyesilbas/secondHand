@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import lombok.Data;
 
 import java.math.BigDecimal;

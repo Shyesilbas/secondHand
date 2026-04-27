@@ -12,9 +12,9 @@ import com.serhat.secondhand.listing.domain.dto.response.electronics.ElectronicL
 import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.serhat.secondhand.listing.util;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -49,12 +49,4 @@ public final class ListingBusinessConstants {
 
     /** Floor for non-negative listing price validation. */
     public static final BigDecimal MIN_NON_NEGATIVE_PRICE = BigDecimal.ZERO;
-
-    public static final String ERROR_MESSAGE_LISTING_REQUIRED = "Listing is required";
-    public static final String ERROR_CODE_LISTING_REQUIRED = "LISTING_REQUIRED";
-
-    public static final String ERROR_MESSAGE_QUANTITY_AT_LEAST_ONE = "Quantity must be at least 1";
-
-    public static final String ERROR_MESSAGE_PRICE_NON_NEGATIVE = "Price must be non-negative";
-    public static final String ERROR_CODE_INVALID_PRICE = "INVALID_PRICE";
 }

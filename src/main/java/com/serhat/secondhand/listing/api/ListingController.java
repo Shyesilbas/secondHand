@@ -18,8 +18,8 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -135,27 +135,24 @@ public class ListingController {
     }
 
     @PutMapping("/{id}/publish")
-    public ResponseEntity<Void> publishListing(
+    public ResponseEntity<?> publishListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingCommandService.publish(id, currentUser.getId());
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(listingCommandService.publish(id, currentUser.getId()));
     }
 
     @PutMapping("/{id}/reactivate")
-    public ResponseEntity<Void> reactivateListing(
+    public ResponseEntity<?> reactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingCommandService.reactivate(id, currentUser.getId());
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(listingCommandService.reactivate(id, currentUser.getId()));
     }
 
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateListing(
+    public ResponseEntity<?> deactivateListing(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingCommandService.deactivate(id, currentUser.getId());
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(listingCommandService.deactivate(id, currentUser.getId()));
     }
 
     @DeleteMapping("/{id}")
@@ -182,11 +179,10 @@ public class ListingController {
     }
 
     @PutMapping("/{id}/mark-sold")
-    public ResponseEntity<Void> markListingAsSold(
+    public ResponseEntity<?> markListingAsSold(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
-        listingCommandService.markAsSold(id, currentUser.getId());
-        return ResponseEntity.ok().build();
+        return ResultResponses.noContent(listingCommandService.markAsSold(id, currentUser.getId()));
     }
 
     @PutMapping("/{id}/quantity")
@@ -221,8 +217,10 @@ public class ListingController {
 
     @PublicEndpoint
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ListingDto>> getListingsByStatus(@PathVariable ListingStatus status) {
-        return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status));
+    public ResponseEntity<Page<ListingDto>> getListingsByStatus(
+            @PathVariable ListingStatus status,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status, pageable));
     }
 
     @PostMapping("/pay-fee")

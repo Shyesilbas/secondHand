@@ -9,7 +9,7 @@ import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;

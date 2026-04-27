@@ -1,6 +1,6 @@
 package com.serhat.secondhand.campaign.entity;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;

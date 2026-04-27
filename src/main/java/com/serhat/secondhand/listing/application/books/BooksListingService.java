@@ -2,8 +2,8 @@ package com.serhat.secondhand.listing.application.books;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.category.AbstractListingService;
-import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
 import com.serhat.secondhand.listing.application.common.ListingValidationService;
+import com.serhat.secondhand.listing.application.filter.GenericListingFilterService;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
@@ -13,8 +13,9 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.books.BooksListingRepository;
-import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.validation.books.BooksSpecValidator;
+import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -111,15 +112,16 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         }
         return booksRepository.findById(id)
                 .map(existing -> performUpdate(existing, request, currentUserId))
-                .orElseGet(() -> Result.error("Books listing not found", "LISTING_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     private Result<Void> performUpdate(BooksListing existing, BooksUpdateRequest request, Long currentUserId) {
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
 
         Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+        if (quantityResult.isError()) return quantityResult;
 
         Result<Void> applyResult = booksListingResolver.apply(
                 existing,

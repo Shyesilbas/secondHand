@@ -1,7 +1,7 @@
 package com.serhat.secondhand.listing.application.filter;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingFilterDto;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;

@@ -11,19 +11,17 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "books_listings")
-@AllArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
-@Data
+ @org.hibernate.annotations.BatchSize(size = 20)
 public class BooksListing extends Listing {
 
     private String author;

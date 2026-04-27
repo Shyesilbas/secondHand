@@ -4,7 +4,7 @@ import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;

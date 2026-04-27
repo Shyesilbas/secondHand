@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -106,15 +107,16 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
 
         return sportsRepository.findById(id)
                 .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error("Sports listing not found", "LISTING_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     private Result<Void> performUpdate(SportsListing existing, SportsUpdateRequest request) {
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
 
         Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+        if (quantityResult.isError()) return quantityResult;
 
         Result<Void> applyResult = sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId());
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());

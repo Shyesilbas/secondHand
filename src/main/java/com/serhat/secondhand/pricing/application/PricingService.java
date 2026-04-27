@@ -7,7 +7,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.repository.CouponRepository;
 import com.serhat.secondhand.coupon.validator.CouponValidator;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.engine.PriceCalculationEngine;
 import com.serhat.secondhand.pricing.handler.OfferPriceHandler;
