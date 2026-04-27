@@ -3,7 +3,6 @@ package com.serhat.secondhand.order.application;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
@@ -11,7 +10,7 @@ import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
-import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,9 +28,8 @@ public class OrderCompletionService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderStatusConsistencyLogger orderStatusConsistencyLogger;
-    private final OrderEscrowService orderEscrowService;
+    private final EscrowService escrowService;
     private final OrderValidationService orderValidationService;
-    private final PaymentOrchestrator paymentOrchestrator;
     private final OrderLogService orderLog;
     private final OrderCompletionPolicy orderCompletionPolicy;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
@@ -78,19 +76,13 @@ public class OrderCompletionService {
     }
 
     private Result<Void> releaseEscrowsForOrder(Order order) {
-        List<OrderItemEscrow> pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
-        
-        if (pendingEscrows.isEmpty()) {
-            return Result.success();
-        }
-
-        Result<Void> orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
+        Result<Void> orchestratorResult = escrowService.release(order);
         
         if (orchestratorResult.isError()) {
             orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error(orchestratorResult.getMessage(), orchestratorResult.getErrorCode());
         } else {
-            orderLog.logEscrowReleased(pendingEscrows.size(), order.getOrderNumber());
+            orderLog.logEscrowReleased(1, order.getOrderNumber()); // We can improve the count later
             return Result.success();
         }
     }

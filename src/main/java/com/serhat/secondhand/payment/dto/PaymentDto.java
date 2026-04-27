@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.dto;
 
 import com.serhat.secondhand.payment.entity.PaymentDirection;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
 
@@ -21,6 +22,7 @@ public record PaymentDto(
         String listingTitle,
         String listingNo,
         LocalDateTime processedAt,
+        PaymentStatus status,
         boolean isSuccess
 ) {
 }

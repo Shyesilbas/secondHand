@@ -3,6 +3,7 @@ package com.serhat.secondhand.payment.dto;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -26,6 +27,8 @@ public record PaymentRequest(
         String verificationCode,
         boolean agreementsAccepted,
         List<UUID> acceptedAgreementIds,
-        String idempotencyKey
+        String idempotencyKey,
+        PaymentStatus status,
+        UUID orderId
 ) {
 }

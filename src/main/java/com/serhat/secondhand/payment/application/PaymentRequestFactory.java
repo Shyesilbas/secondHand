@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class PaymentRequestFactory {
 
     public List<PaymentRequest> buildOrderPaymentRequests(User user, List<Cart> cartItems,
-                                                          CheckoutRequest request, PricingResultDto pricing, String orderNumber) {
+                                                          CheckoutRequest request, PricingResultDto pricing, String orderNumber, java.util.UUID orderExternalId) {
         Map<Long, List<Cart>> paymentsBySeller = groupCartItemsBySeller(cartItems);
 
         return paymentsBySeller.entrySet().stream()
@@ -31,19 +31,19 @@ public class PaymentRequestFactory {
                     List<Cart> sellerItems = entry.getValue();
                     BigDecimal sellerTotal = resolveSellerTotal(sellerId, sellerItems, pricing);
                     String idempotencyKey = orderNumber + "-" + sellerId;
-                    return buildOrderPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request, idempotencyKey);
+                    return buildOrderPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request, idempotencyKey, orderExternalId);
                 })
                 .collect(Collectors.toList());
     }
 
     public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems,
-                                                             BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey) {
+                                                             BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey, java.util.UUID orderExternalId) {
         PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
 
         Listing firstListing = sellerItems.get(0).getListing();
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(null)
+                .toUserId(sellerId)
                 .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname(PaymentProcessingConstants.ESCROW_RECEIVER_SURNAME)
                 .listingId(firstListing.getId())
@@ -58,6 +58,8 @@ public class PaymentRequestFactory {
                 .agreementsAccepted(request.isAgreementsAccepted())
                 .acceptedAgreementIds(request.getAcceptedAgreementIds())
                 .idempotencyKey(idempotencyKey)
+                .status(com.serhat.secondhand.payment.entity.PaymentStatus.ESCROW)
+                .orderId(orderExternalId)
                 .build();
     }
 

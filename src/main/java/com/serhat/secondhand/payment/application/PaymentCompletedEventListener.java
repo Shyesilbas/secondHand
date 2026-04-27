@@ -28,15 +28,21 @@ public class PaymentCompletedEventListener {
         Payment payment = event.getPayment();
         PaymentCompletedHandleResult handleResult = handlerRegistry.handle(payment);
 
-        User user = payment.getFromUser();
-        if (user == null) {
-            log.warn("Payment {} has no fromUser. Skipping payment success notification.", payment.getId());
-            return;
+        PaymentDto paymentDto = paymentMapper.toDto(payment);
+
+        // Notify Sender (fromUser) if exists and it's not a self-payment already handled
+        User sender = payment.getFromUser();
+        if (sender != null) {
+            paymentNotificationService.sendPaymentSuccessNotification(sender, paymentDto);
+            log.info("Payment success notification sent to sender (fromUser) ID: {}", sender.getId());
         }
 
-        PaymentDto paymentDto = paymentMapper.toDto(payment);
-        paymentNotificationService.sendPaymentSuccessNotification(user, paymentDto);
-        log.info("Payment success email sent for payment ID: {}", payment.getId());
+        // Notify Receiver (toUser) if exists and it's different from sender
+        User receiver = payment.getToUser();
+        if (receiver != null && (sender == null || !receiver.getId().equals(sender.getId()))) {
+            paymentNotificationService.sendPaymentSuccessNotification(receiver, paymentDto);
+            log.info("Payment success notification sent to receiver (toUser) ID: {}", receiver.getId());
+        }
     }
 }
 

@@ -106,6 +106,11 @@ const PaymentsPage = () => {
             tone: 'indigo'
         },
         {
+            title: 'In Escrow',
+            value: formatCurrency(pickPaymentStatistic(paymentStats, 'escrowAmount')),
+            tone: 'blue'
+        },
+        {
             title: 'Successful transactions',
             value: pickPaymentStatistic(paymentStats, 'successfulCount').toString(),
             tone: 'amber'
@@ -219,15 +224,16 @@ const PaymentsPage = () => {
                             <p className="text-sm text-slate-500 mt-1">Monitor cash flow and inspect transactions quickly.</p>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
                         {statCards.map((card) => (
                             <div
                                 key={card.title}
                                 className={`rounded-2xl px-4 py-3 border ${
                                     card.tone === 'emerald' ? 'border-emerald-200 bg-emerald-50/60' :
                                         card.tone === 'indigo' ? 'border-indigo-200 bg-indigo-50/60' :
-                                            card.tone === 'amber' ? 'border-amber-200 bg-amber-50/60' :
-                                                'border-slate-200 bg-slate-50/70'
+                                            card.tone === 'blue' ? 'border-blue-200 bg-blue-50/60' :
+                                                card.tone === 'amber' ? 'border-amber-200 bg-amber-50/60' :
+                                                    'border-slate-200 bg-slate-50/70'
                                 }`}
                             >
                                 <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-medium">{card.title}</p>

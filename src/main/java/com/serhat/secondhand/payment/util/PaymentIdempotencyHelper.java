@@ -32,6 +32,8 @@ public class PaymentIdempotencyHelper {
                 .agreementsAccepted(original.agreementsAccepted())
                 .acceptedAgreementIds(original.acceptedAgreementIds())
                 .idempotencyKey(idempotencyKey)
+                .status(original.status())
+                .orderId(original.orderId())
                 .build();
     }
 }

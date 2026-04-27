@@ -6,12 +6,11 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
-import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +33,7 @@ public class OrderCancellationService {
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCancellationValidationService validationService;
     private final OrderCompensationPersistenceService compensationPersistenceService;
-    private final OrderEscrowService orderEscrowService;
-    private final PaymentOrchestrator paymentOrchestrator;
+    private final EscrowService escrowService;
     private final OrderLogService orderLog;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
     private final OrderMapper orderMapper;
@@ -79,11 +77,9 @@ public class OrderCancellationService {
 
     private Result<Void> processRefund(List<OrderItemCancel> cancelRecords, BigDecimal totalRefundAmount, Order order) {
         User buyer = order.getUser();
+        List<OrderItem> itemsToCancel = cancelRecords.stream().map(OrderItemCancel::getOrderItem).toList();
 
-        List<OrderItemEscrow> escrowsToCancel = orderEscrowService.findExistingEscrowsByOrderItems(
-                cancelRecords.stream().map(OrderItemCancel::getOrderItem).toList());
-
-        Result<Void> orchestratorResult = paymentOrchestrator.cancelEscrowsAndRefundBuyer(escrowsToCancel, buyer);
+        Result<Void> orchestratorResult = escrowService.cancel(order, itemsToCancel);
         if (orchestratorResult.isError()) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             orderLog.logEscrowCancelFailed(order.getOrderNumber(), orchestratorResult.getMessage());

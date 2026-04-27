@@ -33,6 +33,8 @@ public interface IEWalletService {
     void creditToUser(User user, BigDecimal amount);
     
     void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType);
+
+    void creditWalletQuietly(User user, BigDecimal amount);
     
     void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType);
     

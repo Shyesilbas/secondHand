@@ -26,7 +26,7 @@ const ListingReviewsSection = ({ listing }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
-      <h3 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Ürün Yorumları</h3>
+      <h3 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">Product Reviews</h3>
 
       {stats && (stats.totalReviews ?? 0) > 0 && (
         <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-slate-200/40">
@@ -49,7 +49,7 @@ const ListingReviewsSection = ({ listing }) => {
               </div>
             </div>
             <span className="text-slate-500 text-sm">
-              {stats.totalReviews} yorum
+              {stats.totalReviews} reviews
             </span>
           </div>
 
@@ -82,7 +82,7 @@ const ListingReviewsSection = ({ listing }) => {
       ) : (
         <div className="text-center py-12">
           <Star className="w-12 h-12 mx-auto text-slate-300 mb-3" strokeWidth={1} />
-          <p className="text-slate-500 text-sm">Bu ürün için henüz yorum yok</p>
+          <p className="text-slate-500 text-sm">No reviews for this product yet</p>
         </div>
       )}
     </div>

@@ -1,5 +1,7 @@
 package com.serhat.secondhand.order.application;
 
+import com.serhat.secondhand.payment.entity.PaymentStatus;
+
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -198,7 +200,7 @@ public class OrderCreationService {
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
                 .notes(notes)
-                .paymentStatus(Order.PaymentStatus.PENDING)
+                .paymentStatus(PaymentStatus.PENDING)
                 .build();
     }
 

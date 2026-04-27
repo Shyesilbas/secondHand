@@ -42,9 +42,7 @@ public class PaymentContextResolver {
                 PaymentTransactionType.REFUND,
                 PaymentTransactionType.EWALLET_DEPOSIT,
                 PaymentTransactionType.EWALLET_WITHDRAWAL,
-                PaymentTransactionType.EWALLET_PAYMENT_RECEIVED,
-                PaymentTransactionType.ITEM_SALE,
-                PaymentTransactionType.ITEM_PURCHASE
+                PaymentTransactionType.EWALLET_PAYMENT_RECEIVED
         ).contains(payment.getTransactionType());
 
         if (isSpecialFlow) {

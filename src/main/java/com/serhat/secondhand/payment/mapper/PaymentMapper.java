@@ -44,6 +44,8 @@ public interface PaymentMapper {
                 .processedAt(result.processedAt())
                 .isSuccess(result.success())
                 .idempotencyKey(paymentRequest.idempotencyKey())
+                .status(paymentRequest.status() != null ? paymentRequest.status() : com.serhat.secondhand.payment.entity.PaymentStatus.COMPLETED)
+                .orderId(paymentRequest.orderId())
                 .build();
     }
 }

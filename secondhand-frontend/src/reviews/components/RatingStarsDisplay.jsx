@@ -1,7 +1,7 @@
 import { REVIEW_LIMITS } from '../reviewConstants.js';
 import { StarIcon } from './StarIcon.jsx';
 
-/** Salt okunur tam yıldız satırı (kart, istatistik özeti). */
+/** Read-only full star row (card, statistics summary). */
 export function RatingStarsDisplay({ value, iconClassName = 'w-4 h-4', mode = 'round' }) {
   const n = Number(value) || 0;
   let raw;

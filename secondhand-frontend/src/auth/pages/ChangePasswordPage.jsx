@@ -78,8 +78,8 @@ const ChangePasswordPage = () => {
             logger.error(error);
             if (error.response?.data?.message) {
                 const msg = error.response.data.message.toLowerCase();
-                if (msg.includes('current') || msg.includes('mevcut') || msg.includes('wrong') || msg.includes('yanlış')) setErrors({ currentPassword: error.response.data.message });
-                else if (msg.includes('password') || msg.includes('şifre')) setErrors({ newPassword: error.response.data.message });
+                if (msg.includes('current') || msg.includes('wrong')) setErrors({ currentPassword: error.response.data.message });
+                else if (msg.includes('password')) setErrors({ newPassword: error.response.data.message });
                 else setErrors({ general: error.response.data.message });
             } else {
                 notification.showError('Error', 'An error occurred while changing your password. Please try again.');

@@ -1,5 +1,7 @@
 package com.serhat.secondhand.order.dto;
 
+import com.serhat.secondhand.payment.entity.PaymentStatus;
+
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
@@ -37,7 +39,7 @@ public class OrderDto {
     private AddressDto billingAddress;
     private String notes;
     private String paymentReference;
-    private Order.PaymentStatus paymentStatus;
+    private PaymentStatus paymentStatus;
     private PaymentType paymentMethod;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
