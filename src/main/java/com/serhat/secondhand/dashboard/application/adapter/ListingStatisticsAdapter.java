@@ -2,7 +2,7 @@ package com.serhat.secondhand.dashboard.application.adapter;
 
 import com.serhat.secondhand.dashboard.application.port.ListingStatisticsPort;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

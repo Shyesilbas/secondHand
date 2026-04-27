@@ -11,7 +11,7 @@ import com.serhat.secondhand.coupon.repository.CouponRedemptionRepository;
 import com.serhat.secondhand.coupon.repository.CouponRepository;
 import com.serhat.secondhand.coupon.util.CouponErrorCodes;
 import com.serhat.secondhand.coupon.validator.CouponValidator;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.order.entity.Order;

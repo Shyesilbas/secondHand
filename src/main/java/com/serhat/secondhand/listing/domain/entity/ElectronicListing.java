@@ -1,34 +1,21 @@
 package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
-import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import org.hibernate.annotations.Check;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.*;
+import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Check;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "electronic_listings")
 @Check(constraints = "connection_type IS NULL OR connection_type IN ('WIRED', 'BLUETOOTH', 'HDMI_USB', 'BOTH')")
-@AllArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
-@Data
+ @org.hibernate.annotations.BatchSize(size = 20)
 public class ElectronicListing extends Listing {
 
     @ManyToOne(fetch = FetchType.LAZY)

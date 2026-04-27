@@ -4,7 +4,7 @@ import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;

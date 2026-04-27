@@ -23,8 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.List;
 import java.util.UUID;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -103,15 +103,16 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
 
         return repository.findById(id)
                 .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error("Electronic listing not found", "LISTING_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     private Result<Void> performUpdate(ElectronicListing existing, ElectronicUpdateRequest request) {
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
 
         Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+        if (quantityResult.isError()) return quantityResult;
 
         Result<Void> resolutionResult = electronicListingResolver.apply(
                 existing,

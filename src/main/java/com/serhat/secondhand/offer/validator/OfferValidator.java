@@ -2,8 +2,8 @@ package com.serhat.secondhand.offer.validator;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.offer.dto.CounterOfferRequest;
 import com.serhat.secondhand.offer.dto.CreateOfferRequest;
 import com.serhat.secondhand.offer.entity.Offer;

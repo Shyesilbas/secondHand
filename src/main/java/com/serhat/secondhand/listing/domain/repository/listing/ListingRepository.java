@@ -1,8 +1,8 @@
 package com.serhat.secondhand.listing.domain.repository.listing;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +33,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE LOWER(l.listingNo) = LOWER(:listingNo)")
     Optional<Listing> findByListingNoWithSeller(@Param("listingNo") String listingNo);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.status = :status")
+    @EntityGraph(attributePaths = {"seller"})
+    @Query("SELECT l FROM Listing l WHERE l.status = :status")
     Page<Listing> findByStatus(@Param("status") ListingStatus status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
@@ -53,7 +54,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
            countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType")
     Page<Listing> findBySellerIdAndListingType(@Param("sellerId") Long sellerId, @Param("listingType") ListingType listingType, Pageable pageable);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller " +
+    @EntityGraph(attributePaths = {"seller"})
+    @Query("SELECT l FROM Listing l " +
             "WHERE (LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
             "OR LOWER(l.listingNo) LIKE LOWER(CONCAT('%', :listingNo, '%'))) " +
             "AND l.status = :status")
@@ -102,7 +104,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId")
     int updatePriceBatch(@Param("ids") List<UUID> ids, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId);
 
-    @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id IN :ids")
+    @EntityGraph(attributePaths = {"seller"})
+    @Query("SELECT l FROM Listing l WHERE l.id IN :ids")
     List<Listing> findAllByIdIn(@Param("ids") Collection<UUID> ids);
 
     long countByIdIn(Collection<UUID> ids);

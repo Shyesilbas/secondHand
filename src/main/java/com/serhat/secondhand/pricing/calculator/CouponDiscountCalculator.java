@@ -2,7 +2,7 @@ package com.serhat.secondhand.pricing.calculator;
 
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.util.PricingUtil;
 import org.springframework.stereotype.Component;

@@ -8,7 +8,7 @@ import com.serhat.secondhand.favorite.domain.dto.FavoriteStatsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingStatisticsDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

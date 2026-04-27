@@ -8,7 +8,7 @@ import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
 import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;

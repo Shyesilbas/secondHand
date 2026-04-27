@@ -1,6 +1,6 @@
 package com.serhat.secondhand.ai.agent.search;
 
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 
 import java.math.BigDecimal;
 

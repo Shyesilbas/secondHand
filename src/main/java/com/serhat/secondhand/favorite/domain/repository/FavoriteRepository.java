@@ -1,7 +1,7 @@
 package com.serhat.secondhand.favorite.domain.repository;
 
 import com.serhat.secondhand.favorite.domain.entity.Favorite;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

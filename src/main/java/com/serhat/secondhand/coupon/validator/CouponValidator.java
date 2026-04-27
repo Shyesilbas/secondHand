@@ -4,7 +4,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.repository.CouponRedemptionRepository;
 import com.serhat.secondhand.coupon.util.CouponErrorCodes;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

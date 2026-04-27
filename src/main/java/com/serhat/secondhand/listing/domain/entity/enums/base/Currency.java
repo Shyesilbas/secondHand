@@ -1,4 +1,4 @@
-package com.serhat.secondhand.listing.domain.entity.enums.vehicle;
+package com.serhat.secondhand.listing.domain.entity.enums.base;
 
 import lombok.Getter;
 

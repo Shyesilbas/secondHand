@@ -37,7 +37,7 @@ public class ListingPaymentHandler {
         }
         Long userId = listing.getSeller() != null ? listing.getSeller().getId() : null;
         if (userId != null) {
-            listing.setListingFeePaid(true);
+            listing.markFeeAsPaid();
             listingRepository.save(listing);
             listingCommandService.publish(listing.getId(), userId);
         }

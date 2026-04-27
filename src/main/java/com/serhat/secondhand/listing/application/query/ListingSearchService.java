@@ -9,7 +9,7 @@ import com.serhat.secondhand.listing.application.sports.SportsListingService;
 import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;

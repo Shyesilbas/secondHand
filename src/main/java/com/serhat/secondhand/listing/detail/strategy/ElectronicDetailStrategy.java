@@ -3,7 +3,7 @@ package com.serhat.secondhand.listing.detail.strategy;
 import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import org.springframework.stereotype.Service;
 
 @Service

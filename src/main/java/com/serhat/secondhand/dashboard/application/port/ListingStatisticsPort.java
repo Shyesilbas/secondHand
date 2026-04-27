@@ -1,7 +1,7 @@
 package com.serhat.secondhand.dashboard.application.port;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 
 import java.util.List;
 import java.util.Optional;

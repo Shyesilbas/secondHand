@@ -5,7 +5,7 @@ import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.pricing.util.PricingUtil;
 import lombok.RequiredArgsConstructor;

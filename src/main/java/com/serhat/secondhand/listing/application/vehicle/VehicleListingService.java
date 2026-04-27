@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -103,12 +104,13 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
 
         return vehicleRepository.findById(id)
                 .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error("Vehicle listing not found", "LISTING_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     private Result<Void> performUpdate(VehicleListing existing, VehicleUpdateRequest request) {
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
 
         Result<Void> applyResult = vehicleListingResolver.apply(existing, request.vehicleTypeId(), request.brandId(), request.vehicleModelId());
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());

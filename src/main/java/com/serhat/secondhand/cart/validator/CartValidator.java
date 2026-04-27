@@ -4,8 +4,8 @@ import com.serhat.secondhand.cart.util.CartErrorCodes;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,10 @@
 package com.serhat.secondhand.listing.application.category;
 
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingValidationService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
@@ -82,16 +83,16 @@ public abstract class AbstractListingService<T extends Listing, C> {
         return listingValidationService.validateOwnership(listingId, userId);
     }
 
-    public Result<Void> validateEditableStatus(Listing listing) {
-        return listingValidationService.validateEditableStatus(listing);
-    }
-
-    public Result<Void> validateStatus(Listing listing, ListingStatus... allowedStatuses) {
-        return listingValidationService.validateStatus(listing, allowedStatuses);
-    }
-
     public Result<Void> applyQuantityUpdate(Listing listing, Optional<Integer> quantity) {
-        return listingValidationService.applyQuantityUpdate(listing, quantity);
+        if (quantity.isPresent()) {
+            try {
+                listing.updateQuantity(quantity.get());
+                return Result.success();
+            } catch (BusinessException e) {
+                return Result.error(e.getMessage(), e.getErrorCode());
+            }
+        }
+        return Result.success();
     }
 
     // ── Abstract template methods ──
@@ -148,9 +149,8 @@ public abstract class AbstractListingService<T extends Listing, C> {
         
         T existing = existingOpt.get();
         
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) {
-            return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
         
         if (resolver != null) {

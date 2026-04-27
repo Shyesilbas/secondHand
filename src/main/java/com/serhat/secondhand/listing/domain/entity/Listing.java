@@ -1,9 +1,9 @@
 package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.core.exception.BusinessException;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.util.ListingNoGenerator;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -27,6 +27,7 @@ import java.util.UUID;
     @Index(name = "idx_listing_created", columnList = "createdAt")
 })
 @Inheritance(strategy = InheritanceType.JOINED)
+@org.hibernate.annotations.BatchSize(size = 20)
 public class Listing {
 
     @Id
@@ -126,7 +127,7 @@ public class Listing {
     }
     
     public boolean isEditable() {
-        return this.status == ListingStatus.DRAFT || this.status == ListingStatus.ACTIVE;
+        return this.status == ListingStatus.DRAFT || this.status == ListingStatus.ACTIVE || this.status == ListingStatus.INACTIVE;
     }
     
     public boolean canBePublished() {

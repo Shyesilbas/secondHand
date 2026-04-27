@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -109,15 +110,16 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
 
         return clothingRepository.findById(id)
                 .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error("Clothing listing not found", "LISTING_NOT_FOUND"));
+                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
     }
 
     private Result<Void> performUpdate(ClothingListing existing, ClothingUpdateRequest request) {
-        Result<Void> statusResult = validateEditableStatus(existing);
-        if (statusResult.isError()) return statusResult;
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
 
         Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
+        if (quantityResult.isError()) return quantityResult;
 
         Result<Void> applyResult = clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId());
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());

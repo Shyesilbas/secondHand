@@ -1,7 +1,7 @@
 package com.serhat.secondhand.campaign.dto;
 
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -4,11 +4,12 @@ import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
+import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,36 +34,56 @@ public class ListingCommandService {
     private final PriceHistoryService priceHistoryService;
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
-    public void publish(UUID listingId, Long userId) {
-        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listing.publish();
-        listingRepository.save(listing);
-        eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
-        log.info("Listing {} published", listingId);
+    public Result<Void> publish(UUID listingId, Long userId) {
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            listing.publish();
+            listingRepository.save(listing);
+            eventPublisher.publishEvent(new NewListingCreatedEvent(this, listing));
+            log.info("Listing {} published", listingId);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
-    public void reactivate(UUID listingId, Long userId) {
-        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listing.reactivate();
-        listingRepository.save(listing);
-        log.info("Listing {} reactivated", listingId);
+    public Result<Void> reactivate(UUID listingId, Long userId) {
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            listing.reactivate();
+            listingRepository.save(listing);
+            log.info("Listing {} reactivated", listingId);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
-    public void deactivate(UUID listingId, Long userId) {
-        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listing.deactivate();
-        listingRepository.save(listing);
-        log.info("Listing {} deactivated", listingId);
+    public Result<Void> deactivate(UUID listingId, Long userId) {
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            listing.deactivate();
+            listingRepository.save(listing);
+            log.info("Listing {} deactivated", listingId);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
-    public void markAsSold(UUID listingId, Long userId) {
-        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-        listing.markAsSold();
-        listingRepository.save(listing);
-        log.info("Listing {} marked as sold", listingId);
+    public Result<Void> markAsSold(UUID listingId, Long userId) {
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            listing.markAsSold();
+            listingRepository.save(listing);
+            log.info("Listing {} marked as sold", listingId);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
@@ -76,20 +97,22 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
-        if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
-            return Result.error(ListingBusinessConstants.ERROR_MESSAGE_QUANTITY_AT_LEAST_ONE,
-                    ListingErrorCodes.INVALID_QUANTITY.toString());
+        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+        try {
+            listing.updateQuantity(quantity);
+            listingRepository.save(listing);
+            log.info("Listing {} quantity updated to {}", listingId, quantity);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
         }
-        int updated = listingRepository.updateQuantity(listingId, quantity, userId);
-        return updated > 0 ? Result.success() : Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchQuantity(List<UUID> listingIds, int quantity, Long userId) {
         if (listingIds == null || listingIds.isEmpty()) return Result.success();
         if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
-            return Result.error(ListingBusinessConstants.ERROR_MESSAGE_QUANTITY_AT_LEAST_ONE,
-                    ListingErrorCodes.INVALID_QUANTITY.toString());
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         int updated = listingRepository.updateQuantityBatch(listingIds, quantity, userId);
         if (updated != listingIds.size()) {
@@ -99,45 +122,29 @@ public class ListingCommandService {
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
+    @TrackPriceChange(reason = "Price updated via quick action")
     public Result<Void> updateSinglePrice(UUID listingId, BigDecimal price, Long userId) {
-        if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {
-            return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
-                    ListingBusinessConstants.ERROR_CODE_INVALID_PRICE);
+        Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+
+        try {
+            listing.updatePrice(price);
+            listingRepository.save(listing);
+            
+            log.info("Listing {} price updated to {}", listingId, price);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
         }
-        Optional<Listing> listingOpt = listingRepository.findById(listingId);
-        if (listingOpt.isEmpty()) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
-        }
-        Listing listing = listingOpt.get();
-        if (!userId.equals(listing.getSeller().getId())) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
-        }
-        BigDecimal oldPrice = listing.getPrice();
-        int updated = listingRepository.updatePrice(listingId, price, userId);
-        if (updated <= 0) {
-            return Result.error(ListingErrorCodes.LISTING_NOT_FOUND);
-        }
-        if (priceChanged(oldPrice, price)) {
-            priceHistoryService.recordPriceChange(
-                    listingId,
-                    listing.getTitle(),
-                    oldPrice,
-                    price,
-                    listing.getCurrency(),
-                    "Price updated via quick action");
-        }
-        return Result.success();
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchPrice(List<UUID> listingIds, BigDecimal price, Long userId) {
         if (listingIds == null || listingIds.isEmpty()) return Result.success();
         if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {
-            return Result.error(ListingBusinessConstants.ERROR_MESSAGE_PRICE_NON_NEGATIVE,
-                    ListingBusinessConstants.ERROR_CODE_INVALID_PRICE);
+            return Result.error(ListingErrorCodes.INVALID_PRICE);
         }
         List<Listing> ownedBefore = listingRepository.findAllByIdIn(listingIds).stream()
-                .filter(l -> userId.equals(l.getSeller().getId()))
+                .filter(l -> l.isOwnedBy(userId))
                 .toList();
         int updated = listingRepository.updatePriceBatch(listingIds, price, userId);
         if (updated != listingIds.size()) {

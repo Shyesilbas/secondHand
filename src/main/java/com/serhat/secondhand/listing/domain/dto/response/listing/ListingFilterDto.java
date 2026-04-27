@@ -3,9 +3,9 @@ package com.serhat.secondhand.listing.domain.dto.response.listing;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Currency;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.Getter;
 import lombok.Setter;
 
