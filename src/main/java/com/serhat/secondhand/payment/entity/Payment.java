@@ -66,4 +66,10 @@ public class Payment {
     @Column(name = "idempotency_key", unique = true, nullable = true, length = 255)
     private String idempotencyKey;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private PaymentStatus status = PaymentStatus.COMPLETED;
+
+    private UUID orderId;
+
 }

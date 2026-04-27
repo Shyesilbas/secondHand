@@ -1,31 +1,31 @@
 import { LISTING_TYPES, LISTING_STATUS } from '../../listing/types/index.js';
 
-const TYPE_TR = {
-  [LISTING_TYPES.VEHICLE]: 'Araç',
-  [LISTING_TYPES.ELECTRONICS]: 'Elektronik',
-  [LISTING_TYPES.REAL_ESTATE]: 'Gayrimenkul',
-  [LISTING_TYPES.CLOTHING]: 'Giyim',
-  [LISTING_TYPES.BOOKS]: 'Kitap',
-  [LISTING_TYPES.SPORTS]: 'Spor',
+const TYPE_LABELS = {
+  [LISTING_TYPES.VEHICLE]: 'Vehicle',
+  [LISTING_TYPES.ELECTRONICS]: 'Electronics',
+  [LISTING_TYPES.REAL_ESTATE]: 'Real Estate',
+  [LISTING_TYPES.CLOTHING]: 'Clothing',
+  [LISTING_TYPES.BOOKS]: 'Books',
+  [LISTING_TYPES.SPORTS]: 'Sports',
 };
 
-const STATUS_TR = {
-  [LISTING_STATUS.ACTIVE]: 'Yayında',
-  [LISTING_STATUS.INACTIVE]: 'Pasif',
-  [LISTING_STATUS.SOLD]: 'Satıldı',
-  [LISTING_STATUS.PENDING]: 'Beklemede',
-  [LISTING_STATUS.DRAFT]: 'Taslak',
-  RESERVED: 'Rezerve',
+const STATUS_LABELS = {
+  [LISTING_STATUS.ACTIVE]: 'Active',
+  [LISTING_STATUS.INACTIVE]: 'Inactive',
+  [LISTING_STATUS.SOLD]: 'Sold',
+  [LISTING_STATUS.PENDING]: 'Pending',
+  [LISTING_STATUS.DRAFT]: 'Draft',
+  RESERVED: 'Reserved',
 };
 
-export function listingTypeLabelTr(type) {
+export function listingTypeLabel(type) {
   if (!type) return null;
-  return TYPE_TR[type] || type;
+  return TYPE_LABELS[type] || type;
 }
 
-export function listingStatusLabelTr(status) {
+export function listingStatusLabel(status) {
   if (!status) return null;
-  return STATUS_TR[status] || status;
+  return STATUS_LABELS[status] || status;
 }
 
 /** Fiyat etiketi (görünüm + API metni için). */
@@ -35,13 +35,13 @@ export function formatListingPriceLabel(price, currency) {
   if (Number.isNaN(n)) return `${price} ${currency || ''}`.trim();
   const cur = (currency || 'TRY').toUpperCase();
   try {
-    return new Intl.NumberFormat('tr-TR', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: cur === 'TRY' || cur === 'USD' || cur === 'EUR' ? cur : 'TRY',
       maximumFractionDigits: cur === 'TRY' ? 0 : 2,
     }).format(n);
   } catch {
-    return `${n.toLocaleString('tr-TR')} ${cur}`;
+    return `${n.toLocaleString('en-US')} ${cur}`;
   }
 }
 
@@ -63,17 +63,17 @@ function electronicsContextLines(listing) {
   const ram = listing.ram != null ? `${listing.ram} GB RAM` : null;
   const storage =
     listing.storage != null
-      ? `${listing.storage} GB depolama${listing.storageType ? ` (${listing.storageType})` : ''}`
+      ? `${listing.storage} GB storage${listing.storageType ? ` (${listing.storageType})` : ''}`
       : null;
-  const processor = listing.processor ? `İşlemci: ${listing.processor}` : null;
+  const processor = listing.processor ? `Processor: ${listing.processor}` : null;
   const battery =
-    listing.batteryHealthPercent != null ? `Pil sağlığı: %${listing.batteryHealthPercent}` : null;
-  const screen = listing.screenSize != null ? `Ekran: ${listing.screenSize}"` : null;
+    listing.batteryHealthPercent != null ? `Battery health: %${listing.batteryHealthPercent}` : null;
+  const screen = listing.screenSize != null ? `Screen: ${listing.screenSize}"` : null;
   const gpu = listing.gpuModel?.trim() ? `GPU: ${listing.gpuModel.trim()}` : null;
-  const os = listing.operatingSystem?.trim() ? `İşletim sistemi: ${listing.operatingSystem.trim()}` : null;
-  const year = listing.year != null ? `Model yılı: ${listing.year}` : null;
+  const os = listing.operatingSystem?.trim() ? `Operating system: ${listing.operatingSystem.trim()}` : null;
+  const year = listing.year != null ? `Model year: ${listing.year}` : null;
   return [
-    brand || subtype ? `Cihaz: ${[brand, subtype, modelName].filter(Boolean).join(' · ')}` : modelName ? `Model: ${modelName}` : null,
+    brand || subtype ? `Device: ${[brand, subtype, modelName].filter(Boolean).join(' · ')}` : modelName ? `Model: ${modelName}` : null,
     ram,
     storage,
     processor,
@@ -88,8 +88,8 @@ function electronicsContextLines(listing) {
 export function buildAuraListingSessionContext(listing) {
   if (!listing) return null;
   const priceLine = formatListingPriceLabel(listing.price, listing.currency);
-  const typeTr = listingTypeLabelTr(listing.type);
-  const statusTr = listingStatusLabelTr(listing.status);
+  const typeStr = listingTypeLabel(listing.type);
+  const statusStr = listingStatusLabel(listing.status);
   const location = [listing.district, listing.city].filter(Boolean).join(', ');
   const rawDesc =
     listing.description && String(listing.description).trim()
@@ -98,16 +98,16 @@ export function buildAuraListingSessionContext(listing) {
   const desc =
     rawDesc && rawDesc.length > 400 ? `${rawDesc.slice(0, 400)}…` : rawDesc;
   const lines = [
-    'Kullanıcı şu ilanla ilgili soru soruyor:',
-    listing.title ? `İlan başlığı: ${listing.title}` : null,
-    typeTr ? `Kategori: ${typeTr}` : null,
-    priceLine ? `Fiyat: ${priceLine}` : null,
-    location ? `Konum: ${location}` : null,
-    statusTr ? `İlan durumu: ${statusTr}` : null,
-    listing.listingNo ? `İlan numarası: ${listing.listingNo}` : null,
-    listing.id ? `Teknik id: ${listing.id}` : null,
+    'User is asking about this listing:',
+    listing.title ? `Listing title: ${listing.title}` : null,
+    typeStr ? `Category: ${typeStr}` : null,
+    priceLine ? `Price: ${priceLine}` : null,
+    location ? `Location: ${location}` : null,
+    statusStr ? `Status: ${statusStr}` : null,
+    listing.listingNo ? `Listing number: ${listing.listingNo}` : null,
+    listing.id ? `ID: ${listing.id}` : null,
     ...electronicsContextLines(listing),
-    desc ? `Açıklama özeti: ${desc}` : null,
+    desc ? `Description summary: ${desc}` : null,
   ];
   return lines.filter(Boolean).join('\n');
 }

@@ -45,20 +45,20 @@ const MyListingsPage = () => {
 
     const applyBulk = useCallback(async () => {
         const ids = Array.from(selectedIds);
-        if (!ids.length) { showError('Seçim yok', 'En az bir ilan seçin'); return; }
+        if (!ids.length) { showError('No selection', 'Select at least one listing'); return; }
         const num = bulkMode === 'quantity' ? parseInt(bulkValue, 10) : parsePrice(bulkValue);
         if (!Number.isFinite(num) || (bulkMode === 'quantity' && num < 1) || (bulkMode === 'price' && num < 0)) {
-            showError('Geçersiz değer', bulkMode === 'quantity' ? 'Miktar en az 1 olmalı' : 'Fiyat 0 veya üzeri olmalı');
+            showError('Invalid value', bulkMode === 'quantity' ? 'Quantity must be at least 1' : 'Price must be 0 or more');
             return;
         }
         setSaving(true);
         try {
             bulkMode === 'quantity' ? await listingService.updateBatchQuantity(ids, num) : await listingService.updateBatchPrice(ids, num);
-            showSuccess('Güncellendi', `${ids.length} ilan güncellendi`);
+            showSuccess('Updated', `${ids.length} listing(s) updated`);
             clearBulk();
             engine.refresh();
         } catch (e) {
-            showError('Güncelleme başarısız', e?.response?.data?.message || 'Hata');
+            showError('Update failed', e?.response?.data?.message || 'Error');
         } finally {
             setSaving(false);
         }
@@ -129,10 +129,10 @@ const MyListingsPage = () => {
                     <>
                         <div className="flex gap-2 mb-3" onClick={e => e.stopPropagation()}>
                             <button type="button" onClick={() => setBulkMode('quantity')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-                                Toplu Quantity Güncelle
+                                Bulk Update Quantity
                             </button>
                             <button type="button" onClick={() => setBulkMode('price')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-                                Toplu Fiyat Güncelle
+                                Bulk Update Price
                             </button>
                         </div>
                         <div className="space-y-2">
@@ -161,7 +161,7 @@ const MyListingsPage = () => {
                         </div>
                         <label className="flex items-center gap-2 py-1 text-sm text-slate-600 cursor-pointer">
                             <input type="checkbox" checked={listings.length > 0 && selectedIds.size === listings.length} onChange={e => e.target.checked ? selectAll() : setSelectedIds(new Set())} className="rounded" />
-                            Tümünü seç
+                            Select all
                         </label>
                         <div className="space-y-1 max-h-48 overflow-y-auto">
                             {listings.map((listing) => (

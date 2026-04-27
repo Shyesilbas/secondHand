@@ -61,7 +61,7 @@ apiClient.interceptors.response.use(
         const status = error.response?.status;
         const errorData = error.response?.data;
 
-        // Hata objesini zenginleştir - Backend'den gelen mesajları extract et
+        // Enrich error object - extract messages from backend
         if (errorData) {
             error.userMessage = errorData.message || null;
             error.errorCode = errorData.errorCode || errorData.code;
@@ -83,11 +83,11 @@ apiClient.interceptors.response.use(
             .some(path => originalRequest.url?.includes(path));
 
         if (isAuthEndpoint) {
-            // Auth endpoint'lerinde backend mesajını koru
+            // Keep backend message for auth endpoints
             return Promise.reject(error);
         }
 
-        // 403: Permission/CSRF hatası - özel handling
+        // 403: Permission/CSRF error - special handling
         if (status === 403) {
             if (errorData?.message?.toLowerCase().includes('csrf')) {
                 error.errorCode = 'CSRF_ERROR';

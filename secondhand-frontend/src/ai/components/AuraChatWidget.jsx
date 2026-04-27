@@ -78,7 +78,7 @@ const AuraChatWidget = () => {
           id: `aura-auth-${Date.now()}`,
           role: 'assistant',
           content:
-            'Merhaba, ben Aura. Sohbet etmek için giriş yapman gerekiyor; hesabınla birlikte sana özel öneriler sunabilirim.',
+            "Hi, I'm Aura. You need to log in to chat; with your account, I can offer personalized recommendations.",
           createdAt: Date.now(),
         },
       ]);
@@ -91,23 +91,23 @@ const AuraChatWidget = () => {
       const response =
         AI_AGENT_MODE_ENABLED && agentMode
           ? await aiChatService.agentQuery({
-              message: 'Merhaba, kısaca kendini tanıt ve bugün nasıl yardımcı olabileceğini söyle.',
+              message: 'Hello, introduce yourself briefly and tell me how you can help today.',
               agentMode: true,
               uiContext: buildAuraWidgetUiContext(),
             })
           : await aiChatService.chat({
-              message: 'Merhaba, kısaca kendini tanıt ve bugün nasıl yardımcı olabileceğini söyle.',
+              message: 'Hello, introduce yourself briefly and tell me how you can help today.',
             });
       const answer =
         response?.answer ||
-        'Merhaba, ben Aura. SecondHand’de ilan, teklif ve güvenli alışveriş konularında yanındayım. Ne arıyorsun?';
+        "Hi, I'm Aura. I'm here to help you with listings, offers, and secure shopping on SecondHand. What are you looking for?";
       const hasUserMessage = messagesRef.current.some((m) => m.role === 'user');
       if (!hasUserMessage) {
         setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content: answer })]);
       }
       localStorage.setItem(storageKey, '1');
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Sohbet başlatılamadı. Biraz sonra tekrar dene.');
+      const errorMessage = getApiErrorMessage(e, 'Could not start chat. Please try again in a moment.');
       setMessages((prev) => [
         ...prev,
         {
@@ -154,7 +154,7 @@ const AuraChatWidget = () => {
               </div>
               <div className="leading-tight min-w-0">
                 <div className="text-sm font-semibold tracking-tight truncate">Aura</div>
-                <div className="text-[11px] text-indigo-200/90 truncate">Pazar yeri asistanın</div>
+                <div className="text-[11px] text-indigo-200/90 truncate">Your marketplace assistant</div>
               </div>
             </button>
             <div className="flex items-center gap-1.5 shrink-0">
@@ -177,7 +177,7 @@ const AuraChatWidget = () => {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="p-2 rounded-xl hover:bg-white/10 text-white/80 hover:text-white transition-colors"
-                aria-label="Kapat"
+                aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -252,7 +252,7 @@ const AuraChatWidget = () => {
 
             {showQuickPrompts && isAuthenticated && userId != null ? (
               <div className="shrink-0 px-4 pb-2 border-t border-slate-100/80 bg-white/60">
-                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-2">Hızlı başla</p>
+                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-2">Quick start</p>
                 <AuraSuggestedPrompts
                   dense
                   disabled={isSending}
@@ -267,7 +267,7 @@ const AuraChatWidget = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={onKeyDown}
-                  placeholder="Aura’ya yaz… (Enter gönderir)"
+                  placeholder="Write to Aura… (Enter to send)"
                   className="flex-1 resize-none rounded-2xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-300 focus:bg-white"
                   rows={2}
                 />
@@ -276,16 +276,16 @@ const AuraChatWidget = () => {
                   onClick={() => sendMessage()}
                   disabled={isSending || !input.trim()}
                   className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-violet-500 transition-all"
-                  aria-label="Gönder"
+                  aria-label="Send"
                 >
                   <Send className="w-4 h-4" />
                 </button>
               </div>
               {isGreeting ? (
-                <div className="mt-2 text-[10px] text-slate-400 tracking-tight">Aura hazırlanıyor…</div>
+                <div className="mt-2 text-[10px] text-slate-400 tracking-tight">Aura is preparing…</div>
               ) : (
                 <p className="mt-2 text-[10px] text-slate-400 leading-snug">
-                  Bu cihazda son konuşman saklanır. Tam ekran ve geçmiş ayarları için üstteki Aura’ya tıkla.
+                  Your last conversation is stored on this device. Click Aura above for full screen and history settings.
                 </p>
               )}
             </div>
@@ -297,7 +297,7 @@ const AuraChatWidget = () => {
         type="button"
         onClick={() => setIsOpen((v) => !v)}
         className="relative w-14 h-14 rounded-full bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-xl shadow-indigo-900/25 hover:shadow-2xl hover:scale-[1.02] transition-all duration-200 flex items-center justify-center cursor-pointer ring-2 ring-white/20"
-        aria-label={isOpen ? 'Aura sohbetini kapat' : 'Aura sohbetini aç'}
+        aria-label={isOpen ? 'Close Aura chat' : 'Open Aura chat'}
         aria-expanded={isOpen}
       >
         {!isOpen ? (

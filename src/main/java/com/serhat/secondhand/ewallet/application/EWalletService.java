@@ -17,6 +17,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,7 @@ public class EWalletService implements IEWalletService {
     private final EWalletValidator eWalletValidator;
     private final IUserService userService;
     private final AppConfigProperties appConfigProperties;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public EWalletDto createEWallet(EwalletRequest ewalletRequest) {
@@ -88,6 +90,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
+    @CacheEvict(value = "paymentStats", allEntries = true)
     public void deposit(DepositRequest request) {
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -102,11 +105,14 @@ public class EWalletService implements IEWalletService {
         eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), request.getAmount()));
         eWalletRepository.save(eWallet);
 
-        paymentRepository.save(buildDepositPayment(user, request.getAmount()));
+        Payment payment = buildDepositPayment(user, request.getAmount());
+        paymentRepository.save(payment);
+        eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
         log.info("eWallet deposit successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
     @Transactional
+    @CacheEvict(value = "paymentStats", allEntries = true)
     public void withdraw(WithdrawRequest request) {
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -121,7 +127,9 @@ public class EWalletService implements IEWalletService {
 
         bankService.credit(user, request.getAmount());
 
-        paymentRepository.save(buildWithdrawalPayment(user, request.getAmount()));
+        Payment payment = buildWithdrawalPayment(user, request.getAmount());
+        paymentRepository.save(payment);
+        eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
         log.info("eWallet withdrawal successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
@@ -234,6 +242,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
+    @CacheEvict(value = "paymentStats", allEntries = true)
     public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
 
@@ -248,10 +257,14 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         if (transactionType == PaymentTransactionType.REFUND) {
-            paymentRepository.save(buildRefundPayment(user, amount, listingId));
+            Payment payment = buildRefundPayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund payment record created for user: {} amount: {}", user.getEmail(), amount);
         } else if (transactionType == PaymentTransactionType.ITEM_SALE) {
-            paymentRepository.save(buildItemSalePayment(user, amount, listingId));
+            Payment payment = buildItemSalePayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Item sale payment record created for seller: {} amount: {}", user.getEmail(), amount);
         }
 
@@ -259,6 +272,21 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
+    public void creditWalletQuietly(User user, BigDecimal amount) {
+        log.info("Quietly crediting {} to user's e-wallet (Escrow Release): {}", amount, user.getEmail());
+
+        EWallet eWallet = eWalletRepository.findByUserWithLock(user)
+                .orElseGet(() -> {
+                    EWallet newWallet = eWalletMapper.createDefaultEWallet(user, appConfigProperties.getEWallet().getDefaultBalance());
+                    return eWalletRepository.save(newWallet);
+                });
+
+        eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), amount));
+        eWalletRepository.save(eWallet);
+    }
+
+    @Transactional
+    @CacheEvict(value = "paymentStats", allEntries = true)
     public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
 
@@ -269,7 +297,9 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         if (transactionType == PaymentTransactionType.REFUND) {
-            paymentRepository.save(buildRefundDebitPayment(user, amount, listingId));
+            Payment payment = buildRefundDebitPayment(user, amount, listingId);
+            paymentRepository.save(payment);
+            eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund debit payment record created for seller: {} amount: {}", user.getEmail(), amount);
         }
 
@@ -280,8 +310,8 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildDepositPayment(User user, BigDecimal amount) {
         return Payment.builder()
-                .fromUser(user)
-                .toUser(null)
+                .fromUser(null) // System/External Bank sends to User
+                .toUser(user)   // User receives
                 .amount(amount)
                 .paymentType(PaymentType.TRANSFER)
                 .transactionType(PaymentTransactionType.EWALLET_DEPOSIT)
@@ -308,8 +338,8 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildRefundPayment(User user, BigDecimal amount, UUID listingId) {
         return Payment.builder()
-                .fromUser(user)
-                .toUser(user)
+                .fromUser(null) // System refunds to User
+                .toUser(user)   // User receives refund
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.REFUND)
@@ -322,8 +352,8 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildRefundDebitPayment(User seller, BigDecimal amount, UUID listingId) {
         return Payment.builder()
-                .fromUser(seller)
-                .toUser(null)
+                .fromUser(seller) // Seller returns money
+                .toUser(null)     // to System/Buyer
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.REFUND)
@@ -336,8 +366,8 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildItemSalePayment(User seller, BigDecimal amount, UUID listingId) {
         return Payment.builder()
-                .fromUser(seller)
-                .toUser(seller)
+                .fromUser(null) // System/Buyer pays to Seller
+                .toUser(seller) // Seller receives
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.ITEM_SALE)

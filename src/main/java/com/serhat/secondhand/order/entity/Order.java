@@ -1,5 +1,6 @@
 package com.serhat.secondhand.order.entity;
 
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(exclude = {"shipping", "orderItems"})
@@ -42,6 +44,17 @@ public class Order {
 
     @Column(name = "order_number", unique = true, nullable = false)
     private String orderNumber;
+
+    @Column(name = "external_id", unique = true)
+    @Builder.Default
+    private UUID externalId = UUID.randomUUID();
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.externalId == null) {
+            this.externalId = UUID.randomUUID();
+        }
+    }
 
     @Column(name = "name", length = 100)
     private String name;
@@ -172,19 +185,4 @@ public class Order {
         }
     }
 
-    @Getter
-    public enum PaymentStatus {
-        PENDING("Pending"),
-        PAID("Paid"),
-        FAILED("Failed"),
-        REFUNDED("Refunded"),
-        PARTIALLY_REFUNDED("Partially Refunded");
-
-        private final String displayName;
-
-        PaymentStatus(String displayName) {
-            this.displayName = displayName;
-        }
-
-    }
 }

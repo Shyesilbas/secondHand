@@ -8,7 +8,7 @@ import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.repository.ShippingRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
-import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,8 +25,7 @@ public class OrderCompletionScheduler {
 
     private final OrderRepository orderRepository;
     private final ShippingRepository shippingRepository;
-    private final OrderEscrowService orderEscrowService;
-    private final PaymentOrchestrator paymentOrchestrator;
+    private final EscrowService escrowService;
     private final OrderLogService orderLog;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -99,15 +98,12 @@ public class OrderCompletionScheduler {
                 Order.OrderStatus oldStatus = order.getStatus();
 
                 // Release escrows first; only mark COMPLETED if release succeeds.
-                var pendingEscrows = orderEscrowService.findPendingEscrowsByOrder(order);
-                if (!pendingEscrows.isEmpty()) {
-                    var orchestratorResult = paymentOrchestrator.releaseEscrowsToSellers(pendingEscrows);
-                    if (orchestratorResult.isError()) {
-                        orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
-                        continue; // skip completing this order; will retry on next scheduler run
-                    }
-                    orderLog.logEscrowReleased(pendingEscrows.size(), order.getOrderNumber());
+                var orchestratorResult = escrowService.release(order);
+                if (orchestratorResult.isError()) {
+                    orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
+                    continue; // skip completing this order; will retry on next scheduler run
                 }
+                orderLog.logEscrowReleased(1, order.getOrderNumber());
 
                 order.setStatus(Order.OrderStatus.COMPLETED);
                 Order savedOrder = orderRepository.save(order);

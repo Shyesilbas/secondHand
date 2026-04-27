@@ -16,7 +16,9 @@ import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.payment.application.OrderPaymentService;
 import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -41,7 +43,7 @@ public class CheckoutOrchestrator {
     private final OrderMapper orderMapper;
     private final CouponService couponService;
     private final IOfferService offerService;
-    private final PaymentOrchestrator paymentOrchestrator;
+    private final EscrowService escrowService;
     private final CheckoutPricingContextFactory checkoutPricingContextFactory;
     private final CheckoutStockReservationService checkoutStockReservationService;
     private final ApplicationEventPublisher eventPublisher;
@@ -79,7 +81,7 @@ public class CheckoutOrchestrator {
 
         try {
             Result<List<PaymentDto>> paymentResult = orderPaymentService.processPaymentsForOrder(
-                    user, effectiveCartItems, request, order.getOrderNumber(), pricing);
+                    user, effectiveCartItems, request, order.getOrderNumber(), pricing, order.getExternalId());
 
             if (paymentResult.isError()) {
                 markOrderAsFailed(order);
@@ -94,7 +96,7 @@ public class CheckoutOrchestrator {
 
             if (allSuccessful) {
                 try {
-                    Result<Void> escrowResult = paymentOrchestrator.createEscrowsForOrder(order);
+                    Result<Void> escrowResult = escrowService.hold(order);
                     if (escrowResult.isError()) {
                         log.error("ESCROW_CREATION_FAILED for order {}: {}. Manual intervention required to create escrows.", 
                                 order.getOrderNumber(), escrowResult.getMessage());
@@ -130,7 +132,7 @@ public class CheckoutOrchestrator {
         if (paymentResults != null && !paymentResults.isEmpty()) {
             order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         }
-        order.setPaymentStatus(allSuccessful ? Order.PaymentStatus.PAID : Order.PaymentStatus.FAILED);
+        order.setPaymentStatus(allSuccessful ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
         order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
         order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
         if (allSuccessful && order.getShipping() != null) {
@@ -142,7 +144,7 @@ public class CheckoutOrchestrator {
     }
 
     private void markOrderAsFailed(Order order) {
-        order.setPaymentStatus(Order.PaymentStatus.FAILED);
+        order.setPaymentStatus(PaymentStatus.FAILED);
         order.setStatus(Order.OrderStatus.CANCELLED);
         orderRepository.save(order);
         log.error("Order {} marked as failed due to payment error", order.getOrderNumber());

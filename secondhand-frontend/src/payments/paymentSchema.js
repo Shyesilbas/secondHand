@@ -35,6 +35,7 @@ export const PAYMENT_STATISTICS_FIELD_KEYS = Object.freeze({
   totalVolume: ['totalAmount', 'totalVolume', 'total'],
   incomingVolume: ['incomingAmount', 'totalIncomingAmount', 'incomingTotal'],
   outgoingVolume: ['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'],
+  escrowAmount: ['escrowAmount', 'totalEscrowAmount', 'escrowTotal'],
   successfulCount: ['successfulCount', 'successfulPayments', 'successCount', 'successfulTransactions'],
 });
 
@@ -73,6 +74,18 @@ export const PAYMENT_DIRECTIONS = {
   OUTGOING: 'OUTGOING'
 };
 
+export const PAYMENT_STATUSES = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  ESCROW: 'ESCROW',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED',
+  PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
+  DISPUTED: 'DISPUTED',
+  CANCELLED: 'CANCELLED'
+};
+
 export const DEFAULT_CURRENCY = 'TRY';
 export const DEFAULT_CURRENCY_SYMBOL = '₺';
 
@@ -104,7 +117,8 @@ export const PaymentDto = (data) => ({
   listingTitle: data.listingTitle || null,
   listingNo: data.listingNo || null,
   processedAt: data.processedAt || null,
-  isSuccess: data.isSuccess || false
+  isSuccess: data.isSuccess || false,
+  status: data.status || (data.isSuccess ? 'COMPLETED' : 'FAILED')
 });
 
 export const BankDto = (data) => ({
@@ -129,6 +143,18 @@ export const TRANSACTION_TYPE_LABELS = {
   [PAYMENT_TRANSACTION_TYPES.EWALLET_WITHDRAWAL]: 'E-Wallet Withdrawal',
   [PAYMENT_TRANSACTION_TYPES.EWALLET_PAYMENT_RECEIVED]: 'E-Wallet Payment Received',
   [PAYMENT_TRANSACTION_TYPES.SHOWCASE_PAYMENT]: 'Showcase Payment'
+};
+
+export const PAYMENT_STATUS_LABELS = {
+  [PAYMENT_STATUSES.PENDING]: 'Pending',
+  [PAYMENT_STATUSES.PAID]: 'Paid',
+  [PAYMENT_STATUSES.ESCROW]: 'In Escrow',
+  [PAYMENT_STATUSES.COMPLETED]: 'Completed',
+  [PAYMENT_STATUSES.FAILED]: 'Failed',
+  [PAYMENT_STATUSES.REFUNDED]: 'Refunded',
+  [PAYMENT_STATUSES.PARTIALLY_REFUNDED]: 'Partially Refunded',
+  [PAYMENT_STATUSES.DISPUTED]: 'Disputed',
+  [PAYMENT_STATUSES.CANCELLED]: 'Cancelled'
 };
 
 export const PAYMENT_DIRECTION_LABELS = {

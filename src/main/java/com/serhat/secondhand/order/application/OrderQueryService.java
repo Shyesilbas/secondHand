@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
@@ -36,7 +37,7 @@ public class OrderQueryService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final OrderEscrowService orderEscrowService;
+    private final EscrowService escrowService;
     private final IUserService userService;
     private final OrderValidationService orderValidationService;
     private final OrderItemCancelRepository orderItemCancelRepository;
@@ -109,7 +110,7 @@ public class OrderQueryService {
         }
 
         List<Long> orderIds = orderList.stream().map(Order::getId).toList();
-        Map<Long, BigDecimal> escrowAmounts = orderEscrowService.sumPendingAmountsByOrderIds(orderIds, sellerId);
+        Map<Long, BigDecimal> escrowAmounts = escrowService.sumPendingAmountsByOrderIds(orderIds, sellerId);
         
         MetadataContext metadata = fetchBulkMetadata(orderList);
 

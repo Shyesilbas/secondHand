@@ -1,27 +1,27 @@
 import {Sparkles, MessageCircle, HelpCircle, ShoppingCart} from 'lucide-react';
 
 /**
- * ChatGPT / Claude tarzı hızlı başlangıç önerileri (Türkçe).
+ * ChatGPT / Claude style quick start suggestions (English).
  */
 export const AURA_QUICK_PROMPTS = [
   {
-    label: 'İlan vermek için adımlar',
-    message: 'İkinci el ilanımı nasıl oluştururum? Hangi sayfadan başlamalıyım?',
+    label: 'How to list items',
+    message: 'How do I create my second-hand listing? Which page should I start from?',
     icon: Sparkles,
   },
   {
-    label: 'Güvenli alışveriş',
-    message: 'Güvenli alışveriş için nelere dikkat etmeliyim?',
+    label: 'Secure shopping',
+    message: 'What should I pay attention to for secure shopping?',
     icon: HelpCircle,
   },
   {
-    label: 'Teklif ve sepet',
-    message: 'Teklif vermek ile sepete eklemek arasındaki fark nedir?',
+    label: 'Offers and Cart',
+    message: 'What is the difference between making an offer and adding to cart?',
     icon: MessageCircle,
   },
   {
-    label: 'Ödeme ve vitrin',
-    message: 'İlan ücreti ve vitrin nedir? Nereden öderim?',
+    label: 'Payment and Showcase',
+    message: 'What is a listing fee and showcase? Where do I pay?',
     icon: ShoppingCart,
   },
 ];

@@ -54,7 +54,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
             rows={4}
             maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Ürün hakkında görüşlerinizi paylaşın..."
+            placeholder="Share your thoughts about the product..."
           />
           <p className="text-xs text-gray-500 mt-1">
             {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH} Characters

@@ -5,7 +5,6 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.entity.OrderItemEscrow;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
@@ -13,7 +12,7 @@ import com.serhat.secondhand.order.policy.OrderRefundPolicy;
 import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
-import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,13 +31,12 @@ public class OrderRefundService {
     private final OrderMapper orderMapper;
     private final OrderStatusConsistencyLogger orderStatusConsistencyLogger;
     private final OrderValidationService orderValidationService;
-    private final PaymentOrchestrator paymentOrchestrator;
+    private final EscrowService escrowService;
     private final OrderLogService orderLog;
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCompensationPersistenceService compensationPersistenceService;
     private final OrderRefundPolicy orderRefundPolicy;
     private final OrderStateTransitionPolicy orderStateTransitionPolicy;
-    private final OrderEscrowService orderEscrowService;
     private final ApplicationEventPublisher eventPublisher;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
@@ -69,9 +67,7 @@ public class OrderRefundService {
 
         compensationPersistenceService.persistRefundRecordsAndRestoreStock(refundRecords);
 
-        List<OrderItemEscrow> escrowsToRefund = orderEscrowService.findExistingEscrowsByOrderItems(itemsToRefund);
-
-        Result<Void> orchestratorResult = paymentOrchestrator.refundFromSellersAndEscrows(escrowsToRefund, user);
+        Result<Void> orchestratorResult = escrowService.refund(order, itemsToRefund);
         if (orchestratorResult.isError()) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             orderLog.logRefundFailed(order.getOrderNumber(), orchestratorResult.getMessage());

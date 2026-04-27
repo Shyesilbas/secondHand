@@ -30,7 +30,7 @@ const RegisterPage = () => {
 
     return (
         <div className="flex min-h-screen w-full">
-            {/* ── Sol: Form ── */}
+            {/* ── Left: Form ── */}
             <div className="flex flex-col w-full lg:w-1/2 min-h-screen overflow-y-auto bg-white">
                 <div className="flex flex-col flex-1 px-8 py-10 max-w-lg mx-auto w-full">
                     {/* Logo */}
@@ -63,7 +63,7 @@ const RegisterPage = () => {
                 </div>
             </div>
 
-            {/* ── Sağ: Carousel ── */}
+            {/* ── Right: Carousel ── */}
             <div className="hidden lg:flex lg:w-1/2 sticky top-0 h-screen bg-secondary-50 border-l border-secondary-200 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-amber-300/15 blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-indigo-300/15 blur-3xl pointer-events-none" />

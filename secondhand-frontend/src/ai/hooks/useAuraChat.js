@@ -31,7 +31,7 @@ export const useAuraChat = ({
   buildPayload = (text) => text,
   sendApi = null,
   echoUserMessageWhenUnauthed = false,
-  /** 'widget' | 'page' — bu cihazda son konuşmayı saklar */
+  /** 'widget' | 'page' — persists the last conversation on this device */
   persistMessagesSurface = null,
 }) => {
   const [messages, setMessages] = useState(() => initialMessages);

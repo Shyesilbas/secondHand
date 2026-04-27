@@ -33,11 +33,11 @@ public class OrderPaymentService {
 
     public Result<List<PaymentDto>> processPaymentsForOrder(User user, List<Cart> cartItems,
                                                             CheckoutRequest request, String orderNumber,
-                                                            PricingResultDto pricing) {
+                                                            PricingResultDto pricing, java.util.UUID orderExternalId) {
         log.info("Processing payments for order: {}", orderNumber);
 
         List<PaymentRequest> paymentRequests = paymentRequestFactory.buildOrderPaymentRequests(
-                user, cartItems, request, pricing, orderNumber);
+                user, cartItems, request, pricing, orderNumber, orderExternalId);
         log.debug("Created {} payment requests for order", paymentRequests.size());
 
         return processPaymentBatch(user.getId(), paymentRequests);

@@ -4,6 +4,8 @@ import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {
   PAYMENT_DIRECTION_LABELS,
   PAYMENT_DIRECTIONS,
+  PAYMENT_STATUS_LABELS,
+  PAYMENT_STATUSES,
   PAYMENT_TYPE_LABELS,
   PAYMENT_TYPES,
   TRANSACTION_TYPE_LABELS,
@@ -118,8 +120,14 @@ const PaymentItem = React.memo(({ payment, onShowReceipt, layout = 'default' }) 
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`p-2 rounded-md flex-shrink-0 ${payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'bg-green-50' : 'bg-gray-50'}`}>
-            <div className={`${payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-600'}`}>
+          <div className={`p-2 rounded-md flex-shrink-0 ${
+            payment.status === PAYMENT_STATUSES.ESCROW ? 'bg-blue-50' : 
+            payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'bg-green-50' : 'bg-gray-50'
+          }`}>
+            <div className={`${
+              payment.status === PAYMENT_STATUSES.ESCROW ? 'text-blue-600' :
+              payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-600'
+            }`}>
               {getPaymentTypeIcon(payment.paymentType)}
             </div>
           </div>
@@ -158,19 +166,34 @@ const PaymentItem = React.memo(({ payment, onShowReceipt, layout = 'default' }) 
                 {payment.listingTitle}
               </p>
             ) : null}
+            
+            {payment.status === PAYMENT_STATUSES.ESCROW && (
+              <p className="text-[10px] text-blue-500 mt-1.5 flex items-center gap-1 italic">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Will be released to your wallet after delivery confirmation.
+              </p>
+            )}
           </div>
         </div>
 
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="text-right">
             <div className="flex items-center gap-2 mb-1.5">
-              <span className={`text-sm font-semibold font-mono ${payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-900'}`}>
+              <span className={`text-sm font-semibold font-mono ${
+                payment.status === PAYMENT_STATUSES.ESCROW ? 'text-blue-600' :
+                payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-900'
+              }`}>
                 {payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '+' : '-'}
                 {formatCurrency(payment.amount)}
               </span>
             </div>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${payment.isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {payment.isSuccess ? 'Success' : 'Failed'}
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${
+              payment.status === PAYMENT_STATUSES.ESCROW ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+              payment.isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+            }`}>
+              {PAYMENT_STATUS_LABELS[payment.status] || (payment.isSuccess ? 'Success' : 'Failed')}
             </span>
           </div>
 

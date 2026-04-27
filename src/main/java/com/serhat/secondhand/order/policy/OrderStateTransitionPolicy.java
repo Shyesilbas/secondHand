@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.policy;
 
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,18 +21,18 @@ public class OrderStateTransitionPolicy {
             if (order.getShipping() != null && order.getShipping().getStatus() != ShippingStatus.DELIVERED) {
                 order.getShipping().setStatus(ShippingStatus.CANCELLED);
             }
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+            order.setPaymentStatus(PaymentStatus.REFUNDED);
             return;
         }
-        order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
+        order.setPaymentStatus(PaymentStatus.PARTIALLY_REFUNDED);
     }
 
     public void applyRefund(Order order, boolean allItemsRefunded) {
         if (allItemsRefunded) {
             order.setStatus(Order.OrderStatus.REFUNDED);
-            order.setPaymentStatus(Order.PaymentStatus.REFUNDED);
+            order.setPaymentStatus(PaymentStatus.REFUNDED);
             return;
         }
-        order.setPaymentStatus(Order.PaymentStatus.PARTIALLY_REFUNDED);
+        order.setPaymentStatus(PaymentStatus.PARTIALLY_REFUNDED);
     }
 }

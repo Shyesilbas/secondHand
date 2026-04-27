@@ -70,7 +70,7 @@ const AuraChatPage = () => {
         id: 'aura-welcome',
         role: 'assistant',
         content:
-          'Merhaba, ben Aura. SecondHand\'de ilan arama, teklif, güvenli ödeme ve vitrin gibi konularda yanındayım. Bugün neye ihtiyacın var?',
+          "Hi, I'm Aura. I'm here to help you with listing search, offers, secure payment, and showcases on SecondHand. What do you need today?",
         createdAt: Date.now(),
       },
     ],
@@ -86,7 +86,7 @@ const AuraChatPage = () => {
 
   const handleNewChat = async () => {
     if (userId == null) {
-      setMessages([createChatMessage({role: 'assistant', content: 'Devam etmek için lütfen giriş yap.'})]);
+      setMessages([createChatMessage({role: 'assistant', content: 'Please log in to continue.'})]);
       return;
     }
     setIsSending(true);
@@ -94,10 +94,10 @@ const AuraChatPage = () => {
       await aiChatService.newChat();
       clearAuraPersistedMessages(userId, 'page');
       localStorage.removeItem(storageKey);
-      setMessages([createChatMessage({role: 'assistant', content: 'Yeni sohbet başladı. Bugün neye bakıyoruz?'})]);
+      setMessages([createChatMessage({role: 'assistant', content: 'New chat started. What are we looking at today?'})]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Yeni sohbet oluşturulamadı.');
+      const errorMessage = getApiErrorMessage(e, 'Could not create new chat.');
       setMessages((prev) => [...prev, createChatMessage({role: 'assistant', content: errorMessage})]);
     } finally {
       setIsSending(false);
@@ -106,16 +106,16 @@ const AuraChatPage = () => {
 
   const handleDeleteHistory = async () => {
     if (userId == null) return;
-    if (!window.confirm('Tüm sohbet geçmişin silinsin mi?')) return;
+    if (!window.confirm('Do you want to delete all chat history?')) return;
     setIsSending(true);
     try {
       await aiChatService.deleteHistory();
       clearAuraPersistedMessages(userId, 'page');
       localStorage.removeItem(storageKey);
-      setMessages([createChatMessage({role: 'assistant', content: 'Geçmiş temizlendi. Aşağıdan yeni bir konuşma başlatabilirsin.'})]);
+      setMessages([createChatMessage({role: 'assistant', content: 'History cleared. You can start a new conversation below.'})]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Geçmiş silinemedi.');
+      const errorMessage = getApiErrorMessage(e, 'Could not delete history.');
       setMessages((prev) => [...prev, createChatMessage({role: 'assistant', content: errorMessage})]);
     } finally {
       setIsSending(false);
@@ -124,16 +124,16 @@ const AuraChatPage = () => {
 
   const handleDeleteMemory = async () => {
     if (userId == null) return;
-    if (!window.confirm('Bellek ve sohbet geçmişi silinecek. Devam edilsin mi?')) return;
+    if (!window.confirm('Memory and chat history will be deleted. Continue?')) return;
     setIsSending(true);
     try {
       await aiChatService.deleteMemory();
       clearAuraPersistedMessages(userId, 'page');
       localStorage.removeItem(storageKey);
-      setMessages([createChatMessage({role: 'assistant', content: 'Bellek sıfırlandı. İstersen aşağıdan yeni sohbet başlat.'})]);
+      setMessages([createChatMessage({role: 'assistant', content: "Memory reset. Start a new chat below if you'd like."})]);
       queueMicrotask(scrollToBottom);
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Bellek silinemedi.');
+      const errorMessage = getApiErrorMessage(e, 'Could not delete memory.');
       setMessages((prev) => [...prev, createChatMessage({role: 'assistant', content: errorMessage})]);
     } finally {
       setIsSending(false);
@@ -192,7 +192,7 @@ const AuraChatPage = () => {
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-medium text-amber-700">
-                  Giriş yap
+                  Log in
                 </span>
               )}
             </div>
@@ -212,7 +212,7 @@ const AuraChatPage = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-900 text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shadow-sm"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Yeni sohbet
+            New chat
           </button>
           <button
             type="button"
@@ -221,7 +221,7 @@ const AuraChatPage = () => {
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
           >
             <Trash2 className="w-3 h-3" />
-            Geçmiş
+            History
           </button>
           <button
             type="button"
@@ -230,7 +230,7 @@ const AuraChatPage = () => {
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-200 bg-white text-xs font-medium text-red-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-50 transition-colors"
           >
             <Shield className="w-3 h-3" />
-            Bellek
+            Memory
           </button>
         </div>
 
@@ -302,7 +302,7 @@ const AuraChatPage = () => {
           {/* Quick prompts */}
           {showQuickPrompts && (
             <div className="shrink-0 border-t border-gray-100 px-5 py-4 sm:px-6">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Önerilen sorular</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Suggested questions</p>
               <AuraSuggestedPrompts disabled={isSending} onPick={(msg) => sendMessage({text: msg})} />
             </div>
           )}
@@ -315,7 +315,7 @@ const AuraChatPage = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={onKeyDown}
-                  placeholder="Aura'ya yaz… (Enter gönderir, Shift+Enter satır)"
+                  placeholder="Write to Aura… (Enter to send, Shift+Enter for new line)"
                   className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white min-h-[52px] max-h-[160px] transition-all duration-200"
                   rows={1}
                 />
@@ -330,7 +330,7 @@ const AuraChatPage = () => {
               </button>
             </div>
             <p className="mt-2 text-[10px] text-gray-400 text-center">
-              Aura hata yapabilir. Önemli bilgileri doğrulamanız önerilir.
+              Aura can make mistakes. It is recommended to verify important information.
             </p>
           </div>
         </div>

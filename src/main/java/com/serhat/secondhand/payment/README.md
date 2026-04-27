@@ -58,9 +58,10 @@ Standart akis:
 6. `AFTER_COMMIT` listener tarafinda handler + bildirim yan etkileri calisir.
 
 Karar noktasi prensipleri:
-- Idempotency kurali `PaymentProcessor` disina dagitilmaz.
+- Idempotency kurali `PaymentProcessor` disina dagitilmaz. `orderId` ve `status` alanlari bu surecte korunur.
 - Verification davranisi pre-check akisinin parcasi olarak kalir.
-- Event sonrasi isler ana transaction kararindan ayrik tutulur.
+- Event sonrasi isler (bildirim, handler) ana transaction kararindan ayrik tutulur ve hem gondereni hem aliciyi bilgilendirir.
+- Odeme yonu (`INCOMING/OUTGOING`) ve islem tipi (`ITEM_SALE/PURCHASE`) veritabaninda statik tutulmak yerine kullanici bazli dinamik cozumlenir.
 
 ## 4) Ana Is Akislari
 
@@ -81,14 +82,15 @@ Karar noktasi prensipleri:
 3. Bildirim servisi basari bildirimi uretir.
 
 ### 4.4 Escrow Akislari
-1. Siparis odemesi sonrasi escrow create.
-2. Tamamlama asamasinda escrow release.
-3. Iptalde escrow cancel + alici iadesi.
-4. Teslim sonrasi iadede satıcıdan kesip aliciya refund.
+1. Siparis odemesi sonrasi tek bir `Payment` kaydi (`status=ESCROW`) olusturulur.
+2. Tamamlama asamasinda bu kayit guncellenir (`status=COMPLETED`).
+3. Iptalde bu kayit guncellenir (`status=CANCELLED`) ve alici iadesi wallet uzerinden yapilir.
+4. Teslim sonrasi iadede kayit guncellenir (`status=REFUNDED`) ve satıcıdan kesip aliciya refund yapilir.
+5. Tum durum degisikliklerinde (`release`, `refund` vb.) event yayinlanarak bildirimler tetiklenir.
 
 ## 5) Kritik Is Kurallari
 
-- Ayni `idempotencyKey + fromUserId` kombinasyonu ikinci kez para cekmez.
+- Ayni `idempotencyKey + fromUserId` kombinasyonu ikinci kez para cekmez. Islem tekrarlarinda mevcut kaydin `orderId` ve `status` bilgileri korunarak guncellenir.
 - Optimistic lock hatasinda retry uygulanir; sinir asilirsa esit hata kodu doner.
 - Verification gereksinimi saglanmadan odeme finalize edilmez.
 - Event tabanli yan etkiler commit oncesi tetiklenmez.
@@ -98,7 +100,7 @@ Karar noktasi prensipleri:
 - Escrow create akisi bulk veri cekimiyle N+1 riskini azaltacak sekilde kalmalidir.
 - Handler zinciri buyudukce `supports` kosullari deterministic tutulmalidir.
 - Retry/backoff sabitleri trafik yogunlugunda operasyonel olarak izlenmelidir.
-- Stats/list endpointlerinde iliskili listing/user enrichment maliyeti olculmelidir.
+- Stats/list endpointlerinde veriler kullaniciya gore filtrelenir (Gonderen=Outgoing, Alici=Incoming) ve internal sistem islemleri istatistiklere dogru yansitilir.
 
 ## 7) Bir Degisiklik Yapacaginda Ne Yapacaksin?
 

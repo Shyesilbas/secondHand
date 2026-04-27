@@ -34,7 +34,7 @@ const MyCouponsPage = () => {
       setTotalElements(Number.isFinite(res?.totalElements) ? res.totalElements : items.length);
     } catch (e) {
       setCampaigns([]);
-      showError('Kuponlarım', e?.response?.data?.message || 'Failed to load campaigns');
+      showError('My Coupons', e?.response?.data?.message || 'Failed to load campaigns');
       setTotalPages(0);
       setTotalElements(0);
     } finally {

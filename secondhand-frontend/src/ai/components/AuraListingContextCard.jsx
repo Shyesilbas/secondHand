@@ -3,17 +3,17 @@ import {ChevronRight, MapPin, Sparkles, Tag} from 'lucide-react';
 import {ROUTES} from '../../common/constants/routes.js';
 import {
   formatListingPriceLabel,
-  listingStatusLabelTr,
-  listingTypeLabelTr,
+  listingStatusLabel,
+  listingTypeLabel,
 } from '../utils/auraListingContext.js';
 
 export default function AuraListingContextCard({listing}) {
   if (!listing) return null;
 
-  const title = listing.title || 'İlan';
+  const title = listing.title || 'Listing';
   const priceLabel = formatListingPriceLabel(listing.price, listing.currency);
-  const typeLabel = listingTypeLabelTr(listing.type);
-  const statusLabel = listingStatusLabelTr(listing.status);
+  const typeLabel = listingTypeLabel(listing.type);
+  const statusLabel = listingStatusLabel(listing.status);
   const location = [listing.district, listing.city].filter(Boolean).join(' · ');
   const detailHref = listing.id ? ROUTES.LISTING_DETAIL(listing.id) : null;
   const thumb = listing.imageUrl;
@@ -25,8 +25,8 @@ export default function AuraListingContextCard({listing}) {
         <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
           <Sparkles className="w-3 h-3 text-white" />
         </div>
-        <span className="text-[11px] font-semibold text-violet-800">İlan bağlamı aktif</span>
-        <span className="text-[11px] text-violet-500 ml-1">— Yanıtlar bu ilana göre kişiselleştirilir</span>
+        <span className="text-[11px] font-semibold text-violet-800">Listing context active</span>
+        <span className="text-[11px] text-violet-500 ml-1">— Replies are personalized based on this listing</span>
       </div>
 
       {/* Content */}
@@ -78,7 +78,7 @@ export default function AuraListingContextCard({listing}) {
             to={detailHref}
             className="inline-flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-800 transition-colors"
           >
-            İlana geri dön
+            Back to listing
             <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>

@@ -19,7 +19,7 @@ export const ORDER_STATUSES = Object.freeze({
   PAID: 'PAID',
 });
 
-/** Sekme filtreleri: tek API status yerine gruplar (useOrderFlow içinde çözülür) */
+/** Tab filters: groups instead of single API status (resolved in useOrderFlow) */
 export const ORDER_STATUS_TAB_FILTER = Object.freeze({
   ALL: '',
   /** PENDING + CONFIRMED + PROCESSING */

@@ -36,18 +36,23 @@ public class PaymentStatsService {
         log.info("[CACHE MISS] paymentStats for userId: {}", userId);
 
         List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, filterType);
-        Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO} : statsRows.get(0);
+        Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO} : statsRows.get(0);
 
         long total = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
         long successful = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
-        BigDecimal totalAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
+        BigDecimal incomingAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
+        BigDecimal outgoingAmount = stats[3] != null ? (BigDecimal) stats[3] : BigDecimal.ZERO;
+        BigDecimal escrowAmount = stats[4] != null ? (BigDecimal) stats[4] : BigDecimal.ZERO;
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("totalPayments", total);
         result.put("successfulPayments", successful);
         result.put("failedPayments", total - successful);
         result.put("successRate", total > 0 ? (double) successful / total * 100 : 0.0);
-        result.put("totalAmount", totalAmount);
+        result.put("incomingAmount", incomingAmount);
+        result.put("outgoingAmount", outgoingAmount);
+        result.put("totalAmount", incomingAmount.add(outgoingAmount)); // Total volume is incoming + outgoing
+        result.put("escrowAmount", escrowAmount);
         return result;
     }
 
@@ -88,6 +93,7 @@ public class PaymentStatsService {
                 payment.getListingTitle(), // Direct snapshot
                 payment.getListingNo(),    // Direct snapshot
                 baseDto.processedAt(),
+                baseDto.status(),
                 baseDto.isSuccess()
         );
     }

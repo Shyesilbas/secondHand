@@ -7,8 +7,8 @@ const VARIANTS = {
 };
 
 /**
- * Tıklanabilir yıldız seçimi.
- * allowDeselect: aynı yıldıza tekrar tıklanınca sıfırla (modal davranışı).
+ * Clickable star selection.
+ * allowDeselect: reset when the same star is clicked again (modal behavior).
  */
 export function InteractiveStarRating({
   value,
