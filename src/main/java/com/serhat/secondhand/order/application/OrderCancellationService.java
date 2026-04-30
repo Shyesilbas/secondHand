@@ -1,16 +1,15 @@
 package com.serhat.secondhand.order.application;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.escrow.application.EscrowService;
+import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.dto.OrderCancelRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
-import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
-import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ public class OrderCancellationService {
     private final OrderCompensationPersistenceService compensationPersistenceService;
     private final EscrowService escrowService;
     private final OrderLogService orderLog;
-    private final OrderStateTransitionPolicy orderStateTransitionPolicy;
     private final OrderMapper orderMapper;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -82,7 +80,6 @@ public class OrderCancellationService {
         Result<Void> orchestratorResult = escrowService.cancel(order, itemsToCancel);
         if (orchestratorResult.isError()) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            orderLog.logEscrowCancelFailed(order.getOrderNumber(), orchestratorResult.getMessage());
             return Result.error(REFUND_FAILED_MESSAGE, OrderErrorCodes.REFUND_FAILED.getCode());
         }
 
@@ -92,7 +89,7 @@ public class OrderCancellationService {
 
     private Result<OrderDto> finalizeCancellation(Order order, User user) {
         boolean allItemsCancelled = compensationPlanner.areAllItemsCancelled(order);
-        orderStateTransitionPolicy.applyCancellation(order, allItemsCancelled);
+        order.applyCancellation(allItemsCancelled);
 
         Result<Order> savedOrderResult = compensationPersistenceService.saveOrderAndReload(order);
         if (savedOrderResult.isError()) {

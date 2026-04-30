@@ -71,9 +71,9 @@ public class ShowcaseController {
     @PostMapping("/{id}/extend")
     public ResponseEntity<?> extendShowcase(
             @PathVariable UUID id,
-            @RequestParam int days,
+            @Valid @RequestBody ShowcasePaymentRequest request,
             @AuthenticationPrincipal User user) {
-        return ResultResponses.noContent(showcaseService.extendShowcase(user.getId(), id, days));
+        return ResultResponses.noContent(showcaseService.extendShowcase(user.getId(), id, request));
     }
 
     @PostMapping("/{id}/cancel")

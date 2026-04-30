@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface IShowcaseService {
     Page<ShowcaseDto> getActiveShowcases(int page, int size);
     List<ShowcaseDto> getUserShowcases(Long userId);
-    Result<Void> extendShowcase(Long userId, UUID showcaseId, int additionalDays);
+    Result<Void> extendShowcase(Long userId, UUID showcaseId, ShowcasePaymentRequest request);
     Result<Void> cancelShowcase(Long userId, UUID showcaseId);
     void expireShowcases();
     ShowcasePricingDto getShowcasePricingConfig();

@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
@@ -47,18 +48,18 @@ public class OrderQueryService {
     @Autowired
     private OrderQueryService self;
 
-    public Page<OrderDto> getUserOrders(Long userId, Pageable pageable) {
+    public Result<Page<OrderDto>> getUserOrders(Long userId, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
         Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {
-            return orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of()));
+            return Result.success(orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of())));
         }
 
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
-        return orders.map(order -> orderMapper.toDto(order, metadata.cancelled(), metadata.refunded()));
+        return Result.success(orders.map(order -> orderMapper.toDto(order, metadata.cancelled(), metadata.refunded())));
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
@@ -84,10 +85,10 @@ public class OrderQueryService {
         return orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order));
     }
 
-    private static final Set<Order.OrderStatus> TERMINAL_STATUSES = EnumSet.of(
-            Order.OrderStatus.COMPLETED,
-            Order.OrderStatus.CANCELLED,
-            Order.OrderStatus.REFUNDED
+    private static final Set<OrderStatus> TERMINAL_STATUSES = EnumSet.of(
+            OrderStatus.COMPLETED,
+            OrderStatus.CANCELLED,
+            OrderStatus.REFUNDED
     );
 
     public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
@@ -97,16 +98,16 @@ public class OrderQueryService {
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
 
-    public Page<OrderDto> getSellerOrders(Long sellerId, Pageable pageable) {
+    public Result<Page<OrderDto>> getSellerOrders(Long sellerId, Pageable pageable) {
         var userResult = userService.findById(sellerId);
-        if (userResult.isError()) return Page.empty();
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
 
         Pageable finalPageable = ensureSort(pageable);
         Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {
-            return orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of()));
+            return Result.success(orders.map(order -> orderMapper.toDto(order, Map.of(), Map.of())));
         }
 
         List<Long> orderIds = orderList.stream().map(Order::getId).toList();
@@ -114,11 +115,11 @@ public class OrderQueryService {
         
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
-        return orders.map(order -> {
+        return Result.success(orders.map(order -> {
             OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata.cancelled(), metadata.refunded());
             orderDto.setEscrowAmount(escrowAmounts.getOrDefault(order.getId(), BigDecimal.ZERO));
             return orderDto;
-        });
+        }));
     }
 
     private record MetadataContext(Map<Long, Integer> cancelled, Map<Long, Integer> refunded) {}
@@ -159,35 +160,25 @@ public class OrderQueryService {
 
     /** Builds a map of orderItemId → cancelledQuantity for all items in the order. */
     private Map<Long, Integer> buildCancelledMap(Order order) {
-        if (order.getOrderItems() == null) return Map.of();
-        return order.getOrderItems().stream()
-                .filter(item -> item.getId() != null)
-                .collect(Collectors.toMap(
-                        OrderItem::getId,
-                        item -> {
-                            Integer v = orderItemCancelRepository.sumCancelledQuantityByOrderItem(item);
-                            return v != null ? v : 0;
-                        }
-                ));
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return Map.of();
+        
+        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
+        return orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(new HashSet<>(itemIds)).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
     }
 
     /** Builds a map of orderItemId → refundedQuantity for all items in the order. */
     private Map<Long, Integer> buildRefundedMap(Order order) {
-        if (order.getOrderItems() == null) return Map.of();
-        return order.getOrderItems().stream()
-                .filter(item -> item.getId() != null)
-                .collect(Collectors.toMap(
-                        OrderItem::getId,
-                        item -> {
-                            Integer v = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
-                            return v != null ? v : 0;
-                        }
-                ));
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return Map.of();
+        
+        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
+        return orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(new HashSet<>(itemIds)).stream()
+                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
     }
 
     @Cacheable(value = "pendingOrders", key = "#userId")
     public Map<String, Object> getPendingCompletionStatus(Long userId) {
-        long count = orderRepository.countByUserIdAndStatus(userId, Order.OrderStatus.DELIVERED);
+        long count = orderRepository.countByUserIdAndStatus(userId, OrderStatus.DELIVERED);
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("hasPendingOrders", count > 0);

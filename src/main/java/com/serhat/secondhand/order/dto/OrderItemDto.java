@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.dto;
 
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class OrderItemDto {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
-    private String currency;
+    private Currency currency;
     private String notes;
     private LocalDateTime createdAt;
     private Integer cancelledQuantity;

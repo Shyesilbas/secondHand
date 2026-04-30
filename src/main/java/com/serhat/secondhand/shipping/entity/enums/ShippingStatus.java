@@ -1,4 +1,4 @@
-package com.serhat.secondhand.order.entity.enums;
+package com.serhat.secondhand.shipping.entity.enums;
 
 import lombok.Getter;
 

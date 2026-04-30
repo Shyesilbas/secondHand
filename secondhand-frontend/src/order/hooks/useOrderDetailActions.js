@@ -140,7 +140,22 @@ export const useOrderDetailActions = ({
     } finally {
       setIsSavingNotes(false);
     }
-  }, [notification, onReviewSuccess, orderNotes, selectedOrder?.id, setIsEditingNotes]);
+  }, [orderNotes, notification, onReviewSuccess, selectedOrder?.id, setIsEditingNotes]);
+
+  const handleShipOrder = useCallback(async (payload) => {
+    if (!isSellerView || isProcessing) return;
+    setIsProcessing(true);
+    try {
+      await orderService.shipOrder(selectedOrder.id, payload);
+      notification.showSuccess('Success', 'Order marked as shipped');
+      if (onReviewSuccess) onReviewSuccess();
+    } catch (error) {
+      notification.showError('Error', error?.response?.data?.message || 'Failed to mark order as shipped');
+      throw error;
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [isProcessing, isSellerView, notification, onReviewSuccess, selectedOrder?.id]);
 
   return {
     flags: {
@@ -157,6 +172,7 @@ export const useOrderDetailActions = ({
       handleCompleteOrder,
       handleSaveAddress,
       handleSaveNotes,
+      handleShipOrder,
     },
   };
 };

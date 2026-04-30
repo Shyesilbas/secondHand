@@ -1,7 +1,12 @@
 package com.serhat.secondhand.order.entity;
 
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.shipping.entity.Shipping;
+import com.serhat.secondhand.shipping.entity.enums.Carrier;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
@@ -13,18 +18,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-@Data
-@EqualsAndHashCode(exclude = {"shipping", "orderItems"})
+
+@Getter @Setter
+@EqualsAndHashCode(of = "externalId")
 @ToString(exclude = {"shipping", "orderItems", "user", "shippingAddress", "billingAddress"})
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
+@Builder
 @Table(name = "orders", indexes = {
     @Index(name = "idx_order_user", columnList = "user_id"),
     @Index(name = "idx_order_status", columnList = "status"),
@@ -86,9 +90,10 @@ public class Order {
     @Column(name = "discount_total", precision = 10, scale = 2)
     private BigDecimal discountTotal;
 
-    @Column(name = "currency", length = 3, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency", length = 10, nullable = false)
     @Builder.Default
-    private String currency = "TRY";
+    private Currency currency = Currency.TRY;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shipping_address_id", nullable = false)
@@ -122,67 +127,144 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Shipping shipping;
 
-    @Getter
-    public enum OrderStatus {
-        PENDING("Pending"),
-        CONFIRMED("Confirmed"),
-        PROCESSING("Processing"),
-        SHIPPED("Shipped"),
-        DELIVERED("Delivered"),
-        COMPLETED("Completed"),
-        CANCELLED("Cancelled"),
-        REFUNDED("Refunded");
+    public Order(String orderNumber, User user, Address shippingAddress, Address billingAddress, 
+                 BigDecimal totalAmount, Currency currency, String notes, String name) {
+        this.orderNumber = orderNumber;
+        this.user = user;
+        this.shippingAddress = shippingAddress;
+        this.billingAddress = billingAddress;
+        this.totalAmount = totalAmount;
+        this.currency = currency != null ? currency : Currency.TRY;
+        this.notes = notes;
+        this.name = name;
+        this.status = OrderStatus.PENDING;
+        this.paymentStatus = PaymentStatus.PENDING;
+        this.externalId = UUID.randomUUID();
+        this.orderItems = new ArrayList<>();
+    }
 
-        private final String displayName;
-
-        OrderStatus(String displayName) {
-            this.displayName = displayName;
+    public void addItem(OrderItem item) {
+        if (this.orderItems == null) {
+            this.orderItems = new ArrayList<>();
         }
+        this.orderItems.add(item);
+        item.setOrder(this);
+        calculateTotals();
+    }
 
-        /**
-         * Statuses in which an order can be cancelled by the buyer.
-         */
-        public static final Set<OrderStatus> CANCELLABLE_STATUSES =
-                EnumSet.of(PENDING, CONFIRMED);
+    public void calculateTotals() {
+        this.subtotal = orderItems.stream()
+                .map(OrderItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        // subtotal already includes campaign discounts (unit prices are campaign prices)
+        BigDecimal couponAmt = couponDiscount != null ? couponDiscount : BigDecimal.ZERO;
+        this.totalAmount = subtotal.subtract(couponAmt).max(BigDecimal.ZERO);
+        
+        BigDecimal totalDisc = couponAmt;
+        if (campaignDiscount != null) totalDisc = totalDisc.add(campaignDiscount);
+        this.discountTotal = totalDisc;
+    }
 
-        /**
-         * Statuses in which an order can be refunded by the buyer.
-         */
-        public static final Set<OrderStatus> REFUNDABLE_STATUSES =
-                EnumSet.of(DELIVERED);
-
-        /**
-         * Statuses in which the order details (address, notes) can still be modified.
-         */
-        public static final Set<OrderStatus> MODIFIABLE_STATUSES =
-                EnumSet.of(PENDING, CONFIRMED);
-
-        /**
-         * Statuses in which an order can be completed (buyer confirms receipt).
-         */
-        public static final Set<OrderStatus> COMPLETABLE_STATUSES =
-                EnumSet.of(DELIVERED);
-
-        public boolean isCancellable() {
-            return CANCELLABLE_STATUSES.contains(this);
+    public void confirm() {
+        if (this.status != OrderStatus.PENDING) {
+            throw new IllegalStateException("Only pending orders can be confirmed");
         }
+        this.status = OrderStatus.CONFIRMED;
+    }
 
-        public boolean isRefundable() {
-            return REFUNDABLE_STATUSES.contains(this);
+    public void cancel() {
+        if (!this.status.isCancellable()) {
+            throw new IllegalStateException("Order in status " + this.status + " cannot be cancelled");
         }
+        this.status = OrderStatus.CANCELLED;
+    }
 
-        public boolean isModifiable() {
-            return MODIFIABLE_STATUSES.contains(this);
-        }
-
-        public boolean isCompletable() {
-            return COMPLETABLE_STATUSES.contains(this);
+    public void markAsPaid(String reference) {
+        this.paymentStatus = PaymentStatus.COMPLETED;
+        this.paymentReference = reference;
+        if (this.status == OrderStatus.PENDING) {
+            this.status = OrderStatus.CONFIRMED;
         }
     }
 
+    public void updateAddress(Address shippingAddress, Address billingAddress) {
+        if (!this.status.isModifiable()) {
+            throw new IllegalStateException("Order is not modifiable in status " + this.status);
+        }
+        this.shippingAddress = shippingAddress;
+        this.billingAddress = billingAddress;
+    }
+
+    public void updateNotes(String notes) {
+        if (!this.status.isModifiable()) {
+            throw new IllegalStateException("Order is not modifiable in status " + this.status);
+        }
+        this.notes = notes;
+    }
+
+    public void markAsProcessing() {
+        if (this.status != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Only confirmed orders can be moved to processing");
+        }
+        this.status = OrderStatus.PROCESSING;
+        this.setUpdatedAt(LocalDateTime.now());
+    }
+
+    public void markAsShipped(Carrier carrier, String trackingNumber) {
+        if (this.status != OrderStatus.PROCESSING) {
+            throw new IllegalStateException("Only processing orders can be moved to shipped");
+        }
+        this.status = OrderStatus.SHIPPED;
+        this.setUpdatedAt(LocalDateTime.now());
+        if (this.shipping != null) {
+            this.shipping.ship(carrier, trackingNumber);
+        }
+    }
+
+    public void markAsDelivered() {
+        if (this.status != OrderStatus.SHIPPED) {
+            throw new IllegalStateException("Only shipped orders can be moved to delivered");
+        }
+        this.status = OrderStatus.DELIVERED;
+        this.setUpdatedAt(LocalDateTime.now());
+        if (this.shipping != null) {
+            this.shipping.markAsDelivered();
+        }
+    }
+
+    public void applyCompletion() {
+        this.status = OrderStatus.COMPLETED;
+        if (this.shipping != null && this.shipping.getStatus() != ShippingStatus.DELIVERED) {
+            this.shipping.setStatus(ShippingStatus.DELIVERED);
+            this.shipping.setDeliveredAt(LocalDateTime.now());
+        }
+    }
+
+    public void applyCancellation(boolean allItemsCancelled) {
+        if (allItemsCancelled) {
+            this.status = OrderStatus.CANCELLED;
+            if (this.shipping != null) {
+                this.shipping.setStatus(ShippingStatus.CANCELLED);
+            }
+            this.paymentStatus = PaymentStatus.REFUNDED;
+        } else {
+            this.paymentStatus = PaymentStatus.PARTIALLY_REFUNDED;
+        }
+    }
+
+    public void applyRefund(boolean allItemsRefunded) {
+        if (allItemsRefunded) {
+            this.status = OrderStatus.REFUNDED;
+            this.paymentStatus = PaymentStatus.REFUNDED;
+        } else {
+            this.paymentStatus = PaymentStatus.PARTIALLY_REFUNDED;
+        }
+    }
 }

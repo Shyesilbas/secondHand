@@ -3,6 +3,7 @@ package com.serhat.secondhand.order.application;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -30,9 +31,6 @@ public class OrderModificationService {
 
         Order order = orderResult.getData();
 
-        Result<Void> modifiableResult = validateOrderIsModifiable(order);
-        if (modifiableResult.isError()) return modifiableResult.propagateError();
-
         Address shippingAddress = addressRepository.findById(shippingAddressId).orElse(null);
         if (shippingAddress == null) {
             return Result.error(OrderErrorCodes.ADDRESS_NOT_FOUND);
@@ -41,19 +39,21 @@ public class OrderModificationService {
             return Result.error(OrderErrorCodes.ADDRESS_NOT_BELONG_TO_USER);
         }
 
-        order.setShippingAddress(shippingAddress);
-
+        Address billingAddress = null;
         if (billingAddressId != null) {
-            Address billingAddress = addressRepository.findById(billingAddressId).orElse(null);
+            billingAddress = addressRepository.findById(billingAddressId).orElse(null);
             if (billingAddress == null) {
                 return Result.error(OrderErrorCodes.ADDRESS_NOT_FOUND);
             }
             if (!billingAddress.getUser().getId().equals(user.getId())) {
                 return Result.error(OrderErrorCodes.BILLING_ADDRESS_NOT_BELONG_TO_USER);
             }
-            order.setBillingAddress(billingAddress);
-        } else {
-            order.setBillingAddress(null);
+        }
+
+        try {
+            order.updateAddress(shippingAddress, billingAddress);
+        } catch (IllegalStateException e) {
+            return Result.error(e.getMessage(), OrderErrorCodes.ORDER_NOT_MODIFIABLE.getCode());
         }
 
         Order savedOrder = orderRepository.save(order);
@@ -67,14 +67,16 @@ public class OrderModificationService {
 
         Order order = orderResult.getData();
 
-        Result<Void> modifiableResult = validateOrderIsModifiable(order);
-        if (modifiableResult.isError()) return modifiableResult.propagateError();
-
         if (notes != null && notes.length() > 1000) {
             return Result.error(OrderErrorCodes.INVALID_ORDER_NOTES);
         }
 
-        order.setNotes(notes);
+        try {
+            order.updateNotes(notes);
+        } catch (IllegalStateException e) {
+            return Result.error(e.getMessage(), OrderErrorCodes.ORDER_NOT_MODIFIABLE.getCode());
+        }
+        
         Order savedOrder = orderRepository.save(order);
 
         orderLog.logOrderModified(order.getOrderNumber(), "notes");
@@ -94,10 +96,9 @@ public class OrderModificationService {
     }
 
     private Result<Void> validateOrderIsModifiable(Order order) {
-        if (!Order.OrderStatus.MODIFIABLE_STATUSES.contains(order.getStatus())) {
+        if (!OrderStatus.MODIFIABLE_STATUSES.contains(order.getStatus())) {
             return Result.error(OrderErrorCodes.ORDER_NOT_MODIFIABLE);
         }
         return Result.success();
     }
 }
-

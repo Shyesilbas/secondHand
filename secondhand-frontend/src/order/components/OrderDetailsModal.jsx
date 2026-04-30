@@ -20,6 +20,8 @@ import {
 } from '../utils/statusPresentation.js';
 import { DeliveryCountdown, OrderProgressStepper } from './orderDetails/OrderTimeline.jsx';
 import { AddressSection, NotesSection } from './orderDetails/OrderEditableSections.jsx';
+import { ShippingDetailsSection } from './orderDetails/ShippingDetailsSection.jsx';
+import { ShipOrderForm } from './orderDetails/ShipOrderForm.jsx';
 import { OrderPaymentSummary } from './orderDetails/OrderPaymentSummary.jsx';
 import { useOrderDetailActions } from '../hooks/useOrderDetailActions.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
@@ -400,6 +402,22 @@ const OrderDetailsModal = React.memo(
                       })}
                     </div>
                   </GlassCard>
+
+                  {selectedOrder.shipping && (
+                    <ShippingDetailsSection 
+                      shipping={selectedOrder.shipping} 
+                      CardComponent={GlassCard} 
+                    />
+                  )}
+
+                  {isSellerView && (selectedOrder.status === 'CONFIRMED' || selectedOrder.status === 'PROCESSING') && (
+                    <ShipOrderForm 
+                      carriers={enums.carriers || []}
+                      isProcessing={actions.flags.isProcessing}
+                      onShip={actions.actions.handleShipOrder}
+                      CardComponent={GlassCard}
+                    />
+                  )}
 
                   {!isSellerView ? (
                     <>

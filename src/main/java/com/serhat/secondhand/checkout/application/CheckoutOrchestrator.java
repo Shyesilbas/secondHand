@@ -4,32 +4,33 @@ import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.application.CouponService;
-import com.serhat.secondhand.offer.entity.Offer;
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.offer.application.IOfferService;
+import com.serhat.secondhand.offer.entity.Offer;
+import com.serhat.secondhand.order.application.OrderCreationService;
+import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.order.application.OrderCreationService;
-import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.payment.application.OrderPaymentService;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.escrow.application.EscrowService;
-import com.serhat.secondhand.payment.orchestrator.PaymentOrchestrator;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -133,7 +134,7 @@ public class CheckoutOrchestrator {
             order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         }
         order.setPaymentStatus(allSuccessful ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
-        order.setStatus(allSuccessful ? Order.OrderStatus.CONFIRMED : Order.OrderStatus.CANCELLED);
+        order.setStatus(allSuccessful ? OrderStatus.CONFIRMED : OrderStatus.CANCELLED);
         order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
         if (allSuccessful && order.getShipping() != null) {
             order.getShipping().setStatus(ShippingStatus.PENDING);
@@ -145,7 +146,7 @@ public class CheckoutOrchestrator {
 
     private void markOrderAsFailed(Order order) {
         order.setPaymentStatus(PaymentStatus.FAILED);
-        order.setStatus(Order.OrderStatus.CANCELLED);
+        order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
         log.error("Order {} marked as failed due to payment error", order.getOrderNumber());
     }

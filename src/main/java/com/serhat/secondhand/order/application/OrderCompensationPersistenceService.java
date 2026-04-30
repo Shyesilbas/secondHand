@@ -61,7 +61,9 @@ public class OrderCompensationPersistenceService {
         ListingType type = item.getListingType();
         if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) return;
         if (listing.getQuantity() == null) return;
-        listingRepository.incrementQuantity(listing.getId(), delta);
+        
+        listing.incrementQuantity(delta);
+        listingRepository.save(listing);
         orderLog.logStockRestored(listing.getId(), delta);
     }
 }

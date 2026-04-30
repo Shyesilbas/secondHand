@@ -117,6 +117,15 @@ public class Listing {
         validateQuantity(newQuantity);
         this.quantity = newQuantity;
     }
+
+    public void incrementQuantity(int delta) {
+        if (this.quantity != null) {
+            this.quantity += delta;
+            if (this.status == ListingStatus.SOLD && this.quantity > 0) {
+                this.status = ListingStatus.ACTIVE;
+            }
+        }
+    }
     
     public void markFeeAsPaid() {
         this.isListingFeePaid = true;

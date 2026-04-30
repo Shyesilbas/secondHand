@@ -66,6 +66,9 @@ export const orderService = {
   getPendingCompletionStatus: async () => {
     return get(API_ENDPOINTS.ORDERS.PENDING_COMPLETION);
   },
+  shipOrder: async (id, payload) => {
+    return put(API_ENDPOINTS.ORDERS.SHIP_ORDER(id), payload);
+  },
 };
 
 

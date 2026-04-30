@@ -11,10 +11,12 @@ Bu dokumanin amaci:
 
 Kapsam:
 - Siparis olusturma ve siparis item modelleme
-- Durum gecisi kurallari (policy tabanli)
+- Siparis olusturma ve siparis item modelleme (Rich Domain Model)
+- Durum gecisi kurallari (Domain Entity icinde merkezilesmis)
 - Scheduler ile otomatik ilerletme/tamamlama
 - Manuel tamamlama, iptal ve iade akislarinin domain orkestrasyonu
 - Siparis event yayini ve bildirim tetikleme noktasi
+- AOP tabanlı semantik loglama
 
 Kapsam disi:
 - Odeme stratejisi ve para hareketi detay motoru (`payment`)
@@ -38,8 +40,11 @@ Kapsam disi:
   - Durum setleri ve domain sabitlerinin bir kismi burada tanimli.
 
 - `policy/*`
-  - Gecis/iptal/iade/tamamlama uygunluk kurallari.
-  - Is kurali degisikliginde ilk bakilacak yer.
+  - Gecis/iptal/iade/tamamlama uygunluk kurallari (Validation mantığı).
+  - Durum değiştirme mantığı artık doğrudan `Order` entity'si içindedir.
+
+- `aspect/*`
+  - `OrderLogAspect`: API isteklerini ve mutasyonlarını otomatik loglar.
 
 - `repository/*`
   - Siparis, item, shipping, escrow ve kompanzasyon sorgulari.
@@ -104,10 +109,11 @@ Prensipler:
 
 ## 6) Performans ve Davranissal Risk Notlari
 
-- Query tarafinda item/shipping/escrow baglantilari N+1 riski acisindan izlenmelidir.
+- Query tarafinda item/shipping/escrow baglantilari N+1 riski acisindan izlenmelidir (Toplu çekim yöntemleri kullanılmıştır).
 - Scheduler akisi buyuk veri setinde toplu isleme uygun kalmalidir.
 - Iptal/iade akislarinda kismi basari senaryolari idempotent ele alinmalidir.
 - Mapper tarafinda ek relation erisimi eklenirse liste endpoint maliyeti yeniden olculmelidir.
+- Tüm API yanıtları `Result` ve `ResultResponses` standartlarına uygundur.
 
 ## 7) Bir Degisiklik Yapacaginda Ne Yapacaksin?
 

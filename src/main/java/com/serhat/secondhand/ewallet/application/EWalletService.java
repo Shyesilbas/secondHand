@@ -238,12 +238,12 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     public void creditToUser(User user, BigDecimal amount) {
-        creditToUser(user, amount, null, null);
+        creditToUser(user, amount, null, null, null);
     }
 
     @Transactional
     @CacheEvict(value = "paymentStats", allEntries = true)
-    public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
+    public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType, User counterpartUser) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
 
         EWallet eWallet = eWalletRepository.findByUserWithLock(user)
@@ -257,12 +257,16 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         if (transactionType == PaymentTransactionType.REFUND) {
-            Payment payment = buildRefundPayment(user, amount, listingId);
+            // Refund: counterpartUser = seller (from), user = buyer (to)
+            User fromUser = counterpartUser != null ? counterpartUser : user;
+            Payment payment = buildRefundPayment(fromUser, user, amount, listingId);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund payment record created for user: {} amount: {}", user.getEmail(), amount);
         } else if (transactionType == PaymentTransactionType.ITEM_SALE) {
-            Payment payment = buildItemSalePayment(user, amount, listingId);
+            // Item sale: counterpartUser = buyer (from), user = seller (to)
+            User fromUser = counterpartUser != null ? counterpartUser : user;
+            Payment payment = buildItemSalePayment(fromUser, user, amount, listingId);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Item sale payment record created for seller: {} amount: {}", user.getEmail(), amount);
@@ -287,7 +291,7 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     @CacheEvict(value = "paymentStats", allEntries = true)
-    public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType) {
+    public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionType transactionType, User counterpartUser) {
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
 
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -297,7 +301,8 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         if (transactionType == PaymentTransactionType.REFUND) {
-            Payment payment = buildRefundDebitPayment(user, amount, listingId);
+            // Refund debit: user = seller (from), counterpartUser = buyer (to)
+            Payment payment = buildRefundDebitPayment(user, counterpartUser, amount, listingId);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund debit payment record created for seller: {} amount: {}", user.getEmail(), amount);
@@ -310,7 +315,7 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildDepositPayment(User user, BigDecimal amount) {
         return Payment.builder()
-                .fromUser(null) // System/External Bank sends to User
+                .fromUser(user) // User deposits from bank (fromUser = user to satisfy NOT NULL constraint)
                 .toUser(user)   // User receives
                 .amount(amount)
                 .paymentType(PaymentType.TRANSFER)
@@ -324,8 +329,8 @@ public class EWalletService implements IEWalletService {
 
     private Payment buildWithdrawalPayment(User user, BigDecimal amount) {
         return Payment.builder()
-                .fromUser(user)
-                .toUser(null)
+                .fromUser(user)  // User sends from e-wallet
+                .toUser(user)    // User receives to bank
                 .amount(amount)
                 .paymentType(PaymentType.TRANSFER)
                 .transactionType(PaymentTransactionType.EWALLET_WITHDRAWAL)
@@ -336,10 +341,10 @@ public class EWalletService implements IEWalletService {
                 .build();
     }
 
-    private Payment buildRefundPayment(User user, BigDecimal amount, UUID listingId) {
+    private Payment buildRefundPayment(User seller, User buyer, BigDecimal amount, UUID listingId) {
         return Payment.builder()
-                .fromUser(null) // System refunds to User
-                .toUser(user)   // User receives refund
+                .fromUser(seller) // Seller/System returns money
+                .toUser(buyer)    // Buyer receives refund
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.REFUND)
@@ -350,10 +355,10 @@ public class EWalletService implements IEWalletService {
                 .build();
     }
 
-    private Payment buildRefundDebitPayment(User seller, BigDecimal amount, UUID listingId) {
+    private Payment buildRefundDebitPayment(User seller, User buyer, BigDecimal amount, UUID listingId) {
         return Payment.builder()
                 .fromUser(seller) // Seller returns money
-                .toUser(null)     // to System/Buyer
+                .toUser(buyer)    // Buyer receives
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.REFUND)
@@ -364,10 +369,10 @@ public class EWalletService implements IEWalletService {
                 .build();
     }
 
-    private Payment buildItemSalePayment(User seller, BigDecimal amount, UUID listingId) {
+    private Payment buildItemSalePayment(User buyer, User seller, BigDecimal amount, UUID listingId) {
         return Payment.builder()
-                .fromUser(null) // System/Buyer pays to Seller
-                .toUser(seller) // Seller receives
+                .fromUser(buyer)  // Buyer pays
+                .toUser(seller)   // Seller receives sale proceeds
                 .amount(amount)
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.ITEM_SALE)

@@ -2,8 +2,10 @@ package com.serhat.secondhand.order.policy;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.shipping.entity.Shipping;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -13,10 +15,10 @@ import java.time.LocalDateTime;
 public class OrderRefundPolicy {
 
     public Result<Void> validateRefundable(Order order) {
-        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
+        if (order.getStatus() == OrderStatus.COMPLETED) {
             return Result.error(OrderErrorCodes.ORDER_ALREADY_COMPLETED);
         }
-        if (!Order.OrderStatus.REFUNDABLE_STATUSES.contains(order.getStatus())) {
+        if (!order.getStatus().isRefundable()) {
             return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_REFUNDED);
         }
 

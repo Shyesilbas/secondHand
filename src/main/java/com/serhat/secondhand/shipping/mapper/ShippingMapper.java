@@ -1,7 +1,7 @@
-package com.serhat.secondhand.order.mapper;
+package com.serhat.secondhand.shipping.mapper;
 
-import com.serhat.secondhand.order.dto.ShippingDto;
-import com.serhat.secondhand.order.entity.Shipping;
+import com.serhat.secondhand.shipping.dto.ShippingDto;
+import com.serhat.secondhand.shipping.entity.Shipping;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +15,11 @@ public class ShippingMapper {
         return ShippingDto.builder()
                 .id(shipping.getId())
                 .status(shipping.getStatus())
+                .carrier(shipping.getCarrier())
+                .carrierName(shipping.getCarrier() != null ? shipping.getCarrier().getName() : null)
+                .trackingNumber(shipping.getTrackingNumber())
+                .trackingUrl(shipping.getTrackingUrl())
+                .estimatedDeliveryDate(shipping.getEstimatedDeliveryDate())
                 .inTransitAt(shipping.getInTransitAt())
                 .deliveredAt(shipping.getDeliveredAt())
                 .createdAt(shipping.getCreatedAt())
@@ -22,4 +27,3 @@ public class ShippingMapper {
                 .build();
     }
 }
-

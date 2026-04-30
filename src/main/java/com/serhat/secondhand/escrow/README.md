@@ -58,9 +58,10 @@ Bu model sayesinde:
 
 ### 4.3 Cancel & Refund
 - Siparis iptalinde veya iadesinde calisir.
-- Para alicinin cüzdanina iade edilir (`ITEM_PURCHASE` -> `REFUND`).
-- Saticinin bekleyen bakiyesinden dusulur.
-- Eger para saticiya coktan aktarilmissa, satici bakiyesinden debit edilir.
+- **Iade/iptal yalnizca escrow durumundayken (para henuz saticiya aktarilmamissa) yapilabilir.** Escrow release edildikten sonra iade mumkun degildir.
+- Para alicinin cüzdanina escrow'dan (sistemden) iade edilir. Satici bu isleme taraf degildir — para hicbir zaman saticiya ulasmamistir.
+- Payment kaydinda `fromUser=buyer, toUser=buyer` olarak kaydedilir (paranin sahibi alicidir, sistem araciligiyla geri doner).
+- Saticinin bekleyen bakiyesinden dusulur (escrow kaydi `REFUNDED`/`CANCELLED` olarak isaretlenir).
 
 ## 5) Kritik Is Kurallari
 

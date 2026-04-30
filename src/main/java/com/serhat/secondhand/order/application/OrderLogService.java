@@ -44,24 +44,6 @@ public class OrderLogService {
         log.info("{} [STATUS_CHANGED] orderNumber={} from={} to={}", PREFIX, orderNumber, oldStatus, newStatus);
     }
 
-    // ==================== Escrow Operations ====================
-
-    public void logEscrowCreated(Long orderItemId, BigDecimal amount, String sellerEmail) {
-        log.info("{} [ESCROW_CREATED] orderItemId={} amount={} seller={}", PREFIX, orderItemId, amount, sellerEmail);
-    }
-
-    public void logEscrowReleased(int count, String orderNumber) {
-        log.info("{} [ESCROW_RELEASED] count={} orderNumber={}", PREFIX, count, orderNumber);
-    }
-
-    public void logEscrowReleaseFailed(String orderNumber, String errorMsg) {
-        log.error("{} [ESCROW_RELEASE_FAILED] orderNumber={} error={}", PREFIX, orderNumber, errorMsg);
-    }
-
-    public void logEscrowCancelFailed(String orderNumber, String errorMsg) {
-        log.error("{} [ESCROW_CANCEL_FAILED] orderNumber={} error={}", PREFIX, orderNumber, errorMsg);
-    }
-
     // ==================== Refund / Payment ====================
 
     public void logRefundProcessed(BigDecimal amount, String buyerEmail, String orderNumber) {

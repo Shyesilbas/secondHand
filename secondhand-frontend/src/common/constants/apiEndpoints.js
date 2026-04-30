@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
         UPDATE_ORDER_NAME: (id) => `/v1/orders/${id}/name`,
         UPDATE_ORDER_ADDRESS: (id) => `/v1/orders/${id}/address`,
         UPDATE_ORDER_NOTES: (id) => `/v1/orders/${id}/notes`,
+        SHIP_ORDER: (id) => `/v1/orders/${id}/ship`,
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard

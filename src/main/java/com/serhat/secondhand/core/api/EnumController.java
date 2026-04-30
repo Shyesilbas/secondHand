@@ -1,7 +1,12 @@
 package com.serhat.secondhand.core.api;
 
 import com.serhat.secondhand.core.audit.entity.AuditLog;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
@@ -18,16 +23,6 @@ import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
-import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
-import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
-import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Doors;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.SeatCount;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.BodyType;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookType;
 import com.serhat.secondhand.listing.domain.repository.books.*;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
@@ -44,10 +39,10 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentType
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
-import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
-import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.shipping.entity.enums.Carrier;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.showcase.application.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,8 +54,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
-
-import com.serhat.secondhand.core.security.PublicEndpoint;
 
 @RestController
 @RequestMapping("/api/v1/enums")
@@ -399,7 +392,7 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getOrderStatuses() {
-        List<Map<String, Object>> list = Arrays.stream(Order.OrderStatus.values())
+        List<Map<String, Object>> list = Arrays.stream(OrderStatus.values())
                 .map(status -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("value", status.name());
@@ -410,20 +403,33 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
+    private ResponseEntity<List<Map<String, Object>>> getCarriers() {
+        List<Map<String, Object>> list = Arrays.stream(Carrier.values())
+                .map(carrier -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", carrier.name());
+                    map.put("label", carrier.getName());
+                    map.put("trackingUrlBase", carrier.getTrackingUrlBase());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(list);
+    }
+
     private List<String> getCancellableOrderStatuses() {
-        return Order.OrderStatus.CANCELLABLE_STATUSES.stream()
+        return OrderStatus.CANCELLABLE_STATUSES.stream()
                 .map(Enum::name)
                 .toList();
     }
 
     private List<String> getRefundableOrderStatuses() {
-        return Order.OrderStatus.REFUNDABLE_STATUSES.stream()
+        return OrderStatus.REFUNDABLE_STATUSES.stream()
                 .map(Enum::name)
                 .toList();
     }
 
     private List<String> getModifiableOrderStatuses() {
-        return Order.OrderStatus.MODIFIABLE_STATUSES.stream()
+        return OrderStatus.MODIFIABLE_STATUSES.stream()
                 .map(Enum::name)
                 .toList();
     }
@@ -796,6 +802,7 @@ public class EnumController {
         allEnums.put("genders", getGenders().getBody());
         allEnums.put("paymentTypes", getPaymentTypes().getBody());
         allEnums.put("shippingStatuses", getShippingStatuses().getBody());
+        allEnums.put("carriers", getCarriers().getBody());
         allEnums.put("orderStatuses", getOrderStatuses().getBody());
         allEnums.put("cancellableOrderStatuses", getCancellableOrderStatuses());
         allEnums.put("refundableOrderStatuses", getRefundableOrderStatuses());

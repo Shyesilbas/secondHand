@@ -2,8 +2,10 @@ package com.serhat.secondhand.order.dto;
 
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 
-import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.shipping.dto.ShippingDto;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,14 +29,14 @@ public class OrderDto {
     private String buyerName;
     private String buyerSurname;
     private String buyerEmail;
-    private Order.OrderStatus status;
+    private OrderStatus status;
     private BigDecimal totalAmount;
     private BigDecimal subtotal;
     private BigDecimal campaignDiscount;
     private String couponCode;
     private BigDecimal couponDiscount;
     private BigDecimal discountTotal;
-    private String currency;
+    private Currency currency;
     private AddressDto shippingAddress;
     private AddressDto billingAddress;
     private String notes;

@@ -3,10 +3,12 @@ package com.serhat.secondhand.order.application;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.application.event.OrderStatusChangedEvent;
 import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.order.entity.Shipping;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.shipping.entity.Shipping;
+import com.serhat.secondhand.shipping.entity.enums.Carrier;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
-import com.serhat.secondhand.order.repository.ShippingRepository;
+import com.serhat.secondhand.shipping.repository.ShippingRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.escrow.application.EscrowService;
 import lombok.RequiredArgsConstructor;
@@ -37,79 +39,64 @@ public class OrderCompletionScheduler {
         LocalDateTime now = LocalDateTime.now();
         int updatedCount = 0;
 
-        List<Order> confirmedOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.CONFIRMED);
+        List<Order> confirmedOrders = orderRepository.findByStatusWithShipping(OrderStatus.CONFIRMED);
         for (Order order : confirmedOrders) {
             if (shouldUpdateToProcessing(order, now)) {
-                Order.OrderStatus oldStatus = order.getStatus();
-                order.setStatus(Order.OrderStatus.PROCESSING);
-                order.setUpdatedAt(now);
+                OrderStatus oldStatus = order.getStatus();
+                order.markAsProcessing();
                 orderRepository.save(order);
-                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.PROCESSING.name()));
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), OrderStatus.PROCESSING.name()));
                 updatedCount++;
                 orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "PROCESSING");
             }
         }
 
-        List<Order> processingOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.PROCESSING);
+        List<Order> processingOrders = orderRepository.findByStatusWithShipping(OrderStatus.PROCESSING);
         for (Order order : processingOrders) {
             if (shouldUpdateToShipped(order, now)) {
-                Order.OrderStatus oldStatus = order.getStatus();
-                order.setStatus(Order.OrderStatus.SHIPPED);
-                order.setUpdatedAt(now);
-                Shipping shipping = order.getShipping();
-                if (shipping != null && shipping.getStatus() == ShippingStatus.PENDING) {
-                    shipping.setStatus(ShippingStatus.IN_TRANSIT);
-                    shipping.setInTransitAt(now);
-                    shippingRepository.save(shipping);
-                }
+                OrderStatus oldStatus = order.getStatus();
+                // Simulation: Use ARAS carrier and a random tracking number
+                String trackingNumber = "TRK" + System.currentTimeMillis();
+                order.markAsShipped(Carrier.ARAS, trackingNumber);
                 orderRepository.save(order);
-                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.SHIPPED.name()));
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), OrderStatus.SHIPPED.name()));
                 updatedCount++;
-                orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "SHIPPED");
+                orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "SHIPPED (Tracking: " + trackingNumber + ")");
             }
         }
 
-        List<Order> shippedOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.SHIPPED);
+        List<Order> shippedOrders = orderRepository.findByStatusWithShipping(OrderStatus.SHIPPED);
         for (Order order : shippedOrders) {
             if (shouldUpdateToDelivered(order, now)) {
-                Order.OrderStatus oldStatus = order.getStatus();
-                order.setStatus(Order.OrderStatus.DELIVERED);
-                order.setUpdatedAt(now);
-                Shipping shipping = order.getShipping();
-                if (shipping != null && shipping.getStatus() == ShippingStatus.IN_TRANSIT) {
-                    shipping.setStatus(ShippingStatus.DELIVERED);
-                    shipping.setDeliveredAt(now);
-                    shippingRepository.save(shipping);
-                }
+                OrderStatus oldStatus = order.getStatus();
+                order.markAsDelivered();
                 orderRepository.save(order);
-                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), Order.OrderStatus.DELIVERED.name()));
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), OrderStatus.DELIVERED.name()));
                 updatedCount++;
                 orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "DELIVERED");
             }
         }
 
-        List<Order> deliveredOrders = orderRepository.findByStatusWithShipping(Order.OrderStatus.DELIVERED);
+        List<Order> deliveredOrders = orderRepository.findByStatusWithShipping(OrderStatus.DELIVERED);
         for (Order order : deliveredOrders) {
             Shipping shipping = order.getShipping();
             if (shipping == null || shipping.getDeliveredAt() == null) {
                 continue;
             }
             if (shouldAutoCompleteOrder(shipping, now)) {
-                Order.OrderStatus oldStatus = order.getStatus();
+                OrderStatus oldStatus = order.getStatus();
 
                 // Release escrows first; only mark COMPLETED if release succeeds.
                 var orchestratorResult = escrowService.release(order);
                 if (orchestratorResult.isError()) {
-                    orderLog.logEscrowReleaseFailed(order.getOrderNumber(), orchestratorResult.getMessage());
                     continue; // skip completing this order; will retry on next scheduler run
                 }
-                orderLog.logEscrowReleased(1, order.getOrderNumber());
 
-                order.setStatus(Order.OrderStatus.COMPLETED);
+                order.applyCompletion();
                 Order savedOrder = orderRepository.save(order);
 
                 eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, savedOrder.getUser(), true));
-                eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), Order.OrderStatus.COMPLETED.name()));
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.COMPLETED.name()));
                 updatedCount++;
                 orderLog.logOrderCompleted(savedOrder.getOrderNumber(), true);
             }

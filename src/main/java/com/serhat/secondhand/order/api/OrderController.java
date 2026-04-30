@@ -1,10 +1,11 @@
 package com.serhat.secondhand.order.api;
 
-import com.serhat.secondhand.core.result.ResultResponses;
-import com.serhat.secondhand.order.dto.*;
-import com.serhat.secondhand.order.application.*;
-import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.checkout.application.CheckoutOrchestrator;
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.escrow.application.EscrowService;
+import com.serhat.secondhand.order.application.*;
+import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -37,9 +37,9 @@ public class OrderController {
     private final OrderRefundService orderRefundService;
     private final OrderCompletionService orderCompletionService;
     private final OrderModificationService orderModificationService;
+    private final OrderShippingService orderShippingService;
     private final EscrowService escrowService;
     private final IReviewService reviewService;
-    private final OrderLogService orderLog;
 
     @PostMapping("/checkout")
     @Operation(summary = "Checkout cart items", description = "Create order from cart items and process payment")
@@ -53,7 +53,6 @@ public class OrderController {
     public ResponseEntity<?> checkout(
             @Valid @RequestBody CheckoutRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("checkout", null, currentUser.getEmail());
         return ResultResponses.ok(checkoutOrchestrator.executeCheckout(currentUser.getId(), request));
     }
 
@@ -69,9 +68,7 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        orderLog.logApiRequest("getUserOrders", currentUser.getEmail());
-        Page<OrderDto> orders = orderQueryService.getUserOrders(currentUser.getId(), pageable);
-        return ResponseEntity.ok(orders);
+        return ResultResponses.ok(orderQueryService.getUserOrders(currentUser.getId(), pageable));
     }
 
     @GetMapping("/seller")
@@ -81,12 +78,10 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<OrderDto>> getSellerOrders(
+    public ResponseEntity<?> getSellerOrders(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 5) Pageable pageable) {
-        orderLog.logApiRequest("getSellerOrders", currentUser.getEmail());
-        Page<OrderDto> orders = orderQueryService.getSellerOrders(currentUser.getId(), pageable);
-        return ResponseEntity.ok(orders);
+        return ResultResponses.ok(orderQueryService.getSellerOrders(currentUser.getId(), pageable));
     }
 
     @GetMapping("/seller/{orderId}")
@@ -95,7 +90,6 @@ public class OrderController {
     public ResponseEntity<?> getSellerOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiRequest("getSellerOrderById", currentUser.getEmail());
         return ResultResponses.ok(orderQueryService.getSellerOrderById(orderId, currentUser.getId()));
     }
 
@@ -106,11 +100,10 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, BigDecimal>> getPendingEscrowAmount(
+    public ResponseEntity<?> getPendingEscrowAmount(
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiRequest("getPendingEscrowAmount", currentUser.getEmail());
         BigDecimal amount = escrowService.getPendingEscrowAmount(currentUser);
-        return ResponseEntity.ok(Map.of("amount", amount));
+        return ResultResponses.ok(Result.success(Map.of("amount", amount)));
     }
 
     @GetMapping("/{orderId}")
@@ -124,7 +117,6 @@ public class OrderController {
     public ResponseEntity<?> getOrderById(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiRequest("getOrderById", currentUser.getEmail());
         return ResultResponses.ok(orderQueryService.getOrderById(orderId, currentUser.getId()));
     }
 
@@ -135,11 +127,9 @@ public class OrderController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, Object>> getPendingCompletionStatus(
+    public ResponseEntity<?> getPendingCompletionStatus(
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiRequest("getPendingCompletionStatus", currentUser.getEmail());
-        Map<String, Object> status = orderQueryService.getPendingCompletionStatus(currentUser.getId());
-        return ResponseEntity.ok(status);
+        return ResultResponses.ok(Result.success(orderQueryService.getPendingCompletionStatus(currentUser.getId())));
     }
 
     @GetMapping("/items/{orderItemId}/review")
@@ -147,7 +137,6 @@ public class OrderController {
     public ResponseEntity<?> getReviewByOrderItem(
             @PathVariable Long orderItemId,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiRequest("getReviewByOrderItem", currentUser.getEmail());
         return ResultResponses.ok(reviewService.getReviewByOrderItem(orderItemId, currentUser.getId()));
     }
 
@@ -164,7 +153,6 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("cancelOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderCancellationService.cancelOrder(orderId, request, currentUser));
     }
 
@@ -181,7 +169,6 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody OrderRefundRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("refundOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderRefundService.refundOrder(orderId, request, currentUser));
     }
 
@@ -197,7 +184,6 @@ public class OrderController {
     public ResponseEntity<?> completeOrder(
             @PathVariable Long orderId,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("completeOrder", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderCompletionService.completeOrder(orderId, currentUser));
     }
 
@@ -214,7 +200,6 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("updateOrderName", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderModificationService.updateOrderName(orderId, request.getName(), currentUser));
     }
 
@@ -231,7 +216,6 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderAddressRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("updateOrderAddress", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderModificationService.updateOrderAddress(
                 orderId, request.getShippingAddressId(), request.getBillingAddressId(), currentUser));
     }
@@ -249,7 +233,22 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody UpdateOrderNotesRequest request,
             @AuthenticationPrincipal User currentUser) {
-        orderLog.logApiMutation("updateOrderNotes", orderId, currentUser.getEmail());
         return ResultResponses.ok(orderModificationService.updateOrderNotes(orderId, request.getNotes(), currentUser));
+    }
+
+    @PutMapping("/{orderId}/ship")
+    @Operation(summary = "Ship order", description = "Mark order as shipped (Seller only)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order marked as shipped successfully"),
+        @ApiResponse(responseCode = "400", description = "Order cannot be shipped"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> shipOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderShipRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(orderShippingService.shipOrder(orderId, request, currentUser));
     }
 }

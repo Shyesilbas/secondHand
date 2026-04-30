@@ -23,7 +23,7 @@ export const useMyShowcases = (userId) => {
   };
 
   const extendMutation = useMutation({
-    mutationFn: ({ showcaseId, days }) => showcaseService.extendShowcase(showcaseId, days),
+    mutationFn: ({ showcaseId, request }) => showcaseService.extendShowcase(showcaseId, request),
     onSuccess: refresh,
   });
 
@@ -36,7 +36,7 @@ export const useMyShowcases = (userId) => {
     showcases,
     isLoading,
     error: error?.response?.data?.message || error?.message || null,
-    extendShowcase: (showcaseId, days) => extendMutation.mutateAsync({ showcaseId, days }),
+    extendShowcase: (showcaseId, request) => extendMutation.mutateAsync({ showcaseId, request }),
     cancelShowcase: (showcaseId) => cancelMutation.mutateAsync(showcaseId),
     isMutating: extendMutation.isPending || cancelMutation.isPending,
     extendError: extendMutation.error?.response?.data?.message || extendMutation.error?.message || null,
