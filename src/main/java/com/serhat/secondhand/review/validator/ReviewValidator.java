@@ -2,8 +2,8 @@ package com.serhat.secondhand.review.validator;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

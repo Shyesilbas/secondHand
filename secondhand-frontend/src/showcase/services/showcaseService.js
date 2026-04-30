@@ -20,8 +20,8 @@ export const showcaseService = {
     return post(API_ENDPOINTS.SHOWCASES.CREATE, payload);
   },
 
-  extendShowcase: (showcaseId, days) =>
-    post(API_ENDPOINTS.SHOWCASES.EXTEND(showcaseId), null, { params: { days } }),
+  extendShowcase: (showcaseId, payload) =>
+    post(API_ENDPOINTS.SHOWCASES.EXTEND(showcaseId), payload),
 
   cancelShowcase: (showcaseId) =>
     post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),

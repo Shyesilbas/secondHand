@@ -159,9 +159,9 @@ public class EscrowService {
                 updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), PaymentStatus.CANCELLED);
 
                 // 3. Refund the Buyer (Real move)
-                // Since this was in ESCROW, money was held by the system.
-                // We credit back the buyer's wallet.
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND);
+                // Since this was in ESCROW, money was held by the system (not by the seller).
+                // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND, null);
                 
                 log.info("Cancelled escrow and refunded {} to buyer for order item {}", 
                         escrow.getAmount(), escrow.getOrderItem().getId());
@@ -180,26 +180,18 @@ public class EscrowService {
 
         for (Escrow escrow : escrows) {
             if (escrow.getStatus() == PaymentStatus.ESCROW) {
-                // Same logic as cancel for escrowed funds
                 escrow.setStatus(PaymentStatus.REFUNDED);
                 escrow.setRefundedAt(LocalDateTime.now());
                 escrowRepository.save(escrow);
 
                 updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), PaymentStatus.REFUNDED);
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND);
-            } 
-            else if (escrow.getStatus() == PaymentStatus.COMPLETED) {
-                // Refund after release: Debit seller, credit buyer
-                escrow.setStatus(PaymentStatus.REFUNDED);
-                escrow.setRefundedAt(LocalDateTime.now());
-                escrowRepository.save(escrow);
 
-                updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), PaymentStatus.REFUNDED);
-                
-                // Debit from seller
-                walletService.debitFromUser(escrow.getSeller(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND);
-                // Credit to buyer
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND);
+                // Credit buyer's wallet — money returns from escrow (system), not from seller.
+                // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND, null);
+            } else {
+                log.warn("Escrow {} for order {} is in {} status, skipping refund. Refund is only possible while funds are in ESCROW.",
+                        escrow.getId(), order.getOrderNumber(), escrow.getStatus());
             }
         }
         return Result.success();

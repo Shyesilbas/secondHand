@@ -5,12 +5,13 @@ import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
-import com.serhat.secondhand.order.entity.Shipping;
-import com.serhat.secondhand.order.entity.enums.ShippingStatus;
+import com.serhat.secondhand.shipping.entity.Shipping;
+import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -69,13 +70,12 @@ public class OrderCreationService {
 
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
         Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
-        List<OrderItem> orderItems;
+        
         try {
-            orderItems = createOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
+            populateOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
         } catch (IllegalStateException e) {
             return Result.error(e.getMessage(), OrderErrorCodes.ORDER_ITEM_MISSING_SELLER.getCode());
         }
-        order.setOrderItems(orderItems);
 
         Order savedOrder = orderRepository.save(order);
         orderLog.logOrderCreated(orderNumber, savedOrder.getId(), user.getEmail());
@@ -118,10 +118,10 @@ public class OrderCreationService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private List<OrderItem> createOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
-        return cartItems.stream()
-                .map(cart -> createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId))
-                .collect(Collectors.toList());
+    private void populateOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
+        for (Cart cart : cartItems) {
+            order.addItem(createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId));
+        }
     }
 
     private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
@@ -141,25 +141,22 @@ public class OrderCreationService {
             throw new IllegalStateException("Cannot create order item: cart item has no listing");
         }
 
-        if (listing.getSeller() == null) {
-            orderLog.logDataWarning("Listing {} has no seller — cannot create order item", listing.getId());
-            throw new IllegalStateException("Cannot create order item: listing " + listing.getId() + " has no seller");
-        }
-
-        Long sellerId = listing.getSeller().getId();
+        User seller = listing.getSeller();
         ListingType listingType = listing.getListingType();
 
-        return OrderItem.builder()
+        OrderItem item = OrderItem.builder()
                 .order(order)
                 .listing(listing)
-                .sellerId(sellerId)
+                .seller(seller)
                 .listingType(listingType)
                 .quantity(cart.getQuantity())
                 .unitPrice(unitPrice)
                 .totalPrice(lineSubtotal)
-                .currency(OrderBusinessConstants.ORDER_CURRENCY)
+                .currency(Currency.TRY)
                 .notes(cart.getNotes())
                 .build();
+        
+        return item;
     }
 
     private Map<UUID, BigDecimal> buildUnitPriceByListingId(PricingResultDto pricing) {
@@ -194,13 +191,11 @@ public class OrderCreationService {
                 .orderNumber(orderNumber)
                 .name(name)
                 .user(user)
-                .status(Order.OrderStatus.PENDING)
                 .totalAmount(totalAmount)
-                .currency(OrderBusinessConstants.ORDER_CURRENCY)
+                .currency(Currency.TRY)
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
                 .notes(notes)
-                .paymentStatus(PaymentStatus.PENDING)
                 .build();
     }
 

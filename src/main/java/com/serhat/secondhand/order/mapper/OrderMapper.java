@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.shipping.mapper.ShippingMapper;
 import com.serhat.secondhand.user.domain.mapper.AddressMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -87,9 +88,9 @@ public class OrderMapper {
 
         String sellerName = null;
         String sellerSurname = null;
-        if (orderItem.getListing() != null && orderItem.getListing().getSeller() != null) {
-            sellerName = orderItem.getListing().getSeller().getName();
-            sellerSurname = orderItem.getListing().getSeller().getSurname();
+        if (orderItem.getSeller() != null) {
+            sellerName = orderItem.getSeller().getName();
+            sellerSurname = orderItem.getSeller().getSurname();
         }
 
         return OrderItemDto.builder()

@@ -1,7 +1,9 @@
 package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
+import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,9 +12,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
-@EqualsAndHashCode(exclude = {"order", "listing"})
-@ToString(exclude = {"order", "listing"})
+@Getter @Setter
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"order", "listing", "seller"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -37,8 +39,9 @@ public class OrderItem {
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 
-    @Column(name = "seller_id", nullable = false)
-    private Long sellerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false)
+    private User seller;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "listing_type")
@@ -53,9 +56,10 @@ public class OrderItem {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
-    @Column(name = "currency", length = 3, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency", length = 10, nullable = false)
     @Builder.Default
-    private String currency = "TRY";
+    private Currency currency = Currency.TRY;
 
     @Column(name = "notes", length = 500)
     private String notes;
@@ -63,4 +67,10 @@ public class OrderItem {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void calculateTotalPrice() {
+        if (this.unitPrice != null && this.quantity != null) {
+            this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+        }
+    }
 }

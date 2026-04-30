@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.repository;
 
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -23,7 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 
-    long countByUserIdAndStatus(Long userId, Order.OrderStatus status);
+    long countByUserIdAndStatus(Long userId, OrderStatus status);
 
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.id = :id")
     Optional<Order> findByIdWithOrderItems(@Param("id") Long id);
@@ -32,7 +33,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdForSeller(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
 
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping WHERE o.status = :status ORDER BY o.updatedAt ASC")
-    List<Order> findByStatusWithShipping(@Param("status") Order.OrderStatus status);
+    List<Order> findByStatusWithShipping(@Param("status") OrderStatus status);
 
 
     // Dashboard Queries
@@ -52,5 +53,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "ORDER BY o.createdAt DESC")
     Page<Order> findOrdersBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
-    boolean existsByUserIdAndStatus(Long userId, Order.OrderStatus status);
+    boolean existsByUserIdAndStatus(Long userId, OrderStatus status);
 }

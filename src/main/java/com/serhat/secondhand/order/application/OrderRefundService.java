@@ -1,18 +1,17 @@
 package com.serhat.secondhand.order.application;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.escrow.application.EscrowService;
+import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderRefundRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemRefund;
 import com.serhat.secondhand.order.mapper.OrderMapper;
-import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.policy.OrderRefundPolicy;
-import com.serhat.secondhand.order.policy.OrderStateTransitionPolicy;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
-import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,7 +35,6 @@ public class OrderRefundService {
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCompensationPersistenceService compensationPersistenceService;
     private final OrderRefundPolicy orderRefundPolicy;
-    private final OrderStateTransitionPolicy orderStateTransitionPolicy;
     private final ApplicationEventPublisher eventPublisher;
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
@@ -83,7 +81,7 @@ public class OrderRefundService {
         order = reloadedOrderResult.getData();
 
         boolean allItemsRefunded = compensationPlanner.areAllItemsRefunded(order);
-        orderStateTransitionPolicy.applyRefund(order, allItemsRefunded);
+        order.applyRefund(allItemsRefunded);
 
         Result<Order> savedOrderResult = compensationPersistenceService.saveOrderAndReload(order);
         if (savedOrderResult.isError()) return savedOrderResult.propagateError();

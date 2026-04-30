@@ -14,7 +14,7 @@ const STEPS = [
   { id: 3, label: 'Payment', icon: Check },
 ];
 
-const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSuccess }) => {
+const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSuccess, isExtension = false, showcaseId = null }) => {
     const [step, setStep] = useState(1);
     const [days, setDays] = useState(7);
     const [allAgreementsAccepted, setAllAgreementsAccepted] = useState(false);
@@ -63,6 +63,11 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const handleDaysChange = useCallback((e) => {
         setDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)));
     }, []);
+
+    const handleAgreementsChange = useCallback((agreements) => {
+        setRequiredAgreements(agreements);
+        onRequiredAgreementsChange(agreements);
+    }, [onRequiredAgreementsChange]);
 
     const handleNextStep = useCallback(() => {
         if (step < 3) setStep(s => s + 1);
@@ -155,10 +160,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         <PaymentAgreementsSection
                             acceptedAgreements={acceptedAgreements}
                             onToggle={onAgreementToggle}
-                            onRequiredAgreementsChange={(agreements) => {
-                                setRequiredAgreements(agreements);
-                                onRequiredAgreementsChange(agreements);
-                            }}
+                            onRequiredAgreementsChange={handleAgreementsChange}
                         />
                     </div>
                 </div>
@@ -185,6 +187,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                 onClose={onClose}
                 acceptedAgreements={acceptedAgreements}
                 getAcceptedAgreementIds={getAcceptedAgreementIds}
+                isExtension={isExtension}
+                showcaseId={showcaseId}
             />
         );
     }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, getAcceptedAgreementIds, handleDaysChange, onRequiredAgreementsChange]);
@@ -195,6 +199,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const successDays = successSummary?.days ?? days;
 
     const renderModalContent = () => {
+        if (showSuccessNotification) return null; // Hide main content if showing success
+
         if (isListingLoading) {
             return (
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -238,8 +244,12 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                                     <Zap className="w-4.5 h-4.5 text-white" />
                                 </div>
                                 <div>
-                                    <h3 className="text-[15px] font-bold text-slate-800 leading-tight">Showcase Promotion</h3>
-                                    <p className="text-[11px] text-slate-400">Boost your listing visibility</p>
+                                    <h3 className="text-[15px] font-bold text-slate-800 leading-tight">
+                                        {isExtension ? 'Extend Showcase' : 'Showcase Promotion'}
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400">
+                                        {isExtension ? 'Extend your promotion duration' : 'Boost your listing visibility'}
+                                    </p>
                                 </div>
                             </div>
                             <button
@@ -325,8 +335,11 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
                         onClose?.();
                     }}
                     type="success"
-                    title="Showcase activated!"
-                    message={`"${successTitle}" will be featured for ${successDays} day${successDays !== 1 ? 's' : ''}.`}
+                    title={isExtension ? "Showcase extended!" : "Showcase activated!"}
+                    message={isExtension 
+                        ? `"${successTitle}" has been extended by ${successDays} day${successDays !== 1 ? 's' : ''}.`
+                        : `"${successTitle}" will be featured for ${successDays} day${successDays !== 1 ? 's' : ''}.`
+                    }
                     autoClose={true}
                     autoCloseDelay={5000}
                     size="md"

@@ -127,17 +127,17 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     @CacheEvict(value = "activeShowcases", allEntries = true)
-    public Result<Void> extendShowcase(Long userId, UUID showcaseId, int additionalDays) {
-        Result<Void> daysValidation = showcaseValidator.validateDaysCount(additionalDays);
+    public Result<Void> extendShowcase(Long userId, UUID showcaseId, ShowcasePaymentRequest request) {
+        Result<Void> daysValidation = showcaseValidator.validateDaysCount(request.days());
         if (daysValidation.isError()) {
             return Result.error(daysValidation.getMessage(), daysValidation.getErrorCode());
         }
         return showcaseRepository.findById(showcaseId)
-                .map(showcase -> performExtension(showcase, userId, additionalDays))
+                .map(showcase -> performExtension(showcase, userId, request))
                 .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
     }
     
-    private Result<Void> performExtension(Showcase showcase, Long userId, int additionalDays) {
+    private Result<Void> performExtension(Showcase showcase, Long userId, ShowcasePaymentRequest request) {
         if (!showcase.getUser().getId().equals(userId)) {
             return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
         }
@@ -147,14 +147,27 @@ public class ShowcaseService implements IShowcaseService {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
-        showcase.setEndDate(showcase.getEndDate().plusDays(additionalDays));
+        // Pricing Calculation for extension
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
         BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
         BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
-        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, additionalDays);
+        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
+
+        // Payment Processing for extension
+        PaymentRequest paymentRequest = paymentRequestFactory.buildShowcaseExtensionRequest(
+                showcase.getUser(), showcase.getListing(), request, additionalCost);
+        
+        var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
+        if (paymentResult.isError()) {
+            return Result.error("Payment for extension failed: " + paymentResult.getMessage(), ShowcaseErrorCodes.PAYMENT_FAILED.toString());
+        }
+
+        // Success - Update dates and cost
+        showcase.setEndDate(showcase.getEndDate().plusDays(request.days()));
         showcase.setTotalCost(showcase.getTotalCost().add(additionalCost));
 
         showcaseRepository.save(showcase);
+        log.info("Successfully extended showcase {} by {} days for user {}", showcase.getId(), request.days(), userId);
         return Result.success();
     }
 

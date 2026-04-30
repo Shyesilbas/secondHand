@@ -10,6 +10,7 @@ import {
     ORDER_LIMITS,
     ORDER_STATUS_TAB_FILTER,
     ORDER_STATUSES,
+    ORDER_TIME,
     ORDER_VIEW_MODES,
 } from '../../constants/orderUiConstants.js';
 import { getOrderStatusBadgeClass } from '../../utils/statusPresentation.js';
@@ -520,11 +521,11 @@ const OrdersListLayout = ({
                     .map((order) => {
                       const escrowAmt = parseFloat(order.escrowAmount) || 0;
                       const deliveredAt = order.shipping?.deliveredAt;
-                      const autoReleaseDate = deliveredAt ? new Date(new Date(deliveredAt).getTime() + 48 * 60 * 60 * 1000) : null;
+                      const autoReleaseDate = deliveredAt ? new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS) : null;
                       const now = new Date();
                       const isAutoReleased = autoReleaseDate && now >= autoReleaseDate;
                       let tooltipText;
-                      if (!deliveredAt) tooltipText = 'Released 48h after delivery.';
+                      if (!deliveredAt) tooltipText = 'Released 72h after delivery.';
                       else if (isAutoReleased) tooltipText = 'Auto-released.';
                       else {
                         const diffMs = autoReleaseDate - now;

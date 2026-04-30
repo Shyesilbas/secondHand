@@ -9,8 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
-@EqualsAndHashCode(exclude = {"orderItem"})
+@Getter @Setter
+@EqualsAndHashCode(of = "id")
 @ToString(exclude = {"orderItem"})
 @NoArgsConstructor
 @AllArgsConstructor

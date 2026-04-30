@@ -25,7 +25,9 @@ const ShowcasePayment = ({
   onSuccess,
   onClose,
   acceptedAgreements,
-  getAcceptedAgreementIds
+  getAcceptedAgreementIds,
+  isExtension = false,
+  showcaseId = null
 }) => {
   const [step, setStep] = useState(1);
   const [paymentType, setPaymentType] = useState('CREDIT_CARD');
@@ -66,14 +68,28 @@ const ShowcasePayment = ({
     setError(null);
     try {
       const acceptedAgreementIds = getAcceptedAgreementIds ? getAcceptedAgreementIds() : [];
-      await showcaseService.createShowcase(
-        listingId, 
-        days, 
-        paymentType, 
-        verificationCode, 
-        acceptedAgreements.size > 0, 
-        acceptedAgreementIds
-      );
+      const payload = {
+        listingId,
+        days,
+        paymentType,
+        verificationCode,
+        agreementsAccepted: acceptedAgreements.size > 0,
+        acceptedAgreementIds,
+        idempotencyKey: `${isExtension ? 'extend' : 'showcase'}-${listingId}-${days}-${Date.now()}`
+      };
+
+      if (isExtension && showcaseId) {
+        await showcaseService.extendShowcase(showcaseId, payload);
+      } else {
+        await showcaseService.createShowcase(
+          listingId, 
+          days, 
+          paymentType, 
+          verificationCode, 
+          acceptedAgreements.size > 0, 
+          acceptedAgreementIds
+        );
+      }
       try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
       onSuccess?.();
     } catch (err) {

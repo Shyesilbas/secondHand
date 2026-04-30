@@ -85,6 +85,28 @@ public class PaymentRequestFactory {
                 .build();
     }
 
+    public PaymentRequest buildShowcaseExtensionRequest(User user, Listing listing,
+                                                         ShowcasePaymentRequest request, BigDecimal additionalCost) {
+        return PaymentRequest.builder()
+                .fromUserId(user.getId())
+                .toUserId(null)
+                .receiverName(user.getName())
+                .receiverSurname(user.getSurname())
+                .listingId(listing.getId())
+                .listingTitle(listing.getTitle())
+                .listingNo(listing.getListingNo())
+                .amount(additionalCost)
+                .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
+                .paymentType(request.paymentType())
+                .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
+                .paymentDirection(PaymentDirection.OUTGOING)
+                .verificationCode(request.verificationCode())
+                .agreementsAccepted(request.agreementsAccepted())
+                .acceptedAgreementIds(request.acceptedAgreementIds())
+                .idempotencyKey(request.idempotencyKey() != null ? request.idempotencyKey() : "extend-" + listing.getId() + "-" + request.days() + "-" + System.currentTimeMillis())
+                .build();
+    }
+
     private Map<Long, List<Cart>> groupCartItemsBySeller(List<Cart> cartItems) {
         return cartItems.stream()
                 .collect(Collectors.groupingBy(cart -> cart.getListing().getSeller().getId()));

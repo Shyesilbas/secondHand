@@ -92,7 +92,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
                                                  @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT SUM(oi.totalPrice) FROM OrderItem oi " +
-            "WHERE oi.sellerId = :sellerId " + // JOIN KALKTI
+            "WHERE oi.seller.id = :sellerId " + 
             "AND oi.order.paymentStatus = 'PAID' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
@@ -102,7 +102,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
                                               @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT oi.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
-            "WHERE oi.sellerId = :sellerId " + // JOIN KALKTI
+            "WHERE oi.seller.id = :sellerId " + 
             "AND oi.order.paymentStatus = 'PAID' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
@@ -114,7 +114,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT oi.listing.id, SUM(oi.totalPrice) as revenue, COUNT(DISTINCT oi.order) as orderCount " +
             "FROM OrderItem oi " +
-            "WHERE oi.sellerId = :sellerId " +
+            "WHERE oi.seller.id = :sellerId " +
             "AND oi.order.paymentStatus = 'PAID' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +

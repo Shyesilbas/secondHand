@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -123,8 +124,15 @@ public class OrderItemCompensationPlanner {
     }
 
     public boolean areAllItemsCancelled(Order order) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return true;
+        
+        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
+        Map<Long, Integer> cancelledMap = orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
+                .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
         for (OrderItem item : order.getOrderItems()) {
-            if (!isFullyCancelled(item)) {
+            int cancelled = cancelledMap.getOrDefault(item.getId(), 0);
+            if (cancelled < item.getQuantity()) {
                 return false;
             }
         }
@@ -132,8 +140,15 @@ public class OrderItemCompensationPlanner {
     }
 
     public boolean areAllItemsRefunded(Order order) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return true;
+        
+        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
+        Map<Long, Integer> refundedMap = orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
+                .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+
         for (OrderItem item : order.getOrderItems()) {
-            if (!isFullyRefunded(item)) {
+            int refunded = refundedMap.getOrDefault(item.getId(), 0);
+            if (refunded < item.getQuantity()) {
                 return false;
             }
         }
@@ -148,14 +163,6 @@ public class OrderItemCompensationPlanner {
     private int refundedQuantity(OrderItem item) {
         Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
         return refunded != null ? refunded : 0;
-    }
-
-    private boolean isFullyCancelled(OrderItem item) {
-        return cancelledQuantity(item) >= item.getQuantity();
-    }
-
-    private boolean isFullyRefunded(OrderItem item) {
-        return refundedQuantity(item) >= item.getQuantity();
     }
 
     public record CancellationPlan(List<OrderItemCancel> records, BigDecimal totalRefundAmount) {

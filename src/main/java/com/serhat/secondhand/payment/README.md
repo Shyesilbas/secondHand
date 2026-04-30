@@ -62,6 +62,7 @@ Karar noktasi prensipleri:
 - Verification davranisi pre-check akisinin parcasi olarak kalir.
 - Event sonrasi isler (bildirim, handler) ana transaction kararindan ayrik tutulur ve hem gondereni hem aliciyi bilgilendirir.
 - Odeme yonu (`INCOMING/OUTGOING`) ve islem tipi (`ITEM_SALE/PURCHASE`) veritabaninda statik tutulmak yerine kullanici bazli dinamik cozumlenir.
+- `fromUser` ve `toUser` alanlari semantik olarak siki takip edilir (or. iadelerde saticidan aliciya) ve veritabanindaki `from_user_id` NOT NULL kısıtı saglanir.
 
 ## 4) Ana Is Akislari
 
@@ -84,9 +85,10 @@ Karar noktasi prensipleri:
 ### 4.4 Escrow Akislari
 1. Siparis odemesi sonrasi tek bir `Payment` kaydi (`status=ESCROW`) olusturulur.
 2. Tamamlama asamasinda bu kayit guncellenir (`status=COMPLETED`).
-3. Iptalde bu kayit guncellenir (`status=CANCELLED`) ve alici iadesi wallet uzerinden yapilir.
-4. Teslim sonrasi iadede kayit guncellenir (`status=REFUNDED`) ve satıcıdan kesip aliciya refund yapilir.
-5. Tum durum degisikliklerinde (`release`, `refund` vb.) event yayinlanarak bildirimler tetiklenir.
+3. Iptalde bu kayit guncellenir (`status=CANCELLED`) ve alici iadesi escrow'dan (sistemden) wallet uzerinden yapilir. Satici bu isleme taraf degildir.
+4. Iade yalnizca escrow durumundayken mumkundur. Kayit guncellenir (`status=REFUNDED`) ve para escrow'dan aliciya iade edilir. Escrow release edildikten sonra iade yapilamaz.
+5. Iade penceresi (`REFUND_WINDOW_HOURS=48h`), otomatik tamamlama suresinden (`AUTO_COMPLETION_HOURS=72h`) kisa tutularak zamanlama yarisi onlenir.
+6. Tum durum degisikliklerinde (`release`, `refund` vb.) event yayinlanarak bildirimler tetiklenir.
 
 ## 5) Kritik Is Kurallari
 

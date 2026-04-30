@@ -14,7 +14,7 @@ Kapsam:
 - Para yatirma (deposit) ve para cekme (withdraw) islemleri
 - Maksimum cüzdan limiti (limit) ve Harcama Uyari Limiti (spendingWarningLimit) yonetimi
 - E-Cuzdan uzerinden gerceklesen siparis odemelerinin bakiye kontrolleri (Sufficient Balance, Spending Warning %90 kontrolu)
-- Puan/Bakiye yukleme, satis sonrasi kazanc aktarimi (creditToUser) ve iade/iptal dususleri (debitFromUser)
+- Puan/Bakiye yukleme, satis sonrasi kazanc aktarimi (`creditToUser`) ve iade/iptal dususleri (`debitFromUser`). Bu islemlerde `counterpartUser` (karsi taraf) bilgisi alinarak islem gonderici ve alicisi dogru kaydedilir. Escrow iadelerinde para sistemden (escrow'dan) aliciya dondugu icin `counterpartUser=null` gecirilir ve `fromUser` otomatik olarak aliciya (paranin sahibine) atanir.
 
 Kapsam disi:
 - Gercek banka entegrasyonu detaylari (`payment.bank` altinda yonetilir)
@@ -75,6 +75,7 @@ Karar noktasi prensipleri:
 ## 5) Kritik Is Kurallari
 
 - Bakiye hicbir zaman eksiye dusemez (Sufficient Balance kurali kesin olarak isler).
+- Veritabanindaki `from_user_id` NOT NULL kısıtı geregi, sistem tarafindan tetiklenen islem dahi olsa (deposit, refund vs.) `fromUser` hicbir zaman null olamaz. Alici-Satici iliskisine gore (counterpart) veya deposit/withdraw durumunda paranin sahibi atanir.
 - Ayni anda ayni cüzdandan birden fazla islem gecmesini engellemek icin DB bazli `PESSIMISTIC_WRITE` lock kullanilir.
 - Aylik harcama uyari limitinde (spending warning) **sadece basarili (isSuccess=true) ve disari yonlu (OUTGOING)** islemler toplanir.
 
