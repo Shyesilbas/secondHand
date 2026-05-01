@@ -208,6 +208,8 @@ public class DashboardService implements IDashboardService {
 
         Map<UUID, FavoriteStatsDto> favoriteStatsMap = favoriteStatisticsPort.getFavoriteStatsForListings(listingIds, userId);
 
+        Map<UUID, ReviewStatsDto> reviewStatsMap = reviewStatisticsPort.getListingReviewStatsDto(listingIds);
+
         return topListingsData.stream()
                 .limit(10)
                 .map(row -> {
@@ -216,8 +218,9 @@ public class DashboardService implements IDashboardService {
                     if (listing == null) return null;
 
                     Long favCount = favoriteStatsMap.getOrDefault(id, FavoriteStatsDto.builder().favoriteCount(0L).build()).getFavoriteCount();
+                    Double avgRating = reviewStatsMap.getOrDefault(id, ReviewStatsDto.empty()).getAverageRating();
 
-                    return dashboardMapper.toTopListingDto(row, listing, favCount, 0.0);
+                    return dashboardMapper.toTopListingDto(row, listing, favCount, avgRating);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -272,3 +275,4 @@ public class DashboardService implements IDashboardService {
                 .setScale(2, RoundingMode.HALF_UP);
     }
 }
+

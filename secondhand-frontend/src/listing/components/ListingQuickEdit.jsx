@@ -28,26 +28,43 @@ export const ListingQuickEdit = ({listing, onChanged, showSuccess, showError, co
         }
     }, [listing.id, onChanged, showSuccess, showError]);
 
-    const inputCls = compact ? 'w-14 px-1.5 py-0.5 text-xs' : 'w-14 px-2 py-1 text-sm';
-    const btnCls = 'p-1 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded disabled:opacity-50';
+    const inputCls = compact ? 'w-16 px-2 py-1 text-xs border-slate-200' : 'w-20 px-2.5 py-1.5 text-sm border-slate-200';
+    const btnCls = `flex items-center justify-center ${compact ? 'w-6 h-6' : 'w-7 h-7'} rounded-md text-emerald-600 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0`;
 
     return (
-        <div className={`flex flex-wrap items-center gap-2 ${compact ? 'gap-1.5' : 'gap-3'}`} onClick={e => e.stopPropagation()}>
+        <div className={`flex flex-wrap items-center gap-3 bg-slate-50/50 p-2 rounded-lg border border-slate-100 w-fit`} onClick={e => e.stopPropagation()}>
             {showQty && (
-                <div className="flex items-center gap-0.5">
-                    <input type="number" min={1} value={qty} onChange={e => setQty(e.target.value)} onKeyDown={e => e.key === 'Enter' && save('quantity', qty)}
-                        className={`${inputCls} border border-slate-200 rounded focus:ring-1 focus:ring-blue-500`} />
-                    <button type="button" onClick={() => save('quantity', qty)} disabled={savingQty} className={btnCls} title="Update stock">
-                        {savingQty ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                <div className="flex items-center gap-1.5 bg-white p-1 rounded-md border border-slate-200 shadow-sm">
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider pl-1 select-none">QTY</span>
+                    <input
+                        type="number"
+                        min={1}
+                        value={qty}
+                        onChange={e => setQty(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && save('quantity', qty)}
+                        className={`${inputCls} rounded border-0 outline-none focus:ring-2 focus:ring-emerald-500/20 bg-slate-50 font-medium text-slate-700 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                    />
+                    <button type="button" onClick={() => save('quantity', qty)} disabled={savingQty || String(qty) === String(listing.quantity)} className={btnCls} title="Save Quantity">
+                        {savingQty ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                     </button>
                 </div>
             )}
-            <div className="flex items-center gap-0.5">
-                <PriceInput value={priceVal} onChange={n => setPriceVal(p => n != null ? n : p)} onKeyDown={e => e.key === 'Enter' && save('price', priceVal)}
-                    compact={compact} className={compact ? 'w-20 py-1' : 'min-w-[7rem]'} />
-                <span className="text-xs font-medium text-slate-500">{listing.currency || 'TRY'}</span>
-                <button type="button" onClick={() => save('price', priceVal)} disabled={savingPrice} className={btnCls} title="Update price">
-                    {savingPrice ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+            <div className="flex items-center gap-1.5 bg-white p-1 rounded-md border border-slate-200 shadow-sm">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider pl-1 select-none">PRICE</span>
+                <div className="relative flex items-center">
+                    <PriceInput
+                        value={priceVal}
+                        onChange={n => setPriceVal(p => n != null ? n : p)}
+                        onKeyDown={e => e.key === 'Enter' && save('price', priceVal)}
+                        compact={compact}
+                        className={`${compact ? 'w-24 py-1' : 'w-28 py-1.5'} pl-2 pr-10 border-0 outline-none focus:ring-2 focus:ring-emerald-500/20 bg-slate-50 font-medium text-slate-700 rounded`}
+                    />
+                    <span className="absolute right-2 text-[10px] font-bold text-slate-400 pointer-events-none select-none">
+                        {listing.currency || 'TRY'}
+                    </span>
+                </div>
+                <button type="button" onClick={() => save('price', priceVal)} disabled={savingPrice || priceVal === listing.price} className={btnCls} title="Save Price">
+                    {savingPrice ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                 </button>
             </div>
         </div>

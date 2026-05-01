@@ -33,8 +33,8 @@ public class CartReservationScheduler {
         List<Long> expiredIds = cartRepository.findExpiredReservationIds(now);
         if (expiredIds.isEmpty()) return;
 
-        log.info("Removing {} expired cart reservations", expiredIds.size());
-        cartRepository.deleteAllByIdInBatch(expiredIds);
-        log.debug("Expired reservations removed in batch");
+        log.info("Clearing {} expired cart reservations", expiredIds.size());
+        cartRepository.clearReservationsByIdInBatch(expiredIds);
+        log.debug("Expired reservations cleared in batch");
     }
 }
