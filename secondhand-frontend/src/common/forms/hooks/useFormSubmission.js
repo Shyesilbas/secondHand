@@ -55,11 +55,11 @@ export const useFormSubmission = (config) => {
     }
 
     try {
-      await submitFunction(formData);
+      const response = await submitFunction(formData);
       notification.showSuccess('Success', successMessage);
       
       if (onSuccess) {
-        onSuccess(formData);
+        onSuccess(response, formData);
       } else {
         navigate(redirectRoute);
       }

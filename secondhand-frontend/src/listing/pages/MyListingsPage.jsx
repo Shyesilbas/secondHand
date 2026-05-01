@@ -43,6 +43,21 @@ const MyListingsPage = () => {
     const selectAll = useCallback(() => setSelectedIds(new Set(listings.map(l => l.id))), [listings]);
     const clearBulk = useCallback(() => { setBulkMode(null); setSelectedIds(new Set()); setBulkValue(''); }, []);
 
+    const totalValueStats = useMemo(() => {
+        const list = engine.filteredListings || engine.listings || [];
+        let totalVal = 0;
+        let activeCount = 0;
+        list.forEach(item => {
+            if (item.status === 'ACTIVE' || item.status === 'DRAFT') {
+                const price = Number(item.price) || 0;
+                const qty = Number(item.quantity) || 1;
+                totalVal += price * qty;
+                activeCount++;
+            }
+        });
+        return { totalVal, activeCount };
+    }, [engine.filteredListings, engine.listings]);
+
     const applyBulk = useCallback(async () => {
         const ids = Array.from(selectedIds);
         if (!ids.length) { showError('No selection', 'Select at least one listing'); return; }
@@ -77,106 +92,125 @@ const MyListingsPage = () => {
     );
 
     const topSlot = useMemo(() => {
-        if (!lowStock || lowStock.count <= 0) return null;
+        const hasLowStock = lowStock && lowStock.count > 0;
+        const stockText = hasLowStock ? `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}` : '';
 
-        const stockText = `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}`;
-
-        // Collapsed state
-        if (!lowStock.isOpen) {
-            return (
-                <div
-                    className="rounded-xl p-4 cursor-pointer mb-6 transition-all duration-200
-                     bg-white/70 backdrop-blur-sm border border-slate-200/60
-                     shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.08)]
-                     hover:border-slate-300/70"
-                    onClick={lowStock.toggle}
-                >
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
-                                <AlertTriangle className="w-5 h-5 text-amber-600/90" />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-slate-800">Low Stock Alert</h3>
-                                <p className="text-sm text-slate-600">
-                                    {stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.
-                                </p>
-                            </div>
-                        </div>
-                        <ChevronDown className="w-5 h-5 text-slate-500 flex-shrink-0" />
-                    </div>
-                </div>
-            );
-        }
-
-        // Expanded state
         return (
-            <div className="rounded-xl p-5 mb-6 bg-white/70 backdrop-blur-sm border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-                <div className="flex items-center justify-between cursor-pointer mb-4" onClick={lowStock.toggle}>
-                    <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
-                            <AlertTriangle className="w-5 h-5 text-amber-600/90" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-slate-800">Stock Running Low</h3>
-                            <p className="text-sm text-slate-600">{stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.</p>
+            <div className="mb-6 space-y-4">
+                {/* Total Value Summary Card */}
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Portfolio Value</p>
+                        <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                            {formatCurrency(totalValueStats.totalVal, 'TRY')}
                         </div>
                     </div>
-                    <ChevronUp className="w-5 h-5 text-slate-500 flex-shrink-0" />
+                    <div className="flex items-center bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-100">
+                        <div className="flex h-2 w-2 relative mr-2.5 shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </div>
+                        <span className="text-sm font-semibold text-slate-700">
+                            {totalValueStats.activeCount} Active/Draft Listings
+                        </span>
+                    </div>
                 </div>
 
-                {!bulkMode ? (
-                    <>
-                        <div className="flex gap-2 mb-3" onClick={e => e.stopPropagation()}>
-                            <button type="button" onClick={() => setBulkMode('quantity')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-                                Bulk Update Quantity
-                            </button>
-                            <button type="button" onClick={() => setBulkMode('price')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
-                                Bulk Update Price
-                            </button>
+                {/* Low Stock Alert */}
+                {hasLowStock && (
+                    !lowStock.isOpen ? (
+                        <div
+                            className="rounded-xl p-4 cursor-pointer transition-all duration-200
+                             bg-white/70 backdrop-blur-sm border border-slate-200/60
+                             shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.08)]
+                             hover:border-slate-300/70"
+                            onClick={lowStock.toggle}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-shrink-0 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
+                                        <AlertTriangle className="w-5 h-5 text-amber-600/90" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Low Stock Alert</h3>
+                                        <p className="text-sm text-slate-600">
+                                            {stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.
+                                        </p>
+                                    </div>
+                                </div>
+                                <ChevronDown className="w-5 h-5 text-slate-500 flex-shrink-0" />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            {lowStock.listings.slice(0, 6).map((listing) => (
-                                <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />
-                            ))}
-                            {lowStock.count > 6 && <div className="text-center py-2 text-sm text-slate-600">And {lowStock.count - 6} more with low stock.</div>}
-                        </div>
-                    </>
-                ) : (
-                    <div className="space-y-2" onClick={e => e.stopPropagation()}>
-                        <div className="flex flex-wrap items-center gap-2 p-3 bg-slate-50 rounded-lg">
-                            {bulkMode === 'quantity' ? (
-                                <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)}
-                                    placeholder="Quantity" className="w-28 px-3 py-2 text-sm border border-slate-200 rounded-lg" />
+                    ) : (
+                        <div className="rounded-xl p-5 bg-white/70 backdrop-blur-sm border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+                            <div className="flex items-center justify-between cursor-pointer mb-4" onClick={lowStock.toggle}>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex-shrink-0 w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
+                                        <AlertTriangle className="w-5 h-5 text-amber-600/90" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Stock Running Low</h3>
+                                        <p className="text-sm text-slate-600">{stockText} {lowStock.count === 1 ? 'has' : 'have'} less than 10 items in stock.</p>
+                                    </div>
+                                </div>
+                                <ChevronUp className="w-5 h-5 text-slate-500 flex-shrink-0" />
+                            </div>
+
+                            {!bulkMode ? (
+                                <>
+                                    <div className="flex gap-2 mb-3" onClick={e => e.stopPropagation()}>
+                                        <button type="button" onClick={() => setBulkMode('quantity')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+                                            Bulk Update Quantity
+                                        </button>
+                                        <button type="button" onClick={() => setBulkMode('price')} className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+                                            Bulk Update Price
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {lowStock.listings.slice(0, 6).map((listing) => (
+                                            <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />
+                                        ))}
+                                        {lowStock.count > 6 && <div className="text-center py-2 text-sm text-slate-600">And {lowStock.count - 6} more with low stock.</div>}
+                                    </div>
+                                </>
                             ) : (
-                                <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')}
-                                    placeholder="Price" className="min-w-[8rem]" />
+                                <div className="space-y-2" onClick={e => e.stopPropagation()}>
+                                    <div className="flex flex-wrap items-center gap-2 p-3 bg-slate-50 rounded-lg">
+                                        {bulkMode === 'quantity' ? (
+                                            <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)}
+                                                placeholder="Quantity" className="w-28 px-3 py-2 text-sm border border-slate-200 rounded-lg" />
+                                        ) : (
+                                            <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')}
+                                                placeholder="Price" className="min-w-[8rem]" />
+                                        )}
+                                        <button type="button" onClick={applyBulk} disabled={saving} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1">
+                                            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null} Apply
+                                        </button>
+                                        <button type="button" onClick={clearBulk} className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-lg">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <label className="flex items-center gap-2 py-1 text-sm text-slate-600 cursor-pointer">
+                                        <input type="checkbox" checked={listings.length > 0 && selectedIds.size === listings.length} onChange={e => e.target.checked ? selectAll() : setSelectedIds(new Set())} className="rounded" />
+                                        Select all
+                                    </label>
+                                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                                        {listings.map((listing) => (
+                                            <label key={listing.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                                <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="rounded" />
+                                                <span className="flex-1 truncate text-sm font-medium text-slate-800">{listing.title}</span>
+                                                <span className="text-xs text-slate-500">{bulkMode === 'quantity' ? `Stock: ${listing.quantity}` : formatCurrency(listing.price, listing.currency)}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
-                            <button type="button" onClick={applyBulk} disabled={saving} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1">
-                                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null} Apply
-                            </button>
-                            <button type="button" onClick={clearBulk} className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-lg">
-                                <X className="w-4 h-4" />
-                            </button>
                         </div>
-                        <label className="flex items-center gap-2 py-1 text-sm text-slate-600 cursor-pointer">
-                            <input type="checkbox" checked={listings.length > 0 && selectedIds.size === listings.length} onChange={e => e.target.checked ? selectAll() : setSelectedIds(new Set())} className="rounded" />
-                            Select all
-                        </label>
-                        <div className="space-y-1 max-h-48 overflow-y-auto">
-                            {listings.map((listing) => (
-                                <label key={listing.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
-                                    <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="rounded" />
-                                    <span className="flex-1 truncate text-sm font-medium text-slate-800">{listing.title}</span>
-                                    <span className="text-xs text-slate-500">{bulkMode === 'quantity' ? `Stock: ${listing.quantity}` : formatCurrency(listing.price, listing.currency)}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
+                    )
                 )}
             </div>
         );
-    }, [lowStock, engine, bulkMode, selectedIds, bulkValue, saving, toggleSelect, selectAll, clearBulk, applyBulk, listings, showSuccess, showError]);
+    }, [lowStock, engine, bulkMode, selectedIds, bulkValue, saving, toggleSelect, selectAll, clearBulk, applyBulk, listings, showSuccess, showError, totalValueStats]);
 
     return (
         <ListingsModuleLayout
