@@ -12,6 +12,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     }
 
     @Transactional
+    @CacheEvict(value = "userProfile", allEntries = true)
     public Result<UUID> createListing(C request, Long sellerId) {
         log.info("Creating {} listing for sellerId: {}", getListingType(), sellerId);
 
@@ -126,6 +128,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     }
     
     @Transactional
+    @CacheEvict(value = "userProfile", allEntries = true)
     protected <U, R> Result<Void> performUpdate(
             UUID id,
             U request,

@@ -54,6 +54,19 @@ const PayListingFeePage = () => {
     const isLoading = isListingsLoading || isConfigLoading;
     const error = listingsError;
 
+    // Pre-select listing from URL if provided
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetListingId = urlParams.get('listingId');
+
+        if (targetListingId && draftListings?.length > 0 && !selectedListing) {
+            const found = draftListings.find(l => l.id === targetListingId);
+            if (found) {
+                setSelectedListing(found);
+            }
+        }
+    }, [draftListings, selectedListing, setSelectedListing]);
+
     useEffect(() => {
         if (showConfirmModal) {
             refetchPaymentMethods();
@@ -83,7 +96,7 @@ const PayListingFeePage = () => {
 
                 {!isLoading && error && <ErrorMessage message={error} />}
 
-                {!isLoading && (draftListings.length === 0 ? (
+                {!isLoading && (draftListings.length === 0 && !selectedListing ? (
                     <div className="mt-6 rounded-[2rem] border border-slate-200/60 bg-white/80 px-6 py-10 shadow-[0_18px_45px_rgba(15,23,42,0.05)]">
                         <EmptyState
                             title="No Draft Listings"

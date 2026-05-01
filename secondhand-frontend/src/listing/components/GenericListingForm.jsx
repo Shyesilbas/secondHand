@@ -12,6 +12,7 @@ import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 import {getListingConfig} from '../config/listingConfig.js';
 import {resolveEnumLabel, toDisplayText} from '../utils/listingDisplayFormat.js';
+import {ROUTES} from '../../common/constants/routes.js';
 import {AlertCircle, ImageIcon, MapPin, Package, FileText} from 'lucide-react';
 
 /* ── Small UI Primitives ───────────────────────────────────── */
@@ -141,12 +142,26 @@ const GenericListingForm = ({
     listingType,
   });
 
+  const submitIntentRef = React.useRef('DRAFT');
+
   const {handleSubmit} = useFormSubmission({
     submitFunction: (isEdit && onUpdate) ? onUpdate : submitFunction,
     formState,
-    successMessage: successMessage || (isEdit ? 'Listing updated successfully!' : 'Listing created successfully!'),
-    errorMessage: errorMessage || (isEdit ? 'Failed to update listing' : 'Failed to create listing'),
-    redirectRoute,
+    successMessage: successMessage || (isEdit ? 'Listing updated successfully!' : (submitIntentRef.current === 'DRAFT' ? 'Listing saved as draft!' : 'Listing created! Redirecting to payment...')),
+    errorMessage: errorMessage || (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
+    onSuccess: (response) => {
+      if (isEdit || submitIntentRef.current === 'DRAFT') {
+        navigate(redirectRoute || ROUTES.MY_LISTINGS);
+      } else {
+        const id = response?.id || response?.data?.id;
+        if (id) {
+          navigate(`${ROUTES.PAY_LISTING_FEE}?listingId=${id}`);
+        } else {
+          // Fallback if ID is null
+          navigate(redirectRoute || ROUTES.MY_LISTINGS);
+        }
+      }
+    }
   });
 
   const {
@@ -473,7 +488,8 @@ const GenericListingForm = ({
       onBack={onBack || (() => navigate(-1))}
       onNext={handleNext}
       onPrev={prevStep}
-      onSubmit={handleSubmit}
+      onSubmit={(e) => { submitIntentRef.current = 'PUBLISH'; handleSubmit(e); }}
+      onSaveDraft={!isEdit ? (e) => { submitIntentRef.current = 'DRAFT'; handleSubmit(e); } : undefined}
       isLoading={Boolean(isLoading)}
       canSubmit={canGoForward}
       renderStep={renderStep}

@@ -157,11 +157,12 @@ const ListingWizard = ({
             </button>
 
             <div className="flex items-center gap-2.5">
-              {onSaveDraft && (
+              {onSaveDraft && isLastStep && (
                 <button
                   type="button"
                   onClick={onSaveDraft}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300 bg-white transition-all duration-200"
+                  disabled={isLoading || !canSubmit}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300 bg-white disabled:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save Draft
@@ -203,7 +204,7 @@ const ListingWizard = ({
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      Publish Listing
+                      {onSaveDraft ? "Publish Now (Pay Fee)" : "Save Changes"}
                     </>
                   )}
                 </button>
