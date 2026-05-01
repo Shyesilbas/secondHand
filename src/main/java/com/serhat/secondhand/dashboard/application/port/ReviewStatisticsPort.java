@@ -9,5 +9,6 @@ public interface ReviewStatisticsPort {
     ReviewStatsDto getUserReviewStats(Long userId);
 
     long countByReviewerId(Long reviewerId);
-}
 
+    java.util.Map<java.util.UUID, ReviewStatsDto> getListingReviewStatsDto(java.util.List<java.util.UUID> listingIds);
+}

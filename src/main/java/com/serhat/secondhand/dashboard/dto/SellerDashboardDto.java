@@ -67,10 +67,10 @@ public class SellerDashboardDto {
         private String listingId;
         private String listingNo;
         private String title;
+        private String mainImageUrl;
         private BigDecimal revenue;
         private Long orderCount;
         private Long favoriteCount;
         private Double averageRating;
     }
 }
-

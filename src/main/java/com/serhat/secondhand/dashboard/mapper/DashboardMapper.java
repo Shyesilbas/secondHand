@@ -8,7 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class DashboardMapper {
@@ -36,6 +39,7 @@ public class DashboardMapper {
                 .listingId(listingId.toString())
                 .listingNo(listing != null ? listing.getListingNo() : "")
                 .title(listing != null ? listing.getTitle() : "")
+                .mainImageUrl(listing != null ? listing.getImageUrl() : null)
                 .revenue(revenue != null ? revenue : BigDecimal.ZERO)
                 .orderCount(orderCount != null ? orderCount : 0L)
                 .favoriteCount(favoriteCount != null ? favoriteCount : 0L)
@@ -86,4 +90,3 @@ public class DashboardMapper {
         return distribution;
     }
 }
-

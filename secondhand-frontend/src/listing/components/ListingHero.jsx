@@ -1,6 +1,9 @@
 import {formatCurrency, formatDateTime} from '../../common/formatters.js';
+import {useActiveReservationCount} from '../../cart/hooks/useActiveReservationCount.js';
+import {Flame} from 'lucide-react';
 
 const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, hasStockInfo, isLowStock }) => {
+  const { count: activeReservations } = useActiveReservationCount(listing?.id);
   if (!listing) return null;
 
   if (variant === 'sidebar') {
@@ -15,13 +18,19 @@ const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, has
         </div>
 
         {hasStockInfo && (
-          <div className="mb-3.5">
+          <div className="mb-3.5 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium ${
               isLowStock ? 'bg-amber-50 text-amber-600' : 'bg-gray-50 text-gray-500'
             }`}>
               {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />}
               {isLowStock ? `${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
             </span>
+            {activeReservations > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-[11px] font-medium text-rose-600">
+                <Flame className="w-3 h-3 fill-current" />
+                {activeReservations} person{activeReservations > 1 ? 's' : ''} looking
+              </span>
+            )}
           </div>
         )}
 
@@ -71,13 +80,19 @@ const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, has
           <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
         </div>
         {hasStockInfo && (
-          <div className="mb-3">
+          <div className="mb-3 flex flex-wrap gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium ${
               isLowStock ? 'bg-amber-50 text-amber-600' : 'bg-gray-50 text-gray-500'
             }`}>
               {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />}
               {isLowStock ? `${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
             </span>
+            {activeReservations > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-[11px] font-medium text-rose-600">
+                <Flame className="w-3 h-3 fill-current" />
+                {activeReservations} person{activeReservations > 1 ? 's' : ''} looking
+              </span>
+            )}
           </div>
         )}
         <div className="flex items-baseline gap-3 flex-wrap">

@@ -77,6 +77,7 @@ public abstract class ListingDto {
     private ReviewStatsDto reviewStats;
     private List<ReviewDto> reviews;
     private ListingViewStatsDto viewStats;
+    private Integer activeReservations;
 
     private BigDecimal campaignPrice;
     private BigDecimal campaignDiscountAmount;

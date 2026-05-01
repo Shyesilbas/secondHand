@@ -140,4 +140,15 @@ public class CartController {
         var result = cartService.isInCart(currentUser.getId(), listingId);
         return ResultResponses.okWithBody(result, Map.of("inCart", result.getData()));
     }
+
+    @GetMapping("/reservations/count/{listingId}")
+    @Operation(summary = "Get active reservation count", description = "Get the total number of active reservations for a listing")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Count retrieved successfully")
+    })
+    public ResponseEntity<?> getActiveReservationCount(@PathVariable UUID listingId) {
+        log.debug("Get active reservation count request - listingId: {}", listingId);
+        var result = cartService.getActiveReservationCount(listingId);
+        return ResultResponses.okWithBody(result, Map.of("count", result.getData()));
+    }
 }

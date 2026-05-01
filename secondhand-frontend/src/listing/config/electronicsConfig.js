@@ -45,7 +45,7 @@ export const electronicsConfig = {
               { name: 'electronicTypeId', label: 'Type', type: 'enum', enumKey: 'electronicTypes', required: true, onChange: ({ value, ctx }) => { ctx.setValue('electronicTypeId', value); ctx.setValue('electronicModelId', ''); } },
               { name: 'electronicBrandId', label: 'Brand', type: 'enum', enumKey: 'electronicBrands', required: true, onChange: ({ value, ctx }) => { ctx.setValue('electronicBrandId', value); ctx.setValue('electronicModelId', ''); } },
               {
-                name: 'electronicModelId', label: 'Model', type: 'searchable', required: true,
+                name: 'electronicModelId', label: 'Model', type: 'searchable', enumKey: 'electronicModels', required: true,
                 disabledWhen: (ctx) => !ctx.formData?.electronicTypeId || !ctx.formData?.electronicBrandId,
                 getOptions: (ctx) => {
                   const brandId = ctx.formData?.electronicBrandId;

@@ -93,7 +93,7 @@ export const vehicleConfig = {
                 onChange: ({ value, ctx }) => { ctx.setValue('brandId', value); ctx.setValue('vehicleModelId', ''); },
               },
               {
-                name: 'vehicleModelId', label: 'Model', type: 'searchable', required: true,
+                name: 'vehicleModelId', label: 'Model', type: 'searchable', enumKey: 'vehicleModels', required: true,
                 disabledWhen: (ctx) => !ctx.formData?.vehicleTypeId || !ctx.formData?.brandId,
                 getOptions: (ctx) => {
                   const typeId = ctx.formData?.vehicleTypeId;

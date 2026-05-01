@@ -45,10 +45,13 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     ReviewStatsProjection getUserReviewStats(@Param("userId") Long userId);
 
     @Query("SELECT " +
-            "r.orderItem.listing.id AS listingId, " +
+            "l.id AS listingId, " +
             REVIEW_STATS_SELECT + " " +
-            "FROM Review r WHERE r.orderItem.listing.id IN :listingIds " +
-            "GROUP BY r.orderItem.listing.id")
+            "FROM Review r " +
+            "JOIN r.orderItem oi " +
+            "JOIN oi.listing l " +
+            "WHERE l.id IN :listingIds " +
+            "GROUP BY l.id")
     List<ListingReviewStatsProjection> getListingReviewStats(@Param("listingIds") List<UUID> listingIds);
 
     boolean existsByReviewerIdAndOrderItemId(Long reviewerId, Long orderItemId);

@@ -22,6 +22,7 @@ public class CartConfig {
     public static class Reservation {
         private Integer timeoutMinutes = 15;
         private boolean enabled = true;
+        private Integer threshold = 3;
 
         public Duration getTimeoutDuration() {
             return Duration.ofMinutes(timeoutMinutes != null ? timeoutMinutes : 15);

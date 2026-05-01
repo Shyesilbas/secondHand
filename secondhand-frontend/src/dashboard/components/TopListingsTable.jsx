@@ -1,6 +1,6 @@
-import { Package, Star, ShoppingBag, Heart } from 'lucide-react';
-import { formatCurrency } from '../../common/formatters.js';
-import { motion } from 'framer-motion';
+import {Heart, Package, ShoppingBag, Star} from 'lucide-react';
+import {formatCurrency} from '../../common/formatters.js';
+import {motion} from 'framer-motion';
 
 const TopListingsTable = ({ listings, title = 'Top Listings' }) => {
   if (!listings || listings.length === 0) {
@@ -36,9 +36,15 @@ const TopListingsTable = ({ listings, title = 'Top Listings' }) => {
             className="group flex flex-col sm:flex-row items-center sm:justify-between p-4 rounded-[16px] bg-white border border-gray-100 hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 gap-4"
           >
             <div className="flex items-center gap-4 flex-1 min-w-0 w-full">
-              <div className="w-12 h-12 bg-indigo-50/50 rounded-[12px] border border-indigo-100/50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                <Package className="w-6 h-6 text-indigo-600" />
-              </div>
+              {listing.mainImageUrl ? (
+                <div className="w-12 h-12 rounded-[12px] overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform duration-300 border border-gray-100">
+                  <img src={listing.mainImageUrl} alt={listing.title} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-indigo-50/50 rounded-[12px] border border-indigo-100/50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                  <Package className="w-6 h-6 text-indigo-600" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{listing.title}</p>
                 <p className="text-[11px] text-gray-500 font-bold tracking-wider mt-0.5 uppercase">{listing.listingNo}</p>
@@ -55,9 +61,9 @@ const TopListingsTable = ({ listings, title = 'Top Listings' }) => {
                 <span className="text-sm font-bold">{listing.favoriteCount}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg shadow-sm sm:shadow-none border sm:border-transparent border-gray-100">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <Star className={`w-4 h-4 ${listing.averageRating > 0 ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} />
                 <span className="text-sm font-bold">
-                  {listing.averageRating ? listing.averageRating.toFixed(1) : 'N/A'}
+                  {listing.averageRating > 0 ? listing.averageRating.toFixed(1) : '0.0'}
                 </span>
               </div>
               <div className="text-right ml-2">

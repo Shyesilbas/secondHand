@@ -6,6 +6,7 @@ import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
+import com.serhat.secondhand.cart.config.CartConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CartValidator {
+
+    private final CartConfig cartConfig;
 
     public Result<Void> validateListingExists(Listing listing) {
         if (listing == null) {
@@ -59,7 +62,8 @@ public class CartValidator {
         }
 
         if (requestedTotalQty > availableStock) {
-            if (actualStock <= 3) {
+            int threshold = Optional.ofNullable(cartConfig.getReservation().getThreshold()).orElse(3);
+            if (actualStock <= threshold) {
                 return Result.error(ListingErrorCodes.LISTING_IS_RESERVED);
             }
             return Result.error(CartErrorCodes.INSUFFICIENT_STOCK);

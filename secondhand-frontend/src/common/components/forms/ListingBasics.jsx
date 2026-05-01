@@ -17,7 +17,7 @@ const ListingBasics = ({formData, errors = {}, onInputChange, enums, isEdit = fa
     <div className="space-y-6">
 
       {/* General Info Section */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-visible">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
             <Type className="w-4 h-4 text-gray-500" />
@@ -79,7 +79,7 @@ const ListingBasics = ({formData, errors = {}, onInputChange, enums, isEdit = fa
       </div>
 
       {/* Pricing Section */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-visible">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
             <DollarSign className="w-4 h-4 text-gray-500" />
