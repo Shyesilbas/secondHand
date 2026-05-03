@@ -6,14 +6,14 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, CheckCircle2 } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 
-const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false }) => {
+const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false, isSelectable = false, isSelected = false, onSelectToggle = null }) => {
     const [showInfo, setShowInfo] = useState(false);
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
@@ -57,10 +57,17 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
             border transition-[transform,box-shadow,border-color] duration-200 ease-out
             hover:shadow-xl hover:-translate-y-1
             ${isOutOfStock ? 'opacity-55' : ''}
-            ${isInCompare
+            ${(isSelectable && isInShowcase) ? 'opacity-40 grayscale-[0.5] cursor-not-allowed' : ''}
+            ${isSelected ? 'border-indigo-600 ring-2 ring-indigo-600/20 shadow-lg shadow-indigo-100' : (isInCompare
                 ? 'border-indigo-400 shadow-md shadow-indigo-100 ring-2 ring-indigo-100'
-                : 'border-slate-200/80 shadow-sm hover:border-slate-300'}
+                : 'border-slate-200/80 shadow-sm hover:border-slate-300')}
         `}>
+            {isSelectable && (
+                <div 
+                  className="absolute inset-0 z-40 cursor-pointer"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelectToggle?.(listing.id); }}
+                />
+            )}
 
             {/* Top-right action buttons */}
             <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2 md:group-hover:translate-x-0">

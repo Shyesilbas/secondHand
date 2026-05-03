@@ -79,8 +79,9 @@ public class ShowcaseService implements IShowcaseService {
                 .map(listing -> createShowcaseInternal(request, user, listing, userId))
                 .orElseGet(() -> Result.error("Listing not found", ListingErrorCodes.LISTING_NOT_FOUND.toString()));
     }
-    
-    private Result<Showcase> createShowcaseInternal(ShowcasePaymentRequest request, User user, Listing listing, Long userId) {
+
+    private Result<Showcase> createShowcaseInternal(ShowcasePaymentRequest request, User user, Listing listing,
+            Long userId) {
         // Pricing Calculation
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
         BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
@@ -88,7 +89,8 @@ public class ShowcaseService implements IShowcaseService {
         BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
 
         // Payment Processing
-        PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, listing, request, totalCost);
+        PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, listing, request,
+                totalCost);
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
 
         if (paymentResult.isError()) {
@@ -99,7 +101,8 @@ public class ShowcaseService implements IShowcaseService {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(request.days());
 
-        Showcase showcase = showcaseMapper.fromCreateRequest(request, user, listing, showcaseDailyCost, totalCost, startDate, endDate);
+        Showcase showcase = showcaseMapper.fromCreateRequest(request, user, listing, showcaseDailyCost, totalCost,
+                startDate, endDate);
         return Result.success(showcaseRepository.save(showcase));
     }
 
@@ -113,7 +116,8 @@ public class ShowcaseService implements IShowcaseService {
     public CachedPage<ShowcaseDto> getCachedActiveShowcases(int page, int size) {
         log.info("[CACHE MISS] activeShowcases::page={}, size={}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE, LocalDateTime.now(), pageable);
+        Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE,
+                LocalDateTime.now(), pageable);
         List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
         return CachedPage.from(new PageImpl<>(dtoList, pageable, activeShowcases.getTotalElements()));
     }
@@ -121,7 +125,8 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     @Transactional(readOnly = true)
     public List<ShowcaseDto> getUserShowcases(Long userId) {
-        List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatusWithListing(userId, ShowcaseStatus.ACTIVE);
+        List<Showcase> activeShowcases = showcaseRepository.findByUserIdAndStatusWithListing(userId,
+                ShowcaseStatus.ACTIVE);
         return showcaseMapper.toDtos(activeShowcases, userId);
     }
 
@@ -136,7 +141,7 @@ public class ShowcaseService implements IShowcaseService {
                 .map(showcase -> performExtension(showcase, userId, request))
                 .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
     }
-    
+
     private Result<Void> performExtension(Showcase showcase, Long userId, ShowcasePaymentRequest request) {
         if (!showcase.getUser().getId().equals(userId)) {
             return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
@@ -156,10 +161,11 @@ public class ShowcaseService implements IShowcaseService {
         // Payment Processing for extension
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcaseExtensionRequest(
                 showcase.getUser(), showcase.getListing(), request, additionalCost);
-        
+
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
         if (paymentResult.isError()) {
-            return Result.error("Payment for extension failed: " + paymentResult.getMessage(), ShowcaseErrorCodes.PAYMENT_FAILED.toString());
+            return Result.error("Payment for extension failed: " + paymentResult.getMessage(),
+                    ShowcaseErrorCodes.PAYMENT_FAILED.toString());
         }
 
         // Success - Update dates and cost
@@ -199,6 +205,109 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     public ShowcasePricingDto getShowcasePricingConfig() {
         log.info("Getting showcase pricing configuration");
-        return showcaseMapper.toPricingDto(showcaseConfig.getDaily().getCost(), showcaseConfig.getFee().getTax());
+        return showcaseMapper.toPricingDto(
+                showcaseConfig.getDaily().getCost(),
+                showcaseConfig.getFee().getTax(),
+                showcaseConfig.getBulkDiscount().getListingThreshold(),
+                showcaseConfig.getBulkDiscount().getDiscountPercentageIfThresholdPassed());
+    }
+
+    @Override
+    @CacheEvict(value = "activeShowcases", allEntries = true)
+    public Result<List<Showcase>> createBulkShowcase(Long userId,
+            com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request) {
+        log.info("Creating bulk showcase for user ID: {} for {} listings", userId, request.listingIds().size());
+
+        // 1. Validate Days
+        Result<Void> validationResult = showcaseValidator.validateDaysCount(request.days());
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+
+        // 2. Resolve User
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) {
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+        }
+        User user = userResult.getData();
+
+        // 3. Resolve Listings
+        List<Listing> listings = listingService.findAllByIds(request.listingIds());
+        if (listings.size() != request.listingIds().size()) {
+            return Result.error("Some listings were not found", ListingErrorCodes.LISTING_NOT_FOUND.toString());
+        }
+
+        // Validate Showcase Status
+        LocalDateTime now = LocalDateTime.now();
+        for (Listing listing : listings) {
+            if (showcaseRepository.existsByListingIdAndEndDateAfter(listing.getId(), now)) {
+                return Result.error("Listing '" + listing.getTitle() + "' is already in an active showcase",
+                        ShowcaseErrorCodes.ALREADY_IN_SHOWCASE.toString());
+            }
+        }
+
+        // 4. Calculate Costs
+        BigDecimal dailyCost = showcaseConfig.getDaily().getCost();
+        BigDecimal tax = showcaseConfig.getFee().getTax();
+        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(dailyCost, tax);
+
+        BigDecimal unitTotalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
+        BigDecimal totalAmountBeforeDiscount = unitTotalCost.multiply(BigDecimal.valueOf(listings.size()));
+
+        BigDecimal finalTotalAmount = totalAmountBeforeDiscount;
+        Integer threshold = showcaseConfig.getBulkDiscount().getListingThreshold();
+        Integer discountPct = showcaseConfig.getBulkDiscount().getDiscountPercentageIfThresholdPassed();
+
+        if (listings.size() >= threshold) {
+            BigDecimal discountMultiplier = BigDecimal.valueOf(100 - discountPct)
+                    .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+            finalTotalAmount = totalAmountBeforeDiscount.multiply(discountMultiplier);
+            log.info("Applying bulk discount: {}% for {} listings (Threshold: {})", discountPct, listings.size(),
+                    threshold);
+        }
+
+        // 5. Payment
+        String listingTitles = listings.stream()
+                .map(Listing::getTitle)
+                .collect(java.util.stream.Collectors.joining(", "));
+        String paymentDescription = "Bulk Showcase Payment for " + listings.size() + " listings: " + listingTitles;
+
+        Listing firstListing = listings.get(0);
+        ShowcasePaymentRequest tempRequest = new ShowcasePaymentRequest(
+                firstListing.getId(), request.days(), 
+                request.paymentType() != null ? request.paymentType() : com.serhat.secondhand.payment.entity.PaymentType.CREDIT_CARD,
+                request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(), 
+                "bulk-showcase-" + userId + "-" + System.currentTimeMillis());
+
+        PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, firstListing,
+                tempRequest, finalTotalAmount);
+        
+        // Override title and description for bulk
+        paymentRequest = paymentRequest.toBuilder()
+                .listingTitle("Bulk Showcase Payment")
+                .description(paymentDescription)
+                .build();
+
+        var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
+
+        if (paymentResult.isError()) {
+            return Result.error("Bulk payment failed: " + paymentResult.getMessage(),
+                    ShowcaseErrorCodes.PAYMENT_FAILED.toString());
+        }
+
+        // 6. Save Showcases
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusDays(request.days());
+        BigDecimal finalUnitCost = finalTotalAmount.divide(BigDecimal.valueOf(listings.size()), 2,
+                java.math.RoundingMode.HALF_UP);
+
+        List<Showcase> createdShowcases = listings.stream()
+                .map(l -> showcaseMapper.fromCreateRequest(
+                        new ShowcasePaymentRequest(l.getId(), request.days(), null, null, true, null, null),
+                        user, l, dailyCost, finalUnitCost, startDate, endDate))
+                .map(showcaseRepository::save)
+                .toList();
+
+        return Result.success(createdShowcases);
     }
 }

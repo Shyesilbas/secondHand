@@ -5,7 +5,7 @@ import {AlertCircle as ExclamationCircleIcon, Image as PhotoIcon} from 'lucide-r
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
 
-const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
+const ListingGrid = memo(({ listings, isLoading, error, onDeleted, isSelectable = false, selectedIds = new Set(), onSelectToggle = null }) => {
     const { user } = useAuthState();
     const { showcases } = useShowcase();
     const showcaseListingIds = useMemo(() => {
@@ -83,6 +83,9 @@ const ListingGrid = memo(({ listings, isLoading, error, onDeleted }) => {
                     currentUserId={user?.id}
                     isInShowcase={showcaseListingIds.has(listing.id)}
                     priorityImage={index === 0}
+                    isSelectable={isSelectable}
+                    isSelected={selectedIds.has(listing.id)}
+                    onSelectToggle={onSelectToggle}
                 />
             ))}
         </div>

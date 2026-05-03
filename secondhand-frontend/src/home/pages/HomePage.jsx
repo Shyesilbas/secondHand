@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, {lazy, Suspense} from 'react';
 import {usePageTheme} from '../../common/theme/usePageTheme.js';
 import {HomePageTheme} from '../themes/index.js';
 

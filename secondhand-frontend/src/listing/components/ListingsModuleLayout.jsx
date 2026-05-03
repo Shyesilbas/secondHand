@@ -13,6 +13,9 @@ const ListingsModuleLayout = ({
   icon,
   extraActions,
   topSlot,
+  isSelectable = false,
+  selectedIds = new Set(),
+  onToggleSelect = null,
 }) => {
   const handleListingChanged = useCallback(() => {
     onListingChanged?.();
@@ -67,6 +70,9 @@ const ListingsModuleLayout = ({
               searchTerm={searchTerm}
               searchMode={searchMode}
               onListingChanged={handleListingChanged}
+              isSelectable={isSelectable}
+              selectedIds={selectedIds}
+              onToggleSelect={onToggleSelect}
             />
           )}
         </ListingsNavigation>

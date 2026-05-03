@@ -27,7 +27,9 @@ const ShowcasePayment = ({
   acceptedAgreements,
   getAcceptedAgreementIds,
   isExtension = false,
-  showcaseId = null
+  showcaseId = null,
+  isBulk = false,
+  listingIds = []
 }) => {
   const [step, setStep] = useState(1);
   const [paymentType, setPaymentType] = useState('CREDIT_CARD');
@@ -56,7 +58,8 @@ const ShowcasePayment = ({
   }, [paymentType, paymentMethods]);
 
   const handlePayment = async () => {
-    if (!listingId) {
+    const targetListingId = isBulk ? (listingIds[0] || null) : listingId;
+    if (!targetListingId && !isBulk) {
       setError('Listing Information not found. Please Try Again');
       return;
     }
@@ -68,17 +71,19 @@ const ShowcasePayment = ({
     setError(null);
     try {
       const acceptedAgreementIds = getAcceptedAgreementIds ? getAcceptedAgreementIds() : [];
-      const payload = {
-        listingId,
-        days,
-        paymentType,
-        verificationCode,
-        agreementsAccepted: acceptedAgreements.size > 0,
-        acceptedAgreementIds,
-        idempotencyKey: `${isExtension ? 'extend' : 'showcase'}-${listingId}-${days}-${Date.now()}`
-      };
-
-      if (isExtension && showcaseId) {
+      
+      if (isBulk) {
+        await showcaseService.createBulkShowcase(listingIds, days, verificationCode, paymentType, acceptedAgreements.size > 0, acceptedAgreementIds);
+      } else if (isExtension && showcaseId) {
+        const payload = {
+          listingId,
+          days,
+          paymentType,
+          verificationCode,
+          agreementsAccepted: acceptedAgreements.size > 0,
+          acceptedAgreementIds,
+          idempotencyKey: `extend-${listingId}-${days}-${Date.now()}`
+        };
         await showcaseService.extendShowcase(showcaseId, payload);
       } else {
         await showcaseService.createShowcase(
@@ -93,7 +98,7 @@ const ShowcasePayment = ({
       try { window.dispatchEvent(new Event('showcases:refresh')); } catch {}
       onSuccess?.();
     } catch (err) {
-      setError(err.message || 'Payment failed');
+      setError(err?.response?.data?.message || err.message || 'Payment failed');
     } finally {
       setLoading(false);
     }
@@ -102,10 +107,13 @@ const ShowcasePayment = ({
   const proceedToPayment = async () => {
     setLoading(true);
     setError(null);
+    const targetListingId = isBulk ? listingIds[0] : listingId;
     try {
       await orderService.initiatePaymentVerification({
         transactionType: 'SHOWCASE_PAYMENT',
-        listingId,
+        listingId: isBulk ? null : listingId,
+        isBulk,
+        customTitle: isBulk ? listingTitle : null,
         days,
         amount: totalCost
       });

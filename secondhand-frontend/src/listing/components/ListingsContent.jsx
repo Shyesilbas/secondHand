@@ -20,6 +20,9 @@ const ListingsContent = React.memo(({
     searchTerm,
     searchMode,
     onListingChanged,
+    isSelectable = false,
+    selectedIds = new Set(),
+    onToggleSelect = null,
 }) => {
     const hasSearch = Boolean(searchTerm) && searchMode !== 'none';
     const categoryLabel = getListingTypeLabel?.(filters.listingType) || 'this category';
@@ -85,6 +88,9 @@ const ListingsContent = React.memo(({
                     isLoading={isLoading}
                     error={error}
                     onDeleted={onListingChanged}
+                    isSelectable={isSelectable}
+                    selectedIds={selectedIds}
+                    onSelectToggle={onToggleSelect}
                 />
             )}
             

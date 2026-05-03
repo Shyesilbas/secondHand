@@ -51,6 +51,24 @@ public class ShowcaseController {
                 .body(showcaseMapper.toDto(result.getData()));
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<?> createBulkShowcase(
+            @Valid @RequestBody com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request,
+            @AuthenticationPrincipal User currentUser) {
+
+        log.info("Request for bulk showcase from user: {} for {} listings",
+                currentUser.getId(), request.listingIds().size());
+
+        var result = showcaseService.createBulkShowcase(currentUser.getId(), request);
+
+        if (result.isError()) {
+            return ResultResponses.ok(result);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(showcaseMapper.toDtos(result.getData(), currentUser.getId()));
+    }
+
     @PublicEndpoint
     @GetMapping("/active")
     public ResponseEntity<Page<ShowcaseDto>> getActiveShowcases(

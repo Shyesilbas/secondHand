@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public class ShowcasePricingDto {
     
     private BigDecimal dailyCost;
-    
     private BigDecimal taxPercentage;
-    
     private BigDecimal totalDailyCost;
+    private Integer bulkDiscountThreshold;
+    private Integer bulkDiscountPercentage;
 }

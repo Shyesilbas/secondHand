@@ -95,7 +95,7 @@ public class ShowcaseMapper {
     }
 
 
-    public ShowcasePricingDto toPricingDto(BigDecimal dailyCost, BigDecimal taxPercentage) {
+    public ShowcasePricingDto toPricingDto(BigDecimal dailyCost, BigDecimal taxPercentage, Integer threshold, Integer percentage) {
         BigDecimal dailyCostTax = dailyCost
                 .multiply(taxPercentage)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -105,6 +105,8 @@ public class ShowcaseMapper {
                 .dailyCost(dailyCost)
                 .taxPercentage(taxPercentage)
                 .totalDailyCost(totalDailyCost)
+                .bulkDiscountThreshold(threshold)
+                .bulkDiscountPercentage(percentage)
                 .build();
     }
 }

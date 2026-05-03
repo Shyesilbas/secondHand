@@ -23,6 +23,7 @@ public record PaymentDto(
         String listingNo,
         LocalDateTime processedAt,
         PaymentStatus status,
-        boolean isSuccess
+        boolean isSuccess,
+        String description
 ) {
 }

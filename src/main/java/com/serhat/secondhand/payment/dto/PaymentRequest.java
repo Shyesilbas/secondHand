@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
+@Builder(toBuilder = true)
 public record PaymentRequest(
         Long fromUserId,
         Long toUserId,
@@ -29,6 +29,7 @@ public record PaymentRequest(
         List<UUID> acceptedAgreementIds,
         String idempotencyKey,
         PaymentStatus status,
-        UUID orderId
+        UUID orderId,
+        String description
 ) {
 }

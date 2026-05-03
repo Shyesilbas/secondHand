@@ -16,6 +16,9 @@ import java.util.UUID;
 @Repository
 public interface ShowcaseRepository extends JpaRepository<Showcase, UUID> {
     
+    @Query("SELECT COUNT(s) > 0 FROM Showcase s WHERE s.listing.id = :listingId AND s.endDate > :now AND s.status = 'ACTIVE'")
+    boolean existsByListingIdAndEndDateAfter(@Param("listingId") UUID listingId, @Param("now") LocalDateTime now);
+
     /** Süresi dolmuş aktif vitrinler: endDate <= an */
     List<Showcase> findByStatusAndEndDateLessThanEqual(ShowcaseStatus status, LocalDateTime now);
     

@@ -20,6 +20,8 @@ public class InitiateVerificationRequest {
     private Integer days;
     private String couponCode;
     private UUID offerId;
+    private boolean isBulk;
+    private String customTitle;
 
 }
 

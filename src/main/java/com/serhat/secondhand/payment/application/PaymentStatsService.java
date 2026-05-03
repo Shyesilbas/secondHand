@@ -1,7 +1,5 @@
 package com.serhat.secondhand.payment.application;
 
-import com.serhat.secondhand.listing.application.common.ListingQueryService;
-import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.entity.Payment;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +91,8 @@ public class PaymentStatsService {
                 payment.getListingNo(),    // Direct snapshot
                 baseDto.processedAt(),
                 baseDto.status(),
-                baseDto.isSuccess()
+                baseDto.isSuccess(),
+                baseDto.description()
         );
     }
 }

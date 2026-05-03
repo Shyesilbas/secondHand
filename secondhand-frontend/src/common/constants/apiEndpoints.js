@@ -301,6 +301,7 @@ export const API_ENDPOINTS = {
     },
     SHOWCASES: {
         CREATE: '/showcases',
+        BULK: '/showcases/bulk',
         ACTIVE: '/showcases/active',
         MY_SHOWCASES: '/showcases/my',
         EXTEND: (id) => `/showcases/${id}/extend`,

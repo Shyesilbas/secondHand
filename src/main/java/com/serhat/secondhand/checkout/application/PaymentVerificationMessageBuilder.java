@@ -46,7 +46,7 @@ public class PaymentVerificationMessageBuilder {
             }
         }
 
-        details.append("Date: ").append(java.time.LocalDateTime.now()).append("\n");
+        details.append("Date: ").append(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy : HH:mm"))).append("\n");
         return details.toString();
     }
 
@@ -94,9 +94,15 @@ public class PaymentVerificationMessageBuilder {
     }
 
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {
-        if (req != null && req.getListingId() != null) {
-            listingService.findById(req.getListingId()).ifPresent(listing ->
-                    details.append("Listing: ").append(listing.getTitle()).append("\n"));
+        if (req != null) {
+            if (req.getCustomTitle() != null && !req.getCustomTitle().isBlank()) {
+                details.append("Listing: ").append(req.getCustomTitle()).append("\n");
+            } else if (req.isBulk()) {
+                details.append("Listing: Bulk Showcase Payment (Multiple Listings)\n");
+            } else if (req.getListingId() != null) {
+                listingService.findById(req.getListingId()).ifPresent(listing ->
+                        details.append("Listing: ").append(listing.getTitle()).append("\n"));
+            }
         }
         if (amount != null) {
             details.append("Amount: ").append(amount).append(" TRY\n");

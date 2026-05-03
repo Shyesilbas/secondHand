@@ -71,5 +71,8 @@ public class Payment {
     private PaymentStatus status = PaymentStatus.COMPLETED;
 
     private UUID orderId;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
 }

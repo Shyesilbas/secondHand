@@ -10,7 +10,8 @@ public enum ShowcaseErrorCodes implements ErrorCode {
     INVALID_SHOWCASE_TYPE("INVALID_SHOWCASE_TYPE", "Invalid showcase type", HttpStatus.BAD_REQUEST),
     SHOWCASE_NOT_ACTIVE("SHOWCASE_NOT_ACTIVE", "Showcase is not active" , HttpStatus.BAD_REQUEST ),
     INVALID_DAYS_COUNT("INVALID_DAYS_COUNT", "Invalid days count. Expected value: 1-30" , HttpStatus.BAD_REQUEST ),
-    PAYMENT_FAILED("PAYMENT_FAILED", "Payment processing failed for showcase", HttpStatus.PAYMENT_REQUIRED);
+    PAYMENT_FAILED("PAYMENT_FAILED", "Payment processing failed for showcase", HttpStatus.PAYMENT_REQUIRED),
+    ALREADY_IN_SHOWCASE("ALREADY_IN_SHOWCASE", "Listing is already in an active showcase", HttpStatus.BAD_REQUEST);
 
 
     private final String code;
