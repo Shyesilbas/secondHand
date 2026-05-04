@@ -35,7 +35,7 @@ public class ShowcaseConfig {
     @Setter
     public static class BulkDiscount {
         private Integer listingThreshold = 4;
-        private Integer discountPercentageIfThresholdPassed = 10;
+        private Integer listingDiscountPercentage = 10;
     }
 
     @Getter
@@ -44,4 +44,3 @@ public class ShowcaseConfig {
         private String expireCron = "0 0 * * * ?";
     }
 }
-
