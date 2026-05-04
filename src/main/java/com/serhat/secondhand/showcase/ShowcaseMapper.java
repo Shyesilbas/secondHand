@@ -1,6 +1,7 @@
 package com.serhat.secondhand.showcase;
 
 import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
@@ -61,7 +62,7 @@ public class ShowcaseMapper {
                 })
                 .toList();
 
-        List<com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto> listingDtos = dtos.stream()
+        List<ListingDto> listingDtos = dtos.stream()
                 .map(ShowcaseDto::listing)
                 .filter(java.util.Objects::nonNull)
                 .toList();

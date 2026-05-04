@@ -24,11 +24,6 @@ import java.util.UUID;
 
     List<Token> findByUserAndTokenStatus(User user, TokenStatus tokenStatus);
 
-    @Query("SELECT t FROM Token t WHERE t.expiresAt <= :now")
-    List<Token> findExpiredTokens(@Param("now") LocalDateTime now);
-    
-    Optional<Token> findByTokenAndTokenTypeAndTokenStatus(String token, TokenType tokenType, TokenStatus tokenStatus);
-
     List<Token> findByUserAndTokenTypeAndTokenStatus(User user, TokenType tokenType, TokenStatus tokenStatus);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

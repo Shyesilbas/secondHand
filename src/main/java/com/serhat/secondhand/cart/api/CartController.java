@@ -1,13 +1,11 @@
 package com.serhat.secondhand.cart.api;
 
+import com.serhat.secondhand.cart.application.CartService;
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
-import com.serhat.secondhand.cart.application.CartService;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +31,7 @@ public class CartController {
 
     @GetMapping
     @Operation(summary = "Get cart items", description = "Get all items in the user's cart with pagination")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart items retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     public ResponseEntity<?> getCartItems(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -47,12 +42,7 @@ public class CartController {
 
     @PostMapping("/items")
     @Operation(summary = "Add item to cart", description = "Add a listing to the user's cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Item added to cart successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Listing not found")
-    })
+
     public ResponseEntity<?> addToCart(
             @Valid @RequestBody AddToCartRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -64,12 +54,7 @@ public class CartController {
 
     @PutMapping("/items/{listingId}")
     @Operation(summary = "Update cart item", description = "Update quantity or notes of a cart item")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart item updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Item not found in cart")
-    })
+
     public ResponseEntity<?> updateCartItem(
             @PathVariable UUID listingId,
             @Valid @RequestBody UpdateCartItemRequest request,
@@ -82,11 +67,7 @@ public class CartController {
 
     @DeleteMapping("/items/{listingId}")
     @Operation(summary = "Remove item from cart", description = "Remove a specific item from the user's cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Item removed from cart successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Item not found in cart")
-    })
+
     public ResponseEntity<?> removeFromCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
@@ -100,10 +81,7 @@ public class CartController {
 
     @DeleteMapping("/items")
     @Operation(summary = "Clear cart", description = "Remove all items from the user's cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart cleared successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Clear cart request - user: {}", currentUser.getEmail());
@@ -114,10 +92,7 @@ public class CartController {
 
     @GetMapping("/count")
     @Operation(summary = "Get cart item count", description = "Get the total number of items in the user's cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart count retrieved successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Get cart count request - user: {}", currentUser.getEmail());
@@ -127,10 +102,7 @@ public class CartController {
 
     @GetMapping("/check/{listingId}")
     @Operation(summary = "Check if item is in cart", description = "Check if a specific listing is in the user's cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Check completed successfully"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
+
     public ResponseEntity<?> isInCart(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
@@ -143,9 +115,7 @@ public class CartController {
 
     @GetMapping("/reservations/count/{listingId}")
     @Operation(summary = "Get active reservation count", description = "Get the total number of active reservations for a listing")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Count retrieved successfully")
-    })
+
     public ResponseEntity<?> getActiveReservationCount(@PathVariable UUID listingId) {
         log.debug("Get active reservation count request - listingId: {}", listingId);
         var result = cartService.getActiveReservationCount(listingId);

@@ -7,20 +7,20 @@ import com.serhat.secondhand.favorite.domain.entity.Favorite;
 import com.serhat.secondhand.favorite.domain.mapper.FavoriteMapper;
 import com.serhat.secondhand.favorite.domain.repository.FavoriteRepository;
 import com.serhat.secondhand.favorite.util.FavoriteErrorCodes;
+import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
-import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class FavoriteService {
-    
+
     private final FavoriteRepository favoriteRepository;
     private final ListingAccessService listingAccessService;
     private final FavoriteMapper favoriteMapper;
@@ -50,7 +50,7 @@ public class FavoriteService {
     private final IUserService userService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final NotificationEventPublisher notificationEventPublisher;
-    
+
 
     @Transactional
     @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
@@ -65,7 +65,7 @@ public class FavoriteService {
 
     private Result<FavoriteDto> addToFavorites(User user, Long userId, UUID listingId) {
         Listing listing = listingAccessService.findById(listingId)
-            .orElse(null);
+                .orElse(null);
 
         if (listing == null) {
             return Result.error(FavoriteErrorCodes.LISTING_NOT_FOUND);
@@ -76,17 +76,17 @@ public class FavoriteService {
             return Result.error(activeResult.getMessage(), activeResult.getErrorCode());
         }
 
-        
+
         Favorite favorite = Favorite.builder()
-            .user(user)
-            .listing(listing)
+                .user(user)
+                .listing(listing)
                 .createdAt(LocalDateTime.now())
-            .build();
+                .build();
 
         if(favorite.getUser().getId().equals(listing.getSeller().getId())){
             return Result.error(FavoriteErrorCodes.OWN_LISTING);
         }
-        
+
         try {
             favorite = favoriteRepository.save(favorite);
         } catch (DataIntegrityViolationException e) {
@@ -121,11 +121,11 @@ public class FavoriteService {
                     e
             );
         }
-        
+
         log.info("Successfully added listing {} to favorites for user {}", listingId, user.getEmail());
         return Result.success(favoriteMapper.toDto(favorite));
     }
-    
+
 
     @Transactional
     @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
@@ -147,7 +147,7 @@ public class FavoriteService {
         log.info("Successfully removed listing {} from favorites for user {}", listingId, user.getEmail());
         return Result.success();
     }
-    
+
 
     @Transactional
     @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
@@ -159,7 +159,7 @@ public class FavoriteService {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         User user = userResult.getData();
-        
+
         boolean isFavorited = favoriteRepository.existsByUserAndListingId(user, listingId);
 
         if (isFavorited) {
@@ -173,7 +173,7 @@ public class FavoriteService {
                 return Result.error(addResult.getMessage(), addResult.getErrorCode());
             }
         }
-        
+
         Result<FavoriteStatsDto> statsResult = getFavoriteStats(listingId, userId);
         if (statsResult.isError()) {
             return Result.error(statsResult.getMessage(), statsResult.getErrorCode());
@@ -208,7 +208,7 @@ public class FavoriteService {
     public Result<Map<UUID, FavoriteStatsDto>> getFavoriteStatsForListings(List<UUID> listingIds, Long userId) {
         return Result.success(favoriteStatsService.getFavoriteStatsForListings(listingIds, userId));
     }
-    
+
 
     @Transactional(readOnly = true)
     public Result<Boolean> isFavorited(Long userId, UUID listingId) {
@@ -225,10 +225,10 @@ public class FavoriteService {
     public Result<Long> getFavoriteCount(UUID listingId) {
         return Result.success(favoriteRepository.countByListingId(listingId));
     }
-    
 
 
-    
+
+
 
     @Transactional(readOnly = true)
     public Result<Page<Object[]>> getTopFavoritedListings(Pageable pageable) {

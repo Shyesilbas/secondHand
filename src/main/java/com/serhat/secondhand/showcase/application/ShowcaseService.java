@@ -57,16 +57,29 @@ public class ShowcaseService implements IShowcaseService {
     @Autowired
     private ShowcaseService self;
 
+    private <T> Result<T> validateShowcaseDays(int days) {
+        Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
+        if (validationResult.isError()) {
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
+        }
+        return null;
+    }
+
+    private BigDecimal getDailyCostWithTax() {
+        return showcaseMapper.calculateDailyCostWithTax(
+                showcaseConfig.getDaily().getCost(),
+                showcaseConfig.getFee().getTax()
+        );
+    }
+
     @Override
     @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
         log.info("Creating showcase for user ID: {} and listing ID: {}", userId, request.listingId());
 
         // 1. Validate Days
-        Result<Void> validationResult = showcaseValidator.validateDaysCount(request.days());
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
+        Result<Showcase> daysError = validateShowcaseDays(request.days());
+        if (daysError != null) return daysError;
 
         // 2. Resolve User & Listing
         var userResult = userService.findById(userId);
@@ -84,9 +97,7 @@ public class ShowcaseService implements IShowcaseService {
             Long userId) {
         // Pricing Calculation
         BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
-        BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
-        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
-        BigDecimal totalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
+        BigDecimal totalCost = showcaseMapper.calculateTotalCost(getDailyCostWithTax(), request.days());
 
         // Payment Processing
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, listing, request,
@@ -133,10 +144,9 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Void> extendShowcase(Long userId, UUID showcaseId, ShowcasePaymentRequest request) {
-        Result<Void> daysValidation = showcaseValidator.validateDaysCount(request.days());
-        if (daysValidation.isError()) {
-            return Result.error(daysValidation.getMessage(), daysValidation.getErrorCode());
-        }
+        Result<Void> daysError = validateShowcaseDays(request.days());
+        if (daysError != null) return daysError;
+
         return showcaseRepository.findById(showcaseId)
                 .map(showcase -> performExtension(showcase, userId, request))
                 .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));
@@ -153,10 +163,7 @@ public class ShowcaseService implements IShowcaseService {
         }
 
         // Pricing Calculation for extension
-        BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
-        BigDecimal showcaseFeeTax = showcaseConfig.getFee().getTax();
-        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(showcaseDailyCost, showcaseFeeTax);
-        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
+        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(getDailyCostWithTax(), request.days());
 
         // Payment Processing for extension
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcaseExtensionRequest(
@@ -209,7 +216,7 @@ public class ShowcaseService implements IShowcaseService {
                 showcaseConfig.getDaily().getCost(),
                 showcaseConfig.getFee().getTax(),
                 showcaseConfig.getBulkDiscount().getListingThreshold(),
-                showcaseConfig.getBulkDiscount().getDiscountPercentageIfThresholdPassed());
+                showcaseConfig.getBulkDiscount().getListingDiscountPercentage());
     }
 
     @Override
@@ -219,10 +226,8 @@ public class ShowcaseService implements IShowcaseService {
         log.info("Creating bulk showcase for user ID: {} for {} listings", userId, request.listingIds().size());
 
         // 1. Validate Days
-        Result<Void> validationResult = showcaseValidator.validateDaysCount(request.days());
-        if (validationResult.isError()) {
-            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-        }
+        Result<List<Showcase>> daysError = validateShowcaseDays(request.days());
+        if (daysError != null) return daysError;
 
         // 2. Resolve User
         var userResult = userService.findById(userId);
@@ -248,15 +253,13 @@ public class ShowcaseService implements IShowcaseService {
 
         // 4. Calculate Costs
         BigDecimal dailyCost = showcaseConfig.getDaily().getCost();
-        BigDecimal tax = showcaseConfig.getFee().getTax();
-        BigDecimal dailyCostWithTax = showcaseMapper.calculateDailyCostWithTax(dailyCost, tax);
 
-        BigDecimal unitTotalCost = showcaseMapper.calculateTotalCost(dailyCostWithTax, request.days());
+        BigDecimal unitTotalCost = showcaseMapper.calculateTotalCost(getDailyCostWithTax(), request.days());
         BigDecimal totalAmountBeforeDiscount = unitTotalCost.multiply(BigDecimal.valueOf(listings.size()));
 
         BigDecimal finalTotalAmount = totalAmountBeforeDiscount;
         Integer threshold = showcaseConfig.getBulkDiscount().getListingThreshold();
-        Integer discountPct = showcaseConfig.getBulkDiscount().getDiscountPercentageIfThresholdPassed();
+        Integer discountPct = showcaseConfig.getBulkDiscount().getListingDiscountPercentage();
 
         if (listings.size() >= threshold) {
             BigDecimal discountMultiplier = BigDecimal.valueOf(100 - discountPct)
@@ -274,14 +277,15 @@ public class ShowcaseService implements IShowcaseService {
 
         Listing firstListing = listings.get(0);
         ShowcasePaymentRequest tempRequest = new ShowcasePaymentRequest(
-                firstListing.getId(), request.days(), 
-                request.paymentType() != null ? request.paymentType() : com.serhat.secondhand.payment.entity.PaymentType.CREDIT_CARD,
-                request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(), 
+                firstListing.getId(), request.days(),
+                request.paymentType() != null ? request.paymentType()
+                        : com.serhat.secondhand.payment.entity.PaymentType.CREDIT_CARD,
+                request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(),
                 "bulk-showcase-" + userId + "-" + System.currentTimeMillis());
 
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, firstListing,
                 tempRequest, finalTotalAmount);
-        
+
         // Override title and description for bulk
         paymentRequest = paymentRequest.toBuilder()
                 .listingTitle("Bulk Showcase Payment")

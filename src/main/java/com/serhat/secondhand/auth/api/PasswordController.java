@@ -4,7 +4,9 @@ import com.serhat.secondhand.auth.application.PasswordService;
 import com.serhat.secondhand.auth.domain.dto.request.ChangePasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ForgotPasswordRequest;
 import com.serhat.secondhand.auth.domain.dto.request.ResetPasswordRequest;
+import com.serhat.secondhand.auth.domain.dto.response.ChangePasswordResponse;
 import com.serhat.secondhand.auth.domain.dto.response.ForgotPasswordResponse;
+import com.serhat.secondhand.auth.domain.dto.response.ResetPasswordResponse;
 import com.serhat.secondhand.core.result.ResultResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/auth/password")
@@ -28,8 +29,18 @@ public class PasswordController {
 
     @PutMapping("/change")
     public ResponseEntity<?> changePassword(
-            @Valid @RequestBody ChangePasswordRequest request) {
-        return ResultResponses.ok(passwordService.changePassword(request));
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication) {
+
+        var result = passwordService.changePassword(request, authentication);
+        if (result.isError()) {
+            return ResultResponses.ok(result);
+        }
+
+        return ResponseEntity.ok(ChangePasswordResponse.builder()
+                .message(result.getData())
+                .status("success")
+                .build());
     }
 
     @PostMapping("/forgot")
@@ -42,7 +53,7 @@ public class PasswordController {
     public ResponseEntity<?> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
         
-        var result = passwordService.forgotPasswordWithCode(request);
+        var result = passwordService.forgotPassword(request);
         if (result.isError()) {
             return ResultResponses.ok(result);
         }
@@ -69,9 +80,9 @@ public class PasswordController {
             return ResultResponses.ok(result);
         }
         
-        return ResponseEntity.ok(Map.of(
-            "message", result.getData(),
-            "status", "success"
-        ));
+        return ResponseEntity.ok(ResetPasswordResponse.builder()
+                .message(result.getData())
+                .status("success")
+                .build());
     }
-} 
+}

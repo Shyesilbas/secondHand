@@ -8,6 +8,7 @@ import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
+import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.entity.Token;
@@ -16,6 +17,7 @@ import com.serhat.secondhand.auth.domain.exception.AccountNotActiveException;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.auth.util.AuthErrorCodes;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.application.IUserService;
@@ -28,10 +30,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -199,17 +203,6 @@ public class AuthService implements IAuthService {
         return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe());
     }
 
-    public Map<String, String> logout(Authentication authentication, HttpServletRequest request) {
-        String username = authentication.getName();
-        String accessToken = extractTokenFromHeader(request);
-        String message = logout(username, accessToken);
-        
-        return Map.of(
-            "message", message,
-            "status", "success"
-        );
-    }
-
     public Map<String, Object> validateToken(Authentication authentication) {
         return Map.of(
             "valid", true,
@@ -281,25 +274,47 @@ public class AuthService implements IAuthService {
                 auditLogService.getClientUserAgent(httpRequest));
     }
 
-    public Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request) {
-        String username = authentication.getName();
-        User user = userService.findByEmail(username)
-                .orElseThrow(() -> new BadCredentialsException("User not found"));
-        
-        log.info("Revoking all sessions for user: {}", username);
-        
-        tokenService.revokeUserRefreshTokens(user);
-        
-        String ipAddress = auditLogService.getClientIpAddress(request);
-        String userAgent = auditLogService.getClientUserAgent(request);
-        auditLogService.logLogout(username, user.getId(), ipAddress, userAgent);
-        
-        log.info("All sessions revoked successfully for user: {}", username);
-        
-        return Map.of(
-            "message", "All sessions have been revoked successfully",
-            "status", "success",
-            "revokedSessions", "all"
-        );
+    public AuthMessageResponse logout(Authentication authentication, HttpServletRequest request) {
+        String username = null;
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        } else if (authentication != null && authentication.getPrincipal() instanceof String) {
+            username = (String) authentication.getPrincipal();
+        }
+
+        if (username != null) {
+            log.info("Processing logout for user: {}", username);
+
+            String accessToken = extractTokenFromHeader(request);
+
+            logout(username, accessToken);
+            log.info("Logout successful for user: {}", username);
+            return AuthMessageResponse.of("Successfully logged out");
+        }
+
+        throw new BusinessException("User information not found", HttpStatus.BAD_REQUEST, "USER_NOT_FOUND");
+    }
+
+    public AuthMessageResponse revokeAllSessions(Authentication authentication, HttpServletRequest request) {
+        String username = null;
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        } else if (authentication != null && authentication.getPrincipal() instanceof String) {
+            username = (String) authentication.getPrincipal();
+        }
+
+        if (username != null) {
+            log.info("Revoking all sessions for user: {}", username);
+
+            User user = userService.findByEmail(username)
+                    .orElseThrow(() -> new BusinessException("User finding failed", HttpStatus.BAD_REQUEST, "USER_NOT_FOUND"));
+
+            tokenService.revokeAllUserTokens(user);
+
+            log.info("All sessions revoked for user: {}", username);
+            return AuthMessageResponse.of("All sessions have been revoked. Please log in again.");
+        }
+
+        throw new BusinessException("User information not found", HttpStatus.BAD_REQUEST, "USER_NOT_FOUND");
     }
 }

@@ -2,8 +2,10 @@ package com.serhat.secondhand.auth.domain.exception;
 
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class AccountNotActiveException extends BusinessException {
 
     private final AccountStatus accountStatus;
@@ -22,7 +24,4 @@ public class AccountNotActiveException extends BusinessException {
         return new AccountNotActiveException(message, status);
     }
 
-    public AccountStatus getAccountStatus() {
-        return accountStatus;
-    }
 }

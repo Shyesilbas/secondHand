@@ -5,6 +5,7 @@ import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
+import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.core.result.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -21,11 +22,11 @@ public interface IAuthService {
     
     LoginResponse refreshToken(String refreshTokenValue);
     
-    Map<String, String> logout(Authentication authentication, HttpServletRequest request);
-    
+    AuthMessageResponse logout(Authentication authentication, HttpServletRequest request);
+
     Map<String, Object> validateToken(Authentication authentication);
     
     LoginResponse completeOAuthRegistration(OAuthCompleteRequest request, HttpServletRequest httpRequest);
     
-    Map<String, String> revokeAllSessions(Authentication authentication, HttpServletRequest request);
+    AuthMessageResponse revokeAllSessions(Authentication authentication, HttpServletRequest request);
 }

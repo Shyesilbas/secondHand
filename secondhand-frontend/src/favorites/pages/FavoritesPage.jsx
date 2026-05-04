@@ -41,10 +41,23 @@ const FavoritesPage = () => {
       .map((fav) => {
         const listing = fav?.listing;
         if (!listing) return null;
+
+        const favoriteCount = listing?.favoriteCount ?? listing?.favoriteStats?.favoriteCount ?? 0;
+        const isFavorited = true;
+
         return {
           ...listing,
           createdAt: formatDate(fav.createdAt),
-          favoriteStats: listing.favoriteStats,
+          favoriteStats: {
+            ...listing.favoriteStats,
+            favoriteCount,
+            isFavorited,
+            favorited: isFavorited,
+          },
+          reviewStats: listing.reviewStats ?? {
+            totalReviews: 0,
+            averageRating: listing?.averageRating ?? 0,
+          }
         };
       })
       .filter(Boolean);
