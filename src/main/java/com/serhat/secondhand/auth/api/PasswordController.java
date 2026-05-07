@@ -8,6 +8,7 @@ import com.serhat.secondhand.auth.domain.dto.response.ChangePasswordResponse;
 import com.serhat.secondhand.auth.domain.dto.response.ForgotPasswordResponse;
 import com.serhat.secondhand.auth.domain.dto.response.ResetPasswordResponse;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,40 +32,43 @@ public class PasswordController {
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             Authentication authentication) {
-
+        
         var result = passwordService.changePassword(request, authentication);
         if (result.isError()) {
             return ResultResponses.ok(result);
         }
-
+        
         return ResponseEntity.ok(ChangePasswordResponse.builder()
                 .message(result.getData())
                 .status("success")
                 .build());
     }
 
+    @PublicEndpoint
     @PostMapping("/forgot")
     @Operation(
         summary = "Forgot password",
-        description = "Request a password reset token for the given email address"
+        description = "Request a password reset token for the given email address. " +
+                "If the email is registered, a code is sent via email; the response is identical regardless of existence to prevent user enumeration."
     )
-    @ApiResponse(responseCode = "200", description = "Password reset instructions sent (if email exists)")
+    @ApiResponse(responseCode = "200", description = "Generic acknowledgement (does not reveal account existence)")
     @ApiResponse(responseCode = "400", description = "Invalid email format")
     public ResponseEntity<?> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
-        
+
         var result = passwordService.forgotPassword(request);
         if (result.isError()) {
             return ResultResponses.ok(result);
         }
 
+        // Doğrulama kodu kasıtlı olarak yanıtta yoktur; yalnızca e-posta kanalı üzerinden iletilir.
         return ResponseEntity.ok(ForgotPasswordResponse.builder()
-                .message("Check your email account for password reset verification code.")
+                .message(result.getData())
                 .status("success")
-                .verificationCode(result.getData())
                 .build());
     }
 
+    @PublicEndpoint
     @PostMapping("/reset")
     @Operation(
         summary = "Reset password",

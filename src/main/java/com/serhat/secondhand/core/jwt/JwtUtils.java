@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -159,5 +160,44 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // OAuth completion akışı için kısa ömürlü, tek amaçlı imzalı token.
+    // Frontend, OAuth2 provider başarılı olduktan sonra bu token'ı sunucuya geri verir;
+    // sunucu da email/sub bilgisini güvenilir biçimde token claim'lerinden alır.
+    private static final String OAUTH_REG_TOKEN_PURPOSE = "oauth_registration";
+    private static final Duration OAUTH_REG_TOKEN_TTL = Duration.ofMinutes(10);
+    private static final String CLAIM_PURPOSE = "purpose";
+    private static final String CLAIM_GOOGLE_SUB = "google_sub";
+    private static final String CLAIM_EMAIL = "email";
+    private static final String CLAIM_NAME = "name";
+    private static final String CLAIM_SURNAME = "surname";
+    private static final String CLAIM_PICTURE = "picture";
+
+    public String generateOAuthRegistrationToken(String email, String googleSub, String name, String surname, String picture) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_PURPOSE, OAUTH_REG_TOKEN_PURPOSE);
+        if (googleSub != null) claims.put(CLAIM_GOOGLE_SUB, googleSub);
+        if (email != null) claims.put(CLAIM_EMAIL, email);
+        if (name != null) claims.put(CLAIM_NAME, name);
+        if (surname != null) claims.put(CLAIM_SURNAME, surname);
+        if (picture != null) claims.put(CLAIM_PICTURE, picture);
+
+        long now = System.currentTimeMillis();
+        return Jwts.builder()
+                .claims(claims)
+                .subject(email != null ? email : "oauth-pending")
+                .id(UUID.randomUUID().toString())
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + OAUTH_REG_TOKEN_TTL.toMillis()))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public Claims parseOAuthRegistrationToken(String token) {
+        Claims claims = extractAllClaims(token);
+        if (!OAUTH_REG_TOKEN_PURPOSE.equals(claims.get(CLAIM_PURPOSE))) {
+            throw new JwtException("Token purpose mismatch");
+        }
+        return claims;
+    }
 
 }

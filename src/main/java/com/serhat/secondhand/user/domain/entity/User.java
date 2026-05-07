@@ -13,6 +13,7 @@ import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import com.serhat.secondhand.user.domain.entity.enums.Provider;
+import com.serhat.secondhand.user.domain.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -93,6 +94,14 @@ public class User implements UserDetails {
     @Column(name = "acc_status", nullable = false)
     private AccountStatus accountStatus;
 
+    // Yetki seviyesi: USER (varsayılan) veya ADMIN. Yönetimsel uçlarda hasRole('ADMIN') ile kontrol edilir.
+    // Mevcut satırların ddl-auto:update sırasında otomatik dolması için DB tarafında DEFAULT 'USER' uygulanır.
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 16)
+    @org.hibernate.annotations.ColumnDefault("'USER'")
+    @Builder.Default
+    private UserRole role = UserRole.USER;
+
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @org.hibernate.annotations.BatchSize(size = 20)
@@ -160,8 +169,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        UserRole effectiveRole = role != null ? role : UserRole.USER;
         List<SimpleGrantedAuthority> auth = new ArrayList<>();
-        auth.add(new SimpleGrantedAuthority("ROLE_USER"));
+        auth.add(new SimpleGrantedAuthority(effectiveRole.authority()));
         return auth;
     }
 

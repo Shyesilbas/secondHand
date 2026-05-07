@@ -60,6 +60,9 @@ public class SecurityConfig {
         log.info("Applying security to {} dynamically discovered public endpoints", dynamicPublicEndpoints.size());
         
         // Add additional non-controller public paths (wildcards)
+        // /actuator/prometheus kasıtlı olarak listede DEĞİL: prod'da metrik scrape'ı için
+        // ayrı management.server.port kullanılmalı veya gateway/network politikasıyla erişim
+        // sınırlandırılmalı. Health/info k8s probe'ları için açık tutulur.
         Set<String> additionalPublicPaths = new java.util.HashSet<>(Arrays.asList(
                 "/oauth2/**",
                 "/login/oauth2/**",
@@ -70,7 +73,6 @@ public class SecurityConfig {
                 "/ws/**",
                 "/actuator/health/**",
                 "/actuator/info",
-                "/actuator/prometheus",
                 "/api/agreements/**" // Many agreements are public
         ));
         

@@ -2,6 +2,7 @@ package com.serhat.secondhand.core.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedRunnerService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/seeds")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminSeedController {
 
     private final SeedRunnerService seedRunnerService;

@@ -24,6 +24,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.application.event.UserRegisteredEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
+import com.serhat.secondhand.user.domain.entity.enums.UserRole;
 import com.serhat.secondhand.user.domain.exception.UserAlreadyLoggedOutException;
 import com.serhat.secondhand.user.domain.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -221,30 +222,55 @@ public class AuthService implements IAuthService {
     }
 
     public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request, HttpServletRequest httpRequest) {
-        User existing = userService.findOptionalByEmail(request.getEmail()).orElse(null);
+        // Güvenlik kuralı: kullanıcı kimliği yalnızca sunucu tarafından üretilmiş imzalı registrationToken'dan
+        // okunur. İstemci tarafından gönderilen email alanı bağlayıcı değildir; token claim ile çapraz doğrulanır.
+        io.jsonwebtoken.Claims claims;
+        try {
+            claims = jwtUtils.parseOAuthRegistrationToken(request.getRegistrationToken());
+        } catch (Exception e) {
+            log.warn("OAuth completion rejected: invalid or expired registration token");
+            throw new BusinessException(
+                    "Invalid or expired registration token. Please start the OAuth flow again.",
+                    HttpStatus.UNAUTHORIZED,
+                    AuthErrorCodes.INVALID_OAUTH_REGISTRATION_TOKEN.getCode());
+        }
 
-        if (existing != null) {
-            existing.setLastLoginDate(LocalDateTime.now());
-            userService.update(existing);
+        String tokenEmail = claims.get("email", String.class);
+        if (tokenEmail == null || tokenEmail.isBlank()) {
+            log.warn("OAuth completion rejected: registration token missing email claim");
+            throw new BusinessException(
+                    "Invalid registration token payload.",
+                    HttpStatus.UNAUTHORIZED,
+                    AuthErrorCodes.INVALID_OAUTH_REGISTRATION_TOKEN.getCode());
+        }
 
-            TokenRotationResult tokens = issueTokens(existing, false);
+        if (!tokenEmail.equalsIgnoreCase(request.getEmail())) {
+            log.warn("OAuth completion rejected: email mismatch between token and request");
+            throw new BusinessException(
+                    "Email mismatch. Please start the OAuth flow again.",
+                    HttpStatus.UNAUTHORIZED,
+                    AuthErrorCodes.INVALID_OAUTH_REGISTRATION_TOKEN.getCode());
+        }
 
-            agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(existing.getId());
-
-            auditOAuthGoogleLogin(existing, httpRequest);
-
-            return new LoginResponse("Login success", existing.getId(), existing.getEmail(), tokens.accessToken(), tokens.refreshToken());
+        // Aynı email ile zaten kullanıcı varsa OAuth handshake'i bu yolu kullanmamalı; success handler
+        // mevcut kullanıcı için doğrudan login yapar. Burada gelmesi anormaldir, dolayısıyla 409.
+        if (userService.findOptionalByEmail(tokenEmail).isPresent()) {
+            throw new BusinessException(
+                    "An account with this email already exists. Please log in.",
+                    HttpStatus.CONFLICT,
+                    AuthErrorCodes.OAUTH_ACCOUNT_ALREADY_EXISTS.getCode());
         }
 
         User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
-                .email(request.getEmail())
+                .email(tokenEmail)
                 .phoneNumber(request.getPhoneNumber())
                 .gender(request.getGender())
                 .birthdate(request.getBirthdate())
                 .provider(com.serhat.secondhand.user.domain.entity.enums.Provider.GOOGLE)
                 .accountStatus(AccountStatus.ACTIVE)
+                .role(UserRole.USER)
                 .accountVerified(true)
                 .accountCreationDate(LocalDate.now())
                 .lastLoginDate(LocalDateTime.now())

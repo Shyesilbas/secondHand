@@ -16,7 +16,9 @@ public enum AuthErrorCodes implements ErrorCode {
     INCORRECT_CURRENT_PASSWORD("INCORRECT_CURRENT_PASSWORD", "Current password is incorrect", HttpStatus.BAD_REQUEST),
     PASSWORD_SAME_AS_CURRENT("PASSWORD_SAME_AS_CURRENT", "New password must be different from current password", HttpStatus.BAD_REQUEST),
     PASSWORD_CONFIRMATION_MISMATCH("PASSWORD_CONFIRMATION_MISMATCH", "Password confirmation does not match", HttpStatus.BAD_REQUEST),
-    TOO_MANY_VERIFICATION_ATTEMPTS("TOO_MANY_VERIFICATION_ATTEMPTS", "Too many failed attempts. Please request a new code.", HttpStatus.BAD_REQUEST);
+    TOO_MANY_VERIFICATION_ATTEMPTS("TOO_MANY_VERIFICATION_ATTEMPTS", "Too many failed attempts. Please request a new code.", HttpStatus.BAD_REQUEST),
+    INVALID_OAUTH_REGISTRATION_TOKEN("INVALID_OAUTH_REGISTRATION_TOKEN", "Invalid or expired OAuth registration token", HttpStatus.UNAUTHORIZED),
+    OAUTH_ACCOUNT_ALREADY_EXISTS("OAUTH_ACCOUNT_ALREADY_EXISTS", "An account with this email already exists", HttpStatus.CONFLICT);
 
     private final String code;
     private final String message;

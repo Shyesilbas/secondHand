@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ForgotPasswordResponse {
     private String message;
     private String status;
-    private String verificationCode; }
+}
 
 

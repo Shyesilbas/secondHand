@@ -56,9 +56,17 @@ public class ChatRestController {
 
 
     @PostMapping("/messages")
-    public ResponseEntity<ChatMessageDto> sendMessage(@Valid @RequestBody ChatMessageDto messageDto) {
-        log.info("Sending message - sender: {}, room: {}", 
-                messageDto.getSenderId(), messageDto.getChatRoomId());
+    public ResponseEntity<ChatMessageDto> sendMessage(
+            @Valid @RequestBody ChatMessageDto messageDto,
+            @AuthenticationPrincipal User currentUser) {
+        // Mesaj sahteciliğini engellemek için sender daima kimlik doğrulanmış kullanıcıdan alınır;
+        // istekte gelen senderId değeri yok sayılır.
+        if (currentUser == null) {
+            return ResponseEntity.status(401).build();
+        }
+        messageDto.setSenderId(currentUser.getId());
+        log.info("Sending message - sender: {}, room: {}",
+                currentUser.getId(), messageDto.getChatRoomId());
         ChatMessageDto sentMessage = chatService.sendMessage(messageDto);
         return ResponseEntity.ok(sentMessage);
     }

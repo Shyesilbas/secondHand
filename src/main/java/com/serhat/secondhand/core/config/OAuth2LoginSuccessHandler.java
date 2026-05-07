@@ -77,11 +77,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
                 handleSuccessResponse(request, response, accessToken, refreshToken);
             } else {
-                // New user: do NOT create yet. Redirect to frontend to complete required fields.
+                // Yeni kullanıcı: kayıt henüz oluşturulmaz. Frontend'in zorunlu alanları tamamlaması için
+                // güvenilir taraftan üretilmiş imzalı kısa ömürlü registrationToken üretilir; istemci
+                // backend'e geri döndüğünde sunucu kimliği yalnızca bu token'dan alır.
+                String googleSub = oAuth2User.getAttribute("sub");
+                String registrationToken = jwtUtils.generateOAuthRegistrationToken(
+                        email, googleSub, name, surname, picture);
                 String redirectUrl = String.format(
-                        "%s/auth/complete?email=%s&name=%s&surname=%s&picture=%s",
+                        "%s/auth/complete?registrationToken=%s",
                         appConfigProperties.getFrontendUrl(),
-                        urlEncode(email), urlEncode(name), urlEncode(surname), urlEncode(picture)
+                        urlEncode(registrationToken)
                 );
                 response.sendRedirect(redirectUrl);
             }

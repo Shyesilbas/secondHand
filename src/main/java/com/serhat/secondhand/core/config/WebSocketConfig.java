@@ -2,6 +2,7 @@ package com.serhat.secondhand.core.config;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -14,19 +15,30 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final String TOKEN_ATTR = "ws_token";
     private static final String ACCESS_TOKEN_COOKIE = "sh_at";
 
+    private final CorsConfigProperties corsConfigProperties;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Origin politikası HTTP CORS allowlist'i ile aynı kümeye sıkıştırılır;
+        // wildcard "*" cookie tabanlı kimlik doğrulamada CSRF benzeri saldırılara izin verir.
+        List<String> allowedOrigins = corsConfigProperties.getAllowedOrigins();
+        String[] origins = (allowedOrigins == null || allowedOrigins.isEmpty())
+                ? new String[]{"http://localhost:5173"}
+                : allowedOrigins.toArray(new String[0]);
+
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns(origins)
                 .addInterceptors(new CookieHandshakeInterceptor());
     }
 

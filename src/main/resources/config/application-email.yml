@@ -4,6 +4,8 @@ app:
     sender: "${EMAIL_SENDER:secondhand@noreply.com}"
     verification-subject: "${EMAIL_VERIFICATION_SUBJECT:SecondHand - Account Verification Code}"
     verification-content: "${EMAIL_VERIFICATION_CONTENT:Hello %s, please use the following code to verify your SecondHand account: Verification Code: %s. This code is valid for 15 minutes. If you did not request this verification, please ignore this email. Best regards, SecondHand Team}"
+    password-reset-subject: "${EMAIL_PASSWORD_RESET_SUBJECT:SecondHand - Password Reset Code}"
+    password-reset-content: "${EMAIL_PASSWORD_RESET_CONTENT:Hello %s, you requested a password reset for your SecondHand account. Use the following verification code to reset your password: %s. This code is valid for 15 minutes. If you did not request this reset, please ignore this email and consider changing your password. Best regards, SecondHand Team}"
     welcome-subject: "${EMAIL_WELCOME_SUBJECT:Welcome to SecondHand!}"
     welcome-content: "${EMAIL_WELCOME_CONTENT:Hello %s, Welcome to SecondHand! Your account has been successfully created. You can now sell your second-hand items, purchase items you like, and communicate safely with other users. Happy shopping! SecondHand Team}"
     phone-update-subject: "${EMAIL_PHONE_UPDATE_SUBJECT:SecondHand - Phone Number Updated}"

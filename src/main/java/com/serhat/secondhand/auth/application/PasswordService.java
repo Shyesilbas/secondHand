@@ -8,6 +8,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.util.UserErrorCodes;
@@ -24,10 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class PasswordService {
 
+    private static final String GENERIC_RESET_RESPONSE_MESSAGE =
+            "If an account exists for the provided email, a password reset code has been sent.";
+
     private final IUserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;
+    private final UserNotificationService userNotificationService;
 
     private Result<User> getActiveUser(String email) {
         Result<User> userResult = userService.findByEmail(email);
@@ -70,20 +75,33 @@ public class PasswordService {
     }
     
     public Result<String> forgotPassword(ForgotPasswordRequest request) {
-        log.info("Password reset requested for email: {}", request.getEmail());
-
-        final String[] codeHolder = { null };
+        // Hash log: PII korumak ve kullanıcı varlığını sızdırmamak için sadece hash'ten ilk 8 karakter loglanır.
+        log.info("Password reset requested (email-hash={})", emailFingerprint(request.getEmail()));
 
         userService.findOptionalByEmail(request.getEmail())
                 .filter(user -> user.getAccountStatus().equals(AccountStatus.ACTIVE))
                 .ifPresent(user -> {
                     String verificationCode = verificationService.generateCode();
                     verificationService.generateVerification(user, verificationCode, CodeType.PASSWORD_RESET);
-                    codeHolder[0] = verificationCode;
-                    log.info("Password reset code generated and available for user: {}", request.getEmail());
+                    // Kod yalnızca e-posta kanalı üzerinden gönderilir; HTTP yanıtına ve log'a düşürülmez.
+                    userNotificationService.sendPasswordResetCodeNotification(user, verificationCode);
                 });
 
-        return Result.success(codeHolder[0]);
+        // Enumeration önlemek için kullanıcı varlığından bağımsız aynı yanıt döner.
+        return Result.success(GENERIC_RESET_RESPONSE_MESSAGE);
+    }
+
+    private String emailFingerprint(String email) {
+        if (email == null) return "null";
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(email.toLowerCase().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 4; i++) sb.append(String.format("%02x", digest[i]));
+            return sb.toString();
+        } catch (Exception e) {
+            return "n/a";
+        }
     }
     
     public Result<String> resetPassword(ResetPasswordRequest request) {

@@ -20,6 +20,7 @@ public interface UserMapper {
         @Mapping(target = "id", ignore = true),
         @Mapping(target = "password", expression = "java(encoder.encode(registerRequest.getPassword()))"),
         @Mapping(target = "accountStatus", constant = "ACTIVE"),
+        @Mapping(target = "role", constant = "USER"),
         @Mapping(target = "accountCreationDate", expression = "java(java.time.LocalDate.now())"),
         @Mapping(target = "lastLoginDate", ignore = true),
         @Mapping(target = "lastLoginIp", ignore = true),

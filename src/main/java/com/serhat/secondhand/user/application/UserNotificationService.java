@@ -54,6 +54,19 @@ public class UserNotificationService {
         }
     }
 
+    // Şifre sıfırlama kodu gönderimi: kod yalnızca e-posta kanalında bulunmalı, log/HTTP yanıtında olmamalı.
+    @Async("notificationExecutor")
+    public void sendPasswordResetCodeNotification(User user, String verificationCode) {
+        try {
+            String subject = emailConfig.getPasswordResetSubject();
+            String content = String.format(emailConfig.getPasswordResetContent(), user.getName(), verificationCode);
+            emailService.sendEmail(user, subject, content, EmailType.PASSWORD_RESET);
+            log.info("Password reset code notification sent to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.warn("Failed to send password reset code notification to user {}: {}", user.getEmail(), e.getMessage());
+        }
+    }
+
     @Async("notificationExecutor")
     public void sendPhoneNumberUpdatedNotification(User user) {
         try {

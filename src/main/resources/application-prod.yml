@@ -13,6 +13,11 @@ logging:
     org.springframework.security.oauth2.core: INFO
 
 management:
+  # Management uçları (prometheus dahil) ayrı portta yayınlanır; bu port yalnızca iç ağdan
+  # (Prometheus scrape sunucusu, k8s probe'ları) erişilebilir biçimde firewall/network policy ile
+  # kısıtlanmalıdır. 8080 üzerinde public Prometheus endpoint kalmaz.
+  server:
+    port: ${MANAGEMENT_SERVER_PORT:9090}
   endpoints:
     web:
       exposure:

@@ -13,4 +13,3 @@ public class ResetPasswordResponse {
     private String message;
     private String status;
 }
-

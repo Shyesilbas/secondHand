@@ -16,6 +16,9 @@ public class EmailConfig {
     private String verificationSubject;
     private String verificationContent;
 
+    private String passwordResetSubject;
+    private String passwordResetContent;
+
     private String welcomeSubject;
     private String welcomeContent;
 

@@ -13,4 +13,3 @@ public class ChangePasswordResponse {
     private String message;
     private String status;
 }
-

@@ -35,3 +35,14 @@ build/
 # Yerel sırlar (spring.config.import optional)
 config/application-local-secret.yml
 .env
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Veritabanı dump'ları repoda tutulmaz (PII / finansal veri sızıntı riski).
+# Mevcut secondhand_dump.sql bilinçli olarak history'den filter-repo ile kaldırılmıştır.
+secondhand_dump.sql
+*.dump
+*.sql.gz
+

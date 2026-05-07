@@ -70,32 +70,21 @@ public class VerificationService implements IVerificationService {
     
     @Override
     public boolean validateVerificationCode(User user, String code, CodeType codeType) {
-        log.info("Validating verification code for user: {}, codeType: {}, code: {}", 
-                user.getEmail(), codeType, code);
-        
+        // Doğrulama kodları (2FA / şifre sıfırlama) hiçbir log seviyesinde yazılmamalıdır.
+        log.debug("Validating verification code for user id: {}, codeType: {}", user.getId(), codeType);
+
         LocalDateTime now = LocalDateTime.now();
-        log.info("Current time: {}", now);
-        
+
         Optional<Verification> verification = verificationRepository.findActiveVerificationByUserCodeTypeAndCode(
                 user, codeType, code, now);
-        
-        log.info("Verification found: {}", verification.isPresent());
-        
-        if (verification.isPresent()) {
-            Verification v = verification.get();
-            log.info("Verification details - Code: {}, ExpiresAt: {}, IsVerified: {}", 
-                    v.getCode(), v.getCodeExpiresAt(), v.isVerified());
-        } else {
-            List<Verification> allActive = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(
-                    user, codeType, now);
-            log.warn("No matching verification found. All active verifications count: {}", allActive.size());
-            
-            for (Verification v : allActive) {
-                log.warn("Active verification - Code: {}, ExpiresAt: {}, IsVerified: {}, Match: {}", 
-                        v.getCode(), v.getCodeExpiresAt(), v.isVerified(), v.getCode().equals(code));
-            }
+
+        if (verification.isEmpty()) {
+            int activeCount = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(
+                    user, codeType, now).size();
+            log.debug("No matching active verification found for user id: {}, active count: {}",
+                    user.getId(), activeCount);
         }
-        
+
         return verification.isPresent();
     }
 
@@ -116,8 +105,8 @@ public class VerificationService implements IVerificationService {
 
     public Result<Void> verifyUser(VerificationRequest request, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        log.info("Verifying user with email: {}", user.getEmail());
-        log.info("Code written by user: {}", request.code());
+        // Kullanıcının girdiği kod ve depodaki kod log'a yazılmamalıdır.
+        log.info("Verifying user id: {}", user.getId());
 
         var verificationOpt = findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);
 
@@ -126,7 +115,6 @@ public class VerificationService implements IVerificationService {
         }
 
         var verification = verificationOpt.get();
-        log.info("Stored verification code: {}", verification.getCode());
 
         if (!request.code().equals(verification.getCode())) {
             decrementVerificationAttempts(verification);

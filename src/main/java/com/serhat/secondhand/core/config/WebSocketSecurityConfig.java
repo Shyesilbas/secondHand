@@ -42,47 +42,71 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                
-                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    String token = extractToken(accessor);
-
-                    if (token != null) {
-                        try {
-                            String username = jwtUtils.extractUsername(token);
-                            
-                            if (username != null) {
-                                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                                
-                                if (jwtUtils.isTokenValid(token, userDetails)) {
-                                    UsernamePasswordAuthenticationToken authentication = 
-                                        new UsernamePasswordAuthenticationToken(
-                                            userDetails, 
-                                            null, 
-                                            userDetails.getAuthorities()
-                                        );
-                                    
-                                    accessor.setUser(authentication);
-                                    log.info("WebSocket authenticated user: {}", username);
-                                } else {
-                                    log.warn("Invalid JWT token for WebSocket connection");
-                                    throw new MessageDeliveryException("Invalid JWT token");
-                                }
-                            }
-                        } catch (MessageDeliveryException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            log.error("WebSocket authentication failed: {}", e.getMessage());
-                            throw new MessageDeliveryException("WebSocket authentication failed: " + e.getMessage());
-                        }
-                    } else {
-                        log.warn("WebSocket CONNECT without token - session attrs: {}",
-                                accessor.getSessionAttributes() != null ? accessor.getSessionAttributes().keySet() : "null");
-                    }
+                if (accessor == null) {
+                    return message;
                 }
-                
+
+                StompCommand command = accessor.getCommand();
+                if (command == null) {
+                    return message;
+                }
+
+                if (StompCommand.CONNECT.equals(command)) {
+                    authenticateConnect(accessor);
+                    return message;
+                }
+
+                // Diğer tüm STOMP komutlarında (SUBSCRIBE/SEND/UNSUBSCRIBE/DISCONNECT) authenticated user zorunludur.
+                if (isAuthorizationRequired(command) && accessor.getUser() == null) {
+                    log.warn("Rejecting unauthenticated WebSocket {} for destination {}",
+                            command, accessor.getDestination());
+                    throw new MessageDeliveryException("WebSocket authentication required");
+                }
+
                 return message;
             }
         });
+    }
+
+    private boolean isAuthorizationRequired(StompCommand command) {
+        return StompCommand.SEND.equals(command)
+                || StompCommand.SUBSCRIBE.equals(command)
+                || StompCommand.UNSUBSCRIBE.equals(command);
+    }
+
+    // CONNECT akışı: token yoksa veya geçersizse bağlantı reddedilir; bu, anonim STOMP oturumunu engeller.
+    private void authenticateConnect(StompHeaderAccessor accessor) {
+        String token = extractToken(accessor);
+        if (token == null) {
+            log.warn("Rejecting WebSocket CONNECT without token");
+            throw new MessageDeliveryException("WebSocket authentication required");
+        }
+
+        try {
+            String username = jwtUtils.extractUsername(token);
+            if (username == null) {
+                throw new MessageDeliveryException("Invalid JWT token");
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (!jwtUtils.isTokenValid(token, userDetails)) {
+                log.warn("Invalid JWT token for WebSocket connection");
+                throw new MessageDeliveryException("Invalid JWT token");
+            }
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+            accessor.setUser(authentication);
+            log.info("WebSocket authenticated user: {}", username);
+        } catch (MessageDeliveryException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("WebSocket authentication failed: {}", e.getMessage());
+            throw new MessageDeliveryException("WebSocket authentication failed");
+        }
     }
 
     /**

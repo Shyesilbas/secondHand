@@ -16,12 +16,19 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class OAuthCompleteRequest {
 
+    // Google OAuth2 başarılı login sonrası backend tarafından üretilip frontend'e iletilen kısa ömürlü imzalı token.
+    // Sunucu, kullanıcının kimliğini (email/sub) yalnızca bu token'dan kabul eder; istemcinin
+    // bağımsız olarak gönderdiği email gibi alanlar token ile çapraz doğrulanır.
+    @NotBlank
+    private String registrationToken;
+
     @NotBlank
     private String name;
 
     @NotBlank
     private String surname;
 
+    // Token'daki email ile eşleşmek zorundadır; eşleşmezse istek reddedilir.
     @NotBlank
     @Email
     private String email;
