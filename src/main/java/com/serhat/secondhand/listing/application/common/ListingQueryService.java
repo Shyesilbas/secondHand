@@ -123,7 +123,15 @@ public class ListingQueryService {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);
-        return CachedPage.from(enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId));
+
+        // null DTO veya type'ı null DTO cache'e yazılmamalı: polymorphic deserialize patlatır.
+        List<ListingDto> safeContent = listingsPage.getContent().stream()
+                .map(listingMapper::toDynamicDto)
+                .filter(dto -> dto != null && dto.getType() != null)
+                .collect(Collectors.toList());
+        Page<ListingDto> sanitizedPage = new PageImpl<>(safeContent, pageable, listingsPage.getTotalElements());
+
+        return CachedPage.from(enrichPage(sanitizedPage, userId));
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {

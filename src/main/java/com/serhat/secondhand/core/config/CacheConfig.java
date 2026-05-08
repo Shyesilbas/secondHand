@@ -1,6 +1,11 @@
 package com.serhat.secondhand.core.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
@@ -18,66 +23,72 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
+/**
+ * Tek noktada, deterministic ve <b>simetrik</b> Redis cache konfigürasyonu.
+ *
+ * <h3>Tasarım kararları</h3>
+ * <ul>
+ *   <li><b>Tek serializer:</b> {@link GenericJackson2JsonRedisSerializer} ile tek
+ *       {@link ObjectMapper}. Projede başka {@code RedisTemplate} / serializer yoktur.</li>
+ *   <li><b>Polymorphic typing:</b> {@code As.PROPERTY} (@class) +
+ *       {@code DefaultTyping.EVERYTHING}. Yazma ve okuma <b>tüm seviyelerde</b>
+ *       (root, nested, final) {@code @class} taşır → asimetri yoktur.
+ *       {@code NON_FINAL} kullanılmaz çünkü {@code CachedPage} (record), UUID,
+ *       enum gibi final tipler için {@code @class} yazılmaz, okurken aranır → fail.</li>
+ *   <li><b>Domain DTO'larında @JsonTypeInfo bulunan tipler</b> (ListingDto,
+ *       ListingFilterDto) Jackson tarafından öncelenir; default typing onların
+ *       diskriminatörünü override etmez (kendi {@code type}/{@code listingType}
+ *       alanı kullanılır).</li>
+ *   <li><b>Cache key versioning:</b> Tüm anahtarların başına {@code v3::} prefix
+ *       eklenir. Eski v1/v2 anahtarları erişilemez, TTL ile temizlenir.</li>
+ *   <li><b>JavaTimeModule:</b> {@code LocalDateTime} ISO-8601 string olarak.</li>
+ * </ul>
+ */
 @Configuration
 @EnableCaching
 @Slf4j
 public class CacheConfig {
 
+    /** Cache key prefix versiyonu. Serializer/format değişimlerinde bumb edilir. */
+    private static final String CACHE_VERSION = "v3";
+
     @Bean
     @Primary
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
-        // ObjectMapper: Java 8 date/time desteği + default typing (tip bilgisi koruması)
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.activateDefaultTyping(
-                BasicPolymorphicTypeValidator.builder()
-                        .allowIfSubType("com.serhat.secondhand")
-                        .allowIfSubType("java.util")
-                        .allowIfSubType("java.time")
-                        .allowIfSubType("java.lang")
-                        .allowIfSubType("java.math")
-                        .allowIfSubType("org.springframework.data.domain")
-                        .build(),
-                ObjectMapper.DefaultTyping.EVERYTHING
-        );
+        GenericJackson2JsonRedisSerializer jsonSerializer =
+                new GenericJackson2JsonRedisSerializer(buildCacheObjectMapper());
 
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-
-        // ── Varsayılan: 30 dakika ──────────────────────────────────────
+        // Tüm cache'lerin paylaştığı temel konfig.
+        // computePrefixWith ile her cache name'in önüne "v<N>::" eklenir → eski versiyon anahtarlarıyla çakışmaz.
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(30))
                 .disableCachingNullValues()
-                .serializeKeysWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .computePrefixWith(cacheName -> CACHE_VERSION + "::" + cacheName + "::")
+                .serializeKeysWith(RedisSerializationContext.SerializationPair
+                        .fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(jsonSerializer));
 
         // ── Tier 1: Statik Lookup — 24 saat ────────────────────────────
-        // Markalar, araç tipleri, elektronik tipleri vb. neredeyse hiç değişmez
         RedisCacheConfiguration lookupConfig = defaultConfig.entryTtl(Duration.ofHours(24));
 
         // ── Tier 2: Tamamlanmış İşlemler — 2 saat ──────────────────────
-        // Statüsü artık değişmeyecek veriler (completed/cancelled/refunded orders, ödeme geçmişi)
         RedisCacheConfiguration completedConfig = defaultConfig.entryTtl(Duration.ofHours(2));
 
+        // ── Tier 2b: Kullanıcı profili — 15 dakika ────────────────────
+        RedisCacheConfiguration profileConfig = defaultConfig.entryTtl(Duration.ofMinutes(15));
+
         // ── Tier 3: Aggregation — 10 dakika ────────────────────────────
-        // Hesaplaması pahalı istatistikler (review/favori batch stats)
         RedisCacheConfiguration aggregationConfig = defaultConfig.entryTtl(Duration.ofMinutes(10));
 
         // ── Tier 3b: Kısa süreli — 5 dakika ───────────────────────────
-        // Sık değişen ama yine de cache'lenebilir veriler
         RedisCacheConfiguration shortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
         // ── Tier 4: Ultra Kısa — 30 saniye ────────────────────────────
-        // Polling yapan badge'ler için DB yükünü azaltmak amacıyla
         RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofSeconds(30));
 
-        // ── Tier 2b: Kullanıcı profili — 15 dakika ────────────────────
-        // Kullanıcı bilgileri nadiren değişir ama güncel kalması önemli
-        RedisCacheConfiguration profileConfig = defaultConfig.entryTtl(Duration.ofMinutes(15));
-
-        log.info("Initialized Redis cache manager with tiered TTL strategy");
+        log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}::", CACHE_VERSION);
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
@@ -111,5 +122,50 @@ public class CacheConfig {
                 .withCacheConfiguration("userBadges", ultraShortConfig)
 
                 .build();
+    }
+
+    /**
+     * Cache için izole, deterministic bir ObjectMapper.
+     * Web layer ObjectMapper'ından bağımsızdır; cache davranışı tek noktadan yönetilir.
+     *
+     * <p><b>EVERYTHING typing:</b> root + nested + leaf (final dahil) tüm seviyelerde
+     * {@code @class} yazar. Read tarafıyla simetriktir — her seviyede {@code @class}
+     * bulunur ve doğru tipe deserialize edilir.
+     */
+    @SuppressWarnings("deprecation") // Jackson 2.18+ DefaultTyping.EVERYTHING deprecated; gerekli (simetri için).
+    private ObjectMapper buildCacheObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // LocalDateTime / LocalDate ISO-8601 string olarak yazılsın.
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // Cache deserialize sırasında bilinmeyen alan / boş bean fail olmasın (forward-compat).
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+
+        // Lombok / record / private alanlar düzgün okunsun (getter'a değil field'a bak).
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+        // Whitelist tabanlı typing — gadget attack korumalı, deserialize'a izinli paketler.
+        BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.serhat.secondhand")
+                .allowIfSubType("java.util")
+                .allowIfSubType("java.time")
+                .allowIfSubType("java.lang")
+                .allowIfSubType("java.math")
+                .allowIfSubType("org.springframework.data.domain")
+                .build();
+
+        // EVERYTHING + As.PROPERTY → her serialize edilen değere @class eklenir.
+        // Domain DTO'larında @JsonTypeInfo varsa Jackson onu önceler (override edilmez).
+        mapper.activateDefaultTyping(
+                validator,
+                ObjectMapper.DefaultTyping.EVERYTHING,
+                JsonTypeInfo.As.PROPERTY
+        );
+
+        return mapper;
     }
 }

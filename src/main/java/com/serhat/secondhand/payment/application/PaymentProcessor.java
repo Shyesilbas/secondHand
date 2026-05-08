@@ -5,22 +5,21 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentResult;
-import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
+import com.serhat.secondhand.payment.outbox.PaymentOutboxService;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
+import com.serhat.secondhand.payment.util.PaymentRedisIdempotencyService;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -30,10 +29,11 @@ public class PaymentProcessor {
 
     private final PaymentStrategyFactory paymentStrategyFactory;
     private final PaymentRepository paymentRepository;
-    private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
     private final PaymentIdempotencyHelper paymentIdempotencyHelper;
     private final PaymentPreCheckService paymentPreCheckService;
+    private final PaymentOutboxService paymentOutboxService;
+    private final PaymentRedisIdempotencyService paymentRedisIdempotencyService;
 
     @Lazy
     @Autowired
@@ -47,13 +47,40 @@ public class PaymentProcessor {
                 : paymentIdempotencyHelper.buildIdempotencyKey(paymentRequest, userId);
 
         PaymentRequest requestWithIdempotency = paymentIdempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
+        String fingerprint = buildRequestFingerprint(userId, requestWithIdempotency);
+
+        PaymentRedisIdempotencyService.ClaimResult claimResult =
+                paymentRedisIdempotencyService.claim(idempotencyKey, fingerprint);
+
+        if (claimResult == PaymentRedisIdempotencyService.ClaimResult.CONFLICT) {
+            return Result.error("Processed already.", PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString());
+        }
+
+        if (claimResult == PaymentRedisIdempotencyService.ClaimResult.IN_PROGRESS) {
+            return Result.error("Payment request is already being processed.",
+                    PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString());
+        }
+
+        if (claimResult == PaymentRedisIdempotencyService.ClaimResult.ALREADY_COMPLETED) {
+            return paymentRepository.findByIdempotencyKeyAndFromUserId(idempotencyKey, userId)
+                    .map(payment -> Result.success(paymentMapper.toDto(payment)))
+                    .orElseGet(() -> Result.error("Processed already.", PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString()));
+        }
 
         int maxRetries = PaymentProcessingConstants.MAX_OPTIMISTIC_LOCK_RETRIES;
         int attempt = 0;
+        boolean completed = false;
 
         while (attempt < maxRetries) {
             try {
-                return self.executePaymentWithTransaction(userId, requestWithIdempotency);
+                Result<PaymentDto> result = self.executePaymentWithTransaction(userId, requestWithIdempotency);
+                if (result.isSuccess()) {
+                    paymentRedisIdempotencyService.markCompleted(idempotencyKey, fingerprint);
+                    completed = true;
+                } else {
+                    paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+                }
+                return result;
             } catch (OptimisticLockException e) {
                 attempt++;
                 log.warn("Optimistic lock exception during payment, attempt {}/{}", attempt, maxRetries);
@@ -71,10 +98,13 @@ public class PaymentProcessor {
             }
         }
 
+        if (!completed) {
+            paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+        }
         return Result.error("Unexpected error occurred during payment processing.", PaymentErrorCodes.PAYMENT_ERROR.toString());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @CacheEvict(value = "paymentStats", allEntries = true)
     public Result<PaymentDto> executePaymentWithTransaction(Long userId, PaymentRequest paymentRequest) {
         String idempotencyKey = paymentRequest.idempotencyKey();
@@ -108,7 +138,7 @@ public class PaymentProcessor {
         payment = paymentRepository.save(payment);
 
         if (result.success()) {
-            eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
+            paymentOutboxService.enqueuePaymentCompleted(payment);
         }
 
         return Result.success(paymentMapper.toDto(payment));
@@ -129,5 +159,12 @@ public class PaymentProcessor {
 
     private void sleepBeforeRetry(int attempt) throws InterruptedException {
         Thread.sleep(PaymentProcessingConstants.BASE_RETRY_BACKOFF_MS * attempt);
+    }
+
+    private String buildRequestFingerprint(Long userId, PaymentRequest paymentRequest) {
+        return userId + "|" +
+                paymentRequest.paymentType() + "|" +
+                paymentRequest.amount() + "|" +
+                paymentRequest.listingId();
     }
 }

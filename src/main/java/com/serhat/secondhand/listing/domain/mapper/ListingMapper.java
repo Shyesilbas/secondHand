@@ -28,6 +28,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Labelable;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.mapstruct.*;
 
@@ -36,6 +37,7 @@ import org.mapstruct.*;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
+@Slf4j
 public abstract class ListingMapper {
 
     // ──────────────────────────────────────────────
@@ -351,8 +353,12 @@ public abstract class ListingMapper {
         }
 
         Listing unproxied = (Listing) Hibernate.unproxy(listing);
+        // Polymorphic deserialize için type diskriminatörü zorunlu.
+        // listingType null ise DTO null döner ve cache pipeline'ında filtrelenmelidir.
         if (unproxied.getListingType() == null) {
-             return null;
+            log.warn("Listing {} has null listingType; skipping mapping (would break cache deserialization)",
+                    unproxied.getId());
+            return null;
         }
 
         return switch (unproxied.getListingType()) {

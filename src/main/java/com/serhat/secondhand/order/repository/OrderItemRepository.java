@@ -25,7 +25,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT COUNT(DISTINCT oi.listing) FROM OrderItem oi " +
             "WHERE oi.listing.seller.id = :sellerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.paymentStatus = 'COMPLETED' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
@@ -47,7 +47,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             "JOIN orders o ON oi.order_id = o.id " +
             "JOIN listings l ON oi.listing_id = l.id " +
             "WHERE l.seller_id = :sellerId " +
-            "AND o.payment_status = 'PAID' " +
+            "AND o.payment_status = 'COMPLETED' " +
             "AND o.status != 'CANCELLED' " +
             "AND o.status != 'REFUNDED' " +
             "AND o.created_at BETWEEN :startDate AND :endDate " +
@@ -60,7 +60,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     // Buyer Dashboard Queries
     @Query("SELECT oi.listing.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
             "WHERE oi.order.user.id = :buyerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.paymentStatus = 'COMPLETED' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
@@ -73,7 +73,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             "FROM order_items oi " +
             "JOIN orders o ON oi.order_id = o.id " +
             "WHERE o.user_id = :buyerId " +
-            "AND o.payment_status = 'PAID' " +
+            "AND o.payment_status = 'COMPLETED' " +
             "AND o.status != 'CANCELLED' " +
             "AND o.status != 'REFUNDED' " +
             "AND o.created_at BETWEEN :startDate AND :endDate " +
@@ -93,7 +93,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT SUM(oi.totalPrice) FROM OrderItem oi " +
             "WHERE oi.seller.id = :sellerId " + 
-            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.paymentStatus = 'COMPLETED' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate")
@@ -103,7 +103,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT oi.listingType, SUM(oi.totalPrice) FROM OrderItem oi " +
             "WHERE oi.seller.id = :sellerId " + 
-            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.paymentStatus = 'COMPLETED' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +
@@ -115,7 +115,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("SELECT oi.listing.id, SUM(oi.totalPrice) as revenue, COUNT(DISTINCT oi.order) as orderCount " +
             "FROM OrderItem oi " +
             "WHERE oi.seller.id = :sellerId " +
-            "AND oi.order.paymentStatus = 'PAID' " +
+            "AND oi.order.paymentStatus = 'COMPLETED' " +
             "AND oi.order.status != 'CANCELLED' " +
             "AND oi.order.status != 'REFUNDED' " +
             "AND oi.order.createdAt BETWEEN :startDate AND :endDate " +

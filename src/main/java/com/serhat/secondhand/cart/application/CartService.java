@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,6 +160,9 @@ public class CartService {
             savedCart = cartRepository.save(cartItem);
         } catch (DataIntegrityViolationException ex) {
             log.warn("Concurrent cart write conflict for user {} and listing {}", userId, listingId, ex);
+            return Result.error(CartErrorCodes.RESERVATION_FAILED);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Optimistic cart write conflict for user {} and listing {}", userId, listingId, ex);
             return Result.error(CartErrorCodes.RESERVATION_FAILED);
         }
         CartDto dto = cartMapper.toDto(savedCart);

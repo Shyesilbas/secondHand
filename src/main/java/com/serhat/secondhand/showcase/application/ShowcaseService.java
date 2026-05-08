@@ -1,7 +1,6 @@
 package com.serhat.secondhand.showcase.application;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
-import com.serhat.secondhand.core.dto.CachedPage;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -22,12 +21,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,10 +47,6 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestFactory paymentRequestFactory;
 
-    @Lazy
-    @Autowired
-    private ShowcaseService self;
-
     private <T> Result<T> validateShowcaseDays(int days) {
         Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
         if (validationResult.isError()) {
@@ -73,7 +63,6 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
-    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request) {
         log.info("Creating showcase for user ID: {} and listing ID: {}", userId, request.listingId());
 
@@ -120,17 +109,23 @@ public class ShowcaseService implements IShowcaseService {
     @Override
     @Transactional(readOnly = true)
     public Page<ShowcaseDto> getActiveShowcases(int page, int size) {
-        return self.getCachedActiveShowcases(page, size).toPage();
-    }
-
-    @Cacheable(value = "activeShowcases", key = "#page + '_' + #size")
-    public CachedPage<ShowcaseDto> getCachedActiveShowcases(int page, int size) {
-        log.info("[CACHE MISS] activeShowcases::page={}, size={}", page, size);
+        log.info("Fetching active showcases from database | page={}, size={}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE,
                 LocalDateTime.now(), pageable);
         List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
-        return CachedPage.from(new PageImpl<>(dtoList, pageable, activeShowcases.getTotalElements()));
+
+
+        List<ShowcaseDto> safeDtoList = dtoList.stream()
+                .filter(dto -> dto != null && dto.listing() != null && dto.listing().getType() != null)
+                .toList();
+
+        if (safeDtoList.size() != dtoList.size()) {
+            log.warn("Filtered {} showcase DTO(s) with null listing/type before response",
+                    dtoList.size() - safeDtoList.size());
+        }
+
+        return new org.springframework.data.domain.PageImpl<>(safeDtoList, pageable, activeShowcases.getTotalElements());
     }
 
     @Override
@@ -142,7 +137,6 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
-    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Void> extendShowcase(Long userId, UUID showcaseId, ShowcasePaymentRequest request) {
         Result<Void> daysError = validateShowcaseDays(request.days());
         if (daysError != null) return daysError;
@@ -185,7 +179,6 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
-    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<Void> cancelShowcase(Long userId, UUID showcaseId) {
         return showcaseRepository.findById(showcaseId)
                 .map(showcase -> {
@@ -220,7 +213,6 @@ public class ShowcaseService implements IShowcaseService {
     }
 
     @Override
-    @CacheEvict(value = "activeShowcases", allEntries = true)
     public Result<List<Showcase>> createBulkShowcase(Long userId,
             com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request) {
         log.info("Creating bulk showcase for user ID: {} for {} listings", userId, request.listingIds().size());

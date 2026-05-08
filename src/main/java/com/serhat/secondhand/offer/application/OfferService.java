@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +56,13 @@ public class OfferService implements IOfferService {
         if (listingValidationResult.isError()) return Result.error(listingValidationResult.getMessage(), listingValidationResult.getErrorCode());
 
         Offer offer = offerMapper.toOffer(request, buyer, listing);
-        Offer saved = offerRepository.save(offer);
+        Offer saved;
+        try {
+            saved = offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent create offer conflict for listing {}", request.getListingId(), ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
 
         offerEmailNotificationService.notifyOfferReceived(saved);
         return Result.success(offerMapper.toDto(saved));
@@ -115,7 +122,13 @@ public class OfferService implements IOfferService {
         }
 
         offer.setStatus(OfferStatus.ACCEPTED);
-        Offer saved = offerRepository.save(offer);
+        Offer saved;
+        try {
+            saved = offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent accept offer conflict for offer {}", offerId, ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
         offerEmailNotificationService.notifyAcceptedToCreator(saved);
         return Result.success(offerMapper.toDto(saved));
     }
@@ -135,7 +148,13 @@ public class OfferService implements IOfferService {
         if (requirePending(offer).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
         offer.setStatus(OfferStatus.REJECTED);
-        Offer saved = offerRepository.save(offer);
+        Offer saved;
+        try {
+            saved = offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent reject offer conflict for offer {}", offerId, ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
         offerEmailNotificationService.notifyRejectedToCreator(saved);
         return Result.success(offerMapper.toDto(saved));
     }
@@ -165,11 +184,22 @@ public class OfferService implements IOfferService {
             return Result.error(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
 
         previous.setStatus(OfferStatus.REJECTED);
-        offerRepository.save(previous);
+        try {
+            offerRepository.save(previous);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent counter-offer parent update conflict for offer {}", offerId, ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
 
         OfferActor actor = offerValidator.resolveActor(user, previous);
         Offer counter = offerMapper.toCounterOffer(request, previous, actor);
-        Offer saved = offerRepository.save(counter);
+        Offer saved;
+        try {
+            saved = offerRepository.save(counter);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent counter-offer create conflict for offer {}", offerId, ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
 
         offerEmailNotificationService.notifyCounterReceived(saved);
         return Result.success(offerMapper.toDto(saved));
@@ -198,7 +228,11 @@ public class OfferService implements IOfferService {
         if (offer == null) return;
         log.info("Marking offer {} as COMPLETED", offer.getId());
         offer.setStatus(OfferStatus.COMPLETED);
-        offerRepository.save(offer);
+        try {
+            offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent markCompleted conflict for offer {}", offer.getId(), ex);
+        }
     }
 
 
@@ -239,7 +273,12 @@ public class OfferService implements IOfferService {
 
     private void processManualExpiration(Offer offer) {
         offer.setStatus(OfferStatus.EXPIRED);
-        offerRepository.save(offer);
+        try {
+            offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent manual expiration conflict for offer {}", offer.getId(), ex);
+            return;
+        }
         offerEmailNotificationService.notifyExpiredToBoth(offer);
     }
 

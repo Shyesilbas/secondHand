@@ -13,6 +13,7 @@ public enum OfferErrorCodes implements ErrorCode {
     OFFER_NOT_FOUND("OFFER_NOT_FOUND", "Offer not found", HttpStatus.NOT_FOUND),
     OFFER_EXPIRED("OFFER_EXPIRED", "Offer has expired", HttpStatus.BAD_REQUEST),
     OFFER_NOT_PENDING("OFFER_NOT_PENDING", "Offer is not pending", HttpStatus.BAD_REQUEST),
+    OFFER_CONCURRENT_MODIFICATION("OFFER_CONCURRENT_MODIFICATION", "Offer was modified concurrently. Please retry.", HttpStatus.CONFLICT),
     OFFER_NOT_ACCEPTED("OFFER_NOT_ACCEPTED", "Offer is not accepted", HttpStatus.BAD_REQUEST),
     OFFER_NOT_ALLOWED("OFFER_NOT_ALLOWED", "You are not allowed to perform this action", HttpStatus.FORBIDDEN),
     OFFER_ALREADY_ACCEPTED_FOR_LISTING("OFFER_ALREADY_ACCEPTED_FOR_LISTING", "There is already an accepted offer for this listing", HttpStatus.CONFLICT),

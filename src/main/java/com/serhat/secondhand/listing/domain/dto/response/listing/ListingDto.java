@@ -31,9 +31,7 @@ import java.util.UUID;
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type",
-    visible = true
-)
+    property = "@type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE"),
     @JsonSubTypes.Type(value = ElectronicListingDto.class, name = "ELECTRONICS"),
