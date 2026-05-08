@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,6 +56,16 @@ public class SellerFollowService {
             return Result.error(FollowErrorCodes.ALREADY_FOLLOWING);
         }
 
+        var archivedFollow = sellerFollowRepository.findAnyByFollowerAndFollowed(currentUser.getId(), userToFollow.getId())
+                .orElse(null);
+        if (archivedFollow != null && archivedFollow.getDeletedAt() != null) {
+            archivedFollow.setDeletedAt(null);
+            archivedFollow.setNotifyOnNewListing(true);
+            SellerFollow reactivated = sellerFollowRepository.save(archivedFollow);
+            log.info("User {} re-followed user {} by reactivating archived relation", currentUser.getId(), userIdToFollow);
+            return Result.success(sellerFollowMapper.toDto(reactivated));
+        }
+
         SellerFollow sellerFollow = SellerFollow.builder()
             .follower(currentUser)
             .followed(userToFollow)
@@ -82,7 +93,7 @@ public class SellerFollowService {
             return Result.error(FollowErrorCodes.NOT_FOLLOWING);
         }
 
-        sellerFollowRepository.delete(sellerFollow);
+        sellerFollowRepository.markDeleted(sellerFollow.getId(), LocalDateTime.now());
         log.info("User {} unfollowed user {}", currentUser.getId(), userIdToUnfollow);
         return Result.success();
     }

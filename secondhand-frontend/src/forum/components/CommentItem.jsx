@@ -40,6 +40,12 @@ export const CommentItem = ({
   const isReplyTarget = !!activeReplyId && Number(activeReplyId) === Number(comment?.id);
   const authorName = String(comment?.authorDisplayName || 'Anonymous');
   const authorInitial = authorName.charAt(0).toUpperCase();
+  const myReaction =
+    comment?.viewerReaction === FORUM_REACTIONS.LIKE || comment?.viewerReaction === FORUM_REACTIONS.DISLIKE
+      ? comment.viewerReaction
+      : null;
+  const voteUpActive = myReaction === FORUM_REACTIONS.LIKE;
+  const voteDownActive = myReaction === FORUM_REACTIONS.DISLIKE;
   const netVotes = (Number(comment?.totalLikes) || 0) - (Number(comment?.totalDislikes) || 0);
 
   return (
@@ -72,7 +78,11 @@ export const CommentItem = ({
                 {/* Compact vote */}
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-all duration-200"
+                  className={`inline-flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 ${
+                    voteUpActive
+                      ? 'text-violet-700 bg-violet-50 ring-1 ring-violet-200/60'
+                      : 'text-gray-400 hover:text-violet-600 hover:bg-violet-50'
+                  }`}
                   onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.LIKE)}
                 >
                   <ChevronUp className="w-4 h-4" />
@@ -84,7 +94,11 @@ export const CommentItem = ({
                 </span>
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+                  className={`inline-flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 ${
+                    voteDownActive
+                      ? 'text-red-600 bg-red-50 ring-1 ring-red-200/60'
+                      : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                  }`}
                   onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.DISLIKE)}
                 >
                   <ChevronDown className="w-4 h-4" />

@@ -1,4 +1,5 @@
 package com.serhat.secondhand.exchange.api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.exchange.ExchangeRateDto;
 import com.serhat.secondhand.exchange.application.ExchangeRateService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/exchange")
+@Tag(name = "Exchange Rate", description = "Exchange Rate operations")
 public class ExchangeRateController {
     private final ExchangeRateService exchangeRateService;
 

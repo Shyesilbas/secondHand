@@ -20,6 +20,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,6 +38,23 @@ public class Coupon {
 
     @Column(nullable = false, unique = true)
     private String code;
+
+    @Column(length = 255)
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    /** When true, any logged-in buyer may use the coupon if other rules pass. When false, only {@link #eligibleUserIds}. */
+    @Column(nullable = false, name = "for_all_users")
+    @Builder.Default
+    private boolean forAllUsers = true;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "coupon_eligible_users", joinColumns = @JoinColumn(name = "coupon_id"))
+    @Column(name = "user_id", nullable = false)
+    @Builder.Default
+    private Set<Long> eligibleUserIds = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private boolean active;

@@ -6,9 +6,9 @@ import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
+import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -161,7 +161,7 @@ public class EscrowService {
                 // 3. Refund the Buyer (Real move)
                 // Since this was in ESCROW, money was held by the system (not by the seller).
                 // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND, null);
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionKind.REFUND, null);
                 
                 log.info("Cancelled escrow and refunded {} to buyer for order item {}", 
                         escrow.getAmount(), escrow.getOrderItem().getId());
@@ -188,7 +188,7 @@ public class EscrowService {
 
                 // Credit buyer's wallet — money returns from escrow (system), not from seller.
                 // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionType.REFUND, null);
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), PaymentTransactionKind.REFUND, null);
             } else {
                 log.warn("Escrow {} for order {} is in {} status, skipping refund. Refund is only possible while funds are in ESCROW.",
                         escrow.getId(), order.getOrderNumber(), escrow.getStatus());

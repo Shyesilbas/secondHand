@@ -104,16 +104,38 @@ const CheckoutPage = () => {
         }
         isRefreshingRef.current = true;
         setIsPreviewLoading(true);
+        const requested =
+            code != null && String(code).trim() !== ''
+                ? String(code).trim().toUpperCase()
+                : null;
         try {
-            const data = await couponService.preview(code, offerId);
+            const data = await couponService.preview(requested, offerId);
             setPricing(data);
-            setCouponError(null);
+            const echoed =
+                data?.couponCode != null && String(data.couponCode).trim() !== ''
+                    ? String(data.couponCode).trim().toUpperCase()
+                    : null;
+            // Backend yalnızca geçerli + sepete uygunsa couponCode döner; aksi halde null.
+            if (!requested) {
+                setAppliedCouponCode(null);
+                setCouponError(null);
+            } else if (echoed && echoed === requested) {
+                setAppliedCouponCode(echoed);
+                setCouponError(null);
+            } else {
+                setAppliedCouponCode(null);
+                setCouponError(CART_MESSAGES.COUPON_APPLY_FAILED);
+            }
         } catch (e) {
             const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
             setCouponError(message);
             setAppliedCouponCode(null);
-            const data = await couponService.preview(null, offerId);
-            setPricing(data);
+            try {
+                const data = await couponService.preview(null, offerId);
+                setPricing(data);
+            } catch {
+                /* ignore nested preview failures */
+            }
         } finally {
             setIsPreviewLoading(false);
             isRefreshingRef.current = false;
@@ -131,14 +153,11 @@ const CheckoutPage = () => {
     const onApplyCoupon = async () => {
         const next = couponInput?.trim() || '';
         if (!next) {
-            setAppliedCouponCode(null);
             setCouponError(null);
             await refreshPreview(null);
             return;
         }
-        const normalized = next.toUpperCase();
-        setAppliedCouponCode(normalized);
-        await refreshPreview(normalized);
+        await refreshPreview(next.toUpperCase());
     };
 
     const onRemoveCoupon = async () => {
@@ -238,12 +257,12 @@ const CheckoutPage = () => {
                             eWallet={checkout.eWallet}
                             paymentVerificationCode={checkout.paymentVerificationCode}
                             setPaymentVerificationCode={checkout.setPaymentVerificationCode}
+                            paymentVerificationExpiresAtMs={checkout.paymentVerificationExpiresAtMs}
                             notes={checkout.notes}
                             setNotes={checkout.setNotes}
                             orderName={checkout.orderName}
                             setOrderName={checkout.setOrderName}
                             emails={checkout.emails}
-                            isEmailsLoading={checkout.isEmailsLoading}
                             fetchEmails={checkout.fetchEmails}
                             onBack={handleBack}
                             onNext={handleNext}
@@ -281,10 +300,10 @@ const CheckoutPage = () => {
                 isOpen={isCouponsModalOpen}
                 onClose={() => setIsCouponsModalOpen(false)}
                 onApply={async (code) => {
-                    setCouponInput(code);
-                    setAppliedCouponCode(code);
-                    await refreshPreview(code);
+                    const c = typeof code === 'string' ? code.trim() : '';
+                    setCouponInput(c);
                     setIsCouponsModalOpen(false);
+                    await refreshPreview(c ? c.toUpperCase() : null);
                 }}
             />
 

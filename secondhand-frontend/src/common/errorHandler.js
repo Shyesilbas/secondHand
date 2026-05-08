@@ -2,8 +2,7 @@ import logger from './utils/logger.js';
 
 /**
  * Error types derived from backend HTTP status codes.
- * Frontend does NOT define its own error messages — all messages come from backend's
- * GlobalExceptionHandler → ErrorResponse { timestamp, status, error, message, path, validationErrors }
+ * Frontend does NOT invent business messages — öncelik backend RFC 7807 ProblemDetail (detail, title, errors).
  */
 export const ERROR_TYPES = Object.freeze({
   VALIDATION: 'validation',
@@ -43,7 +42,7 @@ const GENERIC_FALLBACK_MESSAGE = 'An unexpected error occurred. Please try again
 
 /**
  * Parses any error into a consistent shape.
- * Message priority: backend ErrorResponse.message > interceptor userMessage > fallback
+ * Message priority: ProblemDetail.detail | legacy message | interceptor userMessage | fallback
  */
 export const parseError = (error) => {
   if (!error) {
@@ -63,10 +62,10 @@ export const parseError = (error) => {
   const status = response?.status;
   const data = response?.data;
 
-  // Backend ErrorResponse fields
-  const backendMessage = data?.message;
-  const errorCode = data?.errorCode || data?.error;
-  const validationErrors = data?.validationErrors || null;
+  // RFC 7807 ProblemDetail + legacy ErrorResponse
+  const backendMessage = data?.detail ?? data?.message;
+  const errorCode = data?.errorCode ?? data?.title ?? data?.error;
+  const validationErrors = data?.validationErrors ?? data?.errors ?? null;
 
   // Determine type from status
   let type = ERROR_TYPES.UNKNOWN;
@@ -85,7 +84,7 @@ export const parseError = (error) => {
     statusCode: status,
     errorCode,
     validationErrors,
-    path: data?.path,
+    path: data?.path ?? data?.instance ?? null,
     timestamp: data?.timestamp,
     originalError: error,
   });

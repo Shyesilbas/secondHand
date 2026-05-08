@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @RequestMapping("/api/ewallet")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "E Wallet", description = "E Wallet operations")
 public class EWalletController {
 
     private final IEWalletService eWalletService;

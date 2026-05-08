@@ -23,12 +23,12 @@ const CheckoutStep = ({
     eWallet,
     paymentVerificationCode,
     setPaymentVerificationCode,
+    paymentVerificationExpiresAtMs,
     notes,
     setNotes,
     orderName,
     setOrderName,
     emails,
-    isEmailsLoading,
     fetchEmails,
     onBack,
     onNext,
@@ -97,8 +97,8 @@ const CheckoutStep = ({
                     <CheckoutVerificationStep
                         paymentVerificationCode={paymentVerificationCode}
                         setPaymentVerificationCode={setPaymentVerificationCode}
+                        paymentVerificationExpiresAtMs={paymentVerificationExpiresAtMs}
                         emails={emails}
-                        isEmailsLoading={isEmailsLoading}
                         fetchEmails={fetchEmails}
                         onCheckout={onCheckout}
                         onBack={onBack}

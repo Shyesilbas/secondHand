@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import {useListingData} from '../../listing/hooks/useListingData.js';
@@ -21,6 +21,7 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     const [requiredAgreements, setRequiredAgreements] = useState([]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const [successSummary, setSuccessSummary] = useState(null);
+    const showcasePaymentRef = useRef(null);
     const { enums, isLoading: isPricingLoading } = useEnums();
     const {
         acceptedAgreements,
@@ -74,7 +75,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
     }, [step]);
 
     const handlePrevStep = useCallback(() => {
-        if (step > 1) setStep(s => s - 1);
+        if (step === 3 && showcasePaymentRef.current?.consumeModalBack?.()) return;
+        if (step > 1) setStep((s) => s - 1);
         else onClose();
     }, [step, onClose]);
 
@@ -169,6 +171,8 @@ const ShowcaseModal = ({ isOpen, onClose, listingId, listingTitle = '', onSucces
 
         return (
             <ShowcasePayment
+                ref={showcasePaymentRef}
+                embedded
                 listingId={listingId}
                 listingTitle={listing.title || listingTitle}
                 days={days}

@@ -8,8 +8,7 @@ import logger from '../../utils/logger.js';
  * 1. Result pattern (from ResultResponses): { data, message, error }
  *    - Success: unwraps `data` field, attaches `message` as hidden prop
  *    - Error: converts to standard error format
- * 2. Direct response (from GlobalExceptionHandler ErrorResponse):
- *    { timestamp, status, error, message, path, validationErrors }
+ * 2. ProblemDetail (RFC 7807) / legacy error body from GlobalExceptionHandler
  *    - Already handled by axios interceptor, just re-throw
  */
 export const request = async (method, url, data, config = {}) => {

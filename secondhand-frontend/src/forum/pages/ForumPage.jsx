@@ -30,15 +30,15 @@ const ForumPage = () => {
   const showListSkeleton = forum.threadsLoading && forum.threads.length === 0;
   const visibleThreads = useMemo(() => {
     if (!isAuthenticated || listTab !== FORUM_LIST_TABS.LIKED) return forum.threads;
-    return (forum.threads || []).filter((t) => forum.threadReactions?.[t?.id] === FORUM_REACTIONS.LIKE);
-  }, [forum.threadReactions, forum.threads, isAuthenticated, listTab]);
+    return (forum.threads || []).filter((t) => forum.getEffectiveThreadReaction?.(t) === FORUM_REACTIONS.LIKE);
+  }, [forum.getEffectiveThreadReaction, forum.threads, isAuthenticated, listTab]);
 
   const threadCount = visibleThreads.length;
 
   return (
-    <div className="min-h-screen bg-gray-50/80">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-indigo-50/40">
       {/* ── Hero Header ────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-200/80">
+      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 shadow-[0_1px_0_0_rgb(238_242_255_/_0.6)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6 sm:py-8">
             {/* Top row */}
@@ -162,7 +162,7 @@ const ForumPage = () => {
 
           {/* ── Thread List (Left) ─────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-4">
-            <div className="lg:sticky lg:top-6 space-y-2.5 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1 scrollbar-thin">
+            <div className="rounded-2xl border border-gray-200/70 bg-white/70 backdrop-blur-sm p-2 shadow-sm lg:sticky lg:top-6 space-y-2 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
               {forum.threadsError && (
                 <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">
                   {forum.threadsError}
@@ -177,9 +177,9 @@ const ForumPage = () => {
                   <ThreadCardSkeleton />
                 </>
               ) : visibleThreads.length === 0 ? (
-                <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="w-5 h-5 text-gray-400" />
+                <div className="rounded-2xl border border-gray-200/90 bg-white/90 shadow-sm ring-1 ring-gray-100 p-12 text-center mx-0.5">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="w-5 h-5 text-violet-600" />
                   </div>
                   <p className="text-sm font-semibold text-gray-900">
                     {listTab === FORUM_LIST_TABS.LIKED ? FORUM_MESSAGES.NO_LIKED_THREADS : FORUM_MESSAGES.NO_THREADS_FOUND}
@@ -194,7 +194,7 @@ const ForumPage = () => {
                       thread={t}
                       isSelected={forum.selectedThreadId === t?.id}
                       onSelect={forum.selectThread}
-                      reaction={forum.threadReactions?.[t?.id] || null}
+                      reaction={forum.getEffectiveThreadReaction?.(t) || null}
                     />
                   ))}
                   {forum.threadsHasMore && listTab !== FORUM_LIST_TABS.LIKED && (
@@ -224,7 +224,9 @@ const ForumPage = () => {
                   thread={forum.selectedThread}
                   threadId={forum.selectedThreadId}
                   currentUserId={user?.id || null}
-                  threadReaction={forum.threadReactions?.[forum.selectedThreadId] || null}
+                  threadReaction={
+                    forum.selectedThread ? forum.getEffectiveThreadReaction?.(forum.selectedThread) || null : null
+                  }
                   commentsTree={forum.commentTree}
                   commentsLoading={forum.commentsLoading}
                   commentsError={forum.commentsError}

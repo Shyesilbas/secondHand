@@ -1,41 +1,37 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo } from 'react';
 import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { createRealEstateServiceAdapter } from '../../common/services/entityAdapters.js';
 import { realEstateService } from '../services/realEstateService.js';
 import { RealEstateListingDTO } from '../realEstates.js';
-import { useMemo } from 'react';
 
 export const useRealEstate = (realEstateId = null) => {
-  const realEstateServiceAdapter = useMemo(() => createRealEstateServiceAdapter(realEstateService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createRealEstateServiceAdapter(realEstateService), []);
+  return useListingEntityAlias(adapter, {
     entityId: realEstateId,
-    service: realEstateServiceAdapter,
     defaultData: RealEstateListingDTO,
-    entityName: 'Real Estate'
+    entityName: 'Real Estate',
+    keys: {
+      entity: 'realEstate',
+      fetch: 'fetchRealEstate',
+      create: 'createRealEstate',
+      update: 'updateRealEstate',
+      delete: 'deleteRealEstate',
+    },
   });
-
-  return {
-    ...result,
-    realEstate: result.entity,
-    fetchRealEstate: result.fetchEntity,
-    createRealEstate: result.createEntity,
-    updateRealEstate: result.updateEntity,
-    deleteRealEstate: result.deleteEntity
-  };
 };
 
 export const useRealEstateSearch = () => {
   const realEstateServiceAdapter = useMemo(() => createRealEstateServiceAdapter(realEstateService), []);
-  
+
   const result = useEntitySearch({
     service: realEstateServiceAdapter,
     entityName: 'Real Estate',
-    defaultData: []
+    defaultData: [],
   });
 
-    return {
+  return {
     ...result,
-    realEstates: result.entities
+    realEstates: result.entities,
   };
 };

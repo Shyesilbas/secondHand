@@ -1,19 +1,16 @@
 import { get, post, put } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+import { listingService } from '../../listing/services/listingService.js';
 import { createVehicleCreateRequest, createVehicleUpdateRequest } from '../vehicles.js';
 
 export const vehicleService = {
     createVehicleListing: async (vehicleData) => {
     const createData = createVehicleCreateRequest(vehicleData);
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return post(API_ENDPOINTS.VEHICLES.CREATE, createData);
   },
 
     updateVehicleListing: async (id, vehicleData) => {
     const updateData = createVehicleUpdateRequest(vehicleData);
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return put(API_ENDPOINTS.VEHICLES.UPDATE(id), updateData);
   },
 
@@ -25,12 +22,6 @@ export const vehicleService = {
 
     getCarBrands: async () => get(API_ENDPOINTS.VEHICLES.BRANDS),
 
-    searchVehicles: async (filters) => {
-        const vehicleFilters = {
-      ...filters,
-      listingType: 'VEHICLE'
-    };
-    const filterData = createListingFilterRequest(vehicleFilters);
-    return post(API_ENDPOINTS.LISTINGS.FILTER, filterData);
-  },
+    searchVehicles: async (filters) =>
+        listingService.filterListings({ ...filters, listingType: 'VEHICLE' }),
 };

@@ -1,4 +1,5 @@
 package com.serhat.secondhand.complaint.api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.complaint.application.ComplaintService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/complaints")
+@Tag(name = "Complaint", description = "Complaint operations")
 public class ComplaintController {
 
     private final ComplaintService complaintService;

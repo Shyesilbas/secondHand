@@ -1,27 +1,21 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo } from 'react';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { createBooksServiceAdapter } from '../../common/services/entityAdapters.js';
 import { booksService } from '../services/booksService.js';
 import { BooksListingDTO } from '../books.js';
-import { useMemo } from 'react';
 
 export const useBooks = (bookId = null) => {
-  const booksServiceAdapter = useMemo(() => createBooksServiceAdapter(booksService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createBooksServiceAdapter(booksService), []);
+  return useListingEntityAlias(adapter, {
     entityId: bookId,
-    service: booksServiceAdapter,
     defaultData: BooksListingDTO,
-    entityName: 'Books'
+    entityName: 'Books',
+    keys: {
+      entity: 'book',
+      fetch: 'fetchBook',
+      create: 'createBook',
+      update: 'updateBook',
+      delete: 'deleteBook',
+    },
   });
-
-    return {
-    ...result,
-    book: result.entity,
-    fetchBook: result.fetchEntity,
-    createBook: result.createEntity,
-    updateBook: result.updateEntity,
-    deleteBook: result.deleteEntity
-  };
 };
-
-

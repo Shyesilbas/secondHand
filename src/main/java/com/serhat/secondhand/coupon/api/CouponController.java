@@ -1,6 +1,7 @@
 package com.serhat.secondhand.coupon.api;
 
 import com.serhat.secondhand.coupon.dto.ActiveCouponDto;
+import com.serhat.secondhand.coupon.dto.CouponParticipationDto;
 import com.serhat.secondhand.coupon.dto.CouponPreviewRequest;
 import com.serhat.secondhand.coupon.application.CouponService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
@@ -37,11 +38,18 @@ public class CouponController {
     }
 
     @GetMapping("/active")
-    @Operation(summary = "Get active coupons", description = "List all coupons currently available and valid for the authenticated user")
+    @Operation(summary = "Get active coupons", description = "List coupons available for checkout; excludes coupons you have already used at least once")
     public ResponseEntity<List<ActiveCouponDto>> active(@AuthenticationPrincipal User currentUser) {
 
         log.info("API request to list active coupons for user: {}", currentUser.getId());
 
         return ResponseEntity.ok(couponService.listActiveForUser(currentUser.getId()));
+    }
+
+    @GetMapping("/redemptions")
+    @Operation(summary = "My coupon usages", description = "Redemptions for the current user, with order references where present")
+    public ResponseEntity<List<CouponParticipationDto>> myRedemptions(@AuthenticationPrincipal User currentUser) {
+        log.info("API request to list coupon participations for user: {}", currentUser.getId());
+        return ResponseEntity.ok(couponService.listParticipationsForUser(currentUser.getId()));
     }
 }

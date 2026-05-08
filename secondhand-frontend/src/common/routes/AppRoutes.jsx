@@ -9,6 +9,7 @@ import MainLayout from '../components/layout/MainLayout.jsx';
 import AuthLayout from '../components/layout/AuthLayout.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import PublicRoute from './PublicRoute.jsx';
+import AdminRoute from './AdminRoute.jsx';
 
 // Critical Routes - Eager loaded (always needed on initial load)
 import HomePage from '../../home/pages/HomePage.jsx';
@@ -66,6 +67,7 @@ const CheckoutPage = lazy(() => import('../../cart/pages/CheckoutPage.jsx'));
 const OrderSuccessPage = lazy(() => import('../../order/pages/OrderSuccessPage.jsx'));
 const MyOrdersPage = lazy(() => import('../../order/pages/MyOrdersPage.jsx'));
 const ISoldPage = lazy(() => import('../../order/pages/ISoldPage.jsx'));
+const OrderShipmentPage = lazy(() => import('../../order/pages/OrderShipmentPage.jsx'));
 
 // Favorites & Lists - Lazy loaded
 const FavoritesPage = lazy(() => import('../../favorites/pages/FavoritesPage'));
@@ -83,7 +85,9 @@ const UserReviewsPage = lazy(() => import('../../reviews/pages/UserReviewsPage.j
 const ComplaintsPage = lazy(() => import('../../complaint/pages/ComplaintsPage.jsx'));
 const AgreementsPage = lazy(() => import('../../agreements/pages/AgreementsPage.jsx'));
 const SecurityPage = lazy(() => import('../../audit/pages/SecurityPage.jsx'));
-const MyCouponsPage = lazy(() => import('../../campaign/pages/MyCouponsPage.jsx'));
+const SellerCampaignsPage = lazy(() => import('../../campaign/pages/MyCouponsPage.jsx'));
+const PlatformCouponsPage = lazy(() => import('../../coupon/pages/PlatformCouponsPage.jsx'));
+const AdminCouponsPage = lazy(() => import('../../admin/pages/AdminCouponsPage.jsx'));
 const OffersPage = lazy(() => import('../../offer/pages/OffersPage.jsx'));
 
 // Suspense Fallback Component
@@ -426,6 +430,14 @@ const AppRoutes = () => {
                             </Suspense>
                         } 
                     />
+                    <Route
+                        path={`${ROUTES.MY_ORDERS}/:orderId/shipment`}
+                        element={
+                            <Suspense fallback={<PageLoader />}>
+                                <OrderShipmentPage />
+                            </Suspense>
+                        }
+                    />
                     <Route 
                         path={ROUTES.I_SOLD} 
                         element={
@@ -433,6 +445,14 @@ const AppRoutes = () => {
                                 <ISoldPage />
                             </Suspense>
                         } 
+                    />
+                    <Route
+                        path={`${ROUTES.I_SOLD}/:orderId/shipment`}
+                        element={
+                            <Suspense fallback={<PageLoader />}>
+                                <OrderShipmentPage />
+                            </Suspense>
+                        }
                     />
                     <Route 
                         path={ROUTES.SECURITY} 
@@ -466,13 +486,32 @@ const AppRoutes = () => {
                             </Suspense>
                         }
                     />
-                    <Route 
-                        path={ROUTES.MY_COUPONS} 
+                    <Route
+                        path={ROUTES.PLATFORM_COUPONS}
                         element={
                             <Suspense fallback={<PageLoader />}>
-                                <MyCouponsPage />
+                                <PlatformCouponsPage />
                             </Suspense>
-                        } 
+                        }
+                    />
+                    <Route
+                        path={ROUTES.SELLER_CAMPAIGNS}
+                        element={
+                            <Suspense fallback={<PageLoader />}>
+                                <SellerCampaignsPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route path={ROUTES.MY_COUPONS} element={<Navigate to={ROUTES.SELLER_CAMPAIGNS} replace />} />
+                    <Route
+                        path={ROUTES.ADMIN_COUPONS}
+                        element={
+                            <AdminRoute>
+                                <Suspense fallback={<PageLoader />}>
+                                    <AdminCouponsPage />
+                                </Suspense>
+                            </AdminRoute>
+                        }
                     />
                     <Route 
                         path={ROUTES.OFFERS} 

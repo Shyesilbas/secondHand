@@ -62,6 +62,7 @@ public class CouponService {
     public Result<CouponDto> create(CreateCouponRequest request) {
         Coupon coupon = couponMapper.fromCreateRequest(request);
         coupon.setCode(normalizeCode(coupon.getCode()));
+        normalizeCouponAudience(coupon);
 
         Result<Set<ListingType>> normalizeResult = normalizeEligibleTypes(coupon.getEligibleTypes());
         if (normalizeResult.isError()) {
@@ -85,6 +86,7 @@ public class CouponService {
     
     private Result<CouponDto> performUpdate(Coupon coupon, UpdateCouponRequest request) {
         couponMapper.applyUpdate(coupon, request);
+        normalizeCouponAudience(coupon);
         Result<Set<ListingType>> normalizeResult = normalizeEligibleTypes(coupon.getEligibleTypes());
         if (normalizeResult.isError()) {
             return Result.error(normalizeResult.getErrorCode(), normalizeResult.getMessage());
@@ -178,10 +180,40 @@ public class CouponService {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return List.of();
 
+        User user = userResult.getData();
+        Set<UUID> participated = new HashSet<>(couponRedemptionRepository.findDistinctCouponIdsByUser_Id(userId));
         return couponRepository.findActiveNow(LocalDateTime.now())
                 .stream()
-                .map(coupon -> couponMapper.toActiveDto(coupon, userResult.getData()))
+                .filter(c -> c.isForAllUsers()
+                        || (c.getEligibleUserIds() != null && c.getEligibleUserIds().contains(user.getId())))
+                .map(coupon -> couponMapper.toActiveDto(coupon, user))
+                .filter(d -> !participated.contains(d.getId()))
                 .toList();
+    }
+
+    /** Redemptions for this user with order link (may be null if order absent). */
+    @Transactional(readOnly = true)
+    public List<CouponParticipationDto> listParticipationsForUser(Long userId) {
+        var userResult = userService.findById(userId);
+        if (userResult.isError()) return List.of();
+        return couponRedemptionRepository.findByUser_IdWithCouponAndOrderOrderByRedeemedAtDesc(userId).stream()
+                .map(this::toParticipationDto)
+                .toList();
+    }
+
+    private CouponParticipationDto toParticipationDto(CouponRedemption r) {
+        Coupon coupon = r.getCoupon();
+        Order order = r.getOrder();
+        return CouponParticipationDto.builder()
+                .redemptionId(r.getId())
+                .couponId(coupon.getId())
+                .couponCode(coupon.getCode())
+                .couponTitle(coupon.getTitle())
+                .couponDescription(coupon.getDescription())
+                .redeemedAt(r.getRedeemedAt())
+                .orderId(order != null ? order.getId() : null)
+                .orderNumber(order != null ? order.getOrderNumber() : null)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -218,6 +250,15 @@ public class CouponService {
                 .stream()
                 .map(couponMapper::toDto)
                 .toList();
+    }
+
+    private void normalizeCouponAudience(Coupon coupon) {
+        if (coupon.getEligibleUserIds() == null) {
+            coupon.setEligibleUserIds(new LinkedHashSet<>());
+        }
+        if (coupon.isForAllUsers()) {
+            coupon.getEligibleUserIds().clear();
+        }
     }
 
     private String normalizeCode(String code) {

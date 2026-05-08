@@ -35,6 +35,26 @@ public class CouponValidator {
                 || coupon.getEligibleTypes().contains(ListingType.VEHICLE))) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
+        if (!coupon.isForAllUsers()) {
+            if (coupon.getEligibleUserIds() == null || coupon.getEligibleUserIds().isEmpty()) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+        }
+        return Result.success();
+    }
+
+    /** {@code false} coupon is valid only when buyer id is in {@link Coupon#getEligibleUserIds()}. */
+    public Result<Void> validateUserEligible(Coupon coupon, User user) {
+        if (coupon == null || user == null || user.getId() == null) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        }
+        if (coupon.isForAllUsers()) {
+            return Result.success();
+        }
+        Set<Long> ids = coupon.getEligibleUserIds();
+        if (ids == null || !ids.contains(user.getId())) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        }
         return Result.success();
     }
 
@@ -49,6 +69,11 @@ public class CouponValidator {
         }
         if (coupon.getEndsAt() != null && now.isAfter(coupon.getEndsAt())) {
             return Result.error(CouponErrorCodes.COUPON_EXPIRED);
+        }
+
+        Result<Void> eligible = validateUserEligible(coupon, user);
+        if (eligible.isError()) {
+            return eligible;
         }
 
         if (coupon.getUsageLimitGlobal() != null) {

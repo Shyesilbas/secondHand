@@ -1,27 +1,26 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo } from 'react';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { createClothingServiceAdapter } from '../../common/services/entityAdapters.js';
 import { clothingService } from '../services/clothingService.js';
 import { ClothingListingDTO } from '../clothing.js';
-import { useMemo } from 'react';
 
 export const useClothing = (clothingId = null) => {
-  const clothingServiceAdapter = useMemo(() => createClothingServiceAdapter(clothingService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createClothingServiceAdapter(clothingService), []);
+  const base = useListingEntityAlias(adapter, {
     entityId: clothingId,
-    service: clothingServiceAdapter,
     defaultData: ClothingListingDTO,
-    entityName: 'Clothing'
+    entityName: 'Clothing',
+    keys: {
+      entity: 'clothing',
+      fetch: 'fetchClothing',
+      create: 'createClothing',
+      update: 'updateClothing',
+      delete: 'deleteClothing',
+    },
   });
-
-    return {
-    ...result,
-    clothing: result.entity,
-    fetchClothing: result.fetchEntity,
-    createClothing: result.createEntity,
-    updateClothing: result.updateEntity,
-    deleteClothing: result.deleteEntity,
-        createClothingListing: result.createEntity,
-    updateClothingListing: result.updateEntity
+  return {
+    ...base,
+    createClothingListing: base.createClothing,
+    updateClothingListing: base.updateClothing,
   };
 };

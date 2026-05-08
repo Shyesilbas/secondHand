@@ -35,7 +35,8 @@ const PATH_MATCHERS = [
     { test: (p) => p === '/security', page: 'SecurityPage' },
     { test: (p) => p === '/cart', page: 'ShoppingCartPage' },
     { test: (p) => p === '/checkout', page: 'CheckoutPage' },
-    { test: (p) => p === '/my-coupons', page: 'MyCouponsPage' },
+    { test: (p) => p === '/coupons', page: 'PlatformCouponsPage' },
+    { test: (p) => p === '/selling/campaigns', page: 'SellerCampaignsPage' },
     { test: (p) => p === '/offers', page: 'OffersPage' },
 ];
 

@@ -1,27 +1,21 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo } from 'react';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { createSportsServiceAdapter } from '../../common/services/entityAdapters.js';
 import { sportsService } from '../services/sportsService.js';
 import { SportsListingDTO } from '../sports.js';
-import { useMemo } from 'react';
 
 export const useSports = (sportsId = null) => {
-  const sportsServiceAdapter = useMemo(() => createSportsServiceAdapter(sportsService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createSportsServiceAdapter(sportsService), []);
+  return useListingEntityAlias(adapter, {
     entityId: sportsId,
-    service: sportsServiceAdapter,
     defaultData: SportsListingDTO,
-    entityName: 'Sports'
+    entityName: 'Sports',
+    keys: {
+      entity: 'sports',
+      fetch: 'fetchSports',
+      create: 'createSports',
+      update: 'updateSports',
+      delete: 'deleteSports',
+    },
   });
-
-    return {
-    ...result,
-    sports: result.entity,
-    fetchSports: result.fetchEntity,
-    createSports: result.createEntity,
-    updateSports: result.updateEntity,
-    deleteSports: result.deleteEntity
-  };
 };
-
-

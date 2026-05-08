@@ -17,6 +17,13 @@ import java.util.Set;
 @Builder
 public class CreateCouponRequest {
     private String code;
+    /** Shown on coupon lists */
+    private String title;
+    private String description;
+    /** null / true = all users; false = {@link #eligibleUserIds} only */
+    private Boolean forAllUsers;
+    private Set<Long> eligibleUserIds;
+
     private boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;

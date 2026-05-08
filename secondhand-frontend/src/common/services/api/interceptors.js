@@ -63,14 +63,15 @@ apiClient.interceptors.response.use(
 
         // Enrich error object - extract messages from backend
         if (errorData) {
-            error.userMessage = errorData.message || null;
-            error.errorCode = errorData.errorCode || errorData.code;
-            error.validationErrors = errorData.validationErrors;
+            error.userMessage = errorData.detail || errorData.message || null;
+            error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
+            error.validationErrors = errorData.validationErrors ?? errorData.errors;
             error.errorDetails = {
                 status: status,
                 statusText: error.response?.statusText,
                 timestamp: errorData.timestamp,
-                path: errorData.path
+                path: errorData.path || errorData.instance,
+                title: errorData.title,
             };
         } else if (!error.response) {
             // Network error

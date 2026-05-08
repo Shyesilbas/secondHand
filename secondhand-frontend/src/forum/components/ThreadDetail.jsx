@@ -63,7 +63,7 @@ export const ThreadDetail = ({
 
   if (!threadId) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-16 text-center">
+      <div className="rounded-2xl border border-gray-200/80 bg-gradient-to-br from-slate-50/90 to-white p-16 text-center shadow-sm ring-1 ring-gray-100/80">
         <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
           <MessageCircle className="w-7 h-7 text-gray-300" />
         </div>
@@ -76,7 +76,7 @@ export const ThreadDetail = ({
   const commentCount = commentsTree?.roots?.length || 0;
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+    <div className="rounded-2xl border border-gray-200/80 bg-white/90 shadow-sm ring-1 ring-slate-100/80 overflow-hidden">
 
       {/* ── Thread Header ─────────────────────────────────── */}
       <div className="px-6 py-5 border-b border-gray-100">

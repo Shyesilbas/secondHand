@@ -162,10 +162,10 @@ export const API_ENDPOINTS = {
         FILTER: '/v1/electronics/filter',
     },
     REAL_ESTATES: {
-        CREATE: '/v1/realEstates/create-listing',
-        BY_ID: (id) => `/v1/realEstates/${id}`,
-        UPDATE: (id) => `/v1/realEstates/${id}`,
-        FILTER: '/v1/realEstates/filter',
+        CREATE: '/v1/real-estates/create-listing',
+        BY_ID: (id) => `/v1/real-estates/${id}`,
+        UPDATE: (id) => `/v1/real-estates/${id}`,
+        FILTER: '/v1/real-estates/filter',
     },
     CLOTHING: {
         CREATE: '/v1/clothing/create-listing',
@@ -262,6 +262,11 @@ export const API_ENDPOINTS = {
     COUPONS: {
         PREVIEW: '/v1/coupons/preview',
         ACTIVE: '/v1/coupons/active',
+        REDEMPTIONS: '/v1/coupons/redemptions',
+    },
+    ADMIN_COUPONS: {
+        BASE: '/v1/admin/coupons',
+        BY_ID: (id) => `/v1/admin/coupons/${id}`,
     },
     CAMPAIGNS: {
         SELLER: '/v1/seller/campaigns',

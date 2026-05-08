@@ -10,7 +10,7 @@ export function useReviewSubmission() {
 
   const clearError = useCallback(() => setError(null), []);
 
-  const submitReview = useCallback(async ({ orderItemId, rating, comment, onSuccess }) => {
+  const submitReview = useCallback(async ({ orderItemId, rating, comment, orderId, onSuccess }) => {
     if (rating < REVIEW_LIMITS.MIN_RATING) {
       setError(REVIEW_MESSAGES.RATING_REQUIRED);
       return false;
@@ -25,7 +25,12 @@ export function useReviewSubmission() {
         rating,
         comment: comment?.trim() || null,
       });
-      onSuccess?.();
+      onSuccess?.({
+        orderItemId,
+        rating,
+        comment: comment?.trim() || null,
+        orderId,
+      });
       return true;
     } catch (err) {
       setError(getReviewErrorMessage(err, REVIEW_MESSAGES.UNKNOWN_ERROR));

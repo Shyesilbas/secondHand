@@ -14,6 +14,29 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
         setReview(existingReview);
     }, [existingReview]);
 
+    // Modal + batch map arası senkron sorunlarında (veya esnek API şekli) tek satır GET ile doldur.
+    React.useEffect(() => {
+        if (!skipIndividualFetch || reviewsLoading) return;
+        const oid = orderItem?.id ?? orderItem?.orderItemId;
+        if (oid === undefined || oid === null || oid === '') return;
+        if (existingReview) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                const reviewData = await reviewService.getReviewByOrderItem(oid);
+                if (cancelled || !reviewData) return;
+                setReview(reviewData);
+            } catch (error) {
+                if (error?.response?.status !== 404) {
+                    logger.error('Error hydrating review by order item:', error);
+                }
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [skipIndividualFetch, reviewsLoading, orderItem?.id, orderItem?.orderItemId, existingReview]);
+
     // Parent provides batch reviews via orderReviews - never fetch individually.
     React.useEffect(() => {
         if (skipIndividualFetch || reviewsLoading || !orderItem?.id) return;
@@ -69,8 +92,8 @@ const ReviewButton = ({ orderItem, onReviewCreated, existingReview = null, order
         );
     }
 
-    const handleReviewCreated = () => {
-        onReviewCreated?.();
+    const handleReviewCreated = (payload) => {
+        onReviewCreated?.(payload);
         setLoading(true);
         reviewService.getReviewByOrderItem(orderItem.id)
             .then(setReview)

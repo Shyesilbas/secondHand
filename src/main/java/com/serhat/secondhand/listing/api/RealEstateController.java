@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/realEstates")
+@RequestMapping("/api/v1/real-estates")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Real Estate Listings", description = "Real estate listing operations")
@@ -46,7 +46,7 @@ public class RealEstateController {
             return ResultResponses.ok(result);
         }
 
-        URI location = URI.create("/api/v1/realEstates/" + result.getData());
+        URI location = URI.create("/api/v1/real-estates/" + result.getData());
         return ResponseEntity.created(location).body(Map.of("id", result.getData()));
     }
 

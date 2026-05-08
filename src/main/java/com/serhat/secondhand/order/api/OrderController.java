@@ -3,7 +3,6 @@ package com.serhat.secondhand.order.api;
 import com.serhat.secondhand.checkout.application.CheckoutOrchestrator;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.application.*;
 import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.review.application.IReviewService;
@@ -38,7 +37,7 @@ public class OrderController {
     private final OrderCompletionService orderCompletionService;
     private final OrderModificationService orderModificationService;
     private final OrderShippingService orderShippingService;
-    private final EscrowService escrowService;
+    private final OrderEscrowQueryService orderEscrowQueryService;
     private final IReviewService reviewService;
 
     @PostMapping("/checkout")
@@ -102,7 +101,7 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getPendingEscrowAmount(
             @AuthenticationPrincipal User currentUser) {
-        BigDecimal amount = escrowService.getPendingEscrowAmount(currentUser);
+        BigDecimal amount = orderEscrowQueryService.getPendingEscrowAmount(currentUser.getId());
         return ResultResponses.ok(Result.success(Map.of("amount", amount)));
     }
 

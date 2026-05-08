@@ -34,7 +34,7 @@ const MyCouponsPage = () => {
       setTotalElements(Number.isFinite(res?.totalElements) ? res.totalElements : items.length);
     } catch (e) {
       setCampaigns([]);
-      showError('My Coupons', e?.response?.data?.message || 'Failed to load campaigns');
+      showError('Campaigns', e?.response?.data?.message || 'Failed to load campaigns');
       setTotalPages(0);
       setTotalElements(0);
     } finally {
@@ -115,7 +115,7 @@ const MyCouponsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-7xl mx-auto px-4 pb-8">
+        <div className="max-w-7xl mx-auto px-4 pb-8">
         <div className="sticky top-0 z-20 -mx-4 mb-4 bg-[#F8FAFC]/80 backdrop-blur-md border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -125,16 +125,16 @@ const MyCouponsPage = () => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <h1 className="text-sm sm:text-base font-semibold tracking-tight text-slate-900">
-                    Marketing Campaigns
+                    Campaigns
                   </h1>
                   {campaigns.length > 0 && (
                     <span className="text-[11px] font-medium text-slate-500">
-                      {stats.total} total
+                      {stats.total}
                     </span>
                   )}
                 </div>
                 <p className="hidden sm:block text-[11px] text-slate-500 tracking-tight">
-                  Design and monitor your discount strategy for your shop.
+                  Seller listing discounts
                 </p>
               </div>
             </div>
@@ -157,7 +157,7 @@ const MyCouponsPage = () => {
                 className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-3.5 py-1.5 text-xs sm:text-sm font-semibold tracking-tight text-white shadow-sm hover:bg-slate-800"
               >
                 <Plus className="w-3.5 h-3.5 mr-1.5" />
-                New Campaign
+                New campaign
               </button>
             </div>
           </div>

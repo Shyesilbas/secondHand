@@ -101,6 +101,7 @@ const OrderDetailsModal = React.memo(
         handleCompleteOrder,
         handleSaveAddress,
         handleSaveNotes,
+        handleShipOrder,
       },
     } = useOrderDetailActions({
       isSellerView,
@@ -331,10 +332,13 @@ const OrderDetailsModal = React.memo(
                         const isFullyRefunded = isRefunded && item.refundedQuantity >= item.quantity;
                         const isPartiallyCancelled = isCancelled && item.cancelledQuantity < item.quantity;
                         const isPartiallyRefunded = isRefunded && item.refundedQuantity < item.quantity;
+                        const rawOi = item?.id ?? item?.orderItemId;
+                        const reviewKey =
+                          rawOi === undefined || rawOi === null || rawOi === '' ? null : String(rawOi);
 
                         return (
                           <div
-                            key={idx}
+                            key={reviewKey || `row-${idx}`}
                             className={`py-4 first:pt-0 last:pb-0 flex gap-3 ${isFullyCancelled || isFullyRefunded ? 'opacity-60' : ''}`}
                           >
                             <div
@@ -388,8 +392,9 @@ const OrderDetailsModal = React.memo(
                               </span>
                               {!isSellerView ? (
                                 <ReviewButton
+                                  key={reviewKey || `rev-${idx}`}
                                   orderItem={item}
-                                  existingReview={orderReviews[item.id]}
+                                  existingReview={reviewKey ? orderReviews[reviewKey] : null}
                                   reviewsLoading={reviewsLoading}
                                   skipIndividualFetch
                                   onReviewCreated={onReviewSuccess}
@@ -404,17 +409,23 @@ const OrderDetailsModal = React.memo(
                   </GlassCard>
 
                   {selectedOrder.shipping && (
-                    <ShippingDetailsSection 
-                      shipping={selectedOrder.shipping} 
-                      CardComponent={GlassCard} 
+                    <ShippingDetailsSection
+                      shipping={selectedOrder.shipping}
+                      deliveryAddress={selectedOrder.shippingAddress}
+                      CardComponent={GlassCard}
+                      internalTracking={{
+                        orderId: selectedOrder.id,
+                        isSellerView,
+                        onBeforeNavigate: onClose,
+                      }}
                     />
                   )}
 
                   {isSellerView && (selectedOrder.status === 'CONFIRMED' || selectedOrder.status === 'PROCESSING') && (
                     <ShipOrderForm 
                       carriers={enums.carriers || []}
-                      isProcessing={actions.flags.isProcessing}
-                      onShip={actions.actions.handleShipOrder}
+                      isProcessing={isProcessing}
+                      onShip={handleShipOrder}
                       CardComponent={GlassCard}
                     />
                   )}

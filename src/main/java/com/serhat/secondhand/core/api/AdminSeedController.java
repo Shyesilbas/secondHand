@@ -1,4 +1,5 @@
 package com.serhat.secondhand.core.api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedRunnerService;
@@ -16,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/admin/seeds")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Seed", description = "Admin Seed operations")
 public class AdminSeedController {
 
     private final SeedRunnerService seedRunnerService;

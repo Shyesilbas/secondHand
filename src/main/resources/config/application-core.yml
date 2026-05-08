@@ -85,6 +85,9 @@ aura:
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  api:
+    conventions:
+      fail-fast: true
   e-wallet:
     default-balance: 10000.00
     spending-warning-threshold: 0.90

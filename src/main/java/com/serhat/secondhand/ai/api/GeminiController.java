@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/ai-test")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Gemini", description = "Gemini operations")
 public class GeminiController {
 
     private final GeminiAiService aiService;

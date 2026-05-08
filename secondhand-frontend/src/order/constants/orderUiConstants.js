@@ -74,6 +74,8 @@ export const ORDER_TIME = Object.freeze({
   PENDING_ESCROW_REFRESH_MS: 30 * 1000,
   PENDING_ESCROW_STALE_MS: 30 * 1000,
   ORDERS_QUERY_GC_MS: 10 * 60 * 1000,
+  /** Sipariş listesi: gereksiz sürekli yenilemeyi azaltır */
+  ORDERS_LIST_STALE_MS: 45 * 1000,
   ESCROW_QUERY_GC_MS: 5 * 60 * 1000,
   PENDING_COMPLETION_STALE_MS: 2 * 60 * 1000,
   PENDING_COMPLETION_REFRESH_ACTIVE_MS: 2 * 60 * 1000,
@@ -98,4 +100,7 @@ export const ORDER_MESSAGES = Object.freeze({
   UNKNOWN_ERROR: 'An error occurred',
   ORDER_NAME_TOO_LONG: (max) => `Order name must be ${max} characters or less`,
   ORDER_NOTES_TOO_LONG: (max) => `Notes must be ${max} characters or less`,
+  REVIEW_SUBMITTED_TITLE: 'Review submitted',
+  REVIEW_SUBMITTED_WITH_COMMENT: 'Thanks — your comment has been saved.',
+  REVIEW_SUBMITTED_RATING_ONLY: 'Thanks for rating this purchase.',
 });

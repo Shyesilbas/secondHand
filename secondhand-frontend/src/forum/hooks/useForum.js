@@ -72,6 +72,42 @@ export const useForum = () => {
 
   const pendingKeysRef = useRef(new Set());
 
+  const hydrateViewerReactionsFromThreads = useCallback((list) => {
+    if (!Array.isArray(list) || !list.length) return;
+    const m = new Map(threadReactionsRef.current);
+    list.forEach((t) => {
+      if (!t?.id || String(t.id).startsWith('temp-')) return;
+      m.set(t.id, clampReaction(t.viewerReaction));
+    });
+    threadReactionsRef.current = m;
+    setThreadReactions((prev) => {
+      const next = { ...prev };
+      list.forEach((t) => {
+        if (!t?.id || String(t.id).startsWith('temp-')) return;
+        next[t.id] = clampReaction(t.viewerReaction);
+      });
+      return next;
+    });
+  }, []);
+
+  const hydrateViewerReactionsFromComments = useCallback((list) => {
+    if (!Array.isArray(list) || !list.length) return;
+    const m = new Map(commentReactionsRef.current);
+    list.forEach((c) => {
+      if (!c?.id) return;
+      m.set(c.id, clampReaction(c.viewerReaction));
+    });
+    commentReactionsRef.current = m;
+  }, []);
+
+  const getEffectiveThreadReaction = useCallback((thread) => {
+    if (!thread?.id || String(thread.id).startsWith('temp-')) return null;
+    if (Object.prototype.hasOwnProperty.call(threadReactions, thread.id)) {
+      return clampReaction(threadReactions[thread.id]);
+    }
+    return clampReaction(thread.viewerReaction);
+  }, [threadReactions]);
+
   const listParams = useMemo(() => ({
     category,
     q: search,
@@ -94,6 +130,7 @@ export const useForum = () => {
       const data = await forumService.listThreads({ ...listParams, page, size: FORUM_DEFAULTS.PAGE_SIZE });
       const normalized = normalizePage(data, page, FORUM_DEFAULTS.PAGE_SIZE);
       setThreads((prev) => reset ? normalized.content : [...prev, ...normalized.content]);
+      hydrateViewerReactionsFromThreads(normalized.content);
       setThreadsPage(normalized.number);
       setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
@@ -101,7 +138,7 @@ export const useForum = () => {
     } finally {
       setThreadsLoading(false);
     }
-  }, [listParams, threadsLoading, threadsPage]);
+  }, [hydrateViewerReactionsFromThreads, listParams, threadsLoading, threadsPage]);
 
   const loadMoreThreads = useCallback(async () => {
     if (threadsLoading || !threadsHasMore) return;
@@ -112,6 +149,7 @@ export const useForum = () => {
       const data = await forumService.listThreads({ ...listParams, page: next, size: FORUM_DEFAULTS.PAGE_SIZE });
       const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
       setThreads((prev) => [...prev, ...normalized.content]);
+      hydrateViewerReactionsFromThreads(normalized.content);
       setThreadsPage(normalized.number);
       setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
@@ -119,7 +157,7 @@ export const useForum = () => {
     } finally {
       setThreadsLoading(false);
     }
-  }, [listParams, threadsHasMore, threadsLoading, threadsPage]);
+  }, [hydrateViewerReactionsFromThreads, listParams, threadsHasMore, threadsLoading, threadsPage]);
 
   const selectThread = useCallback(async (threadId) => {
     if (String(threadId || '').startsWith('temp-')) return;
@@ -138,6 +176,7 @@ export const useForum = () => {
     try {
       const data = await forumService.getThreadById(threadId);
       setSelectedThread(data || null);
+      if (data) hydrateViewerReactionsFromThreads([data]);
     } catch (e) {
       setThreadError(e?.message || FORUM_MESSAGES.LOAD_THREAD_FAILED);
     } finally {
@@ -152,6 +191,7 @@ export const useForum = () => {
       });
       const normalized = normalizePage(data, FORUM_DEFAULTS.PAGE, FORUM_DEFAULTS.PAGE_SIZE);
       setComments(normalized.content);
+      hydrateViewerReactionsFromComments(normalized.content);
       setCommentsPage(normalized.number);
       setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
@@ -159,7 +199,7 @@ export const useForum = () => {
     } finally {
       setCommentsLoading(false);
     }
-  }, []);
+  }, [hydrateViewerReactionsFromComments, hydrateViewerReactionsFromThreads]);
 
   const loadMoreComments = useCallback(async () => {
     if (!selectedThreadId || commentsLoading || !commentsHasMore) return;
@@ -173,6 +213,7 @@ export const useForum = () => {
       });
       const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
       setComments((prev) => [...prev, ...normalized.content]);
+      hydrateViewerReactionsFromComments(normalized.content);
       setCommentsPage(normalized.number);
       setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
     } catch (e) {
@@ -180,7 +221,7 @@ export const useForum = () => {
     } finally {
       setCommentsLoading(false);
     }
-  }, [commentsHasMore, commentsLoading, commentsPage, selectedThreadId]);
+  }, [commentsHasMore, commentsLoading, commentsPage, hydrateViewerReactionsFromComments, selectedThreadId]);
 
   const setReplyTarget = useCallback((parentCommentId) => {
     setDraftComment((prev) => ({ ...prev, parentCommentId: parentCommentId || null }));
@@ -205,13 +246,14 @@ export const useForum = () => {
       setDraftComment({ content: '', parentCommentId: null });
       if (created) {
         setComments((prev) => [created, ...prev]);
+        hydrateViewerReactionsFromComments([created]);
       } else {
         await selectThread(selectedThreadId);
       }
     } catch (e) {
       setCommentsError(e?.message || FORUM_MESSAGES.ADD_COMMENT_FAILED);
     }
-  }, [draftComment.content, draftComment.parentCommentId, selectThread, selectedThreadId]);
+  }, [draftComment.content, draftComment.parentCommentId, hydrateViewerReactionsFromComments, selectThread, selectedThreadId]);
 
   const publishThread = useCallback(async ({ category, title, description, authorVisibility }) => {
     const safeTitle = String(title || '').trim();
@@ -361,7 +403,7 @@ export const useForum = () => {
       return prev.map((t) => {
         if (t?.id !== threadId) return t;
         const delta = applyDelta({ likes: t?.totalLikes, dislikes: t?.totalDislikes, prev: prevReaction, next: nextReaction });
-        return { ...t, totalLikes: delta.likes, totalDislikes: delta.dislikes };
+        return { ...t, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
       });
     });
 
@@ -369,7 +411,7 @@ export const useForum = () => {
       rollback.selectedThread = prev;
       if (!prev || prev?.id !== threadId) return prev;
       const delta = applyDelta({ likes: prev?.totalLikes, dislikes: prev?.totalDislikes, prev: prevReaction, next: nextReaction });
-      return { ...prev, totalLikes: delta.likes, totalDislikes: delta.dislikes };
+      return { ...prev, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
     });
 
     threadReactionsRef.current.set(threadId, nextReaction);
@@ -392,8 +434,9 @@ export const useForum = () => {
     if (!threadId || !commentId || pendingKeysRef.current.has(key)) return;
     pendingKeysRef.current.add(key);
 
-    const nextReaction = clampReaction(nextReactionRaw);
     const prevReaction = clampReaction(commentReactionsRef.current.get(commentId));
+    const wanted = clampReaction(nextReactionRaw);
+    const nextReaction = wanted && wanted === prevReaction ? null : wanted;
 
     let rollbackComments = null;
     setComments((prev) => {
@@ -401,7 +444,7 @@ export const useForum = () => {
       return prev.map((c) => {
         if (c?.id !== commentId) return c;
         const delta = applyDelta({ likes: c?.totalLikes, dislikes: c?.totalDislikes, prev: prevReaction, next: nextReaction });
-        return { ...c, totalLikes: delta.likes, totalDislikes: delta.dislikes };
+        return { ...c, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
       });
     });
 
@@ -493,6 +536,7 @@ export const useForum = () => {
     deleteThread,
 
     threadReactions,
+    getEffectiveThreadReaction,
 
     reactToThread,
     reactToComment,

@@ -14,7 +14,7 @@ const ReviewForm = ({ orderItemId, listingTitle, onReviewCreated, onCancel }) =>
       orderItemId,
       rating,
       comment,
-      onSuccess: () => onReviewCreated?.(),
+      onSuccess: (payload) => onReviewCreated?.(payload),
     });
   };
 

@@ -15,6 +15,21 @@ import {
   ORDER_VIEW_MODES,
 } from '../constants/orderUiConstants.js';
 
+/** Normalize order-item id so review maps stay consistent across API number/string shapes. */
+const reviewItemKey = (id) =>
+  id === undefined || id === null || id === '' ? null : String(id);
+
+const reviewOrderItemIdFromRow = (row) =>
+  reviewItemKey(row?.orderItemId ?? row?.order_item_id);
+
+const normalizeReviewsBulkResponse = (res) => {
+  if (!res) return [];
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res.content)) return res.content;
+  if (Array.isArray(res.data)) return res.data;
+  return [];
+};
+
 const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
   const { user } = useAuthState();
   const queryClient = useQueryClient();
@@ -37,7 +52,7 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
     queryKey,
     queryFn,
     enabled: !!user?.id,
-    staleTime: 0,
+    staleTime: ORDER_TIME.ORDERS_LIST_STALE_MS,
     gcTime: ORDER_TIME.ORDERS_QUERY_GC_MS,
     refetchOnWindowFocus: false,
     refetchOnMount: 'always',
@@ -143,6 +158,10 @@ export const useOrderFlow = ({
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewedOrderIds, setReviewedOrderIds] = useState({});
   const [reviewedOrderSummaries, setReviewedOrderSummaries] = useState({});
+  const [reviewedOrderItemIds, setReviewedOrderItemIds] = useState({});
+
+  const [quickReviewOpen, setQuickReviewOpen] = useState(false);
+  const [quickReviewTarget, setQuickReviewTarget] = useState(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const urlQ = searchParams.get('q') || '';
@@ -233,6 +252,7 @@ export const useOrderFlow = ({
       if (mode === ORDER_VIEW_MODES.SELLER || !orders?.length) {
         setReviewedOrderIds({});
         setReviewedOrderSummaries({});
+        setReviewedOrderItemIds({});
         return;
       }
 
@@ -240,12 +260,15 @@ export const useOrderFlow = ({
         [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(order?.status)
       );
       const orderItemIds = reviewEligibleOrders.flatMap((order) =>
-        (order?.orderItems || []).map((item) => item?.id).filter(Boolean)
+        (order?.orderItems || [])
+          .map((item) => item?.id ?? item?.orderItemId)
+          .filter((id) => id !== undefined && id !== null && id !== '')
       );
 
       if (!orderItemIds.length) {
         setReviewedOrderIds({});
         setReviewedOrderSummaries({});
+        setReviewedOrderItemIds({});
         return;
       }
 
@@ -254,37 +277,48 @@ export const useOrderFlow = ({
         const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);
         if (cancelled) return;
 
-        const reviewedItems = new Set(
-          Array.isArray(reviewsResponse)
-            ? reviewsResponse.map((review) => review?.orderItemId).filter(Boolean)
-            : []
-        );
+        const reviewsList = normalizeReviewsBulkResponse(reviewsResponse);
+
+        const reviewedItemLookup = {};
+        reviewsList.forEach((review) => {
+          const k = reviewOrderItemIdFromRow(review);
+          if (!k) return;
+          reviewedItemLookup[k] = true;
+        });
 
         const orderReviewMap = {};
         const orderReviewSummaryMap = {};
         reviewEligibleOrders.forEach((order) => {
-          const firstReviewedItem = (order?.orderItems || []).find((item) => reviewedItems.has(item?.id));
+          const firstReviewedItem = (order?.orderItems || []).find((item) => {
+            const k = reviewItemKey(item?.id ?? item?.orderItemId);
+            return k && reviewedItemLookup[k];
+          });
           const hasReviewedItem = Boolean(firstReviewedItem);
           if (hasReviewedItem) {
             orderReviewMap[order.id] = true;
-            const reviewDetails = Array.isArray(reviewsResponse)
-              ? reviewsResponse.find((review) => review?.orderItemId === firstReviewedItem?.id)
-              : null;
+            orderReviewMap[String(order.id)] = true;
+            const firstKey = reviewItemKey(firstReviewedItem?.id ?? firstReviewedItem?.orderItemId);
+            const reviewDetails = reviewsList.find(
+              (review) => reviewOrderItemIdFromRow(review) === firstKey
+            );
             if (reviewDetails) {
               orderReviewSummaryMap[order.id] = {
                 rating: reviewDetails.rating,
                 comment: reviewDetails.comment,
               };
+              orderReviewSummaryMap[String(order.id)] = orderReviewSummaryMap[order.id];
             }
           }
         });
 
         setReviewedOrderIds(orderReviewMap);
         setReviewedOrderSummaries(orderReviewSummaryMap);
+        setReviewedOrderItemIds(reviewedItemLookup);
       } catch {
         if (!cancelled) {
           setReviewedOrderIds({});
           setReviewedOrderSummaries({});
+          setReviewedOrderItemIds({});
         }
       }
     };
@@ -411,20 +445,33 @@ export const useOrderFlow = ({
         return;
       }
 
-      const orderItemIds = order.orderItems.map((item) => item.id);
+      const orderItemIds = order.orderItems
+        .map((item) => item?.id ?? item?.orderItemId)
+        .filter((id) => id !== undefined && id !== null && id !== '');
+
+      if (!orderItemIds.length) {
+        if (stillCurrent()) setOrderReviews({});
+        return;
+      }
+
       const { reviewService } = await import('../../reviews/services/reviewService.js');
-      const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);
+      let reviewsRaw;
+      try {
+        reviewsRaw = await reviewService.getReviewsForOrderItems(orderItemIds);
+      } catch {
+        if (stillCurrent()) setOrderReviews({});
+        return;
+      }
 
       if (!stillCurrent()) return;
 
+      const reviewsList = normalizeReviewsBulkResponse(reviewsRaw);
       const reviewsMap = {};
-      if (reviewsResponse && Array.isArray(reviewsResponse)) {
-        reviewsResponse.forEach((review) => {
-          if (review.orderItemId) {
-            reviewsMap[review.orderItemId] = review;
-          }
-        });
-      }
+      reviewsList.forEach((review) => {
+        const k = reviewOrderItemIdFromRow(review);
+        if (!k) return;
+        reviewsMap[k] = review;
+      });
 
       setOrderReviews(reviewsMap);
     } finally {
@@ -439,6 +486,9 @@ export const useOrderFlow = ({
   const openOrderModal = useCallback(
     async (order) => {
       const requestId = ++orderDetailRequestRef.current;
+      if (mode !== ORDER_VIEW_MODES.SELLER) {
+        clearReviews();
+      }
       try {
         const freshOrder = mode === ORDER_VIEW_MODES.SELLER
           ? await orderService.getSellerOrderById(order.id)
@@ -453,15 +503,48 @@ export const useOrderFlow = ({
         if (orderDetailRequestRef.current !== requestId) return;
         setSelectedOrder(order);
         setOrderModalOpen(true);
+        if (mode !== ORDER_VIEW_MODES.SELLER) {
+          await fetchReviewsData(order, requestId);
+        }
       }
     },
-    [mode, fetchReviewsData]
+    [mode, fetchReviewsData, clearReviews]
   );
 
   const closeOrderModal = useCallback(() => {
     setOrderModalOpen(false);
     setSelectedOrder(null);
+    setReviewsLoading(false);
+    setOrderReviews({});
   }, []);
+
+  const closeQuickReview = useCallback(() => {
+    setQuickReviewOpen(false);
+    setQuickReviewTarget(null);
+  }, []);
+
+  const openQuickReviewForOrder = useCallback(
+    (order) => {
+      if (!order || mode !== ORDER_VIEW_MODES.BUYER) {
+        openOrderModal(order);
+        return;
+      }
+      const items = order.orderItems || [];
+      const unrated = items.find((item) => {
+        const oid = item?.id;
+        if (oid === undefined || oid === null || oid === '') return false;
+        const k = reviewItemKey(oid);
+        return !reviewedOrderItemIds[k];
+      });
+      if (!unrated) {
+        openOrderModal(order);
+        return;
+      }
+      setQuickReviewTarget({ orderItem: unrated, orderId: order.id });
+      setQuickReviewOpen(true);
+    },
+    [mode, openOrderModal, reviewedOrderItemIds]
+  );
 
   const refreshSelectedOrder = useCallback(async () => {
     if (!selectedOrder?.id) return;
@@ -480,6 +563,46 @@ export const useOrderFlow = ({
     refresh();
     await refreshSelectedOrder();
   }, [refresh, refreshSelectedOrder]);
+
+  const handleQuickReviewCreated = useCallback(
+    async (payload) => {
+      const messageBody = payload?.comment?.trim()
+        ? ORDER_MESSAGES.REVIEW_SUBMITTED_WITH_COMMENT
+        : ORDER_MESSAGES.REVIEW_SUBMITTED_RATING_ONLY;
+      notification.showSuccess(ORDER_MESSAGES.REVIEW_SUBMITTED_TITLE, messageBody);
+
+      const itemId = payload?.orderItemId;
+      const k = reviewItemKey(itemId);
+      if (k) {
+        const draft = {
+          orderItemId: itemId,
+          rating: payload?.rating,
+          comment: payload?.comment,
+        };
+        setReviewedOrderItemIds((prev) => ({ ...prev, [k]: true }));
+        setOrderReviews((prev) => ({ ...prev, [k]: draft }));
+      }
+
+      const orderId = payload?.orderId;
+      if (orderId !== undefined && orderId !== null && orderId !== '') {
+        const oidStr = String(orderId);
+        setReviewedOrderIds((prev) => ({
+          ...prev,
+          [orderId]: true,
+          [oidStr]: true,
+        }));
+        const summary = { rating: payload?.rating, comment: payload?.comment };
+        setReviewedOrderSummaries((prev) => ({
+          ...prev,
+          [orderId]: summary,
+          [oidStr]: summary,
+        }));
+      }
+
+      await handleReviewSuccess();
+    },
+    [handleReviewSuccess, notification]
+  );
 
   const startEditOrderName = useCallback((order, e) => {
     if (e?.stopPropagation) e.stopPropagation();
@@ -589,6 +712,13 @@ export const useOrderFlow = ({
       clearReviews,
       reviewedOrderIds,
       reviewedOrderSummaries,
+    },
+    reviewQuick: {
+      isOpen: quickReviewOpen,
+      target: quickReviewTarget,
+      openForOrder: openQuickReviewForOrder,
+      close: closeQuickReview,
+      onReviewCreated: handleQuickReviewCreated,
     },
     ui: {
       editingOrderId,

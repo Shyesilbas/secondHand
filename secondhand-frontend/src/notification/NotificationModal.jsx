@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     AlertTriangle,
     CheckCircle2,
@@ -23,6 +23,14 @@ const NotificationModal = ({
     const [isLeaving, setIsLeaving] = useState(false);
     const [progressKey, setProgressKey] = useState(0);
 
+    const handleClose = useCallback(() => {
+        setIsLeaving(true);
+        setTimeout(() => {
+            setIsVisible(false);
+            onClose?.();
+        }, 300);
+    }, [onClose]);
+
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
@@ -36,15 +44,7 @@ const NotificationModal = ({
                 return () => clearTimeout(timer);
             }
         }
-    }, [isOpen, autoClose, autoCloseDelay]);
-
-    const handleClose = () => {
-        setIsLeaving(true);
-        setTimeout(() => {
-            setIsVisible(false);
-            onClose?.();
-        }, 300);
-    };
+    }, [isOpen, autoClose, autoCloseDelay, handleClose]);
 
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
@@ -52,9 +52,7 @@ const NotificationModal = ({
         }
     };
 
-    if (!isOpen && !isVisible) return null;
-
-    const getNotificationConfig = () => {
+    const config = useMemo(() => {
         switch (type) {
             case 'success':
                 return {
@@ -98,7 +96,8 @@ const NotificationModal = ({
                     progress: 'bg-indigo-500'
                 };
         }
-    };
+    }, [type]);
+    const IconComponent = config.icon;
 
     const getSizeClasses = () => {
         switch (size) {
@@ -114,8 +113,7 @@ const NotificationModal = ({
         }
     };
 
-    const config = useMemo(() => getNotificationConfig(), [type]);
-    const IconComponent = config.icon;
+    if (!isOpen && !isVisible) return null;
 
     return (
         <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center z-[80] p-4" onClick={handleBackdropClick}>

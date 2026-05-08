@@ -10,6 +10,9 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+
 @Component
 @RequiredArgsConstructor
 public class CouponMapper {
@@ -17,8 +20,17 @@ public class CouponMapper {
     private final CouponRedemptionRepository couponRedemptionRepository;
 
     public Coupon fromCreateRequest(CreateCouponRequest request) {
+        boolean forAll = request.getForAllUsers() == null || Boolean.TRUE.equals(request.getForAllUsers());
+        var eligible = request.getEligibleUserIds() == null
+                ? new LinkedHashSet<Long>()
+                : new LinkedHashSet<>(request.getEligibleUserIds());
+
         return Coupon.builder()
                 .code(request.getCode())
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .forAllUsers(forAll)
+                .eligibleUserIds(forAll ? new LinkedHashSet<>() : eligible)
                 .active(request.isActive())
                 .startsAt(request.getStartsAt())
                 .endsAt(request.getEndsAt())
@@ -33,6 +45,18 @@ public class CouponMapper {
     }
 
     public void applyUpdate(Coupon coupon, UpdateCouponRequest request) {
+        if (request.getTitle() != null) {
+            coupon.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            coupon.setDescription(request.getDescription());
+        }
+        if (request.getForAllUsers() != null) {
+            coupon.setForAllUsers(request.getForAllUsers());
+        }
+        if (request.getEligibleUserIds() != null) {
+            coupon.setEligibleUserIds(new LinkedHashSet<>(request.getEligibleUserIds()));
+        }
         if (request.getActive() != null) {
             coupon.setActive(request.getActive());
         }
@@ -69,6 +93,10 @@ public class CouponMapper {
         return CouponDto.builder()
                 .id(coupon.getId())
                 .code(coupon.getCode())
+                .title(coupon.getTitle())
+                .description(coupon.getDescription())
+                .forAllUsers(coupon.isForAllUsers())
+                .eligibleUserIds(coupon.getEligibleUserIds() == null ? Collections.emptySet() : new LinkedHashSet<>(coupon.getEligibleUserIds()))
                 .active(coupon.isActive())
                 .startsAt(coupon.getStartsAt())
                 .endsAt(coupon.getEndsAt())
@@ -98,6 +126,9 @@ public class CouponMapper {
         return ActiveCouponDto.builder()
                 .id(coupon.getId())
                 .code(coupon.getCode())
+                .title(coupon.getTitle())
+                .description(coupon.getDescription())
+                .forAllUsers(coupon.isForAllUsers())
                 .active(coupon.isActive())
                 .startsAt(coupon.getStartsAt())
                 .endsAt(coupon.getEndsAt())

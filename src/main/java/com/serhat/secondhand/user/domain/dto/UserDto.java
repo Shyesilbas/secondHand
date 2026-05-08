@@ -3,6 +3,7 @@ package com.serhat.secondhand.user.domain.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import com.serhat.secondhand.user.domain.entity.enums.UserRole;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -21,6 +22,6 @@ public record UserDto(
         @JsonFormat(pattern = "dd/MM/yyyy")
         LocalDate accountCreationDate,
         AccountStatus accountStatus,
-        boolean accountVerified
-
+        boolean accountVerified,
+        UserRole role
 ) {}

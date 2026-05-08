@@ -29,8 +29,12 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
     Page<Email> findByUserId(Long userId, Pageable pageable);
 
     @Modifying
-    @Query("delete from Email e where e.user.id = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    @Query("update Email e set e.deletedAt = :deletedAt where e.user.id = :userId and e.deletedAt is null")
+    int softDeleteAllByUserId(@Param("userId") Long userId, @Param("deletedAt") LocalDateTime deletedAt);
+
+    @Modifying
+    @Query("update Email e set e.deletedAt = :deletedAt where e.id = :emailId and e.deletedAt is null")
+    int softDeleteById(@Param("emailId") UUID emailId, @Param("deletedAt") LocalDateTime deletedAt);
 
     @Query("SELECT e FROM Email e WHERE e.user.id = :userId AND e.emailType = :emailType ORDER BY e.createdAt DESC")
     Page<Email> findByUserIdAndEmailType(Long userId, Pageable pageable, EmailType emailType);

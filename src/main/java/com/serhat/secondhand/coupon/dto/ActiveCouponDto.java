@@ -19,6 +19,10 @@ import java.util.UUID;
 public class ActiveCouponDto {
     private UUID id;
     private String code;
+    private String title;
+    private String description;
+    /** false = user-specific pool (user is in that pool if this row is returned) */
+    private boolean forAllUsers;
     private boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;

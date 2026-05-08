@@ -29,5 +29,10 @@ export const CART_MESSAGES = Object.freeze({
   OFFER_LOAD_FAILED: 'Offer could not be loaded',
   COUPON_APPLY_FAILED: 'Coupon could not be applied',
   EMPTY_CART_TITLE: 'Your cart is empty',
-  EMPTY_CART_DESCRIPTION: 'Add some items to your cart to get started.',
+  EMPTY_CART_DESCRIPTION: 'Save items you love and checkout when you are ready.',
+  EMPTY_CART_FAVORITES_TITLE: 'From your favorites',
+  EMPTY_CART_FAVORITES_SUB: 'Jump back into listings you saved.',
+  EMPTY_CART_SEE_ALL_FAVORITES: 'See all favorites',
+  EMPTY_CART_GUEST_FAVORITES: 'Sign in to see your saved favorites here.',
+  EMPTY_CART_SIGN_IN: 'Sign in',
 });

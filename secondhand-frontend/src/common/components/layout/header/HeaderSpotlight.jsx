@@ -8,7 +8,7 @@ import {getAccountHubNavGroups} from '../../../../user/utils/accountHubSections.
  * Searches through all AccountHub navigation items by name/description.
  * Triggered by clicking the search trigger or pressing ⌘K / Ctrl+K.
  */
-const HeaderSpotlight = ({userId, isOpen, onClose}) => {
+const HeaderSpotlight = ({ userId, isAdmin = false, isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
@@ -17,13 +17,13 @@ const HeaderSpotlight = ({userId, isOpen, onClose}) => {
 
   // Build flat list of all navigable items
   const allItems = useMemo(() => {
-    const groups = getAccountHubNavGroups(userId ?? 0);
+    const groups = getAccountHubNavGroups(userId ?? 0, { isAdmin });
     const items = [];
     for (const group of groups) {
       for (const item of group.items) {
         items.push({
           name: item.name,
-          description: item.description,
+          description: item.description ?? '',
           route: item.route,
           icon: item.icon,
           group: group.label,
@@ -31,7 +31,7 @@ const HeaderSpotlight = ({userId, isOpen, onClose}) => {
       }
     }
     return items;
-  }, [userId]);
+  }, [userId, isAdmin]);
 
   // Filter items based on query
   const filteredItems = useMemo(() => {
@@ -40,7 +40,7 @@ const HeaderSpotlight = ({userId, isOpen, onClose}) => {
     return allItems.filter(
       (item) =>
         item.name.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q) ||
+        (item.description || '').toLowerCase().includes(q) ||
         item.group.toLowerCase().includes(q)
     );
   }, [allItems, query]);
@@ -188,7 +188,7 @@ const HeaderSpotlight = ({userId, isOpen, onClose}) => {
                         {item.name}
                       </div>
                       <div className={`text-[11px] truncate ${isSelected ? 'text-white/60' : 'text-gray-400'}`}>
-                        {item.description}
+                        {item.description || item.group}
                       </div>
                     </div>
                     {isSelected && (

@@ -22,7 +22,7 @@ import EmailListItem from '../components/EmailListItem';
 import EmailContent from '../components/EmailContent';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {EMAIL_TYPES} from '../emails.js';
-import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES } from '../emailConstants.js';
+import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES, EMAIL_QUERY_STALE_MS } from '../emailConstants.js';
 
 const EmailsPageLoader = () => (
     <div className="h-screen flex items-center justify-center bg-white">
@@ -95,9 +95,9 @@ const EmailsPage = ({ embedded = false }) => {
         },
         enabled: !!(isAuthenticated && user?.id),
         keepPreviousData: true,
-        staleTime: 0,
+        staleTime: EMAIL_QUERY_STALE_MS,
         refetchOnMount: 'always',
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
     });
 
     const emails = emailPage?.content ?? [];

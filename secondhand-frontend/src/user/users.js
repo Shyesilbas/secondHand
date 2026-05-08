@@ -10,6 +10,8 @@ export const UserDTO = Object.freeze({
   accountVerified: false,
   accountCreationDate: '',
   updatedAt: '',
+  /** USER | ADMIN — from GET /v1/users/me */
+  role: null,
 });
 
 export const UpdatePhoneRequestDTO = Object.freeze({

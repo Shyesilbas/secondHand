@@ -5,10 +5,12 @@ import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +47,12 @@ public interface SellerFollowRepository extends JpaRepository<SellerFollow, Long
     boolean isFollowing(@Param("followerId") Long followerId, @Param("followedId") Long followedId);
 
     void deleteByFollowerAndFollowed(User follower, User followed);
+
+    @Query(value = "SELECT * FROM seller_follows sf WHERE sf.follower_id = :followerId AND sf.followed_id = :followedId LIMIT 1", nativeQuery = true)
+    Optional<SellerFollow> findAnyByFollowerAndFollowed(@Param("followerId") Long followerId, @Param("followedId") Long followedId);
+
+    @Modifying
+    @Query("UPDATE SellerFollow sf SET sf.deletedAt = :deletedAt WHERE sf.id = :id")
+    void markDeleted(@Param("id") Long id, @Param("deletedAt") LocalDateTime deletedAt);
 }
 

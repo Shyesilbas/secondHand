@@ -16,6 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class UpdateCouponRequest {
+    private String title;
+    private String description;
+    /** When set, restricts or opens audience; pair with eligibleUserIds for targeted coupons */
+    private Boolean forAllUsers;
+    private Set<Long> eligibleUserIds;
+
     private Boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;

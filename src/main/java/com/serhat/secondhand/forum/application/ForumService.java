@@ -31,7 +31,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -54,15 +56,31 @@ public class ForumService {
     public Page<ForumThreadDto> listThreads(ForumCategory category,
                                             ForumThreadStatus status,
                                             String q,
-                                            Pageable pageable) {
-        return threadRepository.search(category, status, normalizeQuery(q), pageable).map(threadMapper::toDto);
+                                            Pageable pageable,
+                                            Long viewerUserId) {
+        Page<ForumThread> page = threadRepository.search(category, status, normalizeQuery(q), pageable);
+        List<ForumThread> content = page.getContent();
+        if (viewerUserId == null || content.isEmpty()) {
+            return page.map(t -> threadMapper.toDto(t, null));
+        }
+        List<Long> ids = content.stream().map(ForumThread::getId).toList();
+        Map<Long, ForumReactionType> viewerByThread = viewerReactionsForThreads(ids, viewerUserId);
+        return page.map(t -> threadMapper.toDto(t, viewerByThread.get(t.getId())));
     }
 
     @Transactional(readOnly = true)
-    public Result<ForumThreadDto> getThread(Long threadId) {
+    public Result<ForumThreadDto> getThread(Long threadId, Long viewerUserId) {
         if (threadId == null) return Result.error(ForumErrorCodes.INVALID_REQUEST);
         return threadRepository.findById(threadId)
-                .map(t -> Result.success(threadMapper.toDto(t)))
+                .map(t -> {
+                    ForumReactionType viewer = null;
+                    if (viewerUserId != null) {
+                        viewer = threadReactionRepository.findByThreadIdAndUserId(threadId, viewerUserId)
+                                .map(ForumThreadReaction::getReaction)
+                                .orElse(null);
+                    }
+                    return Result.success(threadMapper.toDto(t, viewer));
+                })
                 .orElseGet(() -> Result.error(ForumErrorCodes.THREAD_NOT_FOUND));
     }
 
@@ -135,8 +153,16 @@ public class ForumService {
         return Result.success();
     }
 
-    public Page<ForumCommentDto> listComments(Long threadId, Pageable pageable) {
-        return commentRepository.findByThreadId(threadId, pageable).map(commentMapper::toDto);
+    @Transactional(readOnly = true)
+    public Page<ForumCommentDto> listComments(Long threadId, Pageable pageable, Long viewerUserId) {
+        Page<ForumComment> page = commentRepository.findByThreadId(threadId, pageable);
+        List<ForumComment> content = page.getContent();
+        if (viewerUserId == null || content.isEmpty()) {
+            return page.map(c -> commentMapper.toDto(c, null));
+        }
+        List<Long> ids = content.stream().map(ForumComment::getId).toList();
+        Map<Long, ForumReactionType> viewerByComment = viewerReactionsForComments(ids, viewerUserId);
+        return page.map(c -> commentMapper.toDto(c, viewerByComment.get(c.getId())));
     }
 
     public Result<ForumCommentDto> addCommentToThread(Long userId, Long threadId, CreateForumCommentRequest req) {
@@ -196,7 +222,7 @@ public class ForumService {
             applyThreadCounters(thread, delta);
 
             ForumThread saved = threadRepository.save(thread);
-            return Result.success(threadMapper.toDto(saved));
+            return Result.success(threadMapper.toDto(saved, newReaction));
         });
     }
 
@@ -217,8 +243,26 @@ public class ForumService {
             applyCommentCounters(comment, delta);
 
             ForumComment saved = commentRepository.save(comment);
-            return Result.success(commentMapper.toDto(saved));
+            return Result.success(commentMapper.toDto(saved, newReaction));
         });
+    }
+
+    private Map<Long, ForumReactionType> viewerReactionsForThreads(List<Long> threadIds, Long userId) {
+        Map<Long, ForumReactionType> map = new HashMap<>();
+        if (userId == null || threadIds == null || threadIds.isEmpty()) return map;
+        for (ForumThreadReaction row : threadReactionRepository.findByThreadIdInAndUserId(threadIds, userId)) {
+            map.put(row.getThreadId(), row.getReaction());
+        }
+        return map;
+    }
+
+    private Map<Long, ForumReactionType> viewerReactionsForComments(List<Long> commentIds, Long userId) {
+        Map<Long, ForumReactionType> map = new HashMap<>();
+        if (userId == null || commentIds == null || commentIds.isEmpty()) return map;
+        for (ForumCommentReaction row : commentReactionRepository.findByCommentIdInAndUserId(commentIds, userId)) {
+            map.put(row.getCommentId(), row.getReaction());
+        }
+        return map;
     }
 
     private <T> Result<T> runWithRetry(Supplier<Result<T>> action) {

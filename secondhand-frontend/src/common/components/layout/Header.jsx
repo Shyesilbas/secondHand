@@ -12,6 +12,7 @@ import {useHeaderScroll} from '../../hooks/useHeaderScroll.js';
 import {useDropdownManager} from '../../hooks/useDropdownManager.js';
 import {useClickOutside} from '../../hooks/useClickOutside.js';
 import {useBadgeCounts} from '../../hooks/useBadgeCounts.js';
+import {isAdminUser} from '../../utils/admin.js';
 import {ShoppingBag, Search, Command} from 'lucide-react';
 
 const Header = () => {
@@ -150,6 +151,7 @@ const Header = () => {
             {/* ── Spotlight Modal ───────────────────── */}
             <HeaderSpotlight
                 userId={user?.id}
+                isAdmin={isAdminUser(user)}
                 isOpen={spotlightOpen}
                 onClose={() => setSpotlightOpen(false)}
             />

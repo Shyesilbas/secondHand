@@ -22,7 +22,7 @@ const PayListingFeePage = () => {
     const { paymentMethods, isLoading: isPaymentMethodsLoading, refetch: refetchPaymentMethods } = usePaymentMethods();
 
     const feeConfig = enums.listingFeeConfig;
-    const { emails, isLoading: isEmailsLoading, fetchEmails, clearEmails } = useEmails();
+    const { emails, fetchEmails, clearEmails } = useEmails();
     const { eWallet } = useEWallet();
     const {
         selectedListing,
@@ -33,7 +33,6 @@ const PayListingFeePage = () => {
         verificationCode,
         setVerificationCode,
         codeExpiryTime,
-        countdown,
         isResendingCode,
         handlePayment,
         startVerification,
@@ -163,11 +162,9 @@ const PayListingFeePage = () => {
                         verificationCode={verificationCode}
                         onChangeVerificationCode={setVerificationCode}
                         codeExpiryTime={codeExpiryTime}
-                        countdown={countdown}
                         onResendCode={resendVerificationCode}
                         isResendingCode={isResendingCode}
                         emails={emails}
-                        isEmailsLoading={isEmailsLoading}
                         onFetchEmails={fetchEmails}
                         onClearEmails={clearEmails}
                     />

@@ -1,6 +1,7 @@
 package com.serhat.secondhand.forum.dto;
 
 import com.serhat.secondhand.forum.entity.enums.ForumAuthorVisibility;
+import com.serhat.secondhand.forum.entity.enums.ForumReactionType;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public record ForumCommentDto(
         long totalDislikes,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        Long version
+        Long version,
+        ForumReactionType viewerReaction
 ) {}
 

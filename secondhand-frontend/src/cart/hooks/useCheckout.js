@@ -10,6 +10,7 @@ import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.j
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_MESSAGES, CART_PAYMENT_TYPES } from '../cartConstants.js';
+import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
 import { getCheckoutErrorMessage } from '../utils/checkoutError.js';
 
 const getCardSelectValue = (card) => (
@@ -30,7 +31,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
 
     const { addresses } = useAddresses();
     const { eWallet } = useEWallet();
-    const { emails, isLoading: isEmailsLoading, fetchEmails } = useEmails();
+    const { emails, fetchEmails } = useEmails();
 
     const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
     const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
@@ -43,6 +44,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
 
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
+    const [paymentVerificationExpiresAtMs, setPaymentVerificationExpiresAtMs] = useState(null);
     const [notes, setNotes] = useState('');
     const [orderName, setOrderName] = useState('');
 
@@ -216,6 +218,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         setBankAccounts([]);
         setSelectedBankAccountIban(null);
         setPaymentVerificationCode('');
+        setPaymentVerificationExpiresAtMs(null);
         setNotes('');
         setShowEWalletWarning(false);
     };
@@ -229,6 +232,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 offerId: offerId || null
             });
             showSuccess(CART_MESSAGES.VERIFICATION_SENT_TITLE, CART_MESSAGES.VERIFICATION_SENT_DESCRIPTION);
+            setPaymentVerificationExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
             try { await fetchEmails(); } catch {}
         } catch (e) {
             showError(
@@ -295,6 +299,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         eWallet,
         paymentVerificationCode,
         setPaymentVerificationCode,
+        paymentVerificationExpiresAtMs,
         notes,
         setNotes,
         orderName,
@@ -307,7 +312,6 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         confirmEWalletWarningAndCheckout,
         sendVerificationCode,
         emails,
-        isEmailsLoading,
         fetchEmails,
         
         // Agreement related

@@ -1,44 +1,38 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo } from 'react';
 import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { createElectronicsServiceAdapter } from '../../common/services/entityAdapters.js';
 import { electronicService } from '../services/electronicService.js';
 import { ElectronicListingDTO } from '../electronics.js';
-import { useMemo } from 'react';
 
 export const useElectronic = (electronicId = null) => {
-  const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
+  return useListingEntityAlias(adapter, {
     entityId: electronicId,
-    service: electronicsServiceAdapter,
     defaultData: ElectronicListingDTO,
-    entityName: 'Electronic'
+    entityName: 'Electronic',
+    keys: {
+      entity: 'electronic',
+      fetch: 'fetchElectronic',
+      create: 'createElectronic',
+      update: 'updateElectronic',
+      delete: 'deleteElectronic',
+    },
   });
-
-    return {
-    ...result,
-    electronic: result.entity,
-    fetchElectronic: result.fetchEntity,
-    createElectronic: result.createEntity,
-    updateElectronic: result.updateEntity,
-    deleteElectronic: result.deleteEntity
-  };
 };
 
 export const useElectronicSearch = () => {
   const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
-  
+
   const result = useEntitySearch({
     service: electronicsServiceAdapter,
     entityName: 'Electronic',
-    defaultData: []
+    defaultData: [],
   });
 
-    return {
+  return {
     ...result,
     electronics: result.entities,
-    searchByType: result.searchByCriteria
+    searchByType: result.searchByCriteria,
   };
 };
-
-

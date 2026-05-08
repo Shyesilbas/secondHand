@@ -29,9 +29,10 @@ import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "@type")
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = VehicleListingDto.class, name = "VEHICLE"),
     @JsonSubTypes.Type(value = ElectronicListingDto.class, name = "ELECTRONICS"),

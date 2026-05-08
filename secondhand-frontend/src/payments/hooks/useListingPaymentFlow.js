@@ -5,7 +5,7 @@ import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
 import {
   createListingFeePaymentRequest,
-  OTP_TTL_MINUTES,
+  OTP_CODE_VALIDITY_SECONDS,
   PAYMENT_FLOW_DEFAULTS,
   PAYMENT_TRANSACTION_TYPES,
   PAYMENT_TYPES,
@@ -116,8 +116,6 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
   const [isResendingCode, setIsResendingCode] = useState(false);
   const { showSuccess, showError, showInfo } = useNotification();
 
-  const [countdown, setCountdown] = useState(null);
-
   const {
     acceptedAgreements,
     onAgreementToggle,
@@ -129,28 +127,6 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
   useEffect(() => {
     listingFeeIdempotencyKeyRef.current = null;
   }, [selectedListing?.id]);
-
-  useEffect(() => {
-    if (!codeExpiryTime) {
-      setCountdown(null);
-      return;
-    }
-    const tick = () => {
-      const now = Date.now();
-      const expiry = new Date(codeExpiryTime).getTime();
-      const msLeft = Math.max(0, expiry - now);
-      const totalSeconds = Math.floor(msLeft / 1000);
-      const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-      const ss = String(totalSeconds % 60).padStart(2, '0');
-      setCountdown(`${mm}:${ss}`);
-      if (msLeft === 0) {
-        setCodeExpiryTime(null);
-      }
-    };
-    tick();
-    const timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
-  }, [codeExpiryTime]);
 
   const handlePayment = async () => {
     if (!selectedListing) {
@@ -180,9 +156,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
         amount: feeConfig.totalCreationFee
       });
       showInfo('Verification Required', 'Enter the verification code sent to your email.');
-      const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + OTP_TTL_MINUTES);
-      setCodeExpiryTime(expiryTime);
+      setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
       return true;
     } catch (err) {
       handleError(err, showError);
@@ -252,9 +226,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
       });
       showSuccess('Success', 'A new verification code has been sent to your email.');
       setVerificationCode('');
-      const expiryTime = new Date();
-      expiryTime.setMinutes(expiryTime.getMinutes() + OTP_TTL_MINUTES);
-      setCodeExpiryTime(expiryTime);
+      setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
     } catch (err) {
       handleError(err, showError);
     } finally {
@@ -271,7 +243,6 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     verificationCode,
     setVerificationCode,
     codeExpiryTime,
-    countdown,
     isResendingCode,
     showConfirmModal,
     setShowConfirmModal,

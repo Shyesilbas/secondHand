@@ -1,10 +1,12 @@
 import {formatCurrency} from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
 import {useSellerReviewStatsCache} from '../../../reviews/hooks/useSellerReviewStatsCache.js';
-import {Star as StarIcon} from 'lucide-react';
+import {useId} from 'react';
+import {StarIcon, STAR_SHAPE_PATH} from '../../../reviews/components/StarIcon.jsx';
 
 const SellerRating = ({ sellerId }) => {
     const { stats, loading } = useSellerReviewStatsCache(sellerId);
+    const halfStarGradientId = `seller-rating-half-${useId().replace(/:/g, '')}`;
 
     const total = Number(stats?.totalReviews);
     const avgRaw = Number(stats?.averageRating);
@@ -15,14 +17,39 @@ const SellerRating = ({ sellerId }) => {
     }
 
     const renderStars = (rating) => {
-        const fullStars = Math.floor(rating);
+        const capped = Math.min(5, Math.max(0, rating));
+        const stars = [];
+        const fullStars = Math.floor(capped);
+        const hasHalfStar = capped % 1 !== 0;
 
-        return Array.from({ length: 5 }, (_, index) => (
-            <StarIcon
-                key={index}
-                className={`w-3 h-3 ${index < fullStars ? 'text-yellow-400' : 'text-gray-300'}`}
-            />
-        ));
+        for (let i = 0; i < fullStars; i += 1) {
+            stars.push(
+                <StarIcon key={`f-${i}`} className="w-3 h-3 text-yellow-400 shrink-0" />,
+            );
+        }
+
+        if (hasHalfStar) {
+            stars.push(
+                <svg key="half" className="w-3 h-3 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                    <defs>
+                        <linearGradient id={halfStarGradientId}>
+                            <stop offset="50%" stopColor="currentColor" />
+                            <stop offset="50%" stopColor="transparent" />
+                        </linearGradient>
+                    </defs>
+                    <path fill={`url(#${halfStarGradientId})`} d={STAR_SHAPE_PATH} />
+                </svg>,
+            );
+        }
+
+        const emptyStars = 5 - Math.ceil(capped);
+        for (let i = 0; i < emptyStars; i += 1) {
+            stars.push(
+                <StarIcon key={`e-${i}`} className="w-3 h-3 text-gray-300 shrink-0" />,
+            );
+        }
+
+        return stars;
     };
 
     return (

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { OrdersListLayout } from '../components/shared';
 import { useOrderFlow } from '../hooks/useOrderFlow.js';
@@ -13,6 +13,8 @@ const MyOrdersPage = () => {
     initialSize: ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightOrderId = searchParams.get('orderId');
 
   return (
     <OrdersListLayout
@@ -21,6 +23,7 @@ const MyOrdersPage = () => {
       stickyHeader
       onAnalytics={() => navigate(ROUTES.BUYER_DASHBOARD)}
       analyticsLabel="Analytics"
+      highlightOrderId={highlightOrderId}
       flow={flow}
       enums={enums}
       viewMode={ORDER_VIEW_MODES.BUYER}

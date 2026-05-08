@@ -1,16 +1,13 @@
 package com.serhat.secondhand.core.api;
 
 import com.serhat.secondhand.core.audit.entity.AuditLog;
+import com.serhat.secondhand.core.application.EnumReadService;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
@@ -19,26 +16,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
-import com.serhat.secondhand.listing.domain.repository.books.*;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
-import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
-import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
-import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepository;
-import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
-import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
-import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
-import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
-import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.shipping.entity.enums.Carrier;
@@ -64,26 +42,7 @@ public class EnumController {
 
     private final ListingFeePaymentService listingFeePaymentService;
     private final ShowcaseService showcaseService;
-    private final ElectronicTypeRepository electronicTypeRepository;
-    private final ElectronicBrandRepository electronicBrandRepository;
-    private final ElectronicModelRepository electronicModelRepository;
-    private final BookTypeRepository bookTypeRepository;
-    private final BookGenreRepository bookGenreRepository;
-    private final BookLanguageRepository bookLanguageRepository;
-    private final BookFormatRepository bookFormatRepository;
-    private final BookConditionRepository bookConditionRepository;
-    private final ClothingBrandRepository clothingBrandRepository;
-    private final ClothingTypeRepository clothingTypeRepository;
-    private final RealEstateTypeRepository realEstateTypeRepository;
-    private final RealEstateAdTypeRepository realEstateAdTypeRepository;
-    private final HeatingTypeRepository heatingTypeRepository;
-    private final ListingOwnerTypeRepository listingOwnerTypeRepository;
-    private final CarBrandRepository carBrandRepository;
-    private final VehicleTypeRepository vehicleTypeRepository;
-    private final VehicleModelRepository vehicleModelRepository;
-    private final SportDisciplineRepository sportDisciplineRepository;
-    private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
-    private final SportConditionRepository sportConditionRepository;
+    private final EnumReadService enumReadService;
 
     private ResponseEntity<List<Map<String, Object>>> getListingTypes() {
         List<Map<String, Object>> listingTypes = Arrays.stream(ListingType.values())
@@ -111,46 +70,15 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getCarBrands() {
-        List<Map<String, Object>> brands = carBrandRepository.findAll().stream()
-                .sorted(Comparator.comparing(b -> Optional.ofNullable(b.getLabel()).orElse("")))
-                .map(brand -> {
-                    Map<String, Object> brandMap = new LinkedHashMap<>();
-                    brandMap.put("id", brand.getId());
-                    brandMap.put("name", brand.getName());
-                    brandMap.put("label", brand.getLabel());
-                    return brandMap;
-                })
-                .toList();
-        return ResponseEntity.ok(brands);
+        return ResponseEntity.ok(enumReadService.getCarBrands());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getVehicleModels() {
-        List<Map<String, Object>> models = vehicleModelRepository.findAll().stream()
-                .sorted(Comparator.comparing(m -> Optional.ofNullable(m.getName()).orElse("")))
-                .map(model -> {
-                    Map<String, Object> modelMap = new LinkedHashMap<>();
-                    modelMap.put("id", model.getId());
-                    modelMap.put("name", model.getName());
-                    modelMap.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
-                    modelMap.put("typeId", model.getType() != null ? model.getType().getId() : null);
-                    return modelMap;
-                })
-                .toList();
-        return ResponseEntity.ok(models);
+        return ResponseEntity.ok(enumReadService.getVehicleModels());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getVehicleTypes() {
-        List<Map<String, Object>> types = vehicleTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
-                .map(type -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", type.getId());
-                    map.put("name", type.getName());
-                    map.put("label", type.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(types);
+        return ResponseEntity.ok(enumReadService.getVehicleTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getFuelTypes() {
@@ -275,96 +203,31 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getElectronicTypes() {
-        List<Map<String, Object>> types = electronicTypeRepository.findAll().stream()
-                .map(type -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", type.getId());
-                    map.put("name", type.getName());
-                    map.put("label", type.getLabel());
-                    return map;
-                }).toList();
-        return ResponseEntity.ok(types);
+        return ResponseEntity.ok(enumReadService.getElectronicTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getElectronicBrands() {
-        List<Map<String, Object>> brands = electronicBrandRepository.findAll().stream()
-                .map(brand -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", brand.getId());
-                    map.put("name", brand.getName());
-                    map.put("label", brand.getLabel());
-                    return map;
-                }).toList();
-        return ResponseEntity.ok(brands);
+        return ResponseEntity.ok(enumReadService.getElectronicBrands());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getElectronicModels() {
-        List<Map<String, Object>> models = electronicModelRepository.findAll().stream()
-                .map(model -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", model.getId());
-                    map.put("name", model.getName());
-                    map.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
-                    map.put("typeId", model.getType() != null ? model.getType().getId() : null);
-                    return map;
-                }).toList();
-        return ResponseEntity.ok(models);
+        return ResponseEntity.ok(enumReadService.getElectronicModels());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getRealEstateTypes() {
-        List<Map<String, Object>> types = realEstateTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
-                .map(type -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", type.getId());
-                    map.put("name", type.getName());
-                    map.put("label", type.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(types);
+        return ResponseEntity.ok(enumReadService.getRealEstateTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getRealEstateAdTypes() {
-        List<Map<String, Object>> adTypes = realEstateAdTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
-                .map(adType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", adType.getId());
-                    map.put("name", adType.getName());
-                    map.put("label", adType.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(adTypes);
+        return ResponseEntity.ok(enumReadService.getRealEstateAdTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getHeatingTypes() {
-        List<Map<String, Object>> heatingTypes = heatingTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
-                .map(heatingType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", heatingType.getId());
-                    map.put("name", heatingType.getName());
-                    map.put("label", heatingType.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(heatingTypes);
+        return ResponseEntity.ok(enumReadService.getHeatingTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getOwnerTypes() {
-        List<Map<String, Object>> ownerTypes = listingOwnerTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse("")))
-                .map(ownerType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", ownerType.getId());
-                    map.put("name", ownerType.getName());
-                    map.put("label", ownerType.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(ownerTypes);
+        return ResponseEntity.ok(enumReadService.getOwnerTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getPaymentTypes() {
@@ -447,27 +310,11 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getClothingBrands() {
-        List<Map<String, Object>> brands = clothingBrandRepository.findAll().stream()
-                .map(brand -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", brand.getId());
-                    map.put("name", brand.getName());
-                    map.put("label", brand.getLabel());
-                    return map;
-                }).toList();
-        return ResponseEntity.ok(brands);
+        return ResponseEntity.ok(enumReadService.getClothingBrands());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getClothingTypes() {
-        List<Map<String, Object>> types = clothingTypeRepository.findAll().stream()
-                .map(type -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", type.getId());
-                    map.put("name", type.getName());
-                    map.put("label", type.getLabel());
-                    return map;
-                }).toList();
-        return ResponseEntity.ok(types);
+        return ResponseEntity.ok(enumReadService.getClothingTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getClothingConditions() {
@@ -519,124 +366,35 @@ public class EnumController {
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookTypes() {
-        List<Map<String, Object>> types = bookTypeRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(com.serhat.secondhand.listing.domain.entity.enums.books.BookType::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(t -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", t.getId());
-                    map.put("name", t.getName());
-                    map.put("label", t.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(types);
+        return ResponseEntity.ok(enumReadService.getBookTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookGenres() {
-        List<Map<String, Object>> genres = bookGenreRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(BookGenre::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(g -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", g.getId());
-                    map.put("name", g.getName());
-                    map.put("label", g.getLabel());
-                    map.put("bookTypeId", g.getBookType() != null ? g.getBookType().getId() : null);
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(genres);
+        return ResponseEntity.ok(enumReadService.getBookGenres());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookLanguages() {
-        List<Map<String, Object>> langs = bookLanguageRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(BookLanguage::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(lang -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", lang.getId());
-                    map.put("name", lang.getName());
-                    map.put("label", lang.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(langs);
+        return ResponseEntity.ok(enumReadService.getBookLanguages());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookFormats() {
-        List<Map<String, Object>> formats = bookFormatRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(BookFormat::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(fmt -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", fmt.getId());
-                    map.put("name", fmt.getName());
-                    map.put("label", fmt.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(formats);
+        return ResponseEntity.ok(enumReadService.getBookFormats());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookConditions() {
-        List<Map<String, Object>> conditions = bookConditionRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(BookCondition::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(cond -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", cond.getId());
-                    map.put("name", cond.getName());
-                    map.put("label", cond.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(conditions);
+        return ResponseEntity.ok(enumReadService.getBookConditions());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportDisciplines() {
-        List<Map<String, Object>> list = sportDisciplineRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(SportDiscipline::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(v -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", v.getId());
-                    map.put("name", v.getName());
-                    map.put("label", v.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(enumReadService.getSportDisciplines());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportEquipmentTypes() {
-        List<Map<String, Object>> list = sportEquipmentTypeRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(SportEquipmentType::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(v -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", v.getId());
-                    map.put("name", v.getName());
-                    map.put("label", v.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(enumReadService.getSportEquipmentTypes());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getSportConditions() {
-        List<Map<String, Object>> list = sportConditionRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(SportCondition::getLabel, String.CASE_INSENSITIVE_ORDER))
-                .map(v -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", v.getId());
-                    map.put("name", v.getName());
-                    map.put("label", v.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(enumReadService.getSportConditions());
     }
 
     private ResponseEntity<List<Map<String, Object>>> getDrivetrains() {

@@ -10,6 +10,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { USER_DEFAULTS } from '../userConstants.js';
 import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
+import { isAdminUser } from '../../common/utils/admin.js';
 import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency } from '../../common/formatters.js';
 import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
@@ -32,10 +33,8 @@ const AccountHubPage = () => {
 
   const navGroups = useMemo(() => {
     const id = user?.id;
-    const groups = getAccountHubNavGroups(id ?? 0);
-    if (!id) return groups.filter((g) => g.id !== 'reviews');
-    return groups;
-  }, [user?.id]);
+    return getAccountHubNavGroups(id ?? 0, { isAdmin: isAdminUser(user) });
+  }, [user?.id, user?.role]);
 
   const toggleGroup = (id) => {
     setOpenGroups((prev) => {
@@ -113,20 +112,14 @@ const AccountHubPage = () => {
                         <Link
                           key={`${group.id}-${item.route}`}
                           to={item.route}
-                          title={item.description}
-                          className={`flex items-start gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                          className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
                             active
                               ? 'bg-[#0f111a] text-white'
                               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`}
                         >
-                          <ItemIcon className={`h-4 w-4 shrink-0 mt-0.5 ${active ? 'text-gray-300' : 'text-gray-400'}`} />
-                          <span className="leading-snug">
-                            <span className="font-medium block">{item.name}</span>
-                            {!active && (
-                              <span className="text-[11px] text-gray-400 font-normal line-clamp-1">{item.description}</span>
-                            )}
-                          </span>
+                          <ItemIcon className={`h-4 w-4 shrink-0 ${active ? 'text-gray-300' : 'text-gray-400'}`} />
+                          <span className="font-medium truncate">{item.name}</span>
                         </Link>
                       );
                     })}

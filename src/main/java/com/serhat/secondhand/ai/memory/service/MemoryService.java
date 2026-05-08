@@ -27,10 +27,6 @@ public class MemoryService {
 
     private static final String DEFAULT_TONE = "Friendly";
     private static final int SUMMARY_MAX_CHARS = 8000;
-    private static final int RECENT_PROMPT_MAX_CHARS = 4000;
-    private static final int SUMMARY_LLM_INPUT_MAX_CHARS = 6000;
-    private static final int SUMMARY_LLM_OUTPUT_TARGET_CHARS = 1200;
-    private static final String MEMORY_RATE_LIMIT_PLACEHOLDER = "Cevap hazır";
     private static final int MEMORY_UPDATE_EVERY_N_USER_MESSAGES = 3;
     private static final int MIN_MESSAGE_LENGTH_FOR_MEMORY_UPDATE = 10;
     private static final Pattern MEMORY_TRIGGER_KEYWORDS = Pattern.compile("\\b(adım|bütçem|arıyorum|satıyorum|konumum|telefonum)\\b", Pattern.CASE_INSENSITIVE);
@@ -47,17 +43,20 @@ public class MemoryService {
     private final UserMemoryRepository userMemoryRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final GeminiClient geminiClient;
+    private final MemoryConversationService memoryConversationService;
     private final ObjectMapper objectMapper;
 
     public MemoryService(
             UserMemoryRepository userMemoryRepository,
             ChatMessageRepository chatMessageRepository,
             GeminiClient geminiClient,
+            MemoryConversationService memoryConversationService,
             ObjectMapper objectMapper
     ) {
         this.userMemoryRepository = userMemoryRepository;
         this.chatMessageRepository = chatMessageRepository;
         this.geminiClient = geminiClient;
+        this.memoryConversationService = memoryConversationService;
         this.objectMapper = objectMapper;
     }
 
@@ -99,64 +98,12 @@ public class MemoryService {
     @Transactional
     public void refreshSummary(Long userId) {
         UserMemory memory = getOrCreate(userId);
-        List<ChatMessage> recent = new ArrayList<>(chatMessageRepository.findTop30ByUserIdOrderByTimestampDesc(userId));
-        recent.sort(Comparator.comparing(ChatMessage::getTimestamp));
-        StringBuilder sb = new StringBuilder();
-        for (ChatMessage msg : recent) {
-            sb.append(msg.getRole().name()).append(": ").append(compact(msg.getMessage())).append("\n");
-        }
-        String transcript = sb.toString().trim();
-        if (transcript.isEmpty()) {
-            memory.setSummaryOfPastConversations(null);
-            userMemoryRepository.save(memory);
-            return;
-        }
-        String transcriptForLlm = trimToMax(transcript, SUMMARY_LLM_INPUT_MAX_CHARS);
-        String aiSummary = summarizeTranscriptWithLlm(transcriptForLlm);
-        String summary = (aiSummary != null && !aiSummary.isBlank())
-                ? trimToMax(aiSummary, SUMMARY_MAX_CHARS)
-                : trimToMax(transcript, SUMMARY_MAX_CHARS);
-        memory.setSummaryOfPastConversations(summary);
-        userMemoryRepository.save(memory);
+        memoryConversationService.refreshSummary(userId, memory);
     }
 
     /** Son mesajları modele taşınacak kısa transkript olarak döner (henüz kaydedilmemiş tur hariç). */
     public String buildRecentConversationBlock(Long userId) {
-        if (userId == null) {
-            return "";
-        }
-        List<ChatMessage> recent = new ArrayList<>(chatMessageRepository.findTop12ByUserIdOrderByTimestampDesc(userId));
-        if (recent.isEmpty()) {
-            return "";
-        }
-        recent.sort(Comparator.comparing(ChatMessage::getTimestamp));
-        StringBuilder sb = new StringBuilder();
-        for (ChatMessage msg : recent) {
-            sb.append(msg.getRole().name()).append(": ").append(compact(msg.getMessage())).append("\n");
-        }
-        return trimToMax(sb.toString().trim(), RECENT_PROMPT_MAX_CHARS);
-    }
-
-    private String summarizeTranscriptWithLlm(String transcript) {
-        String prompt = """
-                Görev: Aşağıdaki Aura asistanı ile kullanıcı arasındaki mesajları Türkçe, tek paragraf veya madde işaretleriyle en fazla %d karakterde özetle.
-                Odak: kullanıcı niyeti, tercihler, açık sorular, verilen tavsiyeler. Markdown veya kod bloğu kullanma.
-                Sadece özeti yaz; giriş cümlesi ekleme.
-
-                TRANSKRİPT:
-                %s
-                """.formatted(SUMMARY_LLM_OUTPUT_TARGET_CHARS, transcript);
-        try {
-            String raw = geminiClient.generateTextForMemory(prompt);
-            if (raw == null || raw.isBlank() || MEMORY_RATE_LIMIT_PLACEHOLDER.equals(raw.trim())) {
-                return null;
-            }
-            String cleaned = compact(raw);
-            return cleaned.length() < 12 ? null : cleaned;
-        } catch (Exception e) {
-            log.warn("Konuşma LLM özeti başarısız: {}", e.getMessage());
-            return null;
-        }
+        return memoryConversationService.buildRecentConversationBlock(userId);
     }
 
     @Transactional

@@ -7,6 +7,13 @@ import logger from '../utils/logger.js';
 const MAX_RECONNECT_ATTEMPTS = 10;
 const INITIAL_RECONNECT_DELAY = 1000; // 1s
 const MAX_RECONNECT_DELAY = 30000; // 30s
+/** Bellek/render: uzun oturumlarda mesaj dizisini sınırla */
+const MAX_MESSAGES_BUFFER = 200;
+
+const appendLimited = (prev, item) => {
+    const next = [...prev, item];
+    return next.length > MAX_MESSAGES_BUFFER ? next.slice(-MAX_MESSAGES_BUFFER) : next;
+};
 
 const useWebSocket = (userId) => {
     const [isConnected, setIsConnected] = useState(false);
@@ -47,7 +54,7 @@ const useWebSocket = (userId) => {
                         `/user/${userId}/queue/messages`,
                         (message) => {
                             const messageData = JSON.parse(message.body);
-                            setMessages((prev) => [...prev, messageData]);
+                            setMessages((prev) => appendLimited(prev, messageData));
                             setUnreadCount((prev) => prev + 1);
                         }
                     );
@@ -107,7 +114,7 @@ const useWebSocket = (userId) => {
             `/user/${userId}/queue/messages`,
             (message) => {
                 const messageData = JSON.parse(message.body);
-                setMessages(prev => [...prev, messageData]);
+                setMessages(prev => appendLimited(prev, messageData));
                 setUnreadCount(prev => prev + 1);
             }
         );
@@ -124,8 +131,8 @@ const useWebSocket = (userId) => {
             `/topic/chat/${chatRoomId}`,
             (message) => {
                 const messageData = JSON.parse(message.body);
-                setMessages(prev => [...prev, messageData]);
-                
+                setMessages(prev => appendLimited(prev, messageData));
+
                 // Tüm callback'leri çağır
                 messageCallbacks.current.forEach(callback => {
                     callback(messageData);

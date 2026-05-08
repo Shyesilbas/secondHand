@@ -18,10 +18,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/forum")
+@Tag(name = "Forum", description = "Forum operations")
 public class ForumController {
 
     private final ForumService forumService;
@@ -32,15 +34,21 @@ public class ForumController {
             @RequestParam(required = false) ForumThreadStatus status,
             @RequestParam(required = false) String q,
             @RequestParam(required = false, defaultValue = "NEW") ForumThreadSort sort,
-            @PageableDefault(size = 20) Pageable pageable
+            @PageableDefault(size = 20) Pageable pageable,
+            @AuthenticationPrincipal User currentUser
     ) {
         Pageable p = applySort(pageable, sort);
-        return forumService.listThreads(category, status, q, p);
+        Long viewerId = currentUser != null ? currentUser.getId() : null;
+        return forumService.listThreads(category, status, q, p, viewerId);
     }
 
     @GetMapping("/threads/{threadId}")
-    public ResponseEntity<?> getThread(@PathVariable Long threadId) {
-        return ResultResponses.ok(forumService.getThread(threadId));
+    public ResponseEntity<?> getThread(
+            @PathVariable Long threadId,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        Long viewerId = currentUser != null ? currentUser.getId() : null;
+        return ResultResponses.ok(forumService.getThread(threadId, viewerId));
     }
 
     @PostMapping("/threads")
@@ -89,10 +97,12 @@ public class ForumController {
     @GetMapping("/threads/{threadId}/comments")
     public Page<ForumCommentDto> listComments(
             @PathVariable Long threadId,
-            @PageableDefault(size = 20) Pageable pageable
+            @PageableDefault(size = 20) Pageable pageable,
+            @AuthenticationPrincipal User currentUser
     ) {
         Pageable p = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
-        return forumService.listComments(threadId, p);
+        Long viewerId = currentUser != null ? currentUser.getId() : null;
+        return forumService.listComments(threadId, p, viewerId);
     }
 
     @PostMapping("/threads/{threadId}/comments")

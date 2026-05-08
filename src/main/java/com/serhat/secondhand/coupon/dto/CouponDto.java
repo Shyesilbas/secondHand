@@ -19,6 +19,10 @@ import java.util.UUID;
 public class CouponDto {
     private UUID id;
     private String code;
+    private String title;
+    private String description;
+    private boolean forAllUsers;
+    private Set<Long> eligibleUserIds;
     private boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;

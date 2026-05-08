@@ -37,10 +37,10 @@ import java.time.Duration;
  *       enum gibi final tipler için {@code @class} yazılmaz, okurken aranır → fail.</li>
  *   <li><b>Domain DTO'larında @JsonTypeInfo bulunan tipler</b> (ListingDto,
  *       ListingFilterDto) Jackson tarafından öncelenir; default typing onların
- *       diskriminatörünü override etmez (kendi {@code type}/{@code listingType}
- *       alanı kullanılır).</li>
- *   <li><b>Cache key versioning:</b> Tüm anahtarların başına {@code v3::} prefix
- *       eklenir. Eski v1/v2 anahtarları erişilemez, TTL ile temizlenir.</li>
+ *       diskriminatörünü override etmez (ListingDto da {@code type}; filter DTO'da
+ *       {@code listingType} kullanılır).</li>
+ *   <li><b>Cache key versioning:</b> Tüm anahtarların başına {@code v4::} prefix
+ *       eklenir. Eski v1/v2/v3 anahtarları erişilemez, TTL ile temizlenir.</li>
  *   <li><b>JavaTimeModule:</b> {@code LocalDateTime} ISO-8601 string olarak.</li>
  * </ul>
  */
@@ -50,7 +50,7 @@ import java.time.Duration;
 public class CacheConfig {
 
     /** Cache key prefix versiyonu. Serializer/format değişimlerinde bumb edilir. */
-    private static final String CACHE_VERSION = "v3";
+    private static final String CACHE_VERSION = "v4";
 
     @Bean
     @Primary

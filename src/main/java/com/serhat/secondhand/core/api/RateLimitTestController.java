@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RequestMapping("/api/test/rate-limit")
 @ConditionalOnProperty(name = "app.test-endpoints.enabled", havingValue = "true")
 @Slf4j
+@Tag(name = "Rate Limit Test", description = "Rate Limit Test operations")
 public class RateLimitTestController {
 
     @GetMapping("/auth")

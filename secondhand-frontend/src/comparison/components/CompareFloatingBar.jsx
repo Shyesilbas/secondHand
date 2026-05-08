@@ -5,7 +5,8 @@ import { useEnums } from '../../common/hooks/useEnums.js';
 import { formatCurrencyCompact } from '../../common/formatters.js';
 
 const CompareFloatingBar = memo(() => {
-    const { items, category, itemCount, maxItems, removeFromComparison, clearComparison, openModal } = useComparison();
+    const { items, category, itemCount, maxItems, removeFromComparison, clearComparison, openModal } =
+        useComparison();
     const { getListingTypeLabel } = useEnums();
 
     if (itemCount === 0) return null;
@@ -14,65 +15,66 @@ const CompareFloatingBar = memo(() => {
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
-            <div className="max-w-4xl mx-auto px-4 pb-4">
-                <div className="pointer-events-auto bg-background-primary/95 backdrop-blur-lg border border-border-light rounded-2xl shadow-2xl overflow-hidden">
-                    <div className="px-4 py-3 bg-gradient-to-r from-accent-indigo-600/10 to-accent-indigo-500/5 border-b border-border-light">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="p-1.5 bg-accent-indigo-600 rounded-lg">
+            <div className="max-w-4xl mx-auto px-4 pb-4 pt-2">
+                <div className="pointer-events-auto rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-md shadow-[0_-4px_24px_-4px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/5 overflow-hidden">
+                    <div className="px-4 py-2.5 bg-gradient-to-r from-indigo-600/08 to-indigo-500/03 border-b border-slate-100">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                                <div className="p-1.5 bg-indigo-600 rounded-lg shadow-sm shadow-indigo-600/20 shrink-0">
                                     <Scale className="w-4 h-4 text-white" />
                                 </div>
-                                <div>
-                                    <span className="text-sm font-semibold text-text-primary">
+                                <div className="min-w-0">
+                                    <span className="text-sm font-semibold text-slate-900 truncate block">
                                         Compare {getListingTypeLabel(category)}
                                     </span>
-                                    <span className="text-xs text-text-secondary ml-2">
-                                        {itemCount} of {maxItems} selected
-                                    </span>
+                                    <span className="text-xs text-slate-500">{itemCount} of {maxItems} selected</span>
                                 </div>
                             </div>
                             <button
+                                type="button"
                                 onClick={clearComparison}
-                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:text-status-error-DEFAULT hover:bg-status-error-bg rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
                             >
                                 <Trash2 className="w-3.5 h-3.5" />
-                                Clear All
+                                Clear all
                             </button>
                         </div>
                     </div>
 
-                    <div className="p-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                    <div className="p-3 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-stretch gap-3">
+                            <div className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-thin">
                                 {items.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="relative group flex-shrink-0 w-20 bg-secondary-50 rounded-xl border border-border-light overflow-hidden hover:border-accent-indigo-300 transition-colors"
+                                        className="relative group flex-shrink-0 w-[4.75rem] rounded-xl border border-slate-200 bg-slate-50/90 overflow-hidden hover:border-indigo-300 hover:shadow-sm transition-all"
                                     >
-                                        <div className="aspect-square relative">
+                                        <div className="aspect-square relative bg-white">
                                             {item.imageUrl ? (
                                                 <img
                                                     src={item.imageUrl}
-                                                    alt={item.title}
+                                                    alt=""
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-secondary-100">
-                                                    <ImageIcon className="w-5 h-5 text-text-muted" />
+                                                <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                                                    <ImageIcon className="w-5 h-5 text-slate-300" />
                                                 </div>
                                             )}
                                             <button
+                                                type="button"
                                                 onClick={() => removeFromComparison(item.id)}
-                                                className="absolute -top-1 -right-1 w-5 h-5 bg-status-error-DEFAULT text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-status-error-hover"
+                                                className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-rose-700"
+                                                aria-label="Remove"
                                             >
                                                 <X className="w-3 h-3" />
                                             </button>
                                         </div>
-                                        <div className="p-1.5">
-                                            <p className="text-[10px] font-medium text-text-primary truncate" title={item.title}>
+                                        <div className="px-1.5 py-1.5 border-t border-slate-100 bg-white">
+                                            <p className="text-[10px] font-medium text-slate-800 truncate leading-tight" title={item.title}>
                                                 {item.title}
                                             </p>
-                                            <p className="text-[10px] font-bold text-accent-indigo-600">
+                                            <p className="text-[10px] font-bold text-indigo-600 tabular-nums mt-0.5">
                                                 {formatCurrencyCompact(item.campaignPrice || item.price, item.currency)}
                                             </p>
                                         </div>
@@ -82,31 +84,31 @@ const CompareFloatingBar = memo(() => {
                                 {Array.from({ length: maxItems - itemCount }).map((_, index) => (
                                     <div
                                         key={`empty-${index}`}
-                                        className="flex-shrink-0 w-20 aspect-square rounded-xl border-2 border-dashed border-border-light flex items-center justify-center"
+                                        className="flex-shrink-0 w-[4.75rem] aspect-[3/4] rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/40 flex items-center justify-center text-slate-300"
                                     >
-                                        <span className="text-[10px] text-text-muted">+</span>
+                                        <span className="text-xl font-light leading-none">+</span>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="flex-shrink-0 pl-3 border-l border-border-light">
+                            <div className="flex sm:flex-col flex-shrink-0 justify-center sm:justify-between gap-2 sm:border-l sm:border-slate-100 sm:pl-4 sm:min-w-[8.5rem]">
                                 <button
+                                    type="button"
                                     onClick={openModal}
                                     disabled={!canCompare}
                                     className={`
-                                        flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
+                                        w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
                                         ${canCompare
-                                            ? 'bg-accent-indigo-600 text-white hover:bg-accent-indigo-700 shadow-lg shadow-accent-indigo-600/25 hover:shadow-xl hover:shadow-accent-indigo-600/30'
-                                            : 'bg-secondary-100 text-text-muted cursor-not-allowed'
-                                        }
+                                            ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/25'
+                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'}
                                     `}
                                 >
-                                    <Scale className="w-4 h-4" />
+                                    <Scale className="w-4 h-4 shrink-0" />
                                     Compare
                                 </button>
                                 {!canCompare && (
-                                    <p className="text-[10px] text-text-muted mt-1 text-center">
-                                        Select at least 2
+                                    <p className="text-center text-[10px] text-slate-400 sm:text-left">
+                                        Add at least 2 items
                                     </p>
                                 )}
                             </div>
@@ -121,4 +123,3 @@ const CompareFloatingBar = memo(() => {
 CompareFloatingBar.displayName = 'CompareFloatingBar';
 
 export default CompareFloatingBar;
-

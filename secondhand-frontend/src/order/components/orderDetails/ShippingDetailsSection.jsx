@@ -1,8 +1,41 @@
-import React from 'react';
-import { Truck, ExternalLink, Package, Calendar, MapPin } from 'lucide-react';
+import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Clock, Truck, Package, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { ROUTES } from '../../../common/constants/routes.js';
 import { formatDateTime } from '../../../common/formatters.js';
 
-export const ShippingDetailsSection = React.memo(({ shipping, CardComponent }) => {
+/**
+ * internalTracking verildiğinde harici sekme yerine uygulama içi /profile/.../shipment rotasına gider (modal için).
+ */
+const linesForDeliveryAddress = (addr) => {
+  if (!addr || typeof addr !== 'object') return { primary: '', secondary: '' };
+  const primary = String(addr.addressLine || '').trim();
+  const secondary = [
+    addr.city,
+    addr.state || addr.region,
+    addr.postalCode || addr.zipCode,
+    addr.country,
+  ]
+    .filter((v) => v != null && String(v).trim() !== '')
+    .map((v) => String(v).trim())
+    .join(', ');
+  return { primary, secondary };
+};
+
+export const ShippingDetailsSection = React.memo(({ shipping, deliveryAddress, CardComponent, internalTracking }) => {
+  const navigate = useNavigate();
+
+  const goInternalTracking = useCallback(() => {
+    const id = internalTracking?.orderId;
+    if (!id) return;
+    internalTracking?.onBeforeNavigate?.();
+    const path =
+      internalTracking.isSellerView
+        ? ROUTES.PROFILE_I_SOLD_SHIPMENT(id)
+        : ROUTES.PROFILE_ORDER_SHIPMENT(id);
+    navigate(path);
+  }, [internalTracking, navigate]);
+
   if (!shipping) return null;
 
   const getStatusColor = (status) => {
@@ -15,6 +48,11 @@ export const ShippingDetailsSection = React.memo(({ shipping, CardComponent }) =
       default: return 'text-slate-600 bg-slate-50 border-slate-100';
     }
   };
+
+  const useInternalLinks = Boolean(internalTracking?.orderId);
+  const canOpenCarrier = Boolean(shipping.trackingUrl && !useInternalLinks);
+  const { primary: addrLine1, secondary: addrLine2 } = linesForDeliveryAddress(deliveryAddress);
+  const hasDeliveryAddress = Boolean(addrLine1 || addrLine2);
 
   return (
     <CardComponent className="p-5">
@@ -40,20 +78,34 @@ export const ShippingDetailsSection = React.memo(({ shipping, CardComponent }) =
           {shipping.trackingNumber && (
             <div>
               <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Tracking Number</p>
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-mono font-bold text-indigo-600">{shipping.trackingNumber}</p>
-                {shipping.trackingUrl && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <p className="text-sm font-mono font-bold text-indigo-600 break-all">{shipping.trackingNumber}</p>
+                {useInternalLinks ? (
+                  <button
+                    type="button"
+                    onClick={goInternalTracking}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-900/10 transition-colors"
+                  >
+                    Track in app
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : null}
+                {canOpenCarrier ? (
                   <a
                     href={shipping.trackingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1 hover:bg-indigo-50 rounded-md text-indigo-500 transition-colors"
-                    title="Track Package"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 transition-colors"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    Open carrier site
                   </a>
-                )}
+                ) : null}
               </div>
+              {useInternalLinks && shipping.trackingUrl ? (
+                <p className="text-[10px] text-slate-400 mt-2">
+                  Full tracking page also offers the carrier website link when available.
+                </p>
+              ) : null}
             </div>
           )}
         </div>
@@ -78,35 +130,38 @@ export const ShippingDetailsSection = React.memo(({ shipping, CardComponent }) =
               </div>
             </div>
           )}
-          
+
           {!shipping.trackingNumber && shipping.status === 'PENDING' && (
             <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <Clock className="w-4 h-4 text-slate-400" />
+              <Clock className="w-4 h-4 text-slate-400 shrink-0" />
               <p className="text-[11px] text-slate-500 font-medium">Waiting for seller to ship the items.</p>
             </div>
           )}
         </div>
       </div>
+
+      {hasDeliveryAddress ? (
+        <div className="mt-5 pt-5 border-t border-slate-100">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+            <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            Teslimat adresi
+          </p>
+          {addrLine1 ? <p className="text-sm font-semibold text-slate-900">{addrLine1}</p> : null}
+          {addrLine2 ? (
+            <p
+              className={
+                addrLine1
+                  ? 'text-[13px] text-slate-600 mt-1 leading-snug'
+                  : 'text-sm font-semibold text-slate-900 leading-snug'
+              }
+            >
+              {addrLine2}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </CardComponent>
   );
 });
 
 ShippingDetailsSection.displayName = 'ShippingDetailsSection';
-
-const Clock = ({ className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);

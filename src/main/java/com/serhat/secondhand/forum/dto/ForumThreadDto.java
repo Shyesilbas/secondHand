@@ -4,7 +4,7 @@ import com.serhat.secondhand.forum.entity.enums.ForumCategory;
 import com.serhat.secondhand.forum.entity.enums.ForumAuthorVisibility;
 import com.serhat.secondhand.forum.entity.enums.ForumThreadStatus;
 
-import java.time.LocalDateTime;
+import com.serhat.secondhand.forum.entity.enums.ForumReactionType;
 import java.util.List;
 
 public record ForumThreadDto(
@@ -19,8 +19,9 @@ public record ForumThreadDto(
         long totalLikes,
         long totalDislikes,
         List<String> keywords,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        Long version
+        java.time.LocalDateTime createdAt,
+        java.time.LocalDateTime updatedAt,
+        Long version,
+        ForumReactionType viewerReaction
 ) {}
 

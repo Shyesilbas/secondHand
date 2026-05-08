@@ -4,6 +4,7 @@ import com.serhat.secondhand.cloudinary.application.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
+@Tag(name = "Image", description = "Image operations")
 public class ImageController {
 
     private final CloudinaryService cloudinaryService;

@@ -4,7 +4,7 @@ import { REVIEW_DEFAULTS, REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConsta
 import { useReviewSubmission } from '../hooks/useReviewSubmission.js';
 import { InteractiveStarRating } from './InteractiveStarRating.jsx';
 
-const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
+const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated, fallbackOrderId }) => {
   const [rating, setRating] = useState(REVIEW_DEFAULTS.INITIAL_RATING);
   const [comment, setComment] = useState('');
   const { submitReview, loading, error, clearError } = useReviewSubmission();
@@ -30,8 +30,9 @@ const ReviewModal = ({ isOpen, onClose, orderItem, onReviewCreated }) => {
       orderItemId: orderItem.id,
       rating,
       comment,
-      onSuccess: () => {
-        onReviewCreated?.();
+      orderId: orderItem.orderId ?? orderItem.order?.id ?? fallbackOrderId,
+      onSuccess: (payload) => {
+        onReviewCreated?.(payload);
         onClose();
       },
     });

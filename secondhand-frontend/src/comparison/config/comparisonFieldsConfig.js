@@ -5,6 +5,17 @@ export const HIGHLIGHT_RULES = {
     NONE: 'none'
 };
 
+// Backend may return label-like objects ({ id, name, label }) for some scalar fields.
+const resolveScalarField = (v) => {
+    if (v == null) return v;
+    if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') return v;
+    if (typeof v !== 'object' || Array.isArray(v)) return v;
+    const inner = v.name ?? v.label ?? v.title ?? v.modelName ?? v.displayName;
+    if (inner != null && typeof inner !== 'object') return inner;
+    if (v.value != null && typeof v.value !== 'object') return v.value;
+    return v;
+};
+
 const commonFields = [
     {
         key: 'price',
@@ -40,6 +51,7 @@ export const comparisonFieldsConfig = {
             label: 'Model',
             type: 'text',
             highlight: HIGHLIGHT_RULES.NONE,
+            getValue: (item) => resolveScalarField(item.model),
             priority: 3
         },
         {
@@ -162,6 +174,7 @@ export const comparisonFieldsConfig = {
             label: 'Model',
             type: 'text',
             highlight: HIGHLIGHT_RULES.NONE,
+            getValue: (item) => resolveScalarField(item.model),
             priority: 3
         },
         {

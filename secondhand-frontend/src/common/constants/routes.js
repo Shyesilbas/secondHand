@@ -47,12 +47,23 @@ export const ROUTES = {
     ORDER_SUCCESS: '/orders/success',
     OFFERS: '/offers',
     MY_ORDERS: '/profile/orders',
+    /** Sipariş kargo takip (alıcı — uygulama içi sayfa). */
+    PROFILE_ORDER_SHIPMENT: (orderId) => `/profile/orders/${orderId}/shipment`,
     I_SOLD: '/profile/i-sold',
+    /** Sipariş kargo takip (satıcı). */
+    PROFILE_I_SOLD_SHIPMENT: (orderId) => `/profile/i-sold/${orderId}/shipment`,
     USER_REVIEWS: (userId) => `/users/${userId}/reviews`,
     REVIEWS_RECEIVED: (userId) => `/reviews/received/${userId}`,
     REVIEWS_GIVEN: (userId) => `/reviews/given/${userId}`,
     MY_SHOWCASES: '/my-showcases',
+    /** Seller-owned listing discounts (≠ platform checkout coupons) */
+    SELLER_CAMPAIGNS: '/selling/campaigns',
+    /** Platform/admin coupons usable at checkout — GET /coupons/active */
+    PLATFORM_COUPONS: '/coupons',
+    /** @deprecated Prefer SELLER_CAMPAIGNS; kept for redirects */
     MY_COUPONS: '/my-coupons',
     MY_LISTS: '/my-lists',
     FAVORITE_LIST_DETAIL: (listId) => `/lists/${listId}`,
+    /** Platform coupon management (ADMIN only; route also guarded in UI) */
+    ADMIN_COUPONS: '/admin/coupons',
 };

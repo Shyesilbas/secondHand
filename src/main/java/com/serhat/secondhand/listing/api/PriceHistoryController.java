@@ -5,6 +5,7 @@ import com.serhat.secondhand.listing.domain.dto.PriceHistoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/price-history")
 @RequiredArgsConstructor
+@Tag(name = "Price History", description = "Price History operations")
 public class PriceHistoryController {
 
     private final PriceHistoryService priceHistoryService;

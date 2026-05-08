@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import com.serhat.secondhand.cart.exception.ReservationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,7 +25,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+    public ResponseEntity<ProblemDetail> handleValidationExceptions(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
 
@@ -35,51 +36,51 @@ public class GlobalExceptionHandler {
             validationErrors.put(fieldName, errorMessage);
         });
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
                 "Validation Failed",
                 "Input validation failed",
-                request.getRequestURI(),
-                validationErrors
+                request.getRequestURI()
         );
+        problem.setProperty("errors", validationErrors);
         log.warn("Validation error: {}", validationErrors);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler(ReservationException.class)
-    public ResponseEntity<ErrorResponse> handleReservationException(
+    public ResponseEntity<ProblemDetail> handleReservationException(
             ReservationException ex,
             HttpServletRequest request) {
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 ex.getHttpStatus(),
                 ex.getErrorCode(),
                 ex.getMessage(),
                 request.getRequestURI()
         );
         log.warn("Reservation exception: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+        return ResponseEntity.status(ex.getHttpStatus()).body(problem);
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<ErrorResponse> handleOptimisticLock(
+    public ResponseEntity<ProblemDetail> handleOptimisticLock(
             ObjectOptimisticLockingFailureException ex,
             HttpServletRequest request) {
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.CONFLICT,
                 "CONCURRENT_MODIFICATION",
                 "The resource is currently being modified by another process. Please try again.",
                 request.getRequestURI()
         );
         log.warn("Optimistic lock failure: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(
             DataIntegrityViolationException ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.CONFLICT,
                 "Conflict",
                 "Data integrity violation",
@@ -87,15 +88,15 @@ public class GlobalExceptionHandler {
         );
 
         log.error("Data integrity violation: {}", ex.getRootCause());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
+    public ResponseEntity<ProblemDetail> handleBadCredentials(
             BadCredentialsException ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.UNAUTHORIZED,
                 "Authentication Failed",
                 "Invalid email or password",
@@ -103,15 +104,15 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Authentication failed: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(
+    public ResponseEntity<ProblemDetail> handleAccessDenied(
             AccessDeniedException ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.FORBIDDEN,
                 "Access Denied",
                 "You don't have permission to access this resource",
@@ -119,15 +120,15 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Access denied: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
+    public ResponseEntity<ProblemDetail> handleBusinessException(
             BusinessException ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 ex.getHttpStatus(),
                 ex.getErrorCode(),
                 ex.getMessage(),
@@ -135,17 +136,17 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Business exception [{}]: {}", ex.getErrorCode(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
+        return ResponseEntity.status(ex.getHttpStatus()).body(problem);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+    public ResponseEntity<ProblemDetail> handleIllegalArgument(
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
         String sanitizedMessage = sanitizeMessage(ex.getMessage());
         
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.BAD_REQUEST,
                 "Bad Request",
                 sanitizedMessage,
@@ -153,15 +154,15 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<ErrorResponse> handleSecurityException(
+    public ResponseEntity<ProblemDetail> handleSecurityException(
             SecurityException ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.FORBIDDEN,
                 "Forbidden",
                 ex.getMessage(),
@@ -169,7 +170,7 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Security exception: {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
 
 
@@ -179,11 +180,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
+    public ResponseEntity<ProblemDetail> handleGenericException(
             Exception ex,
             HttpServletRequest request) {
 
-        ErrorResponse errorResponse = createErrorResponse(
+        ProblemDetail problem = createProblem(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal Server Error",
                 "An unexpected error occurred",
@@ -191,23 +192,15 @@ public class GlobalExceptionHandler {
         );
 
         log.error("Unexpected exception: ", ex);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
-    private ErrorResponse createErrorResponse(HttpStatus httpStatus, String error, String message, String path) {
-        return createErrorResponse(httpStatus, error, message, path, null);
-    }
-
-    private ErrorResponse createErrorResponse(HttpStatus httpStatus, String error, String message, String path, Map<String, String> validationErrors) {
-        return new ErrorResponse(
-                LocalDateTime.now(),
-                httpStatus.value(),
-                error,
-                message,
-                path,
-                validationErrors,
-                null,
-                null);
+    private ProblemDetail createProblem(HttpStatus status, String title, String detail, String path) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setTitle(title);
+        problem.setProperty("path", path);
+        problem.setProperty("timestamp", LocalDateTime.now());
+        return problem;
     }
 
     private String sanitizeMessage(String message) {

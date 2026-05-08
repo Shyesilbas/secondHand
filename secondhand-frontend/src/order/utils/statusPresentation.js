@@ -12,6 +12,8 @@ export const getOrderStatusBadgeClass = (status) => {
   if (s === ORDER_STATUSES.CONFIRMED) return 'bg-green-50 text-green-800 border-green-200';
   if (s === ORDER_STATUSES.PENDING) return 'bg-slate-100 text-slate-700 border-slate-200';
   if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
+  if (s === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'bg-amber-50 text-amber-900 border-amber-200';
+  if (s === ORDER_STATUSES.FAILED) return 'bg-rose-50 text-rose-900 border-rose-300';
   return 'bg-slate-50 text-slate-700 border-slate-200';
 };
 

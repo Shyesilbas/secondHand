@@ -9,6 +9,9 @@ export const couponService = {
   active: async () => {
     return get(API_ENDPOINTS.COUPONS.ACTIVE);
   },
+  redemptions: async () => {
+    return get(API_ENDPOINTS.COUPONS.REDEMPTIONS);
+  },
 };
 
 

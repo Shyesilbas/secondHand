@@ -63,11 +63,11 @@ const FilterSidebar = ({
   if (enumsLoading) {
     return (
       <div className="fixed inset-0 z-50 lg:relative lg:z-auto">
-        <div className="fixed inset-0 bg-black/40 lg:hidden" onClick={onClose} />
-        <div className="fixed left-0 top-0 h-full w-80 bg-white border-r border-gray-100 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-6 h-6 rounded-full border-2 border-gray-900 border-t-transparent animate-spin" />
-            <p className="text-[13px] text-gray-400">Loading filters…</p>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] lg:hidden" onClick={onClose} />
+        <div className="fixed left-0 top-0 h-full w-80 max-w-[calc(100vw-1.25rem)] bg-slate-50 border-r border-slate-200/80 flex items-center justify-center shadow-xl shadow-slate-900/10">
+          <div className="flex flex-col items-center gap-3 px-6">
+            <div className="w-9 h-9 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin" />
+            <p className="text-sm font-medium text-slate-500">Loading filters…</p>
           </div>
         </div>
       </div>
@@ -78,47 +78,59 @@ const FilterSidebar = ({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40 lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
-      <div className={`
-        fixed left-0 top-0 h-screen w-80 bg-white z-50 border-r border-gray-100 flex flex-col
-        transform transition-transform duration-300 ease-in-out
+      <aside
+        className={`
+        fixed left-0 top-0 z-50 flex h-[100dvh] w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-slate-200/80 bg-slate-50 shadow-xl shadow-slate-900/10
+        transform transition-transform duration-300 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      `}
+        aria-labelledby="listing-filters-title"
+      >
         {/* Header */}
-        <div className="border-b border-gray-100 px-4 py-3.5 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-gray-500" />
-              <h2 className="text-[15px] font-semibold text-gray-900">Filters</h2>
+        <header className="flex-shrink-0 border-b border-slate-200/80 bg-white px-4 py-4 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-md shadow-indigo-500/25">
+                <SlidersHorizontal className="w-5 h-5" strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <h2 id="listing-filters-title" className="truncate text-base font-semibold tracking-tight text-slate-900">
+                  Filters
+                </h2>
+                <p className="text-xs font-medium text-slate-500">Refine listings, then Apply</p>
+              </div>
             </div>
             <button
+              type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+              className="shrink-0 rounded-xl border border-transparent p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 lg:hidden"
               aria-label="Close filters"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-4 space-y-4">
+        {/* Scrollable */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+          <div className="flex flex-col gap-3">
             {mode === 'mine' ? (
               /* Mine mode: tabs for category/status */
               <div>
-                <div className="flex gap-1 p-1 bg-gray-50 rounded-lg mb-3">
+              <div className="mb-3 flex gap-1 rounded-xl bg-slate-200/70 p-1">
                   {['category', 'status'].map((tab) => (
                     <button
                       key={tab}
+                      type="button"
                       onClick={() => setMineActiveTab(tab)}
-                      className={`flex-1 px-3 py-2 text-[13px] font-medium rounded-md transition-all capitalize ${
+                      className={`flex-1 px-3 py-2.5 text-sm font-semibold rounded-lg transition-all capitalize ${
                         mineActiveTab === tab
-                          ? 'bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-500 hover:text-gray-700'
+                          ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/70'
+                          : 'text-slate-500 hover:text-slate-700'
                       }`}
                     >
                       {tab}
@@ -166,7 +178,7 @@ const FilterSidebar = ({
               <>
                 {/* Category — only when no category is pre-selected */}
                 {showCategorySelector && (
-                  <FilterSection title="Category">
+                  <FilterSection title="Category" description="Pick a listing type to unlock specific filters">
                     <div className="flex flex-wrap gap-1.5">
                       <CategoryChip
                         label="All"
@@ -192,21 +204,21 @@ const FilterSidebar = ({
 
                 {/* Active category label (when category is locked) */}
                 {selectedCategory && (
-                  <div className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
-                    <span className="text-[13px] font-semibold text-gray-700">
+                  <div className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-white px-3 py-2.5 shadow-sm">
+                    <span className="text-sm font-semibold tracking-tight text-slate-800">
                       {listingConfig?.label || selectedCategory}
                     </span>
                     <button
+                      type="button"
                       onClick={() => onCategoryChange(null)}
-                      className="text-[11px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
+                      className="rounded-lg px-2 py-1 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
                     >
                       Change
                     </button>
                   </div>
                 )}
 
-                {/* Price & Location */}
-                <FilterSection title="Price & Location">
+                <FilterSection title="Budget & location" description="Amounts and Turkish city / district">
                   <PriceLocationFields
                     filters={localFilters}
                     onPriceChange={handleInputChange}
@@ -217,7 +229,10 @@ const FilterSidebar = ({
 
                 {/* Category-specific filters */}
                 {selectedCategory && filterConfig && (
-                  <FilterSection title={`${listingConfig?.label || ''} Filters`}>
+                  <FilterSection
+                    title={listingConfig?.label ? `${listingConfig.label}` : 'Category'}
+                    description="Fine-tune this listing type"
+                  >
                     <FilterRenderer
                       config={filterConfig}
                       filters={localFilters}
@@ -228,8 +243,8 @@ const FilterSidebar = ({
                 )}
 
                 {selectedCategory && !filterConfig && (
-                  <div className="py-4 text-center">
-                    <p className="text-[13px] text-gray-400">No additional filters for this category.</p>
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-6 text-center">
+                    <p className="text-sm font-medium text-slate-500">No extra filters for this category.</p>
                   </div>
                 )}
               </>
@@ -237,47 +252,52 @@ const FilterSidebar = ({
           </div>
         </div>
 
-        {/* Footer actions */}
-        <div className="border-t border-gray-100 px-4 py-3 flex-shrink-0">
+        <footer className="flex-shrink-0 border-t border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur-sm">
           <div className="flex gap-2">
             {mode !== 'mine' && (
               <button
+                type="button"
                 onClick={handleApplyFilters}
-                className="flex-1 px-4 py-2.5 bg-gray-900 text-white text-[13px] font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+                className="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-colors hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/45 focus-visible:ring-offset-2"
               >
-                Apply
+                Apply filters
               </button>
             )}
             <button
+              type="button"
               onClick={handleReset}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-gray-500 text-[13px] font-medium hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-4 h-4 shrink-0" />
               Reset
             </button>
           </div>
-        </div>
-      </div>
+        </footer>
+      </aside>
     </>
   );
 };
 
 /* ── Sub-components ── */
 
-const FilterSection = ({ title, children }) => (
-  <div>
-    <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5 px-0.5">{title}</h3>
-    {children}
-  </div>
+const FilterSection = ({ title, description, children }) => (
+  <section className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]">
+    <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-3">
+      <h3 className="text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
+      {description ? <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{description}</p> : null}
+    </div>
+    <div className="p-4">{children}</div>
+  </section>
 );
 
 const OptionRow = ({ label, active, onClick }) => (
   <button
+    type="button"
     onClick={onClick}
-    className={`w-full px-3 py-2.5 rounded-lg text-left transition-colors text-[13px] font-medium ${
+    className={`w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors ${
       active
-        ? 'bg-gray-900 text-white'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        ? 'bg-indigo-600 text-white shadow-sm'
+        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
     }`}
   >
     {label}
@@ -286,9 +306,12 @@ const OptionRow = ({ label, active, onClick }) => (
 
 const CategoryChip = ({ label, icon, active, onClick }) => (
   <button
+    type="button"
     onClick={onClick}
-    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
-      active ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+    className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${
+      active
+        ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm shadow-indigo-500/20'
+        : 'border-transparent bg-white text-slate-600 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/80 hover:bg-slate-50'
     }`}
   >
     {icon && <span className="text-[11px]">{icon}</span>}

@@ -1,43 +1,39 @@
-import { useEntity } from '../../common/hooks/useEntity.js';
+import { useMemo, useEffect, useState } from 'react';
+import { useListingEntityAlias } from '../../common/hooks/useListingEntityAlias.js';
 import { useEntitySearch } from '../../common/hooks/useEntitySearch.js';
 import { createVehicleServiceAdapter } from '../../common/services/entityAdapters.js';
 import { vehicleService } from '../services/vehicleService.js';
 import { VehicleListingDTO } from '../vehicles.js';
-import { useMemo } from 'react';
 
 export const useVehicle = (vehicleId = null) => {
-  const vehicleServiceAdapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
-  
-  const result = useEntity({
+  const adapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
+  return useListingEntityAlias(adapter, {
     entityId: vehicleId,
-    service: vehicleServiceAdapter,
     defaultData: VehicleListingDTO,
-    entityName: 'Vehicle'
+    entityName: 'Vehicle',
+    keys: {
+      entity: 'vehicle',
+      fetch: 'fetchVehicle',
+      create: 'createVehicle',
+      update: 'updateVehicle',
+      delete: 'deleteVehicle',
+    },
   });
-
-    return {
-    ...result,
-    vehicle: result.entity,
-    fetchVehicle: result.fetchEntity,
-    createVehicle: result.createEntity,
-    updateVehicle: result.updateEntity,
-    deleteVehicle: result.deleteEntity
-  };
 };
 
 export const useVehicleSearch = () => {
   const vehicleServiceAdapter = useMemo(() => createVehicleServiceAdapter(vehicleService), []);
-  
+
   const result = useEntitySearch({
     service: vehicleServiceAdapter,
     entityName: 'Vehicle',
-    defaultData: []
+    defaultData: [],
   });
 
-    return {
+  return {
     ...result,
     vehicles: result.entities,
-    searchByBrandAndModel: result.searchByCriteria
+    searchByBrandAndModel: result.searchByCriteria,
   };
 };
 
@@ -53,7 +49,11 @@ export const useCarBrands = () => {
       const data = await vehicleService.getCarBrands();
       setBrands(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error occurred while fetching car brands. Please try again later.');
+      const msg =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        'Error occurred while fetching car brands. Please try again later.';
+      setError(msg);
       console.error('Error fetching car brands:', err);
     } finally {
       setIsLoading(false);

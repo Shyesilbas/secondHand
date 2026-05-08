@@ -4,6 +4,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { emailService } from '../../emails/services/emailService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
+import { EMAIL_QUERY_STALE_MS } from '../../emails/emailConstants.js';
 
 export const useEmails = () => {
     const { user } = useAuthState();
@@ -24,7 +25,7 @@ export const useEmails = () => {
         queryKey: [...PAYMENT_QUERY_KEYS.emailsMy, user?.id],
         queryFn,
         enabled: false,
-        staleTime: 0,
+        staleTime: EMAIL_QUERY_STALE_MS,
         gcTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
@@ -54,7 +55,7 @@ export const useEmails = () => {
             });
             // Update unread count by invalidating or refetching it if needed
             // (We assume another query handles unread count, but for UI sync, manually updating cache is good)
-        } catch (error) {
+        } catch {
             notification.showError('Error', 'Could not mark email as read.');
         }
     }, [queryClient, user?.id, notification]);

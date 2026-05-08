@@ -8,8 +8,10 @@ const UserReviewsPage = () => {
     
         const isReceivedReviews = location.pathname.includes('/reviews/received/');
     const isGivenReviews = location.pathname.includes('/reviews/given/');
-    
-        const reviewsData = isGivenReviews ? useReviewsByUser(userId) : useReviews(userId);
+
+    const receivedQuery = useReviews(userId, { enabled: !isGivenReviews });
+    const givenQuery = useReviewsByUser(userId, { enabled: isGivenReviews });
+    const reviewsData = isGivenReviews ? givenQuery : receivedQuery;
     const { reviews, loading, error, hasMore, loadMore, refetch } = reviewsData;
     const { stats, loading: statsLoading } = useUserReviewStats(userId);
 

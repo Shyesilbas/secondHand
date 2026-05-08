@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/seller/campaigns")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Campaign", description = "Campaign operations")
 public class CampaignController {
 
     private final ICampaignService campaignService;

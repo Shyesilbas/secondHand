@@ -90,7 +90,8 @@ export const DEFAULT_CURRENCY = 'TRY';
 export const DEFAULT_CURRENCY_SYMBOL = '₺';
 
 export const OTP_CODE_LENGTH = COMMON_OTP_CODE_LENGTH;
-export const OTP_TTL_MINUTES = 3;
+/** Ödeme doğrulama kodu TTL (saniye); tüm frontend geri sayaçları buna bağlanır */
+export const OTP_CODE_VALIDITY_SECONDS = 180;
 
 export const VERIFICATION_STEPS = Object.freeze({
   REVIEW: 'REVIEW',

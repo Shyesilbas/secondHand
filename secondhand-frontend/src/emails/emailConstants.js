@@ -9,6 +9,9 @@ export const EMAIL_DEFAULTS = Object.freeze({
   PAGE_SIZE: 20,
 });
 
+/** React Query: posta kutusu listesi için stale süre */
+export const EMAIL_QUERY_STALE_MS = 2 * 60 * 1000;
+
 export const EMAIL_MESSAGES = Object.freeze({
   LOAD_ERROR_TITLE: 'Error loading emails',
   NO_EMAILS_TITLE: 'No Emails Found',

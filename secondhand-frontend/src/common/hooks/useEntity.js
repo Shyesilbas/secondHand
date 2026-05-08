@@ -18,7 +18,7 @@ export const useEntity = (config) => {
       setEntity(data);
       return data;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || `Error occurred while fetching ${entityName.toLowerCase()}. Please try again later.`;
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while fetching ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
       logger.error(`Error fetching ${entityName.toLowerCase()}:`, err);
       throw err;
@@ -38,7 +38,7 @@ export const useEntity = (config) => {
       const response = await service.createEntity(entityData);
       return response;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || `Error occurred while creating ${entityName.toLowerCase()}. Please try again later.`;
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while creating ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
       logger.error(`Error creating ${entityName.toLowerCase()}:`, err);
       throw err;
@@ -63,7 +63,7 @@ export const useEntity = (config) => {
       
       return response;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || `Error occurred while updating ${entityName.toLowerCase()}. Please try again later.`;
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while updating ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
       logger.error(`Error updating ${entityName.toLowerCase()}:`, err);
       throw err;
@@ -84,7 +84,7 @@ export const useEntity = (config) => {
       setEntity(null);
       return response;
     } catch (err) {
-      const errorMessage = err.response?.data?.message || `Error occurred while deleting ${entityName.toLowerCase()}. Please try again later.`;
+      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while deleting ${entityName.toLowerCase()}. Please try again later.`;
       setError(errorMessage);
       logger.error(`Error deleting ${entityName.toLowerCase()}:`, err);
       throw err;

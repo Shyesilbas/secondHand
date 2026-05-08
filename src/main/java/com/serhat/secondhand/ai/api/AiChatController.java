@@ -1,4 +1,5 @@
 package com.serhat.secondhand.ai.api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.ChatRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
+@Tag(name = "Ai Chat", description = "Ai Chat operations")
 public class AiChatController {
 
     private final GeminiAiService geminiAiService;

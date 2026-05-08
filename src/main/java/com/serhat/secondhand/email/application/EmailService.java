@@ -69,17 +69,15 @@ public class EmailService {
     }
 
     public Result<String> deleteEmail(UUID emailId) {
-        Email email = emailRepository.findById(emailId).orElse(null);
-        if (email != null) {
-            emailRepository.delete(email);
-            return Result.success("Email deleted" + email.getId());
-        } else {
-            return Result.error("Email not found", "EMAIL_NOT_FOUND");
+        int affected = emailRepository.softDeleteById(emailId, LocalDateTime.now());
+        if (affected > 0) {
+            return Result.success("Email deleted " + emailId);
         }
+        return Result.error("Email not found", "EMAIL_NOT_FOUND");
     }
 
     public String deleteAllEmails(Long userId) {
-        emailRepository.deleteAllByUserId(userId);
+        emailRepository.softDeleteAllByUserId(userId, LocalDateTime.now());
         return "Emails deleted for userId: " + userId;
     }
 

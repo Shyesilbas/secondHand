@@ -1,4 +1,5 @@
 package com.serhat.secondhand.ai.agent.api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.ai.agent.dto.AgentDataSourceDto;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryRequest;
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ai/agent")
 @RequiredArgsConstructor
+@Tag(name = "Agent", description = "Agent operations")
 public class AgentController {
 
     private final GeminiAiService geminiAiService;

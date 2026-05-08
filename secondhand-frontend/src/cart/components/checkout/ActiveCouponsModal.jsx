@@ -2,33 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { couponService } from '../../services/couponService.js';
 import { formatCurrency } from '../../../common/formatters.js';
-
-const formatDiscount = (coupon) => {
-  if (!coupon) return '';
-  if (String(coupon.discountKind || '').includes('PERCENT')) {
-    return `%${coupon.value}`;
-  }
-  return formatCurrency(coupon.value, 'TRY');
-};
-
-const formatKindLabel = (kind) => {
-  switch (kind) {
-    case 'ORDER_PERCENT':
-      return 'Cart % discount';
-    case 'ORDER_FIXED':
-      return 'Cart fixed discount';
-    case 'TYPE_PERCENT':
-      return 'Type % discount';
-    case 'TYPE_FIXED':
-      return 'Type fixed discount';
-    case 'THRESHOLD_FIXED':
-      return 'Threshold fixed discount';
-    case 'THRESHOLD_PERCENT':
-      return 'Threshold % discount';
-    default:
-      return kind || 'Discount';
-  }
-};
+import { formatCouponDiscount, formatCouponKindLabel } from '../../../coupon/utils/couponUiFormat.js';
 
 const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
   const [coupons, setCoupons] = useState([]);
@@ -65,8 +39,8 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <div>
-            <div className="text-lg font-semibold text-gray-900">Active Coupons</div>
-            <div className="text-sm text-gray-600">Pick one to apply to your checkout.</div>
+            <div className="text-lg font-semibold text-gray-900">Platform coupons</div>
+            <div className="text-sm text-gray-600">Site codes for checkout — not seller listing campaigns.</div>
           </div>
           <button
             type="button"
@@ -100,12 +74,18 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <div className="font-semibold text-gray-900">{c.code}</div>
+                        <div className="font-semibold text-gray-900 font-mono">{c.code}</div>
                         <span className="px-2 py-0.5 rounded-full text-xs font-semibold border bg-indigo-50 text-indigo-700 border-indigo-200">
-                          {formatKindLabel(c.discountKind)}: {formatDiscount(c)}
+                          {formatCouponKindLabel(c.discountKind)}: {formatCouponDiscount(c)}
                         </span>
                       </div>
 
+                      {(c.title?.trim?.() || '') && (
+                        <div className="mt-1 text-sm font-semibold text-gray-800 leading-snug">{c.title.trim()}</div>
+                      )}
+                      {(c.description?.trim?.() || '') && (
+                        <p className="mt-1 text-xs text-gray-600 leading-relaxed">{c.description.trim()}</p>
+                      )}
                       <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
                         <div>
                           Min subtotal: <span className="font-semibold text-gray-900">{c.minSubtotal != null ? formatCurrency(c.minSubtotal, 'TRY') : '—'}</span>
