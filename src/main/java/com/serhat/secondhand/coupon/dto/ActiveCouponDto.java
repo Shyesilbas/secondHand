@@ -1,5 +1,6 @@
 package com.serhat.secondhand.coupon.dto;
 
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class ActiveCouponDto {
     private String code;
     private String title;
     private String description;
+    private CouponAudience audience;
     /** false = user-specific pool (user is in that pool if this row is returned) */
     private boolean forAllUsers;
     private boolean active;

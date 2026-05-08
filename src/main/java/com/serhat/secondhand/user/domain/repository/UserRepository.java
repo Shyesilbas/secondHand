@@ -1,5 +1,6 @@
 package com.serhat.secondhand.user.domain.repository;
 
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,5 +34,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.id FROM User u")
     List<Long> findAllUserIds();
+
+    @Query("SELECT COUNT(u) FROM User u WHERE NOT EXISTS "
+            + "(SELECT 1 FROM Order o WHERE o.user = u AND o.paymentStatus = :completed)")
+    long countUsersNeverCompletedPaidOrder(@Param("completed") PaymentStatus completed);
 
 }

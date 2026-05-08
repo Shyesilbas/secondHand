@@ -1,5 +1,6 @@
 package com.serhat.secondhand.coupon.dto;
 
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ public class CreateCouponRequest {
     /** Shown on coupon lists */
     private String title;
     private String description;
+    /** Overrides legacy {@link #forAllUsers} when set. */
+    private CouponAudience audience;
     /** null / true = all users; false = {@link #eligibleUserIds} only */
     private Boolean forAllUsers;
     private Set<Long> eligibleUserIds;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, RefreshCw, Ticket } from 'lucide-react';
+import { ArrowLeft, ExternalLink, RefreshCw, Ticket } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { couponService } from '../../cart/services/couponService.js';
@@ -14,6 +14,33 @@ const TABS = {
 
 function sortActive(list) {
   return [...(list || [])].sort((a, b) => String(a.code).localeCompare(String(b.code)));
+}
+
+/** limit null → sınırsız; aksi halde kalan / limit */
+function LimitCell({ limit, remaining }) {
+  if (limit == null) {
+    return <span className="text-slate-400">Sınırsız</span>;
+  }
+  const r = remaining != null ? remaining : '—';
+  return (
+    <span className="tabular-nums">
+      <span className="font-semibold text-slate-900">{r}</span>
+      <span className="font-normal text-slate-400"> / {limit}</span>
+    </span>
+  );
+}
+
+function CouponPeriod({ startsAt, endsAt }) {
+  if (!startsAt && !endsAt) {
+    return <span className="text-slate-500">Süre sınırı yok</span>;
+  }
+  return (
+    <div className="text-xs leading-snug text-slate-600">
+      {startsAt ? <div>Başlangıç {formatDateTime(startsAt)}</div> : null}
+      {endsAt ? <div>Bitiş {formatDateTime(endsAt)}</div> : null}
+      {!startsAt && endsAt ? <div>Bitiş {formatDateTime(endsAt)}</div> : null}
+    </div>
+  );
 }
 
 const PlatformCouponsPage = () => {
@@ -48,178 +75,216 @@ const PlatformCouponsPage = () => {
   const ordersHref = (orderId) =>
     orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
 
+  const tableShell = 'rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden ring-1 ring-slate-900/[0.04]';
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-4xl mx-auto px-4 pb-10">
-        <div className="sticky top-0 z-10 -mx-4 mb-4 px-4 py-4 bg-[#F8FAFC]/90 backdrop-blur border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+      <div className="mx-auto max-w-5xl px-4 pb-10">
+        <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#F8FAFC]/90 px-4 py-4 backdrop-blur">
+          <div className="flex min-w-0 items-center gap-3">
             <Link
               to={ROUTES.DASHBOARD}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-indigo-600 shrink-0"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-violet-600"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back
+              <ArrowLeft className="h-4 w-4" />
+              Hesap
             </Link>
-            <div className="h-8 w-px bg-slate-200 hidden sm:block" />
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="p-2 rounded-xl bg-violet-100 text-violet-700 shrink-0">
-                <Ticket className="w-5 h-5" />
+            <div className="hidden h-8 w-px bg-slate-200 sm:block" />
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="shrink-0 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 p-2 text-white shadow-md shadow-violet-500/20">
+                <Ticket className="h-5 w-5" strokeWidth={2.2} />
               </div>
-              <h1 className="text-lg font-semibold text-slate-900">Coupons</h1>
+              <div className="min-w-0">
+                <h1 className="truncate text-lg font-bold tracking-tight text-slate-900">Platform kuponları</h1>
+                <p className="truncate text-xs text-slate-500">Size uygun kodlar ve kullanım geçmişiniz</p>
+              </div>
             </div>
           </div>
           <button
             type="button"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-60"
           >
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Yenile
           </button>
         </div>
 
-        <div className="flex rounded-xl border border-slate-200 bg-white p-1 mb-6 w-fit max-w-full">
+        <div className="mb-6 flex w-full max-w-md rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
           <button
             type="button"
             onClick={() => setTab(TABS.ACTIVE)}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-              tab === TABS.ACTIVE ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+              tab === TABS.ACTIVE
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Active campaigns
+            Kullanılabilir
           </button>
           <button
             type="button"
             onClick={() => setTab(TABS.PARTICIPATED)}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
-              tab === TABS.PARTICIPATED ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+              tab === TABS.PARTICIPATED
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Participated
+            Kullandıklarım
           </button>
         </div>
 
         {loading && (
           <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet-600" />
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-600 border-t-transparent" />
           </div>
         )}
 
         {!loading && error && (
           <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-            {error?.response?.data?.message || error?.message || 'Could not load.'}
+            {error?.response?.data?.message || error?.message || 'Yüklenemedi.'}
           </div>
         )}
 
         {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-600">
-            No coupons here. Ones you&apos;ve applied to an order appear under Participated.
+            Şu an size atanmış kullanılabilir kupon yok. Siparişte kullandığınız kodlar &quot;Kullandıklarım&quot; sekmesinde.
           </div>
         )}
 
-        {!loading &&
-          !error &&
-          tab === TABS.PARTICIPATED &&
-          participationsList.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-600">
-              You haven&apos;t used a coupon on an order yet.
-            </div>
-          )}
+        {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-600">
+            Henüz bir siparişte kupon kullanmadınız.
+          </div>
+        )}
 
         {!loading && !error && tab === TABS.ACTIVE && activeList.length > 0 && (
-          <div className="space-y-3">
-            {activeList.map((c) => (
-              <article key={c.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <CouponActiveCard c={c} />
-              </article>
-            ))}
+          <div className={tableShell}>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <th className="whitespace-nowrap px-4 py-3">Kod</th>
+                    <th className="min-w-[180px] px-4 py-3">Kampanya</th>
+                    <th className="whitespace-nowrap px-4 py-3">İndirim</th>
+                    <th className="whitespace-nowrap px-4 py-3">
+                      Genel hak
+                      <span className="mt-0.5 block font-normal normal-case tracking-normal text-slate-400">Global kalan / limit</span>
+                    </th>
+                    <th className="whitespace-nowrap px-4 py-3">
+                      Size özel
+                      <span className="mt-0.5 block font-normal normal-case tracking-normal text-slate-400">Kişi başı kalan / limit</span>
+                    </th>
+                    <th className="min-w-[140px] px-4 py-3">Geçerlilik</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {activeList.map((c) => (
+                    <tr key={c.id} className="bg-white transition-colors hover:bg-violet-50/40">
+                      <td className="align-top px-4 py-3 font-mono text-sm font-bold text-slate-900">{c.code}</td>
+                      <td className="align-top px-4 py-3">
+                        <div className="max-w-[220px] truncate font-semibold text-slate-900" title={c.title}>
+                          {c.title?.trim() || '—'}
+                        </div>
+                        {c.description?.trim() && (
+                          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600" title={c.description.trim()}>
+                            {c.description.trim()}
+                          </p>
+                        )}
+                        {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && (
+                          <p className="mt-1 text-[11px] text-slate-500">{c.eligibleTypes.join(', ')}</p>
+                        )}
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3">
+                        <span className="inline-flex flex-col gap-1">
+                          <span className="w-fit rounded-lg border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-semibold text-violet-800">
+                            {formatCouponKindLabel(c.discountKind)}
+                          </span>
+                          <span className="text-xs font-semibold tabular-nums text-slate-900">{formatCouponDiscount(c)}</span>
+                        </span>
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3 text-sm">
+                        <LimitCell limit={c.usageLimitGlobal} remaining={c.usageRemainingGlobal} />
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3 text-sm">
+                        <LimitCell limit={c.usageLimitPerUser} remaining={c.usageRemainingPerUser} />
+                      </td>
+                      <td className="align-top px-4 py-3">
+                        <CouponPeriod startsAt={c.startsAt} endsAt={c.endsAt} />
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3 text-right">
+                        <Link
+                          to={ROUTES.CHECKOUT}
+                          className="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm shadow-violet-500/25 transition hover:from-violet-500 hover:to-indigo-500"
+                        >
+                          Ödeme
+                          <ExternalLink className="h-3.5 w-3.5 opacity-90" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 text-[11px] text-slate-500">
+              Genel hak: kampanyanın tüm kullanıcılar için kalan kullanımı. Size özel: hesabınız için kalan kullanım (limit tanımlıysa).
+            </p>
           </div>
         )}
 
         {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length > 0 && (
-          <div className="space-y-3">
-            {participationsList.map((row) => (
-              <article key={row.redemptionId} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="min-w-0 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono font-semibold text-slate-900 text-lg">{row.couponCode}</span>
-                    </div>
-                    {row.couponTitle?.trim() && (
-                      <div className="text-sm font-semibold text-slate-800">{row.couponTitle.trim()}</div>
-                    )}
-                    {row.couponDescription?.trim() && (
-                      <p className="text-xs text-slate-600">{row.couponDescription.trim()}</p>
-                    )}
-                    <p className="text-xs text-slate-500">Used {row.redeemedAt ? formatDateTime(row.redeemedAt) : '—'}</p>
-                    <div className="text-sm">
-                      {ordersHref(row.orderId) ? (
-                        <Link
-                          to={ordersHref(row.orderId)}
-                          className="font-semibold text-indigo-600 hover:text-indigo-800 hover:underline"
-                        >
-                          Order {row.orderNumber ? `#${row.orderNumber}` : `#${row.orderId}`}
-                        </Link>
-                      ) : (
-                        <span className="text-slate-400 text-sm">No order linked</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
+          <div className={tableShell}>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <th className="whitespace-nowrap px-4 py-3">Kod</th>
+                    <th className="min-w-[200px] px-4 py-3">Kampanya</th>
+                    <th className="whitespace-nowrap px-4 py-3">Kullanıldı</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-right">Sipariş</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {participationsList.map((row) => (
+                    <tr key={row.redemptionId} className="bg-white transition-colors hover:bg-slate-50/80">
+                      <td className="align-top px-4 py-3 font-mono text-sm font-bold text-slate-900">{row.couponCode}</td>
+                      <td className="align-top px-4 py-3">
+                        <div className="max-w-[280px] truncate font-semibold text-slate-900">
+                          {row.couponTitle?.trim() || '—'}
+                        </div>
+                        {row.couponDescription?.trim() && (
+                          <p className="mt-1 line-clamp-2 text-xs text-slate-600">{row.couponDescription.trim()}</p>
+                        )}
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3 text-xs text-slate-600">
+                        {row.redeemedAt ? formatDateTime(row.redeemedAt) : '—'}
+                      </td>
+                      <td className="align-top whitespace-nowrap px-4 py-3 text-right text-sm font-semibold">
+                        {ordersHref(row.orderId) ? (
+                          <Link
+                            to={ordersHref(row.orderId)}
+                            className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 hover:underline"
+                          >
+                            {row.orderNumber ? `#${row.orderNumber}` : `#${row.orderId}`}
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </Link>
+                        ) : (
+                          <span className="text-slate-400 font-normal">Bağlı sipariş yok</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 };
-
-function CouponActiveCard({ c }) {
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-      <div className="min-w-0 space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono font-semibold text-slate-900 text-lg">{c.code}</span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-semibold border bg-violet-50 text-violet-700 border-violet-200">
-            {formatCouponKindLabel(c.discountKind)}: {formatCouponDiscount(c)}
-          </span>
-        </div>
-        {c.title?.trim() && <div className="text-sm font-semibold text-slate-800">{c.title.trim()}</div>}
-        {c.description?.trim() && <p className="text-xs text-slate-600">{c.description.trim()}</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-          <div>
-            Min subtotal:{' '}
-            <strong className="text-slate-900">{c.minSubtotal != null ? formatCurrency(c.minSubtotal, 'TRY') : '—'}</strong>
-          </div>
-          <div>
-            Max discount:{' '}
-            <strong className="text-slate-900">{c.maxDiscount != null ? formatCurrency(c.maxDiscount, 'TRY') : '—'}</strong>
-          </div>
-          <div>
-            Global left:{' '}
-            <strong className="text-slate-900">{c.usageLimitGlobal != null ? String(c.usageRemainingGlobal ?? '—') : '—'}</strong>
-          </div>
-          <div>
-            Per user left:{' '}
-            <strong className="text-slate-900">{c.usageLimitPerUser != null ? String(c.usageRemainingPerUser ?? '—') : '—'}</strong>
-          </div>
-        </div>
-        {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && (
-          <div className="text-xs text-slate-600">
-            Types: <strong>{c.eligibleTypes.join(', ')}</strong>
-          </div>
-        )}
-      </div>
-      <Link
-        to={ROUTES.CHECKOUT}
-        className="shrink-0 inline-flex justify-center px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700"
-      >
-        Checkout
-      </Link>
-    </div>
-  );
-}
 
 export default PlatformCouponsPage;

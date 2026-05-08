@@ -6,6 +6,7 @@ import com.serhat.secondhand.coupon.application.CouponService;
 import com.serhat.secondhand.coupon.dto.CreateCouponRequest;
 import com.serhat.secondhand.coupon.dto.CouponDto;
 import com.serhat.secondhand.coupon.dto.UpdateCouponRequest;
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -43,5 +44,11 @@ public class AdminCouponController {
     @Operation(summary = "Update coupon")
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody UpdateCouponRequest request) {
         return ResultResponses.ok(couponService.update(id, request));
+    }
+
+    @GetMapping("/audience-stats")
+    @Operation(summary = "Eligible user count for a rule-based audience")
+    public ResponseEntity<?> audienceStats(@RequestParam CouponAudience audience) {
+        return ResultResponses.ok(couponService.audienceStats(audience));
     }
 }

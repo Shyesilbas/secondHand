@@ -267,6 +267,7 @@ export const API_ENDPOINTS = {
     ADMIN_COUPONS: {
         BASE: '/v1/admin/coupons',
         BY_ID: (id) => `/v1/admin/coupons/${id}`,
+        AUDIENCE_STATS: (audience) => `/v1/admin/coupons/audience-stats?audience=${encodeURIComponent(audience)}`,
     },
     CAMPAIGNS: {
         SELLER: '/v1/seller/campaigns',

@@ -50,6 +50,11 @@ public class Coupon {
     @Builder.Default
     private boolean forAllUsers = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    @Builder.Default
+    private CouponAudience audience = CouponAudience.ALL_USERS;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "coupon_eligible_users", joinColumns = @JoinColumn(name = "coupon_id"))
     @Column(name = "user_id", nullable = false)

@@ -2,9 +2,13 @@ package com.serhat.secondhand.coupon.validator;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
+import com.serhat.secondhand.coupon.entity.CouponAudience;
+import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
 import com.serhat.secondhand.coupon.repository.CouponRedemptionRepository;
 import com.serhat.secondhand.coupon.util.CouponErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
+import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +21,11 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class CouponValidator {
+
+    private static final BigDecimal FIRST_ORDER_FIXED_TL = new BigDecimal("300");
+
     private final CouponRedemptionRepository couponRedemptionRepository;
+    private final OrderRepository orderRepository;
 
     public Result<Void> validateForCreateOrUpdate(Coupon coupon) {
         if (coupon.getCode() == null || coupon.getCode().isBlank()) {
@@ -35,27 +43,73 @@ public class CouponValidator {
                 || coupon.getEligibleTypes().contains(ListingType.VEHICLE))) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
-        if (!coupon.isForAllUsers()) {
+
+        CouponAudience audience = effectiveAudience(coupon);
+
+        if (audience == CouponAudience.NEVER_ORDERED_FIRST_ORDER) {
+            Set<Long> ids = coupon.getEligibleUserIds();
+            if (ids != null && !ids.isEmpty()) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+            if (coupon.getDiscountKind() != CouponDiscountKind.ORDER_FIXED
+                    || coupon.getValue().compareTo(FIRST_ORDER_FIXED_TL) != 0) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+            if (coupon.getUsageLimitPerUser() == null || coupon.getUsageLimitPerUser() != 1) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+            if (coupon.getUsageLimitGlobal() != null) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+            if (coupon.getStartsAt() != null || coupon.getEndsAt() != null) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+            if (coupon.getMinSubtotal() != null || coupon.getMaxDiscount() != null) {
+                return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+            }
+        } else if (audience == CouponAudience.USER_ID_LIST) {
             if (coupon.getEligibleUserIds() == null || coupon.getEligibleUserIds().isEmpty()) {
                 return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
             }
         }
+
         return Result.success();
     }
 
-    /** {@code false} coupon is valid only when buyer id is in {@link Coupon#getEligibleUserIds()}. */
+    private CouponAudience effectiveAudience(Coupon coupon) {
+        if (coupon.getAudience() != null) {
+            return coupon.getAudience();
+        }
+        return coupon.isForAllUsers() ? CouponAudience.ALL_USERS : CouponAudience.USER_ID_LIST;
+    }
+
     public Result<Void> validateUserEligible(Coupon coupon, User user) {
         if (coupon == null || user == null || user.getId() == null) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
-        if (coupon.isForAllUsers()) {
-            return Result.success();
-        }
+        CouponAudience audience = coupon.getAudience() != null
+                ? coupon.getAudience()
+                : (coupon.isForAllUsers() ? CouponAudience.ALL_USERS : CouponAudience.USER_ID_LIST);
+
+        return switch (audience) {
+            case ALL_USERS -> Result.success();
+            case USER_ID_LIST -> userInEligibleList(coupon, user.getId());
+            case NEVER_ORDERED_FIRST_ORDER -> neverCompletedPaidOrder(user.getId())
+                    ? Result.success()
+                    : Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        };
+    }
+
+    private Result<Void> userInEligibleList(Coupon coupon, Long userId) {
         Set<Long> ids = coupon.getEligibleUserIds();
-        if (ids == null || !ids.contains(user.getId())) {
+        if (ids == null || !ids.contains(userId)) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
         return Result.success();
+    }
+
+    private boolean neverCompletedPaidOrder(Long userId) {
+        return orderRepository.countByUser_IdAndPaymentStatus(userId, PaymentStatus.COMPLETED) == 0;
     }
 
     public Result<Void> validateUsable(Coupon coupon, User user) {

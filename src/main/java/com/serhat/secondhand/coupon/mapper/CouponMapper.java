@@ -5,6 +5,7 @@ import com.serhat.secondhand.coupon.dto.CouponDto;
 import com.serhat.secondhand.coupon.dto.CreateCouponRequest;
 import com.serhat.secondhand.coupon.dto.UpdateCouponRequest;
 import com.serhat.secondhand.coupon.entity.Coupon;
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import com.serhat.secondhand.coupon.repository.CouponRedemptionRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -20,17 +22,19 @@ public class CouponMapper {
     private final CouponRedemptionRepository couponRedemptionRepository;
 
     public Coupon fromCreateRequest(CreateCouponRequest request) {
-        boolean forAll = request.getForAllUsers() == null || Boolean.TRUE.equals(request.getForAllUsers());
-        var eligible = request.getEligibleUserIds() == null
-                ? new LinkedHashSet<Long>()
-                : new LinkedHashSet<>(request.getEligibleUserIds());
+        boolean forAllLegacy = request.getForAllUsers() == null || Boolean.TRUE.equals(request.getForAllUsers());
+        CouponAudience audience = resolveAudience(request.getAudience(), forAllLegacy);
+        boolean forAllUsersFlag = audience == CouponAudience.ALL_USERS;
+
+        LinkedHashSet<Long> eligible = buildEligibleIdsForAudience(audience, request.getEligibleUserIds());
 
         return Coupon.builder()
                 .code(request.getCode())
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .forAllUsers(forAll)
-                .eligibleUserIds(forAll ? new LinkedHashSet<>() : eligible)
+                .audience(audience)
+                .forAllUsers(forAllUsersFlag)
+                .eligibleUserIds(eligible)
                 .active(request.isActive())
                 .startsAt(request.getStartsAt())
                 .endsAt(request.getEndsAt())
@@ -44,7 +48,36 @@ public class CouponMapper {
                 .build();
     }
 
+    private LinkedHashSet<Long> buildEligibleIdsForAudience(CouponAudience audience, Set<Long> requestIds) {
+        if (audience != CouponAudience.USER_ID_LIST) {
+            return new LinkedHashSet<>();
+        }
+        if (requestIds == null || requestIds.isEmpty()) {
+            return new LinkedHashSet<>();
+        }
+        return new LinkedHashSet<>(requestIds);
+    }
+
+    private CouponAudience resolveAudience(CouponAudience explicit, boolean forAllLegacy) {
+        if (explicit != null) {
+            return explicit;
+        }
+        return forAllLegacy ? CouponAudience.ALL_USERS : CouponAudience.USER_ID_LIST;
+    }
+
+    /** Mutates coupon.audience when request carries audience or legacy forAllUsers. */
+    private void syncLegacyFlagsFromAudience(Coupon coupon, UpdateCouponRequest request) {
+        if (request.getAudience() != null) {
+            coupon.setAudience(request.getAudience());
+        } else if (request.getForAllUsers() != null) {
+            coupon.setAudience(Boolean.TRUE.equals(request.getForAllUsers())
+                    ? CouponAudience.ALL_USERS
+                    : CouponAudience.USER_ID_LIST);
+        }
+    }
+
     public void applyUpdate(Coupon coupon, UpdateCouponRequest request) {
+        syncLegacyFlagsFromAudience(coupon, request);
         if (request.getTitle() != null) {
             coupon.setTitle(request.getTitle());
         }
@@ -89,12 +122,21 @@ public class CouponMapper {
         }
     }
 
+    private Integer computeUsageRemainingGlobal(Coupon coupon) {
+        if (coupon.getUsageLimitGlobal() == null) {
+            return null;
+        }
+        long used = couponRedemptionRepository.countByCoupon(coupon);
+        return Math.max(0, coupon.getUsageLimitGlobal() - (int) used);
+    }
+
     public CouponDto toDto(Coupon coupon) {
         return CouponDto.builder()
                 .id(coupon.getId())
                 .code(coupon.getCode())
                 .title(coupon.getTitle())
                 .description(coupon.getDescription())
+                .audience(coupon.getAudience() != null ? coupon.getAudience() : CouponAudience.ALL_USERS)
                 .forAllUsers(coupon.isForAllUsers())
                 .eligibleUserIds(coupon.getEligibleUserIds() == null ? Collections.emptySet() : new LinkedHashSet<>(coupon.getEligibleUserIds()))
                 .active(coupon.isActive())
@@ -107,15 +149,12 @@ public class CouponMapper {
                 .eligibleTypes(coupon.getEligibleTypes())
                 .usageLimitGlobal(coupon.getUsageLimitGlobal())
                 .usageLimitPerUser(coupon.getUsageLimitPerUser())
+                .usageRemainingGlobal(computeUsageRemainingGlobal(coupon))
                 .build();
     }
 
     public ActiveCouponDto toActiveDto(Coupon coupon, User user) {
-        Integer usageRemainingGlobal = null;
-        if (coupon.getUsageLimitGlobal() != null) {
-            long used = couponRedemptionRepository.countByCoupon(coupon);
-            usageRemainingGlobal = Math.max(0, coupon.getUsageLimitGlobal() - (int) used);
-        }
+        Integer usageRemainingGlobal = computeUsageRemainingGlobal(coupon);
 
         Integer usageRemainingPerUser = null;
         if (coupon.getUsageLimitPerUser() != null) {
@@ -128,6 +167,7 @@ public class CouponMapper {
                 .code(coupon.getCode())
                 .title(coupon.getTitle())
                 .description(coupon.getDescription())
+                .audience(coupon.getAudience() != null ? coupon.getAudience() : CouponAudience.ALL_USERS)
                 .forAllUsers(coupon.isForAllUsers())
                 .active(coupon.isActive())
                 .startsAt(coupon.getStartsAt())

@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.repository;
 
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,7 +19,7 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @EntityGraph(attributePaths = {"user", "orderItems"})
+    long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
     @Query("SELECT DISTINCT o FROM Order o " +
            "WHERE o.user.id = :userId")
     Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);

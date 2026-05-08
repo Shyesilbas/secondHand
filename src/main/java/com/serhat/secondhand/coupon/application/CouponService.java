@@ -5,6 +5,7 @@ import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.dto.*;
 import com.serhat.secondhand.coupon.entity.Coupon;
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import com.serhat.secondhand.coupon.entity.CouponRedemption;
 import com.serhat.secondhand.coupon.mapper.CouponMapper;
 import com.serhat.secondhand.coupon.repository.CouponRedemptionRepository;
@@ -17,8 +18,10 @@ import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.application.IPricingService;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,7 @@ public class CouponService {
     private final IOfferService offerService;
     private final IPricingService pricingService;
     private final IUserService userService;
+    private final UserRepository userRepository;
 
     public CouponService(
             CouponRepository couponRepository,
@@ -48,7 +52,8 @@ public class CouponService {
             CartRepository cartRepository,
             IOfferService offerService,
             IPricingService pricingService,
-            IUserService userService) {
+            IUserService userService,
+            UserRepository userRepository) {
         this.couponRepository = couponRepository;
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.couponMapper = couponMapper;
@@ -57,6 +62,7 @@ public class CouponService {
         this.offerService = offerService;
         this.pricingService = pricingService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public Result<CouponDto> create(CreateCouponRequest request) {
@@ -184,8 +190,7 @@ public class CouponService {
         Set<UUID> participated = new HashSet<>(couponRedemptionRepository.findDistinctCouponIdsByUser_Id(userId));
         return couponRepository.findActiveNow(LocalDateTime.now())
                 .stream()
-                .filter(c -> c.isForAllUsers()
-                        || (c.getEligibleUserIds() != null && c.getEligibleUserIds().contains(user.getId())))
+                .filter(c -> couponValidator.validateUserEligible(c, user).isSuccess())
                 .map(coupon -> couponMapper.toActiveDto(coupon, user))
                 .filter(d -> !participated.contains(d.getId()))
                 .toList();
@@ -252,12 +257,45 @@ public class CouponService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Result<CouponAudienceStatsDto> audienceStats(CouponAudience audience) {
+        if (audience == null) {
+            return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
+        }
+        if (audience != CouponAudience.NEVER_ORDERED_FIRST_ORDER) {
+            return Result.success(CouponAudienceStatsDto.builder()
+                    .audience(audience)
+                    .eligibleUserCount(0L)
+                    .build());
+        }
+        long count = userRepository.countUsersNeverCompletedPaidOrder(PaymentStatus.COMPLETED);
+        return Result.success(CouponAudienceStatsDto.builder()
+                .audience(audience)
+                .eligibleUserCount(count)
+                .build());
+    }
+
     private void normalizeCouponAudience(Coupon coupon) {
         if (coupon.getEligibleUserIds() == null) {
             coupon.setEligibleUserIds(new LinkedHashSet<>());
         }
-        if (coupon.isForAllUsers()) {
-            coupon.getEligibleUserIds().clear();
+
+        CouponAudience audience = coupon.getAudience();
+        if (audience == null) {
+            audience = coupon.isForAllUsers() ? CouponAudience.ALL_USERS : CouponAudience.USER_ID_LIST;
+            coupon.setAudience(audience);
+        }
+
+        switch (audience) {
+            case ALL_USERS -> {
+                coupon.setForAllUsers(true);
+                coupon.getEligibleUserIds().clear();
+            }
+            case USER_ID_LIST -> coupon.setForAllUsers(false);
+            case NEVER_ORDERED_FIRST_ORDER -> {
+                coupon.setForAllUsers(false);
+                coupon.getEligibleUserIds().clear();
+            }
         }
     }
 

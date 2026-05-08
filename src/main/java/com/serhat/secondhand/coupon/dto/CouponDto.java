@@ -1,5 +1,6 @@
 package com.serhat.secondhand.coupon.dto;
 
+import com.serhat.secondhand.coupon.entity.CouponAudience;
 import com.serhat.secondhand.coupon.entity.CouponDiscountKind;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class CouponDto {
     private String code;
     private String title;
     private String description;
+    private CouponAudience audience;
     private boolean forAllUsers;
     private Set<Long> eligibleUserIds;
     private boolean active;
@@ -33,6 +35,8 @@ public class CouponDto {
     private Set<ListingType> eligibleTypes;
     private Integer usageLimitGlobal;
     private Integer usageLimitPerUser;
+    /** Remaining uses site-wide before {@link #usageLimitGlobal} caps (null when unlimited). */
+    private Integer usageRemainingGlobal;
 }
 
 
