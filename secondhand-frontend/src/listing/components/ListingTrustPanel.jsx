@@ -3,10 +3,13 @@ import {ROUTES} from '../../common/constants/routes.js';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import {FollowButton} from '../../follow/index.js';
-import {ShieldCheck} from 'lucide-react';
+import {Award, ShieldCheck} from 'lucide-react';
+import {useGreatSellerStatus} from '../../user/hooks/useGreatSellerStatus.js';
 
 const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
+  const {data: greatSeller} = useGreatSellerStatus(listing?.sellerId);
   if (!listing) return null;
+  const showGreatSeller = Boolean(greatSeller?.eligible);
 
   return (
     <>
@@ -19,12 +22,20 @@ const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
               {listing.sellerName?.[0]?.toUpperCase() || 'U'}
             </div>
             <div>
-              <Link
-                to={ROUTES.USER_PROFILE(listing.sellerId)}
-                className="text-[13px] font-semibold text-gray-900 hover:underline block"
-              >
-                {listing.sellerName} {listing.sellerSurname}
-              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  to={ROUTES.USER_PROFILE(listing.sellerId)}
+                  className="text-[13px] font-semibold text-gray-900 hover:underline"
+                >
+                  {listing.sellerName} {listing.sellerSurname}
+                </Link>
+                {showGreatSeller && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold uppercase tracking-wide">
+                    <Award className="w-3 h-3 shrink-0" />
+                    Great Seller
+                  </span>
+                )}
+              </div>
               {listing.sellerAccountCreationDate && (
                 <p className="text-[11px] text-gray-400 mt-0.5">
                   Since {new Date(listing.sellerAccountCreationDate).getFullYear()}

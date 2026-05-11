@@ -1,10 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService.js';
 import { REVIEW_DEFAULTS } from '../reviewConstants.js';
 
 const REVIEW_KEYS = {
     received: (userId, size) => ['reviews', 'received', userId, size],
+    receivedPaged: (userId, page, size) => ['reviews', 'received', 'paged', userId, page, size],
     written: (userId, size) => ['reviews', 'written', userId, size],
     stats: (userId) => ['reviewStats', userId],
 };
@@ -73,6 +74,52 @@ export const useReviews = (userId, options = {}) => {
         hasMore: Boolean(hasNextPage),
         loadMore,
         handlePageSizeChange,
+    };
+};
+
+/** Profil / liste sayfası için Spring sayfalı cevap (Previous–Next doğru çalışır). */
+export const usePagedUserReceivedReviews = (userId, options = {}) => {
+    const enabled = options.enabled ?? true;
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(options.size ?? REVIEW_DEFAULTS.RECEIVED_SIZE);
+
+    useEffect(() => {
+        setPage(0);
+    }, [userId]);
+
+    const { data, isLoading, isFetching, error, refetch } = useQuery({
+        queryKey: REVIEW_KEYS.receivedPaged(userId, page, size),
+        queryFn: () => reviewService.getReviewsReceivedByUser(userId, page, size),
+        enabled: !!(userId && enabled),
+        staleTime: REVIEW_DEFAULTS.STALE_TIME_MS,
+        gcTime: REVIEW_DEFAULTS.GC_TIME_MS,
+        placeholderData: (previousData) => previousData,
+        refetchOnWindowFocus: false,
+    });
+
+    const loadPage = useCallback((nextPage) => {
+        setPage(Math.max(0, nextPage));
+    }, []);
+
+    const handlePageSizeChange = useCallback((newSize) => {
+        setSize(newSize);
+        setPage(0);
+    }, []);
+
+    return {
+        reviews: data?.content ?? [],
+        loading: isLoading,
+        isFetching,
+        error: error?.message || null,
+        pagination: {
+            number: data?.number ?? page,
+            size: data?.size ?? size,
+            totalPages: data?.totalPages ?? 0,
+            totalElements: data?.totalElements ?? 0,
+        },
+        loadPage,
+        handlePageSizeChange,
+        refetch,
     };
 };
 

@@ -20,6 +20,8 @@ export const API_ENDPOINTS = {
         VERIFY: '/v1/users/verification/verify',
         SEND_VERIFICATION: '/v1/users/verification/send',
         BY_ID: (id) => `/v1/users/${id}`,
+        GREAT_SELLER_STATUS: (userId) => `/v1/users/${userId}/great-seller-status`,
+        GREAT_SELLERS_LIST: (limit = 16) => `/v1/users/great-sellers?limit=${encodeURIComponent(limit)}`,
         SEARCH: '/v1/users/search',
         AUDIT_LOGS: '/v1/users/audit-logs',
         BADGES: '/v1/user/badges', // Aggregated endpoint for badge counts

@@ -113,11 +113,6 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
 
   return (
     <div className="w-full">
-      <div className="bg-white rounded-lg border border-gray-100 p-5">
-        <div className="pb-3 border-b border-gray-50 mb-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 tracking-[-0.01em]">Photo</h3>
-          <p className="text-[11px] text-gray-400 mt-0.5">Upload a product image</p>
-        </div>
 
         {imageUrl ? (
           <div className="relative group">
@@ -195,7 +190,6 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
           className="hidden"
           disabled={disabled || isUploading}
         />
-      </div>
     </div>
   );
 };

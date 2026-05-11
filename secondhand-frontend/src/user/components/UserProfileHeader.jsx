@@ -3,9 +3,9 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import {FollowButton, FollowStats} from '../../follow/index.js';
 import {formatDate} from '../../common/formatters.js';
-import {ArrowLeft, Star, Calendar, MessageCircle, Flag, UserPlus} from 'lucide-react';
+import {ArrowLeft, Award, Star, Calendar} from 'lucide-react';
 
-const UserProfileHeader = ({user, isOwnProfile, reviewStats}) => {
+const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible}) => {
   const navigate = useNavigate();
   const name = user?.name || '';
   const surname = user?.surname || '';
@@ -44,6 +44,12 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats}) => {
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                 {name} {surname}
               </h1>
+              {greatSellerEligible && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-bold rounded-full uppercase tracking-wide">
+                  <Award className="w-3.5 h-3.5" />
+                  Great Seller
+                </span>
+              )}
               {isOwnProfile && (
                 <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full uppercase tracking-wider">You</span>
               )}

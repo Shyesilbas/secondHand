@@ -1,9 +1,13 @@
 package com.serhat.secondhand.order.repository;
 
+import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -13,6 +17,52 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
+    @Query("""
+            SELECT COUNT(oi) FROM OrderItem oi
+            WHERE oi.seller.id = :sellerId
+              AND oi.order.paymentStatus = :completed
+              AND oi.order.status <> :cancelled
+              AND oi.order.status <> :refunded
+              AND oi.order.createdAt >= :startDate
+              AND oi.order.createdAt <= :endDate
+              AND oi.unitPrice >= :minUnitPrice
+              AND oi.currency = :currency
+            """)
+    long countGreatSellerEligibleSales(
+            @Param("sellerId") Long sellerId,
+            @Param("completed") PaymentStatus completed,
+            @Param("cancelled") OrderStatus cancelled,
+            @Param("refunded") OrderStatus refunded,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("minUnitPrice") BigDecimal minUnitPrice,
+            @Param("currency") Currency currency);
+
+    /** Aynı filtreler {@link #countGreatSellerEligibleSales} ile; liste için tek GROUP BY (N kez COUNT çalıştırmamak). */
+    @Query("""
+            SELECT oi.seller.id, COUNT(oi)
+            FROM OrderItem oi
+            WHERE oi.order.paymentStatus = :completed
+              AND oi.order.status <> :cancelled
+              AND oi.order.status <> :refunded
+              AND oi.order.createdAt >= :startDate
+              AND oi.order.createdAt <= :endDate
+              AND oi.unitPrice >= :minUnitPrice
+              AND oi.currency = :currency
+            GROUP BY oi.seller.id
+            HAVING COUNT(oi) >= :minSales
+            ORDER BY COUNT(oi) DESC
+            """)
+    List<Object[]> findSellerIdsWithGreatSellerEligibleSalesVolume(
+            @Param("completed") PaymentStatus completed,
+            @Param("cancelled") OrderStatus cancelled,
+            @Param("refunded") OrderStatus refunded,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("minUnitPrice") BigDecimal minUnitPrice,
+            @Param("currency") Currency currency,
+            @Param("minSales") long minSales,
+            Pageable pageable);
 
     @Query("SELECT oi.listing.listingType, COUNT(DISTINCT oi.order) FROM OrderItem oi " +
             "WHERE oi.listing.seller.id = :sellerId " +

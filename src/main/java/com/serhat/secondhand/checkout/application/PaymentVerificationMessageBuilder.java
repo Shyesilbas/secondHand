@@ -1,6 +1,7 @@
 package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
+import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
@@ -8,8 +9,8 @@ import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.application.IPricingService;
+import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class PaymentVerificationMessageBuilder {
     private final ListingQueryService listingService;
     private final IPricingService pricingService;
     private final CheckoutPricingContextFactory checkoutPricingContextFactory;
+    private final CartRepository cartRepository;
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
         StringBuilder details = new StringBuilder("\n\nPayment Details:\n");
@@ -75,10 +77,9 @@ public class PaymentVerificationMessageBuilder {
             return;
         }
 
-        // No offer — price cart directly
-        List<Cart> cartItems = checkoutPricingContextFactory.buildEffectiveCartItems(
-                new java.util.ArrayList<>(), null, user);
-        PricingResultDto pricing = pricingService.priceCart(user, cartItems, couponCode);
+        List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
+        List<Cart> effectiveCartItems = checkoutPricingContextFactory.buildEffectiveCartItems(cartItems, null, user);
+        PricingResultDto pricing = pricingService.priceCart(user, effectiveCartItems, couponCode);
         appendPricingSummary(details, pricing);
     }
 

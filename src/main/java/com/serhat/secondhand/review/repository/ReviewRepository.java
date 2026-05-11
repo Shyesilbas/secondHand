@@ -29,6 +29,9 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     @Query("SELECT COALESCE(AVG(CAST(r.rating AS double)), 0.0) FROM Review r WHERE r.reviewedUser.id = :userId")
     Double getUserAverageRating(@Param("userId") Long userId);
 
+    @Query("SELECT COUNT(DISTINCT r.reviewer.id) FROM Review r WHERE r.reviewedUser.id = :userId")
+    long countDistinctReviewersByReviewedUserId(@Param("userId") Long userId);
+
     @EntityGraph(attributePaths = {"reviewer", "reviewedUser", "orderItem", "orderItem.listing"})
     Optional<Review> findByReviewerIdAndOrderItemId(Long reviewerId, Long orderItemId);
 

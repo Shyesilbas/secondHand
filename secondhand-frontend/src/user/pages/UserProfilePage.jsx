@@ -1,22 +1,118 @@
 import React, {useState} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
-import {Plus, List, Package, Heart, Star, MessageSquare, ChevronRight, AlertCircle} from 'lucide-react';
+import {Plus, Package, Heart, Star, AlertCircle, Award, CheckCircle2} from 'lucide-react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {userService} from '../services/userService.js';
 import {useUserListings} from '../hooks/useUserListings.js';
-import {useReviews, useUserReviewStats} from '../../reviews/index.js';
+import {usePagedUserReceivedReviews, useUserReviewStats} from '../../reviews/index.js';
 import {useUserFavoriteLists, FavoriteListCard, FavoriteListModal} from '../../favoritelist/index.js';
 import ListingCard from '../../listing/components/ListingCard.jsx';
 import UserProfileHeader from '../components/UserProfileHeader.jsx';
 import UserReviews from '../components/UserReviews.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import {ROUTES} from '../../common/constants/routes.js';
+import {useGreatSellerStatus} from '../hooks/useGreatSellerStatus.js';
 
 const TABS = [
     {key: 'listings', label: 'Listings', icon: Package},
     {key: 'lists', label: 'Lists', icon: Heart},
     {key: 'reviews', label: 'Reviews', icon: Star},
 ];
+
+/** Own profile — Great Seller dört ölçüt (tek satış metriği fiyat filtresini içerir). */
+const GreatSellerProgressCard = ({gs}) => {
+    if (!gs) return null;
+    const minTry = Number(gs.minUnitPriceThreshold ?? 1500);
+    const days = gs.rollingWindowDays ?? 60;
+    const salesTarget = gs.qualifyingSalesTarget || 1;
+    const revTarget = gs.distinctReviewerTarget || 1;
+    const salesPct = Math.min(100, (gs.qualifyingSalesLastWindow / salesTarget) * 100);
+    const revPct = Math.min(100, (gs.distinctReviewerCount / revTarget) * 100);
+    const minRating = gs.minimumAverageRating ?? 4.7;
+    const avg = gs.averageRating ?? 0;
+    const ratingPct = gs.ratingMet ? 100 : Math.min(100, minRating ? (avg / minRating) * 100 : 0);
+
+    const Bar = ({pct, done}) => (
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
+            <div
+                className={`h-full rounded-full transition-all ${done ? 'bg-emerald-500' : 'bg-gray-900'}`}
+                style={{width: `${Math.min(100, pct)}%`}}
+            />
+        </div>
+    );
+
+    return (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <div className="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <Award className="w-5 h-5 text-amber-600 shrink-0" />
+                    <h2 className="text-sm font-bold text-gray-900 tracking-tight">Great Seller milestones</h2>
+                    {gs.eligible ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Completed
+                        </span>
+                    ) : null}
+                </div>
+
+                <div className="space-y-5">
+                    <div>
+                        <div className="flex justify-between items-baseline gap-2">
+                            <p className="text-[12px] font-semibold text-gray-800">
+                                Paid order lines ({days}&nbsp;days)
+                            </p>
+                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                                {gs.qualifyingSalesLastWindow}&nbsp;/&nbsp;{gs.qualifyingSalesTarget}
+                                {gs.salesMet ? (
+                                    <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" />
+                                ) : null}
+                            </span>
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">
+                            Completed checkout, TRY lines with unit price ≥ {minTry.toLocaleString('tr-TR')}
+                        </p>
+                        <Bar pct={salesPct} done={gs.salesMet} />
+                    </div>
+
+                    <div className="flex justify-between gap-3 text-[12px]">
+                        <span className="text-gray-600 font-medium">Unit price threshold (per line)</span>
+                        <span className={`text-[11px] font-semibold shrink-0 ${gs.qualifyingSalesLastWindow > 0 ? 'text-emerald-700' : 'text-gray-400'}`}>
+                            {gs.qualifyingSalesLastWindow > 0 ? 'Counted in metric above ✓' : '—'}
+                        </span>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-baseline gap-2">
+                            <p className="text-[12px] font-semibold text-gray-800">Unique buyer reviews</p>
+                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                                {gs.distinctReviewerCount}&nbsp;/&nbsp;{gs.distinctReviewerTarget}
+                                {gs.reviewersMet ? (
+                                    <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" />
+                                ) : null}
+                            </span>
+                        </div>
+                        <Bar pct={revPct} done={gs.reviewersMet} />
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-baseline gap-2">
+                            <p className="text-[12px] font-semibold text-gray-800">Average rating</p>
+                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                                {(avg ?? 0).toFixed(2)}
+                                {' / '}
+                                {minRating.toFixed(1)}
+                                {gs.ratingMet ? (
+                                    <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" />
+                                ) : null}
+                            </span>
+                        </div>
+                        <Bar pct={ratingPct} done={gs.ratingMet} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const useUserProfile = (userId) => {
     const [user, setUser] = React.useState(null);
@@ -57,14 +153,22 @@ const UserProfilePage = () => {
         page: 0,
         size: 12,
     });
-    const {reviews: receivedReviews, loading: receivedReviewsLoading, error: receivedReviewsError, pagination: reviewsPagination, loadPage: loadReviewsPage, handlePageSizeChange: handleReviewsPageSizeChange} = useReviews(userId, {
+    const {
+        reviews: receivedReviews,
+        loading: receivedReviewsLoading,
+        isFetching: receivedReviewsFetching,
+        error: receivedReviewsError,
+        pagination: reviewsPagination,
+        loadPage: loadReviewsPage,
+        handlePageSizeChange: handleReviewsPageSizeChange,
+    } = usePagedUserReceivedReviews(userId, {
         enabled: activeTab === 'reviews',
-        page: 0,
         size: 10,
     });
     const {stats: reviewStats} = useUserReviewStats(userId, {enabled: true});
 
     const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
+    const {data: greatSeller} = useGreatSellerStatus(userId, {enabled: Boolean(userId)});
 
     const {data: favoriteLists = [], isLoading: listsLoading, refetch: refetchLists} = useUserFavoriteLists(userId, isOwnProfile, {
         enabled: activeTab === 'lists',
@@ -112,7 +216,10 @@ const UserProfilePage = () => {
                 user={user}
                 isOwnProfile={isOwnProfile}
                 reviewStats={reviewStats}
+                greatSellerEligible={greatSeller?.eligible}
             />
+
+            {isOwnProfile && greatSeller ? <GreatSellerProgressCard gs={greatSeller} /> : null}
 
             {/* ── Tab Bar ─────────────────────────────────────── */}
             <div className="bg-white border-b border-gray-200/80 sticky top-0 z-10">
@@ -154,7 +261,7 @@ const UserProfilePage = () => {
 
             {/* ── Tab Content ─────────────────────────────────── */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div key={activeTab} className="animate-fadeIn">
+                <div key={activeTab} className="animate-fadeIn min-w-0">
 
                     {/* ── Listings Tab ─────────────────────────── */}
                     {activeTab === 'listings' && (
@@ -304,13 +411,16 @@ const UserProfilePage = () => {
                     {/* ── Reviews Tab ──────────────────────────── */}
                     {activeTab === 'reviews' && (
                         <UserReviews
+                            profileUserId={user.id ?? userId}
                             receivedReviews={receivedReviews}
                             receivedReviewsLoading={receivedReviewsLoading}
+                            receivedReviewsFetching={receivedReviewsFetching}
                             receivedReviewsError={receivedReviewsError}
                             pagination={reviewsPagination}
                             loadPage={loadReviewsPage}
                             handlePageSizeChange={handleReviewsPageSizeChange}
                             reviewStats={reviewStats}
+                            isOwnProfile={isOwnProfile}
                         />
                     )}
                 </div>

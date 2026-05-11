@@ -4,12 +4,15 @@ import com.serhat.secondhand.complaint.ComplaintDto;
 import com.serhat.secondhand.complaint.application.IComplaintService;
 import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.review.application.IReviewService;
+import com.serhat.secondhand.user.application.GreatSellerService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
@@ -47,11 +50,19 @@ public class UserController {
     private final ListingQueryService listingService;
     private final IComplaintService complaintService;
     private final IOfferService offerService;
+    private final GreatSellerService greatSellerService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
         UserDto response = userService.getCurrentUserProfile(authentication);
         return ResponseEntity.ok(response);
+    }
+
+    @PublicEndpoint
+    @GetMapping("/great-sellers")
+    @Operation(summary = "Public list of Great Seller–eligible users (home discovery)")
+    public ResponseEntity<?> listGreatSellerProfiles(@RequestParam(defaultValue = "16") int limit) {
+        return ResultResponses.ok(Result.success(greatSellerService.listGreatSellerProfiles(limit)));
     }
 
 
@@ -100,6 +111,13 @@ public class UserController {
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(offerService.listReceived(currentUser.getId(), pageable));
+    }
+
+    @PublicEndpoint
+    @GetMapping("/{userId}/great-seller-status")
+    @Operation(summary = "Great Seller badge eligibility and progress")
+    public ResponseEntity<?> getGreatSellerStatus(@PathVariable Long userId) {
+        return ResultResponses.ok(Result.success(greatSellerService.getStatus(userId)));
     }
 
     @GetMapping("/{userId}/reviews/received")

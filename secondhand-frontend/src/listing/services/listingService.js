@@ -106,7 +106,8 @@ export const listingService = {
     return get(`${API_ENDPOINTS.LISTINGS.BY_USER(userId)}?page=${page}&size=${size}`);
   },
   getListingByNo: async (no) => {
-    return get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(no));
+    const seg = encodeURIComponent(String(no).trim());
+    return get(API_ENDPOINTS.LISTINGS.BY_LISTING_NO(seg));
   },
 
   deactivateListing: async (id) => {

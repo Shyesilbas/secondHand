@@ -8,6 +8,7 @@ import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.review.entity.Review;
 import com.serhat.secondhand.review.repository.projection.ReviewStatsProjection;
 import com.serhat.secondhand.user.domain.entity.User;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +19,8 @@ public class ReviewMapper {
             return null;
         }
 
+        var listing = review.getOrderItem() != null ? review.getOrderItem().getListing() : null;
+
         return ReviewDto.builder()
                 .id(review.getId())
                 .reviewerId(review.getReviewer().getId())
@@ -27,8 +30,9 @@ public class ReviewMapper {
                 .reviewedUserName(review.getReviewedUser().getName())
                 .reviewedUserSurname(review.getReviewedUser().getSurname())
                 .orderItemId(review.getOrderItem().getId())
-                .listingTitle(review.getOrderItem().getListing().getTitle())
-                .listingNo(review.getOrderItem().getListing().getListingNo())
+                .listingId(listing != null ? listing.getId() : null)
+                .listingTitle(listing != null ? listing.getTitle() : null)
+                .listingNo(listing != null ? listing.getListingNo() : null)
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())

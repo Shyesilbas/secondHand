@@ -13,6 +13,7 @@ import SearchableDropdown from '../../common/components/ui/SearchableDropdown.js
 import {getListingConfig} from '../config/listingConfig.js';
 import {resolveEnumLabel, toDisplayText} from '../utils/listingDisplayFormat.js';
 import {ROUTES} from '../../common/constants/routes.js';
+import {PREFLOW_WIZARD_VARIANT} from '../config/prefilterFlowUi.js';
 import {AlertCircle, ImageIcon, MapPin, Package, FileText} from 'lucide-react';
 
 /* ── Small UI Primitives ───────────────────────────────────── */
@@ -27,64 +28,85 @@ const FieldError = ({error}) => {
   );
 };
 
-const SectionCard = ({title, description, icon: Icon, children}) => (
-  <div className="bg-white rounded-2xl border border-gray-200 overflow-visible">
-    <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-      {Icon && (
-        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-          <Icon className="w-4 h-4 text-gray-500" />
+const SectionCard = ({ title, description, icon: Icon, children }) => {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white">
+      <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-3.5">
+        {Icon && (
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gray-50">
+            <Icon className="h-4 w-4 text-gray-500" />
+          </div>
+        )}
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          {description && (
+            <p className="mt-0.5 text-xs text-gray-500">{description}</p>
+          )}
         </div>
-      )}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
       </div>
+      <div className="p-5 sm:p-6">{children}</div>
     </div>
-    <div className="p-6">{children}</div>
-  </div>
-);
+  );
+};
 
-const ToggleCardField = ({name, label, description, value, onToggle}) => (
+const ToggleCardField = ({
+  name,
+  label,
+  description,
+  value,
+  onToggle,
+}) => (
   <div
-    className={`flex items-center gap-4 px-5 py-4 rounded-xl border-2 transition-all duration-200 cursor-pointer select-none ${
-      value ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'
+    className={`flex cursor-pointer select-none items-center gap-3 rounded-md border px-4 py-3.5 transition-colors ${
+      value
+        ? 'border-black bg-gray-50'
+        : 'border-gray-200 bg-white hover:border-gray-300'
     }`}
     onClick={onToggle}
     role="button"
     tabIndex={0}
     onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onToggle();
+      }
     }}
   >
-    <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
-      value ? 'bg-gray-900 border-gray-900' : 'border-gray-300 bg-white'
-    }`}>
+    <div
+      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border transition-colors ${
+        value
+          ? 'border-black bg-black'
+          : 'border-gray-300 bg-white'
+      }`}
+    >
       {value && (
-        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       )}
     </div>
-    <input
-      id={name}
-      type="checkbox"
-      name={name}
-      checked={Boolean(value)}
-      onChange={() => onToggle()}
-      className="sr-only"
-    />
+    <input id={name} type="checkbox" name={name} checked={Boolean(value)} onChange={() => onToggle()} className="sr-only" />
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-900 cursor-pointer">{label}</label>
-      {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+      <label
+        htmlFor={name}
+        className="block cursor-pointer text-[13px] font-medium text-gray-900"
+      >
+        {label}
+      </label>
+      {description && (
+        <p className="mt-0.5 text-[12px] text-gray-500">
+          {description}
+        </p>
+      )}
     </div>
   </div>
 );
 
 /* ── Input Classes ─────────────────────────────────────────── */
 
-const inputBase = 'w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none transition-all duration-200';
-const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-900/10`;
-const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+const inputBase = 'w-full px-3 py-2 text-[13px] border rounded-md focus:outline-none transition-colors duration-150';
+const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-gray-400 focus:ring-1 focus:ring-gray-900/10`;
+const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-1 focus:ring-red-500/10`;
 
 /* ── Main Form ─────────────────────────────────────────────── */
 
@@ -106,6 +128,27 @@ const GenericListingForm = ({
 
   const listingConfig = useMemo(() => getListingConfig(listingType), [listingType]);
   const formSchema = listingConfig?.formSchema || null;
+  const uiChrome = useMemo(() => (!isEdit ? 'composer' : 'neutral'), [isEdit]);
+  const sectionTone = uiChrome === 'composer' ? 'composer' : 'neutral';
+  const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
+  const labelClass = uiChrome === 'composer' ? 'text-zinc-950' : 'text-gray-900';
+  const descFieldClass = uiChrome === 'composer' ? 'text-zinc-500' : 'text-gray-400';
+
+  const fieldInputOk = useMemo(
+    () =>
+      uiChrome === 'composer'
+        ? 'w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-[13px] text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-950/10'
+        : inputNormal,
+    [uiChrome],
+  );
+
+  const fieldInputErr = useMemo(
+    () =>
+      uiChrome === 'composer'
+        ? 'w-full rounded-md border border-red-200 bg-red-50/40 px-3 py-2 text-[13px] text-zinc-950 outline-none transition-colors focus:border-red-400 focus:ring-1 focus:ring-red-400/25'
+        : inputError,
+    [uiChrome],
+  );
 
   const wizardSteps = useMemo(() => {
     const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
@@ -116,8 +159,8 @@ const GenericListingForm = ({
       ...steps,
       {
         id: summaryId,
-        title: 'Review & Publish',
-        description: 'Review your listing before publishing',
+        title: 'Review',
+        description: 'Check the summary, then publish or save as draft.',
         kind: 'summary',
       },
     ];
@@ -172,6 +215,7 @@ const GenericListingForm = ({
     handleDropdownChange,
     nextStep,
     prevStep,
+    goToStep,
     validateCurrentStep,
   } = formState;
 
@@ -236,7 +280,7 @@ const GenericListingForm = ({
             options={options}
             disabled={disabled}
           />
-          {field.description && <p className="mt-1.5 text-xs text-gray-400">{field.description}</p>}
+          {field.description && <p className={`mt-1.5 text-xs ${descFieldClass}`}>{field.description}</p>}
           <FieldError error={error} />
         </div>
       );
@@ -277,6 +321,7 @@ const GenericListingForm = ({
             label={field.label}
             description={field.description}
             value={Boolean(value)}
+            chrome={toggleChrome}
             onToggle={() => {
               const next = !Boolean(value);
               if (typeof field.onChange === 'function') {
@@ -294,14 +339,14 @@ const GenericListingForm = ({
     if (field.type === 'textarea') {
       return (
         <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
-          <label className="block text-sm font-medium text-gray-900 mb-2">{label}</label>
+          <label className={`mb-2 block text-sm font-medium ${labelClass}`}>{label}</label>
           <textarea
             name={field.name}
             value={value || ''}
             onChange={handleInputChange}
             rows={field.rows || 3}
             placeholder={field.placeholder || ''}
-            className={error ? inputError : inputNormal}
+            className={error ? fieldInputErr : fieldInputOk}
             style={{resize: 'none'}}
           />
           <FieldError error={error} />
@@ -312,7 +357,7 @@ const GenericListingForm = ({
     const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
     return (
       <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
-        <label className="block text-sm font-medium text-gray-900 mb-2">{label}</label>
+        <label className={`mb-2 block text-sm font-medium ${labelClass}`}>{label}</label>
         <input
           type={inputType}
           name={field.name}
@@ -322,7 +367,7 @@ const GenericListingForm = ({
           max={field.max}
           step={field.step}
           placeholder={field.placeholder || ''}
-          className={error ? inputError : inputNormal}
+          className={error ? fieldInputErr : fieldInputOk}
         />
         <FieldError error={error} />
       </div>
@@ -350,21 +395,23 @@ const GenericListingForm = ({
     );
   };
 
-  const renderMediaLocationStep = () => (
-    <div className="space-y-6">
-      <SectionCard title="Photos" description="Upload images of your item" icon={ImageIcon}>
-        <ImageUpload
-          onImageUpload={(imageUrl) => ctx.setValue('imageUrl', imageUrl)}
-          onImageRemove={() => ctx.setValue('imageUrl', '')}
-          imageUrl={formData?.imageUrl}
-          disabled={false}
-        />
-      </SectionCard>
-      <SectionCard title="Location" description="Where is the item located?" icon={MapPin}>
-        <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
-      </SectionCard>
-    </div>
-  );
+  const renderMediaLocationStep = () => {
+    return (
+      <div className="space-y-6">
+        <SectionCard title="Photos" description="Upload images of your item" icon={ImageIcon}>
+          <ImageUpload
+            onImageUpload={(imageUrl) => ctx.setValue('imageUrl', imageUrl)}
+            onImageRemove={() => ctx.setValue('imageUrl', '')}
+            imageUrl={formData?.imageUrl}
+            disabled={false}
+          />
+        </SectionCard>
+        <SectionCard title="Location" description="Where is the item located?" icon={MapPin}>
+          <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+        </SectionCard>
+      </div>
+    );
+  };
 
   const formatSummaryValue = (field, rawValue) => {
     const text = toDisplayText(rawValue, enums, field?.enumKey);
@@ -401,39 +448,38 @@ const GenericListingForm = ({
 
     const typeLabel = listingConfig?.label || listingType;
 
+    const sumHead = 'overflow-hidden rounded-lg border border-gray-200 bg-white';
+    const sumBadge = 'inline-flex items-center rounded-md bg-gray-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-600';
+
     return (
-      <div className="space-y-4">
-        {/* Header card */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="p-6">
+      <div className="space-y-3">
+        <div className={sumHead}>
+          <div className="p-4 sm:p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-gray-100 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
-                  {typeLabel}
-                </span>
-                <h3 className="mt-2 text-lg font-bold text-gray-900 tracking-tight">{formData?.title || 'Untitled'}</h3>
+                <span className={sumBadge}>{typeLabel}</span>
+                <h3 className={`mt-2 text-base font-medium tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
                 {formData?.description && (
-                  <p className="mt-2 text-sm text-gray-500 line-clamp-3 whitespace-pre-wrap leading-relaxed">{formData.description}</p>
+                  <p className={`mt-2 whitespace-pre-wrap line-clamp-3 text-sm leading-relaxed ${descFieldClass}`}>{formData.description}</p>
                 )}
               </div>
               {formData?.imageUrl && (
-                <div className="w-24 h-24 rounded-xl border border-gray-200 overflow-hidden bg-gray-50 shrink-0 shadow-sm">
-                  <img src={formData.imageUrl} alt="Listing" className="w-full h-full object-cover" />
+                <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                  <img src={formData.imageUrl} alt="Listing" className="h-full w-full object-cover" />
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Summary sections */}
         {basics.length > 0 && (
-          <SummarySection title="Basics" icon={Package} rows={basics} />
+          <SummarySection title="Basics" icon={Package} rows={basics} tone={sectionTone} />
         )}
         {location.length > 0 && (
-          <SummarySection title="Location" icon={MapPin} rows={location} />
+          <SummarySection title="Location" icon={MapPin} rows={location} tone={sectionTone} />
         )}
         {detailFields.length > 0 && (
-          <SummarySection title="Details" icon={FileText} rows={detailFields} />
+          <SummarySection title="Details" icon={FileText} rows={detailFields} tone={sectionTone} />
         )}
       </div>
     );
@@ -445,7 +491,16 @@ const GenericListingForm = ({
 
     if (kind === 'basics') {
       const showQuantity = Boolean(step?.showQuantity);
-      return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} isEdit={isEdit} showQuantity={showQuantity} />;
+      return (
+        <ListingBasics
+          formData={formData}
+          errors={errors}
+          onInputChange={handleInputChange}
+          enums={enums}
+          showQuantity={showQuantity}
+          wizardTone={uiChrome === 'composer' ? 'composer' : 'default'}
+        />
+      );
     }
     if (kind === 'mediaLocation') return renderMediaLocationStep();
     if (kind === 'details') return renderDetailsStep(step);
@@ -481,43 +536,67 @@ const GenericListingForm = ({
 
   return (
     <ListingWizard
-      title={typeof formSchema.getTitle === 'function' ? formSchema.getTitle({isEdit, listingType}) : (isEdit ? 'Edit Listing' : 'Create Listing')}
-      subtitle={typeof formSchema.getSubtitle === 'function' ? formSchema.getSubtitle({isEdit, listingType}) : (isEdit ? 'Update your listing details' : 'Create your listing step by step')}
+      title={
+        typeof formSchema.getTitle === 'function'
+          ? formSchema.getTitle({ isEdit, listingType })
+          : isEdit
+            ? 'Edit Listing'
+            : 'Create Listing'
+      }
+      subtitle={
+        typeof formSchema.getSubtitle === 'function'
+          ? formSchema.getSubtitle({ isEdit, listingType })
+          : isEdit
+            ? 'Update your listing details'
+            : undefined
+      }
       steps={wizardSteps}
       currentStep={currentStep}
       onBack={onBack || (() => navigate(-1))}
       onNext={handleNext}
       onPrev={prevStep}
-      onSubmit={(e) => { submitIntentRef.current = 'PUBLISH'; handleSubmit(e); }}
-      onSaveDraft={!isEdit ? (e) => { submitIntentRef.current = 'DRAFT'; handleSubmit(e); } : undefined}
+      onSubmit={(e) => {
+        submitIntentRef.current = 'PUBLISH';
+        handleSubmit(e);
+      }}
+      onSaveDraft={
+        !isEdit
+          ? (e) => {
+              submitIntentRef.current = 'DRAFT';
+              handleSubmit(e);
+            }
+          : undefined
+      }
       isLoading={Boolean(isLoading)}
       canSubmit={canGoForward}
       renderStep={renderStep}
+      wizardVariant={undefined}
+      layoutViewportLocked={false}
+      onStepPick={isEdit ? undefined : (stepId) => goToStep(stepId)}
+      continueLabel="Continue"
     />
   );
 };
 
 /* ── Summary Section ────────────────────────────────────────── */
 
-const SummarySection = ({title, icon: Icon, rows}) => (
-  <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-    <div className="px-6 py-3.5 border-b border-gray-100 flex items-center gap-2.5">
-      {Icon && (
-        <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center">
-          <Icon className="w-3.5 h-3.5 text-gray-500" />
-        </div>
-      )}
-      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</h4>
+const SummarySection = ({ title, icon: Icon, rows }) => {
+  return (
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="border-b border-gray-100 bg-gray-50 px-4 py-2 flex items-center gap-2">
+        {Icon && <Icon className="h-3.5 w-3.5 text-gray-500" />}
+        <h4 className="text-[11px] font-semibold uppercase tracking-wider text-gray-600">{title}</h4>
+      </div>
+      <div className="divide-y divide-gray-100">
+        {rows.map((row) => (
+          <div key={`${row.label}-${row.value}`} className="flex items-start justify-between gap-3 px-4 py-3">
+            <span className="text-[12px] text-gray-500">{row.label}</span>
+            <span className="text-right text-[13px] font-medium tabular-nums text-gray-900">{row.value}</span>
+          </div>
+        ))}
+      </div>
     </div>
-    <div className="divide-y divide-gray-100">
-      {rows.map((row) => (
-        <div key={`${row.label}-${row.value}`} className="flex items-center justify-between px-6 py-3">
-          <span className="text-xs text-gray-400">{row.label}</span>
-          <span className="text-sm font-medium text-gray-900 text-right ml-4 tabular-nums">{row.value}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
 export default GenericListingForm;

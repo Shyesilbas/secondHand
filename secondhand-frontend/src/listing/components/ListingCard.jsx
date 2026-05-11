@@ -6,12 +6,13 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, CheckCircle2 } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
+import { useGreatSellerStatus } from '../../user/hooks/useGreatSellerStatus.js';
 
 const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false, isSelectable = false, isSelected = false, onSelectToggle = null }) => {
     const [showInfo, setShowInfo] = useState(false);
@@ -19,8 +20,14 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
     const { isInComparison } = useComparison();
 
+    const sellerId = listing?.sellerId;
+    const { data: greatSellerPayload } = useGreatSellerStatus(sellerId, {
+        staleTime: 10 * 60 * 1000,
+    });
+
     if (!listing) return null;
 
+    const isGreatSeller = Boolean(greatSellerPayload?.eligible);
     const isInCompare = isInComparison(listing.id);
     const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
     const canAddToCart = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
@@ -141,6 +148,12 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
                             Featured
                         </span>
                     )}
+                    {isGreatSeller && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-sm">
+                            <Award className="w-2.5 h-2.5 shrink-0" />
+                            Great Seller
+                        </span>
+                    )}
                     {hasCampaign && discountPct > 0 && (
                         <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white shadow-sm">
                             <TrendingDown className="w-2.5 h-2.5" />
@@ -225,16 +238,24 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
                 )}
 
                 {/* Footer */}
-                <div className="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                    {listing.sellerName && (
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-indigo-600">
+                <div className="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                    {listing.sellerName ? (
+                        <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
+                            <div className="w-5 h-5 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-indigo-600">
                                 {listing.sellerName[0]?.toUpperCase()}
                             </div>
-                            <span className="text-[11px] font-medium text-slate-500 truncate max-w-[64px]">
+                            <span
+                                className="text-[11px] font-medium text-slate-500 truncate max-w-[88px]"
+                                title={isGreatSeller ? 'Great Seller' : listing.sellerName}
+                            >
                                 {listing.sellerName}
                             </span>
+                            {isGreatSeller && (
+                                <Award className="w-3 h-3 text-amber-600 shrink-0" aria-label="Great Seller" />
+                            )}
                         </div>
+                    ) : (
+                        <div />
                     )}
                     <div className="flex items-center gap-2.5 ml-auto">
                         {listing.city && (
@@ -273,9 +294,13 @@ ListingCard.displayName = 'ListingCard';
 
 export default memo(ListingCard, (prevProps, nextProps) =>
     prevProps.listing?.id === nextProps.listing?.id &&
+    prevProps.listing?.sellerId === nextProps.listing?.sellerId &&
     prevProps.isOwner === nextProps.isOwner &&
     prevProps.currentUserId === nextProps.currentUserId &&
     prevProps.showActions === nextProps.showActions &&
     prevProps.isInShowcase === nextProps.isInShowcase &&
-    prevProps.priorityImage === nextProps.priorityImage
+    prevProps.priorityImage === nextProps.priorityImage &&
+    prevProps.isSelectable === nextProps.isSelectable &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.onSelectToggle === nextProps.onSelectToggle
 );

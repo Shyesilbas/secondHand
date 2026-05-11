@@ -10,6 +10,14 @@ export const userService = {
         return get(API_ENDPOINTS.USER.BY_ID(userId));
     },
 
+    getGreatSellerStatus: async (userId) => {
+        return get(API_ENDPOINTS.USER.GREAT_SELLER_STATUS(userId));
+    },
+
+    listGreatSellers: async (limit = 16) => {
+        return get(API_ENDPOINTS.USER.GREAT_SELLERS_LIST(limit));
+    },
+
         updatePhone: async (phoneData) => {
         const updatePhoneData = createUpdatePhoneRequest(phoneData);
         return put(API_ENDPOINTS.USER.UPDATE_PHONE, updatePhoneData);

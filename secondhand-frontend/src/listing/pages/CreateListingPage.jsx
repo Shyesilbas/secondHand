@@ -29,10 +29,12 @@ const CreateListingPage = () => {
   }
 
   return (
-    <SelectedForm
-      onBack={() => navigate(ROUTES.LISTINGS_PREFILTER_CREATE)}
-      initialData={selection}
-    />
+    <div className="w-full">
+      <SelectedForm
+        onBack={() => navigate(ROUTES.LISTINGS_PREFILTER_CREATE)}
+        initialData={selection}
+      />
+    </div>
   );
 };
 

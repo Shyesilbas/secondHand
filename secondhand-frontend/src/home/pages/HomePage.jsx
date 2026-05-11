@@ -4,6 +4,7 @@ import {HomePageTheme} from '../themes/index.js';
 
 const HeroSection = lazy(() => import('../components/HeroSection.jsx'));
 const ShowcaseSection = lazy(() => import('../components/ShowcaseSection.jsx'));
+const GreatSellersSection = lazy(() => import('../components/GreatSellersSection.jsx'));
 const TrustBand = lazy(() => import('../components/TrustBand.jsx'));
 
 const HomePage = () => {
@@ -14,6 +15,7 @@ const HomePage = () => {
       <Suspense fallback={<div className="py-10 text-center text-[13px] text-gray-400">Loading…</div>}>
         <HeroSection />
         <ShowcaseSection />
+        <GreatSellersSection />
         <TrustBand />
       </Suspense>
     </div>
